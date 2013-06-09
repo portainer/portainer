@@ -33,10 +33,28 @@
                 <td>Running:</td>
                 <td>{{ container.State.Running }}</td>
             </tr>
-
         </tbody>
     </table>
     
+    <div class="row-fluid">
+        <div class="span1">
+            Changes:
+        </div>
+        <div class="span5">
+            <i class="icon-refresh" style="width:32px;height:32px;" ng-click="getChanges()"></i>
+        </div>
+    </div> 
+
+    <div class="well well-large">
+        <ul>
+            <li ng-repeat="change in changes">
+                <strong>{{ change.Path }}</strong> {{ change.Kind }}
+            </li>
+        </ul>
+    </div>
+
+    <hr />
+
     <div class="btn-remove">
         <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="remove()">Remove Container</button>
     </div>
