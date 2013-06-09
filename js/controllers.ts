@@ -87,10 +87,19 @@ class ContainerController extends ContainerControllerBase {
         $scope.start = () => this.start($scope, $routeParams, Container);
         $scope.stop = () => this.stop($scope, $routeParams, Container);
         $scope.remove = () => this.remove($scope, $routeParams, Container);
+        $scope.changes = [];
+
+        $scope.getChanges = () => {
+            Container.changes({id: $routeParams.id}, (d) => {
+                $scope.changes = d;        
+            });
+        };
 
         Container.get({id: $routeParams.id}, (d) => {
             $scope.container = d;        
        }); 
+
+       $scope.getChanges();
     }
 }
 

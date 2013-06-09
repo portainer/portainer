@@ -96,11 +96,20 @@ var ContainerController = (function (_super) {
         $scope.remove = function () {
             return _this.remove($scope, $routeParams, Container);
         };
+        $scope.changes = [];
+        $scope.getChanges = function () {
+            Container.changes({
+                id: $routeParams.id
+            }, function (d) {
+                $scope.changes = d;
+            });
+        };
         Container.get({
             id: $routeParams.id
         }, function (d) {
             $scope.container = d;
         });
+        $scope.getChanges();
     }
     return ContainerController;
 })(ContainerControllerBase);

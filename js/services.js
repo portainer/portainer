@@ -47,8 +47,9 @@ angular.module('dockerui.services', [
         changes: {
             method: 'GET',
             params: {
-                action: 'chagnes'
-            }
+                action: 'changes'
+            },
+            isArray: true
         },
         create: {
             method: 'POST',
