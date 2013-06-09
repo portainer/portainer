@@ -1,0 +1,21 @@
+
+<h2>Images:</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Tag</th>
+            <th>Repository</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="image in images | orderBy:predicate">
+            <td><a href="/#/images/{{ image.Id }}/">{{ image.Id|truncate:10}}</a></td>
+            <td>{{ image.Tag }}</td>
+            <td>{{ image.Repository }}</td>
+            <td>{{ image.Created|getdate }}</td>
+        </tr>
+    </tbody>
+</table>

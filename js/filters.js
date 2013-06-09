@@ -24,4 +24,11 @@ angular.module('dockerui.filters', [])
             }
             return 'success';
         };
+    })
+    .filter('getdate', function() {
+        return function(data) {
+            //Multiply by 1000 for the unix format
+            var date = new Date(data * 1000);
+            return date.toDateString();
+        };    
     });

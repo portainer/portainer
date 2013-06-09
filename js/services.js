@@ -19,11 +19,11 @@ angular.module('dockerui.services', ['ngResource'])
     .factory('Image', function($resource, DOCKER_ENDPOINT) {
         // Resource for docker images
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#images
-        return $resource(DOCKER_ENDPOINT + '/images/:name/:action', {}, {
+        return $resource(DOCKER_ENDPOINT + '/images/:id/:action', {}, {
             query: {method: 'GET', params:{ all: 0, action: 'json'}, isArray: true},
             get :{method: 'GET', params: { action:'json'}},
             search :{method: 'GET', params: { action:'search'}},
-            history :{method: 'GET', params: { action:'history'}},
+            history :{method: 'GET', params: { action:'history'}, isArray: true},
             create :{method: 'POST', params: {action:'create'}},
             insert :{method: 'POST', params: {action:'insert'}},
             push :{method: 'POST', params: {action:'push'}},

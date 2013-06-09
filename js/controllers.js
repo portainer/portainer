@@ -90,3 +90,42 @@ function ContainersController($scope, Container) {
         $scope.containers = d;        
    }); 
 }
+
+function ImagesController($scope, Image) {
+   
+    $scope.predicate = '-Created';
+    Image.query({}, function(d) {
+        $scope.images = d;
+    });    
+}
+
+function ImageController($scope, $routeParams, Image) {
+    $scope.history = [];
+    $scope.tag = {tag: '', repo: '', force: false};
+    $scope.remove = function() {
+        if (confirm("Are you sure you want to delete this image?")) {
+            Image.remove({id: $routeParams.id}, function(d) {
+                $scope.response = d;
+            }); 
+        }
+    };
+
+    $scope.getHistory = function() {
+        Image.history({id: $routeParams.id}, function(d) {
+            $scope.history = d;    
+        });    
+    };
+
+    $scope.updateTag = function() {
+        var tag = $scope.tag;
+        Image.tag({id: $routeParams.id, tag: tag.tag, repo: tag.repo, force: tag.force ? 1 : 0}, function(d) {
+            $scope.response = d;    
+        });
+    };
+    
+    Image.get({id: $routeParams.id}, function(d) {
+        $scope.image = d;
+    });
+
+    $scope.getHistory();
+}
