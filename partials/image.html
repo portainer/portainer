@@ -61,11 +61,9 @@
     <div class="row-fluid">
         <form>
             <fieldset>
-                <legend>Add Tag</legend> 
-                <label>Tag:</label>
-                <input type="text" placeholder="Tag..." ng-model="tag.tag" />
+                <legend>Tag to Repo</legend> 
                 <label>Repo:</label>
-                <input type="text" placeholder="Repo..." ng-model="tag.repo" />
+                <input type="text" placeholder="Repo..." ng-model="tag.repo" required>
                 <label class="checkbox">
                       <input type="checkbox" ng-model="tag.force"/> Force?
                  </label>

@@ -49,16 +49,22 @@ function SettingsController() {
 }
 
 function ContainerController($scope, $routeParams, Container) {
+    $('#response').hide();
 
     $scope.start = function(){
         Container.start({id: $routeParams.id}, function(d) {
             $scope.response = d;        
+            $('#response').show();
+            setTimeout($('#response').hide, 5000);
         });     
     };
 
     $scope.stop = function() {
+        
         Container.stop({id: $routeParams.id}, function(d) {
             $scope.response = d;        
+            $('#response').show();
+            setTimeout($('#response').hide, 5000);
         });
     };
 
@@ -85,11 +91,26 @@ function ContainerController($scope, $routeParams, Container) {
    $scope.getChanges();
 }
 
-function ContainersController($scope, Container) {
-    Container.query({}, function(d) {
-        $scope.containers = d;        
-   }); 
-}
+function ContainersController($scope, Container, Settings) {
+    $scope.displayAll = Settings.displayAll;
+    $scope.predicate = '-Created';
+    var update = function(data) {
+        Container.query(data, function(d) {
+            $scope.containers = d;        
+        }); 
+    };
+   
+    $scope.toggleGetAll = function() {
+        Settings.displayAll = $scope.displayAll;
+        var u = update;
+        var data = {all: 0};
+        if ($scope.displayAll) {
+            data.all = 1;
+        }
+        u(data);
+    };
+    update({all: $scope.displayAll ? 1 : 0}); 
+   }
 
 function ImagesController($scope, Image) {
    
@@ -101,7 +122,7 @@ function ImagesController($scope, Image) {
 
 function ImageController($scope, $routeParams, Image) {
     $scope.history = [];
-    $scope.tag = {tag: '', repo: '', force: false};
+    $scope.tag = {repo: '', force: false};
     $scope.remove = function() {
         if (confirm("Are you sure you want to delete this image?")) {
             Image.remove({id: $routeParams.id}, function(d) {
@@ -118,7 +139,7 @@ function ImageController($scope, $routeParams, Image) {
 
     $scope.updateTag = function() {
         var tag = $scope.tag;
-        Image.tag({id: $routeParams.id, tag: tag.tag, repo: tag.repo, force: tag.force ? 1 : 0}, function(d) {
+        Image.tag({id: $routeParams.id, repo: tag.repo, force: tag.force ? 1 : 0}, function(d) {
             $scope.response = d;    
         });
     };

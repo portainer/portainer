@@ -1,4 +1,8 @@
 <div class="detail">
+    <div id="response" class="alert alert-block">
+        
+    </div>
+
     <h4>Container: {{ container.Id }}</h4>
 
     <div class="btn-group detail">
@@ -26,7 +30,7 @@
             </tr>
             <tr>
                 <td>Image:</td>
-                <td><a href="#">{{ container.Image }}</a></td>
+                <td><a href="/#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
             </tr>
             <tr>
                 <td>Running:</td>

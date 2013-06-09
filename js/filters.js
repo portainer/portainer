@@ -21,6 +21,8 @@ angular.module('dockerui.filters', [])
         return function(text) {
             if (text === 'Ghost') {
                 return 'important';
+            } else if (text.indexOf('Exit') != -1 && text !== 'Exit 0') {
+                return 'warning';
             }
             return 'success';
         };

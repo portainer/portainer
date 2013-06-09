@@ -7,13 +7,13 @@ angular.module('dockerui.services', ['ngResource'])
         return $resource(DOCKER_ENDPOINT + '/containers/:id/:action', {}, {
             query: {method: 'GET', params:{ all: 0, action: 'json'}, isArray: true},
             get :{method: 'GET', params: { action:'json'}},
-            start: {method: 'POST', params: { action: 'start'}},
-            stop: {method: 'POST', params: {t: 5, action: 'stop'}},
-            restart: {method: 'POST', params: {t: 5, action: 'restart' }},
-            kill :{method: 'POST', params: {action:'kill'}},
+            start: {method: 'POST', params: {id: '@id', action: 'start'}},
+            stop: {method: 'POST', params: {id: '@id', t: 5, action: 'stop'}},
+            restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart' }},
+            kill :{method: 'POST', params: {id: '@id', action:'kill'}},
             changes :{method: 'GET', params: {action:'changes'}, isArray: true},
             create :{method: 'POST', params: {action:'create'}},
-            remove :{method: 'DELETE', params: {v:0}}
+            remove :{method: 'DELETE', params: {id: '@id', v:0}}
         });
     })
     .factory('Image', function($resource, DOCKER_ENDPOINT) {
@@ -25,9 +25,14 @@ angular.module('dockerui.services', ['ngResource'])
             search :{method: 'GET', params: { action:'search'}},
             history :{method: 'GET', params: { action:'history'}, isArray: true},
             create :{method: 'POST', params: {action:'create'}},
-            insert :{method: 'POST', params: {action:'insert'}},
-            push :{method: 'POST', params: {action:'push'}},
-            tag :{method: 'POST', params: {action:'tag'}},
-            delete :{method: 'DELETE'}
+            insert :{method: 'POST', params: {id: '@id', action:'insert'}},
+            push :{method: 'POST', params: {id: '@id', action:'push'}},
+            tag :{method: 'POST', params: {id: '@id', action:'tag'}},
+            delete :{id: '@id', method: 'DELETE'}
         });
+    })
+    .factory('Settings', function() {
+        return {
+            displayAll: false    
+        };    
     });
