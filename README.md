@@ -6,7 +6,7 @@ DockerUI is a web interface to interact with the Remote API.  The goal is to pro
 ![Container](/container.png)
 
 ###Installation
-Open js/app.(ts/js - js file if you don't want to compile typescript) and change the DOCKER_ENDPOINT constant to your docker ip and port.  Then host the site like any other html/js application.
+Open js/app.js and change the DOCKER_ENDPOINT constant to your docker ip and port.  Then host the site like any other html/js application.
 
 
     .constant('DOCKER_ENDPOINT', 'http://192.168.1.9:4243\:4243');
@@ -14,7 +14,6 @@ Open js/app.(ts/js - js file if you don't want to compile typescript) and change
 
 ###Stack
 * Angular.js
-* Less
 * Flatstrap ( Flat Twitter Bootstrap )
 
 
