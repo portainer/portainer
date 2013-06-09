@@ -1,0 +1,43 @@
+
+<div class="detail">
+    <h4>Container: {{ container.Id }}</h4>
+
+    <div class="btn-group detail">
+      <button class="btn btn-success" ng-click="start()">Start</button>
+      <button class="btn btn-warning" ng-click="stop()">Stop</button>
+    </div>
+
+    <table class="table table-striped">
+         <tbody>
+            <tr>
+                <td>Created:</td>
+                <td>{{ container.Created }}</td>
+            </tr>
+            <tr>
+                <td>Path:</td>
+                <td>{{ container.Path }}</td>
+            </tr>
+            <tr>
+                <td>Args:</td>
+                <td>{{ container.Args }}</td>
+            </tr>
+            <tr>
+                <td>SysInitpath:</td>
+                <td>{{ container.SysInitPath }}</td>
+            </tr>
+            <tr>
+                <td>Image:</td>
+                <td><a href="#">{{ container.Image }}</a></td>
+            </tr>
+            <tr>
+                <td>Running:</td>
+                <td>{{ container.State.Running }}</td>
+            </tr>
+
+        </tbody>
+    </table>
+    
+    <div class="btn-remove">
+        <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="remove()">Remove Container</button>
+    </div>
+</div>

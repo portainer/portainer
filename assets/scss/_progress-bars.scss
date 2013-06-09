@@ -1,0 +1,118 @@
+//
+// Progress bars
+// --------------------------------------------------
+
+
+// ANIMATIONS
+// ----------
+
+// Webkit
+@-webkit-keyframes progress-bar-stripes {
+  from  { background-position: 40px 0; }
+  to    { background-position: 0 0; }
+}
+
+// Firefox
+@-moz-keyframes progress-bar-stripes {
+  from  { background-position: 40px 0; }
+  to    { background-position: 0 0; }
+}
+
+// IE9
+@-ms-keyframes progress-bar-stripes {
+  from  { background-position: 40px 0; }
+  to    { background-position: 0 0; }
+}
+
+// Opera
+@-o-keyframes progress-bar-stripes {
+  from  { background-position: 0 0; }
+  to    { background-position: 40px 0; }
+}
+
+// Spec
+@keyframes progress-bar-stripes {
+  from  { background-position: 40px 0; }
+  to    { background-position: 0 0; }
+}
+
+
+
+// THE BARS
+// --------
+
+// Outer container
+.progress {
+  overflow: hidden;
+  height: $baseLineHeight;
+  margin-bottom: $baseLineHeight;
+  @include gradient-vertical(#f5f5f5, #f9f9f9);
+}
+
+// Bar of progress
+.progress .bar {
+  width: 0%;
+  height: 100%;
+  color: $white;
+  float: left;
+  font-size: 12px;
+  text-align: center;
+  text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+  @include gradient-vertical(#149bdf, #0480be);
+  @include box-sizing(border-box);
+  @include transition(width .6s ease);
+}
+.progress .bar + .bar {
+}
+
+// Striped bars
+.progress-striped .bar {
+  @include gradient-striped(#149bdf);
+  @include background-size(40px 40px);
+}
+
+// Call animation for the active one
+.progress.active .bar {
+  -webkit-animation: progress-bar-stripes 2s linear infinite;
+     -moz-animation: progress-bar-stripes 2s linear infinite;
+      -ms-animation: progress-bar-stripes 2s linear infinite;
+       -o-animation: progress-bar-stripes 2s linear infinite;
+          animation: progress-bar-stripes 2s linear infinite;
+}
+
+
+
+// COLORS
+// ------
+
+// Danger (red)
+.progress-danger .bar, .progress .bar-danger {
+  @include gradient-vertical(#ee5f5b, #c43c35);
+}
+.progress-danger.progress-striped .bar, .progress-striped .bar-danger {
+  @include gradient-striped(#ee5f5b);
+}
+
+// Success (green)
+.progress-success .bar, .progress .bar-success {
+  @include gradient-vertical(#62c462, #57a957);
+}
+.progress-success.progress-striped .bar, .progress-striped .bar-success {
+  @include gradient-striped(#62c462);
+}
+
+// Info (teal)
+.progress-info .bar, .progress .bar-info {
+  @include gradient-vertical(#5bc0de, #339bb9);
+}
+.progress-info.progress-striped .bar, .progress-striped .bar-info {
+  @include gradient-striped(#5bc0de);
+}
+
+// Warning (orange)
+.progress-warning .bar, .progress .bar-warning {
+  @include gradient-vertical(lighten($orange, 15%), $orange);
+}
+.progress-warning.progress-striped .bar, .progress-striped .bar-warning {
+  @include gradient-striped(lighten($orange, 15%));
+}

@@ -1,0 +1,23 @@
+
+<h2>Containers:</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Image</th>
+            <th>Command</th>
+            <th>Created</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="container in containers">
+            <td><a href="/#/containers/{{ container.Id }}/">{{ container.Id|truncate:10}}</a></td>
+            <td>{{ container.Image }}</td>
+            <td>{{ container.Command }}</td>
+            <td>{{ container.Created }}</td>
+            <td><span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span></td>
+        </tr>
+    </tbody>
+</table>
