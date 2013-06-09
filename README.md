@@ -16,7 +16,6 @@ Open js/app.(ts/js - js file if you don't want to compile typescript) and change
 * Angular.js
 * Less
 * Flatstrap ( Flat Twitter Bootstrap )
-* Typescript ( I'm debating if this is providing any value. )
 
 
 ###License - MIT
