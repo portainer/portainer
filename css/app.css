@@ -3,7 +3,6 @@
     padding-bottom: 60px;
   }
 
-  /* Custom container */
   .container {
     margin: 0 auto;
     max-width: 1000px;
@@ -12,7 +11,6 @@
     margin: 60px 0;
   }
 
-  /* Main marketing message and sign up button */
   .jumbotron {
     margin: 80px 0;
     text-align: center;
@@ -30,7 +28,6 @@
     padding: 14px 24px;
   }
 
-  /* Supporting marketing content */
   .marketing {
     margin: 60px 0;
   }
@@ -38,8 +35,6 @@
     margin-top: 28px;
   }
 
-
-  /* Customize the navbar links to be fill the entire space of the .navbar */
   .navbar .navbar-inner {
     padding: 0;
   }

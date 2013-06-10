@@ -1,5 +1,4 @@
 
-// Controller for the top masthead
 function MastheadController($scope) {
     $scope.template = 'partials/masthead.html';
 
@@ -86,7 +85,6 @@ function SettingsController($scope, Auth, System, Docker, Settings) {
     });
 }
 
-// Controls the page that displays a single container and actions on that container.
 function ContainerController($scope, $routeParams, $location, Container) {
     $('#response').hide();
     $scope.alertClass = 'block';
@@ -174,7 +172,6 @@ function ContainerController($scope, $routeParams, $location, Container) {
    $scope.getChanges();
 }
 
-// Controller for the list of containers
 function ContainersController($scope, Container, Settings) {
     $scope.displayAll = Settings.displayAll;
     $scope.predicate = '-Created';
@@ -199,7 +196,6 @@ function ContainersController($scope, Container, Settings) {
     update({all: $scope.displayAll ? 1 : 0}); 
 }
 
-// Controller for the list of images
 function ImagesController($scope, Image) {
     $scope.predicate = '-Created';
 
@@ -208,7 +204,6 @@ function ImagesController($scope, Image) {
     });    
 }
 
-// Controller for a single image and actions on that image
 function ImageController($scope, $routeParams, $location, Image) {
     $scope.history = [];
     $scope.tag = {repo: '', force: false};
