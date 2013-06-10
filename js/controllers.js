@@ -38,12 +38,56 @@ function HomeController() {
     
 }
 
-function SettingsController($scope, Settings) {
-    
+function SettingsController($scope, Auth, System, Docker, Settings) {
+    $scope.auth = {};
+    $scope.info = {};
+    $scope.docker = {};
+
+    $('#response').hide();
+    $scope.alertClass = 'block';
+
+    var showAndHide = function(hide) {
+        $('#response').show();
+        if (hide) {
+            setTimeout(function() { $('#response').hide();}, 5000);
+        }
+    };
+
+    $scope.updateAuthInfo = function() {
+        if ($scope.auth.password != $scope.auth.cpassword) {
+            $scope.response = 'Your passwords do not match.';
+            showAndHide(true);
+            return;
+        }
+        Auth.update(
+            {username: $scope.auth.username, email: $scope.auth.email, password: $scope.auth.password}, function(d) {
+                console.log(d);
+                $scope.alertClass = 'success';
+                $scope.response = 'Auth information updated.';
+                showAndHide(true);
+            }, function(e) {
+               console.log(e);
+               $scope.alertClass = 'error';
+               $scope.response = e.data;
+               showAndHide(false);
+            });    
+    }; 
+
+    Auth.get({}, function(d) {
+        $scope.auth = d;     
+    });
+
+    Docker.get({}, function(d) {
+        $scope.docker = d;
+    });
+
+    System.get({}, function(d) {
+        $scope.info = d;
+    });
 }
 
 // Controls the page that displays a single container and actions on that container.
-function ContainerController($scope, $routeParams, Container) {
+function ContainerController($scope, $routeParams, $location, Container) {
     $('#response').hide();
     $scope.alertClass = 'block';
 
@@ -82,6 +126,20 @@ function ContainerController($scope, $routeParams, Container) {
         });
     };
 
+    $scope.kill = function() {
+        Container.kill({id: $routeParams.id}, function(d) {
+            console.log(d);
+            $scope.alertClass = 'success';
+            $scope.response = 'Container killed.';
+            showAndHide(true);
+        }, function(e) {
+            console.log(e);
+            $scope.alertClass = 'error';
+            $scope.response = e.data;
+            showAndHide(false);
+        });
+    };
+
     $scope.remove = function() {
         if (confirm("Are you sure you want to remove the container?")) {
             Container.remove({id: $routeParams.id}, function(d) {
@@ -108,6 +166,9 @@ function ContainerController($scope, $routeParams, Container) {
 
     Container.get({id: $routeParams.id}, function(d) {
         $scope.container = d;        
+   }, function(e) {
+        console.log(e);
+        $location.path('/containers/');
    }); 
 
    $scope.getChanges();
@@ -148,7 +209,7 @@ function ImagesController($scope, Image) {
 }
 
 // Controller for a single image and actions on that image
-function ImageController($scope, $routeParams, Image) {
+function ImageController($scope, $routeParams, $location, Image) {
     $scope.history = [];
     $scope.tag = {repo: '', force: false};
 
@@ -201,6 +262,9 @@ function ImageController($scope, $routeParams, Image) {
     
     Image.get({id: $routeParams.id}, function(d) {
         $scope.image = d;
+    }, function(e) {
+        console.log(e);
+        $location.path('/images/');
     });
 
     $scope.getHistory();

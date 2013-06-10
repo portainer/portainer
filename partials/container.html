@@ -8,6 +8,7 @@
     <div class="btn-group detail">
       <button class="btn btn-success" ng-click="start()">Start</button>
       <button class="btn btn-warning" ng-click="stop()">Stop</button>
+      <button class="btn btn-danger" ng-click="kill()">Kill</button>
     </div>
 
     <table class="table table-striped">
@@ -33,8 +34,8 @@
                 <td><a href="/#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
             </tr>
             <tr>
-                <td>Running:</td>
-                <td>{{ container.State.Running }}</td>
+                <td>State:</td>
+                <td><span class="label {{ container.State|getstatelabel }}">{{ container.State|getstatetext }}</span></td>
             </tr>
         </tbody>
     </table>

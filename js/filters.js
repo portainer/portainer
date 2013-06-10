@@ -27,6 +27,32 @@ angular.module('dockerui.filters', [])
             return 'success';
         };
     })
+    .filter('getstatetext', function() {
+        return function(state) {
+            if (state == undefined) return '';
+
+            if (state.Ghost && state.Running) {
+                return 'Ghost';
+            }
+            if (state.Running) {
+                return 'Running';
+            }
+            return 'Stopped';
+        };
+    })
+    .filter('getstatelabel', function() {
+        return function(state) {
+            if (state == undefined) return '';
+
+            if (state.Ghost && state.Running) {
+                return 'label-important';
+            }
+            if (state.Running) {
+                return 'label-success';
+            }
+            return '';
+        };
+    })
     .filter('getdate', function() {
         return function(data) {
             //Multiply by 1000 for the unix format

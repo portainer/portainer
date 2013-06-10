@@ -31,6 +31,28 @@ angular.module('dockerui.services', ['ngResource'])
             delete :{id: '@id', method: 'DELETE'}
         });
     })
+    .factory('Docker', function($resource, DOCKER_ENDPOINT) {
+        // Information for docker
+        // http://docs.docker.io/en/latest/api/docker_remote_api.html#display-system-wide-information
+        return $resource(DOCKER_ENDPOINT + '/version', {}, {
+            get: {method: 'GET'}
+        });
+    })
+    .factory('Auth', function($resource, DOCKER_ENDPOINT) {
+        // Auto Information for docker
+        // http://docs.docker.io/en/latest/api/docker_remote_api.html#set-auth-configuration
+        return $resource(DOCKER_ENDPOINT + '/auth', {}, {
+            get: {method: 'GET'},
+            update: {method: 'POST'}
+        });
+    })
+    .factory('System', function($resource, DOCKER_ENDPOINT) {
+        // System for docker
+        // http://docs.docker.io/en/latest/api/docker_remote_api.html#display-system-wide-information
+        return $resource(DOCKER_ENDPOINT + '/info', {}, {
+            get: {method: 'GET'}
+        });
+    })
     .factory('Settings', function() {
         return {
             displayAll: false    
