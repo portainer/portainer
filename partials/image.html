@@ -1,4 +1,9 @@
 <div class="detail">
+
+    <div id="response" class="alert alert-{{ alertClass }}">
+        {{ response }}        
+    </div>
+
     <h4>Image: {{ image.id }}</h4>
 
     <table class="table table-striped">
@@ -67,7 +72,7 @@
                 <label class="checkbox">
                       <input type="checkbox" ng-model="tag.force"/> Force?
                  </label>
-                 <input type="button" ng-click="updateTag()" value="Update" />
+                 <input type="button" ng-click="updateTag()" value="Update" class="btn btn-info"/>
             </fieldset>
         </form>
     </div>
