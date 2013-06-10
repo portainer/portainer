@@ -1,0 +1,89 @@
+<div class="detail">
+
+    <div id="response" class="alert alert-{{ alertClass }}">
+        {{ response }}        
+    </div>
+
+    <h4>Image: {{ image.id }}</h4>
+
+    <table class="table table-striped">
+         <tbody>
+            <tr>
+                <td>Created:</td>
+                <td>{{ image.created }}</td>
+            </tr>
+            <tr>
+                <td>Parent:</td>
+                <td><a href="/#/images/{{ image.parent }}/">{{ image.parent }}</a></td>
+            </tr>
+            <tr>
+                <td>Container:</td>
+                <td><a href="/#/containers/{{ image.container }}/">{{ image.container }}</a></td>
+            </tr>
+            <tr>
+                <td>Hostname:</td>
+                <td>{{ image.container_config.Hostname }}</td>
+            </tr>
+            <tr>
+                <td>User:</td>
+                <td>{{ image.container_config.User }}</td>
+            </tr>
+            <tr>
+                <td>Cmd:</td>
+                <td>{{ image.container_config.Cmd }}</td>
+            </tr>
+            <tr>
+                <td>Volumes:</td>
+                <td>{{ image.container_config.Volumes }}</td>
+            </tr>
+            <tr>
+                <td>Volumes from:</td>
+                <td>{{ image.container_config.VolumesFrom }}</td>
+            </tr>
+
+        </tbody>
+    </table>
+    
+    <div class="row-fluid">
+        <div class="span1">
+            History:
+        </div>
+        <div class="span5">
+            <i class="icon-refresh" style="width:32px;height:32px;" ng-click="getHistory()"></i>
+        </div>
+    </div> 
+
+    <div class="well well-large">
+        <ul>
+            <li ng-repeat="change in history">
+                <strong>{{ change.Id }}</strong>: Created: {{ change.Created|getdate }} Created by: {{ change.CreatedBy }}
+            </li>
+        </ul>
+    </div>
+
+    <hr />
+
+    <div class="row-fluid">
+        <form>
+            <fieldset>
+                <legend>Tag to Repo</legend> 
+                <label>Repo:</label>
+                <input type="text" placeholder="Repo..." ng-model="tag.repo" required>
+                <label class="checkbox">
+                      <input type="checkbox" ng-model="tag.force"/> Force?
+                 </label>
+                 <input type="button" ng-click="updateTag()" value="Update" class="btn btn-info"/>
+            </fieldset>
+        </form>
+    </div>
+
+    <hr />
+
+    <div ng-include="template" ng-controller="StartContainerController"></div>
+
+    <hr />
+
+    <div class="btn-remove">
+        <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="remove()">Remove Image</button>
+    </div>
+</div>

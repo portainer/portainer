@@ -1,0 +1,67 @@
+<div class="detail">
+    <div id="response" class="alert alert-{{ alertClass }}">
+        {{ response }}        
+    </div>
+
+    <h3>Docker Information</h3>
+    <div>
+        <p class="lead">
+            <strong>Version</strong>{{ docker.Version }}<br />
+            <strong>GitCommit</strong>{{ docker.GitCommit }}<br />
+            <strong>GoVersion</strong>{{ docker.GoVersion }}<br />
+        </p>
+    </div>
+
+    <table class="table table-striped">
+         <tbody>
+            <tr>
+                <td>Containers:</td>
+                <td>{{ info.Containers }}</td>
+            </tr>
+            <tr>
+                <td>Images:</td>
+                <td>{{ info.Images }}</td>
+            </tr>
+            <tr>
+                <td>Debug:</td>
+                <td>{{ info.Debug }}</td>
+            </tr>
+            <tr>
+                <td>NFd:</td>
+                <td>{{ info.NFd }}</td>
+            </tr>
+            <tr>
+                <td>NGoroutines:</td>
+                <td>{{ info.NGoroutines }}</td>
+            </tr>
+            <tr>
+                <td>MemoryLimit:</td>
+                <td>{{ info.MemoryLimit }}</td>
+            </tr>
+            <tr>
+                <td>SwapLimit:</td>
+                <td>{{ info.SwapLimit }}</td>
+            </tr>
+            <tr>
+                <td>NFd:</td>
+                <td>{{ info.NFd }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <form>
+        <fieldset>
+            <legend>Auth Information</legend>
+            <label>Username:</label>
+            <input type="text" ng-model="auth.username" required>
+            <label>Email:</label>
+            <input type="text" ng-model="auth.email" required>
+            <label>Password:</label>
+            <input type="password" ng-model="auth.password" required>
+            <label>Confirm Password:</label>
+            <input type="password" ng-model="auth.cpassword" required>
+            <br />
+            <input type="button" ng-click="updateAuthInfo()" value="Update"/>
+        </fieldset>
+    </form>
+</div>

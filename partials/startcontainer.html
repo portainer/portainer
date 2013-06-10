@@ -1,0 +1,27 @@
+
+<div>
+    {{ response }}
+</div>
+
+
+<form>
+    <fieldset>
+        <legend>Start container from Image</legend>
+
+        <label>Cmd:</label>
+        <textarea ng-model="commands" rows="6"></textarea>
+        <small>Place each command on a new line</small>
+
+        <label>Memory:</label>
+        <input type="number" ng-model="memory"/>
+
+        <label>Memory Swap:</label>
+        <input type="number" ng-model="memorySwap"/>
+
+        <label>Volumes From:</label>
+        <input type="text" ng-model="volumesFrom"/>
+
+        <br />
+        <input type="button" ng-click="launchContainer()" value="Launch" />
+    </fieldset>
+</form>
