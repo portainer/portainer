@@ -269,3 +269,46 @@ function ImageController($scope, $routeParams, $location, Image) {
 
     $scope.getHistory();
 }
+
+function StartContainerController($scope, $routeParams, $location, Container) {
+    $scope.template = 'partials/startcontainer.html';
+    $scope.memory = 0;
+    $scope.memorySwap = 0;
+    $scope.env = '';
+    $scope.dns = '';
+    $scope.volumesFrom = '';
+    $scope.commands = '';
+
+    $scope.launchContainer = function() {
+        var cmds = null;
+        if ($scope.commands !== '') {
+            cmds = $scope.commands.split('\n'); 
+        }
+        var id = $routeParams.id;
+        var ctor = Container;
+        var loc = $location;
+        var s = $scope;
+
+        Container.create({
+                Image: id, 
+                Memory: $scope.memory, 
+                MemorySwap: $scope.memorySwap, 
+                Cmd: cmds, 
+                VolumesFrom: $scope.volumesFrom
+            }, function(d) {
+                console.log(d);
+                if (d.Id) {
+                    ctor.start({id: d.Id}, function(cd) {
+                        console.log(cd);
+                        loc.path('/containers/' + d.Id + '/');
+                    }, function(e) {
+                        console.log(e); 
+                        s.resonse = e.data;
+                    });
+                }
+            }, function(e) {
+                console.log(e);
+                $scope.response = e.data; 
+        });
+    };
+}
