@@ -53,8 +53,9 @@ angular.module('dockerui.services', ['ngResource'])
             get: {method: 'GET'}
         });
     })
-    .factory('Settings', function() {
+    .factory('Settings', function(DOCKER_ENDPOINT) {
         return {
-            displayAll: false    
+            displayAll: false,
+            endpoint: DOCKER_ENDPOINT 
         };    
     });

@@ -10,4 +10,5 @@ angular.module('dockerui', ['dockerui.services', 'dockerui.filters'])
         $routeProvider.when('/settings', {templateUrl: 'partials/settings.html', controller: 'SettingsController'});
         $routeProvider.otherwise({redirectTo: '/'});
     }])
+    // This is your docker url that the api will use to make requests
     .constant('DOCKER_ENDPOINT', 'http://192.168.1.9:4243\:4243');

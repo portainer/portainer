@@ -5,6 +5,10 @@ DockerUI is a web interface to interact with the Remote API.  The goal is to pro
 
 ![Container](/container.png)
 
+
+###Goals
+* Little to no dependencies - I really want to keep this project a pure html/js app.  You can drop the docker binary on your server run so I want to be able to drop these html files on your server and go.
+
 ###Installation
 Open js/app.js and change the DOCKER_ENDPOINT constant to your docker ip and port.  Then host the site like any other html/js application.
 
