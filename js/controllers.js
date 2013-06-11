@@ -37,6 +37,16 @@ function DashboardController($scope, Container) {
     
 }
 
+function SideBarController($scope, Container, Settings) {
+    $scope.template = 'partials/sidebar.html';
+    $scope.containers = [];
+    $scope.endpoint = Settings.endpoint;
+
+    Container.query({all: 0}, function(d) {
+        $scope.containers = d;    
+    }); 
+}
+
 function SettingsController($scope, Auth, System, Docker, Settings) {
     $scope.auth = {};
     $scope.info = {};
