@@ -42,6 +42,8 @@ function SettingsController($scope, Auth, System, Docker, Settings) {
     $scope.auth = {};
     $scope.info = {};
     $scope.docker = {};
+    $scope.endpoint = Settings.endpoint;
+    $scope.apiVersion = Settings.version;
 
     $('#response').hide();
     $scope.alertClass = 'block';
