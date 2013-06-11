@@ -15,13 +15,30 @@ Open js/app.js and change the DOCKER_ENDPOINT constant to your docker ip and por
 
     .constant('DOCKER_ENDPOINT', 'http://192.168.1.9:4243\:4243');
 
+###Remote API Version
+DockerUI currently supports the v1.1 Remote API
 
 ###Stack
 * Angular.js
 * Flatstrap ( Flat Twitter Bootstrap )
 
 
+###Todo:
+I work fast so it will not be long before these changes are impelmented.
+
+* Multiple endpoints
+* Full repository support
+* Search
+* Create images via Dockerfile
+* Push files to a container
+* Unit tests
+
+
 ###License - MIT
+The DockerUI code is licensed under the MIT license. Flatstrap(bootstrap) is licensed under the Apache License v2.0 and Angular.js is licensed under MIT.
+
+
+**DockerUI:**
 Copyright (c) 2013 Michael Crosby. crosbymichael.com
 
 Permission is hereby granted, free of charge, to any person
