@@ -141,6 +141,10 @@ function ContainerController($scope, $routeParams, $location, Container) {
 
     $scope.changes = [];
 
+    $scope.hasContent = function(data) {
+        return data !== null && data !== undefined && data.length > 1;
+    };
+
     $scope.getChanges = function() {
         Container.changes({id: $routeParams.id}, function(d) {
             $scope.changes = d;        

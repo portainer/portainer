@@ -52,7 +52,7 @@
 
     <div class="well well-large">
         <ul>
-            <li ng-repeat="change in changes">
+            <li ng-repeat="change in changes | filter:hasContent">
                 <strong>{{ change.Path }}</strong> {{ change.Kind }}
             </li>
         </ul>
