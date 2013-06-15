@@ -1,8 +1,9 @@
-<div class="detail">
-    <div id="response" class="alert alert-{{ alertClass }}">
+<div id="response" class="alert alert-{{ alertClass }}">
         {{ response }}        
-    </div>
+</div>
 
+<div class="detail">
+    
     <h4>Container: {{ container.Id }}</h4>
 
     <div class="btn-group detail">
@@ -51,7 +52,7 @@
 
     <div class="well well-large">
         <ul>
-            <li ng-repeat="change in changes">
+            <li ng-repeat="change in changes | filter:hasContent">
                 <strong>{{ change.Path }}</strong> {{ change.Kind }}
             </li>
         </ul>

@@ -27,7 +27,7 @@ angular.module('dockerui.services', ['ngResource'])
             create :{method: 'POST', params: {action:'create'}},
             insert :{method: 'POST', params: {id: '@id', action:'insert'}},
             push :{method: 'POST', params: {id: '@id', action:'push'}},
-            tag :{method: 'POST', params: {id: '@id', action:'tag'}},
+            tag :{method: 'POST', params: {id: '@id', action:'tag', force: 0, repo: '@repo'}},
             delete :{id: '@id', method: 'DELETE'}
         });
     })
@@ -53,11 +53,12 @@ angular.module('dockerui.services', ['ngResource'])
             get: {method: 'GET'}
         });
     })
-    .factory('Settings', function(DOCKER_ENDPOINT, DOCKER_API_VERSION) {
+    .factory('Settings', function(DOCKER_ENDPOINT, DOCKER_API_VERSION, UI_VERSION) {
         return {
             displayAll: false,
             endpoint: DOCKER_ENDPOINT,
             version: DOCKER_API_VERSION,
-            url: DOCKER_ENDPOINT + DOCKER_API_VERSION
+            url: DOCKER_ENDPOINT + '/' + DOCKER_API_VERSION,
+            uiVersion: UI_VERSION
         };    
     });

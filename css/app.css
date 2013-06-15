@@ -87,3 +87,12 @@
   .container-bottom {
       height: 50px;
   }
+
+  .footer {
+    max-height:6px;    
+  }
+
+  #response {
+    width: 80%;
+    margin: 0 auto;
+  }
