@@ -27,7 +27,7 @@ angular.module('dockerui.services', ['ngResource'])
             create :{method: 'POST', params: {action:'create'}},
             insert :{method: 'POST', params: {id: '@id', action:'insert'}},
             push :{method: 'POST', params: {id: '@id', action:'push'}},
-            tag :{method: 'POST', params: {id: '@id', action:'tag'}},
+            tag :{method: 'POST', params: {id: '@id', action:'tag', force: 0, repo: '@repo'}},
             delete :{id: '@id', method: 'DELETE'}
         });
     })

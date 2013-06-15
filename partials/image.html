@@ -64,15 +64,15 @@
     <hr />
 
     <div class="row-fluid">
-        <form>
+        <form class="form-inline">
             <fieldset>
-                <legend>Tag to Repo</legend> 
-                <label>Repo:</label>
-                <input type="text" placeholder="Repo..." ng-model="tag.repo" required>
+                <legend>Tag image</legend>
+                <label>Tag:</label>
+                <input type="text" placeholder="repo..." ng-model="tag.repo" required>
                 <label class="checkbox">
                       <input type="checkbox" ng-model="tag.force"/> Force?
                  </label>
-                 <input type="button" ng-click="updateTag()" value="Update" class="btn btn-info"/>
+                 <input type="button" ng-click="updateTag()" value="Tag" class="btn btn-info"/>
             </fieldset>
         </form>
     </div>
