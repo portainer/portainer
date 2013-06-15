@@ -151,7 +151,10 @@ function ContainerController($scope, $routeParams, $location, Container) {
         $scope.container = d;        
    }, function(e) {
         console.log(e);
-        $location.path('/containers/');
+        setFailedResponse($scope, e.data, '#response');
+        if (e.status === 404) {
+            $('.detail').hide();
+        }
    }); 
 
    $scope.getChanges();
@@ -185,9 +188,14 @@ function ContainersController($scope, Container, Settings) {
 // Controller for the list of images
 function ImagesController($scope, Image) {
     $scope.predicate = '-Created';
+    $('#response').hide();
+    $scope.alertClass = 'block';
 
     Image.query({}, function(d) {
         $scope.images = d;
+    }, function (e) {
+        console.log(e);
+        setFailedResponse($scope, e.data, '#response');
     });    
 }
 
@@ -232,7 +240,10 @@ function ImageController($scope, $routeParams, $location, Image) {
         $scope.image = d;
     }, function(e) {
         console.log(e);
-        $location.path('/images/');
+        setFailedResponse($scope, e.data, '#response');
+        if (e.status === 404) {
+            $('.detail').hide();
+        }
     });
 
     $scope.getHistory();
