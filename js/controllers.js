@@ -37,6 +37,13 @@ function DashboardController($scope, Container) {
     
 }
 
+function StatusBarController($scope, Settings) {
+    $scope.template = 'partials/statusbar.html';
+
+    $scope.uiVersion = Settings.uiVersion;
+    $scope.apiVersion = Settings.version;
+}
+
 function SideBarController($scope, Container, Settings) {
     $scope.template = 'partials/sidebar.html';
     $scope.containers = [];
@@ -65,7 +72,7 @@ function SettingsController($scope, Auth, System, Docker, Settings) {
         Auth.update(
             {username: $scope.auth.username, email: $scope.auth.email, password: $scope.auth.password}, function(d) {
                 console.log(d);
-                setSuccessfulResponse($scope, 'Auto information updated.', '#response');
+                setSuccessfulResponse($scope, 'Auth information updated.', '#response');
             }, function(e) {
                console.log(e);
                setFailedResponse($scope, e.data, '#response');

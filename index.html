@@ -28,16 +28,12 @@
   <body>
 
     <div class="container">
+        <div ng-include="template" ng-controller="MastheadController"></div>
 
-        <div ng-include="template" ng-controller="MastheadController" ></div>
-        <div id="view" ng-view>
+        <div id="view" ng-view></div>
 
-    </div>
-    <div class="container-bottom"></div>
-     <div class="footer center well">
-        <p>Created by: <a href="http://crosbymichael.com">crosbymichael</a></p>
-    </div>
-
+        <div class="container-bottom"></div>
+        <div ng-include="template" ng-controller="StatusBarController"></div>
     </div> 
 
     <script src="../assets/js/jquery.js"></script>

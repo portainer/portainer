@@ -53,11 +53,12 @@ angular.module('dockerui.services', ['ngResource'])
             get: {method: 'GET'}
         });
     })
-    .factory('Settings', function(DOCKER_ENDPOINT, DOCKER_API_VERSION) {
+    .factory('Settings', function(DOCKER_ENDPOINT, DOCKER_API_VERSION, UI_VERSION) {
         return {
             displayAll: false,
             endpoint: DOCKER_ENDPOINT,
             version: DOCKER_API_VERSION,
-            url: DOCKER_ENDPOINT + DOCKER_API_VERSION
+            url: DOCKER_ENDPOINT + '/' + DOCKER_API_VERSION,
+            uiVersion: UI_VERSION
         };    
     });

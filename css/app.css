@@ -92,3 +92,7 @@
   .container-bottom {
       height: 50px;
   }
+
+  .footer {
+    max-height:6px;    
+  }
