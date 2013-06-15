@@ -255,17 +255,21 @@ function ImageController($scope, $routeParams, $location, Image) {
 
 function StartContainerController($scope, $routeParams, $location, Container) {
     $scope.template = 'partials/startcontainer.html';
-    $scope.memory = 0;
-    $scope.memorySwap = 0;
-    $scope.env = '';
-    $scope.dns = '';
-    $scope.volumesFrom = '';
-    $scope.commands = '';
+    $scope.config = {
+        memory: 0,
+        memorySwap: 0,
+        env: '',
+        commands: '',
+        volumesFrom: ''
+    };
+    $scope.commandPlaceholder = '["/bin/echo", "Hello world"]';
 
     $scope.launchContainer = function() {
+        $scope.response = '';
+        
         var cmds = null;
-        if ($scope.commands !== '') {
-            cmds = $scope.commands.split('\n'); 
+        if ($scope.config.commands !== '') {
+            cmds = angular.fromJson($scope.config.commands);
         }
         var id = $routeParams.id;
         var ctor = Container;
@@ -274,10 +278,10 @@ function StartContainerController($scope, $routeParams, $location, Container) {
 
         Container.create({
                 Image: id, 
-                Memory: $scope.memory, 
-                MemorySwap: $scope.memorySwap, 
+                Memory: $scope.config.memory, 
+                MemorySwap: $scope.config.memorySwap, 
                 Cmd: cmds, 
-                VolumesFrom: $scope.volumesFrom
+                VolumesFrom: $scope.config.volumesFrom
             }, function(d) {
                 console.log(d);
                 if (d.Id) {
