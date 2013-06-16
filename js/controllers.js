@@ -1,36 +1,6 @@
 
 function MastheadController($scope) {
     $scope.template = 'partials/masthead.html';
-
-    $scope.hclass = 'active';
-    $scope.cclass = '';
-    $scope.iclass = '';
-    $scope.sclass = '';
-
-    $scope.linkChange = function(link) {
-        $scope.hclass = '';
-        $scope.cclass = '';
-        $scope.iclass = '';
-        $scope.sclass = '';
-
-        //This is shitty, I need help with this crap.
-        switch(link) {
-            case 'home':
-                $scope.hclass = 'active';
-                break;
-            case 'containers':
-                $scope.cclass = 'active';
-                break;
-            case 'images':
-                $scope.iclass = 'active';
-                break;
-            case 'settings':
-                $scope.sclass = 'active';
-                break;
-            default:
-                console.log('Not supported:' + link);
-        }
-    };
 }
 
 function DashboardController($scope, Container) {
