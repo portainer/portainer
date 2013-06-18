@@ -195,8 +195,8 @@ function ImageController($scope, $routeParams, $location, Image) {
 
     $scope.getHistory = function() {
         Image.history({id: $routeParams.id}, function(d) {
-            $scope.history = d;    
-        });    
+            $scope.history = d;
+        });
     };
 
     $scope.updateTag = function() {
@@ -209,7 +209,11 @@ function ImageController($scope, $routeParams, $location, Image) {
             setFailedResponse($scope, e.data, '#response');
         });
     };
-    
+
+    $scope.create = function() {
+        $('#create-modal').modal('show');
+    };
+
     Image.get({id: $routeParams.id}, function(d) {
         $scope.image = d;
     }, function(e) {
@@ -234,9 +238,12 @@ function StartContainerController($scope, $routeParams, $location, Container) {
     };
     $scope.commandPlaceholder = '["/bin/echo", "Hello world"]';
 
-    $scope.launchContainer = function() {
+    $scope.close = function() {
+        $('#create-modal').modal('hide');
+    };
+
+    $scope.create = function() {
         $scope.response = '';
-        
         var cmds = null;
         if ($scope.config.commands !== '') {
             cmds = angular.fromJson($scope.config.commands);
@@ -257,6 +264,7 @@ function StartContainerController($scope, $routeParams, $location, Container) {
                 if (d.Id) {
                     ctor.start({id: d.Id}, function(cd) {
                         console.log(cd);
+                        $('#create-modal').modal('hide');
                         loc.path('/containers/' + d.Id + '/');
                     }, function(e) {
                         console.log(e); 
