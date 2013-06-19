@@ -1,17 +1,20 @@
-<!--<script src="/lib/ace/src/ace.js" type="text/javascript" charset="utf-8"></script>-->
+<script src="/lib/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<h2>Build image:</h2>
 
-<h2>Builder:</h2>
+<div class="detail">
+    <div id="response" class="alert alert-{{ alertClass }}">
+        {{ response }}
+    </div>
 
-<div id="response" class="alert alert-{{ alertClass }}">
-    {{ response }}
+    <div id="editor">
+
+    </div>
+
+    <script>
+        ace.config.set('basePath', '/lib/ace-builds/src-noconflict/');
+
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/clouds");
+        editor.getSession().setMode("ace/mode/batchfile");
+    </script>
 </div>
-
-<div id="editor">
-
-</div>
-
-<script>
-    var editor = ace.edit("editor");
-    editor.setTheme("/lib/ace/theme/monokai");
-    editor.getSession().setMode("/lib/ace/mode/javascript");
-</script>
