@@ -278,12 +278,15 @@ function StartContainerController($scope, $routeParams, $location, Container) {
     };
 }
 
-function BuilderController($scope, Image) {
+function BuilderController($scope, Dockerfile) {
     $scope.template = '/partials/builder.html';
 
     ace.config.set('basePath', '/lib/ace-builds/src-noconflict/');
 
     $scope.build = function() {
+        Dockerfile.build(editor.getValue(), function(e) {
+           console.log(e); 
+        });
     };
 }
 
