@@ -4,7 +4,6 @@ function MastheadController($scope) {
 }
 
 function DashboardController($scope, Container) {
-    
 }
 
 function StatusBarController($scope, Settings) {
@@ -20,7 +19,7 @@ function SideBarController($scope, Container, Settings) {
     $scope.endpoint = Settings.endpoint;
 
     Container.query({all: 0}, function(d) {
-        $scope.containers = d;    
+        $scope.containers = d;
     }); 
 }
 
@@ -46,11 +45,11 @@ function SettingsController($scope, Auth, System, Docker, Settings) {
             }, function(e) {
                console.log(e);
                setFailedResponse($scope, e.data, '#response');
-            });    
-    }; 
+            });
+    };
 
     Auth.get({}, function(d) {
-        $scope.auth = d;     
+        $scope.auth = d;
     });
 
     Docker.get({}, function(d) {
@@ -117,34 +116,36 @@ function ContainerController($scope, $routeParams, $location, Container) {
 
     $scope.getChanges = function() {
         Container.changes({id: $routeParams.id}, function(d) {
-            $scope.changes = d;        
+            $scope.changes = d;
         });
     };
 
     Container.get({id: $routeParams.id}, function(d) {
-        $scope.container = d;        
+        $scope.container = d;
    }, function(e) {
         console.log(e);
         setFailedResponse($scope, e.data, '#response');
         if (e.status === 404) {
             $('.detail').hide();
         }
-   }); 
+   });
 
    $scope.getChanges();
 }
 
 // Controller for the list of containers
-function ContainersController($scope, Container, Settings) {
+function ContainersController($scope, Container, Settings, ViewSpinner) {
     $scope.displayAll = Settings.displayAll;
     $scope.predicate = '-Created';
 
     var update = function(data) {
+        ViewSpinner.spin();
         Container.query(data, function(d) {
-            $scope.containers = d;        
-        }); 
+            $scope.containers = d;
+            ViewSpinner.stop();
+        });
     };
-   
+ 
     $scope.toggleGetAll = function() {
         Settings.displayAll = $scope.displayAll;
         var u = update;
@@ -156,11 +157,11 @@ function ContainersController($scope, Container, Settings) {
         u(data);
     };
 
-    update({all: $scope.displayAll ? 1 : 0}); 
+    update({all: $scope.displayAll ? 1 : 0});
 }
 
 // Controller for the list of images
-function ImagesController($scope, Image) {
+function ImagesController($scope, Image, ViewSpinner) {
     $scope.predicate = '-Created';
     $('#response').hide();
     $scope.alertClass = 'block';
@@ -169,11 +170,14 @@ function ImagesController($scope, Image) {
         $('#build-modal').modal('show');
     };
 
+    ViewSpinner.spin();
     Image.query({}, function(d) {
         $scope.images = d;
+        ViewSpinner.stop();
     }, function (e) {
         console.log(e);
         setFailedResponse($scope, e.data, '#response');
+        ViewSpinner.stop();
     });
 }
 
@@ -285,7 +289,7 @@ function BuilderController($scope, Dockerfile) {
 
     $scope.build = function() {
         Dockerfile.build(editor.getValue(), function(e) {
-           console.log(e); 
+           console.log(e);
         });
     };
 }

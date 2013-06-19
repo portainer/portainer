@@ -62,14 +62,23 @@ angular.module('dockerui.services', ['ngResource'])
             displayAll: false,
             endpoint: DOCKER_ENDPOINT,
             version: DOCKER_API_VERSION,
-            rawUrl: DOCKER_ENDPOINT + '/' + DOCKER_API_VERSION,
+            rawUrl: DOCKER_ENDPOINT + DOCKER_PORT + '/' + DOCKER_API_VERSION,
             uiVersion: UI_VERSION,
             url: url
         };
     })
+    .factory('ViewSpinner', function() {
+        var spinner = new Spinner();
+        var target = document.getElementById('view');
+
+       return {
+          spin: function() { spinner.spin(target); },
+          stop: function() { spinner.stop(); }
+       };
+    })
     .factory('Dockerfile', function(Settings) {
+        var url = Settings.rawUrl  + '/build'; 
         return {
-           settings: Settings,
            build: function(file, callback) {
               var data = new FormData();
               var dockerfile = new Blob([file], { type: 'text/text' });
@@ -77,7 +86,7 @@ angular.module('dockerui.services', ['ngResource'])
 
               var request = new XMLHttpRequest();
               request.onload = callback;
-              request.open('POST', 'http://192.168.1.9:4243/v1.1/build');
+              request.open('POST', url);
               request.send(data);
            }
         };
