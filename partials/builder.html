@@ -1,0 +1,17 @@
+<!--<script src="/lib/ace/src/ace.js" type="text/javascript" charset="utf-8"></script>-->
+
+<h2>Builder:</h2>
+
+<div id="response" class="alert alert-{{ alertClass }}">
+    {{ response }}
+</div>
+
+<div id="editor">
+
+</div>
+
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("/lib/ace/theme/monokai");
+    editor.getSession().setMode("/lib/ace/mode/javascript");
+</script>

@@ -101,3 +101,12 @@
     width: 80%;
     margin: 0 auto;
   }
+
+#editor { 
+    height: 300px;
+    width: 475px;
+    border: 1px solid #DDD;
+    border-radius: 4px;
+    border-bottom-right-radius: 0px;
+    margin-top: 5px;
+}

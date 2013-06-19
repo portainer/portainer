@@ -278,6 +278,10 @@ function StartContainerController($scope, $routeParams, $location, Container) {
     };
 }
 
+function BuilderController($scope, Image) {
+    $('#response').hide();
+}
+
 function setSuccessfulResponse($scope, msg, msgId) {
     $scope.alertClass = 'success';
     $scope.response = msg;

@@ -8,6 +8,7 @@ angular.module('dockerui', ['dockerui.services', 'dockerui.filters'])
         $routeProvider.when('/images/', {templateUrl: 'partials/images.html', controller: 'ImagesController'});
         $routeProvider.when('/images/:id/', {templateUrl: 'partials/image.html', controller: 'ImageController'});
         $routeProvider.when('/settings', {templateUrl: 'partials/settings.html', controller: 'SettingsController'});
+        $routeProvider.when('/build', {templateUrl: 'partials/builder.html', controller: 'BuilderController'});
         $routeProvider.otherwise({redirectTo: '/'});
     }])
     // This is your docker url that the api will use to make requests
