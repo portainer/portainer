@@ -165,14 +165,31 @@ function ImagesController($scope, Image, ViewSpinner) {
     $scope.predicate = '-Created';
     $('#response').hide();
     $scope.alertClass = 'block';
+    $scope.toggle = false;
 
     $scope.showBuilder = function() {
         $('#build-modal').modal('show');
     };
 
+    $scope.removeAction = function() {
+        angular.forEach($scope.images, function(i) { 
+            if (i.Checked) {
+                Image.remove({id: i.Id}, function(d) {
+                   console.log(d); 
+                });
+            }
+        });
+    };
+ 
+    $scope.toggleSelectAll = function() {
+        angular.forEach($scope.images, function(i) {
+            i.Checked = $scope.toggle;
+        });
+    };
+
     ViewSpinner.spin();
     Image.query({}, function(d) {
-        $scope.images = d;
+        $scope.images = d.map(function(item) { return new ImageViewModel(item); });
         ViewSpinner.stop();
     }, function (e) {
         console.log(e);
@@ -188,7 +205,7 @@ function ImageController($scope, $routeParams, $location, Image) {
 
     $('#response').hide();
     $scope.alertClass = 'block';
-    
+ 
     $scope.remove = function() {
         if (confirm("Are you sure you want to delete this image?")) {
             Image.remove({id: $routeParams.id}, function(d) {
