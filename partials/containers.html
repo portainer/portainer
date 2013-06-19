@@ -11,6 +11,7 @@
             <th>Image</th>
             <th>Command</th>
             <th>Created</th>
+            <th>Size</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -20,6 +21,7 @@
             <td><a href="/#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
             <td>{{ container.Command|truncate:40 }}</td>
             <td>{{ container.Created|getdate }}</td>
+            <td>{{ container.SizeRw|humansize }}</td>
             <td><span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span></td>
         </tr>
     </tbody>
