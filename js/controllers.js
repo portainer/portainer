@@ -68,8 +68,7 @@ function ContainerController($scope, $routeParams, $location, Container) {
 
     $scope.start = function(){
         Container.start({id: $routeParams.id}, function(d) {
-            console.log(d);
-            setSuccessfulResponse($scope, 'Container started.', '#response');
+            console.log(d); setSuccessfulResponse($scope, 'Container started.', '#response');
         }, function(e) {
             console.log(e);
             setFailedResponse($scope, e.data, '#response');
@@ -137,12 +136,29 @@ function ContainerController($scope, $routeParams, $location, Container) {
 function ContainersController($scope, Container, Settings, ViewSpinner) {
     $scope.displayAll = Settings.displayAll;
     $scope.predicate = '-Created';
+    $scope.toggle = false;
 
     var update = function(data) {
         ViewSpinner.spin();
         Container.query(data, function(d) {
-            $scope.containers = d;
+            $scope.containers = d.map(function(item) { return new ContainerViewModel(item); });
             ViewSpinner.stop();
+        });
+    };
+
+    var batch = function(items, action) {
+         angular.forEach(items, function(c) {
+           if (c.Checked) {
+               action({id: c.Id}, function(d) {
+                  console.log(d); 
+               });
+           }
+        });
+    };
+
+    $scope.toggleSelectAll = function() {
+        angular.forEach($scope.containers, function(i) {
+            i.Checked = $scope.toggle;
         });
     };
  
@@ -155,6 +171,22 @@ function ContainersController($scope, Container, Settings, ViewSpinner) {
             data.all = 1;
         }
         u(data);
+    };
+
+    $scope.startAction = function() {
+        batch($scope.containers, Container.start);
+    };
+
+    $scope.stopAction = function() {
+        batch($scope.containers, Container.stop);
+    };
+
+    $scope.killAction = function() {
+        batch($scope.containers, Container.kill);
+    };
+
+    $scope.removeAction = function() {
+        batch($scope.containers, Container.remove);
     };
 
     update({all: $scope.displayAll ? 1 : 0});
