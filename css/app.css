@@ -104,9 +104,7 @@
 
 #editor { 
     height: 300px;
-    width: 475px;
+    width: 100%;
     border: 1px solid #DDD;
-    border-radius: 4px;
-    border-bottom-right-radius: 0px;
     margin-top: 5px;
 }

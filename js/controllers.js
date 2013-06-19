@@ -165,12 +165,16 @@ function ImagesController($scope, Image) {
     $('#response').hide();
     $scope.alertClass = 'block';
 
+    $scope.showBuilder = function() {
+        $('#build-modal').modal('show');
+    };
+
     Image.query({}, function(d) {
         $scope.images = d;
     }, function (e) {
         console.log(e);
         setFailedResponse($scope, e.data, '#response');
-    });    
+    });
 }
 
 // Controller for a single image and actions on that image
@@ -238,10 +242,6 @@ function StartContainerController($scope, $routeParams, $location, Container) {
     };
     $scope.commandPlaceholder = '["/bin/echo", "Hello world"]';
 
-    $scope.close = function() {
-        $('#create-modal').modal('hide');
-    };
-
     $scope.create = function() {
         $scope.response = '';
         var cmds = null;
@@ -279,7 +279,12 @@ function StartContainerController($scope, $routeParams, $location, Container) {
 }
 
 function BuilderController($scope, Image) {
-    $('#response').hide();
+    $scope.template = '/partials/builder.html';
+
+    ace.config.set('basePath', '/lib/ace-builds/src-noconflict/');
+
+    $scope.build = function() {
+    };
 }
 
 function setSuccessfulResponse($scope, msg, msgId) {

@@ -1,10 +1,13 @@
 
+<div ng-include="template" ng-controller="BuilderController"></div>
+
 <h2>Images:</h2>
 
-    <div id="response" class="alert alert-{{ alertClass }}">
-        {{ response }}
-    </div>
-<a href="/#/build/">Build Image</a>
+<div id="response" class="alert alert-{{ alertClass }}">
+    {{ response }}
+</div>
+
+<a href="" ng-click="showBuilder()">Build Image</a>
 <table class="table table-striped">
     <thead>
         <tr>
