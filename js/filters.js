@@ -53,10 +53,20 @@ angular.module('dockerui.filters', [])
             return '';
         };
     })
+    .filter('humansize', function() {
+        return function(bytes) {
+            var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            if (bytes == 0) {
+                return 'n/a';
+            }
+            var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+            return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[[i]]; 
+        };
+    })
     .filter('getdate', function() {
         return function(data) {
             //Multiply by 1000 for the unix format
             var date = new Date(data * 1000);
             return date.toDateString();
-        };    
+        };
     });

@@ -1,25 +1,43 @@
 
 <h2>Containers:</h2>
 
-<div style="float:right;">
-    <input type="checkbox" ng-model="displayAll" ng-click="toggleGetAll()"/> Display All
+<div>
+    <ul class="nav nav-pills pull-left">
+        <li class="dropdown">
+            <a class="dropdown-toggle" id="drop4" role="button" data-toggle="dropdown" href="#">Actions <b class="caret"></b></a>
+            <ul id="menu1" class="dropdown-menu" role="menu" aria-labelledby="drop4">
+                <li><a tabindex="-1" href="" ng-click="startAction()">Start</a></li>
+                <li><a tabindex="-1" href="" ng-click="stopAction()">Stop</a></li>
+                <li><a tabindex="-1" href="" ng-click="killAction()">Kill</a></li>
+                <li><a tabindex="-1" href="" ng-click="removeAction()">Remove</a></li>
+            </ul>
+        </li>
+    </ul>
+
+    <div class="pull-right">
+        <input type="checkbox" ng-model="displayAll" ng-click="toggleGetAll()"/> Display All
+    </div>
 </div>
 <table class="table table-striped">
     <thead>
         <tr>
+            <th><input type="checkbox" ng-model="toggle" ng-click="toggleSelectAll()" /> Action</th>
             <th>Id</th>
             <th>Image</th>
             <th>Command</th>
             <th>Created</th>
+            <th>Size</th>
             <th>Status</th>
         </tr>
     </thead>
     <tbody>
         <tr ng-repeat="container in containers|orderBy:predicate">
+            <td><input type="checkbox" ng-model="container.Checked" /></td>
             <td><a href="/#/containers/{{ container.Id }}/">{{ container.Id|truncate:10}}</a></td>
             <td><a href="/#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
             <td>{{ container.Command|truncate:40 }}</td>
             <td>{{ container.Created|getdate }}</td>
+            <td>{{ container.SizeRw|humansize }}</td>
             <td><span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span></td>
         </tr>
     </tbody>

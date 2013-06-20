@@ -94,7 +94,7 @@
   }
 
   .footer {
-    max-height:6px;    
+    max-height:6px;
   }
 
   #response {
@@ -107,4 +107,9 @@
     width: 100%;
     border: 1px solid #DDD;
     margin-top: 5px;
+}
+
+.messages {
+    overflow: scroll;
+    max-height: 50px;
 }
