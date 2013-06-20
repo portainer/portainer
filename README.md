@@ -22,6 +22,8 @@ DockerUI currently supports the v1.1 Remote API
 ###Stack
 * Angular.js
 * Flatstrap ( Flat Twitter Bootstrap )
+* Spin.js
+* Ace editor
 
 
 ###Todo:
