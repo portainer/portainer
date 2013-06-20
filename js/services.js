@@ -76,6 +76,14 @@ angular.module('dockerui.services', ['ngResource'])
           stop: function() { spinner.stop(); }
        };
     })
+    .factory('Messages', function($rootScope) {
+        return {
+           event: 'messageSend',
+           send: function(msg) {
+              $rootScope.$broadcast('messageSend', msg); 
+           } 
+        };
+    })
     .factory('Dockerfile', function(Settings) {
         var url = Settings.rawUrl  + '/build'; 
         return {

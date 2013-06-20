@@ -6,6 +6,21 @@ function MastheadController($scope) {
 function DashboardController($scope, Container) {
 }
 
+function MessageController($scope, Messages) {
+    $scope.template = 'partials/messages.html';
+    $scope.messages = [];
+    $scope.$watch('messages.length', function(o, n) {
+       $('#message-display').show(); 
+    });
+
+    $scope.$on(Messages.event, function(e, msg) {
+       $scope.messages.push(msg);
+       setTimeout(function() {
+           $('#message-display').hide('slow'); 
+       }, 10000);
+    });
+}
+
 function StatusBarController($scope, Settings) {
     $scope.template = 'partials/statusbar.html';
 
@@ -20,7 +35,7 @@ function SideBarController($scope, Container, Settings) {
 
     Container.query({all: 0}, function(d) {
         $scope.containers = d;
-    }); 
+    });
 }
 
 function SettingsController($scope, Auth, System, Docker, Settings) {
@@ -193,21 +208,41 @@ function ContainersController($scope, Container, Settings, ViewSpinner) {
 }
 
 // Controller for the list of images
-function ImagesController($scope, Image, ViewSpinner) {
+function ImagesController($scope, Image, ViewSpinner, Messages) {
     $scope.predicate = '-Created';
     $('#response').hide();
     $scope.alertClass = 'block';
     $scope.toggle = false;
+    $scope.respones = [];
 
     $scope.showBuilder = function() {
         $('#build-modal').modal('show');
     };
 
     $scope.removeAction = function() {
+        ViewSpinner.spin();
+        var counter = 0;
+        var complete = function() {
+           counter = counter - 1;
+           if (counter === 0) {
+                ViewSpinner.stop();
+           }
+        };
         angular.forEach($scope.images, function(i) { 
             if (i.Checked) {
+                counter = counter + 1;
                 Image.remove({id: i.Id}, function(d) {
                    console.log(d); 
+                   angular.forEach(d, function(resource) {
+                       Messages.send({class: 'text-success', data: 'Deleted: ' + resource.Deleted});
+                   });
+                   var index = $scope.images.indexOf(i);
+                   $scope.images.splice(index, 1);
+                   complete();
+                }, function(e) {
+                   console.log(e);
+                   Messages.send({class: 'text-error', data: e.data});
+                   complete();
                 });
             }
         });
@@ -225,7 +260,7 @@ function ImagesController($scope, Image, ViewSpinner) {
         ViewSpinner.stop();
     }, function (e) {
         console.log(e);
-        setFailedResponse($scope, e.data, '#response');
+        setFailedResponses($scope, e.data, '#response');
         ViewSpinner.stop();
     });
 }
@@ -331,14 +366,16 @@ function StartContainerController($scope, $routeParams, $location, Container) {
     };
 }
 
-function BuilderController($scope, Dockerfile) {
+function BuilderController($scope, Dockerfile, Messages) {
     $scope.template = '/partials/builder.html';
 
     ace.config.set('basePath', '/lib/ace-builds/src-noconflict/');
 
     $scope.build = function() {
-        Dockerfile.build(editor.getValue(), function(e) {
-           console.log(e);
+        Dockerfile.build(editor.getValue(), function(d) {
+           Messages.send({class:'text-info', data: d});
+        }, function(e) {
+           Messages.send({class:'text-error', data: e});
         });
     };
 }
