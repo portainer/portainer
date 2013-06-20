@@ -38,91 +38,71 @@ function SideBarController($scope, Container, Settings) {
     });
 }
 
-function SettingsController($scope, Auth, System, Docker, Settings) {
+function SettingsController($scope, Auth, System, Docker, Settings, Messages) {
     $scope.auth = {};
     $scope.info = {};
     $scope.docker = {};
     $scope.endpoint = Settings.endpoint;
     $scope.apiVersion = Settings.version;
 
-    $('#response').hide();
-    $scope.alertClass = 'block';
-
     $scope.updateAuthInfo = function() {
         if ($scope.auth.password != $scope.auth.cpassword) {
-            setSuccessfulResponse($scope, 'Your passwords do not match.', '#response');
+            alert('Your passwords do not match.');
             return;
         }
-        Auth.update(
-            {username: $scope.auth.username, email: $scope.auth.email, password: $scope.auth.password}, function(d) {
-                console.log(d);
-                setSuccessfulResponse($scope, 'Auth information updated.', '#response');
+        Auth.update({
+            username: $scope.auth.username,
+            email: $scope.auth.email,
+            password: $scope.auth.password
+            }, function(d) {
+                Messages.send({class: 'text-success', data: 'Auth information updated.'});
             }, function(e) {
-               console.log(e);
-               setFailedResponse($scope, e.data, '#response');
+                Messages.send({class: 'text-error', data: e.data});
             });
     };
 
-    Auth.get({}, function(d) {
-        $scope.auth = d;
-    });
-
-    Docker.get({}, function(d) {
-        $scope.docker = d;
-    });
-
-    System.get({}, function(d) {
-        $scope.info = d;
-    });
+    Auth.get({}, function(d) { $scope.auth = d; });
+    Docker.get({}, function(d) { $scope.docker = d; });
+    System.get({}, function(d) { $scope.info = d; });
 }
 
 // Controls the page that displays a single container and actions on that container.
-function ContainerController($scope, $routeParams, $location, Container) {
-    $('#response').hide();
-    $scope.alertClass = 'block';
+function ContainerController($scope, $routeParams, $location, Container, Messages) {
+    $scope.changes = [];
 
     $scope.start = function(){
         Container.start({id: $routeParams.id}, function(d) {
-            console.log(d); setSuccessfulResponse($scope, 'Container started.', '#response');
+            Messages.send({class: 'text-success', data: 'Container started.'});
         }, function(e) {
-            console.log(e);
-            setFailedResponse($scope, e.data, '#response');
-        }); 
+            failedRequestHandler(e, Messages);
+        });
     };
 
     $scope.stop = function() {
         Container.stop({id: $routeParams.id}, function(d) {
-            console.log(d);
-            setSuccessfulResponse($scope, 'Container stopped.', '#response');
+            Messages.send({class: 'text-success', data: 'Container stopped.'});
         }, function(e) {
-            console.log(e);
-            setFailedResponse($scope, e.data, '#response');
+            failedRequestHandler(e, Messages);
         });
     };
 
     $scope.kill = function() {
         Container.kill({id: $routeParams.id}, function(d) {
-            console.log(d);
-            setSuccessfulResponse($scope, 'Container killed.', '#response');
+            Messages.send({class: 'text-success', data: 'Container killed.'});
         }, function(e) {
-            console.log(e);
-            setFailedResponse($scope, e.data, '#response');
+            failedRequestHandler(e, Messages);
         });
     };
 
     $scope.remove = function() {
         if (confirm("Are you sure you want to remove the container?")) {
             Container.remove({id: $routeParams.id}, function(d) {
-                console.log(d);
-                setSuccessfulResponse($scope, 'Container removed.', '#response');
+                Messages.send({class: 'text-success', data: 'Container removed.'});
             }, function(e){
-                console.log(e);
-                setFailedResponse($scope, e.data, '#response');
+                failedRequestHandler(e, Messages);
             });
         }
     };
-
-    $scope.changes = [];
 
     $scope.hasContent = function(data) {
         return data !== null && data !== undefined && data.length > 1;
@@ -137,8 +117,7 @@ function ContainerController($scope, $routeParams, $location, Container) {
     Container.get({id: $routeParams.id}, function(d) {
         $scope.container = d;
    }, function(e) {
-        console.log(e);
-        setFailedResponse($scope, e.data, '#response');
+        failedRequestHandler(e, Messages);
         if (e.status === 404) {
             $('.detail').hide();
         }
@@ -148,7 +127,7 @@ function ContainerController($scope, $routeParams, $location, Container) {
 }
 
 // Controller for the list of containers
-function ContainersController($scope, Container, Settings, ViewSpinner) {
+function ContainersController($scope, Container, Settings, Messages, ViewSpinner) {
     $scope.displayAll = Settings.displayAll;
     $scope.predicate = '-Created';
     $scope.toggle = false;
@@ -165,7 +144,9 @@ function ContainersController($scope, Container, Settings, ViewSpinner) {
          angular.forEach(items, function(c) {
            if (c.Checked) {
                action({id: c.Id}, function(d) {
-                  console.log(d); 
+                    Messages.send({class: 'text-success', data: d});
+               }, function(e) {
+                  failedRequestHandler(e, Messages);
                });
            }
         });
@@ -179,13 +160,12 @@ function ContainersController($scope, Container, Settings, ViewSpinner) {
  
     $scope.toggleGetAll = function() {
         Settings.displayAll = $scope.displayAll;
-        var u = update;
         var data = {all: 0};
 
         if ($scope.displayAll) {
             data.all = 1;
         }
-        u(data);
+        update(data);
     };
 
     $scope.startAction = function() {
@@ -209,11 +189,7 @@ function ContainersController($scope, Container, Settings, ViewSpinner) {
 
 // Controller for the list of images
 function ImagesController($scope, Image, ViewSpinner, Messages) {
-    $scope.predicate = '-Created';
-    $('#response').hide();
-    $scope.alertClass = 'block';
     $scope.toggle = false;
-    $scope.respones = [];
 
     $scope.showBuilder = function() {
         $('#build-modal').modal('show');
@@ -232,15 +208,14 @@ function ImagesController($scope, Image, ViewSpinner, Messages) {
             if (i.Checked) {
                 counter = counter + 1;
                 Image.remove({id: i.Id}, function(d) {
-                   console.log(d); 
                    angular.forEach(d, function(resource) {
                        Messages.send({class: 'text-success', data: 'Deleted: ' + resource.Deleted});
                    });
+                   //Remove the image from the list
                    var index = $scope.images.indexOf(i);
                    $scope.images.splice(index, 1);
                    complete();
                 }, function(e) {
-                   console.log(e);
                    Messages.send({class: 'text-error', data: e.data});
                    complete();
                 });
@@ -259,28 +234,22 @@ function ImagesController($scope, Image, ViewSpinner, Messages) {
         $scope.images = d.map(function(item) { return new ImageViewModel(item); });
         ViewSpinner.stop();
     }, function (e) {
-        console.log(e);
-        setFailedResponses($scope, e.data, '#response');
+        failedRequestHandler(e, Messages);
         ViewSpinner.stop();
     });
 }
 
 // Controller for a single image and actions on that image
-function ImageController($scope, $routeParams, $location, Image) {
+function ImageController($scope, $routeParams, $location, Image, Messages) {
     $scope.history = [];
     $scope.tag = {repo: '', force: false};
-
-    $('#response').hide();
-    $scope.alertClass = 'block';
  
     $scope.remove = function() {
         if (confirm("Are you sure you want to delete this image?")) {
             Image.remove({id: $routeParams.id}, function(d) {
-                console.log(d);
-                setSuccessfulResponse($scope, 'Image removed.', '#response');
+                Messages.send({class: 'text-success', data: 'Image removed.'});
             }, function(e) {
-                console.log(e);
-                setFailedResponse($scope, e.data, '#response');
+                failedRequestHandler(e, Messages);
             }); 
         }
     };
@@ -294,11 +263,9 @@ function ImageController($scope, $routeParams, $location, Image) {
     $scope.updateTag = function() {
         var tag = $scope.tag;
         Image.tag({id: $routeParams.id, repo: tag.repo, force: tag.force ? 1 : 0}, function(d) {
-            console.log(d);
-            setSuccessfulResponse($scope, 'Tag added.', '#response');
+            Messages.send({class: 'text-success', data: 'Tag added.'});
         }, function(e) {
-            console.log(e);
-            setFailedResponse($scope, e.data, '#response');
+            failedRequestHandler(e, Messages);
         });
     };
 
@@ -309,8 +276,7 @@ function ImageController($scope, $routeParams, $location, Image) {
     Image.get({id: $routeParams.id}, function(d) {
         $scope.image = d;
     }, function(e) {
-        console.log(e);
-        setFailedResponse($scope, e.data, '#response');
+        failedRequestHandler(e, Messages);
         if (e.status === 404) {
             $('.detail').hide();
         }
@@ -319,7 +285,7 @@ function ImageController($scope, $routeParams, $location, Image) {
     $scope.getHistory();
 }
 
-function StartContainerController($scope, $routeParams, $location, Container) {
+function StartContainerController($scope, $routeParams, $location, Container, Messages) {
     $scope.template = 'partials/startcontainer.html';
     $scope.config = {
         memory: 0,
@@ -331,7 +297,6 @@ function StartContainerController($scope, $routeParams, $location, Container) {
     $scope.commandPlaceholder = '["/bin/echo", "Hello world"]';
 
     $scope.create = function() {
-        $scope.response = '';
         var cmds = null;
         if ($scope.config.commands !== '') {
             cmds = angular.fromJson($scope.config.commands);
@@ -348,20 +313,16 @@ function StartContainerController($scope, $routeParams, $location, Container) {
                 Cmd: cmds, 
                 VolumesFrom: $scope.config.volumesFrom
             }, function(d) {
-                console.log(d);
                 if (d.Id) {
                     ctor.start({id: d.Id}, function(cd) {
-                        console.log(cd);
                         $('#create-modal').modal('hide');
                         loc.path('/containers/' + d.Id + '/');
                     }, function(e) {
-                        console.log(e); 
-                        s.resonse = e.data;
+                        failedRequestHandler(e, Messages);
                     });
                 }
             }, function(e) {
-                console.log(e);
-                $scope.response = e.data; 
+                failedRequestHandler(e, Messages);
         });
     };
 }
@@ -380,15 +341,6 @@ function BuilderController($scope, Dockerfile, Messages) {
     };
 }
 
-function setSuccessfulResponse($scope, msg, msgId) {
-    $scope.alertClass = 'success';
-    $scope.response = msg;
-    $(msgId).show();
-    setTimeout(function() { $(msgId).hide();}, 5000);
-}
-
-function setFailedResponse($scope, msg, msgId) {
-    $scope.alertClass = 'error';
-    $scope.response = msg;
-    $(msgId).show();
+function failedRequestHandler(e, Messages) {
+    Messages.send({class: 'text-error', data: e.data});
 }
