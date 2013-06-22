@@ -24,6 +24,11 @@
                 <td><a href="/#/containers/{{ image.container }}/">{{ image.container }}</a></td>
             </tr>
             <tr>
+                <td>Size:</td>
+                <td>{{ image.Size|humansize }}</td>
+            </tr>
+
+            <tr>
                 <td>Hostname:</td>
                 <td>{{ image.container_config.Hostname }}</td>
             </tr>
@@ -43,10 +48,14 @@
                 <td>Volumes from:</td>
                 <td>{{ image.container_config.VolumesFrom }}</td>
             </tr>
+            <tr>
+                <td>Comment:</td>
+                <td>{{ image.comment }}</td>
+            </tr>
 
         </tbody>
     </table>
-    
+
     <div class="row-fluid">
         <div class="span1">
             History:

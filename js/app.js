@@ -14,4 +14,4 @@ angular.module('dockerui', ['dockerui.services', 'dockerui.filters'])
     .constant('DOCKER_ENDPOINT', 'http://192.168.1.9')
     .constant('DOCKER_PORT', ':4243')
     .constant('UI_VERSION', 'v0.2')
-    .constant('DOCKER_API_VERSION', 'v1.1');
+    .constant('DOCKER_API_VERSION', 'v1.2');
