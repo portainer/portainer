@@ -1,36 +1,61 @@
 ##DockerUI
 
 ![Containers](/containers.png)
-DockerUI is a web interface to interact with the Remote API.  The goal is to provide a pure client side implementation so it is effortless to connect to docker.  This project is not complete and is under heavy development.
+DockerUI is a web interface to interact with the Remote API.  The goal is to provide a pure client side implementation so it is effortless to connect and manage docker.  This project is not complete and is still under heavy development.
 
 ![Container](/container.png)
 
 
 ###Goals
-* Little to no dependencies - I really want to keep this project a pure html/js app.  You can drop the docker binary on your server run so I want to be able to drop these html files on your server and go.
-* Consistency - The web UI should be consistent with the commands found on the CLI. 
+* Little to no dependencies - I really want to keep this project a pure html/js app.  I know this will have to change so that I can introduce authentication and authorization along with managing multiple docker endpoints. 
+* Consistency - The web UI should be consistent with the commands found on the docker CLI.
 
-###Installation
-Open js/app.js and change the DOCKER_ENDPOINT constant to your docker ip and port.  Then host the site like any other html/js application.
+###DockerUI Container 
+[Container](https://index.docker.io/u/crosbymichael/dockerui/)
 
 
-    .constant('DOCKER_ENDPOINT', 'http://192.168.1.9:4243\:4243');
+    docker pull crosbymichael/dockerui
 
-###Remote API Version
-DockerUI currently supports the v1.1 Remote API
+This is the easiest way to run DockerUI.  To run the container make sure you have dockerd running with the -H option so that the remote api can be accessed via ip and not bound to localhost.  After you pull the container you need to run it with your dockerd ip as an argument to the dockerui command.
+
+
+    docker run -d crosbymichael/dockerui /dockerui -e="http://192.168.1.9:4243"
+
+This tells dockerui to use http://192.168.1.9:4243 to communicate to dockerd's Remote API.
+
+###Setup
+1. Make sure that you are running dockerd ( docker -d ) with the -H and [-api-enable-cors](http://docs.docker.io/en/latest/api/docker_remote_api_v1.2/#cors-requests) so that the UI can make requests to the Remote API.
+
+
+    docker -d -H="192.168.1.9:4243" -api-enable-cors
+
+
+2. Open js/app.js.  This is where you need to configure DockerUI so that it knows what ip and port your dockerd Remote API is listening on.  There are two constants in the file that you will need to set, dockerd endpoint and dockerd port.  If you have the Remote API running on port 80 then there is no need to set the port, just leave it as an empty string.  The docker_endpoint needs to be set to the url that the Remote API can be accessed on.  Please include the scheme as part of the url.
+
+
+    .constant('DOCKER_ENDPOINT', 'http://192.168.1.9')
+    .constant('DOCKER_PORT', '4243') // Docker port, leave as an empty string if no port is requred. i.e. 4243
+
+
+3. Make sure you run git submodule update --init to pull down any dependencies ( ace editor ).
+4. Use nginx or your favorite server to serve the DockerUI files.  There are not backend dependencies, DockerUI is a pure HTML JS app and can be hosted via any static file server.
+5. Everything should be good to go, if you experience any issues please report them on this repository.
+
 
 ###Stack
 * Angular.js
 * Flatstrap ( Flat Twitter Bootstrap )
+* Spin.js
+* Ace editor
 
 
 ###Todo:
 * Multiple endpoints
 * Full repository support
 * Search
-* Create images via Dockerfile
 * Push files to a container
 * Unit tests
+* Authentication and Authorization
 
 
 ###License - MIT

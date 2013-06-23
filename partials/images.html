@@ -1,13 +1,21 @@
 
+<div ng-include="template" ng-controller="BuilderController"></div>
+
 <h2>Images:</h2>
 
-    <div id="response" class="alert alert-{{ alertClass }}">
-        {{ response }}        
-    </div>
-
+<ul class="nav nav-pills">
+    <li class="active"><a href="" ng-click="showBuilder()">Build Image</a></li>
+    <li class="dropdown">
+        <a class="dropdown-toggle" id="drop4" role="button" data-toggle="dropdown" href="#">Actions <b class="caret"></b></a>
+        <ul id="menu1" class="dropdown-menu" role="menu" aria-labelledby="drop4">
+            <li><a tabindex="-1" href="" ng-click="removeAction()">Remove</a></li>
+        </ul>
+    </li>
+</ul>
 <table class="table table-striped">
     <thead>
         <tr>
+            <th><input type="checkbox" ng-model="toggle" ng-click="toggleSelectAll()" /> Action</th>
             <th>Id</th>
             <th>Tag</th>
             <th>Repository</th>
@@ -16,7 +24,8 @@
     </thead>
     <tbody>
         <tr ng-repeat="image in images | orderBy:predicate">
-            <td><a href="/#/images/{{ image.Id }}/">{{ image.Id|truncate:10}}</a></td>
+            <td><input type="checkbox" ng-model="image.Checked" /></td>
+            <td><a href="/#/images/{{ image.Id }}/">{{ image.Id|truncate:20}}</a></td>
             <td>{{ image.Tag }}</td>
             <td>{{ image.Repository }}</td>
             <td>{{ image.Created|getdate }}</td>

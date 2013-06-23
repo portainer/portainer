@@ -1,10 +1,13 @@
-<div id="response" class="alert alert-{{ alertClass }}">
-        {{ response }}        
-</div>
+<div ng-include="template" ng-controller="StartContainerController"></div>
 
 <div class="detail">
-    
+ 
     <h4>Image: {{ image.id }}</h4>
+
+    <div class="btn-group detail">
+      <button class="btn btn-success" ng-click="create()">Create</button>
+    </div>
+
 
     <table class="table table-striped">
          <tbody>
@@ -20,6 +23,11 @@
                 <td>Container:</td>
                 <td><a href="/#/containers/{{ image.container }}/">{{ image.container }}</a></td>
             </tr>
+            <tr>
+                <td>Size:</td>
+                <td>{{ image.Size|humansize }}</td>
+            </tr>
+
             <tr>
                 <td>Hostname:</td>
                 <td>{{ image.container_config.Hostname }}</td>
@@ -40,10 +48,14 @@
                 <td>Volumes from:</td>
                 <td>{{ image.container_config.VolumesFrom }}</td>
             </tr>
+            <tr>
+                <td>Comment:</td>
+                <td>{{ image.comment }}</td>
+            </tr>
 
         </tbody>
     </table>
-    
+
     <div class="row-fluid">
         <div class="span1">
             History:
@@ -79,9 +91,6 @@
 
     <hr />
 
-    <div ng-include="template" ng-controller="StartContainerController"></div>
-
-    <hr />
 
     <div class="btn-remove">
         <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="remove()">Remove Image</button>

@@ -89,10 +89,23 @@
   }
 
   .footer {
-    max-height:6px;    
+    max-height:6px;
   }
 
   #response {
     width: 80%;
     margin: 0 auto;
   }
+
+#editor {
+    height: 300px;
+    width: 100%;
+    border: 1px solid #DDD;
+    margin-top: 5px;
+}
+
+.messages {
+    max-height: 50px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}

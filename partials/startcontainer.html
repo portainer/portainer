@@ -1,26 +1,28 @@
+<div id="create-modal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Create Container</h3>
+  </div>
+  <div class="modal-body">
+    <form>
+        <fieldset>
+            <legend>Start container from Image</legend>
 
-<div>
-    {{ response }}
+            <label>Cmd:</label>
+            <input type="text" placeholder="{{ commandPlaceholder }}" ng-model="config.commands"/>
+            <small>Input commands as an array</small>
+            <label>Memory:</label>
+            <input type="number" ng-model="config.memory"/>
+
+            <label>Memory Swap:</label>
+            <input type="number" ng-model="config.memorySwap"/>
+
+            <label>Volumes From:</label>
+            <input type="text" ng-model="config.volumesFrom"/>
+        </fieldset>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <a href="" class="btn btn-primary" ng-click="create()">Create</a>
+  </div>
 </div>
-
-
-<form>
-    <fieldset>
-        <legend>Start container from Image</legend>
-
-        <label>Cmd:</label>
-        <input type="text" placeholder="{{ commandPlaceholder }}" ng-model="config.commands"/>
-        <small>Input commands as an array</small>
-        <label>Memory:</label>
-        <input type="number" ng-model="config.memory"/>
-
-        <label>Memory Swap:</label>
-        <input type="number" ng-model="config.memorySwap"/>
-
-        <label>Volumes From:</label>
-        <input type="text" ng-model="config.volumesFrom"/>
-
-        <br />
-        <input type="button" ng-click="launchContainer()" value="Launch" />
-    </fieldset>
-</form>
