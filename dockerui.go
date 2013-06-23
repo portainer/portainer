@@ -6,7 +6,6 @@ import (
 	"github.com/elazarl/goproxy"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -66,12 +65,7 @@ func main() {
 
 	path := fmt.Sprintf(":%s", *port)
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	handler := createHandler(cwd)
+	handler := createHandler("/app")
 
 	log.Fatal(http.ListenAndServe(path, handler))
 }

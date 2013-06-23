@@ -8,7 +8,8 @@ RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt
 RUN apt-get update
 RUN apt-get upgrade
 
-ADD . /dockerui
+ADD . /app/
+ADD dockerui dockerui
 
 EXPOSE 9000:9000
 
