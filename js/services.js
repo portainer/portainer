@@ -80,12 +80,12 @@ angular.module('dockerui.services', ['ngResource'])
         return {
            event: 'messageSend',
            send: function(msg) {
-              $rootScope.$broadcast('messageSend', msg); 
-           } 
+              $rootScope.$broadcast('messageSend', msg);
+           }
         };
     })
     .factory('Dockerfile', function(Settings) {
-        var url = Settings.rawUrl  + '/build'; 
+        var url = Settings.rawUrl  + '/build';
         return {
            build: function(file, callback) {
               var data = new FormData();

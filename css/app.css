@@ -102,7 +102,7 @@
     margin: 0 auto;
   }
 
-#editor { 
+#editor {
     height: 300px;
     width: 100%;
     border: 1px solid #DDD;
@@ -110,6 +110,7 @@
 }
 
 .messages {
-    overflow: scroll;
     max-height: 50px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }

@@ -10,14 +10,14 @@ function MessageController($scope, Messages) {
     $scope.template = 'partials/messages.html';
     $scope.messages = [];
     $scope.$watch('messages.length', function(o, n) {
-       $('#message-display').show(); 
+       $('#message-display').show();
     });
 
     $scope.$on(Messages.event, function(e, msg) {
        $scope.messages.push(msg);
        setTimeout(function() {
-           $('#message-display').hide('slow'); 
-       }, 10000);
+           $('#message-display').hide('slow');
+       }, 30000);
     });
 }
 
@@ -38,70 +38,62 @@ function SideBarController($scope, Container, Settings) {
     });
 }
 
-function SettingsController($scope, Auth, System, Docker, Settings, Messages) {
-    $scope.auth = {};
+function SettingsController($scope, System, Docker, Settings, Messages) {
     $scope.info = {};
     $scope.docker = {};
     $scope.endpoint = Settings.endpoint;
     $scope.apiVersion = Settings.version;
 
-    $scope.updateAuthInfo = function() {
-        if ($scope.auth.password != $scope.auth.cpassword) {
-            alert('Your passwords do not match.');
-            return;
-        }
-        Auth.update({
-            username: $scope.auth.username,
-            email: $scope.auth.email,
-            password: $scope.auth.password
-            }, function(d) {
-                Messages.send({class: 'text-success', data: 'Auth information updated.'});
-            }, function(e) {
-                Messages.send({class: 'text-error', data: e.data});
-            });
-    };
-
-    Auth.get({}, function(d) { $scope.auth = d; });
     Docker.get({}, function(d) { $scope.docker = d; });
     System.get({}, function(d) { $scope.info = d; });
 }
 
 // Controls the page that displays a single container and actions on that container.
-function ContainerController($scope, $routeParams, $location, Container, Messages) {
+function ContainerController($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
     $scope.changes = [];
 
     $scope.start = function(){
+        ViewSpinner.spin();
         Container.start({id: $routeParams.id}, function(d) {
             Messages.send({class: 'text-success', data: 'Container started.'});
+            ViewSpinner.stop();
         }, function(e) {
             failedRequestHandler(e, Messages);
+            ViewSpinner.stop();
         });
     };
 
     $scope.stop = function() {
+        ViewSpinner.spin();
         Container.stop({id: $routeParams.id}, function(d) {
             Messages.send({class: 'text-success', data: 'Container stopped.'});
+            ViewSpinner.stop();
         }, function(e) {
             failedRequestHandler(e, Messages);
+            ViewSpinner.stop();
         });
     };
 
     $scope.kill = function() {
+        ViewSpinner.spin();
         Container.kill({id: $routeParams.id}, function(d) {
             Messages.send({class: 'text-success', data: 'Container killed.'});
+            ViewSpinner.stop();
         }, function(e) {
             failedRequestHandler(e, Messages);
+            ViewSpinner.stop();
         });
     };
 
     $scope.remove = function() {
-        if (confirm("Are you sure you want to remove the container?")) {
-            Container.remove({id: $routeParams.id}, function(d) {
-                Messages.send({class: 'text-success', data: 'Container removed.'});
-            }, function(e){
-                failedRequestHandler(e, Messages);
-            });
-        }
+        ViewSpinner.spin();
+        Container.remove({id: $routeParams.id}, function(d) {
+            Messages.send({class: 'text-success', data: 'Container removed.'});
+            ViewSpinner.stop();
+        }, function(e){
+            failedRequestHandler(e, Messages);
+            ViewSpinner.stop();
+        });
     };
 
     $scope.hasContent = function(data) {
@@ -141,12 +133,25 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
     };
 
     var batch = function(items, action) {
+        ViewSpinner.spin();
+        var counter = 0;
+        var complete = function() {
+            counter = counter -1;
+            if (counter === 0) {
+                ViewSpinner.stop();
+            }
+        };
          angular.forEach(items, function(c) {
            if (c.Checked) {
+               counter = counter + 1;
                action({id: c.Id}, function(d) {
-                    Messages.send({class: 'text-success', data: d});
+                    Messages.send({class: 'text-success', data: 'Container ' + c.Id + ' Removed.'});
+                    var index = $scope.containers.indexOf(c);
+                    $scope.containers.splice(index, 1);
+                    complete();
                }, function(e) {
                   failedRequestHandler(e, Messages);
+                  complete();
                });
            }
         });
@@ -157,7 +162,7 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
             i.Checked = $scope.toggle;
         });
     };
- 
+
     $scope.toggleGetAll = function() {
         Settings.displayAll = $scope.displayAll;
         var data = {all: 0};
@@ -190,6 +195,7 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
 // Controller for the list of images
 function ImagesController($scope, Image, ViewSpinner, Messages) {
     $scope.toggle = false;
+    $scope.predicate = '-Created';
 
     $scope.showBuilder = function() {
         $('#build-modal').modal('show');
@@ -204,7 +210,7 @@ function ImagesController($scope, Image, ViewSpinner, Messages) {
                 ViewSpinner.stop();
            }
         };
-        angular.forEach($scope.images, function(i) { 
+        angular.forEach($scope.images, function(i) {
             if (i.Checked) {
                 counter = counter + 1;
                 Image.remove({id: i.Id}, function(d) {
@@ -222,7 +228,7 @@ function ImagesController($scope, Image, ViewSpinner, Messages) {
             }
         });
     };
- 
+
     $scope.toggleSelectAll = function() {
         angular.forEach($scope.images, function(i) {
             i.Checked = $scope.toggle;
@@ -243,15 +249,13 @@ function ImagesController($scope, Image, ViewSpinner, Messages) {
 function ImageController($scope, $routeParams, $location, Image, Messages) {
     $scope.history = [];
     $scope.tag = {repo: '', force: false};
- 
+
     $scope.remove = function() {
-        if (confirm("Are you sure you want to delete this image?")) {
-            Image.remove({id: $routeParams.id}, function(d) {
-                Messages.send({class: 'text-success', data: 'Image removed.'});
-            }, function(e) {
-                failedRequestHandler(e, Messages);
-            }); 
-        }
+        Image.remove({id: $routeParams.id}, function(d) {
+            Messages.send({class: 'text-success', data: 'Image removed.'});
+        }, function(e) {
+            failedRequestHandler(e, Messages);
+        });
     };
 
     $scope.getHistory = function() {
@@ -307,10 +311,10 @@ function StartContainerController($scope, $routeParams, $location, Container, Me
         var s = $scope;
 
         Container.create({
-                Image: id, 
-                Memory: $scope.config.memory, 
-                MemorySwap: $scope.config.memorySwap, 
-                Cmd: cmds, 
+                Image: id,
+                Memory: $scope.config.memory,
+                MemorySwap: $scope.config.memorySwap,
+                Cmd: cmds,
                 VolumesFrom: $scope.config.volumesFrom
             }, function(d) {
                 if (d.Id) {
@@ -331,12 +335,19 @@ function BuilderController($scope, Dockerfile, Messages) {
     $scope.template = '/partials/builder.html';
 
     ace.config.set('basePath', '/lib/ace-builds/src-noconflict/');
+    var spinner = new Spinner();
 
     $scope.build = function() {
+        spinner.spin(document.getElementById('build-modal'));
         Dockerfile.build(editor.getValue(), function(d) {
-           Messages.send({class:'text-info', data: d});
+           console.log(d.currentTarget.response);
+           $scope.messages = d.currentTarget.response;
+           $scope.$apply();
+           spinner.stop();
         }, function(e) {
-           Messages.send({class:'text-error', data: e});
+           $scope.messages = e;
+           $scope.$apply();
+           spinner.stop();
         });
     };
 }
