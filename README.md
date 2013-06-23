@@ -34,7 +34,7 @@ This tells dockerui to use http://192.168.1.9:4243 to communicate to dockerd's R
 
 
     .constant('DOCKER_ENDPOINT', 'http://192.168.1.9')
-    .constant('DOCKER_PORT', '4243') // Docker port, leave as an empty string if no port is requred. i.e. 4243
+    .constant('DOCKER_PORT', ':4243') 
 
 
 3. Make sure you run git submodule update --init to pull down any dependencies ( ace editor ).
