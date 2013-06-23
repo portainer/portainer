@@ -37,8 +37,9 @@ This tells dockerui to use http://192.168.1.9:4243 to communicate to dockerd's R
     .constant('DOCKER_PORT', '4243') // Docker port, leave as an empty string if no port is requred. i.e. 4243
 
 
-3. Use nginx or your favorite server to serve the DockerUI files.  There are not backend dependencies, DockerUI is a pure HTML JS app and can be hosted via any static file server.
-4. Everything should be good to go, if you experience any issues please report them on this repository.
+3. Make sure you run git submodule update --init to pull down any dependencies ( ace editor ).
+4. Use nginx or your favorite server to serve the DockerUI files.  There are not backend dependencies, DockerUI is a pure HTML JS app and can be hosted via any static file server.
+5. Everything should be good to go, if you experience any issues please report them on this repository.
 
 
 ###Stack
