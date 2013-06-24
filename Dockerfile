@@ -11,5 +11,5 @@ RUN apt-get upgrade
 ADD . /app/
 ADD dockerui dockerui
 
-EXPOSE 9000:9000
+EXPOSE 9000
 
