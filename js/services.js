@@ -78,9 +78,30 @@ angular.module('dockerui.services', ['ngResource'])
     })
     .factory('Messages', function($rootScope) {
         return {
-           event: 'messageSend',
-           send: function(msg) {
-              $rootScope.$broadcast('messageSend', msg);
+          send: function(title, text) {
+              $.gritter.add({
+                   title: title,
+                   text: text,
+                   time: 2000,
+                   before_open: function{
+                       if($('.gritter-item-wrapper').length == 3) {
+                            return false;
+                        }  
+                    }
+
+              }); 
+           },
+           error: function(title, text) {
+                $.gritter.add({
+                    title: title,
+                    text: text,
+                    time: 6000,
+                    before_open: function{
+                       if($('.gritter-item-wrapper').length == 4) {
+                            return false;
+                        }  
+                    }
+                });
            }
         };
     })

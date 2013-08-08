@@ -15,9 +15,11 @@ function MessageController($scope, Messages) {
 
     $scope.$on(Messages.event, function(e, msg) {
        $scope.messages.push(msg);
+       var s = $scope;
        setTimeout(function() {
            $('#message-display').hide('slow');
-       }, 30000);
+           s.messages = [];
+       }, 20000);
     });
 }
 
@@ -53,46 +55,34 @@ function ContainerController($scope, $routeParams, $location, Container, Message
     $scope.changes = [];
 
     $scope.start = function(){
-        ViewSpinner.spin();
         Container.start({id: $routeParams.id}, function(d) {
-            Messages.send({class: 'text-success', data: 'Container started.'});
-            ViewSpinner.stop();
+            Messages.send("Container started", $routeParams.id);
         }, function(e) {
-            failedRequestHandler(e, Messages);
-            ViewSpinner.stop();
+            Messages.error("Failure", "Container failed to start." + e.data);
         });
     };
 
     $scope.stop = function() {
-        ViewSpinner.spin();
         Container.stop({id: $routeParams.id}, function(d) {
-            Messages.send({class: 'text-success', data: 'Container stopped.'});
-            ViewSpinner.stop();
+            Messages.success("Container stopped", $routeParams.id);
         }, function(e) {
-            failedRequestHandler(e, Messages);
-            ViewSpinner.stop();
+            Messages.error("Failure", "Container failed to stop." + e.data);
         });
     };
 
     $scope.kill = function() {
-        ViewSpinner.spin();
         Container.kill({id: $routeParams.id}, function(d) {
-            Messages.send({class: 'text-success', data: 'Container killed.'});
-            ViewSpinner.stop();
+            Messages.success("Container killed", $routeParams.id);
         }, function(e) {
-            failedRequestHandler(e, Messages);
-            ViewSpinner.stop();
+            Messages.error("Failure", "Container failed to die." + e.data);
         });
     };
 
     $scope.remove = function() {
-        ViewSpinner.spin();
         Container.remove({id: $routeParams.id}, function(d) {
-            Messages.send({class: 'text-success', data: 'Container removed.'});
-            ViewSpinner.stop();
+            Messages.success("Container removed", $routeParams.id);
         }, function(e){
-            failedRequestHandler(e, Messages);
-            ViewSpinner.stop();
+            Messages.error("Failure", "Container failed to remove." + e.data);
         });
     };
 
@@ -108,12 +98,14 @@ function ContainerController($scope, $routeParams, $location, Container, Message
 
     Container.get({id: $routeParams.id}, function(d) {
         $scope.container = d;
-   }, function(e) {
-        failedRequestHandler(e, Messages);
+    }, function(e) {
         if (e.status === 404) {
             $('.detail').hide();
+            Messages.error("Not found", "Container not found.");
+        } else {
+            Messages.error("Failure", e.data);
         }
-   });
+    });
 
    $scope.getChanges();
 }
@@ -145,13 +137,13 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
            if (c.Checked) {
                counter = counter + 1;
                action({id: c.Id}, function(d) {
-                    Messages.send({class: 'text-success', data: 'Container ' + c.Id + ' Removed.'});
+                    Messages.error("Container Removed", c.Id);
                     var index = $scope.containers.indexOf(c);
                     $scope.containers.splice(index, 1);
                     complete();
                }, function(e) {
-                  failedRequestHandler(e, Messages);
-                  complete();
+                    Messages.error("Failure", e.data);
+                    complete();
                });
            }
         });
@@ -215,14 +207,13 @@ function ImagesController($scope, Image, ViewSpinner, Messages) {
                 counter = counter + 1;
                 Image.remove({id: i.Id}, function(d) {
                    angular.forEach(d, function(resource) {
-                       Messages.send({class: 'text-success', data: 'Deleted: ' + resource.Deleted});
+                       Messages.send("Image deleted", resource.Deleted);
                    });
-                   //Remove the image from the list
                    var index = $scope.images.indexOf(i);
                    $scope.images.splice(index, 1);
                    complete();
                 }, function(e) {
-                   Messages.send({class: 'text-error', data: e.data});
+                   Messages.error("Failure", e.data);
                    complete();
                 });
             }
@@ -240,7 +231,7 @@ function ImagesController($scope, Image, ViewSpinner, Messages) {
         $scope.images = d.map(function(item) { return new ImageViewModel(item); });
         ViewSpinner.stop();
     }, function (e) {
-        failedRequestHandler(e, Messages);
+        Messages.error("Failure", e.data);
         ViewSpinner.stop();
     });
 }
@@ -252,9 +243,10 @@ function ImageController($scope, $routeParams, $location, Image, Messages) {
 
     $scope.remove = function() {
         Image.remove({id: $routeParams.id}, function(d) {
-            Messages.send({class: 'text-success', data: 'Image removed.'});
+            Messages.send("Image Removed", $routeParams.id);
         }, function(e) {
-            failedRequestHandler(e, Messages);
+            $scope.error = e.data;
+            $('#error-message').show();
         });
     };
 
@@ -267,9 +259,10 @@ function ImageController($scope, $routeParams, $location, Image, Messages) {
     $scope.updateTag = function() {
         var tag = $scope.tag;
         Image.tag({id: $routeParams.id, repo: tag.repo, force: tag.force ? 1 : 0}, function(d) {
-            Messages.send({class: 'text-success', data: 'Tag added.'});
+            Messages.send("Tag Added", $routeParams.id);
         }, function(e) {
-            failedRequestHandler(e, Messages);
+            $scope.error = e.data;
+            $('#error-message').show();
         });
     };
 
@@ -280,10 +273,13 @@ function ImageController($scope, $routeParams, $location, Image, Messages) {
     Image.get({id: $routeParams.id}, function(d) {
         $scope.image = d;
     }, function(e) {
-        failedRequestHandler(e, Messages);
         if (e.status === 404) {
             $('.detail').hide();
+            $scope.error = "Image not found.<br />" + $routeParams.id;
+        } else {
+            $scope.error = e.data;
         }
+        $('#error-message').show();
     });
 
     $scope.getHistory();

@@ -1,5 +1,9 @@
 <div ng-include="template" ng-controller="StartContainerController"></div>
 
+<div class="alert alert-error" id="error-message" style="display:none">
+    {{ error }}
+</div>
+
 <div class="detail">
  
     <h4>Image: {{ image.id }}</h4>
