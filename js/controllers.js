@@ -4,6 +4,51 @@ function MastheadController($scope) {
 }
 
 function DashboardController($scope, Container) {
+    $scope.predicate = '-Created';
+    $scope.containers = [];
+   
+    Container.query({all: 1}, function(d) {
+       var running = 0
+       var ghost = 0;
+       var stopped = 0;
+
+       for (var i = 0; i < d.length; i++) {
+           var item = d[i];
+
+           if (item.Status === "Ghost") {
+               ghost += 1;
+           } else if (item.Status.indexOf('Exit') !== -1) {
+               stopped += 1;
+           } else {
+               running += 1;
+               $scope.containers.push(new ContainerViewModel(item));
+           }
+       }
+
+      var ctx = $("#containers-chart").get(0).getContext("2d");
+      var c = new Chart(ctx);
+      var data = [
+        {
+            value: running,
+            color: '#5bb75b',
+            title: 'Running'
+        }, // running
+        {
+            value: stopped,
+            color: '#C7604C',
+            title: 'Stopped'
+        }, // stopped
+        {
+            value: ghost,
+            color: '#E2EAE9',
+            title: 'Ghost'
+        } // ghost
+      ];
+        
+      c.Doughnut(data, {}); 
+      var lgd = $('#chart-legend').get(0);
+      legend(lgd, data);
+   });
 }
 
 function MessageController($scope, Messages) {
