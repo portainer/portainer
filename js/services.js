@@ -83,7 +83,7 @@ angular.module('dockerui.services', ['ngResource'])
                    title: title,
                    text: text,
                    time: 2000,
-                   before_open: function{
+                   before_open: function() {
                        if($('.gritter-item-wrapper').length == 3) {
                             return false;
                         }  
@@ -96,7 +96,7 @@ angular.module('dockerui.services', ['ngResource'])
                     title: title,
                     text: text,
                     time: 6000,
-                    before_open: function{
+                    before_open: function() {
                        if($('.gritter-item-wrapper').length == 4) {
                             return false;
                         }  

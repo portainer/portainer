@@ -13,3 +13,4 @@ RUN ln -s /app/dockerui /dockerui
 
 EXPOSE 9000
 
+ENTRYPOINT ["/dockerui"]
