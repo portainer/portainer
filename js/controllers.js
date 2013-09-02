@@ -51,23 +51,6 @@ function DashboardController($scope, Container) {
    });
 }
 
-function MessageController($scope, Messages) {
-    $scope.template = 'partials/messages.html';
-    $scope.messages = [];
-    $scope.$watch('messages.length', function(o, n) {
-       $('#message-display').show();
-    });
-
-    $scope.$on(Messages.event, function(e, msg) {
-       $scope.messages.push(msg);
-       var s = $scope;
-       setTimeout(function() {
-           $('#message-display').hide('slow');
-           s.messages = [];
-       }, 20000);
-    });
-}
-
 function StatusBarController($scope, Settings) {
     $scope.template = 'partials/statusbar.html';
 
@@ -109,7 +92,7 @@ function ContainerController($scope, $routeParams, $location, Container, Message
 
     $scope.stop = function() {
         Container.stop({id: $routeParams.id}, function(d) {
-            Messages.success("Container stopped", $routeParams.id);
+            Messages.send("Container stopped", $routeParams.id);
         }, function(e) {
             Messages.error("Failure", "Container failed to stop." + e.data);
         });
@@ -117,7 +100,7 @@ function ContainerController($scope, $routeParams, $location, Container, Message
 
     $scope.kill = function() {
         Container.kill({id: $routeParams.id}, function(d) {
-            Messages.success("Container killed", $routeParams.id);
+            Messages.send("Container killed", $routeParams.id);
         }, function(e) {
             Messages.error("Failure", "Container failed to die." + e.data);
         });
@@ -125,7 +108,7 @@ function ContainerController($scope, $routeParams, $location, Container, Message
 
     $scope.remove = function() {
         Container.remove({id: $routeParams.id}, function(d) {
-            Messages.success("Container removed", $routeParams.id);
+            Messages.send("Container removed", $routeParams.id);
         }, function(e){
             Messages.error("Failure", "Container failed to remove." + e.data);
         });
@@ -169,7 +152,7 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
         });
     };
 
-    var batch = function(items, action) {
+    var batch = function(items, action, msg) {
         ViewSpinner.spin();
         var counter = 0;
         var complete = function() {
@@ -182,7 +165,7 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
            if (c.Checked) {
                counter = counter + 1;
                action({id: c.Id}, function(d) {
-                    Messages.error("Container Removed", c.Id);
+                    Messages.send("Container " + msg, c.Id);
                     var index = $scope.containers.indexOf(c);
                     $scope.containers.splice(index, 1);
                     complete();
@@ -211,19 +194,19 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
     };
 
     $scope.startAction = function() {
-        batch($scope.containers, Container.start);
+        batch($scope.containers, Container.start, "Started");
     };
 
     $scope.stopAction = function() {
-        batch($scope.containers, Container.stop);
+        batch($scope.containers, Container.stop, "Stopped");
     };
 
     $scope.killAction = function() {
-        batch($scope.containers, Container.kill);
+        batch($scope.containers, Container.kill, "Killed");
     };
 
     $scope.removeAction = function() {
-        batch($scope.containers, Container.remove);
+        batch($scope.containers, Container.remove, "Removed");
     };
 
     update({all: $scope.displayAll ? 1 : 0});
