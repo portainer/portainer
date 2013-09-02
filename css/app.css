@@ -110,10 +110,6 @@
     overflow-x: hidden;
 }
 
-.legend {
-    width: 7em;
-}
-
 .legend .title {
     margin: 0.5em;
     border-style: solid;
