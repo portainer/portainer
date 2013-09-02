@@ -25,9 +25,8 @@ function DashboardController($scope, Container) {
            }
        }
 
-      var ctx = $("#containers-chart").get(0).getContext("2d");
-      var c = new Chart(ctx);
-      var data = [
+       var c = getChart('#containers-chart');
+       var data = [
         {
             value: running,
             color: '#5bb75b',
@@ -49,6 +48,11 @@ function DashboardController($scope, Container) {
       var lgd = $('#chart-legend').get(0);
       legend(lgd, data);
    });
+}
+
+function getChart(id) {
+    var ctx = $(id).get(0).getContext("2d");
+    return new Chart(ctx);
 }
 
 function StatusBarController($scope, Settings) {
@@ -265,7 +269,7 @@ function ImagesController($scope, Image, ViewSpinner, Messages) {
 }
 
 // Controller for a single image and actions on that image
-function ImageController($scope, $routeParams, $location, Image, Messages) {
+function ImageController($scope, $q, $routeParams, $location, Image, Container, Messages) {
     $scope.history = [];
     $scope.tag = {repo: '', force: false};
 
@@ -300,6 +304,55 @@ function ImageController($scope, $routeParams, $location, Image, Messages) {
 
     Image.get({id: $routeParams.id}, function(d) {
         $scope.image = d;
+        if ($routeParams.tag) {
+            var promise = getContainersFromImage($q, Container, $routeParams.tag);
+
+            promise.then(function(containers) {
+                var map = {}; 
+                
+                for (var i = 0; i < containers.length; i++) {
+                    var c = containers[i];
+                    var date = new Date(c.Created * 1000).toLocaleDateString();
+                    
+                    var count = map[date];
+                    if (count === undefined) {
+                        count = 0;
+                    }
+                    console.log(map);
+                    count += 1;
+                    map[date] = count;
+                }
+
+                var labels = [];
+                var data = [];
+                var keys = Object.keys(map);
+
+                for (var i = keys.length - 1; i > -1; i--) {
+                    var k = keys[i];
+                    labels.push(k);
+                    data.push(map[k]);
+                };
+                var dataset = {
+                    fillColor : "rgba(151,187,205,0.5)",
+                    strokeColor : "rgba(151,187,205,1)",
+                    pointColor : "rgba(151,187,205,1)",
+                    pointStrokeColor : "#fff",
+                    data : data
+                };
+                console.log(labels, data);
+                var c = getChart('#containers-started-chart');
+                c.Line({
+                    labels: labels,
+                    datasets: [dataset]
+                }, 
+                {
+                    scaleStepWidth: 1, 
+                    pointDotRadius:1,
+                    scaleOverride: true,
+                    scaleSteps: labels.length
+                });
+            });
+        }
     }, function(e) {
         if (e.status === 404) {
             $('.detail').hide();
@@ -378,4 +431,22 @@ function BuilderController($scope, Dockerfile, Messages) {
 
 function failedRequestHandler(e, Messages) {
     Messages.send({class: 'text-error', data: e.data});
+}
+
+// This gonna get messy but we don't have a good way to do this right now
+function getContainersFromImage($q, Container, tag) {
+    var defer = $q.defer();
+    
+    Container.query({all:1, notruc:1}, function(d) {
+        var containers = [];
+        for (var i = 0; i < d.length; i++) {
+            var c = d[i];
+            if (c.Image == tag) {
+                containers.push(new ContainerViewModel(c));
+            }
+        }
+        defer.resolve(containers);
+    });
+
+    return defer.promise;
 }
