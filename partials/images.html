@@ -4,7 +4,6 @@
 <h2>Images:</h2>
 
 <ul class="nav nav-pills">
-    <li class="active"><a href="" ng-click="showBuilder()">Build Image</a></li>
     <li class="dropdown">
         <a class="dropdown-toggle" id="drop4" role="button" data-toggle="dropdown" href="#">Actions <b class="caret"></b></a>
         <ul id="menu1" class="dropdown-menu" role="menu" aria-labelledby="drop4">
@@ -17,7 +16,6 @@
         <tr>
             <th><input type="checkbox" ng-model="toggle" ng-click="toggleSelectAll()" /> Action</th>
             <th>Id</th>
-            <th>Tag</th>
             <th>Repository</th>
             <th>Created</th>
         </tr>
@@ -25,9 +23,8 @@
     <tbody>
         <tr ng-repeat="image in images | orderBy:predicate">
             <td><input type="checkbox" ng-model="image.Checked" /></td>
-            <td><a href="/#/images/{{ image.Id }}/">{{ image.Id|truncate:20}}</a></td>
-            <td>{{ image.Tag }}</td>
-            <td>{{ image.Repository }}</td>
+            <td><a href="/#/images/{{ image.Id }}/?tag={{ image.Repository }}:{{ image.Tag }}">{{ image.Id|truncate:20}}</a></td>
+            <td>{{ image.Repository }}:{{ image.Tag }}</td>
             <td>{{ image.Created|getdate }}</td>
         </tr>
     </tbody>

@@ -7,10 +7,11 @@
     <meta name="description" content="">
     <meta name="author" content="Michael Crosby crosbymichael.com">
 
-    <link href="../assets/css/bootstrap.css" rel="stylesheet">
-    <link href="../assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="lib/jquery.gritter.css" rel="stylesheet">
 
-    <link href="../css/app.css" rel="stylesheet">
+    <link href="css/app.css" rel="stylesheet">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -29,7 +30,6 @@
 
     <div class="container">
         <div ng-include="template" ng-controller="MastheadController"></div>
-        <div ng-include="template" ng-controller="MessageController"></div>
 
         <div id="view" ng-view></div>
 
@@ -51,11 +51,15 @@
     <script src="../assets/js/bootstrap-carousel.js"></script>
     <script src="../assets/js/bootstrap-typeahead.js"></script>
 
-    <script src="/lib/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="/lib/spin.js" type="text/javascript" charset="utf-8"></script>
+    <script src="lib/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="lib/spin.js" type="text/javascript" charset="utf-8"></script>
 
     <script src="lib/angular/angular.js"></script>
     <script src="lib/angular/angular-resource.js"></script>
+
+    <script src="lib/jquery.gritter.min.js"></script>
+    <script src="lib/Chart.min.js"></script>
+    <script src="lib/legend.js"></script>
 
     <script src="js/app.js"></script>
     <script src="js/services.js"></script>

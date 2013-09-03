@@ -1,13 +1,48 @@
  
-<div class="row-fluid">
+<div class="row-fluid center">
     <!--<div class="sidebar span4">
         <div ng-include="template" ng-controller="SideBarController"></div>
     </div>-->
-    <div class="span12">
+    <div class="span12" id="masthead" style="display:none">
         <div class="jumbotron">
             <h1>DockerUI</h1>
             <p class="lead">The Linux container engine</p>
                 <a class="btn btn-large btn-success" href="http://docker.io">Learn more.</a>
           </div>
+    </div>
+    
+    <div class="span12">
+        <div class="span6">
+            <h3>Running Containers</h3>
+            <ul>
+                <li ng-repeat="container in containers|orderBy:predicate">
+                    <a href="/#/containers/{{ container.Id }}/">{{ container.Image }}</a>
+                    <span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span>
+                </li>
+            </ul>
+        </div>
+        <div class="span6 pull-right">
+            <h3 style="float:right">Status</h3>
+            <canvas id="containers-chart" style="float:right;">
+                Get a better broswer... Your holding everyone back.
+            </canvas>
+            <div id="chart-legend" style="float:right;"></div>
+        </div>
+    </div>
+
+
+    <div class="span12" id="stats">
+        <hr />
+        <h4>Containers created</h4>
+       <canvas id="containers-started-chart" width="700" style="float:left">
+            Get a better broswer... Your holding everyone back.
+       </canvas>
+        <h1 style="float:right">{{ totalContainers }}</h1>
+        <hr />
+        <h4>Images created</h4>
+       <canvas id="images-created-chart" width="700" style="float:left">
+            Get a better broswer... Your holding everyone back.
+       </canvas>
+        <h1 style="float:right">{{ totalImages }}</h1>
     </div>
 </div>

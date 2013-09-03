@@ -23,6 +23,27 @@
                 <td>{{ container.Args }}</td>
             </tr>
             <tr>
+                <td>Ports:</td>
+                <td>{{ container.Config.PortSpecs }}</td>
+            </tr>
+            <tr>
+                <td>Hostname:</td>
+                <td>{{ container.Config.Hostname }}</td>
+            </tr>
+            <tr>
+                <td>Cmd:</td>
+                <td>{{ container.Config.Cmd }}</td>
+            </tr>
+            <tr>
+                <td>Entrypoint:</td>
+                <td>{{ container.Config.Entrypoint }}</td>
+            </tr>
+            <tr>
+                <td>Volumes:</td>
+                <td>{{ container.Volumes }}</td>
+            </tr>
+
+            <tr>
                 <td>SysInitpath:</td>
                 <td>{{ container.SysInitPath }}</td>
             </tr>

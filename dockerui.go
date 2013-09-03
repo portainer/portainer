@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	endpoint = flag.String("e", "", "Docker d endpoint.")
-	verbose  = flag.Bool("v", false, "Verbose logging.")
-	port     = flag.String("p", "9000", "Port to serve dockerui.")
-	assets   = flag.String("-a", "/app", "Path to the assets.")
+	endpoint = flag.String("e", "", "Dockerd endpoint")
+	verbose  = flag.Bool("v", false, "Verbose logging")
+	port     = flag.String("p", "9000", "Port to serve dockerui")
+	assets   = flag.String("a", ".", "Path to the assets")
 )
 
 type multiHandler struct {
@@ -34,6 +34,7 @@ func (h *multiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func isDockerRequest(url string) bool {
+	log.Printf("Got request: %s", url)
 	return strings.Contains(url, "dockerapi/")
 }
 

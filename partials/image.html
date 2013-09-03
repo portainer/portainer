@@ -1,13 +1,23 @@
 <div ng-include="template" ng-controller="StartContainerController"></div>
 
+<div class="alert alert-error" id="error-message" style="display:none">
+    {{ error }}
+</div>
+
 <div class="detail">
  
-    <h4>Image: {{ image.id }}</h4>
+    <h4>Image: {{ tag }}</h4>
 
     <div class="btn-group detail">
       <button class="btn btn-success" ng-click="create()">Create</button>
     </div>
 
+    <div>
+       <h4>Containers created:</h4>
+       <canvas id="containers-started-chart" width="750">
+                Get a better broswer... Your holding everyone back.
+       </canvas>
+    </div>
 
     <table class="table table-striped">
          <tbody>
@@ -18,10 +28,6 @@
             <tr>
                 <td>Parent:</td>
                 <td><a href="/#/images/{{ image.parent }}/">{{ image.parent }}</a></td>
-            </tr>
-            <tr>
-                <td>Container:</td>
-                <td><a href="/#/containers/{{ image.container }}/">{{ image.container }}</a></td>
             </tr>
             <tr>
                 <td>Size:</td>
@@ -90,7 +96,6 @@
     </div>
 
     <hr />
-
 
     <div class="btn-remove">
         <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="remove()">Remove Image</button>

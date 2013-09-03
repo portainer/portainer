@@ -3,22 +3,125 @@ function MastheadController($scope) {
     $scope.template = 'partials/masthead.html';
 }
 
-function DashboardController($scope, Container) {
+function newLineChart(id, data, getkey) {
+    var chart = getChart(id);
+    var map = {};
+
+    for (var i = 0; i < data.length; i++) {
+        var c = data[i];
+        var key = getkey(c);
+        
+        var count = map[key];
+        if (count === undefined) {
+            count = 0;
+        }
+        count += 1;
+        map[key] = count;
+    }
+
+    var labels = [];
+    var data = [];
+    var keys = Object.keys(map);
+
+    for (var i = keys.length - 1; i > -1; i--) {
+        var k = keys[i];
+        labels.push(k);
+        data.push(map[k]);
+    }
+    var dataset = {
+        fillColor : "rgba(151,187,205,0.5)",
+        strokeColor : "rgba(151,187,205,1)",
+        pointColor : "rgba(151,187,205,1)",
+        pointStrokeColor : "#fff",
+        data : data
+    };
+    chart.Line({
+        labels: labels,
+        datasets: [dataset]
+    }, 
+    {
+        scaleStepWidth: 1, 
+        pointDotRadius:1,
+        scaleOverride: true,
+        scaleSteps: labels.length
+    });
 }
 
-function MessageController($scope, Messages) {
-    $scope.template = 'partials/messages.html';
-    $scope.messages = [];
-    $scope.$watch('messages.length', function(o, n) {
-       $('#message-display').show();
-    });
+function DashboardController($scope, Container, Image, Settings) {
+    $scope.predicate = '-Created';
+    $scope.containers = [];
 
-    $scope.$on(Messages.event, function(e, msg) {
-       $scope.messages.push(msg);
-       setTimeout(function() {
-           $('#message-display').hide('slow');
-       }, 30000);
-    });
+    var getStarted = function(data) {
+        $scope.totalContainers = data.length;
+        newLineChart('#containers-started-chart', data, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
+        var s = $scope;
+        Image.query({}, function(d) {
+            s.totalImages = d.length;
+            newLineChart('#images-created-chart', d, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
+        });
+    };
+
+    var opts = {animation:false};    
+    if (Settings.firstLoad) {
+        $('#stats').hide();
+        opts.animation = true;
+        Settings.firstLoad = false;
+        $('#masthead').show();
+
+        setTimeout(function() {
+            $('#masthead').slideUp('slow');
+            $('#stats').slideDown('slow');
+        }, 5000);
+    }
+   
+    Container.query({all: 1}, function(d) {
+       var running = 0
+       var ghost = 0;
+       var stopped = 0;
+
+       for (var i = 0; i < d.length; i++) {
+           var item = d[i];
+
+           if (item.Status === "Ghost") {
+               ghost += 1;
+           } else if (item.Status.indexOf('Exit') !== -1) {
+               stopped += 1;
+           } else {
+               running += 1;
+               $scope.containers.push(new ContainerViewModel(item));
+           }
+       }
+
+       getStarted(d);
+
+       var c = getChart('#containers-chart');
+       var data = [
+        {
+            value: running,
+            color: '#5bb75b',
+            title: 'Running'
+        }, // running
+        {
+            value: stopped,
+            color: '#C7604C',
+            title: 'Stopped'
+        }, // stopped
+        {
+            value: ghost,
+            color: '#E2EAE9',
+            title: 'Ghost'
+        } // ghost
+      ];
+        
+      c.Doughnut(data, opts); 
+      var lgd = $('#chart-legend').get(0);
+      legend(lgd, data);
+   });
+}
+
+function getChart(id) {
+    var ctx = $(id).get(0).getContext("2d");
+    return new Chart(ctx);
 }
 
 function StatusBarController($scope, Settings) {
@@ -53,46 +156,34 @@ function ContainerController($scope, $routeParams, $location, Container, Message
     $scope.changes = [];
 
     $scope.start = function(){
-        ViewSpinner.spin();
         Container.start({id: $routeParams.id}, function(d) {
-            Messages.send({class: 'text-success', data: 'Container started.'});
-            ViewSpinner.stop();
+            Messages.send("Container started", $routeParams.id);
         }, function(e) {
-            failedRequestHandler(e, Messages);
-            ViewSpinner.stop();
+            Messages.error("Failure", "Container failed to start." + e.data);
         });
     };
 
     $scope.stop = function() {
-        ViewSpinner.spin();
         Container.stop({id: $routeParams.id}, function(d) {
-            Messages.send({class: 'text-success', data: 'Container stopped.'});
-            ViewSpinner.stop();
+            Messages.send("Container stopped", $routeParams.id);
         }, function(e) {
-            failedRequestHandler(e, Messages);
-            ViewSpinner.stop();
+            Messages.error("Failure", "Container failed to stop." + e.data);
         });
     };
 
     $scope.kill = function() {
-        ViewSpinner.spin();
         Container.kill({id: $routeParams.id}, function(d) {
-            Messages.send({class: 'text-success', data: 'Container killed.'});
-            ViewSpinner.stop();
+            Messages.send("Container killed", $routeParams.id);
         }, function(e) {
-            failedRequestHandler(e, Messages);
-            ViewSpinner.stop();
+            Messages.error("Failure", "Container failed to die." + e.data);
         });
     };
 
     $scope.remove = function() {
-        ViewSpinner.spin();
         Container.remove({id: $routeParams.id}, function(d) {
-            Messages.send({class: 'text-success', data: 'Container removed.'});
-            ViewSpinner.stop();
+            Messages.send("Container removed", $routeParams.id);
         }, function(e){
-            failedRequestHandler(e, Messages);
-            ViewSpinner.stop();
+            Messages.error("Failure", "Container failed to remove." + e.data);
         });
     };
 
@@ -108,12 +199,14 @@ function ContainerController($scope, $routeParams, $location, Container, Message
 
     Container.get({id: $routeParams.id}, function(d) {
         $scope.container = d;
-   }, function(e) {
-        failedRequestHandler(e, Messages);
+    }, function(e) {
         if (e.status === 404) {
             $('.detail').hide();
+            Messages.error("Not found", "Container not found.");
+        } else {
+            Messages.error("Failure", e.data);
         }
-   });
+    });
 
    $scope.getChanges();
 }
@@ -132,7 +225,7 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
         });
     };
 
-    var batch = function(items, action) {
+    var batch = function(items, action, msg) {
         ViewSpinner.spin();
         var counter = 0;
         var complete = function() {
@@ -145,13 +238,13 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
            if (c.Checked) {
                counter = counter + 1;
                action({id: c.Id}, function(d) {
-                    Messages.send({class: 'text-success', data: 'Container ' + c.Id + ' Removed.'});
+                    Messages.send("Container " + msg, c.Id);
                     var index = $scope.containers.indexOf(c);
                     $scope.containers.splice(index, 1);
                     complete();
                }, function(e) {
-                  failedRequestHandler(e, Messages);
-                  complete();
+                    Messages.error("Failure", e.data);
+                    complete();
                });
            }
         });
@@ -174,19 +267,19 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
     };
 
     $scope.startAction = function() {
-        batch($scope.containers, Container.start);
+        batch($scope.containers, Container.start, "Started");
     };
 
     $scope.stopAction = function() {
-        batch($scope.containers, Container.stop);
+        batch($scope.containers, Container.stop, "Stopped");
     };
 
     $scope.killAction = function() {
-        batch($scope.containers, Container.kill);
+        batch($scope.containers, Container.kill, "Killed");
     };
 
     $scope.removeAction = function() {
-        batch($scope.containers, Container.remove);
+        batch($scope.containers, Container.remove, "Removed");
     };
 
     update({all: $scope.displayAll ? 1 : 0});
@@ -215,14 +308,13 @@ function ImagesController($scope, Image, ViewSpinner, Messages) {
                 counter = counter + 1;
                 Image.remove({id: i.Id}, function(d) {
                    angular.forEach(d, function(resource) {
-                       Messages.send({class: 'text-success', data: 'Deleted: ' + resource.Deleted});
+                       Messages.send("Image deleted", resource.Deleted);
                    });
-                   //Remove the image from the list
                    var index = $scope.images.indexOf(i);
                    $scope.images.splice(index, 1);
                    complete();
                 }, function(e) {
-                   Messages.send({class: 'text-error', data: e.data});
+                   Messages.error("Failure", e.data);
                    complete();
                 });
             }
@@ -240,21 +332,22 @@ function ImagesController($scope, Image, ViewSpinner, Messages) {
         $scope.images = d.map(function(item) { return new ImageViewModel(item); });
         ViewSpinner.stop();
     }, function (e) {
-        failedRequestHandler(e, Messages);
+        Messages.error("Failure", e.data);
         ViewSpinner.stop();
     });
 }
 
 // Controller for a single image and actions on that image
-function ImageController($scope, $routeParams, $location, Image, Messages) {
+function ImageController($scope, $q, $routeParams, $location, Image, Container, Messages) {
     $scope.history = [];
     $scope.tag = {repo: '', force: false};
 
     $scope.remove = function() {
         Image.remove({id: $routeParams.id}, function(d) {
-            Messages.send({class: 'text-success', data: 'Image removed.'});
+            Messages.send("Image Removed", $routeParams.id);
         }, function(e) {
-            failedRequestHandler(e, Messages);
+            $scope.error = e.data;
+            $('#error-message').show();
         });
     };
 
@@ -267,9 +360,10 @@ function ImageController($scope, $routeParams, $location, Image, Messages) {
     $scope.updateTag = function() {
         var tag = $scope.tag;
         Image.tag({id: $routeParams.id, repo: tag.repo, force: tag.force ? 1 : 0}, function(d) {
-            Messages.send({class: 'text-success', data: 'Tag added.'});
+            Messages.send("Tag Added", $routeParams.id);
         }, function(e) {
-            failedRequestHandler(e, Messages);
+            $scope.error = e.data;
+            $('#error-message').show();
         });
     };
 
@@ -279,11 +373,24 @@ function ImageController($scope, $routeParams, $location, Image, Messages) {
 
     Image.get({id: $routeParams.id}, function(d) {
         $scope.image = d;
+        $scope.tag = d.id;
+        var t = $routeParams.tag;
+        if (t && t !== ":") {
+            $scope.tag = t;
+            var promise = getContainersFromImage($q, Container, t);
+
+            promise.then(function(containers) {
+                newLineChart('#containers-started-chart', containers, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
+            });
+        }
     }, function(e) {
-        failedRequestHandler(e, Messages);
         if (e.status === 404) {
             $('.detail').hide();
+            $scope.error = "Image not found.<br />" + $routeParams.id;
+        } else {
+            $scope.error = e.data;
         }
+        $('#error-message').show();
     });
 
     $scope.getHistory();
@@ -354,4 +461,22 @@ function BuilderController($scope, Dockerfile, Messages) {
 
 function failedRequestHandler(e, Messages) {
     Messages.send({class: 'text-error', data: e.data});
+}
+
+// This gonna get messy but we don't have a good way to do this right now
+function getContainersFromImage($q, Container, tag) {
+    var defer = $q.defer();
+    
+    Container.query({all:1, notruc:1}, function(d) {
+        var containers = [];
+        for (var i = 0; i < d.length; i++) {
+            var c = d[i];
+            if (c.Image == tag) {
+                containers.push(new ContainerViewModel(c));
+            }
+        }
+        defer.resolve(containers);
+    });
+
+    return defer.promise;
 }

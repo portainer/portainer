@@ -109,3 +109,10 @@
     overflow-y: scroll;
     overflow-x: hidden;
 }
+
+.legend .title {
+    margin: 0.5em;
+    border-style: solid;
+    border-width: 0 0 0 1em;
+    padding: 0 0.3em;
+}
