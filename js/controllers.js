@@ -304,8 +304,11 @@ function ImageController($scope, $q, $routeParams, $location, Image, Container, 
 
     Image.get({id: $routeParams.id}, function(d) {
         $scope.image = d;
-        if ($routeParams.tag) {
-            var promise = getContainersFromImage($q, Container, $routeParams.tag);
+        $scope.tag = d.id;
+        var t = $routeParams.tag;
+        if (t && t !== ":") {
+            $scope.tag = t;
+            var promise = getContainersFromImage($q, Container, t);
 
             promise.then(function(containers) {
                 var map = {}; 
