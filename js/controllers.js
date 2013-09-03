@@ -3,16 +3,74 @@ function MastheadController($scope) {
     $scope.template = 'partials/masthead.html';
 }
 
-function DashboardController($scope, Container, Settings) {
+function newLineChart(id, data, getkey) {
+    var chart = getChart(id);
+    var map = {};
+
+    for (var i = 0; i < data.length; i++) {
+        var c = data[i];
+        var key = getkey(c);
+        
+        var count = map[key];
+        if (count === undefined) {
+            count = 0;
+        }
+        count += 1;
+        map[key] = count;
+    }
+
+    var labels = [];
+    var data = [];
+    var keys = Object.keys(map);
+
+    for (var i = keys.length - 1; i > -1; i--) {
+        var k = keys[i];
+        labels.push(k);
+        data.push(map[k]);
+    }
+    var dataset = {
+        fillColor : "rgba(151,187,205,0.5)",
+        strokeColor : "rgba(151,187,205,1)",
+        pointColor : "rgba(151,187,205,1)",
+        pointStrokeColor : "#fff",
+        data : data
+    };
+    chart.Line({
+        labels: labels,
+        datasets: [dataset]
+    }, 
+    {
+        scaleStepWidth: 1, 
+        pointDotRadius:1,
+        scaleOverride: true,
+        scaleSteps: labels.length
+    });
+}
+
+function DashboardController($scope, Container, Image, Settings) {
     $scope.predicate = '-Created';
     $scope.containers = [];
+
+    var getStarted = function(data) {
+        $scope.totalContainers = data.length;
+        newLineChart('#containers-started-chart', data, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
+        var s = $scope;
+        Image.query({}, function(d) {
+            s.totalImages = d.length;
+            newLineChart('#images-created-chart', d, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
+        });
+    };
+
     var opts = {animation:false};    
     if (Settings.firstLoad) {
+        $('#stats').hide();
         opts.animation = true;
         Settings.firstLoad = false;
         $('#masthead').show();
+
         setTimeout(function() {
             $('#masthead').slideUp('slow');
+            $('#stats').slideDown('slow');
         }, 5000);
     }
    
@@ -33,6 +91,8 @@ function DashboardController($scope, Container, Settings) {
                $scope.containers.push(new ContainerViewModel(item));
            }
        }
+
+       getStarted(d);
 
        var c = getChart('#containers-chart');
        var data = [
@@ -320,49 +380,7 @@ function ImageController($scope, $q, $routeParams, $location, Image, Container, 
             var promise = getContainersFromImage($q, Container, t);
 
             promise.then(function(containers) {
-                var map = {}; 
-                
-                for (var i = 0; i < containers.length; i++) {
-                    var c = containers[i];
-                    var date = new Date(c.Created * 1000).toLocaleDateString();
-                    
-                    var count = map[date];
-                    if (count === undefined) {
-                        count = 0;
-                    }
-                    console.log(map);
-                    count += 1;
-                    map[date] = count;
-                }
-
-                var labels = [];
-                var data = [];
-                var keys = Object.keys(map);
-
-                for (var i = keys.length - 1; i > -1; i--) {
-                    var k = keys[i];
-                    labels.push(k);
-                    data.push(map[k]);
-                };
-                var dataset = {
-                    fillColor : "rgba(151,187,205,0.5)",
-                    strokeColor : "rgba(151,187,205,1)",
-                    pointColor : "rgba(151,187,205,1)",
-                    pointStrokeColor : "#fff",
-                    data : data
-                };
-                console.log(labels, data);
-                var c = getChart('#containers-started-chart');
-                c.Line({
-                    labels: labels,
-                    datasets: [dataset]
-                }, 
-                {
-                    scaleStepWidth: 1, 
-                    pointDotRadius:1,
-                    scaleOverride: true,
-                    scaleSteps: labels.length
-                });
+                newLineChart('#containers-started-chart', containers, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
             });
         }
     }, function(e) {
