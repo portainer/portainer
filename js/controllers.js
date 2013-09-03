@@ -440,23 +440,6 @@ function StartContainerController($scope, $routeParams, $location, Container, Me
 
 function BuilderController($scope, Dockerfile, Messages) {
     $scope.template = '/partials/builder.html';
-
-    ace.config.set('basePath', '/lib/ace-builds/src-noconflict/');
-    var spinner = new Spinner();
-
-    $scope.build = function() {
-        spinner.spin(document.getElementById('build-modal'));
-        Dockerfile.build(editor.getValue(), function(d) {
-           console.log(d.currentTarget.response);
-           $scope.messages = d.currentTarget.response;
-           $scope.$apply();
-           spinner.stop();
-        }, function(e) {
-           $scope.messages = e;
-           $scope.$apply();
-           spinner.stop();
-        });
-    };
 }
 
 function failedRequestHandler(e, Messages) {
