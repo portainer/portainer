@@ -3,9 +3,18 @@ function MastheadController($scope) {
     $scope.template = 'partials/masthead.html';
 }
 
-function DashboardController($scope, Container) {
+function DashboardController($scope, Container, Settings) {
     $scope.predicate = '-Created';
     $scope.containers = [];
+    var opts = {animation:false};    
+    if (Settings.firstLoad) {
+        opts.animation = true;
+        Settings.firstLoad = false;
+        $('#masthead').show();
+        setTimeout(function() {
+            $('#masthead').slideUp('slow');
+        }, 5000);
+    }
    
     Container.query({all: 1}, function(d) {
        var running = 0
@@ -44,7 +53,7 @@ function DashboardController($scope, Container) {
         } // ghost
       ];
         
-      c.Doughnut(data, {}); 
+      c.Doughnut(data, opts); 
       var lgd = $('#chart-legend').get(0);
       legend(lgd, data);
    });

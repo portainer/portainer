@@ -64,7 +64,8 @@ angular.module('dockerui.services', ['ngResource'])
             version: DOCKER_API_VERSION,
             rawUrl: DOCKER_ENDPOINT + DOCKER_PORT + '/' + DOCKER_API_VERSION,
             uiVersion: UI_VERSION,
-            url: url
+            url: url,
+            firstLoad: true,
         };
     })
     .factory('ViewSpinner', function() {
