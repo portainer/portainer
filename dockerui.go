@@ -13,7 +13,7 @@ var (
 	endpoint = flag.String("e", "", "Dockerd endpoint")
 	verbose  = flag.Bool("v", false, "Verbose logging")
 	port     = flag.String("p", "9000", "Port to serve dockerui")
-	assets   = flag.String("a", "/app", "Path to the assets")
+	assets   = flag.String("a", ".", "Path to the assets")
 )
 
 type multiHandler struct {
