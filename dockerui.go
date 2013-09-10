@@ -2,71 +2,40 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"github.com/elazarl/goproxy"
 	"log"
 	"net/http"
-	"strings"
+	"net/http/httputil"
+	"net/url"
 )
 
 var (
 	endpoint = flag.String("e", "", "Dockerd endpoint")
-	verbose  = flag.Bool("v", false, "Verbose logging")
-	port     = flag.String("p", "9000", "Port to serve dockerui")
+	addr     = flag.String("p", ":9000", "Address and port to serve dockerui")
 	assets   = flag.String("a", ".", "Path to the assets")
 )
 
-type multiHandler struct {
-	base    http.Handler
-	proxy   *goproxy.ProxyHttpServer
-	verbose bool
-}
+func createHandler(dir string, dockerEndpoint string) http.Handler {
+	mux := http.NewServeMux()
 
-func (h *multiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if h.verbose {
-		log.Printf("%s: %s\n", r.Method, r.URL.String())
-	}
-	if isDockerRequest(r.URL.String()) {
-		h.proxy.ServeHTTP(w, r)
-	} else {
-		h.base.ServeHTTP(w, r)
-	}
-}
-
-func isDockerRequest(url string) bool {
-	log.Printf("Got request: %s", url)
-	return strings.Contains(url, "dockerapi/")
-}
-
-func createHandler(dir string) http.Handler {
 	fileHandler := http.FileServer(http.Dir(dir))
-	proxy := goproxy.NewProxyHttpServer()
-	proxy.Verbose = *verbose
+	u, err := url.Parse(dockerEndpoint)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	reverseProxy := httputil.NewSingleHostReverseProxy(u)
 
-	proxy.OnRequest().DoFunc(func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-		c := http.Client{}
-		path := strings.Replace(r.URL.RequestURI(), "dockerapi/", "", -1)
-		n, err := http.NewRequest(r.Method, *endpoint+path, r.Body)
-		n.Header = r.Header
+	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", reverseProxy))
+	mux.Handle("/", fileHandler)
 
-		if err != nil {
-			log.Fatal(err)
-		}
-		resp, err := c.Do(n)
-		if err != nil {
-			log.Fatal(err)
-		}
-		return r, resp
-
-	})
-	return &multiHandler{base: fileHandler, proxy: proxy, verbose: *verbose}
+	return mux
 }
 
 func main() {
 	flag.Parse()
 
-	handler := createHandler(*assets)
-
-	path := fmt.Sprintf(":%s", *port)
-	log.Fatal(http.ListenAndServe(path, handler))
+	handler := createHandler(*assets, *endpoint)
+	if err := http.ListenAndServe(*addr, handler); err != nil {
+		log.Fatal(err)
+	}
 }
