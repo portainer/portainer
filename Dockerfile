@@ -1,6 +1,6 @@
 # Dockerfile for DockerUI
 
-FROM ubuntu
+FROM ubuntu:12.04
 
 MAINTAINER Michael Crosby http://crosbymichael.com
 
@@ -10,7 +10,9 @@ RUN apt-get upgrade -y
 
 ADD . /app/
 
-EXPOSE 9000
 WORKDIR /app/
 
+RUN apt-get install -y golang-go && go build dockerui.go
+
+EXPOSE 9000
 ENTRYPOINT ["./dockerui"]
