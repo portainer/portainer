@@ -19,7 +19,7 @@ DockerUI is a web interface to interact with the Remote API.  The goal is to pro
 This is the easiest way to run DockerUI.  To run the container make sure you have dockerd running with the -H option so that the remote api can be accessed via ip and not bound to localhost.  After you pull the container you need to run it with your dockerd ip as an argument to the dockerui command.
 
 
-    docker run -d crosbymichael/dockerui /dockerui -e="http://192.168.1.9:4243"
+    docker run -d crosbymichael/dockerui -e="http://192.168.1.9:4243"
 
 This tells dockerui to use http://192.168.1.9:4243 to communicate to dockerd's Remote API.
 
