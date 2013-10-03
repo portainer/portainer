@@ -7,16 +7,13 @@ MAINTAINER Michael Crosby http://crosbymichael.com
 RUN apt-get update
 RUN apt-get upgrade -y
 
-ADD https://go.googlecode.com/files/go1.1.2.linux-amd64.tar.gz /opt/go.tar.gz
-
-RUN                                       \
-  cd /opt                                ;\
-  tar xvvf go.tar.gz                     ;\
-  rm go.tar.gz                           ;\
-  ln -s /opt/go/bin/go /usr/local/bin/go ;\
+RUN apt-get install -y curl                                                                 ;\
+    curl -s https://go.googlecode.com/files/go1.1.2.linux-amd64.tar.gz | tar -v -C /opt -xz ;\
+    cp -a /opt/go/* /usr/local/                                                             ;\
+    rm -rf /opt/go                                                                          ;\
 #RUN
 
-ENV GOROOT /opt/go
+ENV GOROOT /usr/local/
 
 ADD . /app/
 
