@@ -1,16 +1,25 @@
 # Dockerfile for DockerUI
 
-FROM ubuntu
+FROM ubuntu:12.04
 
 MAINTAINER Michael Crosby http://crosbymichael.com
 
-RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get upgrade -y
 
+RUN apt-get install -y curl                                                                 ;\
+    curl -s https://go.googlecode.com/files/go1.1.2.linux-amd64.tar.gz | tar -v -C /opt -xz ;\
+    cp -a /opt/go/* /usr/local/                                                             ;\
+    rm -rf /opt/go                                                                          ;\
+#RUN
+
+ENV GOROOT /usr/local/
+
 ADD . /app/
 
-EXPOSE 9000
 WORKDIR /app/
 
+RUN go build dockerui.go
+
+EXPOSE 9000
 ENTRYPOINT ["./dockerui"]
