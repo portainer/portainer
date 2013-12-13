@@ -69,6 +69,16 @@ angular.module('dockerui.filters', [])
 			return name.substring(1, name.length);
         };
     })
+    .filter('repotag', function() {
+        return function(image) {
+        	if (image.RepoTags && image.RepoTags.length > 0) {
+	        	var tag = image.RepoTags[0];
+	        	if (tag == '<none>:<none>') { tag = ''; }
+	        	return tag;
+        	}
+    		return '';		
+        };
+    })
     .filter('getdate', function() {
         return function(data) {
             //Multiply by 1000 for the unix format
