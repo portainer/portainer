@@ -63,6 +63,12 @@ angular.module('dockerui.filters', [])
             return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[[i]]; 
         };
     })
+    .filter('containername', function() {
+        return function(container) {
+			var name = container.Names[0];
+			return name.substring(1, name.length);
+        };
+    })
     .filter('getdate', function() {
         return function(data) {
             //Multiply by 1000 for the unix format

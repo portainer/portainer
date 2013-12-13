@@ -15,4 +15,5 @@ function ContainerViewModel(data) {
    this.SizeRw = data.SizeRw;
    this.Status = data.Status;
    this.Checked = false;
+   this.Names = data.Names;
 }
