@@ -5,6 +5,7 @@ function ImageViewModel(data) {
     this.Repository = data.Repository;
     this.Created = data.Created;
     this.Checked = false;
+    this.RepoTags = data.RepoTags;
 }
 
 function ContainerViewModel(data) {
@@ -15,4 +16,5 @@ function ContainerViewModel(data) {
    this.SizeRw = data.SizeRw;
    this.Status = data.Status;
    this.Checked = false;
+   this.Names = data.Names;
 }
