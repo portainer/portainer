@@ -1,4 +1,4 @@
-##DockerUI
+## DockerUI
 
 ![Containers](/containers.png)
 DockerUI is a web interface to interact with the Remote API.  The goal is to provide a pure client side implementation so it is effortless to connect and manage docker.  This project is not complete and is still under heavy development.
@@ -13,12 +13,12 @@ DockerUI is a web interface to interact with the Remote API.  The goal is to pro
 ### Container Quickstart 
 
 * Run your docker daemon with the following options:
-  * `docker -d -H="0.0.0.0:4243" -api-enable-cors`
+* `docker -d -H="0.0.0.0:4243" -api-enable-cors`
 * `docker run -d -p 80:9000 crosbymichael/dockerui -e="http://<dockerd host ip>:4243"`
 * Open your browser to `http://<dockerd host ip>`
 
 
-###Setup
+### Setup
 1. Make sure that you are running dockerd ( docker -d ) with the -H and [-api-enable-cors](http://docs.docker.io/en/latest/api/docker_remote_api_v1.2/#cors-requests) so that the UI can make requests to the Remote API.
 
 
@@ -37,14 +37,21 @@ DockerUI is a web interface to interact with the Remote API.  The goal is to pro
 5. Everything should be good to go, if you experience any issues please report them on this repository.
 
 
-###Stack
+### Connect via a unix socket
+If you want to connect to docker via the unix socket you can pass the socket path to the `-e` variable.  If you are running dockerui in a container you can bind mount the unix socket into the container.
+
+```bash
+docker run -d -p 9000:9000 -v /var/run/docker.sock:/docker.sock dockerui -e /docker.sock
+```
+
+### Stack
 * Angular.js
 * Flatstrap ( Flat Twitter Bootstrap )
 * Spin.js
 * Ace editor
 
 
-###Todo:
+### Todo:
 * Multiple endpoints
 * Full repository support
 * Search
@@ -53,7 +60,7 @@ DockerUI is a web interface to interact with the Remote API.  The goal is to pro
 * Authentication and Authorization
 
 
-###License - MIT
+### License - MIT
 The DockerUI code is licensed under the MIT license. Flatstrap(bootstrap) is licensed under the Apache License v2.0 and Angular.js is licensed under MIT.
 
 
