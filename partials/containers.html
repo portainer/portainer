@@ -15,13 +15,14 @@
     </ul>
 
     <div class="pull-right">
-        <input type="checkbox" ng-model="displayAll" ng-click="toggleGetAll()"/> Display All
+        <input type="checkbox" ng-model="displayAll" 
+        	ng-change="toggleGetAll()"/> Display All
     </div>
 </div>
 <table class="table table-striped">
     <thead>
         <tr>
-            <th><input type="checkbox" ng-model="toggle" ng-click="toggleSelectAll()" /> Action</th>
+            <th><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()" /> Action</th>
             <th>Name</th>
             <th>Image</th>
             <th>Command</th>
