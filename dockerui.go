@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -75,6 +76,12 @@ func createHandler(dir string, e string) http.Handler {
 	if strings.Contains(e, "http") {
 		h = createTcpHandler(e)
 	} else {
+		if _, err := os.Stat(e); err != nil {
+			if os.IsNotExist(err) {
+				log.Fatalf("unix socket %s does not exist", e)
+			}
+			log.Fatal(err)
+		}
 		h = createUnixHandler(e)
 	}
 
