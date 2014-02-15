@@ -1,2 +1,4 @@
+logs/*
+!.gitkeep
 dockerui
-*.esproj*
+*.esproj/*

@@ -15,13 +15,14 @@
     </ul>
 
     <div class="pull-right">
-        <input type="checkbox" ng-model="displayAll" ng-click="toggleGetAll()"/> Display All
+        <input type="checkbox" ng-model="displayAll" 
+        	ng-change="toggleGetAll()"/> Display All
     </div>
 </div>
 <table class="table table-striped">
     <thead>
         <tr>
-            <th><input type="checkbox" ng-model="toggle" ng-click="toggleSelectAll()" /> Action</th>
+            <th><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()" /> Action</th>
             <th>Name</th>
             <th>Image</th>
             <th>Command</th>
@@ -32,7 +33,7 @@
     <tbody>
         <tr ng-repeat="container in containers|orderBy:predicate">
             <td><input type="checkbox" ng-model="container.Checked" /></td>
-            <td><a href="/#/containers/{{ container|containername }}/">{{ container|containername}}</a></td>
+            <td><a href="/#/containers/{{ container.Id }}/">{{ container|containername}}</a></td>
             <td><a href="/#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
             <td>{{ container.Command|truncate:40 }}</td>
             <td>{{ container.Created|getdate }}</td>

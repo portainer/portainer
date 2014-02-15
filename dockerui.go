@@ -2,10 +2,14 @@ package main
 
 import (
 	"flag"
+	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
+	"strings"
 )
 
 var (
@@ -14,20 +18,75 @@ var (
 	assets   = flag.String("a", ".", "Path to the assets")
 )
 
-func createHandler(dir string, dockerEndpoint string) http.Handler {
-	mux := http.NewServeMux()
+type UnixHandler struct {
+	path string
+}
 
-	fileHandler := http.FileServer(http.Dir(dir))
-	u, err := url.Parse(dockerEndpoint)
+func (h *UnixHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	conn, err := net.Dial("unix", h.path)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+	c := httputil.NewClientConn(conn, nil)
+	defer c.Close()
+
+	res, err := c.Do(r)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+	defer res.Body.Close()
+
+	copyHeader(w.Header(), res.Header)
+	if _, err := io.Copy(w, res.Body); err != nil {
+		log.Println(err)
+	}
+}
+
+func copyHeader(dst, src http.Header) {
+	for k, vv := range src {
+		for _, v := range vv {
+			dst.Add(k, v)
+		}
+	}
+}
+
+func createTcpHandler(e string) http.Handler {
+	u, err := url.Parse(e)
 	if err != nil {
 		log.Fatal(err)
-		return nil
 	}
-	reverseProxy := httputil.NewSingleHostReverseProxy(u)
+	return httputil.NewSingleHostReverseProxy(u)
+}
 
-	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", reverseProxy))
+func createUnixHandler(e string) http.Handler {
+	return &UnixHandler{e}
+}
+
+func createHandler(dir string, e string) http.Handler {
+	var (
+		mux         = http.NewServeMux()
+		fileHandler = http.FileServer(http.Dir(dir))
+		h           http.Handler
+	)
+
+	if strings.Contains(e, "http") {
+		h = createTcpHandler(e)
+	} else {
+		if _, err := os.Stat(e); err != nil {
+			if os.IsNotExist(err) {
+				log.Fatalf("unix socket %s does not exist", e)
+			}
+			log.Fatal(err)
+		}
+		h = createUnixHandler(e)
+	}
+
+	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", h))
 	mux.Handle("/", fileHandler)
-
 	return mux
 }
 

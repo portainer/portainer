@@ -213,14 +213,15 @@ function ContainerController($scope, $routeParams, $location, Container, Message
 
 // Controller for the list of containers
 function ContainersController($scope, Container, Settings, Messages, ViewSpinner) {
-    $scope.displayAll = Settings.displayAll;
     $scope.predicate = '-Created';
     $scope.toggle = false;
+    $scope.displayAll = Settings.displayAll;
 
     var update = function(data) {
         ViewSpinner.spin();
         Container.query(data, function(d) {
-            $scope.containers = d.map(function(item) { return new ContainerViewModel(item); });
+            $scope.containers = d.map(function(item) { 
+            	return new ContainerViewModel(item); });
             ViewSpinner.stop();
         });
     };
@@ -258,12 +259,7 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
 
     $scope.toggleGetAll = function() {
         Settings.displayAll = $scope.displayAll;
-        var data = {all: 0};
-
-        if ($scope.displayAll) {
-            data.all = 1;
-        }
-        update(data);
+        update({all: Settings.displayAll ? 1 : 0});
     };
 
     $scope.startAction = function() {
@@ -282,7 +278,7 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
         batch($scope.containers, Container.remove, "Removed");
     };
 
-    update({all: $scope.displayAll ? 1 : 0});
+    update({all: Settings.displayAll ? 1 : 0});
 }
 
 // Controller for the list of images
