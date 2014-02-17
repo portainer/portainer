@@ -12,30 +12,14 @@ DockerUI is a web interface to interact with the Remote API.  The goal is to pro
 
 ### Container Quickstart 
 
-* Run your docker daemon with the following options:
-* `docker -d -H="0.0.0.0:4243" -api-enable-cors`
-* `docker run -d -p 80:9000 crosbymichael/dockerui -e="http://<dockerd host ip>:4243"`
+* Run `docker build -t crosbymichael/dockerui github.com/crosbymichael/dockerui`
+* `docker run -d -p 9000:9000 -v /var/run/docker.sock:/docker.sock crosbymichael/dockerui -e /docker.sock`
 * Open your browser to `http://<dockerd host ip>`
 
 
-### Setup
-1. Make sure that you are running dockerd ( docker -d ) with the -H and [-api-enable-cors](http://docs.docker.io/en/latest/api/docker_remote_api_v1.2/#cors-requests) so that the UI can make requests to the Remote API.
-
-
-    docker -d -H="0.0.0.0:4243" -api-enable-cors
-
-
-2. Open js/app.js.  This is where you need to configure DockerUI so that it knows what ip and port your dockerd Remote API is listening on.  There are two constants in the file that you will need to set, dockerd endpoint and dockerd port.  If you have the Remote API running on port 80 then there is no need to set the port, just leave it as an empty string.  The docker_endpoint needs to be set to the url that the Remote API can be accessed on.  Please include the scheme as part of the url.
-
-
-    .constant('DOCKER_ENDPOINT', 'http://192.168.1.9')
-    .constant('DOCKER_PORT', ':4243') 
-
-
-3. Make sure you run git submodule update --init to pull down any dependencies ( ace editor ).
-4. Use nginx or your favorite server to serve the DockerUI files.  There are not backend dependencies, DockerUI is a pure HTML JS app and can be hosted via any static file server.
-5. Everything should be good to go, if you experience any issues please report them on this repository.
-
+Bind mounting the unix socket into the dockerui container is much more secure than exposing your docker 
+daemon over tcp.  You should still secure your dockerui instance behind some type of auth.  Maybe running 
+nginx infront of dockerui with basic auth.
 
 ### Connect via a unix socket
 If you want to connect to docker via the unix socket you can pass the socket path to the `-e` variable.  If you are running dockerui in a container you can bind mount the unix socket into the container.
@@ -52,12 +36,10 @@ docker run -d -p 9000:9000 -v /var/run/docker.sock:/docker.sock crosbymichael/do
 
 
 ### Todo:
-* Multiple endpoints
 * Full repository support
 * Search
 * Push files to a container
 * Unit tests
-* Authentication and Authorization
 
 
 ### License - MIT
