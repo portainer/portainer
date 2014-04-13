@@ -14,7 +14,7 @@ DockerUI is a web interface to interact with the Remote API.  The goal is to pro
 
 * Run `docker build -t crosbymichael/dockerui github.com/crosbymichael/dockerui`
 * `docker run -d -p 9000:9000 -v /var/run/docker.sock:/docker.sock crosbymichael/dockerui -e /docker.sock`
-* Open your browser to `http://<dockerd host ip>`
+* Open your browser to `http://<dockerd host ip>:9000`
 
 
 Bind mounting the unix socket into the dockerui container is much more secure than exposing your docker 
