@@ -23,7 +23,7 @@
     <tbody>
         <tr ng-repeat="image in images | orderBy:predicate">
             <td><input type="checkbox" ng-model="image.Checked" /></td>
-            <td><a href="/#/images/{{ image.Id }}/?tag={{ image|repotag }}">{{ image.Id|truncate:20}}</a></td>
+            <td><a href="#/images/{{ image.Id }}/?tag={{ image|repotag }}">{{ image.Id|truncate:20}}</a></td>
             <td>{{ image|repotag }}</td>
             <td>{{ image.Created|getdate }}</td>
         </tr>

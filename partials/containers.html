@@ -33,8 +33,8 @@
     <tbody>
         <tr ng-repeat="container in containers|orderBy:predicate">
             <td><input type="checkbox" ng-model="container.Checked" /></td>
-            <td><a href="/#/containers/{{ container.Id }}/">{{ container|containername}}</a></td>
-            <td><a href="/#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
+            <td><a href="#/containers/{{ container.Id }}/">{{ container|containername}}</a></td>
+            <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
             <td>{{ container.Command|truncate:40 }}</td>
             <td>{{ container.Created|getdate }}</td>
             <td><span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span></td>

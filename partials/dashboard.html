@@ -16,7 +16,7 @@
             <h3>Running Containers</h3>
             <ul>
                 <li ng-repeat="container in containers|orderBy:predicate">
-                    <a href="/#/containers/{{ container.Id }}/">{{ container|containername }}</a>
+                    <a href="#/containers/{{ container.Id }}/">{{ container|containername }}</a>
                     <span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span>
                 </li>
             </ul>
