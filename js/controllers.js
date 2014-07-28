@@ -395,6 +395,7 @@ function ImageController($scope, $q, $routeParams, $location, Image, Container, 
 function StartContainerController($scope, $routeParams, $location, Container, Messages) {
     $scope.template = 'partials/startcontainer.html';
     $scope.config = {
+        name: '',
         memory: 0,
         memorySwap: 0,
         env: '',
@@ -415,6 +416,7 @@ function StartContainerController($scope, $routeParams, $location, Container, Me
 
         Container.create({
                 Image: id,
+                name: $scope.config.name,
                 Memory: $scope.config.memory,
                 MemorySwap: $scope.config.memorySwap,
                 Cmd: cmds,
