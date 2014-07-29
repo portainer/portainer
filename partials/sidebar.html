@@ -4,7 +4,7 @@
     <strong>Endpoint: </strong>{{ endpoint }}
     <ul>
         <li ng-repeat="container in containers">
-            <a href="/#/containers/{{ container.Id }}/">{{ container.Id|truncate:20 }}</a>
+            <a href="#/containers/{{ container.Id }}/">{{ container.Id|truncate:20 }}</a>
             <span class="pull-right label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span>   
         </li>
     </ul>

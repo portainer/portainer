@@ -188,7 +188,7 @@ function ContainerController($scope, $routeParams, $location, Container, Message
     };
 
     $scope.hasContent = function(data) {
-        return data !== null && data !== undefined && data.length > 1;
+        return data !== null && data !== undefined;
     };
 
     $scope.getChanges = function() {
@@ -437,7 +437,7 @@ function StartContainerController($scope, $routeParams, $location, Container, Me
 }
 
 function BuilderController($scope, Dockerfile, Messages) {
-    $scope.template = '/partials/builder.html';
+    $scope.template = 'partials/builder.html';
 }
 
 function failedRequestHandler(e, Messages) {
