@@ -4,7 +4,9 @@ angular.module('dockerui.services', ['ngResource'])
     .factory('Container', function($resource, Settings) {
         // Resource for interacting with the docker containers
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#containers
-        return $resource(Settings.url + '/containers/:id/:action', {}, {
+        return $resource(Settings.url + '/containers/:id/:action', {
+        	name: '@name'
+        }, {
             query: {method: 'GET', params:{ all: 0, action: 'json'}, isArray: true},
             get :{method: 'GET', params: { action:'json'}},
             start: {method: 'POST', params: {id: '@id', action: 'start'}},
