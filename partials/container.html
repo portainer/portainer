@@ -31,6 +31,15 @@
                 </td>
             </tr>
             <tr>
+                <td>Environment:</td>
+                <td>
+                    <ul>
+                        <li ng-repeat="k in container.Config.Env">{{ k }}</li>
+                    </ul>
+                </td>
+            </tr>
+
+            <tr>
                 <td>Publish All:</td>
                 <td>{{ container.HostConfig.PublishAllPorts }}</td>
             </tr>
