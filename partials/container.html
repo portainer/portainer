@@ -3,9 +3,21 @@
     <h4>Container: {{ container.Name }}</h4>
 
     <div class="btn-group detail">
-      <button class="btn btn-success" ng-click="start()">Start</button>
-      <button class="btn btn-warning" ng-click="stop()">Stop</button>
-      <button class="btn btn-danger" ng-click="kill()">Kill</button>
+      <button class="btn btn-success"
+            ng-click="start()"
+            ng-show="!container.State.Running">Start</button>
+      <button class="btn btn-warning"
+            ng-click="stop()"
+            ng-show="container.State.Running && !container.State.Paused">Stop</button>
+      <button class="btn btn-danger"
+            ng-click="kill()"
+            ng-show="container.State.Running && !container.State.Paused">Kill</button>
+      <button class="btn btn-info"
+            ng-click="pause()"
+            ng-show="container.State.Running && !container.State.Paused">Pause</button>
+      <button class="btn btn-success"
+            ng-click="unpause()"
+            ng-show="container.State.Running && container.State.Paused">Unpause</button>
     </div>
 
     <table class="table table-striped">
