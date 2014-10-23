@@ -172,7 +172,10 @@ function ContainerController($scope, $routeParams, $location, Container, Message
 
     $scope.start = function(){
         ViewSpinner.spin();
-        Container.start({id: $routeParams.id}, function(d) {
+        Container.start({
+                id: $scope.container.Id,
+                HostConfig: $scope.container.HostConfig
+            }, function(d) {
             update();
             Messages.send("Container started", $routeParams.id);
         }, function(e) {
