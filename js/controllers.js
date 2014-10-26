@@ -453,6 +453,7 @@ function StartContainerController($scope, $routeParams, $location, Container, Me
         name: '',
         memory: 0,
         memorySwap: 0,
+        cpuShares: 1024,
         env: '',
         commands: '',
         volumesFrom: ''
@@ -474,6 +475,7 @@ function StartContainerController($scope, $routeParams, $location, Container, Me
                 name: $scope.config.name,
                 Memory: $scope.config.memory,
                 MemorySwap: $scope.config.memorySwap,
+                CpuShares: $scope.config.cpuShares,
                 Cmd: cmds,
                 VolumesFrom: $scope.config.volumesFrom
             }, function(d) {
