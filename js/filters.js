@@ -34,6 +34,9 @@ angular.module('dockerui.filters', [])
             if (state.Ghost && state.Running) {
                 return 'Ghost';
             }
+            if (state.Running && state.Paused) {
+                return 'Running (Paused)';
+            }
             if (state.Running) {
                 return 'Running';
             }
@@ -65,18 +68,18 @@ angular.module('dockerui.filters', [])
     })
     .filter('containername', function() {
         return function(container) {
-			var name = container.Names[0];
-			return name.substring(1, name.length);
+            var name = container.Names[0];
+            return name.substring(1, name.length);
         };
     })
     .filter('repotag', function() {
         return function(image) {
-        	if (image.RepoTags && image.RepoTags.length > 0) {
-	        	var tag = image.RepoTags[0];
-	        	if (tag == '<none>:<none>') { tag = ''; }
-	        	return tag;
-        	}
-    		return '';		
+            if (image.RepoTags && image.RepoTags.length > 0) {
+                var tag = image.RepoTags[0];
+                if (tag == '<none>:<none>') { tag = ''; }
+                return tag;
+            }
+            return '';      
         };
     })
     .filter('getdate', function() {

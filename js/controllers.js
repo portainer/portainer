@@ -155,34 +155,86 @@ function SettingsController($scope, System, Docker, Settings, Messages) {
 function ContainerController($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
     $scope.changes = [];
 
+    var update = function() {
+        Container.get({id: $routeParams.id}, function(d) {
+            $scope.container = d;
+            ViewSpinner.stop();
+        }, function(e) {
+            if (e.status === 404) {
+                $('.detail').hide();
+                Messages.error("Not found", "Container not found.");
+            } else {
+                Messages.error("Failure", e.data);
+            }
+            ViewSpinner.stop();
+        });
+    };
+
     $scope.start = function(){
-        Container.start({id: $routeParams.id}, function(d) {
+        ViewSpinner.spin();
+        Container.start({
+                id: $scope.container.Id,
+                HostConfig: $scope.container.HostConfig
+            }, function(d) {
+            update();
             Messages.send("Container started", $routeParams.id);
         }, function(e) {
+            update();
             Messages.error("Failure", "Container failed to start." + e.data);
         });
     };
 
     $scope.stop = function() {
+        ViewSpinner.spin();
         Container.stop({id: $routeParams.id}, function(d) {
+            update();
             Messages.send("Container stopped", $routeParams.id);
         }, function(e) {
+            update();
             Messages.error("Failure", "Container failed to stop." + e.data);
         });
     };
 
     $scope.kill = function() {
+        ViewSpinner.spin();
         Container.kill({id: $routeParams.id}, function(d) {
+            update();
             Messages.send("Container killed", $routeParams.id);
         }, function(e) {
+            update();
             Messages.error("Failure", "Container failed to die." + e.data);
         });
     };
 
+    $scope.pause = function() {
+        ViewSpinner.spin();
+        Container.pause({id: $routeParams.id}, function(d) {
+            update();
+            Messages.send("Container paused", $routeParams.id);
+        }, function(e) {
+            update();
+            Messages.error("Failure", "Container failed to pause." + e.data);
+        });
+    };
+
+    $scope.unpause = function() {
+        ViewSpinner.spin();
+        Container.unpause({id: $routeParams.id}, function(d) {
+            update();
+            Messages.send("Container unpaused", $routeParams.id);
+        }, function(e) {
+            update();
+            Messages.error("Failure", "Container failed to unpause." + e.data);
+        });
+    };
+
     $scope.remove = function() {
+        ViewSpinner.spin();
         Container.remove({id: $routeParams.id}, function(d) {
+            update();
             Messages.send("Container removed", $routeParams.id);
         }, function(e){
+            update();
             Messages.error("Failure", "Container failed to remove." + e.data);
         });
     };
@@ -192,23 +244,15 @@ function ContainerController($scope, $routeParams, $location, Container, Message
     };
 
     $scope.getChanges = function() {
+        ViewSpinner.spin();
         Container.changes({id: $routeParams.id}, function(d) {
             $scope.changes = d;
+            ViewSpinner.stop();
         });
     };
 
-    Container.get({id: $routeParams.id}, function(d) {
-        $scope.container = d;
-    }, function(e) {
-        if (e.status === 404) {
-            $('.detail').hide();
-            Messages.error("Not found", "Container not found.");
-        } else {
-            Messages.error("Failure", e.data);
-        }
-    });
-
-   $scope.getChanges();
+    update();
+    $scope.getChanges();
 }
 
 // Controller for the list of containers
@@ -220,8 +264,8 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
     var update = function(data) {
         ViewSpinner.spin();
         Container.query(data, function(d) {
-            $scope.containers = d.map(function(item) { 
-            	return new ContainerViewModel(item); });
+            $scope.containers = d.map(function(item) {
+                return new ContainerViewModel(item); });
             ViewSpinner.stop();
         });
     };
@@ -233,22 +277,25 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
             counter = counter -1;
             if (counter === 0) {
                 ViewSpinner.stop();
+                update({all: Settings.displayAll ? 1 : 0});
             }
         };
-         angular.forEach(items, function(c) {
-           if (c.Checked) {
-               counter = counter + 1;
-               action({id: c.Id}, function(d) {
+        angular.forEach(items, function(c) {
+            if (c.Checked) {
+                counter = counter + 1;
+                action({id: c.Id}, function(d) {
                     Messages.send("Container " + msg, c.Id);
                     var index = $scope.containers.indexOf(c);
-                    $scope.containers.splice(index, 1);
                     complete();
-               }, function(e) {
+                }, function(e) {
                     Messages.error("Failure", e.data);
                     complete();
-               });
-           }
+                });
+            }
         });
+        if (counter === 0) {
+            ViewSpinner.stop();
+        }
     };
 
     $scope.toggleSelectAll = function() {
@@ -272,6 +319,14 @@ function ContainersController($scope, Container, Settings, Messages, ViewSpinner
 
     $scope.killAction = function() {
         batch($scope.containers, Container.kill, "Killed");
+    };
+
+    $scope.pauseAction = function() {
+        batch($scope.containers, Container.pause, "Paused");
+    };
+
+    $scope.unpauseAction = function() {
+        batch($scope.containers, Container.unpause, "Unpaused");
     };
 
     $scope.removeAction = function() {
@@ -398,6 +453,7 @@ function StartContainerController($scope, $routeParams, $location, Container, Me
         name: '',
         memory: 0,
         memorySwap: 0,
+        cpuShares: 1024,
         env: '',
         commands: '',
         volumesFrom: ''
@@ -419,6 +475,7 @@ function StartContainerController($scope, $routeParams, $location, Container, Me
                 name: $scope.config.name,
                 Memory: $scope.config.memory,
                 MemorySwap: $scope.config.memorySwap,
+                CpuShares: $scope.config.cpuShares,
                 Cmd: cmds,
                 VolumesFrom: $scope.config.volumesFrom
             }, function(d) {
