@@ -28,6 +28,8 @@ If you want to connect to docker via the unix socket you can pass the socket pat
 docker run -d -p 9000:9000 -v /var/run/docker.sock:/docker.sock crosbymichael/dockerui -e /docker.sock
 ```
 
+### Check the [wiki](//github.com/crosbymichael/dockerui/wiki) for more info about using dockerui
+
 ### Stack
 * Angular.js
 * Flatstrap ( Flat Twitter Bootstrap )
