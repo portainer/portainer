@@ -9,7 +9,9 @@ build:
 	docker build --rm -t dockerui .
 
 run:
-	docker run -d -p $(PORT):9000 -v /var/run/docker.sock:/docker.sock dockerui -e /docker.sock
+	-docker stop dockerui
+	-docker rm dockerui
+	docker run -d -p $(PORT):9000 -v /var/run/docker.sock:/docker.sock --name dockerui dockerui -e /docker.sock 
 
 open:
 	$(OPEN) localhost:$(PORT)
