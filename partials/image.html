@@ -9,7 +9,7 @@
     <h4>Image: {{ tag }}</h4>
 
     <div class="btn-group detail">
-      <button class="btn btn-success" ng-click="create()">Create</button>
+      <button class="btn btn-success" data-toggle="modal" data-target="#create-modal">Create</button>
     </div>
 
     <div>
@@ -82,15 +82,19 @@
     <hr />
 
     <div class="row-fluid">
-        <form class="form-inline">
+        <form class="form-inline" role="form">
             <fieldset>
                 <legend>Tag image</legend>
-                <label>Tag:</label>
-                <input type="text" placeholder="repo..." ng-model="tag.repo">
-                <label class="checkbox">
-                      <input type="checkbox" ng-model="tag.force"/> Force?
-                 </label>
-                 <input type="button" ng-click="updateTag()" value="Tag" class="btn btn-info"/>
+                <div class="form-group">
+                    <label>Tag:</label>
+                    <input type="text" placeholder="repo..." ng-model="tag.repo" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="tag.force" class="form-control"/> Force?
+                    </label>
+                </div>
+                 <input type="button" ng-click="updateTag()" value="Tag" class="btn btn-primary"/>
             </fieldset>
         </form>
     </div>

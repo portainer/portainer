@@ -3,11 +3,6 @@ body {
     padding-bottom: 60px;
 }
 
-.container {
-    margin: 0 auto;
-    max-width: 1000px;
-}
-
 .container > hr {
     margin: 60px 0;
 }
@@ -38,14 +33,6 @@ body {
 
 .marketing p + h4 {
     margin-top: 28px;
-}
-
-.navbar .navbar-inner {
-    padding: 0;
-}
-
-.navbar .nav {
-    margin: 0;
 }
 
 .navbar .nav li {

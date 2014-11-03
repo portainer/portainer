@@ -418,10 +418,6 @@ function ImageController($scope, $q, $routeParams, $location, Image, Container, 
         });
     };
 
-    $scope.create = function() {
-        $('#create-modal').modal('show');
-    };
-
     Image.get({id: $routeParams.id}, function(d) {
         $scope.image = d;
         $scope.tag = d.id;
