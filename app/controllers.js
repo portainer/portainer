@@ -119,13 +119,6 @@ function getChart(id) {
     return new Chart(ctx);
 }
 
-function StatusBarController($scope, Settings) {
-    $scope.template = 'partials/statusbar.html';
-
-    $scope.uiVersion = Settings.uiVersion;
-    $scope.apiVersion = Settings.version;
-}
-
 function SideBarController($scope, Container, Settings) {
     $scope.template = 'partials/sidebar.html';
     $scope.containers = [];

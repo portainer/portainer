@@ -38,6 +38,7 @@
     <script src="app/controllers.js"></script>
     <!-- TODO: Add minification build step -->
     <script src="app/components/masthead/mastheadController.js"></script>
+    <script src="app/components/footer/footerController.js"></script>
     <script src="app/viewmodel.js"></script>
 
     <!-- Fav and touch icons -->
@@ -56,7 +57,7 @@
         <div id="view" ng-view></div>
 
         <div class="container-bottom"></div>
-        <div ng-include="template" ng-controller="StatusBarController"></div>
+        <div ng-include="template" ng-controller="FooterController"></div>
     </div> 
 
 
