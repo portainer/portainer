@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('dockerui', ['ngRoute', 'dockerui.services', 'dockerui.filters'])
+angular.module('dockerui', ['ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead'])
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/', {templateUrl: 'partials/dashboard.html', controller: 'DashboardController'});
         $routeProvider.when('/containers/', {templateUrl: 'partials/containers.html', controller: 'ContainersController'});

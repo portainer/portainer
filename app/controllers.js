@@ -1,8 +1,3 @@
-
-function MastheadController($scope) {
-    $scope.template = 'partials/masthead.html';
-}
-
 function newLineChart(id, data, getkey) {
     var chart = getChart(id);
     var map = {};
