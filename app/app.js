@@ -1,11 +1,11 @@
 'use strict';
 
-angular.module('dockerui', ['ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers'])
+angular.module('dockerui', ['ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images'])
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/', {templateUrl: 'app/components/dashboard/dashboard.html', controller: 'DashboardController'});
         $routeProvider.when('/containers/', {templateUrl: 'app/components/containers/containers.html', controller: 'ContainersController'});
         $routeProvider.when('/containers/:id/', {templateUrl: 'app/components/container/container.html', controller: 'ContainerController'});
-        $routeProvider.when('/images/', {templateUrl: 'partials/images.html', controller: 'ImagesController'});
+        $routeProvider.when('/images/', {templateUrl: 'app/components/images/images.html', controller: 'ImagesController'});
         $routeProvider.when('/images/:id/', {templateUrl: 'partials/image.html', controller: 'ImageController'});
         $routeProvider.when('/settings', {templateUrl: 'partials/settings.html', controller: 'SettingsController'});
         $routeProvider.otherwise({redirectTo: '/'});
