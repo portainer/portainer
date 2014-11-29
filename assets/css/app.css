@@ -35,6 +35,15 @@ body {
     margin-top: 28px;
 }
 
+.navbar .navbar-inner {
+    padding: 0;
+}
+
+.navbar .nav {
+    margin: 0;
+    width: 100%;
+}
+
 .navbar .nav li {
     display: table-cell;
     width: 1%;
