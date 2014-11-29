@@ -47,10 +47,6 @@ function getChart(id) {
     return new Chart(ctx);
 }
 
-function BuilderController($scope, Dockerfile, Messages) {
-    $scope.template = 'partials/builder.html';
-}
-
 function failedRequestHandler(e, Messages) {
     Messages.send({class: 'text-error', data: e.data});
 }
