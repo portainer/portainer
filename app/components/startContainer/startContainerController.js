@@ -13,6 +13,10 @@ function($scope, $routeParams, $location, Container, Messages) {
     };
     $scope.commandPlaceholder = '["/bin/echo", "Hello world"]';
 
+    function failedRequestHandler(e, Messages) {
+        Messages.send({class: 'text-error', data: e.data});
+    }
+
     $scope.create = function() {
         var cmds = null;
         if ($scope.config.commands !== '') {
@@ -39,6 +43,8 @@ function($scope, $routeParams, $location, Container, Messages) {
                     }, function(e) {
                         failedRequestHandler(e, Messages);
                     });
+                } else {
+                    failedRequestHandler(d, Messages);
                 }
             }, function(e) {
                 failedRequestHandler(e, Messages);

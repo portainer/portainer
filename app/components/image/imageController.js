@@ -1,6 +1,6 @@
 angular.module('image', [])
-.controller('ImageController', ['$scope', '$q', '$routeParams', '$location', 'Image', 'Container', 'Messages',
-function($scope, $q, $routeParams, $location, Image, Container, Messages) {
+.controller('ImageController', ['$scope', '$q', '$routeParams', '$location', 'Image', 'Container', 'Messages', 'LineChart',
+function($scope, $q, $routeParams, $location, Image, Container, Messages, LineChart) {
     $scope.history = [];
     $scope.tag = {repo: '', force: false};
 
@@ -29,6 +29,23 @@ function($scope, $q, $routeParams, $location, Image, Container, Messages) {
         });
     };
 
+    function getContainersFromImage($q, Container, tag) {
+        var defer = $q.defer();
+        
+        Container.query({all:1, notruc:1}, function(d) {
+            var containers = [];
+            for (var i = 0; i < d.length; i++) {
+                var c = d[i];
+                if (c.Image == tag) {
+                    containers.push(new ContainerViewModel(c));
+                }
+            }
+            defer.resolve(containers);
+        });
+
+        return defer.promise;
+    }
+
     Image.get({id: $routeParams.id}, function(d) {
         $scope.image = d;
         $scope.tag = d.id;
@@ -38,7 +55,7 @@ function($scope, $q, $routeParams, $location, Image, Container, Messages) {
             var promise = getContainersFromImage($q, Container, t);
 
             promise.then(function(containers) {
-                newLineChart('#containers-started-chart', containers, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
+                LineChart.build('#containers-started-chart', containers, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
             });
         }
     }, function(e) {

@@ -1,15 +1,15 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$scope', 'Container', 'Image', 'Settings', function($scope, Container, Image, Settings) {
+.controller('DashboardController', ['$scope', 'Container', 'Image', 'Settings', 'LineChart', function($scope, Container, Image, Settings, LineChart) {
     $scope.predicate = '-Created';
     $scope.containers = [];
 
     var getStarted = function(data) {
         $scope.totalContainers = data.length;
-        newLineChart('#containers-started-chart', data, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
+        LineChart.build('#containers-started-chart', data, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
         var s = $scope;
         Image.query({}, function(d) {
             s.totalImages = d.length;
-            newLineChart('#images-created-chart', d, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
+            LineChart.build('#images-created-chart', d, function(c) { return new Date(c.Created * 1000).toLocaleDateString(); });
         });
     };
 
@@ -46,7 +46,7 @@ angular.module('dashboard', [])
 
        getStarted(d);
 
-       var c = getChart('#containers-chart');
+       var c = new Chart($('#containers-chart').get(0).getContext("2d"));
        var data = [
         {
             value: running,

@@ -123,4 +123,52 @@ angular.module('dockerui.services', ['ngResource'])
                 request.send(data);
             }
         };
+    })
+    .factory('LineChart', function(Settings) {
+        var url = Settings.rawUrl  + '/build';
+        return {
+            build: function(id, data, getkey){
+                var chart = new Chart($(id).get(0).getContext("2d"));
+                var map = {};
+
+                for (var i = 0; i < data.length; i++) {
+                    var c = data[i];
+                    var key = getkey(c);
+                    
+                    var count = map[key];
+                    if (count === undefined) {
+                        count = 0;
+                    }
+                    count += 1;
+                    map[key] = count;
+                }
+
+                var labels = [];
+                var data = [];
+                var keys = Object.keys(map);
+
+                for (var i = keys.length - 1; i > -1; i--) {
+                    var k = keys[i];
+                    labels.push(k);
+                    data.push(map[k]);
+                }
+                var dataset = {
+                    fillColor : "rgba(151,187,205,0.5)",
+                    strokeColor : "rgba(151,187,205,1)",
+                    pointColor : "rgba(151,187,205,1)",
+                    pointStrokeColor : "#fff",
+                    data : data
+                };
+                chart.Line({
+                    labels: labels,
+                    datasets: [dataset]
+                }, 
+                {
+                    scaleStepWidth: 1, 
+                    pointDotRadius:1,
+                    scaleOverride: true,
+                    scaleSteps: labels.length
+                });
+            }
+        };
     });
