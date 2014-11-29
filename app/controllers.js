@@ -47,16 +47,6 @@ function getChart(id) {
     return new Chart(ctx);
 }
 
-function SettingsController($scope, System, Docker, Settings, Messages) {
-    $scope.info = {};
-    $scope.docker = {};
-    $scope.endpoint = Settings.endpoint;
-    $scope.apiVersion = Settings.version;
-
-    Docker.get({}, function(d) { $scope.docker = d; });
-    System.get({}, function(d) { $scope.info = d; });
-}
-
 function BuilderController($scope, Dockerfile, Messages) {
     $scope.template = 'partials/builder.html';
 }
