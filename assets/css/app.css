@@ -1,6 +1,5 @@
 body {
     padding-top: 20px;
-    padding-bottom: 60px;
 }
 
 .container > hr {
@@ -35,33 +34,33 @@ body {
     margin-top: 28px;
 }
 
-.navbar .navbar-inner {
-    padding: 0;
-}
-
-.navbar .nav {
+.masthead .nav {
     margin: 0;
     width: 100%;
 }
 
-.navbar .nav li {
+.masthead .nav.well {
+    padding: 0;
+}
+
+.masthead .nav li {
     display: table-cell;
     width: 1%;
     float: none;
 }
 
-.navbar .nav li a {
+.masthead .nav li a {
     font-weight: bold;
     text-align: center;
     border-left: 1px solid rgba(255,255,255,.75);
     border-right: 1px solid rgba(0,0,0,.1);
 }
 
-.navbar .nav li:first-child a {
+.masthead .nav li:first-child a {
     border-left: 0;
     border-radius: 3px 0 0 3px;
 }
-.navbar .nav li:last-child a {
+.masthead .nav li:last-child a {
     border-right: 0;
     border-radius: 0 3px 3px 0;
 }
@@ -76,7 +75,7 @@ body {
 }
 
 .center {
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
 }
 
@@ -93,8 +92,8 @@ body {
     height: 50px;
 }
 
-.footer {
-    max-height:6px;
+.well {
+    padding: 10px 15px 0 15px;
 }
 
 #response {
