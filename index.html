@@ -7,46 +7,46 @@
     <meta name="description" content="">
     <meta name="author" content="Michael Crosby crosbymichael.com">
 
-    <link href="assets/css/bootstrap.css" rel="stylesheet">
-    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="lib/jquery.gritter.css" rel="stylesheet">
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/jquery.gritter.css" rel="stylesheet">
 
-    <link href="css/app.css" rel="stylesheet">
+    <link href="assets/css/app.css" rel="stylesheet">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 	
-    <script src="assets/js/jquery.js"></script>
-    <script src="assets/js/bootstrap-transition.js"></script>
-    <script src="assets/js/bootstrap-alert.js"></script>
-    <script src="assets/js/bootstrap-modal.js"></script>
-    <script src="assets/js/bootstrap-dropdown.js"></script>
-    <script src="assets/js/bootstrap-scrollspy.js"></script>
-    <script src="assets/js/bootstrap-tab.js"></script>
-    <script src="assets/js/bootstrap-tooltip.js"></script>
-    <script src="assets/js/bootstrap-popover.js"></script>
-    <script src="assets/js/bootstrap-button.js"></script>
-    <script src="assets/js/bootstrap-collapse.js"></script>
-    <script src="assets/js/bootstrap-carousel.js"></script>
-    <script src="assets/js/bootstrap-typeahead.js"></script>
+    <script src="assets/js/jquery-1.11.1.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
 
-    <script src="lib/spin.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="assets/js/spin.js" type="text/javascript" charset="utf-8"></script>
 
     <script src="assets/js/angularjs/1.2.6/angular.min.js"></script>
     <script src="assets/js/angularjs/1.2.6/angular-resource.min.js"></script>
     <script src="assets/js/angularjs/1.2.6/angular-route.min.js"></script>
 
-    <script src="lib/jquery.gritter.min.js"></script>
-    <script src="lib/Chart.min.js"></script>
-    <script src="lib/legend.js"></script>
+    <script src="assets/js/jquery.gritter.min.js"></script>
+    <script src="assets/js/Chart.min.js"></script>
+    <script src="assets/js/legend.js"></script>
 
-    <script src="js/app.js"></script>
-    <script src="js/services.js"></script>
-    <script src="js/filters.js"></script>
-    <script src="js/controllers.js"></script>
-    <script src="js/viewmodel.js"></script>
+    <script src="app/app.js"></script>
+    <script src="app/shared/services.js"></script>
+    <script src="app/shared/filters.js"></script>
+    <script src="app/shared/viewmodel.js"></script>
+    <!-- TODO: Add minification build step -->
+    <script src="app/components/masthead/mastheadController.js"></script>
+    <script src="app/components/footer/footerController.js"></script>
+    <script src="app/components/dashboard/dashboardController.js"></script>
+    <script src="app/components/container/containerController.js"></script>
+    <script src="app/components/containers/containersController.js"></script>
+    <script src="app/components/startContainer/startContainerController.js"></script>
+    <script src="app/components/image/imageController.js"></script>
+    <script src="app/components/images/imagesController.js"></script>
+    <script src="app/components/sidebar/sidebarController.js"></script>
+    <script src="app/components/settings/settingsController.js"></script>
+    <script src="app/components/builder/builderController.js"></script>
 
     <!-- Fav and touch icons -->
     <link rel="shortcut icon" href="assets/ico/favicon.ico">
@@ -64,7 +64,7 @@
         <div id="view" ng-view></div>
 
         <div class="container-bottom"></div>
-        <div ng-include="template" ng-controller="StatusBarController"></div>
+        <div ng-include="template" ng-controller="FooterController"></div>
     </div> 
 
 

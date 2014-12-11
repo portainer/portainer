@@ -1,0 +1,44 @@
+<div id="create-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Create And Start Container From Image</h3>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                        <fieldset>
+                                <div class="form-group">
+                                    <label>Cmd:</label>
+                                    <input type="text" placeholder="{{ commandPlaceholder }}" ng-model="config.commands" class="form-control"/>
+                                    <small>Input commands as an array</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Name:</label>
+                                    <input type="text" ng-model="config.name" class="form-control"/>
+                                </div>
+                                <div class="form-group">
+                                    <label>Memory:</label>
+                                    <input type="number" ng-model="config.memory" class="form-control"/>
+                                </div>
+                                <div class="form-group">
+                                    <label>Memory Swap:</label>
+                                    <input type="number" ng-model="config.memorySwap" class="form-control"/>
+                                </div>
+                                <div class="form-group">
+                                    <label>CPU Shares:</label>
+                                    <input type="number" ng-model="config.cpuShares" class="form-control"/>
+                                </div>
+                                <div class="form-group">
+                                    <label>Volumes From:</label>
+                                    <input type="text" ng-model="config.volumesFrom" class="form-control"/>
+                                </div>
+                        </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="" class="btn btn-primary" ng-click="create()">Create</a>
+            </div>
+        </div>
+    </div>
+</div>
