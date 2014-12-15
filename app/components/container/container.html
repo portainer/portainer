@@ -99,6 +99,10 @@
                 <td>State:</td>
                 <td><span class="label {{ container.State|getstatelabel }}">{{ container.State|getstatetext }}</span></td>
             </tr>
+            <tr>
+                 <td>Logs:</td>
+                 <td><a href="#/containers/{{ container.Id }}/logs">stdout/stderr</a></td>
+            </tr>
         </tbody>
     </table>
     
