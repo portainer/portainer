@@ -36,6 +36,7 @@ body {
 
 .masthead .nav {
     margin: 0;
+    margin: 0 0 2em 0;
     width: 100%;
 }
 
@@ -119,4 +120,10 @@ body {
     border-style: solid;
     border-width: 0 0 0 1em;
     padding: 0 0.3em;
+}
+
+pre.pre-x-scrollable {
+    max-height: 700px;
+    word-wrap: normal;
+    white-space: pre;
 }

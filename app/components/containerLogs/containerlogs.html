@@ -1,0 +1,34 @@
+<div class="row logs">
+    <div class="col-xs-12">
+        <h4>Logs for container: <a href="#/containers/{{ container.Id }}/">{{ container.Name }}</a></td></h4>
+        <div class="btn-group detail">
+            <button class="btn btn-info" ng-click="scrollTo('stdout')">stdout</button>
+            <button class="btn btn-warning" ng-click="scrollTo('stderr')">stderr</button>
+        </div>
+        <div class="pull-right">
+            <input id="timestampToggle" type="checkbox" ng-model="showTimestamps" 
+                ng-change="toggleTimestamps()"/> <label for="timestampToggle">Display Timestamps</label>
+        </div>
+    </div>
+
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 id="stdout" class="panel-title">STDOUT</h3>
+            </div>
+            <div class="panel-body">
+                <pre id="stdoutLog" class="pre-scrollable pre-x-scrollable">{{stdout}}</pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 id="stderr" class="panel-title">STDERR</h3>
+            </div>
+            <div class="panel-body">
+                <pre id="stderrLog" class="pre-scrollable pre-x-scrollable">{{stderr}}</pre>
+            </div>
+        </div>
+    </div>
+</div>
