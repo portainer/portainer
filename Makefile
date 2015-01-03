@@ -6,6 +6,7 @@ OPEN = $(shell which xdg-open || which open)
 PORT ?= 9000
 
 build:
+	grunt build
 	docker build --rm -t dockerui .
 
 run:
