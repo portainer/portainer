@@ -4,6 +4,7 @@ function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
     $scope.changes = [];
 
     var update = function() {
+        ViewSpinner.spin();
         Container.get({id: $routeParams.id}, function(d) {
             $scope.container = d;
             ViewSpinner.stop();
