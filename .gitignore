@@ -2,3 +2,5 @@ logs/*
 !.gitkeep
 dockerui
 *.esproj/*
+node_modules
+.idea
