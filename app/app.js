@@ -1,7 +1,6 @@
-'use strict';
-
 angular.module('<%= pkg.name %>', ['<%= pkg.name %>.templates', 'ngRoute', '<%= pkg.name %>.services', '<%= pkg.name %>.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'settings', 'builder', 'containerLogs'])
     .config(['$routeProvider', function ($routeProvider) {
+        'use strict';
         $routeProvider.when('/', {templateUrl: 'app/components/dashboard/dashboard.html', controller: 'DashboardController'});
         $routeProvider.when('/containers/', {templateUrl: 'app/components/containers/containers.html', controller: 'ContainersController'});
         $routeProvider.when('/containers/:id/', {templateUrl: 'app/components/container/container.html', controller: 'ContainerController'});

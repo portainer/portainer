@@ -144,7 +144,10 @@ module.exports = function (grunt) {
                 sub:true,
                 boss:true,
                 eqnull:true,
-                globals:{}
+                globals:{
+                    angular: false,
+                    '$': false
+                }
             }
         }
     });

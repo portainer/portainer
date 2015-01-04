@@ -27,7 +27,7 @@ angular.module('dashboard', [])
     }
    
     Container.query({all: 1}, function(d) {
-       var running = 0
+       var running = 0;
        var ghost = 0;
        var stopped = 0;
 

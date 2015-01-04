@@ -1,7 +1,6 @@
-'use strict';
-
 angular.module('dockerui.services', ['ngResource'])
     .factory('Container', function($resource, Settings) {
+        'use strict';
         // Resource for interacting with the docker containers
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#containers
         return $resource(Settings.url + '/containers/:id/:action', {
@@ -21,6 +20,7 @@ angular.module('dockerui.services', ['ngResource'])
         });
     })
     .factory('ContainerLogs', function($resource, $http, Settings) {
+        'use strict';
         return {
             get: function(id, params, callback) {
                 $http({
@@ -31,9 +31,10 @@ angular.module('dockerui.services', ['ngResource'])
                     console.log(error, data);
                 });
             }
-        }
+        };
     })
     .factory('Image', function($resource, Settings) {
+        'use strict';
         // Resource for docker images
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#images
         return $resource(Settings.url + '/images/:id/:action', {}, {
@@ -49,6 +50,7 @@ angular.module('dockerui.services', ['ngResource'])
         });
     })
     .factory('Docker', function($resource, Settings) {
+        'use strict';
         // Information for docker
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#display-system-wide-information
         return $resource(Settings.url + '/version', {}, {
@@ -56,6 +58,7 @@ angular.module('dockerui.services', ['ngResource'])
         });
     })
     .factory('Auth', function($resource, Settings) {
+        'use strict';
         // Auto Information for docker
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#set-auth-configuration
         return $resource(Settings.url + '/auth', {}, {
@@ -64,6 +67,7 @@ angular.module('dockerui.services', ['ngResource'])
         });
     })
     .factory('System', function($resource, Settings) {
+        'use strict';
         // System for docker
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#display-system-wide-information
         return $resource(Settings.url + '/info', {}, {
@@ -71,6 +75,7 @@ angular.module('dockerui.services', ['ngResource'])
         });
     })
     .factory('Settings', function(DOCKER_ENDPOINT, DOCKER_PORT, DOCKER_API_VERSION, UI_VERSION) {
+        'use strict';
         var url = DOCKER_ENDPOINT;
         if (DOCKER_PORT) {
             url = url + DOCKER_PORT + '\\' + DOCKER_PORT;
@@ -82,10 +87,11 @@ angular.module('dockerui.services', ['ngResource'])
             rawUrl: DOCKER_ENDPOINT + DOCKER_PORT + '/' + DOCKER_API_VERSION,
             uiVersion: UI_VERSION,
             url: url,
-            firstLoad: true,
+            firstLoad: true
         };
     })
     .factory('ViewSpinner', function() {
+        'use strict';
         var spinner = new Spinner();
         var target = document.getElementById('view');
 
@@ -95,6 +101,7 @@ angular.module('dockerui.services', ['ngResource'])
         };
     })
     .factory('Messages', function($rootScope) {
+        'use strict';
         return {
             send: function(title, text) {
                 $.gritter.add({
@@ -102,7 +109,7 @@ angular.module('dockerui.services', ['ngResource'])
                     text: text,
                     time: 2000,
                     before_open: function() {
-                        if($('.gritter-item-wrapper').length == 3) {
+                        if($('.gritter-item-wrapper').length === 3) {
                             return false;
                         }  
                     }
@@ -114,7 +121,7 @@ angular.module('dockerui.services', ['ngResource'])
                     text: text,
                     time: 6000,
                     before_open: function() {
-                        if($('.gritter-item-wrapper').length == 4) {
+                        if($('.gritter-item-wrapper').length === 4) {
                             return false;
                         }  
                     }
@@ -123,6 +130,7 @@ angular.module('dockerui.services', ['ngResource'])
         };
     })
     .factory('Dockerfile', function(Settings) {
+        'use strict';
         var url = Settings.rawUrl  + '/build';
         return {
             build: function(file, callback) {
@@ -138,6 +146,7 @@ angular.module('dockerui.services', ['ngResource'])
         };
     })
     .factory('LineChart', function(Settings) {
+        'use strict';
         var url = Settings.rawUrl  + '/build';
         return {
             build: function(id, data, getkey){
@@ -157,10 +166,10 @@ angular.module('dockerui.services', ['ngResource'])
                 }
 
                 var labels = [];
-                var data = [];
+                data = [];
                 var keys = Object.keys(map);
 
-                for (var i = keys.length - 1; i > -1; i--) {
+                for (i = keys.length - 1; i > -1; i--) {
                     var k = keys[i];
                     labels.push(k);
                     data.push(map[k]);

@@ -36,7 +36,7 @@ function($scope, $q, $routeParams, $location, Image, Container, Messages, LineCh
             var containers = [];
             for (var i = 0; i < d.length; i++) {
                 var c = d[i];
-                if (c.Image == tag) {
+                if (c.Image === tag) {
                     containers.push(new ContainerViewModel(c));
                 }
             }
