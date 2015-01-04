@@ -54,8 +54,8 @@ module.exports = function (grunt) {
             }
         },
         karma: {
-            unit: { options: karmaConfig('test/config/unit.js') },
-            watch: { options: karmaConfig('test/config/unit.js', { singleRun:false, autoWatch: true}) }
+            unit: { options: karmaConfig('test/unit/karma.conf.js') },
+            watch: { options: karmaConfig('test/unit/karma.conf.js', { singleRun:false, autoWatch: true}) }
         },
         html2js: {
             app: {
