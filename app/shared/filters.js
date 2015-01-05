@@ -1,4 +1,4 @@
-angular.module('dockerui.filters', [])
+angular.module('<%= pkg.name %>.filters', [])
     .filter('truncate', function() {
         'use strict';
         return function(text, length, end) {
@@ -7,14 +7,14 @@ angular.module('dockerui.filters', [])
             }
 
             if (end === undefined){
-                end = "...";
+                end = '...';
             }
 
             if (text.length <= length || text.length - end.length <= length) {
                 return text;
             }
             else {
-                return String(text).substring(0, length-end.length) + end;
+                return String(text).substring(0, length - end.length) + end;
             }
         };
     })
