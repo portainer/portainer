@@ -3,4 +3,5 @@ logs/*
 dockerui
 *.esproj/*
 node_modules
+dist
 .idea

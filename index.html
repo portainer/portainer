@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="dockerui">
+<html lang="en" ng-app="<%= pkg.name %>">
   <head>
     <meta charset="utf-8">
     <title>DockerUI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
-    <meta name="author" content="Michael Crosby crosbymichael.com">
+    <meta name="author" content="<%= pkg.author %>">
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/jquery.gritter.css" rel="stylesheet">
 
-    <link href="assets/css/app.css" rel="stylesheet">
+    <link href="<%= pkg.name %>.css" rel="stylesheet">
+
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -31,23 +32,7 @@
     <script src="assets/js/Chart.min.js"></script>
     <script src="assets/js/legend.js"></script>
 
-    <script src="app/app.js"></script>
-    <script src="app/shared/services.js"></script>
-    <script src="app/shared/filters.js"></script>
-    <script src="app/shared/viewmodel.js"></script>
-    <!-- TODO: Add minification build step -->
-    <script src="app/components/masthead/mastheadController.js"></script>
-    <script src="app/components/footer/footerController.js"></script>
-    <script src="app/components/dashboard/dashboardController.js"></script>
-    <script src="app/components/container/containerController.js"></script>
-    <script src="app/components/containers/containersController.js"></script>
-    <script src="app/components/containerLogs/containerLogsController.js"></script>
-    <script src="app/components/startContainer/startContainerController.js"></script>
-    <script src="app/components/image/imageController.js"></script>
-    <script src="app/components/images/imagesController.js"></script>
-    <script src="app/components/sidebar/sidebarController.js"></script>
-    <script src="app/components/settings/settingsController.js"></script>
-    <script src="app/components/builder/builderController.js"></script>
+    <script src="<%= pkg.name %>.js"></script>
 
     <!-- Fav and touch icons -->
     <link rel="shortcut icon" href="assets/ico/favicon.ico">

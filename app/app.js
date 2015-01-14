@@ -1,7 +1,6 @@
-'use strict';
-
-angular.module('dockerui', ['ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'settings', 'builder', 'containerLogs'])
+angular.module('<%= pkg.name %>', ['<%= pkg.name %>.templates', 'ngRoute', '<%= pkg.name %>.services', '<%= pkg.name %>.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'settings', 'builder', 'containerLogs'])
     .config(['$routeProvider', function ($routeProvider) {
+        'use strict';
         $routeProvider.when('/', {templateUrl: 'app/components/dashboard/dashboard.html', controller: 'DashboardController'});
         $routeProvider.when('/containers/', {templateUrl: 'app/components/containers/containers.html', controller: 'ContainersController'});
         $routeProvider.when('/containers/:id/', {templateUrl: 'app/components/container/container.html', controller: 'ContainerController'});
@@ -15,5 +14,5 @@ angular.module('dockerui', ['ngRoute', 'dockerui.services', 'dockerui.filters', 
     // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
     .constant('DOCKER_ENDPOINT', '/dockerapi')
     .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
-    .constant('UI_VERSION', 'v0.5')
+    .constant('UI_VERSION', 'v<%= pkg.version %>')
     .constant('DOCKER_API_VERSION', 'v1.15');

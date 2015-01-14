@@ -5,8 +5,15 @@
 OPEN = $(shell which xdg-open || which open)
 PORT ?= 9000
 
+install:
+	npm install -g grunt-cli
+
 build:
+	grunt build
 	docker build --rm -t dockerui .
+
+test:
+	grunt
 
 run:
 	-docker stop dockerui

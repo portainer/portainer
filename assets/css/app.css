@@ -22,8 +22,8 @@ body {
 }
 
 .jumbotron .btn {
-    font-size: 21px;
     padding: 14px 24px;
+    font-size: 21px;
 }
 
 .marketing {
@@ -46,15 +46,15 @@ body {
 
 .masthead .nav li {
     display: table-cell;
-    width: 1%;
     float: none;
+    width: 1%;
 }
 
 .masthead .nav li a {
     font-weight: bold;
     text-align: center;
-    border-left: 1px solid rgba(255,255,255,.75);
     border-right: 1px solid rgba(0,0,0,.1);
+    border-left: 1px solid rgba(255,255,255,.75);
 }
 
 .masthead .nav li:first-child a {
@@ -81,8 +81,8 @@ body {
 }
 
 .btn-remove {
-    margin: 0 auto;
     max-width: 70%;
+    margin: 0 auto;
 }
 
 .actions {
@@ -97,33 +97,15 @@ body {
     padding: 10px 15px 0 15px;
 }
 
-#response {
-    width: 80%;
-    margin: 0 auto;
-}
-
-#editor {
-    height: 300px;
-    width: 100%;
-    border: 1px solid #DDD;
-    margin-top: 5px;
-}
-
 .messages {
     max-height: 50px;
-    overflow-y: scroll;
     overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 .legend .title {
+    padding: 0 0.3em;
     margin: 0.5em;
     border-style: solid;
     border-width: 0 0 0 1em;
-    padding: 0 0.3em;
-}
-
-pre.pre-x-scrollable {
-    max-height: 700px;
-    word-wrap: normal;
-    white-space: pre;
 }
