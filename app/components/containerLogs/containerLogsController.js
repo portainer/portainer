@@ -1,7 +1,7 @@
 angular.module('containerLogs', [])
 .controller('ContainerLogsController', ['$scope', '$routeParams', '$location', '$anchorScroll', 'ContainerLogs', 'Container', 'ViewSpinner',
 function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Container, ViewSpinner) {
-	$scope.stdout = '';
+    $scope.stdout = '';
     $scope.stderr = '';
     $scope.showTimestamps = false;
 
@@ -20,7 +20,7 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
 
     function getLogs() {
         ContainerLogs.get($routeParams.id, {stdout: 1, stderr: 0, timestamps: $scope.showTimestamps}, function(data, status, headers, config) {
-        	// Replace carriage returns twith newlines to clean up output
+            // Replace carriage returns twith newlines to clean up output
             $scope.stdout = data.replace(/[\r]/g, '\n');
         });
         ContainerLogs.get($routeParams.id, {stdout: 0, stderr: 1}, function(data, status, headers, config) {
@@ -40,9 +40,9 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
     $scope.scrollTo = function(id) {
         $location.hash(id);
         $anchorScroll();
-    }
+    };
 
     $scope.toggleTimestamps = function() {
-    	getLogs();
-    }
+        getLogs();
+    };
 }]);
