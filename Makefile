@@ -12,6 +12,10 @@ build:
 	grunt build
 	docker build --rm -t dockerui .
 
+build-release:
+	grunt release
+	docker build --rm -t dockerui .
+
 test:
 	grunt
 

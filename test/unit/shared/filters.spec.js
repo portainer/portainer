@@ -1,5 +1,5 @@
 describe('filters', function () {
-    beforeEach(module('<%= pkg.name %>.filters'));
+    beforeEach(module('dockerui.filters'));
 
     describe('truncate', function () {
         it('should truncate the string to 10 characters ending in "..." by default', inject(function(truncateFilter) {

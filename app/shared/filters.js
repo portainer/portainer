@@ -1,4 +1,4 @@
-angular.module('<%= pkg.name %>.filters', [])
+angular.module('dockerui.filters', [])
     .filter('truncate', function() {
         'use strict';
         return function(text, length, end) {
