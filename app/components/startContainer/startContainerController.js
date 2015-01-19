@@ -9,7 +9,8 @@ function($scope, $routeParams, $location, Container, Messages) {
         cpuShares: 1024,
         env: '',
         commands: '',
-        volumesFrom: ''
+        volumesFrom: '',
+        portBindings: []
     };
     $scope.commandPlaceholder = '["/bin/echo", "Hello world"]';
 
@@ -27,6 +28,27 @@ function($scope, $routeParams, $location, Container, Messages) {
         var loc = $location;
         var s = $scope;
 
+        var exposedPorts = {};
+        var portBindings = {};
+        // TODO: consider using compatibility library 
+        $scope.config.portBindings.forEach(function(portBinding) {
+            var intPort = portBinding.intPort + "/tcp";
+            var binding = {
+                HostIp: portBinding.ip,
+                HostPort: portBinding.extPort
+            };
+            if (portBinding.intPort) {
+                exposedPorts[intPort] = {};
+                if (intPort in portBindings) {
+                    portBindings[intPort].push(binding);
+                } else {
+                    portBindings[intPort] = [binding];
+                }
+            } else {
+                // TODO: Send warning message? Internal port need to be specified.
+            }
+        });
+
         Container.create({
                 Image: id,
                 name: $scope.config.name,
@@ -34,10 +56,19 @@ function($scope, $routeParams, $location, Container, Messages) {
                 MemorySwap: $scope.config.memorySwap,
                 CpuShares: $scope.config.cpuShares,
                 Cmd: cmds,
-                VolumesFrom: $scope.config.volumesFrom
+                VolumesFrom: $scope.config.volumesFrom,
+                ExposedPorts: exposedPorts,
+                HostConfig: {
+                    PortBindings: portBindings
+                }
             }, function(d) {
                 if (d.Id) {
-                    ctor.start({id: d.Id}, function(cd) {
+                    ctor.start({
+                        id: d.Id,
+                        HostConfig: {
+                            PortBindings: portBindings
+                        }
+                    }, function(cd) {
                         $('#create-modal').modal('hide');
                         loc.path('/containers/' + d.Id + '/');
                     }, function(e) {
@@ -49,5 +80,14 @@ function($scope, $routeParams, $location, Container, Messages) {
             }, function(e) {
                 failedRequestHandler(e, Messages);
         });
+    };
+
+    $scope.addPortBinding = function() {
+        $scope.config.portBindings.push({ip: '', extPort: '', intPort: ''});
+    };
+
+    $scope.removePortBinding = function(portBinding) {
+        var idx = $scope.config.portBindings.indexOf(portBinding);
+        $scope.config.portBindings.splice(idx, 1);
     };
 }]);

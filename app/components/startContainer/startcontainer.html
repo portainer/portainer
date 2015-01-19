@@ -33,6 +33,27 @@
                                     <label>Volumes From:</label>
                                     <input type="text" ng-model="config.volumesFrom" class="form-control"/>
                                 </div>
+                                <div class="form-group">
+                                    <label>Port bindings:</label>
+                                    <div ng-repeat="portBinding in config.portBindings" class="form-inline">
+                                        <div class="form-group">
+                                            <label class="sr-only">Host IP:</label>
+                                            <input type="text" ng-model="portBinding.ip" class="form-control" placeholder="Host IP Address"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="sr-only">Host Port:</label>
+                                            <input type="text" ng-model="portBinding.extPort" class="form-control" placeholder="Host Port"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="sr-only">Container port:</label>
+                                            <input type="text" ng-model="portBinding.intPort" class="form-control" placeholder="Container Port"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <button class="btn btn-danger btn-xs form-control" ng-click="removePortBinding(portBinding)">Remove</button>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-success" ng-click="addPortBinding()">Add Port Binding</button>
+                                </div>
                         </fieldset>
                 </form>
             </div>
