@@ -34,6 +34,23 @@
                                     <input type="text" ng-model="config.volumesFrom" class="form-control"/>
                                 </div>
                                 <div class="form-group">
+                                    <label>Environment Variables:</label>
+                                    <div ng-repeat="envar in config.env" class="form-inline">
+                                        <div class="form-group">
+                                            <label class="sr-only">Variable Name:</label>
+                                            <input type="text" ng-model="envar.name" class="form-control" placeholder="NAME"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="sr-only">Variable Value:</label>
+                                            <input type="text" ng-model="envar.value" class="form-control" placeholder="value"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <button class="btn btn-danger btn-xs form-control" ng-click="removeEnv(portBinding)">Remove</button>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-success" ng-click="addEnv()">Add ENV variable</button>
+                                </div>
+                                <div class="form-group">
                                     <label>Port bindings:</label>
                                     <div ng-repeat="portBinding in config.portBindings" class="form-inline">
                                         <div class="form-group">

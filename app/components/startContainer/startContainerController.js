@@ -7,7 +7,7 @@ function($scope, $routeParams, $location, Container, Messages) {
         memory: 0,
         memorySwap: 0,
         cpuShares: 1024,
-        env: '',
+        env: [],
         commands: '',
         volumesFrom: '',
         portBindings: []
@@ -27,6 +27,10 @@ function($scope, $routeParams, $location, Container, Messages) {
         var ctor = Container;
         var loc = $location;
         var s = $scope;
+
+        var env = $scope.config.env.map(function(envar) {
+            return envar.name + '=' + envar.value;
+        });
 
         var exposedPorts = {};
         var portBindings = {};
@@ -57,6 +61,7 @@ function($scope, $routeParams, $location, Container, Messages) {
                 CpuShares: $scope.config.cpuShares,
                 Cmd: cmds,
                 VolumesFrom: $scope.config.volumesFrom,
+                Env: env,
                 ExposedPorts: exposedPorts,
                 HostConfig: {
                     PortBindings: portBindings
@@ -89,5 +94,14 @@ function($scope, $routeParams, $location, Container, Messages) {
     $scope.removePortBinding = function(portBinding) {
         var idx = $scope.config.portBindings.indexOf(portBinding);
         $scope.config.portBindings.splice(idx, 1);
+    };
+
+    $scope.addEnv = function() {
+        $scope.config.env.push({name: '', value: ''});
+    };
+
+    $scope.removeEnv = function(envar) {
+        var idx = $scope.config.env.indexOf(envar);
+        $scope.config.env.splice(idx, 1);
     };
 }]);

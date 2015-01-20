@@ -6,6 +6,7 @@ files = [
   JASMINE,
   JASMINE_ADAPTER,
   'assets/js/jquery-1.11.1.min.js',
+  'assets/js/bootstrap.min.js',
   'assets/js/angularjs/1.2.6/angular.min.js',
   'assets/js/angularjs/1.2.6/angular-route.min.js',
   'assets/js/angularjs/1.2.6/angular-resource.min.js',
