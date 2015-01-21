@@ -1,7 +1,14 @@
 angular.module('startContainer', [])
-.controller('StartContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages',
-function($scope, $routeParams, $location, Container, Messages) {
+.controller('StartContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages', 'containernameFilter',
+function($scope, $routeParams, $location, Container, Messages, containernameFilter) {
     $scope.template = 'app/components/startContainer/startcontainer.html';
+
+    Container.query({all: 1}, function(d) {
+        $scope.containerNames = d.map(function(container){
+            return containernameFilter(container);
+        });
+    });
+
     $scope.config = {
         name: '',
         memory: 0,
@@ -9,7 +16,7 @@ function($scope, $routeParams, $location, Container, Messages) {
         cpuShares: 1024,
         env: [],
         commands: '',
-        volumesFrom: '',
+        volumesFrom: [],
         portBindings: []
     };
     $scope.commandPlaceholder = '["/bin/echo", "Hello world"]';
@@ -27,6 +34,10 @@ function($scope, $routeParams, $location, Container, Messages) {
         var ctor = Container;
         var loc = $location;
         var s = $scope;
+
+        var volumesFrom = $scope.config.volumesFrom.map(function(volume) {
+            return volume.name;
+        });
 
         var env = $scope.config.env.map(function(envar) {
             return envar.name + '=' + envar.value;
@@ -60,7 +71,7 @@ function($scope, $routeParams, $location, Container, Messages) {
                 MemorySwap: $scope.config.memorySwap,
                 CpuShares: $scope.config.cpuShares,
                 Cmd: cmds,
-                VolumesFrom: $scope.config.volumesFrom,
+                VolumesFrom: volumesFrom,
                 Env: env,
                 ExposedPorts: exposedPorts,
                 HostConfig: {
@@ -103,5 +114,14 @@ function($scope, $routeParams, $location, Container, Messages) {
     $scope.removeEnv = function(envar) {
         var idx = $scope.config.env.indexOf(envar);
         $scope.config.env.splice(idx, 1);
+    };
+
+    $scope.addVolume = function() {
+        $scope.config.volumesFrom.push({name: ''});
+    };
+
+    $scope.removeVolume = function(volume) {
+        var idx = $scope.config.volumesFrom.indexOf(volume);
+        $scope.config.volumesFrom.splice(idx, 1);
     };
 }]);

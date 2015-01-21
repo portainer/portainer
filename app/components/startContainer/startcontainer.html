@@ -30,8 +30,12 @@
                                     <input type="number" ng-model="config.cpuShares" class="form-control"/>
                                 </div>
                                 <div class="form-group">
-                                    <label>Volumes From:</label>
-                                    <input type="text" ng-model="config.volumesFrom" class="form-control"/>
+                                    <label>Mount Volumes From other containers:</label>
+                                    <div ng-repeat="volume in config.volumesFrom" class="form-inline">
+                                        <select ng-model="volume.name" ng-options="name for name in containerNames track by name"/>
+                                        <button class="btn btn-danger btn-xs form-control" ng-click="removeVolume($index)">Remove</button>
+                                    </div>
+                                    <button type="button" class="btn btn-success" ng-click="addVolume()">Add volume</button>
                                 </div>
                                 <div class="form-group">
                                     <label>Environment Variables:</label>
