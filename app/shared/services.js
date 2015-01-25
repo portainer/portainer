@@ -119,7 +119,7 @@ angular.module('dockerui.services', ['ngResource'])
                 $.gritter.add({
                     title: title,
                     text: text,
-                    time: 6000,
+                    time: 10000,
                     before_open: function() {
                         if($('.gritter-item-wrapper').length === 4) {
                             return false;

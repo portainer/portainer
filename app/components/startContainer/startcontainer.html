@@ -8,7 +8,7 @@
             <div class="modal-body">
             <form role="form">
                 <accordion close-others="true">
-                    <accordion-group heading="Container options">
+                    <accordion-group heading="Container options" is-open="menuStatus.containerOpen">
                         <fieldset>
                             <div class="row">
                                 <div class="col-xs-6">
@@ -94,7 +94,7 @@
                                         <label>Security Options:</label>
                                         <div ng-repeat="opt in config.SecurityOpts">
                                             <div class="form-group form-inline">
-                                                <input type="text" ng-model="opt.name" class="form-control" placeholder="???"/>
+                                                <input type="text" ng-model="opt.name" class="form-control" placeholder="label:type:svirt_apache"/>
                                                 <button type="button" class="btn btn-danger btn-sm" ng-click="rmEntry(config.SecurityOpts, opt)">Remove</button>
                                             </div>
                                         </div>
@@ -102,6 +102,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <hr>
                             <div class="form-group">
                                 <label>Environment Variables:</label>
                                 <div ng-repeat="envar in config.Env">
@@ -115,15 +116,15 @@
                                             <input type="text" ng-model="envar.value" class="form-control" placeholder="value"/>
                                         </div>
                                         <div class="form-group">
-                                            <button class="btn btn-danger btn-xs form-control" ng-click="removeEnv(portBinding)">Remove</button>
+                                            <button class="btn btn-danger btn-xs form-control" ng-click="rmEntry(config.Env, envar)">Remove</button>
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-success btn-sm" ng-click="addEnv()">Add ENV variable</button>
+                                <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.Env, {name: '', value: ''})">Add ENV variable</button>
                             </div>
                         </fieldset>
                     </accordion-group>
-                    <accordion-group heading="HostConfig options">
+                    <accordion-group heading="HostConfig options" is-open="menuStatus.hostConfigOpen">
                         <fieldset>
                             <div class="row">
                                 <div class="col-xs-6">
@@ -131,7 +132,7 @@
                                         <label>Binds:</label>
                                         <div ng-repeat="bind in config.HostConfig.Binds">
                                             <div class="form-group form-inline">
-                                                <input type="text" ng-model="bind.name" class="form-control" placeholder="???"/>
+                                                <input type="text" ng-model="bind.name" class="form-control" placeholder="/host:/container"/>
                                                 <button type="button" class="btn btn-danger btn-sm" ng-click="rmEntry(config.HostConfig.Binds, bind)">Remove</button>
                                             </div>
                                         </div>
@@ -161,7 +162,7 @@
                                         <label>DnsSearch:</label>
                                         <div ng-repeat="entry in config.HostConfig.DnsSearch">
                                             <div class="form-group form-inline">
-                                                <input type="text" ng-model="entry.name" class="form-control" placeholder="???"/>
+                                                <input type="text" ng-model="entry.name" class="form-control" placeholder="example.com"/>
                                                 <button type="button" class="btn btn-danger btn-sm" ng-click="rmEntry(config.HostConfig.DnsSearch, entry)">Remove</button>
                                             </div>
                                         </div>
@@ -171,7 +172,7 @@
                                         <label>CapAdd:</label>
                                         <div ng-repeat="entry in config.HostConfig.CapAdd">
                                             <div class="form-group form-inline">
-                                                <input type="text" ng-model="entry.name" class="form-control" placeholder="???"/>
+                                                <input type="text" ng-model="entry.name" class="form-control" placeholder="cap_sys_admin"/>
                                                 <button type="button" class="btn btn-danger btn-sm" ng-click="rmEntry(config.HostConfig.CapAdd, entry)">Remove</button>
                                             </div>
                                         </div>
@@ -183,7 +184,7 @@
                                         <label>CapDrop:</label>
                                         <div ng-repeat="entry in config.HostConfig.CapDrop">
                                             <div class="form-group form-inline">
-                                                <input type="text" ng-model="entry.name" class="form-control" placeholder="???"/>
+                                                <input type="text" ng-model="entry.name" class="form-control" placeholder="cap_sys_admin"/>
                                                 <button type="button" class="btn btn-danger btn-sm" ng-click="rmEntry(config.HostConfig.CapDrop, entry)">Remove</button>
                                             </div>
                                         </div>
@@ -206,10 +207,10 @@
                                         <div ng-repeat="volume in config.HostConfig.VolumesFrom">
                                             <div class="form-inline">
                                                 <select ng-model="volume.name" ng-options="name for name in containerNames track by name" class="form-control"/>
-                                                <button class="btn btn-danger btn-xs form-control" ng-click="removeVolumeFrom($index)">Remove</button>
+                                                <button class="btn btn-danger btn-xs form-control" ng-click="rmEntry(config.HostConfig.VolumesFrom, volume)">Remove</button>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-success btn-sm" ng-click="addVolumeFrom()">Add volume</button>
+                                        <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.VolumesFrom, {name: ''})">Add volume</button>
                                     </div>
                                     <!--
                                     <div class="form-group">
@@ -224,9 +225,10 @@
                                     -->
                                 </div>
                             </div>
+                            <hr>
                             <div class="form-group">
                                 <label>Port bindings:</label>
-                                <div ng-repeat="portBinding in config.PortBindings">
+                                <div ng-repeat="portBinding in config.HostConfig.PortBindings">
                                     <div class="form-group form-inline">
                                         <label class="sr-only">Host IP:</label>
                                         <input type="text" ng-model="portBinding.ip" class="form-control" placeholder="Host IP Address"/>
@@ -234,10 +236,10 @@
                                         <input type="text" ng-model="portBinding.extPort" class="form-control" placeholder="Host Port"/>
                                         <label class="sr-only">Container port:</label>
                                         <input type="text" ng-model="portBinding.intPort" class="form-control" placeholder="Container Port"/>
-                                        <button class="btn btn-danger btn-xs form-control" ng-click="removePortBinding(portBinding)">Remove</button>
+                                        <button class="btn btn-danger btn-xs form-control" ng-click="rmEntry(config.HostConfig.PortBindings, portBinding)">Remove</button>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-success btn-sm" ng-click="addPortBinding()">Add Port Binding</button>
+                                <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.PortBindings, {ip: '', extPort: '', intPort: ''})">Add Port Binding</button>
                             </div>
                         </fieldset>
                     </accordion-group>

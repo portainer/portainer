@@ -1,6 +1,6 @@
 angular.module('startContainer', ['ui.bootstrap'])
-.controller('StartContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages', 'containernameFilter',
-function($scope, $routeParams, $location, Container, Messages, containernameFilter) {
+.controller('StartContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages', 'containernameFilter', 'errorMsgFilter',
+function($scope, $routeParams, $location, Container, Messages, containernameFilter, errorMsgFilter) {
     $scope.template = 'app/components/startContainer/startcontainer.html';
 
     Container.query({all: 1}, function(d) {
@@ -13,8 +13,8 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
         Env: [],
         Volumes: [],
         SecurityOpts: [],
-        PortBindings: [],
         HostConfig: {
+            PortBindings: [],
             Binds: [],
             Links: [],
             Dns: [],
@@ -25,8 +25,13 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
         }
     };
 
+    $scope.menuStatus = {
+        containerOpen: true,
+        hostConfigOpen: false
+    };
+
     function failedRequestHandler(e, Messages) {
-        Messages.send({class: 'text-error', data: e.data});
+        Messages.error('Error', errorMsgFilter(e));
     }
 
     function rmEmptyKeys(col) {
@@ -67,7 +72,7 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
         var ExposedPorts = {};
         var PortBindings = {};
         // TODO: consider using compatibility library 
-        config.PortBindings.forEach(function(portBinding) {
+        config.HostConfig.PortBindings.forEach(function(portBinding) {
             var intPort = portBinding.intPort + "/tcp";
             var binding = {
                 HostIp: portBinding.ip,
@@ -85,7 +90,6 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
             }
         });
         config.ExposedPorts = ExposedPorts;
-        delete config.PortBindings;
         config.HostConfig.PortBindings = PortBindings;
 
         // Remove empty fields from the request to avoid overriding defaults
@@ -109,35 +113,6 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
             }, function(e) {
                 failedRequestHandler(e, Messages);
         });
-    };
-
-    $scope.addPortBinding = function() {
-        $scope.config.PortBindings.push({ip: '', extPort: '', intPort: ''});
-    };
-
-    $scope.removePortBinding = function(portBinding) {
-        var idx = $scope.config.PortBindings.indexOf(portBinding);
-        $scope.config.PortBindings.splice(idx, 1);
-    };
-
-    // TODO: refactor out
-    $scope.addEnv = function() {
-        $scope.config.Env.push({name: '', value: ''});
-    };
-
-    $scope.removeEnv = function(envar) {
-        var idx = $scope.config.env.indexOf(envar);
-        $scope.config.Env.splice(idx, 1);
-    };
-
-    // Todo: refactor out
-    $scope.addVolumeFrom = function() {
-        $scope.config.HostConfig.volumesFrom.push({name: ''});
-    };
-
-    $scope.removeVolumeFrom = function(volume) {
-        var idx = $scope.config.HostConfig.volumesFrom.indexOf(volume);
-        $scope.config.HostConfig.volumesFrom.splice(idx, 1);
     };
 
     $scope.addEntry = function(array, entry) {
