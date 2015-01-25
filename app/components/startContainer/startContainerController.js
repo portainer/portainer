@@ -1,4 +1,4 @@
-angular.module('startContainer', [])
+angular.module('startContainer', ['ui.bootstrap'])
 .controller('StartContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages', 'containernameFilter',
 function($scope, $routeParams, $location, Container, Messages, containernameFilter) {
     $scope.template = 'app/components/startContainer/startcontainer.html';
@@ -10,81 +10,94 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
     });
 
     $scope.config = {
-        name: '',
-        memory: 0,
-        memorySwap: 0,
-        cpuShares: 1024,
-        env: [],
-        commands: '',
-        volumesFrom: [],
-        portBindings: []
+        Env: [],
+        Volumes: [],
+        SecurityOpts: [],
+        PortBindings: [],
+        HostConfig: {
+            Binds: [],
+            Links: [],
+            Dns: [],
+            DnsSearch: [],
+            VolumesFrom: [],
+            CapAdd: [],
+            CapDrop: []
+        }
     };
-    $scope.commandPlaceholder = '["/bin/echo", "Hello world"]';
 
     function failedRequestHandler(e, Messages) {
         Messages.send({class: 'text-error', data: e.data});
     }
 
-    $scope.create = function() {
-        var cmds = null;
-        if ($scope.config.commands !== '') {
-            cmds = angular.fromJson($scope.config.commands);
+    function rmEmptyKeys(col) {
+        for (var key in col) {
+            if (col[key] === null || col[key] === undefined || col[key] === '' || $.isEmptyObject(col[key]) || col[key].length === 0) {
+                delete col[key];
+            }
         }
-        var id = $routeParams.id;
-        var ctor = Container;
-        var loc = $location;
-        var s = $scope;
+    }
 
-        var volumesFrom = $scope.config.volumesFrom.map(function(volume) {
-            return volume.name;
-        });
+    function getNames(arr) {
+        return arr.map(function(item) {return item.name;});
+    }
 
-        var env = $scope.config.env.map(function(envar) {
-            return envar.name + '=' + envar.value;
-        });
+    $scope.create = function() {
+        // Copy the config before transforming fields to the remote API format
+        var config = angular.copy($scope.config);
 
-        var exposedPorts = {};
-        var portBindings = {};
+        config.Image = $routeParams.id;
+
+        if (config.Cmd && config.Cmd[0] === "[") {
+            config.Cmd = angular.fromJson(config.Cmd);
+        }
+
+        config.Env = config.Env.map(function(envar) {return envar.name + '=' + envar.value;});
+
+        config.Volumes = getNames(config.Volumes);
+        config.SecurityOpts = getNames(config.SecurityOpts);
+
+        config.HostConfig.VolumesFrom = getNames(config.HostConfig.VolumesFrom);
+        config.HostConfig.Binds = getNames(config.HostConfig.Binds);
+        config.HostConfig.Links = getNames(config.HostConfig.Links);
+        config.HostConfig.Dns = getNames(config.HostConfig.Dns);
+        config.HostConfig.DnsSearch = getNames(config.HostConfig.DnsSearch);
+        config.HostConfig.CapAdd = getNames(config.HostConfig.CapAdd);
+        config.HostConfig.CapDrop = getNames(config.HostConfig.CapDrop);
+
+        var ExposedPorts = {};
+        var PortBindings = {};
         // TODO: consider using compatibility library 
-        $scope.config.portBindings.forEach(function(portBinding) {
+        config.PortBindings.forEach(function(portBinding) {
             var intPort = portBinding.intPort + "/tcp";
             var binding = {
                 HostIp: portBinding.ip,
                 HostPort: portBinding.extPort
             };
             if (portBinding.intPort) {
-                exposedPorts[intPort] = {};
-                if (intPort in portBindings) {
-                    portBindings[intPort].push(binding);
+                ExposedPorts[intPort] = {};
+                if (intPort in PortBindings) {
+                    PortBindings[intPort].push(binding);
                 } else {
-                    portBindings[intPort] = [binding];
+                    PortBindings[intPort] = [binding];
                 }
             } else {
                 // TODO: Send warning message? Internal port need to be specified.
             }
         });
+        config.ExposedPorts = ExposedPorts;
+        delete config.PortBindings;
+        config.HostConfig.PortBindings = PortBindings;
 
-        Container.create({
-                Image: id,
-                name: $scope.config.name,
-                Memory: $scope.config.memory,
-                MemorySwap: $scope.config.memorySwap,
-                CpuShares: $scope.config.cpuShares,
-                Cmd: cmds,
-                VolumesFrom: volumesFrom,
-                Env: env,
-                ExposedPorts: exposedPorts,
-                HostConfig: {
-                    PortBindings: portBindings
-                }
-            }, function(d) {
+        // Remove empty fields from the request to avoid overriding defaults
+        rmEmptyKeys(config.HostConfig);
+        rmEmptyKeys(config);
+
+        var ctor = Container;
+        var loc = $location;
+        var s = $scope;
+        Container.create(config, function(d) {
                 if (d.Id) {
-                    ctor.start({
-                        id: d.Id,
-                        HostConfig: {
-                            PortBindings: portBindings
-                        }
-                    }, function(cd) {
+                    ctor.start({id: d.Id}, function(cd) {
                         $('#create-modal').modal('hide');
                         loc.path('/containers/' + d.Id + '/');
                     }, function(e) {
@@ -99,29 +112,39 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
     };
 
     $scope.addPortBinding = function() {
-        $scope.config.portBindings.push({ip: '', extPort: '', intPort: ''});
+        $scope.config.PortBindings.push({ip: '', extPort: '', intPort: ''});
     };
 
     $scope.removePortBinding = function(portBinding) {
-        var idx = $scope.config.portBindings.indexOf(portBinding);
-        $scope.config.portBindings.splice(idx, 1);
+        var idx = $scope.config.PortBindings.indexOf(portBinding);
+        $scope.config.PortBindings.splice(idx, 1);
     };
 
+    // TODO: refactor out
     $scope.addEnv = function() {
-        $scope.config.env.push({name: '', value: ''});
+        $scope.config.Env.push({name: '', value: ''});
     };
 
     $scope.removeEnv = function(envar) {
         var idx = $scope.config.env.indexOf(envar);
-        $scope.config.env.splice(idx, 1);
+        $scope.config.Env.splice(idx, 1);
     };
 
-    $scope.addVolume = function() {
-        $scope.config.volumesFrom.push({name: ''});
+    // Todo: refactor out
+    $scope.addVolumeFrom = function() {
+        $scope.config.HostConfig.volumesFrom.push({name: ''});
     };
 
-    $scope.removeVolume = function(volume) {
-        var idx = $scope.config.volumesFrom.indexOf(volume);
-        $scope.config.volumesFrom.splice(idx, 1);
+    $scope.removeVolumeFrom = function(volume) {
+        var idx = $scope.config.HostConfig.volumesFrom.indexOf(volume);
+        $scope.config.HostConfig.volumesFrom.splice(idx, 1);
+    };
+
+    $scope.addEntry = function(array, entry) {
+        array.push(entry);
+    };
+    $scope.rmEntry = function(array, entry) {
+        var idx = array.indexOf(entry);
+        array.splice(idx, 1);
     };
 }]);

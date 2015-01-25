@@ -86,7 +86,8 @@ module.exports = function (grunt) {
             angular: {
                 src:['assets/js/angularjs/1.2.6/angular.min.js',
                      'assets/js/angularjs/1.2.6/angular-route.min.js',
-                     'assets/js/angularjs/1.2.6/angular-resource.min.js'],
+                     'assets/js/angularjs/1.2.6/angular-resource.min.js',
+                     'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js'],
                 dest: '<%= distdir %>/angular.js'
             }
         },
