@@ -1,4 +1,4 @@
-/*! dockerui - v0.6.0 - 2015-01-18
+/*! dockerui - v0.6.0 - 2015-01-25
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby;
  * Licensed MIT
@@ -17,10 +17,10 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
     }])
     // This is your docker url that the api will use to make requests
     // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
-    .constant('DOCKER_ENDPOINT', '/dockerapi')
+    .constant('DOCKER_ENDPOINT', 'dockerapi')
     .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
     .constant('UI_VERSION', 'v0.6.0')
-    .constant('DOCKER_API_VERSION', 'v1.15');
+    .constant('DOCKER_API_VERSION', 'v1.16');
 
 angular.module('builder', [])
 .controller('BuilderController', ['$scope', 'Dockerfile', 'Messages',
@@ -501,44 +501,108 @@ function($scope, Container, Settings) {
     });
 }]);
 
-angular.module('startContainer', [])
-.controller('StartContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages',
-function($scope, $routeParams, $location, Container, Messages) {
+angular.module('startContainer', ['ui.bootstrap'])
+.controller('StartContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages', 'containernameFilter', 'errorMsgFilter',
+function($scope, $routeParams, $location, Container, Messages, containernameFilter, errorMsgFilter) {
     $scope.template = 'app/components/startContainer/startcontainer.html';
+
+    Container.query({all: 1}, function(d) {
+        $scope.containerNames = d.map(function(container){
+            return containernameFilter(container);
+        });
+    });
+
     $scope.config = {
-        name: '',
-        memory: 0,
-        memorySwap: 0,
-        cpuShares: 1024,
-        env: '',
-        commands: '',
-        volumesFrom: ''
+        Env: [],
+        Volumes: [],
+        SecurityOpts: [],
+        HostConfig: {
+            PortBindings: [],
+            Binds: [],
+            Links: [],
+            Dns: [],
+            DnsSearch: [],
+            VolumesFrom: [],
+            CapAdd: [],
+            CapDrop: []
+        }
     };
-    $scope.commandPlaceholder = '["/bin/echo", "Hello world"]';
+
+    $scope.menuStatus = {
+        containerOpen: true,
+        hostConfigOpen: false
+    };
 
     function failedRequestHandler(e, Messages) {
-        Messages.send({class: 'text-error', data: e.data});
+        Messages.error('Error', errorMsgFilter(e));
+    }
+
+    function rmEmptyKeys(col) {
+        for (var key in col) {
+            if (col[key] === null || col[key] === undefined || col[key] === '' || $.isEmptyObject(col[key]) || col[key].length === 0) {
+                delete col[key];
+            }
+        }
+    }
+
+    function getNames(arr) {
+        return arr.map(function(item) {return item.name;});
     }
 
     $scope.create = function() {
-        var cmds = null;
-        if ($scope.config.commands !== '') {
-            cmds = angular.fromJson($scope.config.commands);
+        // Copy the config before transforming fields to the remote API format
+        var config = angular.copy($scope.config);
+
+        config.Image = $routeParams.id;
+
+        if (config.Cmd && config.Cmd[0] === "[") {
+            config.Cmd = angular.fromJson(config.Cmd);
         }
-        var id = $routeParams.id;
+
+        config.Env = config.Env.map(function(envar) {return envar.name + '=' + envar.value;});
+
+        config.Volumes = getNames(config.Volumes);
+        config.SecurityOpts = getNames(config.SecurityOpts);
+
+        config.HostConfig.VolumesFrom = getNames(config.HostConfig.VolumesFrom);
+        config.HostConfig.Binds = getNames(config.HostConfig.Binds);
+        config.HostConfig.Links = getNames(config.HostConfig.Links);
+        config.HostConfig.Dns = getNames(config.HostConfig.Dns);
+        config.HostConfig.DnsSearch = getNames(config.HostConfig.DnsSearch);
+        config.HostConfig.CapAdd = getNames(config.HostConfig.CapAdd);
+        config.HostConfig.CapDrop = getNames(config.HostConfig.CapDrop);
+
+        var ExposedPorts = {};
+        var PortBindings = {};
+        // TODO: consider using compatibility library 
+        config.HostConfig.PortBindings.forEach(function(portBinding) {
+            var intPort = portBinding.intPort + "/tcp";
+            var binding = {
+                HostIp: portBinding.ip,
+                HostPort: portBinding.extPort
+            };
+            if (portBinding.intPort) {
+                ExposedPorts[intPort] = {};
+                if (intPort in PortBindings) {
+                    PortBindings[intPort].push(binding);
+                } else {
+                    PortBindings[intPort] = [binding];
+                }
+            } else {
+                // TODO: Send warning message? Internal port need to be specified.
+            }
+        });
+        config.ExposedPorts = ExposedPorts;
+        config.HostConfig.PortBindings = PortBindings;
+
+        // Remove empty fields from the request to avoid overriding defaults
+        rmEmptyKeys(config.HostConfig);
+        rmEmptyKeys(config);
+
         var ctor = Container;
         var loc = $location;
         var s = $scope;
-
-        Container.create({
-                Image: id,
-                name: $scope.config.name,
-                Memory: $scope.config.memory,
-                MemorySwap: $scope.config.memorySwap,
-                CpuShares: $scope.config.cpuShares,
-                Cmd: cmds,
-                VolumesFrom: $scope.config.volumesFrom
-            }, function(d) {
+        Container.create(config, function(d) {
                 if (d.Id) {
                     ctor.start({id: d.Id}, function(cd) {
                         $('#create-modal').modal('hide');
@@ -552,6 +616,14 @@ function($scope, $routeParams, $location, Container, Messages) {
             }, function(e) {
                 failedRequestHandler(e, Messages);
         });
+    };
+
+    $scope.addEntry = function(array, entry) {
+        array.push(entry);
+    };
+    $scope.rmEntry = function(array, entry) {
+        var idx = array.indexOf(entry);
+        array.splice(idx, 1);
     };
 }]);
 
@@ -655,6 +727,17 @@ angular.module('dockerui.filters', [])
             //Multiply by 1000 for the unix format
             var date = new Date(data * 1000);
             return date.toDateString();
+        };
+    })
+    .filter('errorMsg', function() {
+        return function(object) {
+            var idx = 0;
+            var msg = '';
+            while (object[idx] && typeof(object[idx]) === 'string') {
+                msg += object[idx];
+                idx++;
+            }
+            return msg;
         };
     });
 
@@ -779,7 +862,7 @@ angular.module('dockerui.services', ['ngResource'])
                 $.gritter.add({
                     title: title,
                     text: text,
-                    time: 6000,
+                    time: 10000,
                     before_open: function() {
                         if($('.gritter-item-wrapper').length === 4) {
                             return false;
@@ -1432,38 +1515,248 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                <h3>Create And Start Container From Image</h3>\n" +
     "            </div>\n" +
     "            <div class=\"modal-body\">\n" +
-    "                <form role=\"form\">\n" +
+    "            <form role=\"form\">\n" +
+    "                <accordion close-others=\"true\">\n" +
+    "                    <accordion-group heading=\"Container options\" is-open=\"menuStatus.containerOpen\">\n" +
     "                        <fieldset>\n" +
-    "                                <div class=\"form-group\">\n" +
-    "                                    <label>Cmd:</label>\n" +
-    "                                    <input type=\"text\" placeholder=\"{{ commandPlaceholder }}\" ng-model=\"config.commands\" class=\"form-control\"/>\n" +
-    "                                    <small>Input commands as an array</small>\n" +
+    "                            <div class=\"row\">\n" +
+    "                                <div class=\"col-xs-6\">\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Cmd:</label>\n" +
+    "                                        <input type=\"text\" placeholder='[\"/bin/echo\", \"Hello world\"]' ng-model=\"config.Cmd\" class=\"form-control\"/>\n" +
+    "                                        <small>Input commands as a raw string or JSON array</small>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Entrypoint:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"config.Entrypoint\" class=\"form-control\" placeholder=\"./entrypoint.sh\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Name:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"config.name\" class=\"form-control\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Hostname:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"config.Hostname\" class=\"form-control\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Domainname:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"config.Domainname\" class=\"form-control\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>User:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"config.User\" class=\"form-control\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Memory:</label>\n" +
+    "                                        <input type=\"number\" ng-model=\"config.Memory\" class=\"form-control\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Volumes:</label>\n" +
+    "                                        <div ng-repeat=\"volume in config.Volumes\">\n" +
+    "                                            <div class=\"form-group form-inline\">\n" +
+    "                                                <input type=\"text\" ng-model=\"volume.name\" class=\"form-control\" placeholder=\"/var/data\"/>\n" +
+    "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.Volumes, volume)\">Remove</button>\n" +
+    "                                            </div>\n" +
+    "                                        </div>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.Volumes, {name: ''})\">Add Volume</button>\n" +
+    "                                    </div>\n" +
     "                                </div>\n" +
-    "                                <div class=\"form-group\">\n" +
-    "                                    <label>Name:</label>\n" +
-    "                                    <input type=\"text\" ng-model=\"config.name\" class=\"form-control\"/>\n" +
+    "                                <div class=\"col-xs-6\">\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Memory Swap:</label>\n" +
+    "                                        <input type=\"number\" ng-model=\"config.MemorySwap\" class=\"form-control\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>CPU Shares:</label>\n" +
+    "                                        <input type=\"number\" ng-model=\"config.CpuShares\" class=\"form-control\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Cpuset:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"config.Cpuset\" class=\"form-control\" placeholder=\"1,2\"/>\n" +
+    "                                        <small>Input as comma-separated list of numbers</small>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>WorkingDir:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"config.WorkingDir\" class=\"form-control\" placeholder=\"/app\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>MacAddress:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"config.MacAddress\" class=\"form-control\" placeholder=\"12:34:56:78:9a:bc\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label for=\"networkDisabled\">NetworkDisabled:</label>\n" +
+    "                                        <input id=\"networkDisabled\" type=\"checkbox\" ng-model=\"config.NetworkDisabled\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label for=\"tty\">Tty:</label>\n" +
+    "                                        <input id=\"tty\" type=\"checkbox\" ng-model=\"config.Tty\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label for=\"openStdin\">OpenStdin:</label>\n" +
+    "                                        <input id=\"openStdin\" type=\"checkbox\" ng-model=\"config.OpenStdin\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label for=\"stdinOnce\">StdinOnce:</label>\n" +
+    "                                        <input id=\"stdinOnce\" type=\"checkbox\" ng-model=\"config.StdinOnce\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Security Options:</label>\n" +
+    "                                        <div ng-repeat=\"opt in config.SecurityOpts\">\n" +
+    "                                            <div class=\"form-group form-inline\">\n" +
+    "                                                <input type=\"text\" ng-model=\"opt.name\" class=\"form-control\" placeholder=\"label:type:svirt_apache\"/>\n" +
+    "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.SecurityOpts, opt)\">Remove</button>\n" +
+    "                                            </div>\n" +
+    "                                        </div>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.SecurityOpts, {name: ''})\">Add Option</button>\n" +
+    "                                    </div>\n" +
     "                                </div>\n" +
-    "                                <div class=\"form-group\">\n" +
-    "                                    <label>Memory:</label>\n" +
-    "                                    <input type=\"number\" ng-model=\"config.memory\" class=\"form-control\"/>\n" +
+    "                            </div>\n" +
+    "                            <hr>\n" +
+    "                            <div class=\"form-group\">\n" +
+    "                                <label>Environment Variables:</label>\n" +
+    "                                <div ng-repeat=\"envar in config.Env\">\n" +
+    "                                    <div class=\"form-inline\">\n" +
+    "                                        <div class=\"form-group\">\n" +
+    "                                            <label class=\"sr-only\">Variable Name:</label>\n" +
+    "                                            <input type=\"text\" ng-model=\"envar.name\" class=\"form-control\" placeholder=\"NAME\"/>\n" +
+    "                                        </div>\n" +
+    "                                        <div class=\"form-group\">\n" +
+    "                                            <label class=\"sr-only\">Variable Value:</label>\n" +
+    "                                            <input type=\"text\" ng-model=\"envar.value\" class=\"form-control\" placeholder=\"value\"/>\n" +
+    "                                        </div>\n" +
+    "                                        <div class=\"form-group\">\n" +
+    "                                            <button class=\"btn btn-danger btn-xs form-control\" ng-click=\"rmEntry(config.Env, envar)\">Remove</button>\n" +
+    "                                        </div>\n" +
+    "                                    </div>\n" +
     "                                </div>\n" +
-    "                                <div class=\"form-group\">\n" +
-    "                                    <label>Memory Swap:</label>\n" +
-    "                                    <input type=\"number\" ng-model=\"config.memorySwap\" class=\"form-control\"/>\n" +
-    "                                </div>\n" +
-    "                                <div class=\"form-group\">\n" +
-    "                                    <label>CPU Shares:</label>\n" +
-    "                                    <input type=\"number\" ng-model=\"config.cpuShares\" class=\"form-control\"/>\n" +
-    "                                </div>\n" +
-    "                                <div class=\"form-group\">\n" +
-    "                                    <label>Volumes From:</label>\n" +
-    "                                    <input type=\"text\" ng-model=\"config.volumesFrom\" class=\"form-control\"/>\n" +
-    "                                </div>\n" +
+    "                                <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.Env, {name: '', value: ''})\">Add ENV variable</button>\n" +
+    "                            </div>\n" +
     "                        </fieldset>\n" +
+    "                    </accordion-group>\n" +
+    "                    <accordion-group heading=\"HostConfig options\" is-open=\"menuStatus.hostConfigOpen\">\n" +
+    "                        <fieldset>\n" +
+    "                            <div class=\"row\">\n" +
+    "                                <div class=\"col-xs-6\">\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Binds:</label>\n" +
+    "                                        <div ng-repeat=\"bind in config.HostConfig.Binds\">\n" +
+    "                                            <div class=\"form-group form-inline\">\n" +
+    "                                                <input type=\"text\" ng-model=\"bind.name\" class=\"form-control\" placeholder=\"/host:/container\"/>\n" +
+    "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.HostConfig.Binds, bind)\">Remove</button>\n" +
+    "                                            </div>\n" +
+    "                                        </div>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.Binds, {name: ''})\">Add Bind</button>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Links:</label>\n" +
+    "                                        <div ng-repeat=\"link in config.HostConfig.Links\">\n" +
+    "                                            <div class=\"form-group form-inline\">\n" +
+    "                                                <input type=\"text\" ng-model=\"link.name\" class=\"form-control\" placeholder=\"web:db\">\n" +
+    "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.HostConfig.Links, link)\">Remove</button>\n" +
+    "                                            </div>\n" +
+    "                                        </div>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.Links, {name: ''})\">Add Link</button>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>DNS:</label>\n" +
+    "                                        <div ng-repeat=\"entry in config.HostConfig.Dns\">\n" +
+    "                                            <div class=\"form-group form-inline\">\n" +
+    "                                                <input type=\"text\" ng-model=\"entry.name\" class=\"form-control\" placeholder=\"8.8.8.8\"/>\n" +
+    "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.HostConfig.Dns, entry)\">Remove</button>\n" +
+    "                                            </div>\n" +
+    "                                        </div>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.Dns, {name: ''})\">Add</button>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>DnsSearch:</label>\n" +
+    "                                        <div ng-repeat=\"entry in config.HostConfig.DnsSearch\">\n" +
+    "                                            <div class=\"form-group form-inline\">\n" +
+    "                                                <input type=\"text\" ng-model=\"entry.name\" class=\"form-control\" placeholder=\"example.com\"/>\n" +
+    "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.HostConfig.DnsSearch, entry)\">Remove</button>\n" +
+    "                                            </div>\n" +
+    "                                        </div>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.DnsSearch, {name: ''})\">Add</button>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>CapAdd:</label>\n" +
+    "                                        <div ng-repeat=\"entry in config.HostConfig.CapAdd\">\n" +
+    "                                            <div class=\"form-group form-inline\">\n" +
+    "                                                <input type=\"text\" ng-model=\"entry.name\" class=\"form-control\" placeholder=\"cap_sys_admin\"/>\n" +
+    "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.HostConfig.CapAdd, entry)\">Remove</button>\n" +
+    "                                            </div>\n" +
+    "                                        </div>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.CapAdd, {name: ''})\">Add</button>\n" +
+    "                                    </div>\n" +
+    "                                </div>\n" +
+    "                                <div class=\"col-xs-6\">\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>CapDrop:</label>\n" +
+    "                                        <div ng-repeat=\"entry in config.HostConfig.CapDrop\">\n" +
+    "                                            <div class=\"form-group form-inline\">\n" +
+    "                                                <input type=\"text\" ng-model=\"entry.name\" class=\"form-control\" placeholder=\"cap_sys_admin\"/>\n" +
+    "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.HostConfig.CapDrop, entry)\">Remove</button>\n" +
+    "                                            </div>\n" +
+    "                                        </div>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.CapDrop, {name: ''})\">Add</button>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>NetworkMode:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"config.HostConfig.NetworkMode\" class=\"form-control\" placeholder=\"bridge\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label for=\"publishAllPorts\">PublishAllPorts:</label>\n" +
+    "                                        <input id=\"publishAllPorts\" type=\"checkbox\" ng-model=\"config.HostConfig.PublishAllPorts\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label for=\"privileged\">Privileged:</label>\n" +
+    "                                        <input id=\"privileged\" type=\"checkbox\" ng-model=\"config.HostConfig.Privileged\"/>\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        <label>Mount Volumes From other containers:</label>\n" +
+    "                                        <div ng-repeat=\"volume in config.HostConfig.VolumesFrom\">\n" +
+    "                                            <div class=\"form-inline\">\n" +
+    "                                                <select ng-model=\"volume.name\" ng-options=\"name for name in containerNames track by name\" class=\"form-control\"/>\n" +
+    "                                                <button class=\"btn btn-danger btn-xs form-control\" ng-click=\"rmEntry(config.HostConfig.VolumesFrom, volume)\">Remove</button>\n" +
+    "                                            </div>\n" +
+    "                                        </div>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.VolumesFrom, {name: ''})\">Add volume</button>\n" +
+    "                                    </div>\n" +
+    "                                    <!--\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        RestartPolicy unimplemented...\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        Devices unimplemented...\n" +
+    "                                    </div>\n" +
+    "                                    <div class=\"form-group\">\n" +
+    "                                        LxcConf unimplemented...\n" +
+    "                                    </div>\n" +
+    "                                    -->\n" +
+    "                                </div>\n" +
+    "                            </div>\n" +
+    "                            <hr>\n" +
+    "                            <div class=\"form-group\">\n" +
+    "                                <label>Port bindings:</label>\n" +
+    "                                <div ng-repeat=\"portBinding in config.HostConfig.PortBindings\">\n" +
+    "                                    <div class=\"form-group form-inline\">\n" +
+    "                                        <label class=\"sr-only\">Host IP:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"portBinding.ip\" class=\"form-control\" placeholder=\"Host IP Address\"/>\n" +
+    "                                        <label class=\"sr-only\">Host Port:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"portBinding.extPort\" class=\"form-control\" placeholder=\"Host Port\"/>\n" +
+    "                                        <label class=\"sr-only\">Container port:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"portBinding.intPort\" class=\"form-control\" placeholder=\"Container Port\"/>\n" +
+    "                                        <button class=\"btn btn-danger btn-xs form-control\" ng-click=\"rmEntry(config.HostConfig.PortBindings, portBinding)\">Remove</button>\n" +
+    "                                    </div>\n" +
+    "                                </div>\n" +
+    "                                <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.PortBindings, {ip: '', extPort: '', intPort: ''})\">Add Port Binding</button>\n" +
+    "                            </div>\n" +
+    "                        </fieldset>\n" +
+    "                    </accordion-group>\n" +
+    "                  </accordion>\n" +
     "                </form>\n" +
     "            </div>\n" +
     "            <div class=\"modal-footer\">\n" +
-    "                <a href=\"\" class=\"btn btn-primary\" ng-click=\"create()\">Create</a>\n" +
+    "                <a href=\"\" class=\"btn btn-primary btn-lg\" ng-click=\"create()\">Create</a>\n" +
     "            </div>\n" +
     "        </div>\n" +
     "    </div>\n" +
