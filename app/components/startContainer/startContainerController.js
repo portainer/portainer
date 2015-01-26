@@ -54,6 +54,8 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
 
         if (config.Cmd && config.Cmd[0] === "[") {
             config.Cmd = angular.fromJson(config.Cmd);
+        } else if (config.Cmd) {
+            config.Cmd = config.Cmd.split(' ');
         }
 
         config.Env = config.Env.map(function(envar) {return envar.name + '=' + envar.value;});
@@ -71,7 +73,6 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
 
         var ExposedPorts = {};
         var PortBindings = {};
-        // TODO: consider using compatibility library 
         config.HostConfig.PortBindings.forEach(function(portBinding) {
             var intPort = portBinding.intPort + "/tcp";
             var binding = {
@@ -86,7 +87,7 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
                     PortBindings[intPort] = [binding];
                 }
             } else {
-                // TODO: Send warning message? Internal port need to be specified.
+                Messages.send('Warning', 'Internal port must be specified for PortBindings');
             }
         });
         config.ExposedPorts = ExposedPorts;
@@ -102,8 +103,16 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
         Container.create(config, function(d) {
                 if (d.Id) {
                     ctor.start({id: d.Id}, function(cd) {
-                        $('#create-modal').modal('hide');
-                        loc.path('/containers/' + d.Id + '/');
+                        if (cd.id) {
+                            Messages.send('Container Started', d.Id);
+                            $('#create-modal').modal('hide');
+                            loc.path('/containers/' + d.Id + '/');
+                        } else {
+                            failedRequestHandler(cd, Messages);
+                            ctor.remove({id: d.Id}, function() {
+                                Messages.send('Container Removed', d.Id);
+                            });
+                        }
                     }, function(e) {
                         failedRequestHandler(e, Messages);
                     });
