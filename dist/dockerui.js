@@ -1,4 +1,4 @@
-/*! dockerui - v0.6.0 - 2015-01-25
+/*! dockerui - v0.6.0 - 2015-01-28
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby;
  * Licensed MIT
@@ -524,7 +524,9 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
             DnsSearch: [],
             VolumesFrom: [],
             CapAdd: [],
-            CapDrop: []
+            CapDrop: [],
+            Devices: [],
+            LxcConf: []
         }
     };
 
@@ -573,6 +575,10 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
         config.HostConfig.DnsSearch = getNames(config.HostConfig.DnsSearch);
         config.HostConfig.CapAdd = getNames(config.HostConfig.CapAdd);
         config.HostConfig.CapDrop = getNames(config.HostConfig.CapDrop);
+        config.HostConfig.LxcConf = config.HostConfig.LxcConf.reduce(function(prev, cur, idx){
+            prev[cur.name] = cur.value;
+            return prev;
+        }, {});
 
         var ExposedPorts = {};
         var PortBindings = {};
@@ -1572,11 +1578,11 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                </div>\n" +
     "                                <div class=\"col-xs-6\">\n" +
     "                                    <div class=\"form-group\">\n" +
-    "                                        <label>Memory Swap:</label>\n" +
+    "                                        <label>MemorySwap:</label>\n" +
     "                                        <input type=\"number\" ng-model=\"config.MemorySwap\" class=\"form-control\"/>\n" +
     "                                    </div>\n" +
     "                                    <div class=\"form-group\">\n" +
-    "                                        <label>CPU Shares:</label>\n" +
+    "                                        <label>CpuShares:</label>\n" +
     "                                        <input type=\"number\" ng-model=\"config.CpuShares\" class=\"form-control\"/>\n" +
     "                                    </div>\n" +
     "                                    <div class=\"form-group\">\n" +
@@ -1609,7 +1615,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                        <input id=\"stdinOnce\" type=\"checkbox\" ng-model=\"config.StdinOnce\"/>\n" +
     "                                    </div>\n" +
     "                                    <div class=\"form-group\">\n" +
-    "                                        <label>Security Options:</label>\n" +
+    "                                        <label>SecurityOpts:</label>\n" +
     "                                        <div ng-repeat=\"opt in config.SecurityOpts\">\n" +
     "                                            <div class=\"form-group form-inline\">\n" +
     "                                                <input type=\"text\" ng-model=\"opt.name\" class=\"form-control\" placeholder=\"label:type:svirt_apache\"/>\n" +
@@ -1622,7 +1628,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                            </div>\n" +
     "                            <hr>\n" +
     "                            <div class=\"form-group\">\n" +
-    "                                <label>Environment Variables:</label>\n" +
+    "                                <label>Env:</label>\n" +
     "                                <div ng-repeat=\"envar in config.Env\">\n" +
     "                                    <div class=\"form-inline\">\n" +
     "                                        <div class=\"form-group\">\n" +
@@ -1638,7 +1644,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                        </div>\n" +
     "                                    </div>\n" +
     "                                </div>\n" +
-    "                                <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.Env, {name: '', value: ''})\">Add ENV variable</button>\n" +
+    "                                <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.Env, {name: '', value: ''})\">Add environment variable</button>\n" +
     "                            </div>\n" +
     "                        </fieldset>\n" +
     "                    </accordion-group>\n" +
@@ -1667,14 +1673,14 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.Links, {name: ''})\">Add Link</button>\n" +
     "                                    </div>\n" +
     "                                    <div class=\"form-group\">\n" +
-    "                                        <label>DNS:</label>\n" +
+    "                                        <label>Dns:</label>\n" +
     "                                        <div ng-repeat=\"entry in config.HostConfig.Dns\">\n" +
     "                                            <div class=\"form-group form-inline\">\n" +
     "                                                <input type=\"text\" ng-model=\"entry.name\" class=\"form-control\" placeholder=\"8.8.8.8\"/>\n" +
     "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.HostConfig.Dns, entry)\">Remove</button>\n" +
     "                                            </div>\n" +
     "                                        </div>\n" +
-    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.Dns, {name: ''})\">Add</button>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.Dns, {name: ''})\">Add entry</button>\n" +
     "                                    </div>\n" +
     "                                    <div class=\"form-group\">\n" +
     "                                        <label>DnsSearch:</label>\n" +
@@ -1684,7 +1690,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.HostConfig.DnsSearch, entry)\">Remove</button>\n" +
     "                                            </div>\n" +
     "                                        </div>\n" +
-    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.DnsSearch, {name: ''})\">Add</button>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.DnsSearch, {name: ''})\">Add entry</button>\n" +
     "                                    </div>\n" +
     "                                    <div class=\"form-group\">\n" +
     "                                        <label>CapAdd:</label>\n" +
@@ -1694,10 +1700,8 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.HostConfig.CapAdd, entry)\">Remove</button>\n" +
     "                                            </div>\n" +
     "                                        </div>\n" +
-    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.CapAdd, {name: ''})\">Add</button>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.CapAdd, {name: ''})\">Add entry</button>\n" +
     "                                    </div>\n" +
-    "                                </div>\n" +
-    "                                <div class=\"col-xs-6\">\n" +
     "                                    <div class=\"form-group\">\n" +
     "                                        <label>CapDrop:</label>\n" +
     "                                        <div ng-repeat=\"entry in config.HostConfig.CapDrop\">\n" +
@@ -1706,8 +1710,10 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                                <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"rmEntry(config.HostConfig.CapDrop, entry)\">Remove</button>\n" +
     "                                            </div>\n" +
     "                                        </div>\n" +
-    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.CapDrop, {name: ''})\">Add</button>\n" +
+    "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.CapDrop, {name: ''})\">Add entry</button>\n" +
     "                                    </div>\n" +
+    "                                </div>\n" +
+    "                                <div class=\"col-xs-6\">\n" +
     "                                    <div class=\"form-group\">\n" +
     "                                        <label>NetworkMode:</label>\n" +
     "                                        <input type=\"text\" ng-model=\"config.HostConfig.NetworkMode\" class=\"form-control\" placeholder=\"bridge\"/>\n" +
@@ -1721,7 +1727,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                        <input id=\"privileged\" type=\"checkbox\" ng-model=\"config.HostConfig.Privileged\"/>\n" +
     "                                    </div>\n" +
     "                                    <div class=\"form-group\">\n" +
-    "                                        <label>Mount Volumes From other containers:</label>\n" +
+    "                                        <label>VolumesFrom:</label>\n" +
     "                                        <div ng-repeat=\"volume in config.HostConfig.VolumesFrom\">\n" +
     "                                            <div class=\"form-inline\">\n" +
     "                                                <select ng-model=\"volume.name\" ng-options=\"name for name in containerNames track by name\" class=\"form-control\"/>\n" +
@@ -1730,22 +1736,56 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                        </div>\n" +
     "                                        <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.VolumesFrom, {name: ''})\">Add volume</button>\n" +
     "                                    </div>\n" +
-    "                                    <!--\n" +
+    "                                    \n" +
     "                                    <div class=\"form-group\">\n" +
-    "                                        RestartPolicy unimplemented...\n" +
+    "                                        <label>RestartPolicy:</label>\n" +
+    "                                        <select ng-model=\"config.HostConfig.RestartPolicy.name\">\n" +
+    "                                            <option value=\"\">disabled</option>\n" +
+    "                                            <option value=\"always\">always</option>\n" +
+    "                                            <option value=\"on-failure\">on-failure</option>\n" +
+    "                                        </select>\n" +
+    "                                        <label>MaximumRetryCount:</label>\n" +
+    "                                        <input type=\"number\" ng-model=\"config.HostConfig.RestartPolicy.MaximumRetryCount\"/>\n" +
     "                                    </div>\n" +
-    "                                    <div class=\"form-group\">\n" +
-    "                                        Devices unimplemented...\n" +
-    "                                    </div>\n" +
-    "                                    <div class=\"form-group\">\n" +
-    "                                        LxcConf unimplemented...\n" +
-    "                                    </div>\n" +
-    "                                    -->\n" +
     "                                </div>\n" +
     "                            </div>\n" +
     "                            <hr>\n" +
     "                            <div class=\"form-group\">\n" +
-    "                                <label>Port bindings:</label>\n" +
+    "                                <label>LxcConf:</label>\n" +
+    "                                <div ng-repeat=\"entry in config.HostConfig.LxcConf\">\n" +
+    "                                    <div class=\"form-inline\">\n" +
+    "                                        <div class=\"form-group\">\n" +
+    "                                            <label class=\"sr-only\">Name:</label>\n" +
+    "                                            <input type=\"text\" ng-model=\"entry.name\" class=\"form-control\" placeholder=\"lxc.utsname\"/>\n" +
+    "                                        </div>\n" +
+    "                                        <div class=\"form-group\">\n" +
+    "                                            <label class=\"sr-only\">Value:</label>\n" +
+    "                                            <input type=\"text\" ng-model=\"entry.value\" class=\"form-control\" placeholder=\"docker\"/>\n" +
+    "                                        </div>\n" +
+    "                                        <div class=\"form-group\">\n" +
+    "                                            <button class=\"btn btn-danger btn-xs form-control\" ng-click=\"rmEntry(config.HostConfig.LxcConf, entry)\">Remove</button>\n" +
+    "                                        </div>\n" +
+    "                                    </div>\n" +
+    "                                </div>\n" +
+    "                                <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.LxcConf, {name: '', value: ''})\">Add Entry</button>\n" +
+    "                            </div>\n" +
+    "                            <div class=\"form-group\">\n" +
+    "                                <label>Devices:</label>\n" +
+    "                                <div ng-repeat=\"device in config.HostConfig.Devices\">\n" +
+    "                                    <div class=\"form-group form-inline\">\n" +
+    "                                        <label class=\"sr-only\">PathOnHost:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"device.PathOnHost\" class=\"form-control\" placeholder=\"PathOnHost\"/>\n" +
+    "                                        <label class=\"sr-only\">PathInContainer:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"device.PathInContainer\" class=\"form-control\" placeholder=\"PathInContainer\"/>\n" +
+    "                                        <label class=\"sr-only\">CgroupPermissions:</label>\n" +
+    "                                        <input type=\"text\" ng-model=\"device.CgroupPermissions\" class=\"form-control\" placeholder=\"CgroupPermissions\"/>\n" +
+    "                                        <button class=\"btn btn-danger btn-xs form-control\" ng-click=\"rmEntry(config.HostConfig.Devices, device)\">Remove</button>\n" +
+    "                                    </div>\n" +
+    "                                </div>\n" +
+    "                                <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.Devices, { PathOnHost: '', PathInContainer: '', CgroupPermissions: ''})\">Add Device</button>\n" +
+    "                            </div>\n" +
+    "                            <div class=\"form-group\">\n" +
+    "                                <label>PortBindings:</label>\n" +
     "                                <div ng-repeat=\"portBinding in config.HostConfig.PortBindings\">\n" +
     "                                    <div class=\"form-group form-inline\">\n" +
     "                                        <label class=\"sr-only\">Host IP:</label>\n" +

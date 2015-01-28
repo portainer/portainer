@@ -21,7 +21,9 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
             DnsSearch: [],
             VolumesFrom: [],
             CapAdd: [],
-            CapDrop: []
+            CapDrop: [],
+            Devices: [],
+            LxcConf: []
         }
     };
 
@@ -70,6 +72,10 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
         config.HostConfig.DnsSearch = getNames(config.HostConfig.DnsSearch);
         config.HostConfig.CapAdd = getNames(config.HostConfig.CapAdd);
         config.HostConfig.CapDrop = getNames(config.HostConfig.CapDrop);
+        config.HostConfig.LxcConf = config.HostConfig.LxcConf.reduce(function(prev, cur, idx){
+            prev[cur.name] = cur.value;
+            return prev;
+        }, {});
 
         var ExposedPorts = {};
         var PortBindings = {};

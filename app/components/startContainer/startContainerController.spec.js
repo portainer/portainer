@@ -153,7 +153,10 @@ describe('startContainerController', function() {
                     Dns: ['8.8.8.8'],
                     DnsSearch: ['example.com'],
                     CapAdd: ['cap_sys_admin'],
-                    CapDrop: ['cap_foo_bar']
+                    CapDrop: ['cap_foo_bar'],
+                    Devices: [{ 'PathOnHost': '/dev/deviceName', 'PathInContainer': '/dev/deviceName', 'CgroupPermissions': 'mrw'}],
+                    LxcConf: {'lxc.utsname':'docker'},
+                    RestartPolicy: {name: 'always', MaximumRetryCount: 5}
                 },
                 name: 'container-name'
             };
@@ -185,6 +188,9 @@ describe('startContainerController', function() {
             scope.config.HostConfig.CapDrop = [{name: 'cap_foo_bar'}];
             scope.config.HostConfig.PublishAllPorts = true;
             scope.config.HostConfig.Privileged = true;
+            scope.config.HostConfig.RestartPolicy = {name: 'always', MaximumRetryCount: 5};
+            scope.config.HostConfig.Devices = [{ 'PathOnHost': '/dev/deviceName', 'PathInContainer': '/dev/deviceName', 'CgroupPermissions': 'mrw'}];
+            scope.config.HostConfig.LxcConf = [{name: 'lxc.utsname', value: 'docker'}];
 
             scope.create();
             $httpBackend.flush();

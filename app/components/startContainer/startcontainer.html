@@ -54,11 +54,11 @@
                                 </div>
                                 <div class="col-xs-6">
                                     <div class="form-group">
-                                        <label>Memory Swap:</label>
+                                        <label>MemorySwap:</label>
                                         <input type="number" ng-model="config.MemorySwap" class="form-control"/>
                                     </div>
                                     <div class="form-group">
-                                        <label>CPU Shares:</label>
+                                        <label>CpuShares:</label>
                                         <input type="number" ng-model="config.CpuShares" class="form-control"/>
                                     </div>
                                     <div class="form-group">
@@ -91,7 +91,7 @@
                                         <input id="stdinOnce" type="checkbox" ng-model="config.StdinOnce"/>
                                     </div>
                                     <div class="form-group">
-                                        <label>Security Options:</label>
+                                        <label>SecurityOpts:</label>
                                         <div ng-repeat="opt in config.SecurityOpts">
                                             <div class="form-group form-inline">
                                                 <input type="text" ng-model="opt.name" class="form-control" placeholder="label:type:svirt_apache"/>
@@ -104,7 +104,7 @@
                             </div>
                             <hr>
                             <div class="form-group">
-                                <label>Environment Variables:</label>
+                                <label>Env:</label>
                                 <div ng-repeat="envar in config.Env">
                                     <div class="form-inline">
                                         <div class="form-group">
@@ -120,7 +120,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.Env, {name: '', value: ''})">Add ENV variable</button>
+                                <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.Env, {name: '', value: ''})">Add environment variable</button>
                             </div>
                         </fieldset>
                     </accordion-group>
@@ -149,14 +149,14 @@
                                         <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.Links, {name: ''})">Add Link</button>
                                     </div>
                                     <div class="form-group">
-                                        <label>DNS:</label>
+                                        <label>Dns:</label>
                                         <div ng-repeat="entry in config.HostConfig.Dns">
                                             <div class="form-group form-inline">
                                                 <input type="text" ng-model="entry.name" class="form-control" placeholder="8.8.8.8"/>
                                                 <button type="button" class="btn btn-danger btn-sm" ng-click="rmEntry(config.HostConfig.Dns, entry)">Remove</button>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.Dns, {name: ''})">Add</button>
+                                        <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.Dns, {name: ''})">Add entry</button>
                                     </div>
                                     <div class="form-group">
                                         <label>DnsSearch:</label>
@@ -166,7 +166,7 @@
                                                 <button type="button" class="btn btn-danger btn-sm" ng-click="rmEntry(config.HostConfig.DnsSearch, entry)">Remove</button>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.DnsSearch, {name: ''})">Add</button>
+                                        <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.DnsSearch, {name: ''})">Add entry</button>
                                     </div>
                                     <div class="form-group">
                                         <label>CapAdd:</label>
@@ -176,10 +176,8 @@
                                                 <button type="button" class="btn btn-danger btn-sm" ng-click="rmEntry(config.HostConfig.CapAdd, entry)">Remove</button>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.CapAdd, {name: ''})">Add</button>
+                                        <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.CapAdd, {name: ''})">Add entry</button>
                                     </div>
-                                </div>
-                                <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>CapDrop:</label>
                                         <div ng-repeat="entry in config.HostConfig.CapDrop">
@@ -188,8 +186,10 @@
                                                 <button type="button" class="btn btn-danger btn-sm" ng-click="rmEntry(config.HostConfig.CapDrop, entry)">Remove</button>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.CapDrop, {name: ''})">Add</button>
+                                        <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.CapDrop, {name: ''})">Add entry</button>
                                     </div>
+                                </div>
+                                <div class="col-xs-6">
                                     <div class="form-group">
                                         <label>NetworkMode:</label>
                                         <input type="text" ng-model="config.HostConfig.NetworkMode" class="form-control" placeholder="bridge"/>
@@ -203,7 +203,7 @@
                                         <input id="privileged" type="checkbox" ng-model="config.HostConfig.Privileged"/>
                                     </div>
                                     <div class="form-group">
-                                        <label>Mount Volumes From other containers:</label>
+                                        <label>VolumesFrom:</label>
                                         <div ng-repeat="volume in config.HostConfig.VolumesFrom">
                                             <div class="form-inline">
                                                 <select ng-model="volume.name" ng-options="name for name in containerNames track by name" class="form-control"/>
@@ -212,22 +212,56 @@
                                         </div>
                                         <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.VolumesFrom, {name: ''})">Add volume</button>
                                     </div>
-                                    <!--
+                                    
                                     <div class="form-group">
-                                        RestartPolicy unimplemented...
+                                        <label>RestartPolicy:</label>
+                                        <select ng-model="config.HostConfig.RestartPolicy.name">
+                                            <option value="">disabled</option>
+                                            <option value="always">always</option>
+                                            <option value="on-failure">on-failure</option>
+                                        </select>
+                                        <label>MaximumRetryCount:</label>
+                                        <input type="number" ng-model="config.HostConfig.RestartPolicy.MaximumRetryCount"/>
                                     </div>
-                                    <div class="form-group">
-                                        Devices unimplemented...
-                                    </div>
-                                    <div class="form-group">
-                                        LxcConf unimplemented...
-                                    </div>
-                                    -->
                                 </div>
                             </div>
                             <hr>
                             <div class="form-group">
-                                <label>Port bindings:</label>
+                                <label>LxcConf:</label>
+                                <div ng-repeat="entry in config.HostConfig.LxcConf">
+                                    <div class="form-inline">
+                                        <div class="form-group">
+                                            <label class="sr-only">Name:</label>
+                                            <input type="text" ng-model="entry.name" class="form-control" placeholder="lxc.utsname"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="sr-only">Value:</label>
+                                            <input type="text" ng-model="entry.value" class="form-control" placeholder="docker"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <button class="btn btn-danger btn-xs form-control" ng-click="rmEntry(config.HostConfig.LxcConf, entry)">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.LxcConf, {name: '', value: ''})">Add Entry</button>
+                            </div>
+                            <div class="form-group">
+                                <label>Devices:</label>
+                                <div ng-repeat="device in config.HostConfig.Devices">
+                                    <div class="form-group form-inline">
+                                        <label class="sr-only">PathOnHost:</label>
+                                        <input type="text" ng-model="device.PathOnHost" class="form-control" placeholder="PathOnHost"/>
+                                        <label class="sr-only">PathInContainer:</label>
+                                        <input type="text" ng-model="device.PathInContainer" class="form-control" placeholder="PathInContainer"/>
+                                        <label class="sr-only">CgroupPermissions:</label>
+                                        <input type="text" ng-model="device.CgroupPermissions" class="form-control" placeholder="CgroupPermissions"/>
+                                        <button class="btn btn-danger btn-xs form-control" ng-click="rmEntry(config.HostConfig.Devices, device)">Remove</button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success btn-sm" ng-click="addEntry(config.HostConfig.Devices, { PathOnHost: '', PathInContainer: '', CgroupPermissions: ''})">Add Device</button>
+                            </div>
+                            <div class="form-group">
+                                <label>PortBindings:</label>
                                 <div ng-repeat="portBinding in config.HostConfig.PortBindings">
                                     <div class="form-group form-inline">
                                         <label class="sr-only">Host IP:</label>
