@@ -774,6 +774,25 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                            </div>\n" +
     "                            <hr>\n" +
     "                            <div class=\"form-group\">\n" +
+    "                                <label>ExtraHosts:</label>\n" +
+    "                                <div ng-repeat=\"entry in config.HostConfig.ExtraHosts\">\n" +
+    "                                    <div class=\"form-inline\">\n" +
+    "                                        <div class=\"form-group\">\n" +
+    "                                            <label class=\"sr-only\">Hostname:</label>\n" +
+    "                                            <input type=\"text\" ng-model=\"entry.host\" class=\"form-control\" placeholder=\"hostname\"/>\n" +
+    "                                        </div>\n" +
+    "                                        <div class=\"form-group\">\n" +
+    "                                            <label class=\"sr-only\">IP Address:</label>\n" +
+    "                                            <input type=\"text\" ng-model=\"entry.ip\" class=\"form-control\" placeholder=\"127.0.0.1\"/>\n" +
+    "                                        </div>\n" +
+    "                                        <div class=\"form-group\">\n" +
+    "                                            <button class=\"btn btn-danger btn-xs form-control\" ng-click=\"rmEntry(config.HostConfig.ExtraHosts, entry)\">Remove</button>\n" +
+    "                                        </div>\n" +
+    "                                    </div>\n" +
+    "                                </div>\n" +
+    "                                <button type=\"button\" class=\"btn btn-success btn-sm\" ng-click=\"addEntry(config.HostConfig.ExtraHosts, {host: '', ip: ''})\">Add extra host</button>\n" +
+    "                            </div>\n" +
+    "                            <div class=\"form-group\">\n" +
     "                                <label>LxcConf:</label>\n" +
     "                                <div ng-repeat=\"entry in config.HostConfig.LxcConf\">\n" +
     "                                    <div class=\"form-inline\">\n" +

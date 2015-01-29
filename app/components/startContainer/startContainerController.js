@@ -23,7 +23,8 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
             CapAdd: [],
             CapDrop: [],
             Devices: [],
-            LxcConf: []
+            LxcConf: [],
+            ExtraHosts: []
         }
     };
 
@@ -76,6 +77,7 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
             prev[cur.name] = cur.value;
             return prev;
         }, {});
+        config.HostConfig.ExtraHosts = config.HostConfig.ExtraHosts.map(function(entry) {return entry.host + ':' + entry.ip;});
 
         var ExposedPorts = {};
         var PortBindings = {};

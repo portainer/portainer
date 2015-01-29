@@ -156,6 +156,7 @@ describe('startContainerController', function() {
                     CapDrop: ['cap_foo_bar'],
                     Devices: [{ 'PathOnHost': '/dev/deviceName', 'PathInContainer': '/dev/deviceName', 'CgroupPermissions': 'mrw'}],
                     LxcConf: {'lxc.utsname':'docker'},
+                    ExtraHosts: ['hostname:127.0.0.1'],
                     RestartPolicy: {name: 'always', MaximumRetryCount: 5}
                 },
                 name: 'container-name'
@@ -191,6 +192,7 @@ describe('startContainerController', function() {
             scope.config.HostConfig.RestartPolicy = {name: 'always', MaximumRetryCount: 5};
             scope.config.HostConfig.Devices = [{ 'PathOnHost': '/dev/deviceName', 'PathInContainer': '/dev/deviceName', 'CgroupPermissions': 'mrw'}];
             scope.config.HostConfig.LxcConf = [{name: 'lxc.utsname', value: 'docker'}];
+            scope.config.HostConfig.ExtraHosts = [{host: 'hostname', ip: '127.0.0.1'}];
 
             scope.create();
             $httpBackend.flush();
