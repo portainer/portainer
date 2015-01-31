@@ -1,4 +1,4 @@
-/*! dockerui - v0.6.0 - 2015-01-28
+/*! dockerui - v0.6.0 - 2015-01-31
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby;
  * Licensed MIT
@@ -1632,7 +1632,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                            <div class=\"form-group\">\n" +
     "                                <label>Env:</label>\n" +
     "                                <div ng-repeat=\"envar in config.Env\">\n" +
-    "                                    <div class=\"form-inline\">\n" +
+    "                                    <div class=\"form-group form-inline\">\n" +
     "                                        <div class=\"form-group\">\n" +
     "                                            <label class=\"sr-only\">Variable Name:</label>\n" +
     "                                            <input type=\"text\" ng-model=\"envar.name\" class=\"form-control\" placeholder=\"NAME\"/>\n" +
@@ -1731,7 +1731,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                    <div class=\"form-group\">\n" +
     "                                        <label>VolumesFrom:</label>\n" +
     "                                        <div ng-repeat=\"volume in config.HostConfig.VolumesFrom\">\n" +
-    "                                            <div class=\"form-inline\">\n" +
+    "                                            <div class=\"form-group form-inline\">\n" +
     "                                                <select ng-model=\"volume.name\" ng-options=\"name for name in containerNames track by name\" class=\"form-control\"/>\n" +
     "                                                <button class=\"btn btn-danger btn-xs form-control\" ng-click=\"rmEntry(config.HostConfig.VolumesFrom, volume)\">Remove</button>\n" +
     "                                            </div>\n" +
@@ -1755,7 +1755,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                            <div class=\"form-group\">\n" +
     "                                <label>ExtraHosts:</label>\n" +
     "                                <div ng-repeat=\"entry in config.HostConfig.ExtraHosts\">\n" +
-    "                                    <div class=\"form-inline\">\n" +
+    "                                    <div class=\"form-group form-inline\">\n" +
     "                                        <div class=\"form-group\">\n" +
     "                                            <label class=\"sr-only\">Hostname:</label>\n" +
     "                                            <input type=\"text\" ng-model=\"entry.host\" class=\"form-control\" placeholder=\"hostname\"/>\n" +
@@ -1774,7 +1774,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                            <div class=\"form-group\">\n" +
     "                                <label>LxcConf:</label>\n" +
     "                                <div ng-repeat=\"entry in config.HostConfig.LxcConf\">\n" +
-    "                                    <div class=\"form-inline\">\n" +
+    "                                    <div class=\"form-group form-inline\">\n" +
     "                                        <div class=\"form-group\">\n" +
     "                                            <label class=\"sr-only\">Name:</label>\n" +
     "                                            <input type=\"text\" ng-model=\"entry.name\" class=\"form-control\" placeholder=\"lxc.utsname\"/>\n" +
@@ -1793,7 +1793,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                            <div class=\"form-group\">\n" +
     "                                <label>Devices:</label>\n" +
     "                                <div ng-repeat=\"device in config.HostConfig.Devices\">\n" +
-    "                                    <div class=\"form-group form-inline\">\n" +
+    "                                    <div class=\"form-group form-inline inline-four\">\n" +
     "                                        <label class=\"sr-only\">PathOnHost:</label>\n" +
     "                                        <input type=\"text\" ng-model=\"device.PathOnHost\" class=\"form-control\" placeholder=\"PathOnHost\"/>\n" +
     "                                        <label class=\"sr-only\">PathInContainer:</label>\n" +
@@ -1808,7 +1808,7 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                            <div class=\"form-group\">\n" +
     "                                <label>PortBindings:</label>\n" +
     "                                <div ng-repeat=\"portBinding in config.HostConfig.PortBindings\">\n" +
-    "                                    <div class=\"form-group form-inline\">\n" +
+    "                                    <div class=\"form-group form-inline inline-four\">\n" +
     "                                        <label class=\"sr-only\">Host IP:</label>\n" +
     "                                        <input type=\"text\" ng-model=\"portBinding.ip\" class=\"form-control\" placeholder=\"Host IP Address\"/>\n" +
     "                                        <label class=\"sr-only\">Host Port:</label>\n" +

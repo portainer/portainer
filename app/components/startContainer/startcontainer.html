@@ -106,7 +106,7 @@
                             <div class="form-group">
                                 <label>Env:</label>
                                 <div ng-repeat="envar in config.Env">
-                                    <div class="form-inline">
+                                    <div class="form-group form-inline">
                                         <div class="form-group">
                                             <label class="sr-only">Variable Name:</label>
                                             <input type="text" ng-model="envar.name" class="form-control" placeholder="NAME"/>
@@ -205,7 +205,7 @@
                                     <div class="form-group">
                                         <label>VolumesFrom:</label>
                                         <div ng-repeat="volume in config.HostConfig.VolumesFrom">
-                                            <div class="form-inline">
+                                            <div class="form-group form-inline">
                                                 <select ng-model="volume.name" ng-options="name for name in containerNames track by name" class="form-control"/>
                                                 <button class="btn btn-danger btn-xs form-control" ng-click="rmEntry(config.HostConfig.VolumesFrom, volume)">Remove</button>
                                             </div>
@@ -229,7 +229,7 @@
                             <div class="form-group">
                                 <label>ExtraHosts:</label>
                                 <div ng-repeat="entry in config.HostConfig.ExtraHosts">
-                                    <div class="form-inline">
+                                    <div class="form-group form-inline">
                                         <div class="form-group">
                                             <label class="sr-only">Hostname:</label>
                                             <input type="text" ng-model="entry.host" class="form-control" placeholder="hostname"/>
@@ -248,7 +248,7 @@
                             <div class="form-group">
                                 <label>LxcConf:</label>
                                 <div ng-repeat="entry in config.HostConfig.LxcConf">
-                                    <div class="form-inline">
+                                    <div class="form-group form-inline">
                                         <div class="form-group">
                                             <label class="sr-only">Name:</label>
                                             <input type="text" ng-model="entry.name" class="form-control" placeholder="lxc.utsname"/>
@@ -267,7 +267,7 @@
                             <div class="form-group">
                                 <label>Devices:</label>
                                 <div ng-repeat="device in config.HostConfig.Devices">
-                                    <div class="form-group form-inline">
+                                    <div class="form-group form-inline inline-four">
                                         <label class="sr-only">PathOnHost:</label>
                                         <input type="text" ng-model="device.PathOnHost" class="form-control" placeholder="PathOnHost"/>
                                         <label class="sr-only">PathInContainer:</label>
@@ -282,7 +282,7 @@
                             <div class="form-group">
                                 <label>PortBindings:</label>
                                 <div ng-repeat="portBinding in config.HostConfig.PortBindings">
-                                    <div class="form-group form-inline">
+                                    <div class="form-group form-inline inline-four">
                                         <label class="sr-only">Host IP:</label>
                                         <input type="text" ng-model="portBinding.ip" class="form-control" placeholder="Host IP Address"/>
                                         <label class="sr-only">Host Port:</label>
