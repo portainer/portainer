@@ -37,7 +37,7 @@ module.exports = function (grunt) {
         ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
         ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
         src: {
-            js: ['app/**/*.js'],
+            js: ['app/**/*.js', '!app/**/*.spec.js'],
             jsTpl: ['<%= distdir %>/templates/**/*.js'],
             specs: ['test/**/*.spec.js'],
             scenarios: ['test/**/*.scenario.js'],
@@ -86,7 +86,8 @@ module.exports = function (grunt) {
             angular: {
                 src:['assets/js/angularjs/1.2.6/angular.min.js',
                      'assets/js/angularjs/1.2.6/angular-route.min.js',
-                     'assets/js/angularjs/1.2.6/angular-resource.min.js'],
+                     'assets/js/angularjs/1.2.6/angular-resource.min.js',
+                     'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js'],
                 dest: '<%= distdir %>/angular.js'
             }
         },

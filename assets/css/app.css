@@ -109,3 +109,7 @@ body {
     border-style: solid;
     border-width: 0 0 0 1em;
 }
+
+.inline-four .form-control {
+    max-width: 25%;
+}
