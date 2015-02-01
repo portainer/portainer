@@ -110,7 +110,9 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
         var s = $scope;
         Container.create(config, function(d) {
                 if (d.Id) {
-                    ctor.start({id: d.Id}, function(cd) {
+                    var reqBody = config.HostConfig || {};
+                    reqBody.id = d.Id;
+                    ctor.start(reqBody, function(cd) {
                         if (cd.id) {
                             Messages.send('Container Started', d.Id);
                             $('#create-modal').modal('hide');

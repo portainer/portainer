@@ -1,6 +1,6 @@
-/*! dockerui - v0.6.0 - 2015-01-31
+/*! dockerui - v0.6.0 - 2015-02-01
  * https://github.com/crosbymichael/dockerui
- * Copyright (c) 2015 Michael Crosby;
+ * Copyright (c) 2015 Michael Crosby & Kevan Ahlquist;
  * Licensed MIT
  */
 angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'settings', 'builder', 'containerLogs'])
@@ -613,7 +613,9 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
         var s = $scope;
         Container.create(config, function(d) {
                 if (d.Id) {
-                    ctor.start({id: d.Id}, function(cd) {
+                    var reqBody = config.HostConfig || {};
+                    reqBody.id = d.Id;
+                    ctor.start(reqBody, function(cd) {
                         if (cd.id) {
                             Messages.send('Container Started', d.Id);
                             $('#create-modal').modal('hide');
