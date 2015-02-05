@@ -6,8 +6,16 @@
             <button class="btn btn-warning" ng-click="scrollTo('stderr')">stderr</button>
         </div>
         <div class="pull-right">
-            <input id="timestampToggle" type="checkbox" ng-model="showTimestamps" 
-                ng-change="toggleTimestamps()"/> <label for="timestampToggle">Display Timestamps</label>
+            <span style="padding-right: 10px">
+                <label for="tailLines">Show last</label>
+                <input id="tailLines" type="text" size="1" maxlength="4"
+                    ng-model="tailLines" ng-keypress="($event.which === 13)? toggleTail() : 0"/>
+                <label for="tailLines">lines</label>
+            </span>
+            <span>
+                <input id="timestampToggle" type="checkbox" ng-model="showTimestamps"
+                    ng-change="toggleTimestamps()"/> <label for="timestampToggle">Display Timestamps</label>
+            </span>
         </div>
     </div>
 
