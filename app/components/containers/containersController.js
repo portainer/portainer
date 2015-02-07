@@ -27,7 +27,7 @@ function($scope, Container, Settings, Messages, ViewSpinner) {
         angular.forEach(items, function(c) {
             if (c.Checked) {
                 counter = counter + 1;
-                action({id: c.Id}, function(d) {
+                action({id: c.Id, HostConfig: c.HostConfig}, function(d) {
                     Messages.send("Container " + msg, c.Id);
                     var index = $scope.containers.indexOf(c);
                     complete();
