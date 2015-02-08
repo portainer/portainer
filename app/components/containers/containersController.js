@@ -26,15 +26,41 @@ function($scope, Container, Settings, Messages, ViewSpinner) {
         };
         angular.forEach(items, function(c) {
             if (c.Checked) {
-                counter = counter + 1;
-                action({id: c.Id, HostConfig: c.HostConfig}, function(d) {
-                    Messages.send("Container " + msg, c.Id);
-                    var index = $scope.containers.indexOf(c);
-                    complete();
-                }, function(e) {
-                    Messages.error("Failure", e.data);
-                    complete();
-                });
+              if(msg === "Started"){
+                  Container.get({id: c.Id}, function(d) {
+                    c = d;
+                    counter = counter + 1;
+                    action({id: c.Id, HostConfig: c.HostConfig || {}}, function(d) {
+                        Messages.send("Container " + msg, c.Id);
+                        var index = $scope.containers.indexOf(c);
+                        complete();
+                    }, function(e) {
+                        Messages.error("Failure", e.data);
+                        complete();
+                    });
+                  }, function(e) {
+                      if (e.status === 404) {
+                          $('.detail').hide();
+                          Messages.error("Not found", "Container not found.");
+                      } else {
+                          Messages.error("Failure", e.data);
+                      }
+                      complete();
+                  });
+                }
+                else{
+                  counter = counter + 1;
+                  action({id: c.Id}, function(d) {
+                      Messages.send("Container " + msg, c.Id);
+                      var index = $scope.containers.indexOf(c);
+                      complete();
+                  }, function(e) {
+                      Messages.error("Failure", e.data);
+                      complete();
+                  });
+
+                }
+
             }
         });
         if (counter === 0) {
