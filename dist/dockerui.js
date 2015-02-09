@@ -1,4 +1,4 @@
-/*! dockerui - v0.6.0 - 2015-02-08
+/*! dockerui - v0.6.0 - 2015-02-09
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby & Kevan Ahlquist;
  * Licensed MIT
@@ -211,7 +211,7 @@ function($scope, Container, Settings, Messages, ViewSpinner) {
         };
         angular.forEach(items, function(c) {
             if (c.Checked) {
-              if(msg === "Started"){
+              if(action === Container.start){
                   Container.get({id: c.Id}, function(d) {
                     c = d;
                     counter = counter + 1;

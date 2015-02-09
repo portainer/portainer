@@ -26,7 +26,7 @@ function($scope, Container, Settings, Messages, ViewSpinner) {
         };
         angular.forEach(items, function(c) {
             if (c.Checked) {
-              if(msg === "Started"){
+              if(action === Container.start){
                   Container.get({id: c.Id}, function(d) {
                     c = d;
                     counter = counter + 1;
