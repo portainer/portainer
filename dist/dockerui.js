@@ -1512,25 +1512,77 @@ angular.module("app/components/settings/settings.html", []).run(["$templateCache
     "                <td>Debug:</td>\n" +
     "                <td>{{ info.Debug }}</td>\n" +
     "            </tr>\n" +
+    "			<tr>\n" +
+    "				<td>CPUs:</td>\n" +
+    "				<td>{{ info.NCPU }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>Total Memory:</td>\n" +
+    "				<td>{{ info.MemTotal }}MB</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>Operating System:</td>\n" +
+    "				<td>{{ info.OperatingSystem }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>Kernel Version:</td>\n" +
+    "				<td>{{ info.KernelVersion }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>ID:</td>\n" +
+    "				<td>{{ info.ID }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>Init SHA1</td>\n" +
+    "				<td>{{ info.InitSha1 }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>Labels:</td>\n" +
+    "				<td>{{ info.Labels }}</td>\n" +
+    "			</tr>\n" +
     "            <tr>\n" +
-    "                <td>NFd:</td>\n" +
+    "                <td>File Descriptors:</td>\n" +
     "                <td>{{ info.NFd }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>NGoroutines:</td>\n" +
+    "                <td>Goroutines:</td>\n" +
     "                <td>{{ info.NGoroutines }}</td>\n" +
     "            </tr>\n" +
+    "			<tr>\n" +
+    "				<td>Storage Driver:</td>\n" +
+    "				<td>{{ info.Driver }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>Storage Driver Status:</td>\n" +
+    "				<td>{{ info.DriverStatus }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>Execution Driver:</td>\n" +
+    "				<td>{{ info.ExecutionDriver }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>IPv4 Forwarding:</td>\n" +
+    "				<td>{{ info.IPv4Forwarding }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>Index Server Address:</td>\n" +
+    "				<td>{{ info.IndexServerAddress }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>Init Path:</td>\n" +
+    "				<td>{{ info.InitPath }}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "				<td>Docker Root Directory:</td>\n" +
+    "				<td>{{ info.DockerRootDir }}</td>\n" +
+    "			</tr>\n" +
     "            <tr>\n" +
-    "                <td>MemoryLimit:</td>\n" +
+    "                <td>Memory Limit:</td>\n" +
     "                <td>{{ info.MemoryLimit }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>SwapLimit:</td>\n" +
+    "                <td>Swap Limit:</td>\n" +
     "                <td>{{ info.SwapLimit }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>NFd:</td>\n" +
-    "                <td>{{ info.NFd }}</td>\n" +
     "            </tr>\n" +
     "        </tbody>\n" +
     "    </table>\n" +
