@@ -219,8 +219,7 @@ angular.module("app/components/containers/containers.html", []).run(["$templateC
     "    </ul>\n" +
     "\n" +
     "    <div class=\"pull-right\">\n" +
-    "        <input type=\"checkbox\" ng-model=\"displayAll\" \n" +
-    "            ng-change=\"toggleGetAll()\"/> Display All\n" +
+    "        <input type=\"checkbox\" ng-model=\"displayAll\" id=\"displayAll\" ng-change=\"toggleGetAll()\"/> <label for=\"displayAll\">Display All</label>\n" +
     "    </div>\n" +
     "</div>\n" +
     "<table class=\"table table-striped\">\n" +
