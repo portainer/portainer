@@ -1504,7 +1504,7 @@ angular.module("app/components/info/info.html", []).run(["$templateCache", funct
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Total Memory:</td>\n" +
-    "                <td>{{ info.MemTotal }}MB</td>\n" +
+    "                <td>{{ info.MemTotal|humansize }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Operating System:</td>\n" +
