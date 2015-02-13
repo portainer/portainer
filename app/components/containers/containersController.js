@@ -87,6 +87,10 @@ function($scope, Container, Settings, Messages, ViewSpinner) {
         batch($scope.containers, Container.stop, "Stopped");
     };
 
+    $scope.restartAction = function() {
+        batch($scope.containers, Container.restart, "Restarted");
+    };
+
     $scope.killAction = function() {
         batch($scope.containers, Container.kill, "Killed");
     };
