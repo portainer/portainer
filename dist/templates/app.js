@@ -86,7 +86,7 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
     "                <td>\n" +
     "                    <ul style=\"display:inline-table\">\n" +
     "                        <li ng-repeat=\"(containerport, hostports) in container.HostConfig.PortBindings\">\n" +
-    "                            {{ containerport }} => <span class=\"label\" ng-repeat=\"(k,v) in hostports\">{{ v.HostIp }}:{{ v.HostPort }}</span>\n" +
+    "                            {{ containerport }} => <span class=\"label label-default\" ng-repeat=\"(k,v) in hostports\">{{ v.HostIp }}:{{ v.HostPort }}</span>\n" +
     "                        </li>\n" +
     "                    </ul>\n" +
     "                </td>\n" +
@@ -279,7 +279,7 @@ angular.module("app/components/dashboard/dashboard.html", []).run(["$templateCac
     "            <div class=\"col-xs-5 text-right\">\n" +
     "                <h3>Status</h3>\n" +
     "                <canvas id=\"containers-chart\" class=\"pull-right\">\n" +
-    "                    Get a better browser... Your holding everyone back.\n" +
+    "                    <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.</p>\n" +
     "                </canvas>\n" +
     "                <div id=\"chart-legend\"></div>\n" +
     "            </div>\n" +
@@ -290,11 +290,11 @@ angular.module("app/components/dashboard/dashboard.html", []).run(["$templateCac
     "        <div class=\"col-xs-10\" id=\"stats\">\n" +
     "            <h4>Containers created</h4>\n" +
     "           <canvas id=\"containers-started-chart\" width=\"700\">\n" +
-    "                Get a better browser... You're holding everyone back.\n" +
+    "                <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.</p>\n" +
     "           </canvas>\n" +
     "            <h4>Images created</h4>\n" +
     "           <canvas id=\"images-created-chart\" width=\"700\">\n" +
-    "                Get a better browser... You're holding everyone back.\n" +
+    "                <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.</p>\n" +
     "           </canvas>\n" +
     "        </div>\n" +
     "    </div>\n" +
@@ -329,7 +329,7 @@ angular.module("app/components/image/image.html", []).run(["$templateCache", fun
     "    <div>\n" +
     "       <h4>Containers created:</h4>\n" +
     "       <canvas id=\"containers-started-chart\" width=\"750\">\n" +
-    "                Get a better broswer... Your holding everyone back.\n" +
+    "          <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.</p>\n" +
     "       </canvas>\n" +
     "    </div>\n" +
     "\n" +

@@ -6,7 +6,7 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
         $routeProvider.when('/containers/:id/', {templateUrl: 'app/components/container/container.html', controller: 'ContainerController'});
         $routeProvider.when('/containers/:id/logs/', {templateUrl: 'app/components/containerLogs/containerlogs.html', controller: 'ContainerLogsController'});
         $routeProvider.when('/images/', {templateUrl: 'app/components/images/images.html', controller: 'ImagesController'});
-        $routeProvider.when('/images/:id/', {templateUrl: 'app/components/image/image.html', controller: 'ImageController'});
+        $routeProvider.when('/images/:id*/', {templateUrl: 'app/components/image/image.html', controller: 'ImageController'});
         $routeProvider.when('/settings', {templateUrl: 'app/components/settings/settings.html', controller: 'SettingsController'});
         $routeProvider.otherwise({redirectTo: '/'});
     }])
