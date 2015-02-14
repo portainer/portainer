@@ -1,4 +1,4 @@
-angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containers/containers.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/masthead/masthead.html', 'app/components/settings/settings.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
+angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containers/containers.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
 
 angular.module("app/components/builder/builder.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("app/components/builder/builder.html",
@@ -459,22 +459,8 @@ angular.module("app/components/images/images.html", []).run(["$templateCache", f
     "");
 }]);
 
-angular.module("app/components/masthead/masthead.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("app/components/masthead/masthead.html",
-    "  <div class=\"masthead\">\n" +
-    "    <h3 class=\"text-muted\">DockerUI</h3>\n" +
-    "      <ul class=\"nav well\">\n" +
-    "        <li><a href=\"#\">Dashboard</a></li>\n" +
-    "        <li><a href=\"#/containers/\">Containers</a></li>\n" +
-    "        <li><a href=\"#/images/\">Images</a></li>\n" +
-    "        <li><a href=\"#/settings/\">Settings</a></li>\n" +
-    "      </ul>\n" +
-    "  </div>\n" +
-    "");
-}]);
-
-angular.module("app/components/settings/settings.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("app/components/settings/settings.html",
+angular.module("app/components/info/info.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("app/components/info/info.html",
     "<div class=\"detail\">\n" +
     "    <h2>Docker Information</h2>\n" +
     "    <div>\n" +
@@ -502,28 +488,94 @@ angular.module("app/components/settings/settings.html", []).run(["$templateCache
     "                <td>{{ info.Debug }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>NFd:</td>\n" +
+    "                <td>CPUs:</td>\n" +
+    "                <td>{{ info.NCPU }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Total Memory:</td>\n" +
+    "                <td>{{ info.MemTotal|humansize }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Operating System:</td>\n" +
+    "                <td>{{ info.OperatingSystem }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Kernel Version:</td>\n" +
+    "                <td>{{ info.KernelVersion }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>ID:</td>\n" +
+    "                <td>{{ info.ID }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Labels:</td>\n" +
+    "                <td>{{ info.Labels }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>File Descriptors:</td>\n" +
     "                <td>{{ info.NFd }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>NGoroutines:</td>\n" +
+    "                <td>Goroutines:</td>\n" +
     "                <td>{{ info.NGoroutines }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>MemoryLimit:</td>\n" +
+    "                <td>Storage Driver:</td>\n" +
+    "                <td>{{ info.Driver }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Storage Driver Status:</td>\n" +
+    "                <td>{{ info.DriverStatus }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Execution Driver:</td>\n" +
+    "                <td>{{ info.ExecutionDriver }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>IPv4 Forwarding:</td>\n" +
+    "                <td>{{ info.IPv4Forwarding }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Index Server Address:</td>\n" +
+    "                <td>{{ info.IndexServerAddress }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Init Path:</td>\n" +
+    "                <td>{{ info.InitPath }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Docker Root Directory:</td>\n" +
+    "                <td>{{ info.DockerRootDir }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Init SHA1</td>\n" +
+    "                <td>{{ info.InitSha1 }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Memory Limit:</td>\n" +
     "                <td>{{ info.MemoryLimit }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>SwapLimit:</td>\n" +
+    "                <td>Swap Limit:</td>\n" +
     "                <td>{{ info.SwapLimit }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>NFd:</td>\n" +
-    "                <td>{{ info.NFd }}</td>\n" +
     "            </tr>\n" +
     "        </tbody>\n" +
     "    </table>\n" +
     "</div>\n" +
+    "");
+}]);
+
+angular.module("app/components/masthead/masthead.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("app/components/masthead/masthead.html",
+    "  <div class=\"masthead\">\n" +
+    "    <h3 class=\"text-muted\">DockerUI</h3>\n" +
+    "      <ul class=\"nav well\">\n" +
+    "        <li><a href=\"#\">Dashboard</a></li>\n" +
+    "        <li><a href=\"#/containers/\">Containers</a></li>\n" +
+    "        <li><a href=\"#/images/\">Images</a></li>\n" +
+    "        <li><a href=\"#/info/\">Info</a></li>\n" +
+    "      </ul>\n" +
+    "  </div>\n" +
     "");
 }]);
 
