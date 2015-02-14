@@ -336,40 +336,40 @@ angular.module("app/components/image/image.html", []).run(["$templateCache", fun
     "         <tbody>\n" +
     "            <tr>\n" +
     "                <td>Created:</td>\n" +
-    "                <td>{{ image.created }}</td>\n" +
+    "                <td>{{ image.Created }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Parent:</td>\n" +
-    "                <td><a href=\"#/images/{{ image.parent }}/\">{{ image.parent }}</a></td>\n" +
+    "                <td><a href=\"#/images/{{ image.Parent }}/\">{{ image.Parent }}</a></td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>Size:</td>\n" +
-    "                <td>{{ image.Size|humansize }}</td>\n" +
+    "                <td>Size (Virtual Size):</td>\n" +
+    "				<td>{{ image.Size|humansize }} ({{ image.VirtualSize|humansize }})</td>\n" +
     "            </tr>\n" +
     "\n" +
     "            <tr>\n" +
     "                <td>Hostname:</td>\n" +
-    "                <td>{{ image.container_config.Hostname }}</td>\n" +
+    "                <td>{{ image.ContainerConfig.Hostname }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>User:</td>\n" +
-    "                <td>{{ image.container_config.User }}</td>\n" +
+    "                <td>{{ image.ContainerConfig.User }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Cmd:</td>\n" +
-    "                <td>{{ image.container_config.Cmd }}</td>\n" +
+    "                <td>{{ image.ContainerConfig.Cmd }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Volumes:</td>\n" +
-    "                <td>{{ image.container_config.Volumes }}</td>\n" +
+    "                <td>{{ image.ContainerConfig.Volumes }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Volumes from:</td>\n" +
-    "                <td>{{ image.container_config.VolumesFrom }}</td>\n" +
+    "                <td>{{ image.ContainerConfig.VolumesFrom }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>Comment:</td>\n" +
-    "                <td>{{ image.comment }}</td>\n" +
+    "                <td>Built with:</td>\n" +
+    "				<td>Docker {{ image.DockerVersion }} on {{ image.Os}}, {{ image.Architecture }}</td>\n" +
     "            </tr>\n" +
     "\n" +
     "        </tbody>\n" +
