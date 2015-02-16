@@ -20,7 +20,6 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
     });
 
     function getLogs() {
-        console.log($scope.tailLines);
         ContainerLogs.get($routeParams.id, {
             stdout: 1,
             stderr: 0,
