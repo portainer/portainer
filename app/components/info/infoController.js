@@ -1,5 +1,5 @@
-angular.module('settings', [])
-.controller('SettingsController', ['$scope', 'System', 'Docker', 'Settings', 'Messages',
+angular.module('info', [])
+.controller('InfoController', ['$scope', 'System', 'Docker', 'Settings', 'Messages',
 function($scope, System, Docker, Settings, Messages) {
     $scope.info = {};
     $scope.docker = {};

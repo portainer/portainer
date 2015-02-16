@@ -23,40 +23,40 @@
          <tbody>
             <tr>
                 <td>Created:</td>
-                <td>{{ image.created }}</td>
+                <td>{{ image.Created }}</td>
             </tr>
             <tr>
                 <td>Parent:</td>
-                <td><a href="#/images/{{ image.parent }}/">{{ image.parent }}</a></td>
+                <td><a href="#/images/{{ image.Parent }}/">{{ image.Parent }}</a></td>
             </tr>
             <tr>
-                <td>Size:</td>
-                <td>{{ image.Size|humansize }}</td>
+                <td>Size (Virtual Size):</td>
+                <td>{{ image.Size|humansize }} ({{ image.VirtualSize|humansize }})</td>
             </tr>
 
             <tr>
                 <td>Hostname:</td>
-                <td>{{ image.container_config.Hostname }}</td>
+                <td>{{ image.ContainerConfig.Hostname }}</td>
             </tr>
             <tr>
                 <td>User:</td>
-                <td>{{ image.container_config.User }}</td>
+                <td>{{ image.ContainerConfig.User }}</td>
             </tr>
             <tr>
                 <td>Cmd:</td>
-                <td>{{ image.container_config.Cmd }}</td>
+                <td>{{ image.ContainerConfig.Cmd }}</td>
             </tr>
             <tr>
                 <td>Volumes:</td>
-                <td>{{ image.container_config.Volumes }}</td>
+                <td>{{ image.ContainerConfig.Volumes }}</td>
             </tr>
             <tr>
                 <td>Volumes from:</td>
-                <td>{{ image.container_config.VolumesFrom }}</td>
+                <td>{{ image.ContainerConfig.VolumesFrom }}</td>
             </tr>
             <tr>
-                <td>Comment:</td>
-                <td>{{ image.comment }}</td>
+                <td>Built with:</td>
+                <td>Docker {{ image.DockerVersion }} on {{ image.Os}}, {{ image.Architecture }}</td>
             </tr>
 
         </tbody>

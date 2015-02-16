@@ -114,3 +114,7 @@ body {
 .inline-four .form-control {
   max-width: 25%;
 }
+
+.dropdown {
+  cursor: pointer;
+}

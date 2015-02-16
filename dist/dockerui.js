@@ -1,9 +1,9 @@
-/*! dockerui - v0.6.0 - 2015-02-01
+/*! dockerui - v0.6.0 - 2015-02-13
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby & Kevan Ahlquist;
  * Licensed MIT
  */
-angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'settings', 'builder', 'containerLogs'])
+angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'info', 'builder', 'containerLogs'])
     .config(['$routeProvider', function ($routeProvider) {
         'use strict';
         $routeProvider.when('/', {templateUrl: 'app/components/dashboard/dashboard.html', controller: 'DashboardController'});
@@ -12,7 +12,7 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
         $routeProvider.when('/containers/:id/logs/', {templateUrl: 'app/components/containerLogs/containerlogs.html', controller: 'ContainerLogsController'});
         $routeProvider.when('/images/', {templateUrl: 'app/components/images/images.html', controller: 'ImagesController'});
         $routeProvider.when('/images/:id/', {templateUrl: 'app/components/image/image.html', controller: 'ImageController'});
-        $routeProvider.when('/settings', {templateUrl: 'app/components/settings/settings.html', controller: 'SettingsController'});
+        $routeProvider.when('/info', {templateUrl: 'app/components/info/info.html', controller: 'InfoController'});
         $routeProvider.otherwise({redirectTo: '/'});
     }])
     // This is your docker url that the api will use to make requests
@@ -159,7 +159,7 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
             // Replace carriage returns twith newlines to clean up output
             $scope.stdout = data.replace(/[\r]/g, '\n');
         });
-        ContainerLogs.get($routeParams.id, {stdout: 0, stderr: 1}, function(data, status, headers, config) {
+        ContainerLogs.get($routeParams.id, {stdout: 0, stderr: 1, timestamps: $scope.showTimestamps}, function(data, status, headers, config) {
             $scope.stderr = data.replace(/[\r]/g, '\n');
         });
     }
@@ -211,15 +211,41 @@ function($scope, Container, Settings, Messages, ViewSpinner) {
         };
         angular.forEach(items, function(c) {
             if (c.Checked) {
-                counter = counter + 1;
-                action({id: c.Id}, function(d) {
-                    Messages.send("Container " + msg, c.Id);
-                    var index = $scope.containers.indexOf(c);
-                    complete();
-                }, function(e) {
-                    Messages.error("Failure", e.data);
-                    complete();
-                });
+              if(action === Container.start){
+                  Container.get({id: c.Id}, function(d) {
+                    c = d;
+                    counter = counter + 1;
+                    action({id: c.Id, HostConfig: c.HostConfig || {}}, function(d) {
+                        Messages.send("Container " + msg, c.Id);
+                        var index = $scope.containers.indexOf(c);
+                        complete();
+                    }, function(e) {
+                        Messages.error("Failure", e.data);
+                        complete();
+                    });
+                  }, function(e) {
+                      if (e.status === 404) {
+                          $('.detail').hide();
+                          Messages.error("Not found", "Container not found.");
+                      } else {
+                          Messages.error("Failure", e.data);
+                      }
+                      complete();
+                  });
+                }
+                else{
+                  counter = counter + 1;
+                  action({id: c.Id}, function(d) {
+                      Messages.send("Container " + msg, c.Id);
+                      var index = $scope.containers.indexOf(c);
+                      complete();
+                  }, function(e) {
+                      Messages.error("Failure", e.data);
+                      complete();
+                  });
+
+                }
+
             }
         });
         if (counter === 0) {
@@ -244,6 +270,10 @@ function($scope, Container, Settings, Messages, ViewSpinner) {
 
     $scope.stopAction = function() {
         batch($scope.containers, Container.stop, "Stopped");
+    };
+
+    $scope.restartAction = function() {
+        batch($scope.containers, Container.restart, "Restarted");
     };
 
     $scope.killAction = function() {
@@ -472,13 +502,8 @@ function($scope, Image, ViewSpinner, Messages) {
     });
 }]);
 
-angular.module('masthead', [])
-.controller('MastheadController', ['$scope', function($scope) {
-    $scope.template = 'app/components/masthead/masthead.html';
-}]);
-
-angular.module('settings', [])
-.controller('SettingsController', ['$scope', 'System', 'Docker', 'Settings', 'Messages',
+angular.module('info', [])
+.controller('InfoController', ['$scope', 'System', 'Docker', 'Settings', 'Messages',
 function($scope, System, Docker, Settings, Messages) {
     $scope.info = {};
     $scope.docker = {};
@@ -487,6 +512,11 @@ function($scope, System, Docker, Settings, Messages) {
 
     Docker.get({}, function(d) { $scope.docker = d; });
     System.get({}, function(d) { $scope.info = d; });
+}]);
+
+angular.module('masthead', [])
+.controller('MastheadController', ['$scope', function($scope) {
+    $scope.template = 'app/components/masthead/masthead.html';
 }]);
 
 angular.module('sidebar', [])
@@ -979,7 +1009,7 @@ function ContainerViewModel(data) {
    this.Names = data.Names;
 }
 
-angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containers/containers.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/masthead/masthead.html', 'app/components/settings/settings.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
+angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containers/containers.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
 
 angular.module("app/components/builder/builder.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("app/components/builder/builder.html",
@@ -1190,6 +1220,7 @@ angular.module("app/components/containers/containers.html", []).run(["$templateC
     "            <ul id=\"menu1\" class=\"dropdown-menu\" role=\"menu\" aria-labelledby=\"drop4\">\n" +
     "                <li><a tabindex=\"-1\" href=\"\" ng-click=\"startAction()\">Start</a></li>\n" +
     "                <li><a tabindex=\"-1\" href=\"\" ng-click=\"stopAction()\">Stop</a></li>\n" +
+    "                <li><a tabindex=\"-1\" href=\"\" ng-click=\"restartAction()\">Restart</a></li>\n" +
     "                <li><a tabindex=\"-1\" href=\"\" ng-click=\"killAction()\">Kill</a></li>\n" +
     "                <li><a tabindex=\"-1\" href=\"\" ng-click=\"pauseAction()\">Pause</a></li>\n" +
     "                <li><a tabindex=\"-1\" href=\"\" ng-click=\"unpauseAction()\">Unpause</a></li>\n" +
@@ -1199,8 +1230,7 @@ angular.module("app/components/containers/containers.html", []).run(["$templateC
     "    </ul>\n" +
     "\n" +
     "    <div class=\"pull-right\">\n" +
-    "        <input type=\"checkbox\" ng-model=\"displayAll\" \n" +
-    "            ng-change=\"toggleGetAll()\"/> Display All\n" +
+    "        <input type=\"checkbox\" ng-model=\"displayAll\" id=\"displayAll\" ng-change=\"toggleGetAll()\"/> <label for=\"displayAll\">Display All</label>\n" +
     "    </div>\n" +
     "</div>\n" +
     "<table class=\"table table-striped\">\n" +
@@ -1317,40 +1347,40 @@ angular.module("app/components/image/image.html", []).run(["$templateCache", fun
     "         <tbody>\n" +
     "            <tr>\n" +
     "                <td>Created:</td>\n" +
-    "                <td>{{ image.created }}</td>\n" +
+    "                <td>{{ image.Created }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Parent:</td>\n" +
-    "                <td><a href=\"#/images/{{ image.parent }}/\">{{ image.parent }}</a></td>\n" +
+    "                <td><a href=\"#/images/{{ image.Parent }}/\">{{ image.Parent }}</a></td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>Size:</td>\n" +
-    "                <td>{{ image.Size|humansize }}</td>\n" +
+    "                <td>Size (Virtual Size):</td>\n" +
+    "				<td>{{ image.Size|humansize }} ({{ image.VirtualSize|humansize }})</td>\n" +
     "            </tr>\n" +
     "\n" +
     "            <tr>\n" +
     "                <td>Hostname:</td>\n" +
-    "                <td>{{ image.container_config.Hostname }}</td>\n" +
+    "                <td>{{ image.ContainerConfig.Hostname }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>User:</td>\n" +
-    "                <td>{{ image.container_config.User }}</td>\n" +
+    "                <td>{{ image.ContainerConfig.User }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Cmd:</td>\n" +
-    "                <td>{{ image.container_config.Cmd }}</td>\n" +
+    "                <td>{{ image.ContainerConfig.Cmd }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Volumes:</td>\n" +
-    "                <td>{{ image.container_config.Volumes }}</td>\n" +
+    "                <td>{{ image.ContainerConfig.Volumes }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Volumes from:</td>\n" +
-    "                <td>{{ image.container_config.VolumesFrom }}</td>\n" +
+    "                <td>{{ image.ContainerConfig.VolumesFrom }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>Comment:</td>\n" +
-    "                <td>{{ image.comment }}</td>\n" +
+    "                <td>Built with:</td>\n" +
+    "				<td>Docker {{ image.DockerVersion }} on {{ image.Os}}, {{ image.Architecture }}</td>\n" +
     "            </tr>\n" +
     "\n" +
     "        </tbody>\n" +
@@ -1440,22 +1470,8 @@ angular.module("app/components/images/images.html", []).run(["$templateCache", f
     "");
 }]);
 
-angular.module("app/components/masthead/masthead.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("app/components/masthead/masthead.html",
-    "  <div class=\"masthead\">\n" +
-    "    <h3 class=\"text-muted\">DockerUI</h3>\n" +
-    "      <ul class=\"nav well\">\n" +
-    "        <li><a href=\"#\">Dashboard</a></li>\n" +
-    "        <li><a href=\"#/containers/\">Containers</a></li>\n" +
-    "        <li><a href=\"#/images/\">Images</a></li>\n" +
-    "        <li><a href=\"#/settings/\">Settings</a></li>\n" +
-    "      </ul>\n" +
-    "  </div>\n" +
-    "");
-}]);
-
-angular.module("app/components/settings/settings.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("app/components/settings/settings.html",
+angular.module("app/components/info/info.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("app/components/info/info.html",
     "<div class=\"detail\">\n" +
     "    <h2>Docker Information</h2>\n" +
     "    <div>\n" +
@@ -1483,28 +1499,94 @@ angular.module("app/components/settings/settings.html", []).run(["$templateCache
     "                <td>{{ info.Debug }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>NFd:</td>\n" +
+    "                <td>CPUs:</td>\n" +
+    "                <td>{{ info.NCPU }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Total Memory:</td>\n" +
+    "                <td>{{ info.MemTotal|humansize }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Operating System:</td>\n" +
+    "                <td>{{ info.OperatingSystem }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Kernel Version:</td>\n" +
+    "                <td>{{ info.KernelVersion }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>ID:</td>\n" +
+    "                <td>{{ info.ID }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Labels:</td>\n" +
+    "                <td>{{ info.Labels }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>File Descriptors:</td>\n" +
     "                <td>{{ info.NFd }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>NGoroutines:</td>\n" +
+    "                <td>Goroutines:</td>\n" +
     "                <td>{{ info.NGoroutines }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>MemoryLimit:</td>\n" +
+    "                <td>Storage Driver:</td>\n" +
+    "                <td>{{ info.Driver }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Storage Driver Status:</td>\n" +
+    "                <td>{{ info.DriverStatus }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Execution Driver:</td>\n" +
+    "                <td>{{ info.ExecutionDriver }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>IPv4 Forwarding:</td>\n" +
+    "                <td>{{ info.IPv4Forwarding }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Index Server Address:</td>\n" +
+    "                <td>{{ info.IndexServerAddress }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Init Path:</td>\n" +
+    "                <td>{{ info.InitPath }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Docker Root Directory:</td>\n" +
+    "                <td>{{ info.DockerRootDir }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Init SHA1</td>\n" +
+    "                <td>{{ info.InitSha1 }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Memory Limit:</td>\n" +
     "                <td>{{ info.MemoryLimit }}</td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
-    "                <td>SwapLimit:</td>\n" +
+    "                <td>Swap Limit:</td>\n" +
     "                <td>{{ info.SwapLimit }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>NFd:</td>\n" +
-    "                <td>{{ info.NFd }}</td>\n" +
     "            </tr>\n" +
     "        </tbody>\n" +
     "    </table>\n" +
     "</div>\n" +
+    "");
+}]);
+
+angular.module("app/components/masthead/masthead.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("app/components/masthead/masthead.html",
+    "  <div class=\"masthead\">\n" +
+    "    <h3 class=\"text-muted\">DockerUI</h3>\n" +
+    "      <ul class=\"nav well\">\n" +
+    "        <li><a href=\"#\">Dashboard</a></li>\n" +
+    "        <li><a href=\"#/containers/\">Containers</a></li>\n" +
+    "        <li><a href=\"#/images/\">Images</a></li>\n" +
+    "        <li><a href=\"#/info/\">Info</a></li>\n" +
+    "      </ul>\n" +
+    "  </div>\n" +
     "");
 }]);
 
