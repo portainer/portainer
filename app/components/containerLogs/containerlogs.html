@@ -5,17 +5,17 @@
             <button class="btn btn-info" ng-click="scrollTo('stdout')">stdout</button>
             <button class="btn btn-warning" ng-click="scrollTo('stderr')">stderr</button>
         </div>
-        <div class="pull-right">
-            <span style="padding-right: 10px">
-                <label for="tailLines">Show last</label>
-                <input id="tailLines" type="text" size="1" maxlength="4"
+        <div class="pull-right col-xs-6">
+            <div class="col-xs-6">
+                <a class="btn btn-primary" ng-click="toggleTail()" role="button">Reload logs</a>
+                <input id="tailLines" type="number" ng-style="{width: '45px'}"
                     ng-model="tailLines" ng-keypress="($event.which === 13)? toggleTail() : 0"/>
                 <label for="tailLines">lines</label>
-            </span>
-            <span>
+            </div>
+            <div class="col-xs-4">
                 <input id="timestampToggle" type="checkbox" ng-model="showTimestamps"
-                    ng-change="toggleTimestamps()"/> <label for="timestampToggle">Display Timestamps</label>
-            </span>
+                    ng-change="toggleTimestamps()"/> <label for="timestampToggle">Timestamps</label>
+            </div>
         </div>
     </div>
 
