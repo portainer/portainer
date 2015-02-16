@@ -30,7 +30,12 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
             // Replace carriage returns twith newlines to clean up output
             $scope.stdout = data.replace(/[\r]/g, '\n');
         });
-        ContainerLogs.get($routeParams.id, {stdout: 0, stderr: 1, timestamps: $scope.showTimestamps}, function(data, status, headers, config) {
+        ContainerLogs.get($routeParams.id, {
+            stdout: 0,
+            stderr: 1,
+            timestamps: $scope.showTimestamps,
+            tail: $scope.tailLines
+        }, function(data, status, headers, config) {
             $scope.stderr = data.replace(/[\r]/g, '\n');
         });
     }
