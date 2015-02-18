@@ -4,3 +4,4 @@ logs/*
 node_modules
 .idea
 dist
+dockerui

@@ -1,8 +1,7 @@
-FROM crosbymichael/golang
+FROM scratch
 
-COPY dockerui.go /app/
-COPY dist/ /app/
-WORKDIR /app/
-RUN go build dockerui.go
+COPY dockerui /
+COPY dist /
+
 EXPOSE 9000
-ENTRYPOINT ["./dockerui"]
+ENTRYPOINT ["/dockerui"]

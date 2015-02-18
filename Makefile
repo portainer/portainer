@@ -7,14 +7,15 @@ PORT ?= 9000
 
 install:
 	npm install -g grunt-cli
+	npm install
 
 build:
 	grunt build
 	docker build --rm -t dockerui .
 
 build-release:
-	grunt release
-	docker build --rm -t dockerui .
+	grunt build
+	docker run --rm -v $(pwd):/src centurylink/golang-builder
 
 test:
 	grunt
