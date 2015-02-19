@@ -20,11 +20,20 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
 
     function getLogs() {
         ContainerLogs.get($routeParams.id, {stdout: 1, stderr: 0, timestamps: $scope.showTimestamps}, function(data, status, headers, config) {
-            // Replace carriage returns twith newlines to clean up output
-            $scope.stdout = data.replace(/[\r]/g, '\n');
+            // Replace carriage returns with newlines to clean up output
+            data = data.replace(/[\r]/g, '\n')
+            // Strip 8 byte header from each line of output
+            data = data.substring(8);
+            data = data.replace(/\n(.{8})/g, '\n');
+            $scope.stdout = data;
         });
         ContainerLogs.get($routeParams.id, {stdout: 0, stderr: 1, timestamps: $scope.showTimestamps}, function(data, status, headers, config) {
-            $scope.stderr = data.replace(/[\r]/g, '\n');
+            // Replace carriage returns with newlines to clean up output
+            data = data.replace(/[\r]/g, '\n')
+            // Strip 8 byte header from each line of output
+            data = data.substring(8);
+            data = data.replace(/\n(.{8})/g, '\n');
+            $scope.stderr = data;
         });
     }
 
