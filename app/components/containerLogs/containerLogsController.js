@@ -20,6 +20,7 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
     });
 
     function getLogs() {
+        ViewSpinner.spin();
         ContainerLogs.get($routeParams.id, {
             stdout: 1,
             stderr: 0,
@@ -28,7 +29,9 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
         }, function(data, status, headers, config) {
             // Replace carriage returns twith newlines to clean up output
             $scope.stdout = data.replace(/[\r]/g, '\n');
+            ViewSpinner.stop();
         });
+
         ContainerLogs.get($routeParams.id, {
             stdout: 0,
             stderr: 1,
@@ -36,6 +39,7 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
             tail: $scope.tailLines
         }, function(data, status, headers, config) {
             $scope.stderr = data.replace(/[\r]/g, '\n');
+            ViewSpinner.stop();
         });
     }
 
