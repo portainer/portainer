@@ -4,6 +4,7 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
     $scope.stdout = '';
     $scope.stderr = '';
     $scope.showTimestamps = false;
+    $scope.tailLines = 2000;
 
     ViewSpinner.spin();
     Container.get({id: $routeParams.id}, function(d) {
@@ -19,12 +20,26 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
     });
 
     function getLogs() {
-        ContainerLogs.get($routeParams.id, {stdout: 1, stderr: 0, timestamps: $scope.showTimestamps}, function(data, status, headers, config) {
+        ViewSpinner.spin();
+        ContainerLogs.get($routeParams.id, {
+            stdout: 1,
+            stderr: 0,
+            timestamps: $scope.showTimestamps,
+            tail: $scope.tailLines
+        }, function(data, status, headers, config) {
             // Replace carriage returns twith newlines to clean up output
             $scope.stdout = data.replace(/[\r]/g, '\n');
+            ViewSpinner.stop();
         });
-        ContainerLogs.get($routeParams.id, {stdout: 0, stderr: 1, timestamps: $scope.showTimestamps}, function(data, status, headers, config) {
+
+        ContainerLogs.get($routeParams.id, {
+            stdout: 0,
+            stderr: 1,
+            timestamps: $scope.showTimestamps,
+            tail: $scope.tailLines
+        }, function(data, status, headers, config) {
             $scope.stderr = data.replace(/[\r]/g, '\n');
+            ViewSpinner.stop();
         });
     }
 
@@ -43,6 +58,10 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
     };
 
     $scope.toggleTimestamps = function() {
+        getLogs();
+    };
+
+    $scope.toggleTail = function() {
         getLogs();
     };
 }]);
