@@ -27,8 +27,12 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
             timestamps: $scope.showTimestamps,
             tail: $scope.tailLines
         }, function(data, status, headers, config) {
-            // Replace carriage returns twith newlines to clean up output
-            $scope.stdout = data.replace(/[\r]/g, '\n');
+            // Replace carriage returns with newlines to clean up output
+            data = data.replace(/[\r]/g, '\n')
+            // Strip 8 byte header from each line of output
+            data = data.substring(8);
+            data = data.replace(/\n(.{8})/g, '\n');
+            $scope.stdout = data;
             ViewSpinner.stop();
         });
 
@@ -38,7 +42,12 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
             timestamps: $scope.showTimestamps,
             tail: $scope.tailLines
         }, function(data, status, headers, config) {
-            $scope.stderr = data.replace(/[\r]/g, '\n');
+            // Replace carriage returns with newlines to clean up output
+            data = data.replace(/[\r]/g, '\n')
+            // Strip 8 byte header from each line of output
+            data = data.substring(8);
+            data = data.replace(/\n(.{8})/g, '\n');
+            $scope.stderr = data;
             ViewSpinner.stop();
         });
     }
