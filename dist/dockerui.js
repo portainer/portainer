@@ -1,4 +1,4 @@
-/*! dockerui - v0.6.0 - 2015-02-18
+/*! dockerui - v0.6.0 - 2015-02-25
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby & Kevan Ahlquist;
  * Licensed MIT
@@ -11,7 +11,7 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
         $routeProvider.when('/containers/:id/', {templateUrl: 'app/components/container/container.html', controller: 'ContainerController'});
         $routeProvider.when('/containers/:id/logs/', {templateUrl: 'app/components/containerLogs/containerlogs.html', controller: 'ContainerLogsController'});
         $routeProvider.when('/images/', {templateUrl: 'app/components/images/images.html', controller: 'ImagesController'});
-        $routeProvider.when('/images/:id/', {templateUrl: 'app/components/image/image.html', controller: 'ImageController'});
+        $routeProvider.when('/images/:id*/', {templateUrl: 'app/components/image/image.html', controller: 'ImageController'});
         $routeProvider.when('/info', {templateUrl: 'app/components/info/info.html', controller: 'InfoController'});
         $routeProvider.otherwise({redirectTo: '/'});
     }])
@@ -140,6 +140,7 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
     $scope.stdout = '';
     $scope.stderr = '';
     $scope.showTimestamps = false;
+    $scope.tailLines = 2000;
 
     ViewSpinner.spin();
     Container.get({id: $routeParams.id}, function(d) {
@@ -155,12 +156,35 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
     });
 
     function getLogs() {
-        ContainerLogs.get($routeParams.id, {stdout: 1, stderr: 0, timestamps: $scope.showTimestamps}, function(data, status, headers, config) {
-            // Replace carriage returns twith newlines to clean up output
-            $scope.stdout = data.replace(/[\r]/g, '\n');
+        ViewSpinner.spin();
+        ContainerLogs.get($routeParams.id, {
+            stdout: 1,
+            stderr: 0,
+            timestamps: $scope.showTimestamps,
+            tail: $scope.tailLines
+        }, function(data, status, headers, config) {
+            // Replace carriage returns with newlines to clean up output
+            data = data.replace(/[\r]/g, '\n')
+            // Strip 8 byte header from each line of output
+            data = data.substring(8);
+            data = data.replace(/\n(.{8})/g, '\n');
+            $scope.stdout = data;
+            ViewSpinner.stop();
         });
-        ContainerLogs.get($routeParams.id, {stdout: 0, stderr: 1, timestamps: $scope.showTimestamps}, function(data, status, headers, config) {
-            $scope.stderr = data.replace(/[\r]/g, '\n');
+
+        ContainerLogs.get($routeParams.id, {
+            stdout: 0,
+            stderr: 1,
+            timestamps: $scope.showTimestamps,
+            tail: $scope.tailLines
+        }, function(data, status, headers, config) {
+            // Replace carriage returns with newlines to clean up output
+            data = data.replace(/[\r]/g, '\n')
+            // Strip 8 byte header from each line of output
+            data = data.substring(8);
+            data = data.replace(/\n(.{8})/g, '\n');
+            $scope.stderr = data;
+            ViewSpinner.stop();
         });
     }
 
@@ -179,6 +203,10 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
     };
 
     $scope.toggleTimestamps = function() {
+        getLogs();
+    };
+
+    $scope.toggleTail = function() {
         getLogs();
     };
 }]);
@@ -1097,7 +1125,7 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
     "                <td>\n" +
     "                    <ul style=\"display:inline-table\">\n" +
     "                        <li ng-repeat=\"(containerport, hostports) in container.HostConfig.PortBindings\">\n" +
-    "                            {{ containerport }} => <span class=\"label\" ng-repeat=\"(k,v) in hostports\">{{ v.HostIp }}:{{ v.HostPort }}</span>\n" +
+    "                            {{ containerport }} => <span class=\"label label-default\" ng-repeat=\"(k,v) in hostports\">{{ v.HostIp }}:{{ v.HostPort }}</span>\n" +
     "                        </li>\n" +
     "                    </ul>\n" +
     "                </td>\n" +
@@ -1178,9 +1206,17 @@ angular.module("app/components/containerLogs/containerlogs.html", []).run(["$tem
     "            <button class=\"btn btn-info\" ng-click=\"scrollTo('stdout')\">stdout</button>\n" +
     "            <button class=\"btn btn-warning\" ng-click=\"scrollTo('stderr')\">stderr</button>\n" +
     "        </div>\n" +
-    "        <div class=\"pull-right\">\n" +
-    "            <input id=\"timestampToggle\" type=\"checkbox\" ng-model=\"showTimestamps\" \n" +
-    "                ng-change=\"toggleTimestamps()\"/> <label for=\"timestampToggle\">Display Timestamps</label>\n" +
+    "        <div class=\"pull-right col-xs-6\">\n" +
+    "            <div class=\"col-xs-6\">\n" +
+    "                <a class=\"btn btn-primary\" ng-click=\"toggleTail()\" role=\"button\">Reload logs</a>\n" +
+    "                <input id=\"tailLines\" type=\"number\" ng-style=\"{width: '45px'}\"\n" +
+    "                    ng-model=\"tailLines\" ng-keypress=\"($event.which === 13)? toggleTail() : 0\"/>\n" +
+    "                <label for=\"tailLines\">lines</label>\n" +
+    "            </div>\n" +
+    "            <div class=\"col-xs-4\">\n" +
+    "                <input id=\"timestampToggle\" type=\"checkbox\" ng-model=\"showTimestamps\"\n" +
+    "                    ng-change=\"toggleTimestamps()\"/> <label for=\"timestampToggle\">Timestamps</label>\n" +
+    "            </div>\n" +
     "        </div>\n" +
     "    </div>\n" +
     "\n" +
@@ -1289,7 +1325,7 @@ angular.module("app/components/dashboard/dashboard.html", []).run(["$templateCac
     "            <div class=\"col-xs-5 text-right\">\n" +
     "                <h3>Status</h3>\n" +
     "                <canvas id=\"containers-chart\" class=\"pull-right\">\n" +
-    "                    Get a better browser... Your holding everyone back.\n" +
+    "                    <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.</p>\n" +
     "                </canvas>\n" +
     "                <div id=\"chart-legend\"></div>\n" +
     "            </div>\n" +
@@ -1300,11 +1336,11 @@ angular.module("app/components/dashboard/dashboard.html", []).run(["$templateCac
     "        <div class=\"col-xs-10\" id=\"stats\">\n" +
     "            <h4>Containers created</h4>\n" +
     "           <canvas id=\"containers-started-chart\" width=\"700\">\n" +
-    "                Get a better browser... You're holding everyone back.\n" +
+    "                <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.</p>\n" +
     "           </canvas>\n" +
     "            <h4>Images created</h4>\n" +
     "           <canvas id=\"images-created-chart\" width=\"700\">\n" +
-    "                Get a better browser... You're holding everyone back.\n" +
+    "                <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.</p>\n" +
     "           </canvas>\n" +
     "        </div>\n" +
     "    </div>\n" +
@@ -1339,7 +1375,7 @@ angular.module("app/components/image/image.html", []).run(["$templateCache", fun
     "    <div>\n" +
     "       <h4>Containers created:</h4>\n" +
     "       <canvas id=\"containers-started-chart\" width=\"750\">\n" +
-    "                Get a better broswer... Your holding everyone back.\n" +
+    "          <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.</p>\n" +
     "       </canvas>\n" +
     "    </div>\n" +
     "\n" +
