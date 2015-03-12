@@ -2,11 +2,14 @@ angular.module('container', [])
 .controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages', 'ViewSpinner',
 function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
     $scope.changes = [];
+    $scope.edit = false;
 
     var update = function() {
         ViewSpinner.spin();
         Container.get({id: $routeParams.id}, function(d) {
             $scope.container = d;
+            $scope.container.edit = false;
+            $scope.container.newContainerName = d.Name;
             ViewSpinner.stop();
         }, function(e) {
             if (e.status === 404) {
@@ -98,6 +101,20 @@ function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
             $scope.changes = d;
             ViewSpinner.stop();
         });
+    };
+
+    $scope.renameContainer = function () {
+        // #FIXME fix me later to handle http status to show the correct error message
+        Container.rename({id: $routeParams.id, 'name': $scope.container.newContainerName}, function(data){
+            if (data.name){
+                $scope.container.Name = data.name;
+                Messages.send("Container renamed", $routeParams.id);
+            }else {
+                $scope.container.newContainerName = $scope.container.Name;
+                Messages.error("Failure", "Container failed to rename.");
+            }
+        });
+        $scope.container.edit = false;
     };
 
     update();

@@ -1,6 +1,21 @@
 <div class="detail">
     
-    <h4>Container: {{ container.Name }}</h4>
+    <div ng-if="!container.edit">
+        <h4>Container: {{ container.Name }}
+            <button class="btn btn-primary"
+                    ng-click="container.edit = true;">Rename</button>
+        </h4>
+    </div>
+    <div ng-if="container.edit">
+        <h4>
+            Container:
+            <input type="text" ng-model="container.newContainerName">
+            <button class="btn btn-success"
+                    ng-click="renameContainer()">Edit</button>
+            <button class="btn btn-danger"
+                    ng-click="container.edit = false;">&times;</button>
+        </h4>
+    </div>
 
     <div class="btn-group detail">
       <button class="btn btn-success"
