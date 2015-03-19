@@ -41,15 +41,15 @@ describe('startContainerController', function() {
             var expectedBody = {
                 'name': 'container-name',
                 'ExposedPorts': {
-                    '9000/tcp': {},
+                    '9000/tcp': {}
                 },
                 'HostConfig': {
                     'PortBindings': {
                         '9000/tcp': [{
                             'HostPort': '9999',
-                            'HostIp': '10.20.10.15',
+                            'HostIp': '10.20.10.15'
                         }]
-                    },
+                    }
                 }
             };
 
@@ -69,7 +69,7 @@ describe('startContainerController', function() {
                 ip: '10.20.10.15',
                 extPort: '9999',
                 intPort: '9000'
-            }]
+            }];
 
             scope.create();
             $httpBackend.flush();

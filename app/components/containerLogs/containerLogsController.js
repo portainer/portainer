@@ -28,7 +28,7 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
             tail: $scope.tailLines
         }, function(data, status, headers, config) {
             // Replace carriage returns with newlines to clean up output
-            data = data.replace(/[\r]/g, '\n')
+            data = data.replace(/[\r]/g, '\n');
             // Strip 8 byte header from each line of output
             data = data.substring(8);
             data = data.replace(/\n(.{8})/g, '\n');
@@ -43,7 +43,7 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
             tail: $scope.tailLines
         }, function(data, status, headers, config) {
             // Replace carriage returns with newlines to clean up output
-            data = data.replace(/[\r]/g, '\n')
+            data = data.replace(/[\r]/g, '\n');
             // Strip 8 byte header from each line of output
             data = data.substring(8);
             data = data.replace(/\n(.{8})/g, '\n');
