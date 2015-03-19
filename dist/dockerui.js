@@ -1,4 +1,4 @@
-/*! dockerui - v0.6.0 - 2015-02-25
+/*! dockerui - v0.7.0-beta - 2015-03-18
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby & Kevan Ahlquist;
  * Licensed MIT
@@ -20,7 +20,7 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
     .constant('DOCKER_ENDPOINT', 'dockerapi')
     .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
     .constant('UI_VERSION', 'v0.6.0')
-    .constant('DOCKER_API_VERSION', 'v1.16');
+    .constant('DOCKER_API_VERSION', 'v1.17');
 
 angular.module('builder', [])
 .controller('BuilderController', ['$scope', 'Dockerfile', 'Messages',
@@ -32,11 +32,14 @@ angular.module('container', [])
 .controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages', 'ViewSpinner',
 function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
     $scope.changes = [];
+    $scope.edit = false;
 
     var update = function() {
         ViewSpinner.spin();
         Container.get({id: $routeParams.id}, function(d) {
             $scope.container = d;
+            $scope.container.edit = false;
+            $scope.container.newContainerName = d.Name;
             ViewSpinner.stop();
         }, function(e) {
             if (e.status === 404) {
@@ -130,6 +133,20 @@ function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
         });
     };
 
+    $scope.renameContainer = function () {
+        // #FIXME fix me later to handle http status to show the correct error message
+        Container.rename({id: $routeParams.id, 'name': $scope.container.newContainerName}, function(data){
+            if (data.name){
+                $scope.container.Name = data.name;
+                Messages.send("Container renamed", $routeParams.id);
+            }else {
+                $scope.container.newContainerName = $scope.container.Name;
+                Messages.error("Failure", "Container failed to rename.");
+            }
+        });
+        $scope.container.edit = false;
+    };
+
     update();
     $scope.getChanges();
 }]);
@@ -164,7 +181,7 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
             tail: $scope.tailLines
         }, function(data, status, headers, config) {
             // Replace carriage returns with newlines to clean up output
-            data = data.replace(/[\r]/g, '\n')
+            data = data.replace(/[\r]/g, '\n');
             // Strip 8 byte header from each line of output
             data = data.substring(8);
             data = data.replace(/\n(.{8})/g, '\n');
@@ -179,7 +196,7 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
             tail: $scope.tailLines
         }, function(data, status, headers, config) {
             // Replace carriage returns with newlines to clean up output
-            data = data.replace(/[\r]/g, '\n')
+            data = data.replace(/[\r]/g, '\n');
             // Strip 8 byte header from each line of output
             data = data.substring(8);
             data = data.replace(/\n(.{8})/g, '\n');
@@ -836,7 +853,8 @@ angular.module('dockerui.services', ['ngResource'])
             unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
             changes: {method: 'GET', params: {action:'changes'}, isArray: true},
             create: {method: 'POST', params: {action:'create'}},
-            remove: {method: 'DELETE', params: {id: '@id', v:0}}
+            remove: {method: 'DELETE', params: {id: '@id', v:0}},
+            rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false}
         });
     })
     .factory('ContainerLogs', function($resource, $http, Settings) {
@@ -1065,7 +1083,22 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
   $templateCache.put("app/components/container/container.html",
     "<div class=\"detail\">\n" +
     "    \n" +
-    "    <h4>Container: {{ container.Name }}</h4>\n" +
+    "    <div ng-if=\"!container.edit\">\n" +
+    "        <h4>Container: {{ container.Name }}\n" +
+    "            <button class=\"btn btn-primary\"\n" +
+    "                    ng-click=\"container.edit = true;\">Rename</button>\n" +
+    "        </h4>\n" +
+    "    </div>\n" +
+    "    <div ng-if=\"container.edit\">\n" +
+    "        <h4>\n" +
+    "            Container:\n" +
+    "            <input type=\"text\" ng-model=\"container.newContainerName\">\n" +
+    "            <button class=\"btn btn-success\"\n" +
+    "                    ng-click=\"renameContainer()\">Edit</button>\n" +
+    "            <button class=\"btn btn-danger\"\n" +
+    "                    ng-click=\"container.edit = false;\">&times;</button>\n" +
+    "        </h4>\n" +
+    "    </div>\n" +
     "\n" +
     "    <div class=\"btn-group detail\">\n" +
     "      <button class=\"btn btn-success\"\n" +

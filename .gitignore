@@ -3,3 +3,4 @@ logs/*
 *.esproj/*
 node_modules
 .idea
+*.iml

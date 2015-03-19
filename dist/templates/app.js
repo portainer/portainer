@@ -26,7 +26,22 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
   $templateCache.put("app/components/container/container.html",
     "<div class=\"detail\">\n" +
     "    \n" +
-    "    <h4>Container: {{ container.Name }}</h4>\n" +
+    "    <div ng-if=\"!container.edit\">\n" +
+    "        <h4>Container: {{ container.Name }}\n" +
+    "            <button class=\"btn btn-primary\"\n" +
+    "                    ng-click=\"container.edit = true;\">Rename</button>\n" +
+    "        </h4>\n" +
+    "    </div>\n" +
+    "    <div ng-if=\"container.edit\">\n" +
+    "        <h4>\n" +
+    "            Container:\n" +
+    "            <input type=\"text\" ng-model=\"container.newContainerName\">\n" +
+    "            <button class=\"btn btn-success\"\n" +
+    "                    ng-click=\"renameContainer()\">Edit</button>\n" +
+    "            <button class=\"btn btn-danger\"\n" +
+    "                    ng-click=\"container.edit = false;\">&times;</button>\n" +
+    "        </h4>\n" +
+    "    </div>\n" +
     "\n" +
     "    <div class=\"btn-group detail\">\n" +
     "      <button class=\"btn btn-success\"\n" +

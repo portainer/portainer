@@ -15,4 +15,4 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
     .constant('DOCKER_ENDPOINT', 'dockerapi')
     .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
     .constant('UI_VERSION', 'v0.6.0')
-    .constant('DOCKER_API_VERSION', 'v1.16');
+    .constant('DOCKER_API_VERSION', 'v1.17');
