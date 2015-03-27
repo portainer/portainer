@@ -59,7 +59,7 @@ describe('startContainerController', function() {
                 'Id': id,
                 'Warnings': null
             });
-            $httpBackend.expectPOST('dockerapi/containers/' + id + '/start?').respond({
+            $httpBackend.expectPOST('dockerapi/containers/' + id + '/start').respond({
                 'id': id,
                 'Warnings': null
             });
@@ -91,7 +91,7 @@ describe('startContainerController', function() {
                 'Id': id,
                 'Warnings': null
             });
-            $httpBackend.expectPOST('dockerapi/containers/' + id + '/start?').respond({
+            $httpBackend.expectPOST('dockerapi/containers/' + id + '/start').respond({
                 'id': id,
                 'Warnings': null
             });
@@ -127,7 +127,7 @@ describe('startContainerController', function() {
                 'Id': id,
                 'Warnings': null
             });
-            $httpBackend.expectPOST('dockerapi/containers/' + id + '/start?').respond({
+            $httpBackend.expectPOST('dockerapi/containers/' + id + '/start').respond({
                 'id': id,
                 'Warnings': null
             });
@@ -168,7 +168,7 @@ describe('startContainerController', function() {
                 'Id': id,
                 'Warnings': null
             });
-            $httpBackend.expectPOST('dockerapi/containers/' + id + '/start?').respond({
+            $httpBackend.expectPOST('dockerapi/containers/' + id + '/start').respond({
                 'id': id,
                 'Warnings': null
             });
