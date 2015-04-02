@@ -1,17 +1,39 @@
-/*! dockerui - v0.7.0-beta - 2015-03-18
+/*! dockerui - v0.7.0-beta - 2015-04-02
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby & Kevan Ahlquist;
  * Licensed MIT
  */
-angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'info', 'builder', 'containerLogs'])
+angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'info', 'builder', 'containerLogs', 'containerTop'])
     .config(['$routeProvider', function ($routeProvider) {
         'use strict';
-        $routeProvider.when('/', {templateUrl: 'app/components/dashboard/dashboard.html', controller: 'DashboardController'});
-        $routeProvider.when('/containers/', {templateUrl: 'app/components/containers/containers.html', controller: 'ContainersController'});
-        $routeProvider.when('/containers/:id/', {templateUrl: 'app/components/container/container.html', controller: 'ContainerController'});
-        $routeProvider.when('/containers/:id/logs/', {templateUrl: 'app/components/containerLogs/containerlogs.html', controller: 'ContainerLogsController'});
-        $routeProvider.when('/images/', {templateUrl: 'app/components/images/images.html', controller: 'ImagesController'});
-        $routeProvider.when('/images/:id*/', {templateUrl: 'app/components/image/image.html', controller: 'ImageController'});
+        $routeProvider.when('/', {
+            templateUrl: 'app/components/dashboard/dashboard.html',
+            controller: 'DashboardController'
+        });
+        $routeProvider.when('/containers/', {
+            templateUrl: 'app/components/containers/containers.html',
+            controller: 'ContainersController'
+        });
+        $routeProvider.when('/containers/:id/', {
+            templateUrl: 'app/components/container/container.html',
+            controller: 'ContainerController'
+        });
+        $routeProvider.when('/containers/:id/logs/', {
+            templateUrl: 'app/components/containerLogs/containerlogs.html',
+            controller: 'ContainerLogsController'
+        });
+        $routeProvider.when('/containers/:id/top', {
+            templateUrl: 'app/components/containerTop/containerTop.html',
+            controller: 'ContainerTopController'
+        });
+        $routeProvider.when('/images/', {
+            templateUrl: 'app/components/images/images.html',
+            controller: 'ImagesController'
+        });
+        $routeProvider.when('/images/:id*/', {
+            templateUrl: 'app/components/image/image.html',
+            controller: 'ImageController'
+        });
         $routeProvider.when('/info', {templateUrl: 'app/components/info/info.html', controller: 'InfoController'});
         $routeProvider.otherwise({redirectTo: '/'});
     }])
@@ -19,7 +41,7 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
     // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
     .constant('DOCKER_ENDPOINT', 'dockerapi')
     .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
-    .constant('UI_VERSION', 'v0.6.0')
+    .constant('UI_VERSION', 'v0.7.0-beta')
     .constant('DOCKER_API_VERSION', 'v1.17');
 
 angular.module('builder', [])
@@ -228,6 +250,25 @@ function($scope, $routeParams, $location, $anchorScroll, ContainerLogs, Containe
     };
 }]);
 
+angular.module('containerTop', [])
+    .controller('ContainerTopController', ['$scope', '$routeParams', 'ContainerTop', 'ViewSpinner', function ($scope, $routeParams, ContainerTop, ViewSpinner) {
+        $scope.ps_args = '';
+
+        /**
+         * Get container processes
+         */
+        $scope.getTop = function () {
+            ViewSpinner.spin();
+            ContainerTop.get($routeParams.id, {
+                ps_args: $scope.ps_args
+            }, function (data) {
+                $scope.containerTop = data;
+                ViewSpinner.stop();
+            });
+        };
+
+        $scope.getTop();
+    }]);
 angular.module('containers', [])
 .controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner', 
 function($scope, Container, Settings, Messages, ViewSpinner) {
@@ -836,58 +877,77 @@ angular.module('dockerui.filters', [])
     });
 
 angular.module('dockerui.services', ['ngResource'])
-    .factory('Container', function($resource, Settings) {
+    .factory('Container', function ($resource, Settings) {
         'use strict';
         // Resource for interacting with the docker containers
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#containers
         return $resource(Settings.url + '/containers/:id/:action', {
             name: '@name'
         }, {
-            query: {method: 'GET', params:{ all: 0, action: 'json'}, isArray: true},
-            get: {method: 'GET', params: { action:'json'}},
+            query: {method: 'GET', params: {all: 0, action: 'json'}, isArray: true},
+            get: {method: 'GET', params: {action: 'json'}},
             start: {method: 'POST', params: {id: '@id', action: 'start'}},
             stop: {method: 'POST', params: {id: '@id', t: 5, action: 'stop'}},
-            restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart' }},
+            restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart'}},
             kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
             pause: {method: 'POST', params: {id: '@id', action: 'pause'}},
             unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
-            changes: {method: 'GET', params: {action:'changes'}, isArray: true},
-            create: {method: 'POST', params: {action:'create'}},
-            remove: {method: 'DELETE', params: {id: '@id', v:0}},
+            changes: {method: 'GET', params: {action: 'changes'}, isArray: true},
+            create: {method: 'POST', params: {action: 'create'}},
+            remove: {method: 'DELETE', params: {id: '@id', v: 0}},
             rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false}
         });
     })
-    .factory('ContainerLogs', function($resource, $http, Settings) {
+    .factory('ContainerLogs', function ($resource, $http, Settings) {
         'use strict';
         return {
-            get: function(id, params, callback) {
+            get: function (id, params, callback) {
                 $http({
                     method: 'GET',
-                    url: Settings.url + '/containers/'+id+'/logs',
-                    params: {'stdout': params.stdout || 0, 'stderr': params.stderr || 0, 'timestamps': params.timestamps || 0, 'tail': params.tail || 'all'}
-                }).success(callback).error(function(data, status, headers, config) {
+                    url: Settings.url + '/containers/' + id + '/logs',
+                    params: {
+                        'stdout': params.stdout || 0,
+                        'stderr': params.stderr || 0,
+                        'timestamps': params.timestamps || 0,
+                        'tail': params.tail || 'all'
+                    }
+                }).success(callback).error(function (data, status, headers, config) {
                     console.log(error, data);
                 });
             }
         };
     })
-    .factory('Image', function($resource, Settings) {
+    .factory('ContainerTop', function ($http, Settings) {
+        'use strict';
+        return {
+            get: function (id, params, callback, errorCallback) {
+                $http({
+                    method: 'GET',
+                    url: Settings.url + '/containers/' + id + '/top',
+                    params: {
+                        ps_args: params.ps_args
+                    }
+                }).success(callback);
+            }
+        };
+    })
+    .factory('Image', function ($resource, Settings) {
         'use strict';
         // Resource for docker images
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#images
         return $resource(Settings.url + '/images/:id/:action', {}, {
-            query: {method: 'GET', params:{ all: 0, action: 'json'}, isArray: true},
-            get: {method: 'GET', params: { action:'json'}},
-            search: {method: 'GET', params: { action:'search'}},
-            history: {method: 'GET', params: { action:'history'}, isArray: true},
-            create: {method: 'POST', params: {action:'create'}},
-            insert: {method: 'POST', params: {id: '@id', action:'insert'}},
-            push: {method: 'POST', params: {id: '@id', action:'push'}},
-            tag: {method: 'POST', params: {id: '@id', action:'tag', force: 0, repo: '@repo'}},
+            query: {method: 'GET', params: {all: 0, action: 'json'}, isArray: true},
+            get: {method: 'GET', params: {action: 'json'}},
+            search: {method: 'GET', params: {action: 'search'}},
+            history: {method: 'GET', params: {action: 'history'}, isArray: true},
+            create: {method: 'POST', params: {action: 'create'}},
+            insert: {method: 'POST', params: {id: '@id', action: 'insert'}},
+            push: {method: 'POST', params: {id: '@id', action: 'push'}},
+            tag: {method: 'POST', params: {id: '@id', action: 'tag', force: 0, repo: '@repo'}},
             remove: {method: 'DELETE', params: {id: '@id'}, isArray: true}
         });
     })
-    .factory('Docker', function($resource, Settings) {
+    .factory('Docker', function ($resource, Settings) {
         'use strict';
         // Information for docker
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#display-system-wide-information
@@ -895,7 +955,7 @@ angular.module('dockerui.services', ['ngResource'])
             get: {method: 'GET'}
         });
     })
-    .factory('Auth', function($resource, Settings) {
+    .factory('Auth', function ($resource, Settings) {
         'use strict';
         // Auto Information for docker
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#set-auth-configuration
@@ -904,7 +964,7 @@ angular.module('dockerui.services', ['ngResource'])
             update: {method: 'POST'}
         });
     })
-    .factory('System', function($resource, Settings) {
+    .factory('System', function ($resource, Settings) {
         'use strict';
         // System for docker
         // http://docs.docker.io/en/latest/api/docker_remote_api.html#display-system-wide-information
@@ -912,7 +972,7 @@ angular.module('dockerui.services', ['ngResource'])
             get: {method: 'GET'}
         });
     })
-    .factory('Settings', function(DOCKER_ENDPOINT, DOCKER_PORT, DOCKER_API_VERSION, UI_VERSION) {
+    .factory('Settings', function (DOCKER_ENDPOINT, DOCKER_PORT, DOCKER_API_VERSION, UI_VERSION) {
         'use strict';
         var url = DOCKER_ENDPOINT;
         if (DOCKER_PORT) {
@@ -928,52 +988,56 @@ angular.module('dockerui.services', ['ngResource'])
             firstLoad: true
         };
     })
-    .factory('ViewSpinner', function() {
+    .factory('ViewSpinner', function () {
         'use strict';
         var spinner = new Spinner();
         var target = document.getElementById('view');
 
         return {
-            spin: function() { spinner.spin(target); },
-            stop: function() { spinner.stop(); }
+            spin: function () {
+                spinner.spin(target);
+            },
+            stop: function () {
+                spinner.stop();
+            }
         };
     })
-    .factory('Messages', function($rootScope) {
+    .factory('Messages', function ($rootScope) {
         'use strict';
         return {
-            send: function(title, text) {
+            send: function (title, text) {
                 $.gritter.add({
                     title: title,
                     text: text,
                     time: 2000,
-                    before_open: function() {
-                        if($('.gritter-item-wrapper').length === 3) {
+                    before_open: function () {
+                        if ($('.gritter-item-wrapper').length === 3) {
                             return false;
-                        }  
+                        }
                     }
-                }); 
+                });
             },
-            error: function(title, text) {
+            error: function (title, text) {
                 $.gritter.add({
                     title: title,
                     text: text,
                     time: 10000,
-                    before_open: function() {
-                        if($('.gritter-item-wrapper').length === 4) {
+                    before_open: function () {
+                        if ($('.gritter-item-wrapper').length === 4) {
                             return false;
-                        }  
+                        }
                     }
                 });
             }
         };
     })
-    .factory('Dockerfile', function(Settings) {
+    .factory('Dockerfile', function (Settings) {
         'use strict';
-        var url = Settings.rawUrl  + '/build';
+        var url = Settings.rawUrl + '/build';
         return {
-            build: function(file, callback) {
+            build: function (file, callback) {
                 var data = new FormData();
-                var dockerfile = new Blob([file], { type: 'text/text' });
+                var dockerfile = new Blob([file], {type: 'text/text'});
                 data.append('Dockerfile', dockerfile);
 
                 var request = new XMLHttpRequest();
@@ -983,18 +1047,18 @@ angular.module('dockerui.services', ['ngResource'])
             }
         };
     })
-    .factory('LineChart', function(Settings) {
+    .factory('LineChart', function (Settings) {
         'use strict';
-        var url = Settings.rawUrl  + '/build';
+        var url = Settings.rawUrl + '/build';
         return {
-            build: function(id, data, getkey){
+            build: function (id, data, getkey) {
                 var chart = new Chart($(id).get(0).getContext("2d"));
                 var map = {};
 
                 for (var i = 0; i < data.length; i++) {
                     var c = data[i];
                     var key = getkey(c);
-                    
+
                     var count = map[key];
                     if (count === undefined) {
                         count = 0;
@@ -1013,22 +1077,22 @@ angular.module('dockerui.services', ['ngResource'])
                     data.push(map[k]);
                 }
                 var dataset = {
-                    fillColor : "rgba(151,187,205,0.5)",
-                    strokeColor : "rgba(151,187,205,1)",
-                    pointColor : "rgba(151,187,205,1)",
-                    pointStrokeColor : "#fff",
-                    data : data
+                    fillColor: "rgba(151,187,205,0.5)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    data: data
                 };
                 chart.Line({
-                    labels: labels,
-                    datasets: [dataset]
-                }, 
-                {
-                    scaleStepWidth: 1, 
-                    pointDotRadius:1,
-                    scaleOverride: true,
-                    scaleSteps: labels.length
-                });
+                        labels: labels,
+                        datasets: [dataset]
+                    },
+                    {
+                        scaleStepWidth: 1,
+                        pointDotRadius: 1,
+                        scaleOverride: true,
+                        scaleSteps: labels.length
+                    });
             }
         };
     });
@@ -1055,7 +1119,7 @@ function ContainerViewModel(data) {
    this.Names = data.Names;
 }
 
-angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containers/containers.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
+angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containerTop/containerTop.html', 'app/components/containers/containers.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
 
 angular.module("app/components/builder/builder.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("app/components/builder/builder.html",
@@ -1082,11 +1146,12 @@ angular.module("app/components/builder/builder.html", []).run(["$templateCache",
 angular.module("app/components/container/container.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("app/components/container/container.html",
     "<div class=\"detail\">\n" +
-    "    \n" +
+    "\n" +
     "    <div ng-if=\"!container.edit\">\n" +
     "        <h4>Container: {{ container.Name }}\n" +
     "            <button class=\"btn btn-primary\"\n" +
-    "                    ng-click=\"container.edit = true;\">Rename</button>\n" +
+    "                    ng-click=\"container.edit = true;\">Rename\n" +
+    "            </button>\n" +
     "        </h4>\n" +
     "    </div>\n" +
     "    <div ng-if=\"container.edit\">\n" +
@@ -1094,116 +1159,126 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
     "            Container:\n" +
     "            <input type=\"text\" ng-model=\"container.newContainerName\">\n" +
     "            <button class=\"btn btn-success\"\n" +
-    "                    ng-click=\"renameContainer()\">Edit</button>\n" +
+    "                    ng-click=\"renameContainer()\">Edit\n" +
+    "            </button>\n" +
     "            <button class=\"btn btn-danger\"\n" +
     "                    ng-click=\"container.edit = false;\">&times;</button>\n" +
     "        </h4>\n" +
     "    </div>\n" +
     "\n" +
     "    <div class=\"btn-group detail\">\n" +
-    "      <button class=\"btn btn-success\"\n" +
-    "            ng-click=\"start()\"\n" +
-    "            ng-show=\"!container.State.Running\">Start</button>\n" +
-    "      <button class=\"btn btn-warning\"\n" +
-    "            ng-click=\"stop()\"\n" +
-    "            ng-show=\"container.State.Running && !container.State.Paused\">Stop</button>\n" +
-    "      <button class=\"btn btn-danger\"\n" +
-    "            ng-click=\"kill()\"\n" +
-    "            ng-show=\"container.State.Running && !container.State.Paused\">Kill</button>\n" +
-    "      <button class=\"btn btn-info\"\n" +
-    "            ng-click=\"pause()\"\n" +
-    "            ng-show=\"container.State.Running && !container.State.Paused\">Pause</button>\n" +
-    "      <button class=\"btn btn-success\"\n" +
-    "            ng-click=\"unpause()\"\n" +
-    "            ng-show=\"container.State.Running && container.State.Paused\">Unpause</button>\n" +
+    "        <button class=\"btn btn-success\"\n" +
+    "                ng-click=\"start()\"\n" +
+    "                ng-show=\"!container.State.Running\">Start\n" +
+    "        </button>\n" +
+    "        <button class=\"btn btn-warning\"\n" +
+    "                ng-click=\"stop()\"\n" +
+    "                ng-show=\"container.State.Running && !container.State.Paused\">Stop\n" +
+    "        </button>\n" +
+    "        <button class=\"btn btn-danger\"\n" +
+    "                ng-click=\"kill()\"\n" +
+    "                ng-show=\"container.State.Running && !container.State.Paused\">Kill\n" +
+    "        </button>\n" +
+    "        <button class=\"btn btn-info\"\n" +
+    "                ng-click=\"pause()\"\n" +
+    "                ng-show=\"container.State.Running && !container.State.Paused\">Pause\n" +
+    "        </button>\n" +
+    "        <button class=\"btn btn-success\"\n" +
+    "                ng-click=\"unpause()\"\n" +
+    "                ng-show=\"container.State.Running && container.State.Paused\">Unpause\n" +
+    "        </button>\n" +
     "    </div>\n" +
     "\n" +
     "    <table class=\"table table-striped\">\n" +
-    "         <tbody>\n" +
-    "            <tr>\n" +
-    "                <td>Created:</td>\n" +
-    "                <td>{{ container.Created }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Path:</td>\n" +
-    "                <td>{{ container.Path }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Args:</td>\n" +
-    "                <td>{{ container.Args }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Exposed Ports:</td>\n" +
-    "                <td>\n" +
-    "                    <ul>\n" +
-    "                        <li ng-repeat=\"(k, v) in container.Config.ExposedPorts\">{{ k }}</li>\n" +
-    "                    </ul>\n" +
-    "                </td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Environment:</td>\n" +
-    "                <td>\n" +
-    "                    <ul>\n" +
-    "                        <li ng-repeat=\"k in container.Config.Env\">{{ k }}</li>\n" +
-    "                    </ul>\n" +
-    "                </td>\n" +
-    "            </tr>\n" +
+    "        <tbody>\n" +
+    "        <tr>\n" +
+    "            <td>Created:</td>\n" +
+    "            <td>{{ container.Created }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Path:</td>\n" +
+    "            <td>{{ container.Path }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Args:</td>\n" +
+    "            <td>{{ container.Args }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Exposed Ports:</td>\n" +
+    "            <td>\n" +
+    "                <ul>\n" +
+    "                    <li ng-repeat=\"(k, v) in container.Config.ExposedPorts\">{{ k }}</li>\n" +
+    "                </ul>\n" +
+    "            </td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Environment:</td>\n" +
+    "            <td>\n" +
+    "                <ul>\n" +
+    "                    <li ng-repeat=\"k in container.Config.Env\">{{ k }}</li>\n" +
+    "                </ul>\n" +
+    "            </td>\n" +
+    "        </tr>\n" +
     "\n" +
-    "            <tr>\n" +
-    "                <td>Publish All:</td>\n" +
-    "                <td>{{ container.HostConfig.PublishAllPorts }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Ports:</td>\n" +
-    "                <td>\n" +
-    "                    <ul style=\"display:inline-table\">\n" +
-    "                        <li ng-repeat=\"(containerport, hostports) in container.HostConfig.PortBindings\">\n" +
-    "                            {{ containerport }} => <span class=\"label label-default\" ng-repeat=\"(k,v) in hostports\">{{ v.HostIp }}:{{ v.HostPort }}</span>\n" +
-    "                        </li>\n" +
-    "                    </ul>\n" +
-    "                </td>\n" +
+    "        <tr>\n" +
+    "            <td>Publish All:</td>\n" +
+    "            <td>{{ container.HostConfig.PublishAllPorts }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Ports:</td>\n" +
+    "            <td>\n" +
+    "                <ul style=\"display:inline-table\">\n" +
+    "                    <li ng-repeat=\"(containerport, hostports) in container.HostConfig.PortBindings\">\n" +
+    "                        {{ containerport }} => <span class=\"label label-default\" ng-repeat=\"(k,v) in hostports\">{{ v.HostIp }}:{{ v.HostPort }}</span>\n" +
+    "                    </li>\n" +
+    "                </ul>\n" +
+    "            </td>\n" +
     "\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Hostname:</td>\n" +
-    "                <td>{{ container.Config.Hostname }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>IPAddress:</td>\n" +
-    "                <td>{{ container.NetworkSettings.IPAddress }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Cmd:</td>\n" +
-    "                <td>{{ container.Config.Cmd }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Entrypoint:</td>\n" +
-    "                <td>{{ container.Config.Entrypoint }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Volumes:</td>\n" +
-    "                <td>{{ container.Volumes }}</td>\n" +
-    "            </tr>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Hostname:</td>\n" +
+    "            <td>{{ container.Config.Hostname }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>IPAddress:</td>\n" +
+    "            <td>{{ container.NetworkSettings.IPAddress }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Cmd:</td>\n" +
+    "            <td>{{ container.Config.Cmd }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Entrypoint:</td>\n" +
+    "            <td>{{ container.Config.Entrypoint }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Volumes:</td>\n" +
+    "            <td>{{ container.Volumes }}</td>\n" +
+    "        </tr>\n" +
     "\n" +
-    "            <tr>\n" +
-    "                <td>SysInitpath:</td>\n" +
-    "                <td>{{ container.SysInitPath }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Image:</td>\n" +
-    "                <td><a href=\"#/images/{{ container.Image }}/\">{{ container.Image }}</a></td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>State:</td>\n" +
-    "                <td><span class=\"label {{ container.State|getstatelabel }}\">{{ container.State|getstatetext }}</span></td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                 <td>Logs:</td>\n" +
-    "                 <td><a href=\"#/containers/{{ container.Id }}/logs\">stdout/stderr</a></td>\n" +
-    "            </tr>\n" +
+    "        <tr>\n" +
+    "            <td>SysInitpath:</td>\n" +
+    "            <td>{{ container.SysInitPath }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Image:</td>\n" +
+    "            <td><a href=\"#/images/{{ container.Image }}/\">{{ container.Image }}</a></td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>State:</td>\n" +
+    "            <td><span class=\"label {{ container.State|getstatelabel }}\">{{ container.State|getstatetext }}</span></td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Logs:</td>\n" +
+    "            <td><a href=\"#/containers/{{ container.Id }}/logs\">stdout/stderr</a></td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Top:</td>\n" +
+    "            <td><a href=\"#/containers/{{ container.Id }}/top\">Top</a></td>\n" +
+    "        </tr>\n" +
     "        </tbody>\n" +
     "    </table>\n" +
-    "    \n" +
+    "\n" +
     "    <div class=\"row-fluid\">\n" +
     "        <div class=\"span1\">\n" +
     "            Changes:\n" +
@@ -1211,7 +1286,7 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
     "        <div class=\"span5\">\n" +
     "            <i class=\"icon-refresh\" style=\"width:32px;height:32px;\" ng-click=\"getChanges()\"></i>\n" +
     "        </div>\n" +
-    "    </div> \n" +
+    "    </div>\n" +
     "\n" +
     "    <div class=\"well well-large\">\n" +
     "        <ul>\n" +
@@ -1221,7 +1296,7 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
     "        </ul>\n" +
     "    </div>\n" +
     "\n" +
-    "    <hr />\n" +
+    "    <hr/>\n" +
     "\n" +
     "    <div class=\"btn-remove\">\n" +
     "        <button class=\"btn btn-large btn-block btn-primary btn-danger\" ng-click=\"remove()\">Remove Container</button>\n" +
@@ -1275,6 +1350,29 @@ angular.module("app/components/containerLogs/containerlogs.html", []).run(["$tem
     "    </div>\n" +
     "</div>\n" +
     "");
+}]);
+
+angular.module("app/components/containerTop/containerTop.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("app/components/containerTop/containerTop.html",
+    "<div class=\"containerTop\">\n" +
+    "    <div class=\"form-group col-xs-2\">\n" +
+    "        <input type=\"text\" class=\"form-control\" placeholder=\"[options] (aux)\" ng-model=\"ps_args\">\n" +
+    "    </div>\n" +
+    "    <button type=\"button\" class=\"btn btn-default\" ng-click=\"getTop()\">Submit</button>\n" +
+    "\n" +
+    "    <table class=\"table table-striped\">\n" +
+    "        <thead>\n" +
+    "        <tr>\n" +
+    "            <th ng-repeat=\"title in containerTop.Titles\">{{title}}</th>\n" +
+    "        </tr>\n" +
+    "        </thead>\n" +
+    "        <tbody>\n" +
+    "        <tr ng-repeat=\"processInfos in containerTop.Processes\">\n" +
+    "            <td ng-repeat=\"processInfo in processInfos track by $index\">{{processInfo}}</td>\n" +
+    "        </tr>\n" +
+    "        </tbody>\n" +
+    "    </table>\n" +
+    "</div>");
 }]);
 
 angular.module("app/components/containers/containers.html", []).run(["$templateCache", function($templateCache) {

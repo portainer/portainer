@@ -1,4 +1,4 @@
-angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containers/containers.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
+angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containerTop/containerTop.html', 'app/components/containers/containers.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
 
 angular.module("app/components/builder/builder.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("app/components/builder/builder.html",
@@ -25,11 +25,12 @@ angular.module("app/components/builder/builder.html", []).run(["$templateCache",
 angular.module("app/components/container/container.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("app/components/container/container.html",
     "<div class=\"detail\">\n" +
-    "    \n" +
+    "\n" +
     "    <div ng-if=\"!container.edit\">\n" +
     "        <h4>Container: {{ container.Name }}\n" +
     "            <button class=\"btn btn-primary\"\n" +
-    "                    ng-click=\"container.edit = true;\">Rename</button>\n" +
+    "                    ng-click=\"container.edit = true;\">Rename\n" +
+    "            </button>\n" +
     "        </h4>\n" +
     "    </div>\n" +
     "    <div ng-if=\"container.edit\">\n" +
@@ -37,116 +38,126 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
     "            Container:\n" +
     "            <input type=\"text\" ng-model=\"container.newContainerName\">\n" +
     "            <button class=\"btn btn-success\"\n" +
-    "                    ng-click=\"renameContainer()\">Edit</button>\n" +
+    "                    ng-click=\"renameContainer()\">Edit\n" +
+    "            </button>\n" +
     "            <button class=\"btn btn-danger\"\n" +
     "                    ng-click=\"container.edit = false;\">&times;</button>\n" +
     "        </h4>\n" +
     "    </div>\n" +
     "\n" +
     "    <div class=\"btn-group detail\">\n" +
-    "      <button class=\"btn btn-success\"\n" +
-    "            ng-click=\"start()\"\n" +
-    "            ng-show=\"!container.State.Running\">Start</button>\n" +
-    "      <button class=\"btn btn-warning\"\n" +
-    "            ng-click=\"stop()\"\n" +
-    "            ng-show=\"container.State.Running && !container.State.Paused\">Stop</button>\n" +
-    "      <button class=\"btn btn-danger\"\n" +
-    "            ng-click=\"kill()\"\n" +
-    "            ng-show=\"container.State.Running && !container.State.Paused\">Kill</button>\n" +
-    "      <button class=\"btn btn-info\"\n" +
-    "            ng-click=\"pause()\"\n" +
-    "            ng-show=\"container.State.Running && !container.State.Paused\">Pause</button>\n" +
-    "      <button class=\"btn btn-success\"\n" +
-    "            ng-click=\"unpause()\"\n" +
-    "            ng-show=\"container.State.Running && container.State.Paused\">Unpause</button>\n" +
+    "        <button class=\"btn btn-success\"\n" +
+    "                ng-click=\"start()\"\n" +
+    "                ng-show=\"!container.State.Running\">Start\n" +
+    "        </button>\n" +
+    "        <button class=\"btn btn-warning\"\n" +
+    "                ng-click=\"stop()\"\n" +
+    "                ng-show=\"container.State.Running && !container.State.Paused\">Stop\n" +
+    "        </button>\n" +
+    "        <button class=\"btn btn-danger\"\n" +
+    "                ng-click=\"kill()\"\n" +
+    "                ng-show=\"container.State.Running && !container.State.Paused\">Kill\n" +
+    "        </button>\n" +
+    "        <button class=\"btn btn-info\"\n" +
+    "                ng-click=\"pause()\"\n" +
+    "                ng-show=\"container.State.Running && !container.State.Paused\">Pause\n" +
+    "        </button>\n" +
+    "        <button class=\"btn btn-success\"\n" +
+    "                ng-click=\"unpause()\"\n" +
+    "                ng-show=\"container.State.Running && container.State.Paused\">Unpause\n" +
+    "        </button>\n" +
     "    </div>\n" +
     "\n" +
     "    <table class=\"table table-striped\">\n" +
-    "         <tbody>\n" +
-    "            <tr>\n" +
-    "                <td>Created:</td>\n" +
-    "                <td>{{ container.Created }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Path:</td>\n" +
-    "                <td>{{ container.Path }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Args:</td>\n" +
-    "                <td>{{ container.Args }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Exposed Ports:</td>\n" +
-    "                <td>\n" +
-    "                    <ul>\n" +
-    "                        <li ng-repeat=\"(k, v) in container.Config.ExposedPorts\">{{ k }}</li>\n" +
-    "                    </ul>\n" +
-    "                </td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Environment:</td>\n" +
-    "                <td>\n" +
-    "                    <ul>\n" +
-    "                        <li ng-repeat=\"k in container.Config.Env\">{{ k }}</li>\n" +
-    "                    </ul>\n" +
-    "                </td>\n" +
-    "            </tr>\n" +
+    "        <tbody>\n" +
+    "        <tr>\n" +
+    "            <td>Created:</td>\n" +
+    "            <td>{{ container.Created }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Path:</td>\n" +
+    "            <td>{{ container.Path }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Args:</td>\n" +
+    "            <td>{{ container.Args }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Exposed Ports:</td>\n" +
+    "            <td>\n" +
+    "                <ul>\n" +
+    "                    <li ng-repeat=\"(k, v) in container.Config.ExposedPorts\">{{ k }}</li>\n" +
+    "                </ul>\n" +
+    "            </td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Environment:</td>\n" +
+    "            <td>\n" +
+    "                <ul>\n" +
+    "                    <li ng-repeat=\"k in container.Config.Env\">{{ k }}</li>\n" +
+    "                </ul>\n" +
+    "            </td>\n" +
+    "        </tr>\n" +
     "\n" +
-    "            <tr>\n" +
-    "                <td>Publish All:</td>\n" +
-    "                <td>{{ container.HostConfig.PublishAllPorts }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Ports:</td>\n" +
-    "                <td>\n" +
-    "                    <ul style=\"display:inline-table\">\n" +
-    "                        <li ng-repeat=\"(containerport, hostports) in container.HostConfig.PortBindings\">\n" +
-    "                            {{ containerport }} => <span class=\"label label-default\" ng-repeat=\"(k,v) in hostports\">{{ v.HostIp }}:{{ v.HostPort }}</span>\n" +
-    "                        </li>\n" +
-    "                    </ul>\n" +
-    "                </td>\n" +
+    "        <tr>\n" +
+    "            <td>Publish All:</td>\n" +
+    "            <td>{{ container.HostConfig.PublishAllPorts }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Ports:</td>\n" +
+    "            <td>\n" +
+    "                <ul style=\"display:inline-table\">\n" +
+    "                    <li ng-repeat=\"(containerport, hostports) in container.HostConfig.PortBindings\">\n" +
+    "                        {{ containerport }} => <span class=\"label label-default\" ng-repeat=\"(k,v) in hostports\">{{ v.HostIp }}:{{ v.HostPort }}</span>\n" +
+    "                    </li>\n" +
+    "                </ul>\n" +
+    "            </td>\n" +
     "\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Hostname:</td>\n" +
-    "                <td>{{ container.Config.Hostname }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>IPAddress:</td>\n" +
-    "                <td>{{ container.NetworkSettings.IPAddress }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Cmd:</td>\n" +
-    "                <td>{{ container.Config.Cmd }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Entrypoint:</td>\n" +
-    "                <td>{{ container.Config.Entrypoint }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Volumes:</td>\n" +
-    "                <td>{{ container.Volumes }}</td>\n" +
-    "            </tr>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Hostname:</td>\n" +
+    "            <td>{{ container.Config.Hostname }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>IPAddress:</td>\n" +
+    "            <td>{{ container.NetworkSettings.IPAddress }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Cmd:</td>\n" +
+    "            <td>{{ container.Config.Cmd }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Entrypoint:</td>\n" +
+    "            <td>{{ container.Config.Entrypoint }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Volumes:</td>\n" +
+    "            <td>{{ container.Volumes }}</td>\n" +
+    "        </tr>\n" +
     "\n" +
-    "            <tr>\n" +
-    "                <td>SysInitpath:</td>\n" +
-    "                <td>{{ container.SysInitPath }}</td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>Image:</td>\n" +
-    "                <td><a href=\"#/images/{{ container.Image }}/\">{{ container.Image }}</a></td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                <td>State:</td>\n" +
-    "                <td><span class=\"label {{ container.State|getstatelabel }}\">{{ container.State|getstatetext }}</span></td>\n" +
-    "            </tr>\n" +
-    "            <tr>\n" +
-    "                 <td>Logs:</td>\n" +
-    "                 <td><a href=\"#/containers/{{ container.Id }}/logs\">stdout/stderr</a></td>\n" +
-    "            </tr>\n" +
+    "        <tr>\n" +
+    "            <td>SysInitpath:</td>\n" +
+    "            <td>{{ container.SysInitPath }}</td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Image:</td>\n" +
+    "            <td><a href=\"#/images/{{ container.Image }}/\">{{ container.Image }}</a></td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>State:</td>\n" +
+    "            <td><span class=\"label {{ container.State|getstatelabel }}\">{{ container.State|getstatetext }}</span></td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Logs:</td>\n" +
+    "            <td><a href=\"#/containers/{{ container.Id }}/logs\">stdout/stderr</a></td>\n" +
+    "        </tr>\n" +
+    "        <tr>\n" +
+    "            <td>Top:</td>\n" +
+    "            <td><a href=\"#/containers/{{ container.Id }}/top\">Top</a></td>\n" +
+    "        </tr>\n" +
     "        </tbody>\n" +
     "    </table>\n" +
-    "    \n" +
+    "\n" +
     "    <div class=\"row-fluid\">\n" +
     "        <div class=\"span1\">\n" +
     "            Changes:\n" +
@@ -154,7 +165,7 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
     "        <div class=\"span5\">\n" +
     "            <i class=\"icon-refresh\" style=\"width:32px;height:32px;\" ng-click=\"getChanges()\"></i>\n" +
     "        </div>\n" +
-    "    </div> \n" +
+    "    </div>\n" +
     "\n" +
     "    <div class=\"well well-large\">\n" +
     "        <ul>\n" +
@@ -164,7 +175,7 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
     "        </ul>\n" +
     "    </div>\n" +
     "\n" +
-    "    <hr />\n" +
+    "    <hr/>\n" +
     "\n" +
     "    <div class=\"btn-remove\">\n" +
     "        <button class=\"btn btn-large btn-block btn-primary btn-danger\" ng-click=\"remove()\">Remove Container</button>\n" +
@@ -218,6 +229,29 @@ angular.module("app/components/containerLogs/containerlogs.html", []).run(["$tem
     "    </div>\n" +
     "</div>\n" +
     "");
+}]);
+
+angular.module("app/components/containerTop/containerTop.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("app/components/containerTop/containerTop.html",
+    "<div class=\"containerTop\">\n" +
+    "    <div class=\"form-group col-xs-2\">\n" +
+    "        <input type=\"text\" class=\"form-control\" placeholder=\"[options] (aux)\" ng-model=\"ps_args\">\n" +
+    "    </div>\n" +
+    "    <button type=\"button\" class=\"btn btn-default\" ng-click=\"getTop()\">Submit</button>\n" +
+    "\n" +
+    "    <table class=\"table table-striped\">\n" +
+    "        <thead>\n" +
+    "        <tr>\n" +
+    "            <th ng-repeat=\"title in containerTop.Titles\">{{title}}</th>\n" +
+    "        </tr>\n" +
+    "        </thead>\n" +
+    "        <tbody>\n" +
+    "        <tr ng-repeat=\"processInfos in containerTop.Processes\">\n" +
+    "            <td ng-repeat=\"processInfo in processInfos track by $index\">{{processInfo}}</td>\n" +
+    "        </tr>\n" +
+    "        </tbody>\n" +
+    "    </table>\n" +
+    "</div>");
 }]);
 
 angular.module("app/components/containers/containers.html", []).run(["$templateCache", function($templateCache) {
