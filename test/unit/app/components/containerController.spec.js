@@ -1,4 +1,4 @@
-describe('ContainerController', function() {
+describe('ContainerController', function () {
     var $scope, $httpBackend, mockContainer, $routeParams;
 
     beforeEach(module('dockerui'));
@@ -27,7 +27,7 @@ describe('ContainerController', function() {
         });
     }
 
-    it("a correct create request to the Docker remote API", function () {
+    it("a correct rename request to the Docker remote API", function () {
 
         $routeParams.id = 'b17882378cee8ec0136f482681b764cca430befd52a9bfd1bde031f49b8bba9f';
         $scope.container = {
@@ -41,7 +41,7 @@ describe('ContainerController', function() {
         var newContainerName = "newName";
         expectGetContainer();
 
-        $httpBackend.expectGET('dockerapi/containers/changes?').respond([{"Kind":1,"Path":"/docker.sock"}]);
+        $httpBackend.expectGET('dockerapi/containers/changes?').respond([{"Kind": 1, "Path": "/docker.sock"}]);
 
         $httpBackend.expectPOST('dockerapi/containers/' + $routeParams.id + '/rename?name=newName').
             respond({
