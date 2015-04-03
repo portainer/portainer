@@ -55,7 +55,7 @@ The DockerUI code is licensed under the MIT license.
 
 
 **DockerUI:**
-Copyright (c) 2014 Michael Crosby. crosbymichael.com
+Copyright (c) 2014-2015 Michael Crosby (crosbymichael.com), Kevan Ahlquist (kevanahlquist.com)
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation 
