@@ -19,7 +19,7 @@ describe('ContainerController', function () {
     }));
 
     function expectGetContainer() {
-        $httpBackend.expectGET('dockerapi/containers/json?').respond({
+        $httpBackend.expectGET('dockerapi/containers/json').respond({
             'Created': 1421817232,
             'id': 'b17882378cee8ec0136f482681b764cca430befd52a9bfd1bde031f49b8bba9f',
             'Image': 'dockerui:latest',
@@ -41,7 +41,7 @@ describe('ContainerController', function () {
         var newContainerName = "newName";
         expectGetContainer();
 
-        $httpBackend.expectGET('dockerapi/containers/changes?').respond([{"Kind": 1, "Path": "/docker.sock"}]);
+        $httpBackend.expectGET('dockerapi/containers/changes').respond([{"Kind": 1, "Path": "/docker.sock"}]);
 
         $httpBackend.expectPOST('dockerapi/containers/' + $routeParams.id + '/rename?name=newName').
             respond({
