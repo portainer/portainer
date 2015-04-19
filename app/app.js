@@ -1,12 +1,34 @@
-angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'info', 'builder', 'containerLogs', 'events'])
+angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'info', 'builder', 'containerLogs', 'containerTop', 'events'])
     .config(['$routeProvider', function ($routeProvider) {
         'use strict';
-        $routeProvider.when('/', {templateUrl: 'app/components/dashboard/dashboard.html', controller: 'DashboardController'});
-        $routeProvider.when('/containers/', {templateUrl: 'app/components/containers/containers.html', controller: 'ContainersController'});
-        $routeProvider.when('/containers/:id/', {templateUrl: 'app/components/container/container.html', controller: 'ContainerController'});
-        $routeProvider.when('/containers/:id/logs/', {templateUrl: 'app/components/containerLogs/containerlogs.html', controller: 'ContainerLogsController'});
-        $routeProvider.when('/images/', {templateUrl: 'app/components/images/images.html', controller: 'ImagesController'});
-        $routeProvider.when('/images/:id*/', {templateUrl: 'app/components/image/image.html', controller: 'ImageController'});
+        $routeProvider.when('/', {
+            templateUrl: 'app/components/dashboard/dashboard.html',
+            controller: 'DashboardController'
+        });
+        $routeProvider.when('/containers/', {
+            templateUrl: 'app/components/containers/containers.html',
+            controller: 'ContainersController'
+        });
+        $routeProvider.when('/containers/:id/', {
+            templateUrl: 'app/components/container/container.html',
+            controller: 'ContainerController'
+        });
+        $routeProvider.when('/containers/:id/logs/', {
+            templateUrl: 'app/components/containerLogs/containerlogs.html',
+            controller: 'ContainerLogsController'
+        });
+        $routeProvider.when('/containers/:id/top', {
+            templateUrl: 'app/components/containerTop/containerTop.html',
+            controller: 'ContainerTopController'
+        });
+        $routeProvider.when('/images/', {
+            templateUrl: 'app/components/images/images.html',
+            controller: 'ImagesController'
+        });
+        $routeProvider.when('/images/:id*/', {
+            templateUrl: 'app/components/image/image.html',
+            controller: 'ImageController'
+        });
         $routeProvider.when('/info', {templateUrl: 'app/components/info/info.html', controller: 'InfoController'});
         $routeProvider.when('/events', {templateUrl: 'app/components/events/events.html', controller: 'EventsController'});
         $routeProvider.otherwise({redirectTo: '/'});

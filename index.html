@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="<%= pkg.name %>">
-  <head>
+<head>
     <meta charset="utf-8">
     <title>DockerUI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,9 +15,9 @@
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-	
+
     <script src="assets/js/jquery-1.11.1.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
 
@@ -37,19 +37,19 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
-  </head>
+</head>
 
-  <body>
+<body>
 
-    <div class="container">
-        <div ng-include="template" ng-controller="MastheadController"></div>
+<div class="container">
+    <div ng-include="template" ng-controller="MastheadController"></div>
 
-        <div id="view" ng-view></div>
+    <div id="view" ng-view></div>
 
-        <div class="container-bottom"></div>
-        <div ng-include="template" ng-controller="FooterController"></div>
-    </div> 
+    <div class="container-bottom"></div>
+    <div ng-include="template" ng-controller="FooterController"></div>
+</div>
 
 
-  </body>
+</body>
 </html>
