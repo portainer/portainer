@@ -1,9 +1,9 @@
-/*! dockerui - v0.7.0 - 2015-04-03
+/*! dockerui - v0.7.0 - 2015-04-26
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby & Kevan Ahlquist;
  * Licensed MIT
  */
-angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'images', 'image', 'startContainer', 'sidebar', 'info', 'builder', 'containerLogs', 'containerTop'])
+angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'containersNetwork', 'images', 'image', 'startContainer', 'sidebar', 'info', 'builder', 'containerLogs', 'containerTop'])
     .config(['$routeProvider', function ($routeProvider) {
         'use strict';
         $routeProvider.when('/', {
@@ -25,6 +25,10 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
         $routeProvider.when('/containers/:id/top', {
             templateUrl: 'app/components/containerTop/containerTop.html',
             controller: 'ContainerTopController'
+        });
+        $routeProvider.when('/containers_network', {
+            templateUrl: 'app/components/containersNetwork/containersNetwork.html',
+            controller: 'ContainersNetworkController'
         });
         $routeProvider.when('/images/', {
             templateUrl: 'app/components/images/images.html',
@@ -379,6 +383,103 @@ function($scope, Container, Settings, Messages, ViewSpinner) {
     };
 
     update({all: Settings.displayAll ? 1 : 0});
+}]);
+
+angular.module('containersNetwork', ['ngVis'])
+.controller('ContainersNetworkController', ['$scope', '$location', 'Container', 'Messages', 'VisDataSet', function($scope, $location, Container, Messages, VisDataSet) {
+    $scope.options = {
+      navigation: true,
+      keyboard: true,
+      height: '500px', width: '700px',
+      nodes: {
+        shape: 'box'
+      },
+      edges: {
+        style: 'arrow'
+      },
+      physics: {
+        barnesHut : {
+          springLength: 200
+        }
+      }
+    };
+    $scope.data = new ContainersNetwork();
+    $scope.events = {
+      doubleClick : function(event) {
+        $scope.$apply( function() {
+          $location.path('/containers/' + event.nodes[0]);
+        });
+      }
+    };
+
+    function ContainersNetwork() {
+        this.containers = [];
+        this.nodes = new VisDataSet();
+        this.edges = new VisDataSet();
+
+        this.add = function(data) {
+            var container = new ContainerNode(data);
+            this.containers.push(container);
+            this.nodes.add({id: container.Id, label: container.Name});
+            for (var i = 0; i < this.containers.length; i++) {
+                var otherContainer = this.containers[i];
+                this.addLinkEdgeIfExists(container, otherContainer);
+                this.addLinkEdgeIfExists(otherContainer, container);
+                this.addVolumeEdgeIfExists(container, otherContainer);
+                this.addVolumeEdgeIfExists(otherContainer, container);
+            }
+        }
+
+        this.addLinkEdgeIfExists = function(from, to) {
+            if (from.Links != null && from.Links[to.Name] != null) {
+                this.edges.add({ from: from.Id, to: to.Id, label: from.Links[to.Name] });
+            }
+        }
+
+        this.addVolumeEdgeIfExists = function(from, to) {
+            if (from.VolumesFrom != null && from.VolumesFrom[to.Id] != null) {
+                this.edges.add({ from: from.Id, to: to.Id, color: { color: '#A0A0A0', highlight: '#A0A0A0', hover: '#848484'}});
+            }
+        }
+    }
+
+    function ContainerNode(data) {
+        this.Id = data.Id;
+        this.Name = data.Name.substring(1, data.Name.length);
+        var dataLinks = data.HostConfig.Links;
+        if (dataLinks != null) {
+            this.Links = [];
+            for (var i = 0; i < dataLinks.length; i++) {
+                // links have the following format: /TargetContainerName:/SourceContainerName/LinkAlias
+                var link = dataLinks[i].split(":");
+                var target = link[0].split("/")[1];
+                var alias = link[1].split("/")[2];
+                // only keep shortest alias
+                if (this.Links[target] == null || alias.length < this.Links[target].length) {
+                    this.Links[target] = alias;
+                }
+            }
+        }
+        var dataVolumes = data.HostConfig.VolumesFrom;
+        //converting array into properties for simpler and faster access
+        if (dataVolumes != null) {
+            this.VolumesFrom = [];
+            for (var i = 0; i < dataVolumes.length; i++) {
+                this.VolumesFrom[dataVolumes[i]] = true;
+            }
+        }
+    }
+
+    Container.query({all: 0}, function(d) {
+        for (var i = 0; i < d.length; i++) {
+            Container.get({id: d[i].Id}, function(d) {
+                    $scope.data.add(d);
+                }, function(e) {
+                    Messages.error('Failure', e.data);
+                });
+
+        }
+   });
 }]);
 
 angular.module('dashboard', [])
@@ -1119,7 +1220,7 @@ function ContainerViewModel(data) {
    this.Names = data.Names;
 }
 
-angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containerTop/containerTop.html', 'app/components/containers/containers.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
+angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containerTop/containerTop.html', 'app/components/containers/containers.html', 'app/components/containersNetwork/containersNetwork.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
 
 angular.module("app/components/builder/builder.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("app/components/builder/builder.html",
@@ -1422,6 +1523,18 @@ angular.module("app/components/containers/containers.html", []).run(["$templateC
     "        </tr>\n" +
     "    </tbody>\n" +
     "</table>\n" +
+    "");
+}]);
+
+angular.module("app/components/containersNetwork/containersNetwork.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("app/components/containersNetwork/containersNetwork.html",
+    "<div class=\"detail\">\n" +
+    "    <h2>Containers Network</h2>\n" +
+    "\n" +
+    "    <div>\n" +
+    "        <vis-network data=\"data\" options=\"options\" events=\"events\"/>\n" +
+    "    </div>\n" +
+    "</div>\n" +
     "");
 }]);
 
@@ -1750,6 +1863,7 @@ angular.module("app/components/masthead/masthead.html", []).run(["$templateCache
     "      <ul class=\"nav well\">\n" +
     "        <li><a href=\"#\">Dashboard</a></li>\n" +
     "        <li><a href=\"#/containers/\">Containers</a></li>\n" +
+    "        <li><a href=\"#/containers_network/\">Containers Network</a></li>\n" +
     "        <li><a href=\"#/images/\">Images</a></li>\n" +
     "        <li><a href=\"#/info/\">Info</a></li>\n" +
     "      </ul>\n" +

@@ -1,4 +1,4 @@
-angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containerTop/containerTop.html', 'app/components/containers/containers.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
+angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containerTop/containerTop.html', 'app/components/containers/containers.html', 'app/components/containersNetwork/containersNetwork.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
 
 angular.module("app/components/builder/builder.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("app/components/builder/builder.html",
@@ -301,6 +301,18 @@ angular.module("app/components/containers/containers.html", []).run(["$templateC
     "        </tr>\n" +
     "    </tbody>\n" +
     "</table>\n" +
+    "");
+}]);
+
+angular.module("app/components/containersNetwork/containersNetwork.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("app/components/containersNetwork/containersNetwork.html",
+    "<div class=\"detail\">\n" +
+    "    <h2>Containers Network</h2>\n" +
+    "\n" +
+    "    <div>\n" +
+    "        <vis-network data=\"data\" options=\"options\" events=\"events\"/>\n" +
+    "    </div>\n" +
+    "</div>\n" +
     "");
 }]);
 
@@ -629,6 +641,7 @@ angular.module("app/components/masthead/masthead.html", []).run(["$templateCache
     "      <ul class=\"nav well\">\n" +
     "        <li><a href=\"#\">Dashboard</a></li>\n" +
     "        <li><a href=\"#/containers/\">Containers</a></li>\n" +
+    "        <li><a href=\"#/containers_network/\">Containers Network</a></li>\n" +
     "        <li><a href=\"#/images/\">Images</a></li>\n" +
     "        <li><a href=\"#/info/\">Info</a></li>\n" +
     "      </ul>\n" +
