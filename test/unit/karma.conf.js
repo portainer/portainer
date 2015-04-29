@@ -13,6 +13,7 @@ files = [
   'assets/js/angularjs/1.2.6/angular-route.min.js',
   'assets/js/angularjs/1.2.6/angular-resource.min.js',
   'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js',
+  'assets/js/angular-vis.js',
   'test/assets/angular/angular-mocks.js',
   'app/**/*.js',
   'test/unit/**/*.spec.js',
