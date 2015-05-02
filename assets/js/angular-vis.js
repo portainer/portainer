@@ -92,7 +92,8 @@ angular.module('ngVis', [])
             scope: {
                 data: '=',
                 options: '=',
-                events: '='
+                events: '=',
+                component: '='
             },
             link: function (scope, element, attr) {
                 var networkEvents = [
@@ -103,6 +104,7 @@ angular.module('ngVis', [])
                 ];
 
                 var network = new vis.Network(element[0], scope.data, scope.options);
+                scope.component = network;
 
                 scope.$watch('data', function () {
                     // Sanity check
@@ -118,6 +120,7 @@ angular.module('ngVis', [])
 
                     // Create the graph2d object
                     network = new vis.Network(element[0]);
+                    scope.component = network;
 
                     // Attach an event handler if defined
                     angular.forEach(scope.events, function (callback, event) {

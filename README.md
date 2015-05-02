@@ -41,7 +41,7 @@ DockerUI listens on port 9000 by default. If you run DockerUI inside a container
 * [Gritter](https://github.com/jboesch/Gritter)
 * [Spin.js](https://github.com/fgnass/spin.js/)
 * [Golang](https://golang.org/)
-* [Vis.js](http://visjs.org/)
+* [Vis.js](http://visjs.org/) - We are using a [patched version](https://github.com/visjs/angular-visjs/pull/22)
 
 
 ### Todo:
