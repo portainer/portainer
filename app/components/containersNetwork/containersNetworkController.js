@@ -8,7 +8,7 @@ angular.module('containersNetwork', ['ngVis'])
         this.Image = data.Config.Image;
         var dataLinks = data.HostConfig.Links;
         if (dataLinks != null) {
-            this.Links = [];
+            this.Links = {};
             for (var i = 0; i < dataLinks.length; i++) {
                 // links have the following format: /TargetContainerName:/SourceContainerName/LinkAlias
                 var link = dataLinks[i].split(":");
@@ -23,7 +23,7 @@ angular.module('containersNetwork', ['ngVis'])
         var dataVolumes = data.HostConfig.VolumesFrom;
         //converting array into properties for simpler and faster access
         if (dataVolumes != null) {
-            this.VolumesFrom = [];
+            this.VolumesFrom = {};
             for (var j = 0; j < dataVolumes.length; j++) {
                 this.VolumesFrom[dataVolumes[j]] = true;
             }
@@ -69,12 +69,12 @@ angular.module('containersNetwork', ['ngVis'])
 
     function ContainersNetwork() {
         this.data = new ContainersNetworkData();
-        this.containers = [];
-        this.selectedContainers = [];
-        this.shownContainers = [];
+        this.containers = {};
+        this.selectedContainersIds = [];
+        this.shownContainersIds = [];
         this.events = {
             select : function(event) {
-                $scope.network.selectedContainers = event.nodes;
+                $scope.network.selectedContainersIds = event.nodes;
                 $scope.$apply( function() {
                     $scope.query = '';
                 });
@@ -104,11 +104,11 @@ angular.module('containersNetwork', ['ngVis'])
 
         this.addContainer = function(data) {
             var container = new ContainerNode(data);
-            this.containers.push(container);
-            this.shownContainers.push(container);
+            this.containers[container.Id] = container;
+            this.shownContainersIds.push(container.Id);
             this.data.addContainerNode(container);
-            for (var i = 0; i < this.containers.length; i++) {
-                var otherContainer = this.containers[i];
+            for (var otherContainerId in this.containers) {
+                var otherContainer = this.containers[otherContainerId];
                 this.data.addLinkEdgeIfExists(container, otherContainer);
                 this.data.addLinkEdgeIfExists(otherContainer, container);
                 this.data.addVolumeEdgeIfExists(container, otherContainer);
@@ -118,8 +118,8 @@ angular.module('containersNetwork', ['ngVis'])
 
         this.selectContainers = function(query) {
             if (this.component != null) {
-                this.selectedContainers = this.searchContainers(query);
-                this.component.selectNodes(this.selectedContainers);
+                this.selectedContainersIds = this.searchContainers(query);
+                this.component.selectNodes(this.selectedContainersIds);
             }
         };
 
@@ -127,38 +127,103 @@ angular.module('containersNetwork', ['ngVis'])
             if (query.trim() === "") {
               return [];
             }
-            var selectedContainers = [];
-            for (var i=0; i < this.shownContainers.length; i++) {
-                var container = this.shownContainers[i];
+            var selectedContainersIds = [];
+            for (var i=0; i < this.shownContainersIds.length; i++) {
+                var container = this.containers[this.shownContainersIds[i]];
                 if (container.Name.indexOf(query) > -1 ||
                     container.Image.indexOf(query) > -1 ||
                     container.Id.indexOf(query) > -1) {
-                    selectedContainers.push(container.Id);
+                    selectedContainersIds.push(container.Id);
                 }
             }
-            return selectedContainers;
+            return selectedContainersIds;
         };
 
         this.hideSelected = function() {
             var i=0;
-            while ( i < this.shownContainers.length ) {
-                if (this.selectedContainers.indexOf(this.shownContainers[i].Id) > -1) {
-                    this.shownContainers.splice(i, 1);
+            while ( i < this.shownContainersIds.length ) {
+                if (this.selectedContainersIds.indexOf(this.shownContainersIds[i]) > -1) {
+                    this.shownContainersIds.splice(i, 1);
                 } else {
                     i++;
                 }
             }
-            this.data.removeContainersNodes(this.selectedContainers);
+            this.data.removeContainersNodes(this.selectedContainersIds);
             $scope.query = '';
-            this.selectedContainers = [];
+            this.selectedContainersIds = [];
+        };
+
+        this.searchDownstream = function(containerId, downstreamContainersIds) {
+            if (downstreamContainersIds.indexOf(containerId) > -1) {
+                return;
+            }
+            downstreamContainersIds.push(containerId);
+            var container = this.containers[containerId];
+            if (container.Links == null && container.VolumesFrom == null) {
+                return;
+            }
+            for (var otherContainerId in this.containers) {
+                var otherContainer = this.containers[otherContainerId];
+                if (container.Links != null && container.Links[otherContainer.Name] != null) {
+                    this.searchDownstream(otherContainer.Id, downstreamContainersIds);
+                } else if (container.VolumesFrom != null &&
+                        container.VolumesFrom[otherContainer.Id] != null) {
+                    this.searchDownstream(otherContainer.Id, downstreamContainersIds);
+                }
+            }
+        };
+
+        this.updateShownContainers = function(newShownContainersIds) {
+            for (var containerId in this.containers) {
+                if (newShownContainersIds.indexOf(containerId) > -1 &&
+                        this.shownContainersIds.indexOf(containerId) === -1) {
+                    this.data.addContainerNode(this.containers[containerId]);
+                } else if (newShownContainersIds.indexOf(containerId) === -1 &&
+                        this.shownContainersIds.indexOf(containerId) > -1) {
+                    this.data.removeContainersNodes(containerId);
+                }
+            }
+            this.shownContainersIds = newShownContainersIds;
+        };
+
+        this.showSelectedDownstream = function() {
+            var downstreamContainersIds = [];
+            for (var i=0; i < this.selectedContainersIds.length; i++) {
+                this.searchDownstream(this.selectedContainersIds[i], downstreamContainersIds);
+            }
+            this.updateShownContainers(downstreamContainersIds);
+        };
+
+        this.searchUpstream = function(containerId, upstreamContainersIds) {
+            if (upstreamContainersIds.indexOf(containerId) > -1) {
+                return;
+            }
+            upstreamContainersIds.push(containerId);
+            var container = this.containers[containerId];
+            for (var otherContainerId in this.containers) {
+                var otherContainer = this.containers[otherContainerId];
+                if (otherContainer.Links != null && otherContainer.Links[container.Name] != null) {
+                    this.searchUpstream(otherContainer.Id, upstreamContainersIds);
+                } else if (otherContainer.VolumesFrom != null &&
+                        otherContainer.VolumesFrom[container.Id] != null) {
+                    this.searchUpstream(otherContainer.Id, upstreamContainersIds);
+                }
+            }
+        };
+
+        this.showSelectedUpstream = function() {
+            var upstreamContainersIds = [];
+            for (var i=0; i < this.selectedContainersIds.length; i++) {
+                this.searchUpstream(this.selectedContainersIds[i], upstreamContainersIds);
+            }
+            this.updateShownContainers(upstreamContainersIds);
         };
 
         this.showAll = function() {
-            for (var i=0; i < this.containers.length; i++) {
-                var container = this.containers[i];
-                if (this.shownContainers.indexOf(container) === -1) {
-                    this.data.addContainerNode(container);
-                    this.shownContainers.push(container);
+            for (var containerId in this.containers) {
+                if (this.shownContainersIds.indexOf(containerId) === -1) {
+                    this.data.addContainerNode(this.containers[containerId]);
+                    this.shownContainersIds.push(containerId);
                 }
             }
         };

@@ -19,7 +19,8 @@ angular.module('ngVis', [])
             scope: {
                 data: '=',
                 options: '=',
-                events: '='
+                events: '=',
+                component: '='
             },
             link: function (scope, element, attr) {
                 var timelineEvents = [
@@ -46,6 +47,7 @@ angular.module('ngVis', [])
 
                     // Create the timeline object
                     timeline = new vis.Timeline(element[0]);
+                    scope.component = timeline;
 
                     // Attach an event handler if defined
                     angular.forEach(scope.events, function (callback, event) {
@@ -169,7 +171,8 @@ angular.module('ngVis', [])
             scope: {
                 data: '=',
                 options: '=',
-                events: '='
+                events: '=',
+                component: '='
             },
             link: function (scope, element, attr) {
                 var graphEvents = [
@@ -181,6 +184,7 @@ angular.module('ngVis', [])
 
                 // Create the chart
                 var graph = new vis.Graph2d(element[0]);
+                scope.component = graph;
 
                 scope.$watch('data', function () {
                     // Sanity check
@@ -196,6 +200,7 @@ angular.module('ngVis', [])
 
                     // Create the graph2d object
                     graph = new vis.Graph2d(element[0]);
+                    scope.component = graph;
 
                     // Attach an event handler if defined
                     angular.forEach(scope.events, function (callback, event) {
