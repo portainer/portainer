@@ -40,6 +40,10 @@
                 ng-click="unpause()"
                 ng-show="container.State.Running && container.State.Paused">Unpause
         </button>
+        <button class="btn btn-primary"
+                ng-click="commit()"
+                ng-show="container.State.Running && !container.State.Paused">Commit
+        </button>
     </div>
 
     <table class="table table-striped">

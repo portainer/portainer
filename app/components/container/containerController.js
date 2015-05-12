@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages', 'ViewSpinner',
-function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
+.controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'ContainerCommit', 'Messages', 'ViewSpinner',
+function($scope, $routeParams, $location, Container, ContainerCommit, Messages, ViewSpinner) {
     $scope.changes = [];
     $scope.edit = false;
 
@@ -58,6 +58,16 @@ function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
         });
     };
 
+    $scope.commit =  function() {
+        ViewSpinner.spin();
+        ContainerCommit.commit({id: $routeParams.id, repo: $scope.container.Config.Image}, function(d) {
+            update();
+            Messages.send("Container commited", $routeParams.id);
+        }, function(e) {
+            update();
+            Messages.error("Failure", "Container failed to commit." + e.data);
+        });
+    };
     $scope.pause = function() {
         ViewSpinner.spin();
         Container.pause({id: $routeParams.id}, function(d) {
