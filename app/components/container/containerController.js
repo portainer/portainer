@@ -91,6 +91,17 @@ function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
         });
     };
 
+    $scope.restart = function() {
+        ViewSpinner.spin();
+        Container.restart({id: $routeParams.id}, function(d) {
+            update();
+            Messages.send("Container restarted", $routeParams.id);
+        }, function(e){
+            update();
+            Messages.error("Failure", "Container failed to restart." + e.data);
+        });
+    };
+
     $scope.hasContent = function(data) {
         return data !== null && data !== undefined;
     };
