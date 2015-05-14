@@ -20,6 +20,23 @@ angular.module('dockerui.services', ['ngResource'])
             rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false}
         });
     })
+    .factory('ContainerCommit', function ($resource, $http, Settings) {
+        'use strict';
+        return {
+            commit: function (params, callback) {
+                   $http({
+                       method: 'POST',
+                       url: Settings.url + '/commit',
+                       params: {
+                           'container': params.id,
+                           'repo': params.repo
+                       }
+                   }).success(callback).error(function (data, status, headers, config) {
+                       console.log(error, data);
+                   });
+            }
+        };
+    })
     .factory('ContainerLogs', function ($resource, $http, Settings) {
         'use strict';
         return {

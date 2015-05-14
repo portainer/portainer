@@ -11,6 +11,7 @@ files = [
   'assets/js/spin.js',
   'dist/angular.js',
   'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js',
+  'assets/js/angular-vis.js',
   'test/assets/angular/angular-mocks.js',
   'app/**/*.js',
   'test/unit/**/*.spec.js',
