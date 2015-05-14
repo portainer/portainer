@@ -2,7 +2,7 @@ angular.module('dockerui.services', ['ngResource'])
     .factory('Container', function ($resource, Settings) {
         'use strict';
         // Resource for interacting with the docker containers
-        // https://docs.docker.com/reference/api/docker_remote_api/
+        // http://docs.docker.io/en/latest/api/docker_remote_api.html#containers
         return $resource(Settings.url + '/containers/:id/:action', {
             name: '@name'
         }, {
