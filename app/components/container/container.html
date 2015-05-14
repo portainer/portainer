@@ -1,9 +1,10 @@
 <div class="detail">
-    
+
     <div ng-if="!container.edit">
         <h4>Container: {{ container.Name }}
             <button class="btn btn-primary"
-                    ng-click="container.edit = true;">Rename</button>
+                    ng-click="container.edit = true;">Rename
+            </button>
         </h4>
     </div>
     <div ng-if="container.edit">
@@ -11,116 +12,134 @@
             Container:
             <input type="text" ng-model="container.newContainerName">
             <button class="btn btn-success"
-                    ng-click="renameContainer()">Edit</button>
+                    ng-click="renameContainer()">Edit
+            </button>
             <button class="btn btn-danger"
                     ng-click="container.edit = false;">&times;</button>
         </h4>
     </div>
 
     <div class="btn-group detail">
-      <button class="btn btn-success"
-            ng-click="start()"
-            ng-show="!container.State.Running">Start</button>
-      <button class="btn btn-warning"
-            ng-click="stop()"
-            ng-show="container.State.Running && !container.State.Paused">Stop</button>
-      <button class="btn btn-danger"
-            ng-click="kill()"
-            ng-show="container.State.Running && !container.State.Paused">Kill</button>
-      <button class="btn btn-info"
-            ng-click="pause()"
-            ng-show="container.State.Running && !container.State.Paused">Pause</button>
-      <button class="btn btn-success"
-            ng-click="unpause()"
-            ng-show="container.State.Running && container.State.Paused">Unpause</button>
+        <button class="btn btn-success"
+                ng-click="start()"
+                ng-show="!container.State.Running">Start
+        </button>
+        <button class="btn btn-warning"
+                ng-click="stop()"
+                ng-show="container.State.Running && !container.State.Paused">Stop
+        </button>
+        <button class="btn btn-danger"
+                ng-click="kill()"
+                ng-show="container.State.Running && !container.State.Paused">Kill
+        </button>
+        <button class="btn btn-info"
+                ng-click="pause()"
+                ng-show="container.State.Running && !container.State.Paused">Pause
+        </button>
+        <button class="btn btn-success"
+                ng-click="unpause()"
+                ng-show="container.State.Running && container.State.Paused">Unpause
+        </button>
+        <button class="btn btn-success"
+                ng-click="restart()"
+                ng-show="container.State.Running && !container.State.Stopped">Restart
+        </button>
+        <button class="btn btn-primary"
+                ng-click="commit()"
+                ng-show="container.State.Running && !container.State.Paused">Commit
+        </button>
     </div>
 
     <table class="table table-striped">
-         <tbody>
-            <tr>
-                <td>Created:</td>
-                <td>{{ container.Created }}</td>
-            </tr>
-            <tr>
-                <td>Path:</td>
-                <td>{{ container.Path }}</td>
-            </tr>
-            <tr>
-                <td>Args:</td>
-                <td>{{ container.Args }}</td>
-            </tr>
-            <tr>
-                <td>Exposed Ports:</td>
-                <td>
-                    <ul>
-                        <li ng-repeat="(k, v) in container.Config.ExposedPorts">{{ k }}</li>
-                    </ul>
-                </td>
-            </tr>
-            <tr>
-                <td>Environment:</td>
-                <td>
-                    <ul>
-                        <li ng-repeat="k in container.Config.Env">{{ k }}</li>
-                    </ul>
-                </td>
-            </tr>
+        <tbody>
+        <tr>
+            <td>Created:</td>
+            <td>{{ container.Created }}</td>
+        </tr>
+        <tr>
+            <td>Path:</td>
+            <td>{{ container.Path }}</td>
+        </tr>
+        <tr>
+            <td>Args:</td>
+            <td>{{ container.Args }}</td>
+        </tr>
+        <tr>
+            <td>Exposed Ports:</td>
+            <td>
+                <ul>
+                    <li ng-repeat="(k, v) in container.Config.ExposedPorts">{{ k }}</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>Environment:</td>
+            <td>
+                <ul>
+                    <li ng-repeat="k in container.Config.Env">{{ k }}</li>
+                </ul>
+            </td>
+        </tr>
 
-            <tr>
-                <td>Publish All:</td>
-                <td>{{ container.HostConfig.PublishAllPorts }}</td>
-            </tr>
-            <tr>
-                <td>Ports:</td>
-                <td>
-                    <ul style="display:inline-table">
-                        <li ng-repeat="(containerport, hostports) in container.HostConfig.PortBindings">
-                            {{ containerport }} => <span class="label label-default" ng-repeat="(k,v) in hostports">{{ v.HostIp }}:{{ v.HostPort }}</span>
-                        </li>
-                    </ul>
-                </td>
+        <tr>
+            <td>Publish All:</td>
+            <td>{{ container.HostConfig.PublishAllPorts }}</td>
+        </tr>
+        <tr>
+            <td>Ports:</td>
+            <td>
+                <ul style="display:inline-table">
+                    <li ng-repeat="(containerport, hostports) in container.HostConfig.PortBindings">
+                        {{ containerport }} => <span class="label label-default" ng-repeat="(k,v) in hostports">{{ v.HostIp }}:{{ v.HostPort }}</span>
+                    </li>
+                </ul>
+            </td>
 
-            </tr>
-            <tr>
-                <td>Hostname:</td>
-                <td>{{ container.Config.Hostname }}</td>
-            </tr>
-            <tr>
-                <td>IPAddress:</td>
-                <td>{{ container.NetworkSettings.IPAddress }}</td>
-            </tr>
-            <tr>
-                <td>Cmd:</td>
-                <td>{{ container.Config.Cmd }}</td>
-            </tr>
-            <tr>
-                <td>Entrypoint:</td>
-                <td>{{ container.Config.Entrypoint }}</td>
-            </tr>
-            <tr>
-                <td>Volumes:</td>
-                <td>{{ container.Volumes }}</td>
-            </tr>
+        </tr>
+        <tr>
+            <td>Hostname:</td>
+            <td>{{ container.Config.Hostname }}</td>
+        </tr>
+        <tr>
+            <td>IPAddress:</td>
+            <td>{{ container.NetworkSettings.IPAddress }}</td>
+        </tr>
+        <tr>
+            <td>Cmd:</td>
+            <td>{{ container.Config.Cmd }}</td>
+        </tr>
+        <tr>
+            <td>Entrypoint:</td>
+            <td>{{ container.Config.Entrypoint }}</td>
+        </tr>
+        <tr>
+            <td>Volumes:</td>
+            <td>{{ container.Volumes }}</td>
+        </tr>
 
-            <tr>
-                <td>SysInitpath:</td>
-                <td>{{ container.SysInitPath }}</td>
-            </tr>
-            <tr>
-                <td>Image:</td>
-                <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
-            </tr>
-            <tr>
-                <td>State:</td>
-                <td><span class="label {{ container.State|getstatelabel }}">{{ container.State|getstatetext }}</span></td>
-            </tr>
-            <tr>
-                 <td>Logs:</td>
-                 <td><a href="#/containers/{{ container.Id }}/logs">stdout/stderr</a></td>
-            </tr>
+        <tr>
+            <td>SysInitpath:</td>
+            <td>{{ container.SysInitPath }}</td>
+        </tr>
+        <tr>
+            <td>Image:</td>
+            <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
+        </tr>
+        <tr>
+            <td>State:</td>
+            <td><span class="label {{ container.State|getstatelabel }}">{{ container.State|getstatetext }}</span></td>
+        </tr>
+        <tr>
+            <td>Logs:</td>
+            <td><a href="#/containers/{{ container.Id }}/logs">stdout/stderr</a></td>
+        </tr>
+        <tr>
+            <td>Top:</td>
+            <td><a href="#/containers/{{ container.Id }}/top">Top</a></td>
+        </tr>
         </tbody>
     </table>
-    
+
     <div class="row-fluid">
         <div class="span1">
             Changes:
@@ -128,7 +147,7 @@
         <div class="span5">
             <i class="icon-refresh" style="width:32px;height:32px;" ng-click="getChanges()"></i>
         </div>
-    </div> 
+    </div>
 
     <div class="well well-large">
         <ul>
@@ -138,7 +157,7 @@
         </ul>
     </div>
 
-    <hr />
+    <hr/>
 
     <div class="btn-remove">
         <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="remove()">Remove Container</button>
