@@ -66,6 +66,14 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
     "                ng-click=\"unpause()\"\n" +
     "                ng-show=\"container.State.Running && container.State.Paused\">Unpause\n" +
     "        </button>\n" +
+    "        <button class=\"btn btn-success\"\n" +
+    "                ng-click=\"restart()\"\n" +
+    "                ng-show=\"container.State.Running && !container.State.Stopped\">Restart\n" +
+    "        </button>\n" +
+    "        <button class=\"btn btn-primary\"\n" +
+    "                ng-click=\"commit()\"\n" +
+    "                ng-show=\"container.State.Running && !container.State.Paused\">Commit\n" +
+    "        </button>\n" +
     "    </div>\n" +
     "\n" +
     "    <table class=\"table table-striped\">\n" +
@@ -309,8 +317,24 @@ angular.module("app/components/containersNetwork/containersNetwork.html", []).ru
     "<div class=\"detail\">\n" +
     "    <h2>Containers Network</h2>\n" +
     "\n" +
-    "    <div>\n" +
-    "        <vis-network data=\"data\" options=\"options\" events=\"events\"/>\n" +
+    "    <div class=\"row\">\n" +
+    "        <div class=\"input-group\">\n" +
+    "            <input type=\"text\" ng-model=\"query\" autofocus=\"true\" class=\"form-control\"\n" +
+    "                   placeholder=\"Search\" ng-change=\"network.selectContainers(query)\"/>\n" +
+    "            <span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-search\"/></span>\n" +
+    "        </div>\n" +
+    "    </div>\n" +
+    "    <div class=\"row\">\n" +
+    "        <div class=\"btn-group\">\n" +
+    "            <button class=\"btn btn-warning\" ng-click=\"network.hideSelected()\">Hide Selected</button>\n" +
+    "            <button class=\"btn btn-info\" ng-click=\"network.showSelectedDownstream()\">Show Selected Downstream</button>\n" +
+    "            <button class=\"btn btn-info\" ng-click=\"network.showSelectedUpstream()\">Show Selected Upstream</button>\n" +
+    "            <button class=\"btn btn-success\" ng-click=\"network.showAll()\">Show All</button>\n" +
+    "        </div>\n" +
+    "    </div>\n" +
+    "    <div class=\"row\">\n" +
+    "        <vis-network data=\"network.data\" options=\"network.options\" events=\"network.events\"\n" +
+    "                     component=\"network.component\"/>\n" +
     "    </div>\n" +
     "</div>\n" +
     "");
@@ -958,6 +982,10 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                        <input type=\"text\" ng-model=\"portBinding.extPort\" class=\"form-control\" placeholder=\"Host Port\"/>\n" +
     "                                        <label class=\"sr-only\">Container port:</label>\n" +
     "                                        <input type=\"text\" ng-model=\"portBinding.intPort\" class=\"form-control\" placeholder=\"Container Port\"/>\n" +
+    "                                        <select ng-model=\"portBinding.protocol\">\n" +
+    "                                            <option value=\"\">tcp</option>\n" +
+    "                                            <option value=\"udp\">udp</option>\n" +
+    "                                        </select>\n" +
     "                                        <button class=\"btn btn-danger btn-xs form-control\" ng-click=\"rmEntry(config.HostConfig.PortBindings, portBinding)\">Remove</button>\n" +
     "                                    </div>\n" +
     "                                </div>\n" +

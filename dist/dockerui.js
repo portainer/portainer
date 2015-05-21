@@ -1,4 +1,4 @@
-/*! dockerui - v0.7.0 - 2015-04-26
+/*! dockerui - v0.8.0 - 2015-05-20
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby & Kevan Ahlquist;
  * Licensed MIT
@@ -55,8 +55,8 @@ function($scope, Dockerfile, Messages) {
 }]);
 
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'Messages', 'ViewSpinner',
-function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
+.controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'ContainerCommit', 'Messages', 'ViewSpinner',
+function($scope, $routeParams, $location, Container, ContainerCommit, Messages, ViewSpinner) {
     $scope.changes = [];
     $scope.edit = false;
 
@@ -114,6 +114,16 @@ function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
         });
     };
 
+    $scope.commit =  function() {
+        ViewSpinner.spin();
+        ContainerCommit.commit({id: $routeParams.id, repo: $scope.container.Config.Image}, function(d) {
+            update();
+            Messages.send("Container commited", $routeParams.id);
+        }, function(e) {
+            update();
+            Messages.error("Failure", "Container failed to commit." + e.data);
+        });
+    };
     $scope.pause = function() {
         ViewSpinner.spin();
         Container.pause({id: $routeParams.id}, function(d) {
@@ -144,6 +154,17 @@ function($scope, $routeParams, $location, Container, Messages, ViewSpinner) {
         }, function(e){
             update();
             Messages.error("Failure", "Container failed to remove." + e.data);
+        });
+    };
+
+    $scope.restart = function() {
+        ViewSpinner.spin();
+        Container.restart({id: $routeParams.id}, function(d) {
+            update();
+            Messages.send("Container restarted", $routeParams.id);
+        }, function(e){
+            update();
+            Messages.error("Failure", "Container failed to restart." + e.data);
         });
     };
 
@@ -387,73 +408,20 @@ function($scope, Container, Settings, Messages, ViewSpinner) {
 
 angular.module('containersNetwork', ['ngVis'])
 .controller('ContainersNetworkController', ['$scope', '$location', 'Container', 'Messages', 'VisDataSet', function($scope, $location, Container, Messages, VisDataSet) {
-    $scope.options = {
-      navigation: true,
-      keyboard: true,
-      height: '500px', width: '700px',
-      nodes: {
-        shape: 'box'
-      },
-      edges: {
-        style: 'arrow'
-      },
-      physics: {
-        barnesHut : {
-          springLength: 200
-        }
-      }
-    };
-    $scope.data = new ContainersNetwork();
-    $scope.events = {
-      doubleClick : function(event) {
-        $scope.$apply( function() {
-          $location.path('/containers/' + event.nodes[0]);
-        });
-      }
-    };
-
-    function ContainersNetwork() {
-        this.containers = [];
-        this.nodes = new VisDataSet();
-        this.edges = new VisDataSet();
-
-        this.add = function(data) {
-            var container = new ContainerNode(data);
-            this.containers.push(container);
-            this.nodes.add({id: container.Id, label: container.Name});
-            for (var i = 0; i < this.containers.length; i++) {
-                var otherContainer = this.containers[i];
-                this.addLinkEdgeIfExists(container, otherContainer);
-                this.addLinkEdgeIfExists(otherContainer, container);
-                this.addVolumeEdgeIfExists(container, otherContainer);
-                this.addVolumeEdgeIfExists(otherContainer, container);
-            }
-        }
-
-        this.addLinkEdgeIfExists = function(from, to) {
-            if (from.Links != null && from.Links[to.Name] != null) {
-                this.edges.add({ from: from.Id, to: to.Id, label: from.Links[to.Name] });
-            }
-        }
-
-        this.addVolumeEdgeIfExists = function(from, to) {
-            if (from.VolumesFrom != null && from.VolumesFrom[to.Id] != null) {
-                this.edges.add({ from: from.Id, to: to.Id, color: { color: '#A0A0A0', highlight: '#A0A0A0', hover: '#848484'}});
-            }
-        }
-    }
 
     function ContainerNode(data) {
         this.Id = data.Id;
-        this.Name = data.Name.substring(1, data.Name.length);
+        // names have the following format: /Name
+        this.Name = data.Name.substring(1);
+        this.Image = data.Config.Image;
         var dataLinks = data.HostConfig.Links;
         if (dataLinks != null) {
-            this.Links = [];
+            this.Links = {};
             for (var i = 0; i < dataLinks.length; i++) {
                 // links have the following format: /TargetContainerName:/SourceContainerName/LinkAlias
                 var link = dataLinks[i].split(":");
-                var target = link[0].split("/")[1];
-                var alias = link[1].split("/")[2];
+                var target = link[0].substring(1);
+                var alias = link[1].substring(link[1].lastIndexOf("/") + 1);
                 // only keep shortest alias
                 if (this.Links[target] == null || alias.length < this.Links[target].length) {
                     this.Links[target] = alias;
@@ -463,23 +431,229 @@ angular.module('containersNetwork', ['ngVis'])
         var dataVolumes = data.HostConfig.VolumesFrom;
         //converting array into properties for simpler and faster access
         if (dataVolumes != null) {
-            this.VolumesFrom = [];
-            for (var i = 0; i < dataVolumes.length; i++) {
-                this.VolumesFrom[dataVolumes[i]] = true;
+            this.VolumesFrom = {};
+            for (var j = 0; j < dataVolumes.length; j++) {
+                this.VolumesFrom[dataVolumes[j]] = true;
             }
         }
     }
 
+    function ContainersNetworkData() {
+        this.nodes = new VisDataSet();
+        this.edges = new VisDataSet();
+
+        this.addContainerNode = function(container) {
+            this.nodes.add({
+                id: container.Id,
+                label: container.Name,
+                title: "<ul style=\"list-style-type:none; padding: 0px; margin: 0px\">" +
+                    "<li><strong>ID:</strong> " + container.Id + "</li>" +
+                    "<li><strong>Image:</strong> " + container.Image + "</li>" +
+                     "</ul>"});
+        };
+
+        this.addLinkEdgeIfExists = function(from, to) {
+            if (from.Links != null && from.Links[to.Name] != null) {
+                this.edges.add({
+                    from: from.Id,
+                    to: to.Id,
+                    label: from.Links[to.Name] });
+            }
+        };
+
+        this.addVolumeEdgeIfExists = function(from, to) {
+            if (from.VolumesFrom != null && from.VolumesFrom[to.Id] != null) {
+                this.edges.add({
+                    from: from.Id,
+                    to: to.Id,
+                    color: { color: '#A0A0A0', highlight: '#A0A0A0', hover: '#848484'}});
+            }
+        };
+
+        this.removeContainersNodes = function(containersIds) {
+            this.nodes.remove(containersIds);
+        };
+    }
+
+    function ContainersNetwork() {
+        this.data = new ContainersNetworkData();
+        this.containers = {};
+        this.selectedContainersIds = [];
+        this.shownContainersIds = [];
+        this.events = {
+            select : function(event) {
+                $scope.network.selectedContainersIds = event.nodes;
+                $scope.$apply( function() {
+                    $scope.query = '';
+                });
+            },
+            doubleClick : function(event) {
+                $scope.$apply( function() {
+                    $location.path('/containers/' + event.nodes[0]);
+                });
+            }
+        };
+        this.options = {
+            navigation: true,
+            keyboard: true,
+            height: '500px', width: '700px',
+            nodes: {
+                shape: 'box'
+            },
+            edges: {
+                style: 'arrow'
+            },
+            physics: {
+                barnesHut : {
+                    springLength: 200
+                }
+            }
+        };
+
+        this.addContainer = function(data) {
+            var container = new ContainerNode(data);
+            this.containers[container.Id] = container;
+            this.shownContainersIds.push(container.Id);
+            this.data.addContainerNode(container);
+            for (var otherContainerId in this.containers) {
+                var otherContainer = this.containers[otherContainerId];
+                this.data.addLinkEdgeIfExists(container, otherContainer);
+                this.data.addLinkEdgeIfExists(otherContainer, container);
+                this.data.addVolumeEdgeIfExists(container, otherContainer);
+                this.data.addVolumeEdgeIfExists(otherContainer, container);
+            }
+        };
+
+        this.selectContainers = function(query) {
+            if (this.component != null) {
+                this.selectedContainersIds = this.searchContainers(query);
+                this.component.selectNodes(this.selectedContainersIds);
+            }
+        };
+
+        this.searchContainers = function(query) {
+            if (query.trim() === "") {
+              return [];
+            }
+            var selectedContainersIds = [];
+            for (var i=0; i < this.shownContainersIds.length; i++) {
+                var container = this.containers[this.shownContainersIds[i]];
+                if (container.Name.indexOf(query) > -1 ||
+                    container.Image.indexOf(query) > -1 ||
+                    container.Id.indexOf(query) > -1) {
+                    selectedContainersIds.push(container.Id);
+                }
+            }
+            return selectedContainersIds;
+        };
+
+        this.hideSelected = function() {
+            var i=0;
+            while ( i < this.shownContainersIds.length ) {
+                if (this.selectedContainersIds.indexOf(this.shownContainersIds[i]) > -1) {
+                    this.shownContainersIds.splice(i, 1);
+                } else {
+                    i++;
+                }
+            }
+            this.data.removeContainersNodes(this.selectedContainersIds);
+            $scope.query = '';
+            this.selectedContainersIds = [];
+        };
+
+        this.searchDownstream = function(containerId, downstreamContainersIds) {
+            if (downstreamContainersIds.indexOf(containerId) > -1) {
+                return;
+            }
+            downstreamContainersIds.push(containerId);
+            var container = this.containers[containerId];
+            if (container.Links == null && container.VolumesFrom == null) {
+                return;
+            }
+            for (var otherContainerId in this.containers) {
+                var otherContainer = this.containers[otherContainerId];
+                if (container.Links != null && container.Links[otherContainer.Name] != null) {
+                    this.searchDownstream(otherContainer.Id, downstreamContainersIds);
+                } else if (container.VolumesFrom != null &&
+                        container.VolumesFrom[otherContainer.Id] != null) {
+                    this.searchDownstream(otherContainer.Id, downstreamContainersIds);
+                }
+            }
+        };
+
+        this.updateShownContainers = function(newShownContainersIds) {
+            for (var containerId in this.containers) {
+                if (newShownContainersIds.indexOf(containerId) > -1 &&
+                        this.shownContainersIds.indexOf(containerId) === -1) {
+                    this.data.addContainerNode(this.containers[containerId]);
+                } else if (newShownContainersIds.indexOf(containerId) === -1 &&
+                        this.shownContainersIds.indexOf(containerId) > -1) {
+                    this.data.removeContainersNodes(containerId);
+                }
+            }
+            this.shownContainersIds = newShownContainersIds;
+        };
+
+        this.showSelectedDownstream = function() {
+            var downstreamContainersIds = [];
+            for (var i=0; i < this.selectedContainersIds.length; i++) {
+                this.searchDownstream(this.selectedContainersIds[i], downstreamContainersIds);
+            }
+            this.updateShownContainers(downstreamContainersIds);
+        };
+
+        this.searchUpstream = function(containerId, upstreamContainersIds) {
+            if (upstreamContainersIds.indexOf(containerId) > -1) {
+                return;
+            }
+            upstreamContainersIds.push(containerId);
+            var container = this.containers[containerId];
+            for (var otherContainerId in this.containers) {
+                var otherContainer = this.containers[otherContainerId];
+                if (otherContainer.Links != null && otherContainer.Links[container.Name] != null) {
+                    this.searchUpstream(otherContainer.Id, upstreamContainersIds);
+                } else if (otherContainer.VolumesFrom != null &&
+                        otherContainer.VolumesFrom[container.Id] != null) {
+                    this.searchUpstream(otherContainer.Id, upstreamContainersIds);
+                }
+            }
+        };
+
+        this.showSelectedUpstream = function() {
+            var upstreamContainersIds = [];
+            for (var i=0; i < this.selectedContainersIds.length; i++) {
+                this.searchUpstream(this.selectedContainersIds[i], upstreamContainersIds);
+            }
+            this.updateShownContainers(upstreamContainersIds);
+        };
+
+        this.showAll = function() {
+            for (var containerId in this.containers) {
+                if (this.shownContainersIds.indexOf(containerId) === -1) {
+                    this.data.addContainerNode(this.containers[containerId]);
+                    this.shownContainersIds.push(containerId);
+                }
+            }
+        };
+
+    }
+
+    $scope.network = new ContainersNetwork();
+
+    var showFailure = function (event) {
+        Messages.error('Failure', e.data);
+    };
+
+    var addContainer = function (container) {
+        $scope.network.addContainer(container);
+    };
+
     Container.query({all: 0}, function(d) {
         for (var i = 0; i < d.length; i++) {
-            Container.get({id: d[i].Id}, function(d) {
-                    $scope.data.add(d);
-                }, function(e) {
-                    Messages.error('Failure', e.data);
-                });
-
+            Container.get({id: d[i].Id}, addContainer, showFailure);
         }
-   });
+    });
+
 }]);
 
 angular.module('dashboard', [])
@@ -803,6 +977,9 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
         var PortBindings = {};
         config.HostConfig.PortBindings.forEach(function(portBinding) {
             var intPort = portBinding.intPort + "/tcp";
+            if (portBinding.protocol === "udp") {
+                intPort = portBinding.intPort + "/udp";
+            }
             var binding = {
                 HostIp: portBinding.ip,
                 HostPort: portBinding.extPort
@@ -998,6 +1175,23 @@ angular.module('dockerui.services', ['ngResource'])
             remove: {method: 'DELETE', params: {id: '@id', v: 0}},
             rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false}
         });
+    })
+    .factory('ContainerCommit', function ($resource, $http, Settings) {
+        'use strict';
+        return {
+            commit: function (params, callback) {
+                   $http({
+                       method: 'POST',
+                       url: Settings.url + '/commit',
+                       params: {
+                           'container': params.id,
+                           'repo': params.repo
+                       }
+                   }).success(callback).error(function (data, status, headers, config) {
+                       console.log(error, data);
+                   });
+            }
+        };
     })
     .factory('ContainerLogs', function ($resource, $http, Settings) {
         'use strict';
@@ -1288,6 +1482,14 @@ angular.module("app/components/container/container.html", []).run(["$templateCac
     "                ng-click=\"unpause()\"\n" +
     "                ng-show=\"container.State.Running && container.State.Paused\">Unpause\n" +
     "        </button>\n" +
+    "        <button class=\"btn btn-success\"\n" +
+    "                ng-click=\"restart()\"\n" +
+    "                ng-show=\"container.State.Running && !container.State.Stopped\">Restart\n" +
+    "        </button>\n" +
+    "        <button class=\"btn btn-primary\"\n" +
+    "                ng-click=\"commit()\"\n" +
+    "                ng-show=\"container.State.Running && !container.State.Paused\">Commit\n" +
+    "        </button>\n" +
     "    </div>\n" +
     "\n" +
     "    <table class=\"table table-striped\">\n" +
@@ -1531,8 +1733,24 @@ angular.module("app/components/containersNetwork/containersNetwork.html", []).ru
     "<div class=\"detail\">\n" +
     "    <h2>Containers Network</h2>\n" +
     "\n" +
-    "    <div>\n" +
-    "        <vis-network data=\"data\" options=\"options\" events=\"events\"/>\n" +
+    "    <div class=\"row\">\n" +
+    "        <div class=\"input-group\">\n" +
+    "            <input type=\"text\" ng-model=\"query\" autofocus=\"true\" class=\"form-control\"\n" +
+    "                   placeholder=\"Search\" ng-change=\"network.selectContainers(query)\"/>\n" +
+    "            <span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-search\"/></span>\n" +
+    "        </div>\n" +
+    "    </div>\n" +
+    "    <div class=\"row\">\n" +
+    "        <div class=\"btn-group\">\n" +
+    "            <button class=\"btn btn-warning\" ng-click=\"network.hideSelected()\">Hide Selected</button>\n" +
+    "            <button class=\"btn btn-info\" ng-click=\"network.showSelectedDownstream()\">Show Selected Downstream</button>\n" +
+    "            <button class=\"btn btn-info\" ng-click=\"network.showSelectedUpstream()\">Show Selected Upstream</button>\n" +
+    "            <button class=\"btn btn-success\" ng-click=\"network.showAll()\">Show All</button>\n" +
+    "        </div>\n" +
+    "    </div>\n" +
+    "    <div class=\"row\">\n" +
+    "        <vis-network data=\"network.data\" options=\"network.options\" events=\"network.events\"\n" +
+    "                     component=\"network.component\"/>\n" +
     "    </div>\n" +
     "</div>\n" +
     "");
@@ -2180,6 +2398,10 @@ angular.module("app/components/startContainer/startcontainer.html", []).run(["$t
     "                                        <input type=\"text\" ng-model=\"portBinding.extPort\" class=\"form-control\" placeholder=\"Host Port\"/>\n" +
     "                                        <label class=\"sr-only\">Container port:</label>\n" +
     "                                        <input type=\"text\" ng-model=\"portBinding.intPort\" class=\"form-control\" placeholder=\"Container Port\"/>\n" +
+    "                                        <select ng-model=\"portBinding.protocol\">\n" +
+    "                                            <option value=\"\">tcp</option>\n" +
+    "                                            <option value=\"udp\">udp</option>\n" +
+    "                                        </select>\n" +
     "                                        <button class=\"btn btn-danger btn-xs form-control\" ng-click=\"rmEntry(config.HostConfig.PortBindings, portBinding)\">Remove</button>\n" +
     "                                    </div>\n" +
     "                                </div>\n" +

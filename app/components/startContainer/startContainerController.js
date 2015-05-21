@@ -83,6 +83,9 @@ function($scope, $routeParams, $location, Container, Messages, containernameFilt
         var PortBindings = {};
         config.HostConfig.PortBindings.forEach(function(portBinding) {
             var intPort = portBinding.intPort + "/tcp";
+            if (portBinding.protocol === "udp") {
+                intPort = portBinding.intPort + "/udp";
+            }
             var binding = {
                 HostIp: portBinding.ip,
                 HostPort: portBinding.extPort
