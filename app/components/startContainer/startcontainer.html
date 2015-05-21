@@ -289,6 +289,10 @@
                                         <input type="text" ng-model="portBinding.extPort" class="form-control" placeholder="Host Port"/>
                                         <label class="sr-only">Container port:</label>
                                         <input type="text" ng-model="portBinding.intPort" class="form-control" placeholder="Container Port"/>
+                                        <select ng-model="portBinding.protocol">
+                                            <option value="">tcp</option>
+                                            <option value="udp">udp</option>
+                                        </select>
                                         <button class="btn btn-danger btn-xs form-control" ng-click="rmEntry(config.HostConfig.PortBindings, portBinding)">Remove</button>
                                     </div>
                                 </div>
