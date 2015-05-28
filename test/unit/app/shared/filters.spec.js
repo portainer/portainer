@@ -150,7 +150,7 @@ describe('filters', function () {
 
     describe('getdate', function () {
         it('should convert the Docker date to a human readable form', inject(function(getdateFilter) {
-            expect(getdateFilter(1420424998)).toBe('Mon Jan 05 2015');
+            expect(getdateFilter(1420424998)).toBe('Sun Jan 04 2015');
         }));
     });
 
