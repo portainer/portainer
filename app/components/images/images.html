@@ -1,5 +1,5 @@
-
 <div ng-include="template" ng-controller="BuilderController"></div>
+<div ng-include="template" ng-controller="PullImageController"></div>
 
 <h2>Images:</h2>
 
@@ -10,6 +10,7 @@
             <li><a tabindex="-1" href="" ng-click="removeAction()">Remove</a></li>
         </ul>
     </li>
+    <li><a data-toggle="modal" data-target="#pull-modal" href="">Pull</a></li>
 </ul>
 <table class="table table-striped">
     <thead>
