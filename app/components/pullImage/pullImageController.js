@@ -1,14 +1,18 @@
 angular.module('pullImage', [])
     .controller('PullImageController', ['$scope', '$log', 'Dockerfile', 'Messages', 'Image', 'ViewSpinner',
-        function($scope, $log, Dockerfile, Messages, Image, ViewSpinne) {
+        function($scope, $log, Dockerfile, Messages, Image, ViewSpinner) {
             $scope.template = 'app/components/pullImage/pullImage.html';
 
-            $scope.config = {
-                registry: '',
-                repo: '',
-                fromImage: '',
-                tag: 'latest'
+            $scope.init = function() {
+                $scope.config = {
+                    registry: '',
+                    repo: '',
+                    fromImage: '',
+                    tag: 'latest'
+                }
             }
+
+            $scope.init();
 
             function failedRequestHandler(e, Messages) {
                 Messages.error('Error', errorMsgFilter(e));
@@ -23,6 +27,7 @@ angular.module('pullImage', [])
                     (config.tag ? ':' + config.tag : '');
 
                 ViewSpinner.spin();
+                $('#pull-modal').modal('hide');
                 Image.create(config, function(data) {
                     ViewSpinner.stop();
                     if (data.constructor === Array) {
@@ -31,18 +36,20 @@ angular.module('pullImage', [])
                         if (f) {
                             var d = data[data.length - 1];
                             $scope.error = "Cannot pull image " + imageName + " Reason: " + d.error;
+                            $('#pull-modal').modal('show');
                             $('#error-message').show();
                         } else {
                             Messages.send("Image Added", imageName);
-                            $('#pull-modal').modal('hide');
+                            $scope.init();
                         }
                     } else {
                         Messages.send("Image Added", imageName);
-                        $('#pull-modal').modal('hide');
+                        $scope.init();
                     }
                 }, function(e) {
                     ViewSpinner.stop();
                     $scope.error = "Cannot pull image " + imageName + " Reason: " + e.data;
+                    $('#pull-modal').modal('show');
                     $('#error-message').show();
                 });
             }
