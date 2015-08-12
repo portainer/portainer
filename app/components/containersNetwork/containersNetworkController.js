@@ -41,7 +41,9 @@ angular.module('containersNetwork', ['ngVis'])
                 title: "<ul style=\"list-style-type:none; padding: 0px; margin: 0px\">" +
                     "<li><strong>ID:</strong> " + container.Id + "</li>" +
                     "<li><strong>Image:</strong> " + container.Image + "</li>" +
-                     "</ul>"});
+                    "</ul>",
+		color: (container.State.Running ? null : "gray")
+	    });
         };
 
         this.addLinkEdgeIfExists = function(from, to) {
@@ -240,10 +242,19 @@ angular.module('containersNetwork', ['ngVis'])
         $scope.network.addContainer(container);
     };
 
-    Container.query({all: 0}, function(d) {
-        for (var i = 0; i < d.length; i++) {
-            Container.get({id: d[i].Id}, addContainer, showFailure);
-        }
-    });
-
+    var update = function (data) {
+        Container.query(data, function(d) {
+            for (var i = 0; i < d.length; i++) {
+		Container.get({id: d[i].Id}, addContainer, showFailure);
+            }
+	});
+    };
+    update({all: 0});
+    
+    $scope.includeStopped = false;
+    $scope.toggleIncludeStopped = function() {
+	$scope.network.updateShownContainers([]);
+	update({all: $scope.includeStopped ? 1 : 0});
+    };
+    
 }]);
