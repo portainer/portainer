@@ -43,7 +43,7 @@ angular.module('containersNetwork', ['ngVis'])
                     "<li><strong>ID:</strong> " + container.Id + "</li>" +
                     "<li><strong>Image:</strong> " + container.Image + "</li>" +
                     "</ul>",
-		color: (container.Running ? null : "gray")
+		color: (container.Running ? "cyan" : "gray")
 	    });
         };
 
