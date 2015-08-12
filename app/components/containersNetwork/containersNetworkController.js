@@ -51,7 +51,7 @@ angular.module('containersNetwork', ['ngVis'])
 	    return this.edges.getIds({
 		filter: function (item) {
 		    return item.from == from.Id && item.to == to.Id;
-		} });
+		} }).length > 0;
 	};
 
 	this.addLinkEdgeIfExists = function(from, to) {
