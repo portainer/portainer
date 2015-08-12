@@ -6,6 +6,7 @@ angular.module('containersNetwork', ['ngVis'])
         // names have the following format: /Name
         this.Name = data.Name.substring(1);
         this.Image = data.Config.Image;
+	this.Running = data.State.Running;
         var dataLinks = data.HostConfig.Links;
         if (dataLinks != null) {
             this.Links = {};
@@ -42,7 +43,7 @@ angular.module('containersNetwork', ['ngVis'])
                     "<li><strong>ID:</strong> " + container.Id + "</li>" +
                     "<li><strong>Image:</strong> " + container.Image + "</li>" +
                     "</ul>",
-		color: (container.State.Running ? null : "gray")
+		color: (container.Running ? null : "gray")
 	    });
         };
 
