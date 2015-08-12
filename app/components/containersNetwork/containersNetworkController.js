@@ -54,7 +54,7 @@ angular.module('containersNetwork', ['ngVis'])
         };
 
         this.addVolumeEdgeIfExists = function(from, to) {
-            if (from.VolumesFrom != null && from.VolumesFrom[to.Id] != null) {
+          if (from.VolumesFrom != null && (from.VolumesFrom[to.Id] != null || from.VolumesFrom[to.Name] != null)) {
                 this.edges.add({
                     from: from.Id,
                     to: to.Id,
