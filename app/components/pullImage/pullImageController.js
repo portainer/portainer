@@ -9,8 +9,8 @@ angular.module('pullImage', [])
                     repo: '',
                     fromImage: '',
                     tag: 'latest'
-                }
-            }
+                };
+            };
 
             $scope.init();
 
@@ -52,5 +52,5 @@ angular.module('pullImage', [])
                     $('#pull-modal').modal('show');
                     $('#error-message').show();
                 });
-            }
+            };
         }]);

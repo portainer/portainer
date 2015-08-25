@@ -46,7 +46,7 @@ angular.module('stats', [])
             if (systemDelta > 0.0 && cpuDelta > 0.0) {
                 cpuPercent = (cpuDelta / systemDelta) * curCpu.cpu_usage.percpu_usage.size() * 100.0;
             }
-            return cpuPercent
+            return cpuPercent;
         };
 
         function updateChart(data) {

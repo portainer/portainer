@@ -50,7 +50,7 @@ angular.module('containersNetwork', ['ngVis'])
             this.hasEdge = function (from, to) {
                 return this.edges.getIds({
                         filter: function (item) {
-                            return item.from == from.Id && item.to == to.Id;
+                            return item.from === from.Id && item.to === to.Id;
                         }
                     }).length > 0;
             };
