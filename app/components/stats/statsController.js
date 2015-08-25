@@ -12,7 +12,9 @@ angular.module('stats', [])
         function updateStats() {
             Container.stats({id: $routeParams.id}, function (d) {
                 console.log(d);
-                var arr = Object.keys(d).map(function (key) {return d[key];});
+                var arr = Object.keys(d).map(function (key) {
+                    return d[key];
+                });
                 if (arr.join('').indexOf('no such id') !== -1) {
                     Messages.error('Unable to retrieve container stats', 'Has this container been removed?');
                     return;

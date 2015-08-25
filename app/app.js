@@ -38,7 +38,10 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
             controller: 'ImageController'
         });
         $routeProvider.when('/info', {templateUrl: 'app/components/info/info.html', controller: 'InfoController'});
-        $routeProvider.when('/events', {templateUrl: 'app/components/events/events.html', controller: 'EventsController'});
+        $routeProvider.when('/events', {
+            templateUrl: 'app/components/events/events.html',
+            controller: 'EventsController'
+        });
         $routeProvider.otherwise({redirectTo: '/'});
     }])
     // This is your docker url that the api will use to make requests

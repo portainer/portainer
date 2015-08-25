@@ -11,19 +11,19 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-html2js');
 
     // Default task.
-    grunt.registerTask('default', ['jshint','build','karma:unit']);
-    grunt.registerTask('build', ['clean','html2js','concat','recess:build', 'copy']);
-    grunt.registerTask('release', ['clean','html2js','uglify','jshint','karma:unit','concat:index', 'recess:min', 'copy']);
+    grunt.registerTask('default', ['jshint', 'build', 'karma:unit']);
+    grunt.registerTask('build', ['clean', 'html2js', 'concat', 'recess:build', 'copy']);
+    grunt.registerTask('release', ['clean', 'html2js', 'uglify', 'jshint', 'karma:unit', 'concat:index', 'recess:min', 'copy']);
     grunt.registerTask('test-watch', ['karma:watch']);
 
     // Print a timestamp (useful for when watching)
-    grunt.registerTask('timestamp', function() {
+    grunt.registerTask('timestamp', function () {
         grunt.log.subhead(Date());
     });
 
-    var karmaConfig = function(configFile, customOptions) {
-        var options = { configFile: configFile, keepalive: true };
-        var travisOptions = process.env.TRAVIS && { browsers: ['Firefox'], reporters: 'dots' };
+    var karmaConfig = function (configFile, customOptions) {
+        var options = {configFile: configFile, keepalive: true};
+        var travisOptions = process.env.TRAVIS && {browsers: ['Firefox'], reporters: 'dots'};
         return grunt.util._.extend(options, customOptions, travisOptions);
     };
 
@@ -31,8 +31,7 @@ module.exports = function (grunt) {
     grunt.initConfig({
         distdir: 'dist',
         pkg: grunt.file.readJSON('package.json'),
-        banner:
-        '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
+        banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
         '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
         ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
         ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
@@ -50,12 +49,12 @@ module.exports = function (grunt) {
         clean: ['<%= distdir %>/*'],
         copy: {
             assets: {
-                files: [{ dest: '<%= distdir %>/assets', src : '**', expand: true, cwd: 'assets/' }]
+                files: [{dest: '<%= distdir %>/assets', src: '**', expand: true, cwd: 'assets/'}]
             }
         },
         karma: {
-            unit: { options: karmaConfig('test/unit/karma.conf.js') },
-            watch: { options: karmaConfig('test/unit/karma.conf.js', { singleRun:false, autoWatch: true}) }
+            unit: {options: karmaConfig('test/unit/karma.conf.js')},
+            watch: {options: karmaConfig('test/unit/karma.conf.js', {singleRun: false, autoWatch: true})}
         },
         html2js: {
             app: {
@@ -67,14 +66,14 @@ module.exports = function (grunt) {
                 module: '<%= pkg.name %>.templates'
             }
         },
-        concat:{
-            dist:{
+        concat: {
+            dist: {
                 options: {
                     banner: "<%= banner %>",
                     process: true
                 },
-                src:['<%= src.js %>', '<%= src.jsTpl %>'],
-                dest:'<%= distdir %>/<%= pkg.name %>.js'
+                src: ['<%= src.js %>', '<%= src.jsTpl %>'],
+                dest: '<%= distdir %>/<%= pkg.name %>.js'
             },
             index: {
                 src: ['index.html'],
@@ -84,32 +83,32 @@ module.exports = function (grunt) {
                 }
             },
             angular: {
-                src:['assets/js/angularjs/1.3.15/angular.min.js',
-                     'assets/js/angularjs/1.3.15/angular-route.min.js',
-                     'assets/js/angularjs/1.3.15/angular-resource.min.js',
-                     'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js',
-                     'assets/js/angular-oboe.min.js'],
+                src: ['assets/js/angularjs/1.3.15/angular.min.js',
+                    'assets/js/angularjs/1.3.15/angular-route.min.js',
+                    'assets/js/angularjs/1.3.15/angular-resource.min.js',
+                    'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js',
+                    'assets/js/angular-oboe.min.js'],
                 dest: '<%= distdir %>/angular.js'
             }
         },
         uglify: {
-            dist:{
+            dist: {
                 options: {
                     banner: "<%= banner %>"
                 },
-                src:['<%= src.js %>' ,'<%= src.jsTpl %>'],
-                dest:'<%= distdir %>/<%= pkg.name %>.js'
+                src: ['<%= src.js %>', '<%= src.jsTpl %>'],
+                dest: '<%= distdir %>/<%= pkg.name %>.js'
             },
             angular: {
-                src:['<%= concat.angular.src %>'],
+                src: ['<%= concat.angular.src %>'],
                 dest: '<%= distdir %>/angular.js'
             }
         },
         recess: {
             build: {
                 files: {
-                    '<%= distdir %>/<%= pkg.name %>.css':
-                    ['<%= src.css %>'] },
+                    '<%= distdir %>/<%= pkg.name %>.css': ['<%= src.css %>']
+                },
                 options: {
                     compile: true,
                     noOverqualifying: false // TODO: Added because of .nav class, rename
@@ -124,29 +123,29 @@ module.exports = function (grunt) {
                 }
             }
         },
-        watch:{
+        watch: {
             all: {
-                files:['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl.app %>', '<%= src.tpl.common %>', '<%= src.html %>'],
-                tasks:['default','timestamp']
+                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl.app %>', '<%= src.tpl.common %>', '<%= src.html %>'],
+                tasks: ['default', 'timestamp']
             },
             build: {
-                files:['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl.app %>', '<%= src.tpl.common %>', '<%= src.html %>'],
-                tasks:['build','timestamp']
+                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl.app %>', '<%= src.tpl.common %>', '<%= src.html %>'],
+                tasks: ['build', 'timestamp']
             }
         },
-        jshint:{
-            files:['gruntFile.js', '<%= src.js %>', '<%= src.jsTpl %>', '<%= src.specs %>', '<%= src.scenarios %>'],
-            options:{
-                curly:true,
-                eqeqeq:true,
-                immed:true,
-                latedef:true,
-                newcap:true,
-                noarg:true,
-                sub:true,
-                boss:true,
-                eqnull:true,
-                globals:{
+        jshint: {
+            files: ['gruntFile.js', '<%= src.js %>', '<%= src.jsTpl %>', '<%= src.specs %>', '<%= src.scenarios %>'],
+            options: {
+                curly: true,
+                eqeqeq: true,
+                immed: true,
+                latedef: true,
+                newcap: true,
+                noarg: true,
+                sub: true,
+                boss: true,
+                eqnull: true,
+                globals: {
                     angular: false,
                     '$': false
                 }
