@@ -84,10 +84,11 @@ module.exports = function (grunt) {
                 }
             },
             angular: {
-                src:['assets/js/angularjs/1.2.6/angular.min.js',
-                     'assets/js/angularjs/1.2.6/angular-route.min.js',
-                     'assets/js/angularjs/1.2.6/angular-resource.min.js',
-                     'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js'],
+                src:['assets/js/angularjs/1.3.15/angular.min.js',
+                     'assets/js/angularjs/1.3.15/angular-route.min.js',
+                     'assets/js/angularjs/1.3.15/angular-resource.min.js',
+                     'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js',
+                     'assets/js/angular-oboe.min.js'],
                 dest: '<%= distdir %>/angular.js'
             }
         },

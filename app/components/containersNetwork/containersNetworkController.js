@@ -6,6 +6,7 @@ angular.module('containersNetwork', ['ngVis'])
         // names have the following format: /Name
         this.Name = data.Name.substring(1);
         this.Image = data.Config.Image;
+	this.Running = data.State.Running;
         var dataLinks = data.HostConfig.Links;
         if (dataLinks != null) {
             this.Links = {};
@@ -41,11 +42,20 @@ angular.module('containersNetwork', ['ngVis'])
                 title: "<ul style=\"list-style-type:none; padding: 0px; margin: 0px\">" +
                     "<li><strong>ID:</strong> " + container.Id + "</li>" +
                     "<li><strong>Image:</strong> " + container.Image + "</li>" +
-                     "</ul>"});
+                    "</ul>",
+		color: (container.Running ? "#8888ff" : "#cccccc")
+	    });
         };
 
-        this.addLinkEdgeIfExists = function(from, to) {
-            if (from.Links != null && from.Links[to.Name] != null) {
+	this.hasEdge = function(from, to) {
+	    return this.edges.getIds({
+		filter: function (item) {
+		    return item.from == from.Id && item.to == to.Id;
+		} }).length > 0;
+	};
+
+	this.addLinkEdgeIfExists = function(from, to) {
+            if (from.Links != null && from.Links[to.Name] != null && !this.hasEdge(from, to)) {
                 this.edges.add({
                     from: from.Id,
                     to: to.Id,
@@ -54,7 +64,7 @@ angular.module('containersNetwork', ['ngVis'])
         };
 
         this.addVolumeEdgeIfExists = function(from, to) {
-            if (from.VolumesFrom != null && from.VolumesFrom[to.Id] != null) {
+            if (from.VolumesFrom != null && (from.VolumesFrom[to.Id] != null || from.VolumesFrom[to.Name] != null) && !this.hasEdge(from, to)) {
                 this.edges.add({
                     from: from.Id,
                     to: to.Id,
@@ -240,10 +250,19 @@ angular.module('containersNetwork', ['ngVis'])
         $scope.network.addContainer(container);
     };
 
-    Container.query({all: 0}, function(d) {
-        for (var i = 0; i < d.length; i++) {
-            Container.get({id: d[i].Id}, addContainer, showFailure);
-        }
-    });
-
+    var update = function (data) {
+        Container.query(data, function(d) {
+            for (var i = 0; i < d.length; i++) {
+		Container.get({id: d[i].Id}, addContainer, showFailure);
+            }
+	});
+    };
+    update({all: 0});
+    
+    $scope.includeStopped = false;
+    $scope.toggleIncludeStopped = function() {
+	$scope.network.updateShownContainers([]);
+	update({all: $scope.includeStopped ? 1 : 0});
+    };
+    
 }]);

@@ -2,9 +2,9 @@
     <h2>Docker Information</h2>
     <div>
         <p class="lead">
-            <strong>Endpoint: </strong>{{ endpoint }}<br />
-            <strong>Api Version: </strong>{{ apiVersion }}<br />
-            <strong>Version: </strong>{{ docker.Version }}<br />
+            <strong>API Endpoint: </strong>{{ endpoint }}<br />
+            <strong>API Version: </strong>{{ docker.ApiVersion }}<br />
+            <strong>Docker version: </strong>{{ docker.Version }}<br />
             <strong>Git Commit: </strong>{{ docker.GitCommit }}<br />
             <strong>Go Version: </strong>{{ docker.GoVersion }}<br />
         </p>
@@ -62,11 +62,19 @@
             </tr>
             <tr>
                 <td>Storage Driver Status:</td>
-                <td>{{ info.DriverStatus }}</td>
+                <td>
+                <p ng-repeat="val in info.DriverStatus">
+                    {{ val[0] }}: {{ val[1] }}
+                </p>
+                </td>
             </tr>
             <tr>
                 <td>Execution Driver:</td>
                 <td>{{ info.ExecutionDriver }}</td>
+            </tr>
+            <tr>
+                <td>Events:</td>
+                <td><a href="#/events">Events</a></td>
             </tr>
             <tr>
                 <td>IPv4 Forwarding:</td>

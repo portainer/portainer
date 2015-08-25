@@ -1,4 +1,4 @@
-angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containerTop/containerTop.html', 'app/components/containers/containers.html', 'app/components/containersNetwork/containersNetwork.html', 'app/components/dashboard/dashboard.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
+angular.module('dockerui.templates', ['app/components/builder/builder.html', 'app/components/container/container.html', 'app/components/containerLogs/containerlogs.html', 'app/components/containerTop/containerTop.html', 'app/components/containers/containers.html', 'app/components/containersNetwork/containersNetwork.html', 'app/components/dashboard/dashboard.html', 'app/components/events/events.html', 'app/components/footer/statusbar.html', 'app/components/image/image.html', 'app/components/images/images.html', 'app/components/info/info.html', 'app/components/masthead/masthead.html', 'app/components/pullImage/pullImage.html', 'app/components/sidebar/sidebar.html', 'app/components/startContainer/startcontainer.html']);
 
 angular.module("app/components/builder/builder.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("app/components/builder/builder.html",
@@ -331,6 +331,7 @@ angular.module("app/components/containersNetwork/containersNetwork.html", []).ru
     "            <button class=\"btn btn-info\" ng-click=\"network.showSelectedUpstream()\">Show Selected Upstream</button>\n" +
     "            <button class=\"btn btn-success\" ng-click=\"network.showAll()\">Show All</button>\n" +
     "        </div>\n" +
+    "	<input type=\"checkbox\" ng-model=\"includeStopped\" id=\"includeStopped\" ng-change=\"toggleIncludeStopped()\"/> <label for=\"includeStopped\">Include stopped containers</label>\n" +
     "    </div>\n" +
     "    <div class=\"row\">\n" +
     "        <vis-network data=\"network.data\" options=\"network.options\" events=\"network.events\"\n" +
@@ -389,6 +390,44 @@ angular.module("app/components/dashboard/dashboard.html", []).run(["$templateCac
     "                <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.</p>\n" +
     "           </canvas>\n" +
     "        </div>\n" +
+    "    </div>\n" +
+    "</div>\n" +
+    "");
+}]);
+
+angular.module("app/components/events/events.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("app/components/events/events.html",
+    "<div class=\"row\">\n" +
+    "    <div class=\"col-xs-12\">\n" +
+    "        <h2>Events</h2>\n" +
+    "        <form class=\"form-inline\">\n" +
+    "            <div class=\"form-group\">\n" +
+    "                <label for=\"since\">Since:</label>\n" +
+    "                <input id=\"since\" type=\"datetime-local\" ng-model=\"model.since\" class=\"form-control\" step=\"any\"/>\n" +
+    "            </div>\n" +
+    "            <div class=\"form-group\">\n" +
+    "                <label for=\"until\">Until:</label>\n" +
+    "                <input id=\"until\" type=\"datetime-local\" ng-model=\"model.until\" class=\"form-control\" step=\"any\"/>\n" +
+    "            </div>\n" +
+    "            <button ng-click=\"updateEvents()\" class=\"btn btn-primary\">Update</button>\n" +
+    "        </form>\n" +
+    "        <br>\n" +
+    "        <table class=\"table\">\n" +
+    "            <tbody>\n" +
+    "                <tr>\n" +
+    "                    <th>Event</th>\n" +
+    "                    <th>From</th>\n" +
+    "                    <th>ID</th>\n" +
+    "                    <th>Time</th>\n" +
+    "                </tr>\n" +
+    "                <tr ng-repeat=\"event in dockerEvents\">\n" +
+    "                    <td ng-bind=\"event.status\"/>\n" +
+    "                    <td ng-bind=\"event.from\"/>\n" +
+    "                    <td ng-bind=\"event.id\"/>\n" +
+    "                    <td ng-bind=\"event.time * 1000 | date:'medium'\"/>\n" +
+    "                </tr>\n" +
+    "            </tbody>\n" +
+    "        </table>\n" +
     "    </div>\n" +
     "</div>\n" +
     "");
@@ -516,8 +555,8 @@ angular.module("app/components/image/image.html", []).run(["$templateCache", fun
 
 angular.module("app/components/images/images.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("app/components/images/images.html",
-    "\n" +
     "<div ng-include=\"template\" ng-controller=\"BuilderController\"></div>\n" +
+    "<div ng-include=\"template\" ng-controller=\"PullImageController\"></div>\n" +
     "\n" +
     "<h2>Images:</h2>\n" +
     "\n" +
@@ -528,6 +567,7 @@ angular.module("app/components/images/images.html", []).run(["$templateCache", f
     "            <li><a tabindex=\"-1\" href=\"\" ng-click=\"removeAction()\">Remove</a></li>\n" +
     "        </ul>\n" +
     "    </li>\n" +
+    "    <li><a data-toggle=\"modal\" data-target=\"#pull-modal\" href=\"\">Pull</a></li>\n" +
     "</ul>\n" +
     "<table class=\"table table-striped\">\n" +
     "    <thead>\n" +
@@ -558,9 +598,9 @@ angular.module("app/components/info/info.html", []).run(["$templateCache", funct
     "    <h2>Docker Information</h2>\n" +
     "    <div>\n" +
     "        <p class=\"lead\">\n" +
-    "            <strong>Endpoint: </strong>{{ endpoint }}<br />\n" +
-    "            <strong>Api Version: </strong>{{ apiVersion }}<br />\n" +
-    "            <strong>Version: </strong>{{ docker.Version }}<br />\n" +
+    "            <strong>API Endpoint: </strong>{{ endpoint }}<br />\n" +
+    "            <strong>API Version: </strong>{{ docker.ApiVersion }}<br />\n" +
+    "            <strong>Docker version: </strong>{{ docker.Version }}<br />\n" +
     "            <strong>Git Commit: </strong>{{ docker.GitCommit }}<br />\n" +
     "            <strong>Go Version: </strong>{{ docker.GoVersion }}<br />\n" +
     "        </p>\n" +
@@ -618,11 +658,19 @@ angular.module("app/components/info/info.html", []).run(["$templateCache", funct
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Storage Driver Status:</td>\n" +
-    "                <td>{{ info.DriverStatus }}</td>\n" +
+    "                <td>\n" +
+    "                <p ng-repeat=\"val in info.DriverStatus\">\n" +
+    "                    {{ val[0] }}: {{ val[1] }}\n" +
+    "                </p>\n" +
+    "                </td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>Execution Driver:</td>\n" +
     "                <td>{{ info.ExecutionDriver }}</td>\n" +
+    "            </tr>\n" +
+    "            <tr>\n" +
+    "                <td>Events:</td>\n" +
+    "                <td><a href=\"#/events\">Events</a></td>\n" +
     "            </tr>\n" +
     "            <tr>\n" +
     "                <td>IPv4 Forwarding:</td>\n" +
@@ -670,6 +718,51 @@ angular.module("app/components/masthead/masthead.html", []).run(["$templateCache
     "        <li><a href=\"#/info/\">Info</a></li>\n" +
     "      </ul>\n" +
     "  </div>\n" +
+    "");
+}]);
+
+angular.module("app/components/pullImage/pullImage.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("app/components/pullImage/pullImage.html",
+    "<div id=\"pull-modal\" class=\"modal fade\">\n" +
+    "    <div class=\"modal-dialog\">\n" +
+    "        <div class=\"modal-content\">\n" +
+    "            <div class=\"modal-header\">\n" +
+    "                <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\n" +
+    "                <h3>Pull Image</h3>\n" +
+    "            </div>\n" +
+    "            <div class=\"modal-body\">\n" +
+    "                <form novalidate role=\"form\" name=\"pullForm\">\n" +
+    "                    <!--<div class=\"input-group\">\n" +
+    "                        <span class=\"input-group-addon\" id=\"basic-addon1\">Image name</span>\n" +
+    "                        <input type=\"text\" class=\"form-control\" placeholder=\"imageName\" aria-describedby=\"basic-addon1\">\n" +
+    "                    </div>-->\n" +
+    "                    <div class=\"form-group\">\n" +
+    "                        <label>Registry:</label>\n" +
+    "                        <input type=\"text\" ng-model=\"config.registry\" class=\"form-control\" placeholder=\"Registry. Leave empty to user docker hub\"/>\n" +
+    "                    </div>\n" +
+    "                    <div class=\"form-group\">\n" +
+    "                        <label>Repo:</label>\n" +
+    "                        <input type=\"text\" ng-model=\"config.repo\" class=\"form-control\" placeholder=\"Repository - usually your username.\"/>\n" +
+    "                    </div>\n" +
+    "                    <div class=\"form-group\">\n" +
+    "                        <label>Image Name:</label>\n" +
+    "                        <input type=\"text\" ng-model=\"config.fromImage\" class=\"form-control\" placeholder=\"Image name\" required/>\n" +
+    "                    </div>\n" +
+    "                    <div class=\"form-group\">\n" +
+    "                        <label>Tag Name:</label>\n" +
+    "                        <input type=\"text\" ng-model=\"config.tag\" class=\"form-control\" placeholder=\"Tag name. If empty it will download ALL tags.\"/>\n" +
+    "                    </div>\n" +
+    "                </form>\n" +
+    "            </div>\n" +
+    "            <div class=\"alert alert-error\" id=\"error-message\" style=\"display:none\">\n" +
+    "                {{ error }}\n" +
+    "            </div>\n" +
+    "            <div class=\"modal-footer\">\n" +
+    "                <a href=\"\" class=\"btn btn-primary\" ng-click=\"pull()\">Pull</a>\n" +
+    "            </div>\n" +
+    "        </div>\n" +
+    "    </div>\n" +
+    "</div>\n" +
     "");
 }]);
 
