@@ -9,6 +9,7 @@ files = [
     'assets/js/jquery.gritter.min.js',
     'assets/js/bootstrap.min.js',
     'assets/js/spin.js',
+    'assets/js/Chart.min.js',
     'dist/angular.js',
     'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js',
     'assets/js/angular-vis.js',

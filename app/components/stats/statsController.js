@@ -1,35 +1,52 @@
 angular.module('stats', [])
-    .controller('StatsController', ['Settings', '$scope', 'Messages', '$timeout', 'Container', 'LineChart', '$routeParams', function (Settings, $scope, Messages, $timeout, Container, LineChart, $routeParams) {
-        var sessionKey = 'dockeruiStats-' + $routeParams.id;
-        var localData = sessionStorage.getItem(sessionKey);
-        if (localData) {
-            $scope.dockerStats = localData;
-        } else {
-            $scope.dockerStats = [];
+    .controller('StatsController', ['Settings', '$scope', 'Messages', '$timeout', 'Container', '$routeParams', function (Settings, $scope, Messages, $timeout, Container, $routeParams) {
+        // TODO: Implement memory chart, force scale to 0-100 for cpu, 0 to limit for memory, fix charts on dashboard
+
+        var labels = [];
+        var data = [];
+        for (var i = 0; i < 40; i ++) {
+            labels.push('');
+            data.push(0);
         }
+        var dataset = { // CPU Usage
+            fillColor: "rgba(151,187,205,0.5)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
+            pointStrokeColor: "#fff",
+            data: data
+        };
+
+        var chart = new Chart($('#cpu-stats-chart').get(0).getContext("2d")).Line({
+                labels: labels,
+                datasets: [dataset]
+            });
 
 
         function updateStats() {
             Container.stats({id: $routeParams.id}, function (d) {
-                console.log(d);
                 var arr = Object.keys(d).map(function (key) {
                     return d[key];
                 });
                 if (arr.join('').indexOf('no such id') !== -1) {
-                    Messages.error('Unable to retrieve container stats', 'Has this container been removed?');
+                    Messages.error('Unable to retrieve stats', 'Is this container running?');
                     return;
                 }
-                $scope.dockerStats.push(d);
-                sessionStorage.setItem(sessionKey, $scope.dockerStats);
-                $timeout(updateStats, 1000);
+
                 // Update graph with latest data
-                updateChart($scope.dockerStats);
+                updateChart(d);
+                $timeout(updateStats, 1000); // TODO: Switch to setInterval for more consistent readings
             }, function () {
-                Messages.error('Unable to retrieve container stats', 'Has this container been removed?');
+                Messages.error('Unable to retrieve stats', 'Is this container running?');
             });
         }
 
         updateStats();
+
+        function updateChart(data) {
+            console.log('updateChart', data);
+            chart.addData([$scope.calculateCPUPercent(data)], new Date(data.read).toLocaleTimeString());
+            chart.removeData();
+        }
 
         $scope.calculateCPUPercent = function (stats) {
             // Same algorithm the official client uses: https://github.com/docker/docker/blob/master/api/client/stats.go#L195-L208
@@ -44,15 +61,10 @@ angular.module('stats', [])
             var systemDelta = curCpu.system_cpu_usage - prevCpu.system_cpu_usage;
 
             if (systemDelta > 0.0 && cpuDelta > 0.0) {
-                cpuPercent = (cpuDelta / systemDelta) * curCpu.cpu_usage.percpu_usage.size() * 100.0;
+                //console.log('size thing:', curCpu.cpu_usage.percpu_usage);
+                cpuPercent = (cpuDelta / systemDelta) * curCpu.cpu_usage.percpu_usage.length * 100.0;
             }
-            return cpuPercent;
+            return Math.random() * 100;
+            //return cpuPercent; TODO: Switch back to the real value
         };
-
-        function updateChart(data) {
-            // TODO: Build data in the right format and create chart.
-            //LineChart.build('#cpu-stats-chart', $scope.dockerStats, function (d) {
-            //    return $scope.calculateCPUPercent(d)
-            //});
-        }
     }]);

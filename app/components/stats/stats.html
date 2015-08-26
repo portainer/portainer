@@ -1,21 +1,9 @@
 <div class="row">
     <div class="col-xs-12">
-        <h2>Stats</h2>
-        <canvas id="cpu-stats-chart" width="700"></canvas>
-        <br>
-        <table class="table">
-            <tbody>
-            <tr>
-                <th>Time read</th>
-                <th>CPU usage</th>
-                <th>Stat</th>
-            </tr>
-            <tr ng-repeat="stat in dockerStats">
-                <td ng-bind="stat.read"/>
-                <td ng-bind="calculateCPUPercent(stat)"/>
-                <td ng-bind="stat"/>
-            </tr>
-            </tbody>
-        </table>
+        <h1>Stats</h1>
+        <h2>CPU Usage</h2>
+        <canvas id="cpu-stats-chart" width="700" height="300"></canvas>
+        <canvas id="memory-stats-chart" width="700" height="300"></canvas>
+        <h2>Memory</h2>
     </div>
 </div>
