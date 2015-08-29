@@ -24,7 +24,7 @@ angular.module('stats', [])
         var networkLabels = [];
         var networkTxData = [];
         var networkRxData = [];
-        for (var i = 0; i < 40; i++) {
+        for (var i = 0; i < 20; i++) {
             cpuLabels.push('');
             cpuData.push(0);
             memoryLabels.push('');
@@ -76,7 +76,7 @@ angular.module('stats', [])
             }];
         legend($('#network-legend').get(0), networkLegendData);
 
-
+        Chart.defaults.global.animationSteps = 30; // Lower from 60 to ease CPU load.
         var cpuChart = new Chart($('#cpu-stats-chart').get(0).getContext("2d")).Line({
             labels: cpuLabels,
             datasets: [cpuDataset]
@@ -124,7 +124,7 @@ angular.module('stats', [])
                 updateCpuChart(d);
                 updateMemoryChart(d);
                 updateNetworkChart(d);
-                timeout = $timeout(updateStats, 1000);
+                timeout = $timeout(updateStats, 2000);
             }, function () {
                 Messages.error('Unable to retrieve stats', 'Is this container running?');
             });
