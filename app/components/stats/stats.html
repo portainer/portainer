@@ -2,13 +2,14 @@
     <div class="col-xs-12">
         <h1>Stats</h1>
 
-        <h2>CPU Usage</h2>
+        <h2>CPU</h2>
 
         <div class="row">
             <div class="col-sm-7">
                 <canvas id="cpu-stats-chart" width="650" height="300"></canvas>
             </div>
         </div>
+
         <h2>Memory</h2>
 
         <div class="row">
@@ -25,11 +26,35 @@
                         <td>Limit</td>
                         <td>{{ data.memory_stats.limit | humansize }}</td>
                     </tr>
+                    <tr>
+                        <td>Fail count</td>
+                        <td>{{ data.memory_stats.failcnt }}</td>
+                    </tr>
                 </table>
                 <accordion>
                     <accordion-group heading="Other stats">
                         <table class="table">
                             <tr ng-repeat="(key, value) in data.memory_stats.stats">
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        </table>
+                    </accordion-group>
+                </accordion>
+            </div>
+        </div>
+
+        <h1>Network</h1>
+        <div class="row">
+            <div class="col-sm-7">
+                <canvas id="network-stats-chart" width="650" height="300"></canvas>
+            </div>
+            <div class="col-sm-offset-1 col-sm-4">
+                <div id="network-legend" style="margin-bottom: 20px;"></div>
+                <accordion>
+                    <accordion-group heading="Other stats">
+                        <table class="table">
+                            <tr ng-repeat="(key, value) in data.network">
                                 <td>{{ key }}</td>
                                 <td>{{ value }}</td>
                             </tr>

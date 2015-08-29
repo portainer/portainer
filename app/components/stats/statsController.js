@@ -1,5 +1,5 @@
 angular.module('stats', [])
-    .controller('StatsController', ['Settings', '$scope', 'Messages', '$timeout', 'Container', '$routeParams', 'humansizeFilter', function (Settings, $scope, Messages, $timeout, Container, $routeParams, humansizeFilter) {
+    .controller('StatsController', ['Settings', '$scope', 'Messages', '$timeout', 'Container', '$routeParams', 'humansizeFilter', '$sce', function (Settings, $scope, Messages, $timeout, Container, $routeParams, humansizeFilter, $sce) {
         // TODO: Implement memory chart, force scale to 0-100 for cpu, 0 to limit for memory, fix charts on dashboard,
         // TODO: Force memory scale to 0 - max memory
         //var initialStats = {}; // Used to set scale of memory graph.
@@ -21,11 +21,17 @@ angular.module('stats', [])
         var cpuData = [];
         var memoryLabels = [];
         var memoryData = [];
+        var networkLabels = [];
+        var networkTxData = [];
+        var networkRxData = [];
         for (var i = 0; i < 40; i++) {
             cpuLabels.push('');
             cpuData.push(0);
             memoryLabels.push('');
             memoryData.push(0);
+            networkLabels.push('');
+            networkTxData.push(0);
+            networkRxData.push(0);
         }
         var cpuDataset = { // CPU Usage
             fillColor: "rgba(151,187,205,0.5)",
@@ -41,6 +47,34 @@ angular.module('stats', [])
             pointStrokeColor: "#fff",
             data: memoryData
         };
+        var networkRxDataset = {
+            label: "Rx Bytes",
+            fillColor: "rgba(151,187,205,0.5)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
+            pointStrokeColor: "#fff",
+            data: networkRxData
+        };
+        var networkTxDataset = {
+            label: "Tx Bytes",
+            fillColor: "rgba(255,180,174,0.5)",
+            strokeColor: "rgba(255,180,174,1)",
+            pointColor: "rgba(255,180,174,1)",
+            pointStrokeColor: "#fff",
+            data: networkTxData
+        };
+        var networkLegendData = [
+            {
+                //value: '',
+                color: 'rgba(151,187,205,0.5)',
+                title: 'Rx Data'
+            },
+            {
+                //value: '',
+                color: 'rgba(255,180,174,0.5)',
+                title: 'Rx Data'
+            }];
+        legend($('#network-legend').get(0), networkLegendData);
 
 
         var cpuChart = new Chart($('#cpu-stats-chart').get(0).getContext("2d")).Line({
@@ -64,7 +98,16 @@ angular.module('stats', [])
                 //scaleStepWidth: Math.ceil(initialStats.memory_stats.limit / 10),
                 //scaleStartValue: 0
             });
-
+        var networkChart = new Chart($('#network-stats-chart').get(0).getContext("2d")).Line({
+            labels: networkLabels,
+            datasets: [networkRxDataset, networkTxDataset]
+        }, {
+            scaleLabel: function (valueObj) {
+                return humansizeFilter(parseInt(valueObj.value, 10));
+            },
+            responsive: true
+        });
+        $scope.networkLegend = $sce.trustAsHtml(networkChart.generateLegend());
 
         function updateStats() {
             Container.stats({id: $routeParams.id}, function (d) {
@@ -78,8 +121,9 @@ angular.module('stats', [])
 
                 // Update graph with latest data
                 $scope.data = d;
-                updateChart(d);
+                updateCpuChart(d);
                 updateMemoryChart(d);
+                updateNetworkChart(d);
                 timeout = $timeout(updateStats, 1000);
             }, function () {
                 Messages.error('Unable to retrieve stats', 'Is this container running?');
@@ -93,8 +137,8 @@ angular.module('stats', [])
 
         updateStats();
 
-        function updateChart(data) {
-            console.log('updateChart', data);
+        function updateCpuChart(data) {
+            console.log('updateCpuChart', data);
             cpuChart.addData([calculateCPUPercent(data)], new Date(data.read).toLocaleTimeString());
             cpuChart.removeData();
         }
@@ -103,7 +147,22 @@ angular.module('stats', [])
             console.log('updateMemoryChart', data);
             memoryChart.addData([data.memory_stats.usage], new Date(data.read).toLocaleTimeString());
             memoryChart.removeData();
+        }
 
+        var lastRxBytes = 0, lastTxBytes = 0;
+
+        function updateNetworkChart(data) {
+            var rxBytes = 0, txBytes = 0;
+            if (lastRxBytes !== 0 || lastTxBytes !== 0) {
+                // These will be zero on first call, ignore to prevent large graph spike
+                rxBytes = data.network.rx_bytes - lastRxBytes;
+                txBytes = data.network.tx_bytes - lastTxBytes;
+            }
+            lastRxBytes = data.network.rx_bytes;
+            lastTxBytes = data.network.tx_bytes;
+            console.log('updateNetworkChart', data);
+            networkChart.addData([rxBytes, txBytes], new Date(data.read).toLocaleTimeString());
+            networkChart.removeData();
         }
 
         function calculateCPUPercent(stats) {
