@@ -1,24 +1,41 @@
 <div class="row">
     <div class="col-xs-12">
         <h1>Stats</h1>
+
         <h2>CPU Usage</h2>
+
         <div class="row">
-            <div class="col-sm-8">
-                <canvas id="cpu-stats-chart" width="700" height="300"></canvas>
-            </div>
-            <div class="col-sm-4">
-                <h3>Other CPU usage data</h3>
-                <p>TODO</p>
+            <div class="col-sm-7">
+                <canvas id="cpu-stats-chart" width="650" height="300"></canvas>
             </div>
         </div>
         <h2>Memory</h2>
+
         <div class="row">
-            <div class="col-sm-8">
-                <canvas id="memory-stats-chart" width="700" height="300"></canvas>
+            <div class="col-sm-7">
+                <canvas id="memory-stats-chart" width="650" height="300"></canvas>
             </div>
-            <div class="col-sm-4">
-                <h3>Other Memory Stats</h3>
-                <p>TODO</p>
+            <div class="col-sm-offset-1 col-sm-4">
+                <table class="table">
+                    <tr>
+                        <td>Max usage</td>
+                        <td>{{ data.memory_stats.max_usage | humansize }}</td>
+                    </tr>
+                    <tr>
+                        <td>Limit</td>
+                        <td>{{ data.memory_stats.limit | humansize }}</td>
+                    </tr>
+                </table>
+                <accordion>
+                    <accordion-group heading="Other stats">
+                        <table class="table">
+                            <tr ng-repeat="(key, value) in data.memory_stats.stats">
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        </table>
+                    </accordion-group>
+                </accordion>
             </div>
         </div>
     </div>

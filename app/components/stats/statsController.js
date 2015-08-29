@@ -56,9 +56,9 @@ angular.module('stats', [])
             },
             {
                 scaleLabel: function (valueObj) {
-                    return humansizeFilter(parseInt(valueObj.value));
+                    return humansizeFilter(parseInt(valueObj.value, 10));
                 },
-                responsive: true,
+                responsive: true
                 //scaleOverride: true,
                 //scaleSteps: 10,
                 //scaleStepWidth: Math.ceil(initialStats.memory_stats.limit / 10),
@@ -77,13 +77,19 @@ angular.module('stats', [])
                 }
 
                 // Update graph with latest data
+                $scope.data = d;
                 updateChart(d);
                 updateMemoryChart(d);
-                $timeout(updateStats, 1000); // TODO: Switch to setInterval for more consistent readings
+                timeout = $timeout(updateStats, 1000);
             }, function () {
                 Messages.error('Unable to retrieve stats', 'Is this container running?');
             });
         }
+
+        var timeout;
+        $scope.$on('$destroy', function () {
+            $timeout.cancel(timeout);
+        });
 
         updateStats();
 
@@ -116,8 +122,7 @@ angular.module('stats', [])
                 //console.log('size thing:', curCpu.cpu_usage.percpu_usage);
                 cpuPercent = (cpuDelta / systemDelta) * curCpu.cpu_usage.percpu_usage.length * 100.0;
             }
-            return Math.random() * 100;
-            //return cpuPercent; TODO: Switch back to the real value
+            return cpuPercent;
         }
     }])
 ;

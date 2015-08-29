@@ -71,7 +71,9 @@ angular.module('dockerui.filters', [])
                 return 'n/a';
             }
             var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
-            return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[[i]];
+            var value = bytes / Math.pow(1024, i);
+            var decimalPlaces = (i < 1) ? 0 : (i - 1);
+            return value.toFixed(decimalPlaces) + ' ' + sizes[[i]];
         };
     })
     .filter('containername', function () {

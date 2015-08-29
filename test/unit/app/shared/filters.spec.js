@@ -106,19 +106,19 @@ describe('filters', function () {
         }));
 
         it('should handle KB values', inject(function (humansizeFilter) {
-            expect(humansizeFilter(5120)).toBe('5 KB');
+            expect(humansizeFilter(5 * 1024)).toBe('5 KB');
         }));
 
         it('should handle MB values', inject(function (humansizeFilter) {
-            expect(humansizeFilter(5 * Math.pow(10, 6))).toBe('5 MB');
+            expect(humansizeFilter(5 * 1024 * 1024)).toBe('5.0 MB');
         }));
 
         it('should handle GB values', inject(function (humansizeFilter) {
-            expect(humansizeFilter(5 * Math.pow(10, 9))).toBe('5 GB');
+            expect(humansizeFilter(5 * 1024 * 1024 * 1024)).toBe('5.00 GB');
         }));
 
         it('should handle TB values', inject(function (humansizeFilter) {
-            expect(humansizeFilter(5 * Math.pow(10, 12))).toBe('5 TB');
+            expect(humansizeFilter(5 * 1024 * 1024 * 1024 * 1024)).toBe('5.000 TB');
         }));
     });
 
