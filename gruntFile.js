@@ -31,6 +31,7 @@ module.exports = function (grunt) {
     grunt.initConfig({
         distdir: 'dist',
         pkg: grunt.file.readJSON('package.json'),
+        remoteApiVersion: 'v1.20',
         banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
         '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
         ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
