@@ -19,14 +19,12 @@ angular.module('dashboard', [])
 
         var opts = {animation: false};
         if (Settings.firstLoad) {
-            $('#stats').hide();
             opts.animation = true;
             Settings.firstLoad = false;
             $('#masthead').show();
 
             setTimeout(function () {
                 $('#masthead').slideUp('slow');
-                $('#stats').slideDown('slow');
             }, 5000);
         }
 
