@@ -2,7 +2,7 @@ angular.module('dockerui.services', ['ngResource'])
     .factory('Container', function ($resource, Settings) {
         'use strict';
         // Resource for interacting with the docker containers
-        // http://docs.docker.io/en/latest/api/docker_remote_api.html#containers
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-1-containers
         return $resource(Settings.url + '/containers/:id/:action', {
             name: '@name'
         }, {
@@ -17,28 +17,31 @@ angular.module('dockerui.services', ['ngResource'])
             changes: {method: 'GET', params: {action: 'changes'}, isArray: true},
             create: {method: 'POST', params: {action: 'create'}},
             remove: {method: 'DELETE', params: {id: '@id', v: 0}},
-            rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false}
+            rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false},
+            stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 2000}
         });
     })
     .factory('ContainerCommit', function ($resource, $http, Settings) {
         'use strict';
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#create-a-new-image-from-a-container-s-changes
         return {
             commit: function (params, callback) {
-                   $http({
-                       method: 'POST',
-                       url: Settings.url + '/commit',
-                       params: {
-                           'container': params.id,
-                           'repo': params.repo
-                       }
-                   }).success(callback).error(function (data, status, headers, config) {
-                       console.log(error, data);
-                   });
+                $http({
+                    method: 'POST',
+                    url: Settings.url + '/commit',
+                    params: {
+                        'container': params.id,
+                        'repo': params.repo
+                    }
+                }).success(callback).error(function (data, status, headers, config) {
+                    console.log(error, data);
+                });
             }
         };
     })
     .factory('ContainerLogs', function ($resource, $http, Settings) {
         'use strict';
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#get-container-logs
         return {
             get: function (id, params, callback) {
                 $http({
@@ -58,6 +61,7 @@ angular.module('dockerui.services', ['ngResource'])
     })
     .factory('ContainerTop', function ($http, Settings) {
         'use strict';
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#list-processes-running-inside-a-container
         return {
             get: function (id, params, callback, errorCallback) {
                 $http({
@@ -72,18 +76,19 @@ angular.module('dockerui.services', ['ngResource'])
     })
     .factory('Image', function ($resource, Settings) {
         'use strict';
-        // Resource for docker images
-        // http://docs.docker.io/en/latest/api/docker_remote_api.html#images
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-2-images
         return $resource(Settings.url + '/images/:id/:action', {}, {
             query: {method: 'GET', params: {all: 0, action: 'json'}, isArray: true},
             get: {method: 'GET', params: {action: 'json'}},
             search: {method: 'GET', params: {action: 'search'}},
             history: {method: 'GET', params: {action: 'history'}, isArray: true},
-            create: {method: 'POST', isArray: true, transformResponse: [function f(data) {
-                var str = data.replace(/\n/g, " ").replace(/\}\W*\{/g, "}, {");
-                return angular.fromJson("[" + str + "]");
-            }],
-                params: {action: 'create', fromImage: '@fromImage', repo: '@repo', tag: '@tag', registry: '@registry'}},
+            create: {
+                method: 'POST', isArray: true, transformResponse: [function f(data) {
+                    var str = data.replace(/\n/g, " ").replace(/\}\W*\{/g, "}, {");
+                    return angular.fromJson("[" + str + "]");
+                }],
+                params: {action: 'create', fromImage: '@fromImage', repo: '@repo', tag: '@tag', registry: '@registry'}
+            },
             insert: {method: 'POST', params: {id: '@id', action: 'insert'}},
             push: {method: 'POST', params: {id: '@id', action: 'push'}},
             tag: {method: 'POST', params: {id: '@id', action: 'tag', force: 0, repo: '@repo'}},
@@ -92,16 +97,14 @@ angular.module('dockerui.services', ['ngResource'])
     })
     .factory('Docker', function ($resource, Settings) {
         'use strict';
-        // Information for docker
-        // http://docs.docker.io/en/latest/api/docker_remote_api.html#display-system-wide-information
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#show-the-docker-version-information
         return $resource(Settings.url + '/version', {}, {
             get: {method: 'GET'}
         });
     })
     .factory('Auth', function ($resource, Settings) {
         'use strict';
-        // Auto Information for docker
-        // http://docs.docker.io/en/latest/api/docker_remote_api.html#set-auth-configuration
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#check-auth-configuration
         return $resource(Settings.url + '/auth', {}, {
             get: {method: 'GET'},
             update: {method: 'POST'}
@@ -109,8 +112,7 @@ angular.module('dockerui.services', ['ngResource'])
     })
     .factory('System', function ($resource, Settings) {
         'use strict';
-        // System for docker
-        // http://docs.docker.io/en/latest/api/docker_remote_api.html#display-system-wide-information
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#display-system-wide-information
         return $resource(Settings.url + '/info', {}, {
             get: {method: 'GET'}
         });
@@ -176,6 +178,7 @@ angular.module('dockerui.services', ['ngResource'])
     })
     .factory('Dockerfile', function (Settings) {
         'use strict';
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#build-image-from-a-dockerfile
         var url = Settings.rawUrl + '/build';
         return {
             build: function (file, callback) {
@@ -192,7 +195,6 @@ angular.module('dockerui.services', ['ngResource'])
     })
     .factory('LineChart', function (Settings) {
         'use strict';
-        var url = Settings.rawUrl + '/build';
         return {
             build: function (id, data, getkey) {
                 var chart = new Chart($(id).get(0).getContext("2d"));

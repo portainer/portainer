@@ -1,6 +1,7 @@
 <div class="row">
     <div class="col-xs-12">
         <h2>Events</h2>
+
         <form class="form-inline">
             <div class="form-group">
                 <label for="since">Since:</label>
@@ -15,18 +16,18 @@
         <br>
         <table class="table">
             <tbody>
-                <tr>
-                    <th>Event</th>
-                    <th>From</th>
-                    <th>ID</th>
-                    <th>Time</th>
-                </tr>
-                <tr ng-repeat="event in dockerEvents">
-                    <td ng-bind="event.status"/>
-                    <td ng-bind="event.from"/>
-                    <td ng-bind="event.id"/>
-                    <td ng-bind="event.time * 1000 | date:'medium'"/>
-                </tr>
+            <tr>
+                <th>Event</th>
+                <th>From</th>
+                <th>ID</th>
+                <th>Time</th>
+            </tr>
+            <tr ng-repeat="event in dockerEvents">
+                <td ng-bind="event.status"/>
+                <td ng-bind="event.from"/>
+                <td ng-bind="event.id"/>
+                <td ng-bind="event.time * 1000 | date:'medium'"/>
+            </tr>
             </tbody>
         </table>
     </div>

@@ -1,4 +1,4 @@
-angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'containersNetwork', 'images', 'image', 'pullImage', 'startContainer', 'sidebar', 'info', 'builder', 'containerLogs', 'containerTop', 'events'])
+angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services', 'dockerui.filters', 'masthead', 'footer', 'dashboard', 'container', 'containers', 'containersNetwork', 'images', 'image', 'pullImage', 'startContainer', 'sidebar', 'info', 'builder', 'containerLogs', 'containerTop', 'events', 'stats'])
     .config(['$routeProvider', function ($routeProvider) {
         'use strict';
         $routeProvider.when('/', {
@@ -21,6 +21,10 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
             templateUrl: 'app/components/containerTop/containerTop.html',
             controller: 'ContainerTopController'
         });
+        $routeProvider.when('/containers/:id/stats', {
+            templateUrl: 'app/components/stats/stats.html',
+            controller: 'StatsController'
+        });
         $routeProvider.when('/containers_network', {
             templateUrl: 'app/components/containersNetwork/containersNetwork.html',
             controller: 'ContainersNetworkController'
@@ -34,12 +38,15 @@ angular.module('dockerui', ['dockerui.templates', 'ngRoute', 'dockerui.services'
             controller: 'ImageController'
         });
         $routeProvider.when('/info', {templateUrl: 'app/components/info/info.html', controller: 'InfoController'});
-        $routeProvider.when('/events', {templateUrl: 'app/components/events/events.html', controller: 'EventsController'});
+        $routeProvider.when('/events', {
+            templateUrl: 'app/components/events/events.html',
+            controller: 'EventsController'
+        });
         $routeProvider.otherwise({redirectTo: '/'});
     }])
     // This is your docker url that the api will use to make requests
     // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
     .constant('DOCKER_ENDPOINT', 'dockerapi')
     .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
-    .constant('UI_VERSION', 'v0.6.0')
-    .constant('DOCKER_API_VERSION', 'v1.17');
+    .constant('UI_VERSION', 'v0.8.0')
+    .constant('DOCKER_API_VERSION', 'v1.20');
