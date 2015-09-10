@@ -3,33 +3,38 @@
 
 <h2>Images:</h2>
 
-<ul class="nav nav-pills">
-    <li class="dropdown">
-        <a class="dropdown-toggle" id="drop4" role="button" data-toggle="dropdown" data-target="#">Actions <b
-                class="caret"></b></a>
-        <ul id="menu1" class="dropdown-menu" role="menu" aria-labelledby="drop4">
-            <li><a tabindex="-1" href="" ng-click="removeAction()">Remove</a></li>
-        </ul>
-    </li>
-    <li><a data-toggle="modal" data-target="#pull-modal" href="">Pull</a></li>
-</ul>
+<div>
+    <ul class="nav nav-pills pull-left">
+        <li class="dropdown">
+            <a class="dropdown-toggle" id="drop4" role="button" data-toggle="dropdown" data-target="#">Actions <b class="caret"></b></a>
+            <ul id="menu1" class="dropdown-menu" role="menu" aria-labelledby="drop4">
+                <li><a tabindex="-1" href="" ng-click="removeAction()">Remove</a></li>
+            </ul>
+        </li>
+        <li><a data-toggle="modal" data-target="#pull-modal" href="">Pull</a></li>
+    </ul>
+
+    <div class="pull-right form-inline">
+        <input type="text" class="form-control" id="filter" placeholder="Filter" ng-model="filter"/> <label class="sr-only" for="filter">Filter</label>
+    </div>
+</div>
 <table class="table table-striped">
     <thead>
-    <tr>
-        <th><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()"/> Action</th>
-        <th>Id</th>
-        <th>Repository</th>
-        <th>VirtualSize</th>
-        <th>Created</th>
-    </tr>
+        <tr>
+            <th><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()" /> Action</th>
+            <th>Id</th>
+            <th>Repository</th>
+            <th>VirtualSize</th>
+            <th>Created</th>
+        </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="image in images | orderBy:predicate">
-        <td><input type="checkbox" ng-model="image.Checked"/></td>
-        <td><a href="#/images/{{ image.Id }}/?tag={{ image|repotag }}">{{ image.Id|truncate:20}}</a></td>
-        <td>{{ image|repotag }}</td>
-        <td>{{ image.VirtualSize|humansize }}</td>
-        <td>{{ image.Created|getdate }}</td>
-    </tr>
+        <tr ng-repeat="image in images | filter:filter | orderBy:predicate">
+            <td><input type="checkbox" ng-model="image.Checked" /></td>
+            <td><a href="#/images/{{ image.Id }}/?tag={{ image|repotag }}">{{ image.Id|truncate:20}}</a></td>
+            <td>{{ image|repotag }}</td>
+            <td>{{ image.VirtualSize|humansize }}</td>
+            <td>{{ image.Created|getdate }}</td>
+        </tr>
     </tbody>
 </table>
