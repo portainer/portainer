@@ -1,4 +1,3 @@
-
 function ImageViewModel(data) {
     this.Id = data.Id;
     this.Tag = data.Tag;
@@ -10,12 +9,12 @@ function ImageViewModel(data) {
 }
 
 function ContainerViewModel(data) {
-   this.Id = data.Id;
-   this.Image = data.Image;
-   this.Command = data.Command;
-   this.Created = data.Created;
-   this.SizeRw = data.SizeRw;
-   this.Status = data.Status;
-   this.Checked = false;
-   this.Names = data.Names;
+    this.Id = data.Id;
+    this.Image = data.Image;
+    this.Command = data.Command;
+    this.Created = data.Created;
+    this.SizeRw = data.SizeRw;
+    this.Status = data.Status;
+    this.Checked = false;
+    this.Names = data.Names;
 }

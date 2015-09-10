@@ -17,8 +17,9 @@
         </li>
     </ul>
 
-    <div class="pull-right">
-        <input type="checkbox" ng-model="displayAll" id="displayAll" ng-change="toggleGetAll()"/> <label for="displayAll">Display All</label>
+    <div class="pull-right form-inline">
+        <input type="checkbox" ng-model="displayAll" id="displayAll" ng-change="toggleGetAll()"/> <label for="displayAll">Display All</label>&nbsp;
+        <input type="text" class="form-control" style="vertical-align: center" id="filter" placeholder="Filter" ng-model="filter"/> <label class="sr-only" for="filter">Filter</label>
     </div>
 </div>
 <table class="table table-striped">
@@ -33,7 +34,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="container in containers|orderBy:predicate">
+        <tr ng-repeat="container in containers | filter:filter | orderBy:predicate">
             <td><input type="checkbox" ng-model="container.Checked" /></td>
             <td><a href="#/containers/{{ container.Id }}/">{{ container|containername}}</a></td>
             <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>

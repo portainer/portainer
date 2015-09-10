@@ -12,7 +12,7 @@
             Container:
             <input type="text" ng-model="container.newContainerName">
             <button class="btn btn-success"
-                    ng-click="renameContainer()">Edit
+                    ng-click="renameContainer()">Save
             </button>
             <button class="btn btn-danger"
                     ng-click="container.edit = false;">&times;</button>
@@ -132,6 +132,10 @@
         <tr>
             <td>Logs:</td>
             <td><a href="#/containers/{{ container.Id }}/logs">stdout/stderr</a></td>
+        </tr>
+        <tr>
+            <td>Stats:</td>
+            <td><a href="#/containers/{{ container.Id }}/stats">stats</a></td>
         </tr>
         <tr>
             <td>Top:</td>
