@@ -1,12 +1,12 @@
 angular.module('dockerui.filters', [])
-    .filter('truncate', function() {
+    .filter('truncate', function () {
         'use strict';
-        return function(text, length, end) {
+        return function (text, length, end) {
             if (isNaN(length)) {
                 length = 10;
             }
 
-            if (end === undefined){
+            if (end === undefined) {
                 end = '...';
             }
 
@@ -18,9 +18,9 @@ angular.module('dockerui.filters', [])
             }
         };
     })
-    .filter('statusbadge', function() {
+    .filter('statusbadge', function () {
         'use strict';
-        return function(text) {
+        return function (text) {
             if (text === 'Ghost') {
                 return 'important';
             } else if (text.indexOf('Exit') !== -1 && text !== 'Exit 0') {
@@ -29,9 +29,9 @@ angular.module('dockerui.filters', [])
             return 'success';
         };
     })
-    .filter('getstatetext', function() {
+    .filter('getstatetext', function () {
         'use strict';
-        return function(state) {
+        return function (state) {
             if (state === undefined) {
                 return '';
             }
@@ -47,9 +47,9 @@ angular.module('dockerui.filters', [])
             return 'Stopped';
         };
     })
-    .filter('getstatelabel', function() {
+    .filter('getstatelabel', function () {
         'use strict';
-        return function(state) {
+        return function (state) {
             if (state === undefined) {
                 return '';
             }
@@ -63,45 +63,49 @@ angular.module('dockerui.filters', [])
             return '';
         };
     })
-    .filter('humansize', function() {
+    .filter('humansize', function () {
         'use strict';
-        return function(bytes) {
+        return function (bytes) {
             var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
             if (bytes === 0) {
                 return 'n/a';
             }
             var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
-            return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[[i]]; 
+            var value = bytes / Math.pow(1024, i);
+            var decimalPlaces = (i < 1) ? 0 : (i - 1);
+            return value.toFixed(decimalPlaces) + ' ' + sizes[[i]];
         };
     })
-    .filter('containername', function() {
+    .filter('containername', function () {
         'use strict';
-        return function(container) {
+        return function (container) {
             var name = container.Names[0];
             return name.substring(1, name.length);
         };
     })
-    .filter('repotag', function() {
+    .filter('repotag', function () {
         'use strict';
-        return function(image) {
+        return function (image) {
             if (image.RepoTags && image.RepoTags.length > 0) {
                 var tag = image.RepoTags[0];
-                if (tag === '<none>:<none>') { tag = ''; }
+                if (tag === '<none>:<none>') {
+                    tag = '';
+                }
                 return tag;
             }
-            return '';      
+            return '';
         };
     })
-    .filter('getdate', function() {
+    .filter('getdate', function () {
         'use strict';
-        return function(data) {
+        return function (data) {
             //Multiply by 1000 for the unix format
             var date = new Date(data * 1000);
             return date.toDateString();
         };
     })
-    .filter('errorMsg', function() {
-        return function(object) {
+    .filter('errorMsg', function () {
+        return function (object) {
             var idx = 0;
             var msg = '';
             while (object[idx] && typeof(object[idx]) === 'string') {

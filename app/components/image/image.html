@@ -5,59 +5,60 @@
 </div>
 
 <div class="detail">
- 
+
     <h4>Image: {{ tag }}</h4>
 
     <div class="btn-group detail">
-      <button class="btn btn-success" data-toggle="modal" data-target="#create-modal">Create</button>
+        <button class="btn btn-success" data-toggle="modal" data-target="#create-modal">Create</button>
     </div>
 
     <div>
-       <h4>Containers created:</h4>
-       <canvas id="containers-started-chart" width="750">
-          <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-       </canvas>
+        <h4>Containers created:</h4>
+        <canvas id="containers-started-chart" width="750">
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
+                    href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        </canvas>
     </div>
 
     <table class="table table-striped">
-         <tbody>
-            <tr>
-                <td>Created:</td>
-                <td>{{ image.Created }}</td>
-            </tr>
-            <tr>
-                <td>Parent:</td>
-                <td><a href="#/images/{{ image.Parent }}/">{{ image.Parent }}</a></td>
-            </tr>
-            <tr>
-                <td>Size (Virtual Size):</td>
-                <td>{{ image.Size|humansize }} ({{ image.VirtualSize|humansize }})</td>
-            </tr>
+        <tbody>
+        <tr>
+            <td>Created:</td>
+            <td>{{ image.Created }}</td>
+        </tr>
+        <tr>
+            <td>Parent:</td>
+            <td><a href="#/images/{{ image.Parent }}/">{{ image.Parent }}</a></td>
+        </tr>
+        <tr>
+            <td>Size (Virtual Size):</td>
+            <td>{{ image.Size|humansize }} ({{ image.VirtualSize|humansize }})</td>
+        </tr>
 
-            <tr>
-                <td>Hostname:</td>
-                <td>{{ image.ContainerConfig.Hostname }}</td>
-            </tr>
-            <tr>
-                <td>User:</td>
-                <td>{{ image.ContainerConfig.User }}</td>
-            </tr>
-            <tr>
-                <td>Cmd:</td>
-                <td>{{ image.ContainerConfig.Cmd }}</td>
-            </tr>
-            <tr>
-                <td>Volumes:</td>
-                <td>{{ image.ContainerConfig.Volumes }}</td>
-            </tr>
-            <tr>
-                <td>Volumes from:</td>
-                <td>{{ image.ContainerConfig.VolumesFrom }}</td>
-            </tr>
-            <tr>
-                <td>Built with:</td>
-                <td>Docker {{ image.DockerVersion }} on {{ image.Os}}, {{ image.Architecture }}</td>
-            </tr>
+        <tr>
+            <td>Hostname:</td>
+            <td>{{ image.ContainerConfig.Hostname }}</td>
+        </tr>
+        <tr>
+            <td>User:</td>
+            <td>{{ image.ContainerConfig.User }}</td>
+        </tr>
+        <tr>
+            <td>Cmd:</td>
+            <td>{{ image.ContainerConfig.Cmd }}</td>
+        </tr>
+        <tr>
+            <td>Volumes:</td>
+            <td>{{ image.ContainerConfig.Volumes }}</td>
+        </tr>
+        <tr>
+            <td>Volumes from:</td>
+            <td>{{ image.ContainerConfig.VolumesFrom }}</td>
+        </tr>
+        <tr>
+            <td>Built with:</td>
+            <td>Docker {{ image.DockerVersion }} on {{ image.Os}}, {{ image.Architecture }}</td>
+        </tr>
 
         </tbody>
     </table>
@@ -69,17 +70,18 @@
         <div class="span5">
             <i class="icon-refresh" style="width:32px;height:32px;" ng-click="getHistory()"></i>
         </div>
-    </div> 
+    </div>
 
     <div class="well well-large">
         <ul>
             <li ng-repeat="change in history">
-                <strong>{{ change.Id }}</strong>: Created: {{ change.Created|getdate }} Created by: {{ change.CreatedBy }}
+                <strong>{{ change.Id }}</strong>: Created: {{ change.Created|getdate }} Created by: {{ change.CreatedBy
+                }}
             </li>
         </ul>
     </div>
 
-    <hr />
+    <hr/>
 
     <div class="row-fluid">
         <form class="form-inline" role="form">
@@ -94,12 +96,12 @@
                         <input type="checkbox" ng-model="tag.force" class="form-control"/> Force?
                     </label>
                 </div>
-                 <input type="button" ng-click="updateTag()" value="Tag" class="btn btn-primary"/>
+                <input type="button" ng-click="updateTag()" value="Tag" class="btn btn-primary"/>
             </fieldset>
         </form>
     </div>
 
-    <hr />
+    <hr/>
 
     <div class="btn-remove">
         <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="remove()">Remove Image</button>

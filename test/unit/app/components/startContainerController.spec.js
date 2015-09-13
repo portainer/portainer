@@ -1,19 +1,19 @@
-describe('startContainerController', function() {
+describe('startContainerController', function () {
     var scope, $location, createController, mockContainer, $httpBackend;
 
     beforeEach(angular.mock.module('dockerui'));
 
-    beforeEach(inject(function($rootScope, $controller, _$location_) {
+    beforeEach(inject(function ($rootScope, $controller, _$location_) {
         $location = _$location_;
         scope = $rootScope.$new();
 
-        createController = function() {
+        createController = function () {
             return $controller('StartContainerController', {
                 '$scope': scope
             });
         };
 
-        angular.mock.inject(function(_Container_, _$httpBackend_) {
+        angular.mock.inject(function (_Container_, _$httpBackend_) {
             mockContainer = _Container_;
             $httpBackend = _$httpBackend_;
         });
@@ -34,8 +34,9 @@ describe('startContainerController', function() {
             'Status': 'Up 2 minutes'
         }]);
     }
-    describe('Create and start a container with port bindings', function() {
-        it('should issue a correct create request to the Docker remote API', function() {
+
+    describe('Create and start a container with port bindings', function () {
+        it('should issue a correct create request to the Docker remote API', function () {
             var controller = createController();
             var id = '6abd8bfba81cf8a05a76a4bdefcb36c4b66cd02265f4bfcd0e236468696ebc6c';
             var expectedBody = {
@@ -76,8 +77,8 @@ describe('startContainerController', function() {
         });
     });
 
-    describe('Create and start a container with environment variables', function() {
-        it('should issue a correct create request to the Docker remote API', function() {
+    describe('Create and start a container with environment variables', function () {
+        it('should issue a correct create request to the Docker remote API', function () {
             var controller = createController();
             var id = '6abd8bfba81cf8a05a76a4bdefcb36c4b66cd02265f4bfcd0e236468696ebc6c';
             var expectedBody = {
@@ -110,8 +111,8 @@ describe('startContainerController', function() {
         });
     });
 
-    describe('Create and start a container with volumesFrom', function() {
-        it('should issue a correct create request to the Docker remote API', function() {
+    describe('Create and start a container with volumesFrom', function () {
+        it('should issue a correct create request to the Docker remote API', function () {
             var controller = createController();
             var id = '6abd8bfba81cf8a05a76a4bdefcb36c4b66cd02265f4bfcd0e236468696ebc6c';
             var expectedBody = {
@@ -133,15 +134,15 @@ describe('startContainerController', function() {
             });
 
             scope.config.name = 'container-name';
-            scope.config.HostConfig.VolumesFrom = [{name: 'parent'}, {name:'other:ro'}];
+            scope.config.HostConfig.VolumesFrom = [{name: 'parent'}, {name: 'other:ro'}];
 
             scope.create();
             $httpBackend.flush();
         });
     });
-    
-    describe('Create and start a container with multiple options', function() {
-        it('should issue a correct create request to the Docker remote API', function() {
+
+    describe('Create and start a container with multiple options', function () {
+        it('should issue a correct create request to the Docker remote API', function () {
             var controller = createController();
             var id = '6abd8bfba81cf8a05a76a4bdefcb36c4b66cd02265f4bfcd0e236468696ebc6c';
             var expectedBody = {
@@ -154,8 +155,12 @@ describe('startContainerController', function() {
                     DnsSearch: ['example.com'],
                     CapAdd: ['cap_sys_admin'],
                     CapDrop: ['cap_foo_bar'],
-                    Devices: [{ 'PathOnHost': '/dev/deviceName', 'PathInContainer': '/dev/deviceName', 'CgroupPermissions': 'mrw'}],
-                    LxcConf: {'lxc.utsname':'docker'},
+                    Devices: [{
+                        'PathOnHost': '/dev/deviceName',
+                        'PathInContainer': '/dev/deviceName',
+                        'CgroupPermissions': 'mrw'
+                    }],
+                    LxcConf: {'lxc.utsname': 'docker'},
                     ExtraHosts: ['hostname:127.0.0.1'],
                     RestartPolicy: {name: 'always', MaximumRetryCount: 5}
                 },
@@ -190,7 +195,11 @@ describe('startContainerController', function() {
             scope.config.HostConfig.PublishAllPorts = true;
             scope.config.HostConfig.Privileged = true;
             scope.config.HostConfig.RestartPolicy = {name: 'always', MaximumRetryCount: 5};
-            scope.config.HostConfig.Devices = [{ 'PathOnHost': '/dev/deviceName', 'PathInContainer': '/dev/deviceName', 'CgroupPermissions': 'mrw'}];
+            scope.config.HostConfig.Devices = [{
+                'PathOnHost': '/dev/deviceName',
+                'PathInContainer': '/dev/deviceName',
+                'CgroupPermissions': 'mrw'
+            }];
             scope.config.HostConfig.LxcConf = [{name: 'lxc.utsname', value: 'docker'}];
             scope.config.HostConfig.ExtraHosts = [{host: 'hostname', ip: '127.0.0.1'}];
 

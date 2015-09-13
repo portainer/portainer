@@ -1,6 +1,6 @@
 angular.module('events', ['ngOboe'])
-    .controller('EventsController', ['Settings', '$scope', 'Oboe', 'Messages', '$timeout', function(Settings, $scope, oboe, Messages, $timeout) {
-        $scope.updateEvents = function() {
+    .controller('EventsController', ['Settings', '$scope', 'Oboe', 'Messages', '$timeout', function (Settings, $scope, oboe, Messages, $timeout) {
+        $scope.updateEvents = function () {
             $scope.dockerEvents = [];
 
             // TODO: Clean up URL building
@@ -16,18 +16,18 @@ angular.module('events', ['ngOboe'])
             }
 
             oboe({
-                    url: url,
-                    pattern: '{id status time}'
-                })
-                .then(function(node) {
+                url: url,
+                pattern: '{id status time}'
+            })
+                .then(function (node) {
                     // finished loading
-                    $timeout(function() {
+                    $timeout(function () {
                         $scope.$apply();
                     });
-                }, function(error) {
+                }, function (error) {
                     // handle errors
                     Messages.error("Failure", error.data);
-                }, function(node) {
+                }, function (node) {
                     // node received
                     $scope.dockerEvents.push(node);
                 });
