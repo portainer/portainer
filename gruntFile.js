@@ -12,8 +12,8 @@ module.exports = function (grunt) {
 
     // Default task.
     grunt.registerTask('default', ['jshint', 'build', 'karma:unit']);
-    grunt.registerTask('build', ['clean', 'html2js', 'concat', 'recess:build', 'copy']);
-    grunt.registerTask('release', ['clean', 'html2js', 'uglify', 'jshint', 'karma:unit', 'concat:index', 'recess:min', 'copy']);
+    grunt.registerTask('build', ['clean:all', 'html2js', 'concat', 'clean:tmpl', 'recess:build', 'copy']);
+    grunt.registerTask('release', ['clean:all', 'html2js', 'uglify', 'clean:tmpl', 'jshint', 'karma:unit', 'concat:index', 'recess:min', 'copy']);
     grunt.registerTask('test-watch', ['karma:watch']);
 
     // Print a timestamp (useful for when watching)
@@ -39,18 +39,39 @@ module.exports = function (grunt) {
         src: {
             js: ['app/**/*.js', '!app/**/*.spec.js'],
             jsTpl: ['<%= distdir %>/templates/**/*.js'],
+            jsVendor: [
+                'bower_components/jquery/dist/jquery.js',
+                'bower_components/jquery.gritter/js/jquery.gritter.js',
+                'bower_components/bootstrap/dist/js/bootstrap.js',
+                'bower_components/spin.js/spin.js',
+                'bower_components/vis/dist/vis.js',
+                'bower_components/Chart.js/Chart.js',
+                'bower_components/oboe/dist/oboe-browser.js',
+                'assets/js/legend.js' // Not a bower package
+            ],
             specs: ['test/**/*.spec.js'],
             scenarios: ['test/**/*.scenario.js'],
             html: ['index.html'],
-            tpl: {
-                app: ['app/components/**/*.html']
-            },
-            css: ['assets/css/app.css']
+            tpl: ['app/components/**/*.html'],
+            css: ['assets/css/app.css'],
+            cssVendor: [
+                'bower_components/bootstrap/dist/css/bootstrap.css',
+                'bower_components/jquery.gritter/css/jquery.gritter.css',
+                'bower_components/vis/dist/vis.css'
+            ]
         },
-        clean: ['<%= distdir %>/*'],
+        clean: {
+            all: ['<%= distdir %>/*'],
+            tmpl: ['<%= distdir %>/templates']
+        },
         copy: {
             assets: {
-                files: [{dest: '<%= distdir %>/assets', src: '**', expand: true, cwd: 'assets/'}]
+                files: [
+                    {dest: '<%= distdir %>/fonts/', src: '**', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
+                    {dest: '<%= distdir %>/images/', src: '**', expand: true, cwd: 'bower_components/jquery.gritter/images/'},
+                    {dest: '<%= distdir %>/img', src: '**', expand: true, cwd: 'bower_components/vis/dist/img'},
+                    {dest: '<%= distdir %>/ico', src: '**', expand: true, cwd: 'assets/ico'}
+                ]
             }
         },
         karma: {
@@ -62,7 +83,7 @@ module.exports = function (grunt) {
                 options: {
                     base: '.'
                 },
-                src: ['<%= src.tpl.app %>'],
+                src: ['<%= src.tpl %>'],
                 dest: '<%= distdir %>/templates/app.js',
                 module: '<%= pkg.name %>.templates'
             }
@@ -76,6 +97,10 @@ module.exports = function (grunt) {
                 src: ['<%= src.js %>', '<%= src.jsTpl %>'],
                 dest: '<%= distdir %>/<%= pkg.name %>.js'
             },
+            vendor: {
+                src: ['<%= src.jsVendor %>'],
+                dest: '<%= distdir %>/vendor.js'
+            },
             index: {
                 src: ['index.html'],
                 dest: '<%= distdir %>/index.html',
@@ -84,11 +109,12 @@ module.exports = function (grunt) {
                 }
             },
             angular: {
-                src: ['assets/js/angularjs/1.3.15/angular.min.js',
-                    'assets/js/angularjs/1.3.15/angular-route.min.js',
-                    'assets/js/angularjs/1.3.15/angular-resource.min.js',
-                    'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js',
-                    'assets/js/angular-oboe.min.js'],
+                src: ['bower_components/angular/angular.js',
+                    'bower_components/angular-route/angular-route.js',
+                    'bower_components/angular-resource/angular-resource.js',
+                    'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+                    'bower_components/angular-oboe/dist/angular-oboe.js',
+                    'bower_components/angular-visjs/angular-vis.js'],
                 dest: '<%= distdir %>/angular.js'
             }
         },
@@ -100,6 +126,10 @@ module.exports = function (grunt) {
                 src: ['<%= src.js %>', '<%= src.jsTpl %>'],
                 dest: '<%= distdir %>/<%= pkg.name %>.js'
             },
+            vendor: {
+                src: ['<%= src.jsVendor %>'],
+                dest: '<%= distdir %>/vendor.js'
+            },
             angular: {
                 src: ['<%= concat.angular.src %>'],
                 dest: '<%= distdir %>/angular.js'
@@ -108,34 +138,27 @@ module.exports = function (grunt) {
         recess: {
             build: {
                 files: {
-                    '<%= distdir %>/<%= pkg.name %>.css': ['<%= src.css %>']
+                    '<%= distdir %>/<%= pkg.name %>.css': ['<%= src.css %>'],
+                    '<%= distdir %>/vendor.css': ['<%= src.cssVendor %>']
                 },
                 options: {
                     compile: true,
                     noOverqualifying: false // TODO: Added because of .nav class, rename
                 }
-            },
-            min: {
-                files: {
-                    '<%= distdir %>/<%= pkg.name %>.css': ['<%= src.css %>']
-                },
-                options: {
-                    compress: true
-                }
             }
         },
         watch: {
             all: {
-                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl.app %>', '<%= src.tpl.common %>', '<%= src.html %>'],
+                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.tpl.common %>', '<%= src.html %>'],
                 tasks: ['default', 'timestamp']
             },
             build: {
-                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl.app %>', '<%= src.tpl.common %>', '<%= src.html %>'],
+                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.tpl.common %>', '<%= src.html %>'],
                 tasks: ['build', 'timestamp']
             }
         },
         jshint: {
-            files: ['gruntFile.js', '<%= src.js %>', '<%= src.jsTpl %>', '<%= src.specs %>', '<%= src.scenarios %>'],
+            files: ['gruntFile.js', '<%= src.js %>', '<%= src.specs %>', '<%= src.scenarios %>'],
             options: {
                 curly: true,
                 eqeqeq: true,
