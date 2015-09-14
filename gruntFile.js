@@ -127,15 +127,21 @@ module.exports = function (grunt) {
                 dest: '<%= distdir %>/<%= pkg.name %>.js'
             },
             vendor: {
+                options: {
+                    preserveComments: 'some' // Preserve license comments
+                },
                 src: ['<%= src.jsVendor %>'],
                 dest: '<%= distdir %>/vendor.js'
             },
             angular: {
+                options: {
+                    preserveComments: 'some' // Preserve license comments
+                },
                 src: ['<%= concat.angular.src %>'],
                 dest: '<%= distdir %>/angular.js'
             }
         },
-        recess: {
+        recess: { // TODO: not maintained, unable to preserve license comments, switch out for something better.
             build: {
                 files: {
                     '<%= distdir %>/<%= pkg.name %>.css': ['<%= src.css %>'],
@@ -143,6 +149,17 @@ module.exports = function (grunt) {
                 },
                 options: {
                     compile: true,
+                    noOverqualifying: false // TODO: Added because of .nav class, rename
+                }
+            },
+            min: {
+                files: {
+                    '<%= distdir %>/<%= pkg.name %>.css': ['<%= src.css %>'],
+                    '<%= distdir %>/vendor.css': ['<%= src.cssVendor %>']
+                },
+                options: {
+                    compile: true,
+                    compress: true,
                     noOverqualifying: false // TODO: Added because of .nav class, rename
                 }
             }
