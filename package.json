@@ -30,8 +30,10 @@
     "grunt-contrib-uglify": "^0.9.2",
     "grunt-contrib-watch": "~0.3.1",
     "grunt-html2js": "~0.1.0",
+    "grunt-if": "^0.1.5",
     "grunt-karma": "~0.4.4",
-    "grunt-recess": "~0.3"
+    "grunt-recess": "~0.3",
+    "grunt-shell": "^1.1.2"
   },
   "scripts": {
     "postinstall": "bower install"

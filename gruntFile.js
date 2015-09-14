@@ -9,12 +9,16 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-recess');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-html2js');
+    grunt.loadNpmTasks('grunt-shell');
+    grunt.loadNpmTasks('grunt-if');
 
     // Default task.
     grunt.registerTask('default', ['jshint', 'build', 'karma:unit']);
-    grunt.registerTask('build', ['clean:all', 'html2js', 'concat', 'clean:tmpl', 'recess:build', 'copy']);
-    grunt.registerTask('release', ['clean:all', 'html2js', 'uglify', 'clean:tmpl', 'jshint', 'karma:unit', 'concat:index', 'recess:min', 'copy']);
+    grunt.registerTask('build', ['clean:app', 'if:binaryNotExist', 'html2js', 'concat', 'clean:tmpl', 'recess:build', 'copy']);
+    grunt.registerTask('release', ['clean:all', 'if:binaryNotExist', 'html2js', 'uglify', 'clean:tmpl', 'jshint', 'karma:unit', 'concat:index', 'recess:min', 'copy']);
     grunt.registerTask('test-watch', ['karma:watch']);
+    grunt.registerTask('run', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
+    grunt.registerTask('run-dev', ['if:binaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
 
     // Print a timestamp (useful for when watching)
     grunt.registerTask('timestamp', function () {
@@ -62,14 +66,33 @@ module.exports = function (grunt) {
         },
         clean: {
             all: ['<%= distdir %>/*'],
+            app: ['<%= distdir %>/*', '!<%= distdir %>/dockerui'],
             tmpl: ['<%= distdir %>/templates']
         },
         copy: {
             assets: {
                 files: [
                     {dest: '<%= distdir %>/fonts/', src: '**', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
-                    {dest: '<%= distdir %>/images/', src: '**', expand: true, cwd: 'bower_components/jquery.gritter/images/'},
-                    {dest: '<%= distdir %>/img', src: '**', expand: true, cwd: 'bower_components/vis/dist/img'},
+                    {
+                        dest: '<%= distdir %>/images/',
+                        src: ['**', '!trees.jpg'],
+                        expand: true,
+                        cwd: 'bower_components/jquery.gritter/images/'
+                    },
+                    {
+                        dest: '<%= distdir %>/img',
+                        src: [
+                            'network/downArrow.png',
+                            'network/leftArrow.png',
+                            'network/upArrow.png',
+                            'network/rightArrow.png',
+                            'network/minus.png',
+                            'network/plus.png',
+                            'network/zoomExtends.png'
+                        ],
+                        expand: true,
+                        cwd: 'bower_components/vis/dist/img'
+                    },
                     {dest: '<%= distdir %>/ico', src: '**', expand: true, cwd: 'assets/ico'}
                 ]
             }
@@ -166,12 +189,18 @@ module.exports = function (grunt) {
         },
         watch: {
             all: {
-                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.tpl.common %>', '<%= src.html %>'],
+                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
                 tasks: ['default', 'timestamp']
             },
             build: {
-                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.tpl.common %>', '<%= src.html %>'],
-                tasks: ['build', 'timestamp']
+                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
+                tasks: ['build', 'shell:buildImage', 'shell:run', 'shell:cleanImages']
+                /*
+                 * Why don't we just use a host volume
+                 * http.FileServer uses sendFile which virtualbox hates
+                 * Tried using a host volume with -v, copying files with `docker cp`, restating container, none worked
+                 * Rebuilding image on each change was only method that worked, takes ~4s per change to update
+                 */
             }
         },
         jshint: {
@@ -190,6 +219,37 @@ module.exports = function (grunt) {
                     angular: false,
                     '$': false
                 }
+            }
+        },
+        shell: {
+            buildImage: {
+                command: 'docker build --rm -t dockerui .'
+            },
+            buildBinary: {
+                command: [
+                    'docker run --rm -v $(pwd):/src centurylink/golang-builder',
+                    'shasum dockerui > dockerui-checksum.txt',
+                    'mkdir -p dist',
+                    'mv dockerui dist/'
+                ].join('&&')
+            },
+            run: {
+                command: [
+                    'docker stop dockerui',
+                    'docker rm dockerui',
+                    'docker run --privileged -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name dockerui dockerui'
+                ].join(';')
+            },
+            cleanImages: {
+                command: 'docker rmi $(docker images -q -f dangling=true)'
+            }
+        },
+        'if': {
+            binaryNotExist: {
+                options: {
+                    executable: 'dist/dockerui'
+                },
+                ifFalse: ['shell:buildBinary']
             }
         }
     });
