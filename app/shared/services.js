@@ -1,5 +1,5 @@
 angular.module('dockerui.services', ['ngResource'])
-    .factory('Container', function ($resource, Settings) {
+    .factory('Container', ['$resource', 'Settings', function ContainerFactory($resource, Settings) {
         'use strict';
         // Resource for interacting with the docker containers
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-1-containers
@@ -20,8 +20,8 @@ angular.module('dockerui.services', ['ngResource'])
             rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false},
             stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 2000}
         });
-    })
-    .factory('ContainerCommit', function ($resource, $http, Settings) {
+    }])
+    .factory('ContainerCommit', ['$resource', '$http', 'Settings', function ContainerCommitFactory($resource, $http, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#create-a-new-image-from-a-container-s-changes
         return {
@@ -38,8 +38,8 @@ angular.module('dockerui.services', ['ngResource'])
                 });
             }
         };
-    })
-    .factory('ContainerLogs', function ($resource, $http, Settings) {
+    }])
+    .factory('ContainerLogs', ['$resource', '$http', 'Settings', function ContainerLogsFactory($resource, $http, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#get-container-logs
         return {
@@ -58,8 +58,8 @@ angular.module('dockerui.services', ['ngResource'])
                 });
             }
         };
-    })
-    .factory('ContainerTop', function ($http, Settings) {
+    }])
+    .factory('ContainerTop', ['$http', 'Settings', function ($http, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#list-processes-running-inside-a-container
         return {
@@ -73,8 +73,8 @@ angular.module('dockerui.services', ['ngResource'])
                 }).success(callback);
             }
         };
-    })
-    .factory('Image', function ($resource, Settings) {
+    }])
+    .factory('Image', ['$resource', 'Settings', function ImageFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-2-images
         return $resource(Settings.url + '/images/:id/:action', {}, {
@@ -94,30 +94,30 @@ angular.module('dockerui.services', ['ngResource'])
             tag: {method: 'POST', params: {id: '@id', action: 'tag', force: 0, repo: '@repo'}},
             remove: {method: 'DELETE', params: {id: '@id'}, isArray: true}
         });
-    })
-    .factory('Docker', function ($resource, Settings) {
+    }])
+    .factory('Docker', ['$resource', 'Settings', function DockerFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#show-the-docker-version-information
         return $resource(Settings.url + '/version', {}, {
             get: {method: 'GET'}
         });
-    })
-    .factory('Auth', function ($resource, Settings) {
+    }])
+    .factory('Auth', ['$resource', 'Settings', function AuthFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#check-auth-configuration
         return $resource(Settings.url + '/auth', {}, {
             get: {method: 'GET'},
             update: {method: 'POST'}
         });
-    })
-    .factory('System', function ($resource, Settings) {
+    }])
+    .factory('System', ['$resource', 'Settings', function SystemFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#display-system-wide-information
         return $resource(Settings.url + '/info', {}, {
             get: {method: 'GET'}
         });
-    })
-    .factory('Settings', function (DOCKER_ENDPOINT, DOCKER_PORT, DOCKER_API_VERSION, UI_VERSION) {
+    }])
+    .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'DOCKER_API_VERSION', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, DOCKER_API_VERSION, UI_VERSION) {
         'use strict';
         var url = DOCKER_ENDPOINT;
         if (DOCKER_PORT) {
@@ -132,8 +132,8 @@ angular.module('dockerui.services', ['ngResource'])
             url: url,
             firstLoad: true
         };
-    })
-    .factory('ViewSpinner', function () {
+    }])
+    .factory('ViewSpinner', function ViewSpinnerFactory() {
         'use strict';
         var spinner = new Spinner();
         var target = document.getElementById('view');
@@ -147,7 +147,7 @@ angular.module('dockerui.services', ['ngResource'])
             }
         };
     })
-    .factory('Messages', function ($rootScope) {
+    .factory('Messages', ['$rootScope', function MessagesFactory($rootScope) {
         'use strict';
         return {
             send: function (title, text) {
@@ -175,8 +175,8 @@ angular.module('dockerui.services', ['ngResource'])
                 });
             }
         };
-    })
-    .factory('Dockerfile', function (Settings) {
+    }])
+    .factory('Dockerfile', ['Settings', function DockerfileFactory(Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#build-image-from-a-dockerfile
         var url = Settings.rawUrl + '/build';
@@ -192,8 +192,8 @@ angular.module('dockerui.services', ['ngResource'])
                 request.send(data);
             }
         };
-    })
-    .factory('LineChart', function (Settings) {
+    }])
+    .factory('LineChart', ['Settings', function LineChartFactory(Settings) {
         'use strict';
         return {
             build: function (id, data, getkey) {
@@ -240,4 +240,4 @@ angular.module('dockerui.services', ['ngResource'])
                     });
             }
         };
-    });
+    }]);
