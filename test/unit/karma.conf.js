@@ -5,18 +5,11 @@ basePath = '../..';
 files = [
     JASMINE,
     JASMINE_ADAPTER,
-    'assets/js/jquery-1.11.1.min.js',
-    'assets/js/jquery.gritter.min.js',
-    'assets/js/bootstrap.min.js',
-    'assets/js/spin.js',
-    'assets/js/Chart.min.js',
     'dist/angular.js',
-    'assets/js/ui-bootstrap/ui-bootstrap-custom-tpls-0.12.0.min.js',
-    'assets/js/angular-vis.js',
-    'test/assets/angular/angular-mocks.js',
-    'app/**/*.js',
-    'test/unit/**/*.spec.js',
-    'dist/templates/**/*.js'
+    'dist/vendor.js',
+    'dist/dockerui.js',
+    'bower_components/angular-mocks/angular-mocks.js',
+    'test/unit/**/*.spec.js'
 ];
 
 // use dots reporter, as travis terminal does not support escaping sequences
