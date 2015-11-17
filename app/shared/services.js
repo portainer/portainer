@@ -215,11 +215,15 @@ angular.module('dockerui.services', ['ngResource'])
                 var labels = [];
                 data = [];
                 var keys = Object.keys(map);
+                var max = 1;
 
                 for (i = keys.length - 1; i > -1; i--) {
                     var k = keys[i];
                     labels.push(k);
                     data.push(map[k]);
+                    if (map[k] > max) {
+                      max = map[k];
+                    }
                 }
                 var dataset = {
                     fillColor: "rgba(151,187,205,0.5)",
@@ -236,7 +240,7 @@ angular.module('dockerui.services', ['ngResource'])
                         scaleStepWidth: 1,
                         pointDotRadius: 1,
                         scaleOverride: true,
-                        scaleSteps: labels.length
+                        scaleSteps: max
                     });
             }
         };
