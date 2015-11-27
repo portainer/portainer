@@ -276,7 +276,8 @@
                                                 <div class="form-group form-inline">
                                                     <select ng-model="volume.name"
                                                             ng-options="name for name in containerNames track by name"
-                                                            class="form-control"/>
+                                                            class="form-control">
+                                                    </select>
                                                     <button class="btn btn-danger btn-xs form-control"
                                                             ng-click="rmEntry(config.HostConfig.VolumesFrom, volume)">
                                                         Remove
