@@ -148,6 +148,32 @@
                                         variable
                                     </button>
                                 </div>
+                                <div class="form-group">
+                                    <label>Labels:</label>
+
+                                    <div ng-repeat="label in config.Labels">
+                                        <div class="form-group form-inline">
+                                            <div class="form-group">
+                                                <label class="sr-only">Key:</label>
+                                                <input type="text" ng-model="label.key" class="form-control"
+                                                       placeholder="key"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="sr-only">Value:</label>
+                                                <input type="text" ng-model="label.value" class="form-control"
+                                                       placeholder="value"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <button class="btn btn-danger btn-xs form-control"
+                                                        ng-click="rmEntry(config.Labels, label)">Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-success btn-sm"
+                                            ng-click="addEntry(config.Labels, {key: '', value: ''})">Add Label
+                                    </button>
+                                </div>
                             </fieldset>
                         </accordion-group>
                         <accordion-group heading="HostConfig options" is-open="menuStatus.hostConfigOpen">

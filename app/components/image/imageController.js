@@ -2,11 +2,22 @@ angular.module('image', [])
     .controller('ImageController', ['$scope', '$q', '$routeParams', '$location', 'Image', 'Container', 'Messages', 'LineChart',
         function ($scope, $q, $routeParams, $location, Image, Container, Messages, LineChart) {
             $scope.history = [];
-            $scope.tag = {repo: '', force: false};
+            $scope.tagInfo = {repo: '', version: '', force: false};
+            $scope.id = '';
+            $scope.repoTags = [];
 
-            $scope.remove = function () {
-                Image.remove({id: $routeParams.id}, function (d) {
-                    Messages.send("Image Removed", $routeParams.id);
+            $scope.removeImage = function (id) {
+                Image.remove({id: id}, function (d) {
+                    d.forEach(function(msg){
+                        var key = Object.keys(msg)[0];
+                        Messages.send(key, msg[key]);
+                    });
+                    // If last message key is 'Deleted' then assume the image is gone and send to images page
+                    if (d[d.length-1].Deleted) {
+                        $location.path('/images');
+                    } else {
+                        $location.path('/images/' + $scope.id); // Refresh the current page.
+                    }
                 }, function (e) {
                     $scope.error = e.data;
                     $('#error-message').show();
@@ -19,24 +30,30 @@ angular.module('image', [])
                 });
             };
 
-            $scope.updateTag = function () {
-                var tag = $scope.tag;
-                Image.tag({id: $routeParams.id, repo: tag.repo, force: tag.force ? 1 : 0}, function (d) {
+            $scope.addTag = function () {
+                var tag = $scope.tagInfo;
+                Image.tag({
+                    id: $routeParams.id,
+                    repo: tag.repo,
+                    tag: tag.version,
+                    force: tag.force ? 1 : 0
+                }, function (d) {
                     Messages.send("Tag Added", $routeParams.id);
+                    $location.path('/images/' + $scope.id);
                 }, function (e) {
                     $scope.error = e.data;
                     $('#error-message').show();
                 });
             };
 
-            function getContainersFromImage($q, Container, tag) {
+            function getContainersFromImage($q, Container, imageId) {
                 var defer = $q.defer();
 
                 Container.query({all: 1, notruc: 1}, function (d) {
                     var containers = [];
                     for (var i = 0; i < d.length; i++) {
                         var c = d[i];
-                        if (c.Image === tag) {
+                        if (c.ImageID === imageId) {
                             containers.push(new ContainerViewModel(c));
                         }
                     }
@@ -48,18 +65,14 @@ angular.module('image', [])
 
             Image.get({id: $routeParams.id}, function (d) {
                 $scope.image = d;
-                $scope.tag = d.id;
-                var t = $routeParams.tag;
-                if (t && t !== ":") {
-                    $scope.tag = t;
-                    var promise = getContainersFromImage($q, Container, t);
+                $scope.id = d.Id;
+                $scope.RepoTags = d.RepoTags;
 
-                    promise.then(function (containers) {
-                        LineChart.build('#containers-started-chart', containers, function (c) {
-                            return new Date(c.Created * 1000).toLocaleDateString();
-                        });
+                getContainersFromImage($q, Container, $scope.id).then(function (containers) {
+                    LineChart.build('#containers-started-chart', containers, function (c) {
+                        return new Date(c.Created * 1000).toLocaleDateString();
                     });
-                }
+                });
             }, function (e) {
                 if (e.status === 404) {
                     $('.detail').hide();

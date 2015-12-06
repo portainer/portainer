@@ -11,6 +11,7 @@ angular.module('startContainer', ['ui.bootstrap'])
 
             $scope.config = {
                 Env: [],
+                Labels: [],
                 Volumes: [],
                 SecurityOpts: [],
                 HostConfig: {
@@ -66,6 +67,11 @@ angular.module('startContainer', ['ui.bootstrap'])
                 config.Env = config.Env.map(function (envar) {
                     return envar.name + '=' + envar.value;
                 });
+                var labels = {};
+                config.Labels = config.Labels.forEach(function(label) {
+                    labels[label.key] = label.value;
+                });
+                config.Labels = labels;
 
                 config.Volumes = getNames(config.Volumes);
                 config.SecurityOpts = getNames(config.SecurityOpts);

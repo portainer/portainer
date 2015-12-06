@@ -6,10 +6,10 @@
 
 <div class="detail">
 
-    <h4>Image: {{ tag }}</h4>
+    <h4>Image: {{ id }}</h4>
 
     <div class="btn-group detail">
-        <button class="btn btn-success" data-toggle="modal" data-target="#create-modal">Create</button>
+        <button class="btn btn-success" data-toggle="modal" data-target="#create-modal">Start Container</button>
     </div>
 
     <div>
@@ -23,8 +23,18 @@
     <table class="table table-striped">
         <tbody>
         <tr>
+            <td>Tags:</td>
+            <td>
+                <ul>
+                    <li ng-repeat="tag in RepoTags">{{ tag }}
+                        <button ng-click="removeImage(tag)" class="btn btn-sm btn-danger">Remove tag</button>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
             <td>Created:</td>
-            <td>{{ image.Created }}</td>
+            <td>{{ image.Created | date: 'medium'}}</td>
         </tr>
         <tr>
             <td>Parent:</td>
@@ -89,14 +99,15 @@
                 <legend>Tag image</legend>
                 <div class="form-group">
                     <label>Tag:</label>
-                    <input type="text" placeholder="repo..." ng-model="tag.repo" class="form-control">
+                    <input type="text" placeholder="repo" ng-model="tagInfo.repo" class="form-control">
+                    <input type="text" placeholder="version" ng-model="tagInfo.version" class="form-control">
                 </div>
                 <div class="form-group">
                     <label class="checkbox">
-                        <input type="checkbox" ng-model="tag.force" class="form-control"/> Force?
+                        <input type="checkbox" ng-model="tagInfo.force" class="form-control"/> Force?
                     </label>
                 </div>
-                <input type="button" ng-click="updateTag()" value="Tag" class="btn btn-primary"/>
+                <input type="button" ng-click="addTag()" value="Add Tag" class="btn btn-primary"/>
             </fieldset>
         </form>
     </div>
@@ -104,6 +115,6 @@
     <hr/>
 
     <div class="btn-remove">
-        <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="remove()">Remove Image</button>
+        <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="removeImage(id)">Remove Image</button>
     </div>
 </div>
