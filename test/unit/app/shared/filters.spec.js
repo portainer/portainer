@@ -73,8 +73,8 @@ describe('filters', function () {
     });
 
     describe('getstatelabel', function () {
-        it('should return an empty string when state is undefined', inject(function (getstatelabelFilter) {
-            expect(getstatelabelFilter(undefined)).toBe('');
+        it('should return default when state is undefined', inject(function (getstatelabelFilter) {
+            expect(getstatelabelFilter(undefined)).toBe('label-default');
         }));
 
         it('should return label-important when a ghost state is detected', inject(function (getstatelabelFilter) {

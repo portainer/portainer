@@ -111,6 +111,43 @@ describe('startContainerController', function () {
         });
     });
 
+    describe('Create and start a container with labels', function () {
+        it('should issue a correct create request to the Docker remote API', function () {
+            var controller = createController();
+            var id = '6abd8bfba81cf8a05a76a4bdefcb36c4b66cd02265f4bfcd0e236468696ebc6c';
+            var expectedBody = {
+                'name': 'container-name',
+                'Labels': {
+                    "org.foo.bar": "Baz",
+                    "com.biz.baz": "Boo"
+                }
+            };
+
+            expectGetContainers();
+
+            $httpBackend.expectPOST('dockerapi/containers/create?name=container-name', expectedBody).respond({
+                'Id': id,
+                'Warnings': null
+            });
+            $httpBackend.expectPOST('dockerapi/containers/' + id + '/start').respond({
+                'id': id,
+                'Warnings': null
+            });
+
+            scope.config.name = 'container-name';
+            scope.config.Labels = [{
+                key: 'org.foo.bar',
+                value: 'Baz'
+            }, {
+                key: 'com.biz.baz',
+                value: 'Boo'
+            }];
+
+            scope.create();
+            $httpBackend.flush();
+        });
+    });
+
     describe('Create and start a container with volumesFrom', function () {
         it('should issue a correct create request to the Docker remote API', function () {
             var controller = createController();

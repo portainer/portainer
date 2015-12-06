@@ -54,7 +54,7 @@
         <tbody>
         <tr>
             <td>Created:</td>
-            <td>{{ container.Created }}</td>
+            <td>{{ container.Created | date: 'medium' }}</td>
         </tr>
         <tr>
             <td>Path:</td>
@@ -62,7 +62,9 @@
         </tr>
         <tr>
             <td>Args:</td>
-            <td>{{ container.Args }}</td>
+            <td>
+                <pre>{{ container.Args.join(' ') || 'None' }}</pre>
+            </td>
         </tr>
         <tr>
             <td>Exposed Ports:</td>
@@ -78,6 +80,21 @@
                 <ul>
                     <li ng-repeat="k in container.Config.Env">{{ k }}</li>
                 </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>Labels:</td>
+            <td>
+                <table role="table" class="table">
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr ng-repeat="(k, v) in container.Config.Labels">
+                        <td>{{ k }}</td>
+                        <td>{{ v }}</td>
+                    </tr>
+                </table>
             </td>
         </tr>
 
@@ -110,7 +127,9 @@
         </tr>
         <tr>
             <td>Entrypoint:</td>
-            <td>{{ container.Config.Entrypoint }}</td>
+            <td>
+                <pre>{{ container.Config.Entrypoint.join(' ') }}</pre>
+            </td>
         </tr>
         <tr>
             <td>Volumes:</td>
@@ -127,7 +146,15 @@
         </tr>
         <tr>
             <td>State:</td>
-            <td><span class="label {{ container.State|getstatelabel }}">{{ container.State|getstatetext }}</span></td>
+            <td>
+                <accordion close-others="true">
+                    <accordion-group heading="{{ container.State|getstatetext }}">
+                        <ul>
+                            <li ng-repeat="(key, val) in container.State">{{key}} : {{ val }}</li>
+                        </ul>
+                    </accordion-group>
+                </accordion>
+            </td>
         </tr>
         <tr>
             <td>Logs:</td>
