@@ -45,7 +45,7 @@ module.exports = function (grunt) {
             jsTpl: ['<%= distdir %>/templates/**/*.js'],
             jsVendor: [
                 'bower_components/jquery/dist/jquery.js',
-                'bower_components/jquery.gritter/js/jquery.gritter.js',
+                'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
                 'bower_components/bootstrap/dist/js/bootstrap.js',
                 'bower_components/spin.js/spin.js',
                 'bower_components/vis/dist/vis.js',
