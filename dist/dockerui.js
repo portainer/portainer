@@ -1,4 +1,4 @@
-/*! dockerui - v0.8.0 - 2015-12-06
+/*! dockerui - v0.8.0 - 2015-12-07
  * https://github.com/crosbymichael/dockerui
  * Copyright (c) 2015 Michael Crosby & Kevan Ahlquist;
  * Licensed MIT
