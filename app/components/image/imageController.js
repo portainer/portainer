@@ -63,10 +63,29 @@ angular.module('image', [])
                 return defer.promise;
             }
 
+            /**
+             * Get RepoTags from the /images/query endpoint instead of /image/json,
+             * for backwards compatibility with Docker API versions older than 1.21
+             * @param {string} imageId
+             */
+            function getRepoTags(imageId) {
+                Image.query({}, function (d) {
+                    d.forEach(function(image) {
+                        if (image.Id === imageId && image.RepoTags[0] !== '<none>:<none>') {
+                            $scope.RepoTags = image.RepoTags;
+                        }
+                    });
+                });
+            }
+
             Image.get({id: $routeParams.id}, function (d) {
                 $scope.image = d;
                 $scope.id = d.Id;
-                $scope.RepoTags = d.RepoTags;
+                if (d.RepoTags) {
+                    $scope.RepoTags = d.RepoTags;
+                } else {
+                    getRepoTags($scope.id);
+                }
 
                 getContainersFromImage($q, Container, $scope.id).then(function (containers) {
                     LineChart.build('#containers-started-chart', containers, function (c) {
