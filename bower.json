@@ -1,6 +1,6 @@
 {
   "name": "dockerui",
-  "version": "0.8.0",
+  "version": "0.9.0-beta",
   "homepage": "https://github.com/crosbymichael/dockerui",
   "authors": [
     "Michael Crosby <crosbymichael@gmail.com>",
