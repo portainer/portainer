@@ -1,4 +1,2 @@
-node_modules
-bower_components
-.git
-Dockerfile
+*
+!dist
