@@ -117,6 +117,16 @@ angular.module('dockerui.services', ['ngResource'])
             get: {method: 'GET'}
         });
     }])
+    .factory('Network', ['$resource', 'Settings', function NetworksFactory($resource, Settings) {
+        'use strict';
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-5-networks
+        return $resource(Settings.url + '/networks/:id/:action', {}, {
+            query: {method: 'GET', isArray: true},
+            get: {method: 'GET'},
+            create: {method: 'POST', params: {action: 'create'}},
+            remove: {method: 'DELETE', params: {id: '@id'}}
+        });
+    }])
     .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'DOCKER_API_VERSION', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, DOCKER_API_VERSION, UI_VERSION) {
         'use strict';
         var url = DOCKER_ENDPOINT;
