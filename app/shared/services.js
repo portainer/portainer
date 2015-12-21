@@ -117,7 +117,7 @@ angular.module('dockerui.services', ['ngResource'])
             get: {method: 'GET'}
         });
     }])
-    .factory('Network', ['$resource', 'Settings', function NetworksFactory($resource, Settings) {
+    .factory('Network', ['$resource', 'Settings', function NetworkFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-5-networks
         return $resource(Settings.url + '/networks/:id/:action', {id: '@id'}, {
@@ -127,6 +127,16 @@ angular.module('dockerui.services', ['ngResource'])
             remove: {method: 'DELETE'},
             connect: {method: 'POST', params: {action: 'connect'}},
             disconnect: {method: 'POST', params: {action: 'disconnect'}}
+        });
+    }])
+    .factory('Volume', ['$resource', 'Settings', function VolumeFactory($resource, Settings) {
+        'use strict';
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-5-networks
+        return $resource(Settings.url + '/volumes/:name/:action', {name: '@name'}, {
+            query: {method: 'GET'},
+            get: {method: 'GET'},
+            create: {method: 'POST', params: {action: 'create'}},
+            remove: {method: 'DELETE'}
         });
     }])
     .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, UI_VERSION) {

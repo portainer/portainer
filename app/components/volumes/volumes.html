@@ -1,0 +1,56 @@
+<h2>Volumes:</h2>
+
+<div>
+    <ul class="nav nav-pills pull-left">
+        <li class="dropdown">
+            <a class="dropdown-toggle" id="drop4" role="button" data-toggle="dropdown" data-target="#">Actions <b
+                    class="caret"></b></a>
+            <ul id="menu1" class="dropdown-menu" role="menu" aria-labelledby="drop4">
+                <li><a tabindex="-1" href="" ng-click="removeAction()">Remove</a></li>
+            </ul>
+        </li>
+    </ul>
+
+    <div class="pull-right form-inline">
+        <input type="text" class="form-control" id="filter" placeholder="Filter" ng-model="filter"/> <label
+            class="sr-only" for="filter">Filter</label>
+    </div>
+</div>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()"/> Select</th>
+        <th>Name</th>
+        <th>Driver</th>
+        <th>Mountpoint</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="volume in volumes | filter:filter | orderBy:predicate">
+        <td><input type="checkbox" ng-model="volume.Checked"/></td>
+        <td>{{ volume.Name|truncate:20 }}</td>
+        <td>{{ volume.Driver }}</td>
+        <td>{{ volume.Mountpoint }}</td>
+    </tr>
+    </tbody>
+</table>
+<div class="row">
+    <div class="col-xs-offset-3 col-xs-6">
+        <form role="form" class="">
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" placeholder='tardis'
+                       ng-model="createVolumeConfig.Name" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label>Driver:</label>
+                <input type="text" placeholder='local'
+                       ng-model="createVolumeConfig.Driver" class="form-control"/>
+            </div>
+            <button type="button" class="btn btn-success btn-sm"
+                    ng-click="addVolume(createVolumeConfig)">
+                Create Volume
+            </button>
+        </form>
+    </div>
+</div>

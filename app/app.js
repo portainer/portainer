@@ -21,7 +21,8 @@ angular.module('dockerui', [
     'events',
     'stats',
     'network',
-    'networks'])
+    'networks',
+    'volumes'])
     .config(['$routeProvider', function ($routeProvider) {
         'use strict';
         $routeProvider.when('/', {
