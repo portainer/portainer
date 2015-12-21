@@ -95,7 +95,7 @@ angular.module('dockerui.services', ['ngResource'])
             remove: {method: 'DELETE', params: {id: '@id'}, isArray: true}
         });
     }])
-    .factory('Docker', ['$resource', 'Settings', function DockerFactory($resource, Settings) {
+    .factory('Version', ['$resource', 'Settings', function VersionFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#show-the-docker-version-information
         return $resource(Settings.url + '/version', {}, {
@@ -110,7 +110,7 @@ angular.module('dockerui.services', ['ngResource'])
             update: {method: 'POST'}
         });
     }])
-    .factory('System', ['$resource', 'Settings', function SystemFactory($resource, Settings) {
+    .factory('Info', ['$resource', 'Settings', function InfoFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#display-system-wide-information
         return $resource(Settings.url + '/info', {}, {
@@ -129,7 +129,7 @@ angular.module('dockerui.services', ['ngResource'])
             disconnect: {method: 'POST', params: {action: 'disconnect'}}
         });
     }])
-    .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'DOCKER_API_VERSION', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, DOCKER_API_VERSION, UI_VERSION) {
+    .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, UI_VERSION) {
         'use strict';
         var url = DOCKER_ENDPOINT;
         if (DOCKER_PORT) {
@@ -138,8 +138,6 @@ angular.module('dockerui.services', ['ngResource'])
         return {
             displayAll: false,
             endpoint: DOCKER_ENDPOINT,
-            version: DOCKER_API_VERSION,
-            rawUrl: DOCKER_ENDPOINT + DOCKER_PORT + '/' + DOCKER_API_VERSION,
             uiVersion: UI_VERSION,
             url: url,
             firstLoad: true
@@ -185,23 +183,6 @@ angular.module('dockerui.services', ['ngResource'])
                         }
                     }
                 });
-            }
-        };
-    }])
-    .factory('Dockerfile', ['Settings', function DockerfileFactory(Settings) {
-        'use strict';
-        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#build-image-from-a-dockerfile
-        var url = Settings.rawUrl + '/build';
-        return {
-            build: function (file, callback) {
-                var data = new FormData();
-                var dockerfile = new Blob([file], {type: 'text/text'});
-                data.append('Dockerfile', dockerfile);
-
-                var request = new XMLHttpRequest();
-                request.onload = callback;
-                request.open('POST', url);
-                request.send(data);
             }
         };
     }])

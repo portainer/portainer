@@ -1,6 +1,6 @@
 angular.module('pullImage', [])
-    .controller('PullImageController', ['$scope', '$log', 'Dockerfile', 'Messages', 'Image', 'ViewSpinner',
-        function ($scope, $log, Dockerfile, Messages, Image, ViewSpinner) {
+    .controller('PullImageController', ['$scope', '$log', 'Messages', 'Image', 'ViewSpinner',
+        function ($scope, $log, Messages, Image, ViewSpinner) {
             $scope.template = 'app/components/pullImage/pullImage.html';
 
             $scope.init = function () {
