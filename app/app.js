@@ -20,6 +20,7 @@ angular.module('dockerui', [
     'containerTop',
     'events',
     'stats',
+    'network',
     'networks'])
     .config(['$routeProvider', function ($routeProvider) {
         'use strict';

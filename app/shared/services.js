@@ -120,11 +120,13 @@ angular.module('dockerui.services', ['ngResource'])
     .factory('Network', ['$resource', 'Settings', function NetworksFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-5-networks
-        return $resource(Settings.url + '/networks/:id/:action', {}, {
+        return $resource(Settings.url + '/networks/:id/:action', {id: '@id'}, {
             query: {method: 'GET', isArray: true},
             get: {method: 'GET'},
             create: {method: 'POST', params: {action: 'create'}},
-            remove: {method: 'DELETE', params: {id: '@id'}}
+            remove: {method: 'DELETE'},
+            connect: {method: 'POST', params: {action: 'connect'}},
+            disconnect: {method: 'POST', params: {action: 'disconnect'}}
         });
     }])
     .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'DOCKER_API_VERSION', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, DOCKER_API_VERSION, UI_VERSION) {
@@ -232,7 +234,7 @@ angular.module('dockerui.services', ['ngResource'])
                     labels.push(k);
                     data.push(map[k]);
                     if (map[k] > max) {
-                      max = map[k];
+                        max = map[k];
                     }
                 }
                 var dataset = {
