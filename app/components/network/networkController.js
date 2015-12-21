@@ -3,14 +3,14 @@ angular.module('network', []).config(['$routeProvider', function ($routeProvider
         templateUrl: 'app/components/network/network.html',
         controller: 'NetworkController'
     });
-}]).controller('NetworkController', ['$scope', 'Network', 'ViewSpinner', 'Messages', '$routeParams', '$location',
-    function ($scope, Network, ViewSpinner, Messages, $routeParams, $location) {
+}]).controller('NetworkController', ['$scope', 'Network', 'ViewSpinner', 'Messages', '$routeParams', '$location', 'errorMsgFilter',
+    function ($scope, Network, ViewSpinner, Messages, $routeParams, $location, errorMsgFilter) {
 
         $scope.disconnect = function disconnect(networkId, containerId) {
             ViewSpinner.spin();
             Network.disconnect({id: $routeParams.id}, {Container: containerId}, function (d) {
                 ViewSpinner.stop();
-                Messages.send("Container disconnected", d);
+                Messages.send("Container disconnected", containerId);
                 $location.path('/networks/' + $routeParams.id); // Refresh the current page.
             }, function (e) {
                 ViewSpinner.stop();
@@ -21,7 +21,12 @@ angular.module('network', []).config(['$routeProvider', function ($routeProvider
             ViewSpinner.spin();
             Network.connect({id: $routeParams.id}, {Container: containerId}, function (d) {
                 ViewSpinner.stop();
-                Messages.send("Container connected", d);
+                var errmsg = errorMsgFilter(d);
+                if (errmsg) {
+                    Messages.error('Error', errmsg);
+                } else {
+                    Messages.send("Container connected", d);
+                }
                 $location.path('/networks/' + $routeParams.id); // Refresh the current page.
             }, function (e) {
                 ViewSpinner.stop();

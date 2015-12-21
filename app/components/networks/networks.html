@@ -32,7 +32,7 @@
     </thead>
     <tbody>
     <tr ng-repeat="network in networks | filter:filter | orderBy:predicate">
-        <td><input type="checkbox" ng-model="image.Checked"/></td>
+        <td><input type="checkbox" ng-model="network.Checked"/></td>
         <td><a href="#/networks/{{ network.Id }}/">{{ network.Name|truncate:20}}</a></td>
         <td>{{ network.Id }}</td>
         <td>{{ network.Scope }}</td>
@@ -59,17 +59,17 @@
             <div class="form-group">
                 <label>Subnet:</label>
                 <input type="text" placeholder='172.20.0.0/16'
-                       ng-model="createNetworkConfig.Subnet" class="form-control"/>
+                       ng-model="createNetworkConfig.IPAM.Config[0].Subnet" class="form-control"/>
             </div>
             <div class="form-group">
                 <label>IPRange:</label>
                 <input type="text" placeholder='172.20.10.0/24'
-                       ng-model="createNetworkConfig.IPRange" class="form-control"/>
+                       ng-model="createNetworkConfig.IPAM.Config[0].IPRange" class="form-control"/>
             </div>
             <div class="form-group">
                 <label>Gateway:</label>
                 <input type="text" placeholder='172.20.10.11'
-                       ng-model="createNetworkConfig.Gateway" class="form-control"/>
+                       ng-model="createNetworkConfig.IPAM.Config[0].Gateway" class="form-control"/>
             </div>
             <button type="button" class="btn btn-success btn-sm"
                     ng-click="addNetwork(createNetworkConfig)">
