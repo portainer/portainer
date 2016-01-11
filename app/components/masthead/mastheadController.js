@@ -11,5 +11,5 @@ angular.module('masthead', [])
 
         $scope.refresh = function() {
             location.reload();
-        }
+        };
     }]);
