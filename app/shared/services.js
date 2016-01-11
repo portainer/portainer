@@ -95,7 +95,7 @@ angular.module('dockerui.services', ['ngResource'])
             remove: {method: 'DELETE', params: {id: '@id'}, isArray: true}
         });
     }])
-    .factory('Docker', ['$resource', 'Settings', function DockerFactory($resource, Settings) {
+    .factory('Version', ['$resource', 'Settings', function VersionFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#show-the-docker-version-information
         return $resource(Settings.url + '/version', {}, {
@@ -110,27 +110,48 @@ angular.module('dockerui.services', ['ngResource'])
             update: {method: 'POST'}
         });
     }])
-    .factory('System', ['$resource', 'Settings', function SystemFactory($resource, Settings) {
+    .factory('Info', ['$resource', 'Settings', function InfoFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#display-system-wide-information
         return $resource(Settings.url + '/info', {}, {
             get: {method: 'GET'}
         });
     }])
-    .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'DOCKER_API_VERSION', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, DOCKER_API_VERSION, UI_VERSION) {
+    .factory('Network', ['$resource', 'Settings', function NetworkFactory($resource, Settings) {
+        'use strict';
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-5-networks
+        return $resource(Settings.url + '/networks/:id/:action', {id: '@id'}, {
+            query: {method: 'GET', isArray: true},
+            get: {method: 'GET'},
+            create: {method: 'POST', params: {action: 'create'}},
+            remove: {method: 'DELETE'},
+            connect: {method: 'POST', params: {action: 'connect'}},
+            disconnect: {method: 'POST', params: {action: 'disconnect'}}
+        });
+    }])
+    .factory('Volume', ['$resource', 'Settings', function VolumeFactory($resource, Settings) {
+        'use strict';
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-5-networks
+        return $resource(Settings.url + '/volumes/:name/:action', {name: '@name'}, {
+            query: {method: 'GET'},
+            get: {method: 'GET'},
+            create: {method: 'POST', params: {action: 'create'}},
+            remove: {method: 'DELETE'}
+        });
+    }])
+    .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, UI_VERSION) {
         'use strict';
         var url = DOCKER_ENDPOINT;
         if (DOCKER_PORT) {
             url = url + DOCKER_PORT + '\\' + DOCKER_PORT;
         }
+        var firstLoad = (localStorage.getItem('firstLoad') || 'true') === 'true';
         return {
             displayAll: false,
             endpoint: DOCKER_ENDPOINT,
-            version: DOCKER_API_VERSION,
-            rawUrl: DOCKER_ENDPOINT + DOCKER_PORT + '/' + DOCKER_API_VERSION,
             uiVersion: UI_VERSION,
             url: url,
-            firstLoad: true
+            firstLoad: firstLoad
         };
     }])
     .factory('ViewSpinner', function ViewSpinnerFactory() {
@@ -176,23 +197,6 @@ angular.module('dockerui.services', ['ngResource'])
             }
         };
     }])
-    .factory('Dockerfile', ['Settings', function DockerfileFactory(Settings) {
-        'use strict';
-        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#build-image-from-a-dockerfile
-        var url = Settings.rawUrl + '/build';
-        return {
-            build: function (file, callback) {
-                var data = new FormData();
-                var dockerfile = new Blob([file], {type: 'text/text'});
-                data.append('Dockerfile', dockerfile);
-
-                var request = new XMLHttpRequest();
-                request.onload = callback;
-                request.open('POST', url);
-                request.send(data);
-            }
-        };
-    }])
     .factory('LineChart', ['Settings', function LineChartFactory(Settings) {
         'use strict';
         return {
@@ -222,7 +226,7 @@ angular.module('dockerui.services', ['ngResource'])
                     labels.push(k);
                     data.push(map[k]);
                     if (map[k] > max) {
-                      max = map[k];
+                        max = map[k];
                     }
                 }
                 var steps = Math.min(max, 10);

@@ -1,5 +1,5 @@
 angular.module('builder', [])
-    .controller('BuilderController', ['$scope', 'Dockerfile', 'Messages',
-        function ($scope, Dockerfile, Messages) {
+    .controller('BuilderController', ['$scope',
+        function ($scope) {
             $scope.template = 'app/components/builder/builder.html';
         }]);

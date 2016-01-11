@@ -1,21 +1,7 @@
 angular.module('stats', [])
     .controller('StatsController', ['Settings', '$scope', 'Messages', '$timeout', 'Container', '$routeParams', 'humansizeFilter', '$sce', function (Settings, $scope, Messages, $timeout, Container, $routeParams, humansizeFilter, $sce) {
-        // TODO: Implement memory chart, force scale to 0-100 for cpu, 0 to limit for memory, fix charts on dashboard,
+        // TODO: Force scale to 0-100 for cpu, fix charts on dashboard,
         // TODO: Force memory scale to 0 - max memory
-        //var initialStats = {}; // Used to set scale of memory graph.
-        //
-        //Container.stats({id: $routeParams.id}, function (d) {
-        //    var arr = Object.keys(d).map(function (key) {
-        //        return d[key];
-        //    });
-        //    if (arr.join('').indexOf('no such id') !== -1) {
-        //        Messages.error('Unable to retrieve stats', 'Is this container running?');
-        //        return;
-        //    }
-        //    initialStats = d;
-        //}, function () {
-        //    Messages.error('Unable to retrieve stats', 'Is this container running?');
-        //});
 
         var cpuLabels = [];
         var cpuData = [];
