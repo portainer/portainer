@@ -1,12 +1,21 @@
 <div class="masthead">
     <h3 class="text-muted">DockerUI</h3>
-    <ul class="nav well">
-        <li><a href="#/">Dashboard</a></li>
-        <li><a href="#/containers/">Containers</a></li>
-        <li><a href="#/containers_network/">Containers Network</a></li>
-        <li><a href="#/images/">Images</a></li>
-        <li><a href="#/networks/" ng-if="showNetworksVolumes">Networks</a></li>
-        <li><a href="#/volumes/" ng-if="showNetworksVolumes">Volumes</a></li>
-        <li><a href="#/info/">Info</a></li>
-    </ul>
+
+    <div class="col-xs-11">
+        <ul class="nav well">
+            <li><a href="#/">Dashboard</a></li>
+            <li><a href="#/containers/">Containers</a></li>
+            <li><a href="#/containers_network/">Containers Network</a></li>
+            <li><a href="#/images/">Images</a></li>
+            <li><a href="#/networks/" ng-if="showNetworksVolumes">Networks</a></li>
+            <li><a href="#/volumes/" ng-if="showNetworksVolumes">Volumes</a></li>
+            <li><a href="#/info/">Info</a></li>
+        </ul>
+    </div>
+    <div class="col-xs-1">
+        <button class="btn btn-primary" ng-click="refresh()">
+            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+            Refresh
+        </button>
+    </div>
 </div>

@@ -8,4 +8,8 @@ angular.module('masthead', [])
                 $scope.showNetworksVolumes = true;
             }
         });
+
+        $scope.refresh = function() {
+            location.reload();
+        }
     }]);
