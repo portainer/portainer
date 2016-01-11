@@ -138,6 +138,12 @@ angular.module('stats', [])
         var lastRxBytes = 0, lastTxBytes = 0;
 
         function updateNetworkChart(data) {
+            // 1.9+ contains an object of networks, for now we'll just show stats for the first network
+            // TODO: Show graphs for all networks
+            if (data.networks) {
+                $scope.networkName = Object.keys(data.networks)[0];
+                data.network = data.networks[$scope.networkName];
+            }
             var rxBytes = 0, txBytes = 0;
             if (lastRxBytes !== 0 || lastTxBytes !== 0) {
                 // These will be zero on first call, ignore to prevent large graph spike
