@@ -145,12 +145,13 @@ angular.module('dockerui.services', ['ngResource'])
         if (DOCKER_PORT) {
             url = url + DOCKER_PORT + '\\' + DOCKER_PORT;
         }
+        var firstLoad = (localStorage.getItem('firstLoad') || 'true') === 'true';
         return {
             displayAll: false,
             endpoint: DOCKER_ENDPOINT,
             uiVersion: UI_VERSION,
             url: url,
-            firstLoad: true
+            firstLoad: firstLoad
         };
     }])
     .factory('ViewSpinner', function ViewSpinnerFactory() {
