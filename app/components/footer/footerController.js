@@ -1,9 +1,9 @@
 angular.module('footer', [])
-    .controller('FooterController', ['$scope', 'Settings', 'Docker', function ($scope, Settings, Docker) {
+    .controller('FooterController', ['$scope', 'Settings', 'Version', function ($scope, Settings, Version) {
         $scope.template = 'app/components/footer/statusbar.html';
 
         $scope.uiVersion = Settings.uiVersion;
-        Docker.get({}, function (d) {
+        Version.get({}, function (d) {
             $scope.apiVersion = d.ApiVersion;
         });
     }]);

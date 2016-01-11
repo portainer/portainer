@@ -21,6 +21,7 @@ angular.module('dashboard', [])
         if (Settings.firstLoad) {
             opts.animation = true;
             Settings.firstLoad = false;
+            localStorage.setItem('firstLoad', false);
             $('#masthead').show();
 
             setTimeout(function () {

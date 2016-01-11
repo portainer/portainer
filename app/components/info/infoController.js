@@ -1,15 +1,14 @@
 angular.module('info', [])
-    .controller('InfoController', ['$scope', 'System', 'Docker', 'Settings', 'Messages',
-        function ($scope, System, Docker, Settings, Messages) {
+    .controller('InfoController', ['$scope', 'Info', 'Version', 'Settings',
+        function ($scope, Info, Version, Settings) {
             $scope.info = {};
             $scope.docker = {};
             $scope.endpoint = Settings.endpoint;
-            $scope.apiVersion = Settings.version;
 
-            Docker.get({}, function (d) {
+            Version.get({}, function (d) {
                 $scope.docker = d;
             });
-            System.get({}, function (d) {
+            Info.get({}, function (d) {
                 $scope.info = d;
             });
         }]);
