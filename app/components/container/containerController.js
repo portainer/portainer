@@ -1,6 +1,6 @@
 angular.module('container', [])
-    .controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'ContainerCommit', 'Messages', 'ViewSpinner',
-        function ($scope, $routeParams, $location, Container, ContainerCommit, Messages, ViewSpinner) {
+    .controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'ContainerCommit', 'Messages', 'ViewSpinner', '$timeout',
+        function ($scope, $routeParams, $location, Container, ContainerCommit, Messages, ViewSpinner, $timeout) {
             $scope.changes = [];
             $scope.edit = false;
 
@@ -94,6 +94,7 @@ angular.module('container', [])
                 ViewSpinner.spin();
                 Container.remove({id: $routeParams.id}, function (d) {
                     update();
+                    $location.path('/containers');
                     Messages.send("Container removed", $routeParams.id);
                 }, function (e) {
                     update();

@@ -14,8 +14,27 @@ module.exports = function (grunt) {
 
     // Default task.
     grunt.registerTask('default', ['jshint', 'build', 'karma:unit']);
-    grunt.registerTask('build', ['clean:app', 'if:binaryNotExist', 'html2js', 'concat', 'clean:tmpl', 'recess:build', 'copy']);
-    grunt.registerTask('release', ['clean:all', 'if:binaryNotExist', 'html2js', 'uglify', 'clean:tmpl', 'jshint', 'karma:unit', 'concat:index', 'recess:min', 'copy']);
+    grunt.registerTask('build', [
+        'clean:app',
+        'if:binaryNotExist',
+        'html2js',
+        'concat',
+        'clean:tmpl',
+        'recess:build',
+        'copy'
+    ]);
+    grunt.registerTask('release', [
+        'clean:all',
+        'if:binaryNotExist',
+        'html2js',
+        'uglify',
+        'clean:tmpl',
+        'jshint',
+        'karma:unit',
+        'concat:index',
+        'recess:min',
+        'copy'
+    ]);
     grunt.registerTask('test-watch', ['karma:watch']);
     grunt.registerTask('run', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
     grunt.registerTask('run-dev', ['if:binaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);

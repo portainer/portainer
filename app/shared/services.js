@@ -228,6 +228,7 @@ angular.module('dockerui.services', ['ngResource'])
                         max = map[k];
                     }
                 }
+                var steps = Math.min(max, 10);
                 var dataset = {
                     fillColor: "rgba(151,187,205,0.5)",
                     strokeColor: "rgba(151,187,205,1)",
@@ -240,10 +241,11 @@ angular.module('dockerui.services', ['ngResource'])
                         datasets: [dataset]
                     },
                     {
-                        scaleStepWidth: 1,
+                        scaleStepWidth: Math.ceil(max / steps),
                         pointDotRadius: 1,
+                        scaleIntegersOnly: true,
                         scaleOverride: true,
-                        scaleSteps: max
+                        scaleSteps: steps
                     });
             }
         };
