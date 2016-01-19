@@ -106,7 +106,7 @@
             <td>Ports:</td>
             <td>
                 <ul style="display:inline-table">
-                    <li ng-repeat="(containerport, hostports) in container.HostConfig.PortBindings">
+                    <li ng-repeat="(containerport, hostports) in container.NetworkSettings.Ports">
                         {{ containerport }} => <span class="label label-default" ng-repeat="(k,v) in hostports">{{ v.HostIp }}:{{ v.HostPort }}</span>
                     </li>
                 </ul>
