@@ -110,9 +110,10 @@ angular.module('stats', [])
                 updateCpuChart(d);
                 updateMemoryChart(d);
                 updateNetworkChart(d);
-                timeout = $timeout(updateStats, 2000);
+                timeout = $timeout(updateStats, 5000);
             }, function () {
                 Messages.error('Unable to retrieve stats', 'Is this container running?');
+                timeout = $timeout(updateStats, 5000);
             });
         }
 
@@ -124,13 +125,11 @@ angular.module('stats', [])
         updateStats();
 
         function updateCpuChart(data) {
-            console.log('updateCpuChart', data);
             cpuChart.addData([calculateCPUPercent(data)], new Date(data.read).toLocaleTimeString());
             cpuChart.removeData();
         }
 
         function updateMemoryChart(data) {
-            console.log('updateMemoryChart', data);
             memoryChart.addData([data.memory_stats.usage], new Date(data.read).toLocaleTimeString());
             memoryChart.removeData();
         }
@@ -152,7 +151,6 @@ angular.module('stats', [])
             }
             lastRxBytes = data.network.rx_bytes;
             lastTxBytes = data.network.tx_bytes;
-            console.log('updateNetworkChart', data);
             networkChart.addData([rxBytes, txBytes], new Date(data.read).toLocaleTimeString());
             networkChart.removeData();
         }
@@ -170,7 +168,6 @@ angular.module('stats', [])
             var systemDelta = curCpu.system_cpu_usage - prevCpu.system_cpu_usage;
 
             if (systemDelta > 0.0 && cpuDelta > 0.0) {
-                //console.log('size thing:', curCpu.cpu_usage.percpu_usage);
                 cpuPercent = (cpuDelta / systemDelta) * curCpu.cpu_usage.percpu_usage.length * 100.0;
             }
             return cpuPercent;
