@@ -37,6 +37,7 @@ module.exports = function (grunt) {
     ]);
     grunt.registerTask('test-watch', ['karma:watch']);
     grunt.registerTask('run', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
+    grunt.registerTask('runSwarm', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm']);
     grunt.registerTask('run-dev', ['if:binaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
 
     // Print a timestamp (useful for when watching)
@@ -257,6 +258,13 @@ module.exports = function (grunt) {
                     'docker stop dockerui',
                     'docker rm dockerui',
                     'docker run --privileged -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name dockerui dockerui'
+                ].join(';')
+            },
+            runSwarm: {
+                command: [
+                    'docker stop dockerui',
+                    'docker rm dockerui',
+                    'docker run --net=host -d --name dockerui dockerui -e http://127.0.0.1:2374'
                 ].join(';')
             },
             cleanImages: {

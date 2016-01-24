@@ -1,0 +1,11 @@
+dockerui:
+  image: dockerui/dockerui
+  command: -e http://127.0.0.1:2375
+  net: "host"
+
+socat:
+  build: .
+  net: "host"
+  command: socat -d -d TCP-L:2375,fork,bind=localhost ssl:127.0.0.1:3376,cert=/var/lib/boot2docker/server.pem,cafile=/var/lib/boot2docker/ca.pem,key=/var/lib/boot2docker/server-key.pem
+  volumes:
+    - /var/lib/boot2docker:/var/lib/boot2docker
