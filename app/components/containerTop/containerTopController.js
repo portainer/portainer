@@ -1,5 +1,5 @@
 angular.module('containerTop', [])
-    .controller('ContainerTopController', ['$scope', '$routeParams', 'ContainerTop', 'ViewSpinner', function ($scope, $routeParams, ContainerTop, ViewSpinner) {
+    .controller('ContainerTopController', ['$scope', '$routeParams', 'ContainerTop', 'Container', 'ViewSpinner', function ($scope, $routeParams, ContainerTop, Container, ViewSpinner) {
         $scope.ps_args = '';
 
         /**
@@ -14,6 +14,12 @@ angular.module('containerTop', [])
                 ViewSpinner.stop();
             });
         };
+
+        Container.get({id: $routeParams.id}, function (d) {
+            $scope.containerName = d.Name.substring(1);
+        }, function (e) {
+            Messages.error("Failure", e.data);
+        });
 
         $scope.getTop();
     }]);

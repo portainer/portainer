@@ -172,5 +172,11 @@ angular.module('stats', [])
             }
             return cpuPercent;
         }
+
+        Container.get({id: $routeParams.id}, function (d) {
+            $scope.containerName = d.Name.substring(1);
+        }, function (e) {
+            Messages.error("Failure", e.data);
+        });
     }])
 ;
