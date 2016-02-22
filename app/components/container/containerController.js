@@ -1,8 +1,11 @@
 angular.module('container', [])
-    .controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'ContainerCommit', 'Messages', 'ViewSpinner', '$timeout',
-        function ($scope, $routeParams, $location, Container, ContainerCommit, Messages, ViewSpinner, $timeout) {
+    .controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'ContainerCommit', 'Image', 'Messages', 'ViewSpinner', '$timeout',
+        function ($scope, $routeParams, $location, Container, ContainerCommit, Image, Messages, ViewSpinner, $timeout) {
             $scope.changes = [];
             $scope.edit = false;
+            $scope.newCfg = {
+                Env: []
+            };
 
             var update = function () {
                 ViewSpinner.spin();
@@ -10,6 +13,10 @@ angular.module('container', [])
                     $scope.container = d;
                     $scope.container.edit = false;
                     $scope.container.newContainerName = d.Name;
+                    $scope.newCfg.Env = d.Config.Env.map(function(entry) {
+                        return {name: entry.split('=')[0], value: entry.split('=')[1]};
+                    });
+
                     ViewSpinner.stop();
                 }, function (e) {
                     if (e.status === 404) {
@@ -20,6 +27,7 @@ angular.module('container', [])
                     }
                     ViewSpinner.stop();
                 });
+
             };
 
             $scope.start = function () {
@@ -55,6 +63,80 @@ angular.module('container', [])
                 }, function (e) {
                     update();
                     Messages.error("Failure", "Container failed to die." + e.data);
+                });
+            };
+
+            $scope.restartEnv = function () {
+                var config = angular.copy($scope.container.Config);
+
+                config.Env = $scope.newCfg.Env.map(function(entry) {
+                    return entry.name+"="+entry.value;
+                });
+
+                console.log(config);
+
+
+
+                ViewSpinner.spin();
+                ContainerCommit.commit({id: $routeParams.id, tag: $scope.container.Config.Image, config: config }, function (d) {
+                    console.log(d.Id);
+                    if ('Id' in d) {
+                        var imageId = d.Id;
+                        Image.inspect({id: imageId}, function(imageData) {
+                            console.log(imageData);
+                            Container.create(imageData.Config, function(containerData) {
+                               console.log(containerData);
+                                // Stop current if running
+                                if ($scope.container.State.Running) {
+                                    Container.stop({id: $routeParams.id}, function (d) {
+                                        Messages.send("Container stopped", $routeParams.id);
+                                        // start new
+                                        Container.start({
+                                            id: containerData.Id
+                                            // HostConfig: $scope.container.HostConfig we really need this?
+                                        }, function (d) {
+                                            $location.url('/containers/' + containerData.Id + '/');
+                                            Messages.send("Container started", $routeParams.id);
+                                        }, function (e) {
+                                            update();
+                                            Messages.error("Failure", "Container failed to start." + e.data);
+                                        });
+                                    }, function (e) {
+                                        update();
+                                        Messages.error("Failure", "Container failed to stop." + e.data);
+                                    });
+                                } else {
+                                    // start new
+                                    Container.start({
+                                        id: containerData.Id
+                                        // HostConfig: $scope.container.HostConfig we really need this?
+                                    }, function (d) {
+                                        $location.url('/containers/'+containerData.Id+'/');
+                                        Messages.send("Container started", $routeParams.id);
+                                    }, function (e) {
+                                        update();
+                                        Messages.error("Failure", "Container failed to start." + e.data);
+                                    });
+                                }
+
+                            }, function(e) {
+                                update();
+                                Messages.error("Failure", "Image failed to get." + e.data);
+                            });
+                        }, function (e) {
+                            update();
+                            Messages.error("Failure", "Image failed to get." + e.data);
+                        })
+
+                    } else {
+                        update();
+                        Messages.send("Container commit failed", $routeParams.id);
+                    }
+
+
+                }, function (e) {
+                    update();
+                    Messages.error("Failure", "Container failed to commit." + e.data);
                 });
             };
 
@@ -139,6 +221,15 @@ angular.module('container', [])
                 $scope.container.edit = false;
             };
 
+            $scope.addEntry = function (array, entry) {
+                array.push(entry);
+            };
+            $scope.rmEntry = function (array, entry) {
+                var idx = array.indexOf(entry);
+                array.splice(idx, 1);
+            };
+
             update();
             $scope.getChanges();
         }]);
+
