@@ -76,37 +76,43 @@
         <tr>
             <td>Environment:</td>
             <td>
-                <div class="form-group">
+                <div ng-show="!edit">
+                    <button class="btn btn-default btn-xs pull-right" ng-click="toggleEdit()"><i class="glyphicon glyphicon-pencil"></i></button>
+                    <ul>
+                        <li ng-repeat="k in container.Config.Env">{{ k }}</li>
+                    </ul>
+                </div>
+                <div class="form-group" ng-show="edit">
                     <label>Env:</label>
 
                     <div ng-repeat="envar in newCfg.Env">
                         <div class="form-group form-inline">
                             <div class="form-group">
                                 <label class="sr-only">Variable Name:</label>
-                                <input type="text" ng-model="envar.name" class="form-control"
+                                <input type="text" ng-model="envar.name" class="form-control input-sm"
                                        placeholder="NAME"/>
                             </div>
                             <div class="form-group">
                                 <label class="sr-only">Variable Value:</label>
-                                <input type="text" ng-model="envar.value" class="form-control"
+                                <input type="text" ng-model="envar.value" class="form-control input-sm" style="width: 400px"
                                        placeholder="value"/>
                             </div>
                             <div class="form-group">
-                                <button class="btn btn-danger btn-xs form-control"
-                                        ng-click="rmEntry(newCfg.Env, envar)">Remove
+                                <button class="btn btn-danger btn-sm input-sm form-control"
+                                        ng-click="rmEntry(newCfg.Env, envar)"><i class="glyphicon glyphicon-remove"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
                     <button type="button" class="btn btn-success btn-sm"
-                            ng-click="addEntry(newCfg.Env, {name: '', value: ''})">Add environment
-                        variable
+                            ng-click="addEntry(newCfg.Env, {name: '', value: ''})"><i class="glyphicon glyphicon-plus"></i> Add
                     </button>
+                    <button class="btn btn-primary btn-sm"
+                            ng-click="restartEnv()"
+                            ng-show="!container.State.Restarting">Commit and restart</button>
                 </div>
 
-                <button class="btn btn-success"
-                        ng-click="restartEnv()"
-                        ng-show="!container.State.Restarting">Restart with new env</button>
+
             </td>
         </tr>
         <tr>
@@ -132,11 +138,42 @@
         <tr>
             <td>Ports:</td>
             <td>
-                <ul style="display:inline-table">
+                <div ng-show="!edit">
+                    <button class="btn btn-default btn-xs pull-right" ng-click="toggleEdit()"><i class="glyphicon glyphicon-pencil"></i></button>
+                    <ul>
                     <li ng-repeat="(containerport, hostports) in container.NetworkSettings.Ports">
-                        {{ containerport }} => <span class="label label-default" ng-repeat="(k,v) in hostports">{{ v.HostIp }}:{{ v.HostPort }}</span>
+                        {{ containerport }} =>
+                        <span class="label label-default" style="margin-right: 5px;" ng-repeat="(k,v) in hostports">{{ v.HostIp }}:{{ v.HostPort }}</span>
                     </li>
                 </ul>
+                </div>
+                <div ng-show="edit">
+                    <div ng-repeat="(containerport, hostports) in newCfg.NetworkSettings.Ports" style="margin-bottom: 5px;">
+                        <label>{{ containerport }}</label>
+                        <div style="margin-left: 20px;">
+                            <div ng-repeat="(k,v) in hostports" class="form-group form-inline">
+                                <div class="form-group">
+                                    <input type="text" ng-model="v.HostIp" class="form-control input-sm" placeholder="IP address, ex. 0.0.0.0" />
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" ng-model="v.HostPort" class="form-control input-sm"
+                                           placeholder="Port" />
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-danger btn-sm input-sm form-control"
+                                            ng-click="rmEntry(hostports, v)"><i class="glyphicon glyphicon-remove"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-success btn-sm"
+                                ng-click="addEntry(hostports, {HostIp: '0.0.0.0', HostPort: ''})"><i class="glyphicon glyphicon-plus"></i> Add
+                        </button>
+                    </div>
+                    <button class="btn btn-primary btn-sm"
+                            ng-click="restartEnv()"
+                            ng-show="!container.State.Restarting">Commit and restart</button>
+                </div>
             </td>
 
         </tr>

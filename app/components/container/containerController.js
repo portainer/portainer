@@ -4,7 +4,8 @@ angular.module('container', [])
             $scope.changes = [];
             $scope.edit = false;
             $scope.newCfg = {
-                Env: []
+                Env: [],
+                NetworkSettings: {}
             };
 
             var update = function () {
@@ -16,6 +17,8 @@ angular.module('container', [])
                     $scope.newCfg.Env = d.Config.Env.map(function(entry) {
                         return {name: entry.split('=')[0], value: entry.split('=')[1]};
                     });
+                    $scope.newCfg.NetworkSettings.Ports = angular.copy(d.NetworkSettings.Ports) || [];
+                    angular.forEach($scope.newCfg.NetworkSettings.Ports, function(conf, port, arr) { arr[port] = conf || []; });
 
                     ViewSpinner.stop();
                 }, function (e) {
@@ -73,19 +76,19 @@ angular.module('container', [])
                     return entry.name+"="+entry.value;
                 });
 
-                console.log(config);
-
+                var portBindings = angular.copy($scope.newCfg.NetworkSettings.Ports);
 
 
                 ViewSpinner.spin();
                 ContainerCommit.commit({id: $routeParams.id, tag: $scope.container.Config.Image, config: config }, function (d) {
-                    console.log(d.Id);
                     if ('Id' in d) {
                         var imageId = d.Id;
                         Image.inspect({id: imageId}, function(imageData) {
-                            console.log(imageData);
+                            // Append current host config to image with new port bindings
+                            imageData.Config.HostConfig = angular.copy($scope.container.HostConfig);
+                            imageData.Config.HostConfig.PortBindings = portBindings;
+
                             Container.create(imageData.Config, function(containerData) {
-                               console.log(containerData);
                                 // Stop current if running
                                 if ($scope.container.State.Running) {
                                     Container.stop({id: $routeParams.id}, function (d) {
@@ -227,6 +230,10 @@ angular.module('container', [])
             $scope.rmEntry = function (array, entry) {
                 var idx = array.indexOf(entry);
                 array.splice(idx, 1);
+            };
+
+            $scope.toggleEdit = function() {
+                $scope.edit = !$scope.edit;
             };
 
             update();
