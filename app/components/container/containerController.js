@@ -5,7 +5,7 @@ angular.module('container', [])
             $scope.edit = false;
             $scope.newCfg = {
                 Env: [],
-                NetworkSettings: {}
+                Ports: {}
             };
 
             var update = function () {
@@ -17,8 +17,8 @@ angular.module('container', [])
                     $scope.newCfg.Env = d.Config.Env.map(function(entry) {
                         return {name: entry.split('=')[0], value: entry.split('=')[1]};
                     });
-                    $scope.newCfg.NetworkSettings.Ports = angular.copy(d.NetworkSettings.Ports) || [];
-                    angular.forEach($scope.newCfg.NetworkSettings.Ports, function(conf, port, arr) { arr[port] = conf || []; });
+                    $scope.newCfg.Ports = angular.copy(d.HostConfig.PortBindings) || [];
+                    angular.forEach($scope.newCfg.Ports, function(conf, port, arr) { arr[port] = conf || []; });
 
                     ViewSpinner.stop();
                 }, function (e) {
@@ -76,7 +76,7 @@ angular.module('container', [])
                     return entry.name+"="+entry.value;
                 });
 
-                var portBindings = angular.copy($scope.newCfg.NetworkSettings.Ports);
+                var portBindings = angular.copy($scope.newCfg.Ports);
 
 
                 ViewSpinner.spin();

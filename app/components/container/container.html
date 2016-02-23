@@ -141,14 +141,14 @@
                 <div ng-show="!edit">
                     <button class="btn btn-default btn-xs pull-right" ng-click="toggleEdit()"><i class="glyphicon glyphicon-pencil"></i></button>
                     <ul>
-                    <li ng-repeat="(containerport, hostports) in container.NetworkSettings.Ports">
+                    <li ng-repeat="(containerport, hostports) in container.HostConfig.PortBindings">
                         {{ containerport }} =>
                         <span class="label label-default" style="margin-right: 5px;" ng-repeat="(k,v) in hostports">{{ v.HostIp }}:{{ v.HostPort }}</span>
                     </li>
                 </ul>
                 </div>
                 <div ng-show="edit">
-                    <div ng-repeat="(containerport, hostports) in newCfg.NetworkSettings.Ports" style="margin-bottom: 5px;">
+                    <div ng-repeat="(containerport, hostports) in newCfg.Ports" style="margin-bottom: 5px;">
                         <label>{{ containerport }}</label>
                         <div style="margin-left: 20px;">
                             <div ng-repeat="(k,v) in hostports" class="form-group form-inline">
