@@ -31,7 +31,8 @@ angular.module('dockerui.services', ['ngResource'])
                     url: Settings.url + '/commit',
                     params: {
                         'container': params.id,
-                        'tag': params.tag
+                        'tag': params.tag || null,
+                        'repo': params.repo || null
                     },
                     data: params.config
                 }).success(callback).error(function (data, status, headers, config) {

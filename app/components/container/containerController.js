@@ -165,7 +165,6 @@
                                         // start new
                                         Container.start({
                                             id: containerData.Id
-                                            // HostConfig: $scope.container.HostConfig we really need this?
                                         }, function (d) {
                                             $location.url('/containers/' + containerData.Id + '/');
                                             Messages.send("Container started", $routeParams.id);
@@ -181,7 +180,6 @@
                                     // start new
                                     Container.start({
                                         id: containerData.Id
-                                        // HostConfig: $scope.container.HostConfig we really need this?
                                     }, function (d) {
                                         $location.url('/containers/'+containerData.Id+'/');
                                         Messages.send("Container started", $routeParams.id);
@@ -202,7 +200,7 @@
 
                     } else {
                         update();
-                        Messages.send("Container commit failed", $routeParams.id);
+                        Messages.error("Failure", "Container commit failed.");
                     }
 
 
