@@ -116,6 +116,11 @@
                 });
 
                 var portBindings = angular.copy($scope.newCfg.Ports);
+                angular.forEach(portBindings, function(item, key) {
+                    if (item.length == 0)
+                        delete portBindings[key];
+                });
+
 
                 var binds = [];
                 angular.forEach($scope.newCfg.Binds, function(b) {
@@ -144,8 +149,15 @@
                             imageData.Config.HostConfig = angular.copy($scope.container.HostConfig);
                             imageData.Config.HostConfig.PortBindings = portBindings;
                             imageData.Config.HostConfig.Binds = binds;
+                            if (imageData.Config.HostConfig.NetworkMode == 'host') {
+                                imageData.Config.Hostname = '';
+                            }
 
                             Container.create(imageData.Config, function(containerData) {
+                                if (!('Id' in containerData)) {
+                                    Messages.error("Failure", "Container failed to create.");
+                                    return;
+                                }
                                 // Stop current if running
                                 if ($scope.container.State.Running) {
                                     Container.stop({id: $routeParams.id}, function (d) {
