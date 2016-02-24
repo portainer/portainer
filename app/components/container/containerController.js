@@ -1,4 +1,4 @@
-angular.module('container', [])
+    angular.module('container', [])
     .controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'ContainerCommit', 'Image', 'Messages', 'ViewSpinner', '$timeout',
         function ($scope, $routeParams, $location, Container, ContainerCommit, Image, Messages, ViewSpinner, $timeout) {
             $scope.changes = [];
@@ -18,16 +18,20 @@ angular.module('container', [])
                     $scope.container.newContainerName = d.Name;
 
                     // fill up env
-                    $scope.newCfg.Env = d.Config.Env.map(function(entry) {
-                        return {name: entry.split('=')[0], value: entry.split('=')[1]};
-                    });
+                    if (d.Config.Env) {
+                        $scope.newCfg.Env = d.Config.Env.map(function (entry) {
+                            return {name: entry.split('=')[0], value: entry.split('=')[1]};
+                        });
+                    }
 
                     // fill up ports
                     $scope.newCfg.Ports = {};
                     angular.forEach(d.Config.ExposedPorts, function(i, port) {
-                        $scope.newCfg.Ports[port] = d.HostConfig.PortBindings[port] || [];
+                        if (d.HostConfig.PortBindings && port in d.HostConfig.PortBindings)
+                            $scope.newCfg.Ports[port] = d.HostConfig.PortBindings[port];
+                        else
+                            $scope.newCfg.Ports[port] = [];
                     });
-                    //angular.forEach($scope.newCfg.Ports, function(conf, port, arr) { arr[port] = conf || []; });
 
                     // fill up bindings
                     $scope.newCfg.Binds = [];
