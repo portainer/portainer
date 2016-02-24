@@ -76,13 +76,13 @@
         <tr>
             <td>Environment:</td>
             <td>
-                <div ng-show="!edit">
-                    <button class="btn btn-default btn-xs pull-right" ng-click="toggleEdit()"><i class="glyphicon glyphicon-pencil"></i></button>
+                <div ng-show="!editEnv">
+                    <button class="btn btn-default btn-xs pull-right" ng-click="editEnv = true"><i class="glyphicon glyphicon-pencil"></i></button>
                     <ul>
                         <li ng-repeat="k in container.Config.Env">{{ k }}</li>
                     </ul>
                 </div>
-                <div class="form-group" ng-show="edit">
+                <div class="form-group" ng-show="editEnv">
                     <label>Env:</label>
 
                     <div ng-repeat="envar in newCfg.Env">
@@ -138,8 +138,8 @@
         <tr>
             <td>Ports:</td>
             <td>
-                <div ng-show="!edit">
-                    <button class="btn btn-default btn-xs pull-right" ng-click="toggleEdit()"><i class="glyphicon glyphicon-pencil"></i></button>
+                <div ng-show="!editPorts">
+                    <button class="btn btn-default btn-xs pull-right" ng-click="editPorts = true"><i class="glyphicon glyphicon-pencil"></i></button>
                     <ul>
                     <li ng-repeat="(containerport, hostports) in container.HostConfig.PortBindings">
                         {{ containerport }} =>
@@ -147,7 +147,7 @@
                     </li>
                 </ul>
                 </div>
-                <div ng-show="edit">
+                <div ng-show="editPorts">
                     <div ng-repeat="(containerport, hostports) in newCfg.Ports" style="margin-bottom: 5px;">
                         <label>{{ containerport }}</label>
                         <div style="margin-left: 20px;">
@@ -193,6 +193,44 @@
             <td>Entrypoint:</td>
             <td>
                 <pre>{{ container.Config.Entrypoint.join(' ') }}</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>Bindings:</td>
+            <td>
+                <div ng-show="!editBinds">
+                    <button class="btn btn-default btn-xs pull-right" ng-click="editBinds = true"><i class="glyphicon glyphicon-pencil"></i></button>
+
+                    <ul>
+                        <li ng-repeat="b in container.HostConfig.Binds">{{ b }}</li>
+                    </ul>
+                </div>
+                <div ng-show="editBinds">
+                    <div ng-repeat="(vol, b) in newCfg.Binds" class="form-group form-inline">
+                        <div class="form-group">
+                            <input type="text" ng-model="b.HostPath" class="form-control input-sm"
+                                   placeholder="Host path or volume name" style="width: 250px;" />
+                        </div>
+                        <div class="form-group">
+                            <input type="text" ng-model="b.ContPath" ng-readonly="b.DefaultBind" class="form-control input-sm" placeholder="Container path" />
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" ng-model="b.ReadOnly" /> read only</label>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-danger btn-sm input-sm form-control"
+                                    ng-click="rmEntry(newCfg.Binds, b)"><i class="glyphicon glyphicon-remove"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm"
+                            ng-click="addEntry(newCfg.Binds, { ContPath: '', HostPath: '', ReadOnly: false, DefaultBind: false })"><i class="glyphicon glyphicon-plus"></i> Add
+                    </button>
+                    <button class="btn btn-primary btn-sm"
+                            ng-click="restartEnv()"
+                            ng-show="!container.State.Restarting">Commit and restart</button>
+
+                </div>
             </td>
         </tr>
         <tr>

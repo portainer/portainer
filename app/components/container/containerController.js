@@ -2,7 +2,9 @@ angular.module('container', [])
     .controller('ContainerController', ['$scope', '$routeParams', '$location', 'Container', 'ContainerCommit', 'Image', 'Messages', 'ViewSpinner', '$timeout',
         function ($scope, $routeParams, $location, Container, ContainerCommit, Image, Messages, ViewSpinner, $timeout) {
             $scope.changes = [];
-            $scope.edit = false;
+            $scope.editEnv = false;
+            $scope.editPorts = false;
+            $scope.editBinds = false;
             $scope.newCfg = {
                 Env: [],
                 Ports: {}
@@ -14,11 +16,46 @@ angular.module('container', [])
                     $scope.container = d;
                     $scope.container.edit = false;
                     $scope.container.newContainerName = d.Name;
+
+                    // fill up env
                     $scope.newCfg.Env = d.Config.Env.map(function(entry) {
                         return {name: entry.split('=')[0], value: entry.split('=')[1]};
                     });
-                    $scope.newCfg.Ports = angular.copy(d.HostConfig.PortBindings) || [];
-                    angular.forEach($scope.newCfg.Ports, function(conf, port, arr) { arr[port] = conf || []; });
+
+                    // fill up ports
+                    $scope.newCfg.Ports = {};
+                    angular.forEach(d.Config.ExposedPorts, function(i, port) {
+                        $scope.newCfg.Ports[port] = d.HostConfig.PortBindings[port] || [];
+                    });
+                    //angular.forEach($scope.newCfg.Ports, function(conf, port, arr) { arr[port] = conf || []; });
+
+                    // fill up bindings
+                    $scope.newCfg.Binds = [];
+                    var defaultBinds = {};
+                    angular.forEach(d.Config.Volumes, function(value, vol) {
+                        defaultBinds[vol] = { ContPath: vol, HostPath: '', ReadOnly: false, DefaultBind: true };
+                    });
+                    angular.forEach(d.HostConfig.Binds, function(binding, i) {
+                        var mountpoint = binding.split(':')[0];
+                        var vol = binding.split(':')[1] || '';
+                        var ro = binding.split(':').length > 2 && binding.split(':')[2] == 'ro';
+                        var defaultBind = false;
+                        if (vol == '') {
+                            vol = mountpoint;
+                            mountpoint = '';
+                        }
+
+                        if (vol in defaultBinds) {
+                            delete defaultBinds[vol];
+                            defaultBind = true;
+                        }
+                        $scope.newCfg.Binds.push({ ContPath: vol, HostPath: mountpoint, ReadOnly: ro, DefaultBind: defaultBind });
+                    });
+                    angular.forEach(defaultBinds, function(bind) {
+                        $scope.newCfg.Binds.push(bind);
+                    });
+
+                    console.log($scope.newCfg);
 
                     ViewSpinner.stop();
                 }, function (e) {
@@ -78,6 +115,21 @@ angular.module('container', [])
 
                 var portBindings = angular.copy($scope.newCfg.Ports);
 
+                var binds = [];
+                angular.forEach($scope.newCfg.Binds, function(b) {
+                    if (b.ContPath != '') {
+                        var bindLine = '';
+                        if (b.HostPath != '') {
+                            bindLine = b.HostPath + ':';
+                        }
+                        bindLine += b.ContPath;
+                        if (b.ReadOnly) {
+                            bindLine += ':ro';
+                        }
+                        binds.push(bindLine);
+                    }
+                });
+
 
                 ViewSpinner.spin();
                 ContainerCommit.commit({id: $routeParams.id, tag: $scope.container.Config.Image, config: config }, function (d) {
@@ -87,6 +139,7 @@ angular.module('container', [])
                             // Append current host config to image with new port bindings
                             imageData.Config.HostConfig = angular.copy($scope.container.HostConfig);
                             imageData.Config.HostConfig.PortBindings = portBindings;
+                            imageData.Config.HostConfig.Binds = binds;
 
                             Container.create(imageData.Config, function(containerData) {
                                 // Stop current if running
