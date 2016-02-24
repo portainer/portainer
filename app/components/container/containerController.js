@@ -59,8 +59,6 @@
                         $scope.newCfg.Binds.push(bind);
                     });
 
-                    console.log($scope.newCfg);
-
                     ViewSpinner.stop();
                 }, function (e) {
                     if (e.status === 404) {
@@ -130,7 +128,9 @@
                         if (b.ReadOnly) {
                             bindLine += ':ro';
                         }
-                        binds.push(bindLine);
+                        if (b.HostPath != '' || !b.DefaultBind) {
+                            binds.push(bindLine);
+                        }
                     }
                 });
 
