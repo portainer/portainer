@@ -1,12 +1,17 @@
 angular.module('networks', []).config(['$routeProvider', function ($routeProvider) {
-    $routeProvider.when('/networks', {
+    $routeProvider.when('/networks/', {
         templateUrl: 'app/components/networks/networks.html',
         controller: 'NetworksController'
     });
 }]).controller('NetworksController', ['$scope', 'Network', 'ViewSpinner', 'Messages', '$route', 'errorMsgFilter',
     function ($scope, Network, ViewSpinner, Messages, $route, errorMsgFilter) {
+        $scope.sortType = 'Name';
+        $scope.sortReverse = true;
         $scope.toggle = false;
-        $scope.predicate = '-Created';
+        $scope.order = function(sortType) {
+            $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+            $scope.sortType = sortType;
+        };
         $scope.createNetworkConfig = {
             "Name": '',
             "Driver": '',

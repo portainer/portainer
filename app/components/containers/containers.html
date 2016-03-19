@@ -25,16 +25,46 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()" /> Action</th>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Command</th>
-            <th>Created</th>
-            <th>Status</th>
+            <th><label><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()" /> Select</label></th>
+            <th>
+                <a href="#/containers/" ng-click="order('Names')">
+                    Name
+                    <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#/containers/" ng-click="order('Image')">
+                    Image
+                    <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#/containers/" ng-click="order('Command')">
+                    Command
+                    <span ng-show="sortType == 'Command' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Command' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#/containers/" ng-click="order('Created')">
+                    Created
+                    <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#/containers/" ng-click="order('Status')">
+                    Status
+                    <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+            </th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="container in containers | filter:filter | orderBy:predicate">
+        <tr ng-repeat="container in containers | filter:filter | orderBy:sortType:sortReverse">
             <td><input type="checkbox" ng-model="container.Checked" /></td>
             <td><a href="#/containers/{{ container.Id }}/">{{ container|containername}}</a></td>
             <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
