@@ -23,7 +23,7 @@ angular.module('dockerui', [
     'network',
     'networks',
     'volumes'])
-    .config(['$routeProvider', function ($routeProvider) {
+    .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
         'use strict';
         $routeProvider.when('/', {
             templateUrl: 'app/components/dashboard/dashboard.html',
@@ -67,6 +67,22 @@ angular.module('dockerui', [
             controller: 'EventsController'
         });
         $routeProvider.otherwise({redirectTo: '/'});
+
+        // The Docker API likes to return plaintext errors, this catches them and disp
+        $httpProvider.interceptors.push(function() {
+            return {
+                'response': function(response) {
+                    if (typeof(response.data) === 'string' && response.data.startsWith('Conflict.')) {
+                        $.gritter.add({
+                            title: 'Error',
+                            text: response.data,
+                            time: 10000
+                        });
+                    }
+                    return response;
+                }
+            };
+        });
     }])
     // This is your docker url that the api will use to make requests
     // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
