@@ -27,10 +27,12 @@
                     // fill up ports
                     $scope.newCfg.Ports = {};
                     angular.forEach(d.Config.ExposedPorts, function(i, port) {
-                        if (d.HostConfig.PortBindings && port in d.HostConfig.PortBindings)
+                        if (d.HostConfig.PortBindings && port in d.HostConfig.PortBindings) {
                             $scope.newCfg.Ports[port] = d.HostConfig.PortBindings[port];
-                        else
+                        }
+                        else {
                             $scope.newCfg.Ports[port] = [];
+                        }
                     });
 
                     // fill up bindings
@@ -42,9 +44,9 @@
                     angular.forEach(d.HostConfig.Binds, function(binding, i) {
                         var mountpoint = binding.split(':')[0];
                         var vol = binding.split(':')[1] || '';
-                        var ro = binding.split(':').length > 2 && binding.split(':')[2] == 'ro';
+                        var ro = binding.split(':').length > 2 && binding.split(':')[2] === 'ro';
                         var defaultBind = false;
-                        if (vol == '') {
+                        if (vol === '') {
                             vol = mountpoint;
                             mountpoint = '';
                         }
@@ -117,23 +119,24 @@
 
                 var portBindings = angular.copy($scope.newCfg.Ports);
                 angular.forEach(portBindings, function(item, key) {
-                    if (item.length == 0)
+                    if (item.length === 0) {
                         delete portBindings[key];
+                    }
                 });
 
 
                 var binds = [];
                 angular.forEach($scope.newCfg.Binds, function(b) {
-                    if (b.ContPath != '') {
+                    if (b.ContPath !== '') {
                         var bindLine = '';
-                        if (b.HostPath != '') {
+                        if (b.HostPath !== '') {
                             bindLine = b.HostPath + ':';
                         }
                         bindLine += b.ContPath;
                         if (b.ReadOnly) {
                             bindLine += ':ro';
                         }
-                        if (b.HostPath != '' || !b.DefaultBind) {
+                        if (b.HostPath !== '' || !b.DefaultBind) {
                             binds.push(bindLine);
                         }
                     }
@@ -149,7 +152,7 @@
                             imageData.Config.HostConfig = angular.copy($scope.container.HostConfig);
                             imageData.Config.HostConfig.PortBindings = portBindings;
                             imageData.Config.HostConfig.Binds = binds;
-                            if (imageData.Config.HostConfig.NetworkMode == 'host') {
+                            if (imageData.Config.HostConfig.NetworkMode === 'host') {
                                 imageData.Config.Hostname = '';
                             }
 
@@ -196,7 +199,7 @@
                         }, function (e) {
                             update();
                             Messages.error("Failure", "Image failed to get." + e.data);
-                        })
+                        });
 
                     } else {
                         update();

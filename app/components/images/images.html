@@ -21,15 +21,39 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()" /> Action</th>
-            <th>Id</th>
-            <th>Repository</th>
-            <th>VirtualSize</th>
-            <th>Created</th>
+            <th><label><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()" /> Select</label></th>
+            <th>
+                <a href="#/images/" ng-click="order('Id')">
+                    Id
+                    <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#/images/" ng-click="order('RepoTags')">
+                    Repository
+                    <span ng-show="sortType == 'RepoTags' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'RepoTags' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#/images/" ng-click="order('VirtualSize')">
+                    VirtualSize
+                    <span ng-show="sortType == 'VirtualSize' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'VirtualSize' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#/images/" ng-click="order('Created')">
+                    Created
+                    <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+            </th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="image in images | filter:filter | orderBy:predicate">
+        <tr ng-repeat="image in images | filter:filter | orderBy:sortType:sortReverse">
             <td><input type="checkbox" ng-model="image.Checked" /></td>
             <td><a href="#/images/{{ image.Id }}/?tag={{ image|repotag }}">{{ image.Id|truncate:20}}</a></td>
             <td>{{ image|repotag }}</td>

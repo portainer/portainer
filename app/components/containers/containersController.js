@@ -1,9 +1,15 @@
 angular.module('containers', [])
     .controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner',
         function ($scope, Container, Settings, Messages, ViewSpinner) {
-            $scope.predicate = '-Created';
+            $scope.sortType = 'Created';
+            $scope.sortReverse = true;
             $scope.toggle = false;
             $scope.displayAll = Settings.displayAll;
+
+            $scope.order = function(sortType) {
+                $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+                $scope.sortType = sortType;
+            };
 
             var update = function (data) {
                 ViewSpinner.spin();

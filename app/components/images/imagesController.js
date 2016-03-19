@@ -1,8 +1,14 @@
 angular.module('images', [])
     .controller('ImagesController', ['$scope', 'Image', 'ViewSpinner', 'Messages',
         function ($scope, Image, ViewSpinner, Messages) {
+            $scope.sortType = 'Created';
+            $scope.sortReverse = true;
             $scope.toggle = false;
-            $scope.predicate = '-Created';
+
+            $scope.order = function(sortType) {
+                $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+                $scope.sortType = sortType;
+            };
 
             $scope.showBuilder = function () {
                 $('#build-modal').modal('show');

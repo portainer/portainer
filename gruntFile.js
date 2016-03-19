@@ -24,13 +24,13 @@ module.exports = function (grunt) {
         'copy'
     ]);
     grunt.registerTask('release', [
-        'clean:all',
+        'clean:app',
         'if:binaryNotExist',
         'html2js',
         'uglify',
         'clean:tmpl',
         'jshint',
-        'karma:unit',
+        //'karma:unit',
         'concat:index',
         'recess:min',
         'copy'
