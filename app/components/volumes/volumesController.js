@@ -1,12 +1,17 @@
 angular.module('volumes', []).config(['$routeProvider', function ($routeProvider) {
-    $routeProvider.when('/volumes', {
+    $routeProvider.when('/volumes/', {
         templateUrl: 'app/components/volumes/volumes.html',
         controller: 'VolumesController'
     });
 }]).controller('VolumesController', ['$scope', 'Volume', 'ViewSpinner', 'Messages', '$route', 'errorMsgFilter',
     function ($scope, Volume, ViewSpinner, Messages, $route, errorMsgFilter) {
+        $scope.sortType = 'Name';
+        $scope.sortReverse = true;
         $scope.toggle = false;
-        $scope.predicate = '-Created';
+        $scope.order = function(sortType) {
+            $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+            $scope.sortType = sortType;
+        };
         $scope.createVolumeConfig = {
             "Name": "",
             "Driver": ""
