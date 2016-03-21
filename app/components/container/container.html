@@ -141,7 +141,7 @@
                 <div ng-show="!editPorts">
                     <button class="btn btn-default btn-xs pull-right" ng-click="editPorts = true"><i class="glyphicon glyphicon-pencil"></i></button>
                     <ul>
-                    <li ng-repeat="(containerport, hostports) in container.HostConfig.PortBindings">
+                    <li ng-repeat="(containerport, hostports) in container.NetworkSettings.Ports">
                         {{ containerport }} =>
                         <span class="label label-default" style="margin-right: 5px;" ng-repeat="(k,v) in hostports">{{ v.HostIp }}:{{ v.HostPort }}</span>
                     </li>
