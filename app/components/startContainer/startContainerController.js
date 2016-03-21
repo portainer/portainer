@@ -40,7 +40,7 @@ angular.module('startContainer', ['ui.bootstrap'])
 
             function rmEmptyKeys(col) {
                 for (var key in col) {
-                    if (col[key] === null || col[key] === undefined || col[key] === '' || $.isEmptyObject(col[key]) || col[key].length === 0) {
+                    if (col[key] === null || col[key] === undefined || col[key] === '' || ($.isPlainObject(col[key]) && $.isEmptyObject(col[key])) || col[key].length === 0) {
                         delete col[key];
                     }
                 }
