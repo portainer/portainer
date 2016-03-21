@@ -133,7 +133,17 @@
 
         <tr>
             <td>Publish All:</td>
-            <td>{{ container.HostConfig.PublishAllPorts }}</td>
+            <td>
+            <div>{{ container.HostConfig.PublishAllPorts }}</div>
+            <div ng-show="container.HostConfig.PublishAllPorts">
+                <ul>
+                    <li ng-repeat="(containerport, hostports) in container.NetworkSettings.Ports">
+                        {{ containerport }} =>
+                        <span class="label label-default" style="margin-right: 5px;" ng-repeat="(k,v) in hostports">{{ v.HostIp }}:{{ v.HostPort }}</span>
+                    </li>
+                </ul>
+            </div>
+            </td>
         </tr>
         <tr>
             <td>Ports:</td>
