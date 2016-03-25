@@ -45,7 +45,7 @@ angular.module('volumes', []).config(['$routeProvider', function ($routeProvider
         };
 
         $scope.toggleSelectAll = function () {
-            angular.forEach($scope.volumes, function (i) {
+            angular.forEach($scope.filteredVolumes, function (i) {
                 i.Checked = $scope.toggle;
             });
         };

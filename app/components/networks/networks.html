@@ -72,7 +72,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="network in networks | filter:filter | orderBy:sortType:sortReverse">
+    <tr ng-repeat="network in ( filteredNetworks = (networks | filter:filter | orderBy:sortType:sortReverse))">
         <td><input type="checkbox" ng-model="network.Checked"/></td>
         <td><a href="#/networks/{{ network.Id }}/">{{ network.Name|truncate:20}}</a></td>
         <td>{{ network.Id }}</td>
