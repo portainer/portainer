@@ -44,7 +44,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="volume in volumes | filter:filter | orderBy:sortType:sortReverse">
+    <tr ng-repeat="volume in (filteredVolumes = (volumes | filter:filter | orderBy:sortType:sortReverse))">
         <td><input type="checkbox" ng-model="volume.Checked"/></td>
         <td>{{ volume.Name|truncate:20 }}</td>
         <td>{{ volume.Driver }}</td>

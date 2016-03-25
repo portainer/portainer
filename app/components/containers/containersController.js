@@ -6,7 +6,7 @@ angular.module('containers', [])
             $scope.toggle = false;
             $scope.displayAll = Settings.displayAll;
 
-            $scope.order = function(sortType) {
+            $scope.order = function (sortType) {
                 $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
                 $scope.sortType = sortType;
             };
@@ -76,7 +76,7 @@ angular.module('containers', [])
             };
 
             $scope.toggleSelectAll = function () {
-                angular.forEach($scope.containers, function (i) {
+                angular.forEach($scope.filteredContainers, function (i) {
                     i.Checked = $scope.toggle;
                 });
             };

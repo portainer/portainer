@@ -42,7 +42,7 @@ angular.module('images', [])
             };
 
             $scope.toggleSelectAll = function () {
-                angular.forEach($scope.images, function (i) {
+                angular.forEach($scope.filteredImages, function (i) {
                     i.Checked = $scope.toggle;
                 });
             };
