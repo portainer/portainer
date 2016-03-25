@@ -53,7 +53,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="image in images | filter:filter | orderBy:sortType:sortReverse">
+        <tr ng-repeat="image in (filteredImages = (images | filter:filter | orderBy:sortType:sortReverse))">
             <td><input type="checkbox" ng-model="image.Checked" /></td>
             <td><a href="#/images/{{ image.Id }}/?tag={{ image|repotag }}">{{ image.Id|truncate:20}}</a></td>
             <td>{{ image|repotag }}</td>

@@ -52,7 +52,7 @@ angular.module('networks', []).config(['$routeProvider', function ($routeProvide
         };
 
         $scope.toggleSelectAll = function () {
-            angular.forEach($scope.networks, function (i) {
+            angular.forEach($scope.filteredNetworks, function (i) {
                 i.Checked = $scope.toggle;
             });
         };

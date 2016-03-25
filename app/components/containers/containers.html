@@ -64,7 +64,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="container in containers | filter:filter | orderBy:sortType:sortReverse">
+        <tr ng-repeat="container in (filteredContainers = ( containers | filter:filter | orderBy:sortType:sortReverse))">
             <td><input type="checkbox" ng-model="container.Checked" /></td>
             <td><a href="#/containers/{{ container.Id }}/">{{ container|containername}}</a></td>
             <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
