@@ -25,6 +25,10 @@ angular.module('dockerui', [
     'volumes'])
     .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
         'use strict';
+
+        $httpProvider.defaults.xsrfCookieName = '_gorilla_csrf';
+        $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-Token';
+
         $routeProvider.when('/', {
             templateUrl: 'app/components/dashboard/dashboard.html',
             controller: 'DashboardController'
@@ -79,7 +83,13 @@ angular.module('dockerui', [
                             time: 10000
                         });
                     }
+                    console.log('response', response);
                     return response;
+                },
+                request: function(config) {
+                    console.log(document.cookie);
+                    console.log('request', config);
+                    return config;
                 }
             };
         });
