@@ -11,7 +11,6 @@ import (
 	"os"
 	"strings"
 	"github.com/gorilla/csrf"
-	"github.com/gorilla/securecookie"
 )
 
 var (
@@ -19,7 +18,7 @@ var (
 	addr     = flag.String("p", ":9000", "Address and port to serve dockerui")
 	assets   = flag.String("a", ".", "Path to the assets")
 	CSRF = csrf.Protect(
-		[]byte(securecookie.GenerateRandomKey(32)),
+		[]byte("32-byte-long-auth-key"), // FIXME: generate once, reuse on restarts
 		csrf.HttpOnly(false),
 		csrf.Secure(false),
 	)
