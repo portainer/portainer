@@ -75,7 +75,7 @@ angular.module('dockerui', [
                     if (typeof(response.data) === 'string' && response.data.startsWith('Conflict.')) {
                         $.gritter.add({
                             title: 'Error',
-                            text: response.data,
+                            text: $('<div>').text(response.data).html(),
                             time: 10000
                         });
                     }

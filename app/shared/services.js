@@ -1,4 +1,4 @@
-angular.module('dockerui.services', ['ngResource'])
+angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
     .factory('Container', ['$resource', 'Settings', function ContainerFactory($resource, Settings) {
         'use strict';
         // Resource for interacting with the docker containers
@@ -171,13 +171,13 @@ angular.module('dockerui.services', ['ngResource'])
             }
         };
     })
-    .factory('Messages', ['$rootScope', function MessagesFactory($rootScope) {
+    .factory('Messages', ['$rootScope', '$sanitize', function MessagesFactory($rootScope, $sanitize) {
         'use strict';
         return {
             send: function (title, text) {
                 $.gritter.add({
-                    title: title,
-                    text: text,
+                    title: $sanitize(title),
+                    text: $sanitize(text),
                     time: 2000,
                     before_open: function () {
                         if ($('.gritter-item-wrapper').length === 3) {
@@ -188,8 +188,8 @@ angular.module('dockerui.services', ['ngResource'])
             },
             error: function (title, text) {
                 $.gritter.add({
-                    title: title,
-                    text: text,
+                    title: $sanitize(title),
+                    text: $sanitize(text),
                     time: 10000,
                     before_open: function () {
                         if ($('.gritter-item-wrapper').length === 4) {
