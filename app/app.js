@@ -26,7 +26,7 @@ angular.module('dockerui', [
     .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
         'use strict';
 
-        $httpProvider.defaults.xsrfCookieName = '_gorilla_csrf';
+        $httpProvider.defaults.xsrfCookieName = 'csrfToken';
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-Token';
 
         $routeProvider.when('/', {
@@ -83,13 +83,11 @@ angular.module('dockerui', [
                             time: 10000
                         });
                     }
-                    console.log('response', response);
+                    var csrfToken = response.headers('X-Csrf-Token');
+                    if (csrfToken) {
+                        document.cookie = 'csrfToken=' + csrfToken;
+                    }
                     return response;
-                },
-                request: function(config) {
-                    console.log(document.cookie);
-                    console.log('request', config);
-                    return config;
                 }
             };
         });

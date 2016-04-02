@@ -93,22 +93,13 @@ func createHandler(dir string, e string) http.Handler {
 
 	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", h))
 	mux.Handle("/", fileHandler)
-	return logWrapper(CSRF(mux))
+	return CSRF(csrfWrapper(mux))
 }
 
-func logWrapper(h http.Handler) http.Handler {
+func csrfWrapper(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Request starting: " + r.URL.Path)
-		c, err := r.Cookie ("_gorilla_csrf")
-		if err != nil {
-			log.Println("Unable to find session cookie _gorilla_csrf")
-			h.ServeHTTP(w, r)
-		} else {
-			log.Println("Cookie:" + c.Value)
-			log.Println("Header:" + r.Header.Get("X-CSRF-Token"))
-			h.ServeHTTP(w, r)
-			log.Println("Request ending")
-		}
+		w.Header().Set("X-CSRF-Token", csrf.Token(r))
+		h.ServeHTTP(w, r)
 	})
 }
 
