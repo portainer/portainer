@@ -25,6 +25,10 @@ angular.module('dockerui', [
     'volumes'])
     .config(['$routeProvider', '$httpProvider', function ($routeProvider, $httpProvider) {
         'use strict';
+
+        $httpProvider.defaults.xsrfCookieName = 'csrfToken';
+        $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-Token';
+
         $routeProvider.when('/', {
             templateUrl: 'app/components/dashboard/dashboard.html',
             controller: 'DashboardController'
@@ -75,9 +79,13 @@ angular.module('dockerui', [
                     if (typeof(response.data) === 'string' && response.data.startsWith('Conflict.')) {
                         $.gritter.add({
                             title: 'Error',
-                            text: response.data,
+                            text: $('<div>').text(response.data).html(),
                             time: 10000
                         });
+                    }
+                    var csrfToken = response.headers('X-Csrf-Token');
+                    if (csrfToken) {
+                        document.cookie = 'csrfToken=' + csrfToken;
                     }
                     return response;
                 }
@@ -88,4 +96,4 @@ angular.module('dockerui', [
     // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
     .constant('DOCKER_ENDPOINT', 'dockerapi')
     .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
-    .constant('UI_VERSION', 'v0.10.0-beta');
+    .constant('UI_VERSION', 'v0.10.1-beta');

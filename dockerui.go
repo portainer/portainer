@@ -10,12 +10,18 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"github.com/gorilla/csrf"
+	"io/ioutil"
+	"fmt"
+	"github.com/gorilla/securecookie"
 )
 
 var (
 	endpoint = flag.String("e", "/var/run/docker.sock", "Dockerd endpoint")
 	addr     = flag.String("p", ":9000", "Address and port to serve dockerui")
 	assets   = flag.String("a", ".", "Path to the assets")
+	authKey  []byte
+	authKeyFile = "authKey.dat"
 )
 
 type UnixHandler struct {
@@ -85,9 +91,35 @@ func createHandler(dir string, e string) http.Handler {
 		h = createUnixHandler(e)
 	}
 
+	// Use existing csrf authKey if present or generate a new one.
+	dat, err := ioutil.ReadFile(authKeyFile)
+	if err != nil {
+		fmt.Println(err)
+		authKey = securecookie.GenerateRandomKey(32)
+		err := ioutil.WriteFile(authKeyFile, authKey, 0644)
+		if err != nil {
+			fmt.Println("unable to persist auth key", err)
+		}
+	} else {
+		authKey = dat
+	}
+
+	CSRF := csrf.Protect(
+		authKey,
+		csrf.HttpOnly(false),
+		csrf.Secure(false),
+	)
+
 	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", h))
 	mux.Handle("/", fileHandler)
-	return mux
+	return CSRF(csrfWrapper(mux))
+}
+
+func csrfWrapper(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-CSRF-Token", csrf.Token(r))
+		h.ServeHTTP(w, r)
+	})
 }
 
 func main() {
