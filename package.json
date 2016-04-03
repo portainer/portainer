@@ -2,7 +2,7 @@
   "author": "Michael Crosby & Kevan Ahlquist",
   "name": "dockerui",
   "homepage": "https://github.com/crosbymichael/dockerui",
-  "version": "0.9.0-beta",
+  "version": "0.10.1-beta",
   "repository": {
     "type": "git",
     "url": "git@github.com:crosbymichael/dockerui.git"
