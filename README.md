@@ -10,10 +10,16 @@ DockerUI is a web interface for the Docker Remote API.  The goal is to provide a
 * Minimal dependencies - I really want to keep this project a pure html/js app.
 * Consistency - The web UI should be consistent with the commands found on the docker CLI.
 
-### Container Quickstart 
-1. Run: `docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock dockerui/dockerui`
-
-2. Open your browser to `http://<dockerd host ip>:9000`
+### Quickstart 
+```
+git clone https://github.com/crosbymichael/not-dockers-ui.git
+cd not-dockers-ui
+npm install
+npm install -g grunt-cli
+# Make sure your Docker daemon is running
+grunt run     # Takes a while, will build the image locally as dockerui:latest and run it
+# Open your browser to `http://<dockerd host ip>:9000`
+```
 
 
 Bind mounting the Unix socket into the DockerUI container is much more secure than exposing your docker daemon over TCP. The `--privileged` flag is required for hosts using SELinux. You should still secure your DockerUI instance behind some type of auth. Directions for using Nginx auth are [here](https://github.com/crosbymichael/dockerui/wiki/Dockerui-with-Nginx-HTTP-Auth).
