@@ -12,8 +12,8 @@ DockerUI is a web interface for the Docker Remote API.  The goal is to provide a
 
 ### Quickstart 
 ```
-git clone https://github.com/crosbymichael/not-dockers-ui.git
-cd not-dockers-ui
+git clone https://github.com/kevana/ui-for-docker.git
+cd ui-for-docker
 npm install
 npm install -g grunt-cli
 # Make sure your Docker daemon is running
