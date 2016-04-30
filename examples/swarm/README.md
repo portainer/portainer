@@ -1,4 +1,4 @@
-# DockerUI with Swarm
+# UI For Docker with Swarm
 
 This example works with swarm clusters created with docker-machine.
 

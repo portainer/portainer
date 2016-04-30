@@ -1,5 +1,5 @@
 dockerui:
-  image: dockerui/dockerui
+  image: uifd/ui-for-docker
   command: -e http://127.0.0.1:2375
   net: "host"
 

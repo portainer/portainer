@@ -1,5 +1,5 @@
-angular.module('dockerui', [
-    'dockerui.templates',
+angular.module('uifordocker', [
+    'uifordocker.templates',
     'ngRoute',
     'dockerui.services',
     'dockerui.filters',
