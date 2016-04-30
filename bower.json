@@ -1,13 +1,14 @@
 {
-  "name": "dockerui",
+  "name": "uifordocker",
   "version": "0.10.1-beta",
-  "homepage": "https://github.com/crosbymichael/dockerui",
+  "homepage": "https://github.com/kevana/ui-for-docker",
   "authors": [
     "Michael Crosby <crosbymichael@gmail.com>",
-    "Kevan Ahlquist <ahlqu039@umn.edu>"
+    "Kevan Ahlquist <ahlquistkd@gmail.com>"
   ],
   "description": "A web interface for the Docker Remote API.",
   "keywords": [
+    "uifordocker",
     "dockerui",
     "docker",
     "api"

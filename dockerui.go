@@ -1,4 +1,4 @@
-package main // import "github.com/crosbymichael/dockerui"
+package main // import "github.com/kevana/ui-for-docker"
 
 import (
 	"flag"
@@ -18,7 +18,7 @@ import (
 
 var (
 	endpoint = flag.String("e", "/var/run/docker.sock", "Dockerd endpoint")
-	addr     = flag.String("p", ":9000", "Address and port to serve dockerui")
+	addr     = flag.String("p", ":9000", "Address and port to serve UI For Docker")
 	assets   = flag.String("a", ".", "Path to the assets")
 	authKey  []byte
 	authKeyFile = "authKey.dat"

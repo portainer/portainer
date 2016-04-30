@@ -1,19 +1,19 @@
 {
   "author": "Michael Crosby & Kevan Ahlquist",
-  "name": "dockerui",
-  "homepage": "https://github.com/crosbymichael/dockerui",
+  "name": "uifordocker",
+  "homepage": "https://github.com/kevana/ui-for-docker",
   "version": "0.10.1-beta",
   "repository": {
     "type": "git",
-    "url": "git@github.com:crosbymichael/dockerui.git"
+    "url": "git@github.com:kevana/ui-for-docker.git"
   },
   "bugs": {
-    "url": "https://github.com/crosbymichael/dockerui/issues"
+    "url": "https://github.com/kevana/ui-for-docker/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://raw.githubusercontent.com/crosbymichael/dockerui/master/LICENSE"
+      "url": "https://raw.githubusercontent.com/kevana/ui-for-docker/master/LICENSE"
     }
   ],
   "engines": {
