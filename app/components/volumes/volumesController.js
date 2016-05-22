@@ -14,10 +14,20 @@ angular.module('volumes', []).config(['$routeProvider', function ($routeProvider
         };
         $scope.createVolumeConfig = {
             "Name": "",
-            "Driver": ""
+            "Driver": "",
+            "DriverOpts": {}
+        };
+        $scope.driverOptions = [];
+
+        $scope.addNewOption = function() {
+          var newItemNo = $scope.driverOptions.length+1;
+          $scope.driverOptions.push({});
         };
 
-
+        $scope.removeOption = function() {
+          var lastItem = $scope.driverOptions.length-1;
+          $scope.driverOptions.splice(lastItem);
+        };
 
         $scope.removeAction = function () {
             ViewSpinner.spin();
@@ -52,6 +62,7 @@ angular.module('volumes', []).config(['$routeProvider', function ($routeProvider
 
         $scope.addVolume = function addVolume(createVolumeConfig) {
             ViewSpinner.spin();
+            assignOptions(createVolumeConfig);
             Volume.create(createVolumeConfig, function (d) {
                 if (d.Name) {
                     Messages.send("Volume created", d.Name);
@@ -65,6 +76,13 @@ angular.module('volumes', []).config(['$routeProvider', function ($routeProvider
                 ViewSpinner.stop();
             });
         };
+
+        function assignOptions(createVolumeConfig) {
+          createVolumeConfig.DriverOpts = {};
+          angular.forEach($scope.driverOptions, function (option) {
+            createVolumeConfig.DriverOpts[option.name] = option.value;
+          });
+        }
 
         function fetchVolumes() {
             ViewSpinner.spin();
