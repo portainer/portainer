@@ -255,8 +255,11 @@ angular.module('containersNetwork', ['ngVis'])
 
         var update = function (data) {
             Container.query(data, function (d) {
-                for (var i = 0; i < d.length; i++) {
-                    Container.get({id: d[i].Id}, addContainer, showFailure);
+                var containers = d.filter(function (container) {
+                  return container.Image !== 'swarm';
+                });
+                for (var i = 0; i < containers.length; i++) {
+                    Container.get({id: containers[i].Id}, addContainer, showFailure);
                 }
             });
         };

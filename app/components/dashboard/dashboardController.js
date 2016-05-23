@@ -34,8 +34,11 @@ angular.module('dashboard', [])
             var ghost = 0;
             var stopped = 0;
 
-            for (var i = 0; i < d.length; i++) {
-                var item = d[i];
+            var containers = d.filter(function (container) {
+              return container.Image !== 'swarm';
+            });
+            for (var i = 0; i < containers.length; i++) {
+                var item = containers[i];
 
                 if (item.Status === "Ghost") {
                     ghost += 1;
@@ -47,7 +50,7 @@ angular.module('dashboard', [])
                 }
             }
 
-            getStarted(d);
+            getStarted(containers);
 
             var c = new Chart($('#containers-chart').get(0).getContext("2d"));
             var data = [

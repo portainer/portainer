@@ -14,8 +14,10 @@ angular.module('containers', [])
             var update = function (data) {
                 ViewSpinner.spin();
                 Container.query(data, function (d) {
-                    $scope.containers = d.map(function (item) {
-                        return new ContainerViewModel(item);
+                    $scope.containers = d.filter(function (container) {
+                      return container.Image !== 'swarm';
+                    }).map(function (container) {
+                          return new ContainerViewModel(container);
                     });
                     ViewSpinner.stop();
                 });
