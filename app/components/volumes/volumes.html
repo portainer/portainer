@@ -67,12 +67,12 @@
             </div>
             <div class="form-group">
                 <label>Options:</label>
+                <button class="addOpts" ng-click="addNewOption()">Add option</button>
+                <button class="remove" ng-click="removeOption()">Remove option</button>
                 <fieldset  data-ng-repeat="option in driverOptions">
     				      Name: <input type="text" ng-model="option.name" name="" placeholder="Option name" class="form-control">
                   Value: <input type="text" ng-model="option.value" name="" placeholder="Option value" class="form-control">
-    				      <button class="remove" ng-show="$last" ng-click="removeOption()">-</button>
 				        </fieldset>
-                <button class="addOpts" ng-click="addNewOption()">Add option</button>
             </div>
             <button type="button" class="btn btn-success btn-sm"
                     ng-click="addVolume(createVolumeConfig)">
