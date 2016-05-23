@@ -8,16 +8,10 @@ angular.module('info', [])
 
       Version.get({}, function (d) {
         $scope.docker = d;
-        console.log('Docker');
-        console.log(JSON.stringify($scope.docker, null, 4));
       });
       Info.get({}, function (d) {
         $scope.info = d;
-        console.log('Info');
-        console.log(JSON.stringify($scope.info, null, 4));
         extractSwarmInfo(d);
-        console.log('Swarm');
-        console.log(JSON.stringify($scope.swarm, null, 4));
       });
 
       function extractSwarmInfo(info) {
