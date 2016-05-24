@@ -1,0 +1,130 @@
+<div class="row">
+  <div class="col-lg-3 col-md-6 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="widget-icon pull-left">
+          <i class="fa fa-code"></i>
+        </div>
+        <div class="title">{{ docker.Version }}</div>
+        <div class="comment">Swarm version</div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-3 col-md-6 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="widget-icon pull-left">
+          <i class="fa fa-code"></i>
+        </div>
+        <div class="title">{{ docker.ApiVersion }}</div>
+        <div class="comment">API version</div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-3 col-md-6 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="widget-icon pull-left">
+          <i class="fa fa-code"></i>
+        </div>
+        <div class="title">{{ docker.GoVersion }}</div>
+        <div class="comment">Go version</div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-6">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title="Cluster status"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Nodes</td>
+              <td>{{ swarm.Nodes }}</td>
+            </tr>
+            <tr>
+              <td>Containers</td>
+              <td>{{ info.Containers }}</td>
+            </tr>
+            <tr>
+              <td>Images</td>
+              <td>{{ info.Images }}</td>
+            </tr>
+            <tr>
+              <td>Strategy</td>
+              <td>{{ swarm.Strategy }}</td>
+            </tr>
+            <tr>
+              <td>CPUs</td>
+              <td>{{ info.NCPU }}</td>
+            </tr>
+            <tr>
+              <td>Total Memory</td>
+              <td>{{ info.MemTotal|humansize }}</td>
+            </tr>
+            <tr>
+              <td>Operating System</td>
+              <td>{{ info.OperatingSystem }}</td>
+            </tr>
+            <tr>
+              <td>Kernel Version</td>
+              <td>{{ info.KernelVersion }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-6">
+    <rd-widget>
+      <rd-widget-header icon="fa-hdd-o" title="Nodes status"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>
+                <a href="#/swarm/" ng-click="order('Name')">
+                  Name
+                  <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a href="#/swarm/" ng-click="order('IP')">
+                  IP
+                  <span ng-show="sortType == 'IP' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'IP' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a href="#/swarm/" ng-click="order('Containers')">
+                  Containers
+                  <span ng-show="sortType == 'Containers' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Containers' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a href="#/swarm/" ng-click="order('Status')">
+                  Status
+                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="node in (state.filteredNodes = (swarm.Status | filter:state.filter | orderBy:sortType:sortReverse))">
+              <td>{{ node.name }}</td>
+              <td>{{ node.ip }}</td>
+              <td>{{ node.containers }}</td>
+              <td><span class="label label-{{ node.status|statusbadge }}">{{ node.status }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

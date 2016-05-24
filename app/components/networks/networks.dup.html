@@ -1,0 +1,121 @@
+<h2>Networks:</h2>
+
+<div>
+    <ul class="nav nav-pills pull-left">
+        <li class="dropdown">
+            <a class="dropdown-toggle" id="drop4" role="button" data-toggle="dropdown" data-target="#">Actions <b
+                    class="caret"></b></a>
+            <ul id="menu1" class="dropdown-menu" role="menu" aria-labelledby="drop4">
+                <li><a tabindex="-1" href="" ng-click="removeAction()">Remove</a></li>
+            </ul>
+        </li>
+    </ul>
+
+    <div class="pull-right form-inline">
+        <input type="text" class="form-control" id="filter" placeholder="Filter" ng-model="filter"/> <label
+            class="sr-only" for="filter">Filter</label>
+    </div>
+</div>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th><label><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()"/> Select</label></th>
+        <th>
+            <a href="#/networks/" ng-click="order('Name')">
+                Name
+                <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+            </a>
+        </th>
+        <th>
+            <a href="#/networks/" ng-click="order('Id')">
+                Id
+                <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+            </a>
+        </th>
+        <th>
+            <a href="#/networks/" ng-click="order('Scope')">
+                Scope
+                <span ng-show="sortType == 'Scope' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'Scope' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+            </a>
+        </th>
+        <th>
+            <a href="#/networks/" ng-click="order('Driver')">
+                Driver
+                <span ng-show="sortType == 'Driver' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+            </a>
+        </th>
+        <th>
+            <a href="#/networks/" ng-click="order('IPAM.Driver')">
+                IPAM Driver
+                <span ng-show="sortType == 'IPAM.Driver' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'IPAM.Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+            </a>
+        </th>
+        <th>
+            <a href="#/networks/" ng-click="order('IPAM.Config[0].Subnet')">
+                IPAM Subnet
+                <span ng-show="sortType == 'IPAM.Config[0].Subnet' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'IPAM.Config[0].Subnet' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+            </a>
+        </th>
+        <th>
+            <a href="#/networks/" ng-click="order('IPAM.Config[0].Gateway')">
+                IPAM Gateway
+                <span ng-show="sortType == 'IPAM.Config[0].Gateway' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'IPAM.Config[0].Gateway' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+            </a>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="network in ( filteredNetworks = (networks | filter:filter | orderBy:sortType:sortReverse))">
+        <td><input type="checkbox" ng-model="network.Checked"/></td>
+        <td><a href="#/networks/{{ network.Id }}/">{{ network.Name|truncate:20}}</a></td>
+        <td>{{ network.Id }}</td>
+        <td>{{ network.Scope }}</td>
+        <td>{{ network.Driver }}</td>
+        <td>{{ network.IPAM.Driver }}</td>
+        <td>{{ network.IPAM.Config[0].Subnet }}</td>
+        <td>{{ network.IPAM.Config[0].Gateway }}</td>
+    </tr>
+    </tbody>
+</table>
+<div class="row">
+    <div class="col-xs-offset-3 col-xs-6">
+        <form role="form" class="">
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" placeholder='isolated_nw'
+                       ng-model="createNetworkConfig.Name" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label>Driver:</label>
+                <input type="text" placeholder='bridge'
+                       ng-model="createNetworkConfig.Driver" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label>Subnet:</label>
+                <input type="text" placeholder='172.20.0.0/16'
+                       ng-model="createNetworkConfig.IPAM.Config[0].Subnet" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label>IPRange:</label>
+                <input type="text" placeholder='172.20.10.0/24'
+                       ng-model="createNetworkConfig.IPAM.Config[0].IPRange" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label>Gateway:</label>
+                <input type="text" placeholder='172.20.10.11'
+                       ng-model="createNetworkConfig.IPAM.Config[0].Gateway" class="form-control"/>
+            </div>
+            <button type="button" class="btn btn-success btn-sm"
+                    ng-click="addNetwork(createNetworkConfig)">
+                Create Network
+            </button>
+        </form>
+    </div>
+</div>

@@ -1,76 +1,79 @@
-
-<h2>Containers:</h2>
-
-<div>
-    <ul class="nav nav-pills pull-left">
-        <li class="dropdown">
-            <a class="dropdown-toggle" id="drop4" role="button" data-toggle="dropdown" data-target="#">Actions <b class="caret"></b></a>
-            <ul id="menu1" class="dropdown-menu" role="menu" aria-labelledby="drop4">
-                <li><a tabindex="-1" href="" ng-click="startAction()">Start</a></li>
-                <li><a tabindex="-1" href="" ng-click="stopAction()">Stop</a></li>
-                <li><a tabindex="-1" href="" ng-click="restartAction()">Restart</a></li>
-                <li><a tabindex="-1" href="" ng-click="killAction()">Kill</a></li>
-                <li><a tabindex="-1" href="" ng-click="pauseAction()">Pause</a></li>
-                <li><a tabindex="-1" href="" ng-click="unpauseAction()">Unpause</a></li>
-                <li><a tabindex="-1" href="" ng-click="removeAction()">Remove</a></li>
-            </ul>
-        </li>
-    </ul>
-
-    <div class="pull-right form-inline">
-        <input type="checkbox" ng-model="displayAll" id="displayAll" ng-change="toggleGetAll()"/> <label for="displayAll">Display All</label>&nbsp;
-        <input type="text" class="form-control" style="vertical-align: center" id="filter" placeholder="Filter" ng-model="filter"/> <label class="sr-only" for="filter">Filter</label>
-    </div>
-</div>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th><label><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()" /> Select</label></th>
-            <th>
+<div class="col-lg-12">
+  <rd-widget>
+    <rd-widget-header icon="fa-tasks" title="Containers">
+    </rd-widget-header>
+    <rd-widget-taskbar classes="col-lg-12">
+      <div class="pull-left">
+        <div class="btn-group" role="group" aria-label="...">
+          <button type="button" class="btn btn-default">Start</button>
+          <button type="button" class="btn btn-default">Stop</button>
+          <button type="button" class="btn btn-default">Restart</button>
+          <button type="button" class="btn btn-default">Kill</button>
+          <button type="button" class="btn btn-default">Pause</button>
+          <button type="button" class="btn btn-default">Unpause</button>
+          <button type="button" class="btn btn-default">Remove</button>
+        </div>
+      </div>
+      <div class="pull-right">
+        <input type="checkbox" ng-model="state.displayAll" id="displayAll" ng-change="toggleGetAll()"/><label for="displayAll">Display All</label>
+        <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
+      </div>
+    </rd-widget-taskbar>
+    <rd-widget-body classes="no-padding">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th><label><input type="checkbox" ng-model="state.toggle" ng-change="toggleSelectAll()" /> Select</label></th>
+              <th>
                 <a href="#/containers/" ng-click="order('Names')">
-                    Name
-                    <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  Name
+                  <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-            </th>
-            <th>
+              </th>
+              <th>
                 <a href="#/containers/" ng-click="order('Image')">
-                    Image
-                    <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  Image
+                  <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-            </th>
-            <th>
+              </th>
+              <th>
                 <a href="#/containers/" ng-click="order('Command')">
-                    Command
-                    <span ng-show="sortType == 'Command' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Command' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  Command
+                  <span ng-show="sortType == 'Command' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Command' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-            </th>
-            <th>
+              </th>
+              <th>
                 <a href="#/containers/" ng-click="order('Created')">
-                    Created
-                    <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  Created
+                  <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-            </th>
-            <th>
+              </th>
+              <th>
                 <a href="#/containers/" ng-click="order('Status')">
-                    Status
-                    <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  Status
+                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="container in (filteredContainers = ( containers | filter:filter | orderBy:sortType:sortReverse))">
-            <td><input type="checkbox" ng-model="container.Checked" /></td>
-            <td><a href="#/containers/{{ container.Id }}/">{{ container|containername}}</a></td>
-            <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
-            <td>{{ container.Command|truncate:40 }}</td>
-            <td>{{ container.Created|getdate }}</td>
-            <td><span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span></td>
-        </tr>
-    </tbody>
-</table>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse))">
+              <td><input type="checkbox" ng-model="container.Checked" /></td>
+              <td><a href="#/containers/{{ container.Id }}/">{{ container|containername}}</a></td>
+              <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
+              <td>{{ container.Command|truncate:40 }}</td>
+              <td>{{ container.Created|getdate }}</td>
+              <td><span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </rd-widget-body>
+  <rd-widget>
+</div>

@@ -1,52 +1,71 @@
-<div class="col-xs-offset-1">
-    <!--<div class="sidebar span4">
-        <div ng-include="template" ng-controller="SideBarController"></div>
-    </div>-->
-    <div class="row">
-        <div class="col-xs-10" id="masthead" style="display:none">
-            <div class="jumbotron">
-                <h1>UI For Docker</h1>
-
-                <p class="lead">The UI for Docker container engine</p>
-                <a class="btn btn-large btn-success" href="http://docker.io">Learn more.</a>
-            </div>
+<div class="row">
+  <div class="col-lg-3 col-md-6 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="widget-icon blue pull-left">
+          <i class="fa fa-tasks"></i>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xs-10">
-            <div class="col-xs-5">
-                <h3>Running Containers</h3>
-                <ul>
-                    <li ng-repeat="container in containers|orderBy:predicate">
-                        <a href="#/containers/{{ container.Id }}/">{{ container|containername }}</a>
-                        <span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-xs-5 text-right">
-                <h3>Status</h3>
-                <canvas id="containers-chart" class="pull-right">
-                    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
-                            href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-                </canvas>
-                <div id="chart-legend"></div>
-            </div>
+        <div class="title">{{ containerData.total }}</div>
+        <div class="comment">Containers</div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-3 col-md-6 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="widget-icon green pull-left">
+          <i class="fa fa-tasks"></i>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xs-10" id="stats">
-            <h4>Containers created</h4>
-            <canvas id="containers-started-chart" width="700">
-                <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
-                        href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-            </canvas>
-            <h4>Images created</h4>
-            <canvas id="images-created-chart" width="700">
-                <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
-                        href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-            </canvas>
+        <div class="title">{{ containerData.running }}</div>
+        <div class="comment">Running</div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-3 col-md-6 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="widget-icon red pull-left">
+          <i class="fa fa-tasks"></i>
         </div>
-    </div>
+        <div class="title">{{ containerData.stopped }}</div>
+        <div class="comment">Stopped</div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-3 col-md-6 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="widget-icon gray pull-left">
+          <i class="fa fa-tasks"></i>
+        </div>
+        <div class="title">{{ containerData.ghost }}</div>
+        <div class="comment">Ghost</div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-6">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title="Containers created"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <canvas id="containers-started-chart" width="770" height="230">
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
+                    href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        </canvas>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-6">
+    <rd-widget>
+      <rd-widget-header icon="fa-tag" title="Images created"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <canvas id="images-created-chart" width="770" height="230">
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
+                    href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        </canvas>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
 </div>

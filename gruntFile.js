@@ -37,7 +37,7 @@ module.exports = function (grunt) {
     ]);
     grunt.registerTask('test-watch', ['karma:watch']);
     grunt.registerTask('run', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
-    grunt.registerTask('runSwarm', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm']);
+    grunt.registerTask('runSwarm', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
     grunt.registerTask('run-dev', ['if:binaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
 
     // Print a timestamp (useful for when watching)
@@ -68,7 +68,6 @@ module.exports = function (grunt) {
                 'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
                 'bower_components/bootstrap/dist/js/bootstrap.js',
                 'bower_components/spin.js/spin.js',
-                'bower_components/vis/dist/vis.js',
                 'bower_components/Chart.js/Chart.js',
                 'bower_components/oboe/dist/oboe-browser.js',
                 'assets/js/legend.js' // Not a bower package
@@ -81,7 +80,8 @@ module.exports = function (grunt) {
             cssVendor: [
                 'bower_components/bootstrap/dist/css/bootstrap.css',
                 'bower_components/jquery.gritter/css/jquery.gritter.css',
-                'bower_components/vis/dist/vis.css'
+                'bower_components/font-awesome/css/font-awesome.min.css',
+                'bower_components/rdash-ui/dist/css/rdash.css'
             ]
         },
         clean: {
@@ -92,7 +92,9 @@ module.exports = function (grunt) {
         copy: {
             assets: {
                 files: [
-                    {dest: '<%= distdir %>/fonts/', src: '**', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
+                  {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
+                  {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
+                  {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
                     {
                         dest: '<%= distdir %>/images/',
                         src: ['**', '!trees.jpg'],
@@ -100,18 +102,10 @@ module.exports = function (grunt) {
                         cwd: 'bower_components/jquery.gritter/images/'
                     },
                     {
-                        dest: '<%= distdir %>/img',
-                        src: [
-                            'network/downArrow.png',
-                            'network/leftArrow.png',
-                            'network/upArrow.png',
-                            'network/rightArrow.png',
-                            'network/minus.png',
-                            'network/plus.png',
-                            'network/zoomExtends.png'
-                        ],
+                        dest: '<%= distdir %>/images/',
+                        src: ['**'],
                         expand: true,
-                        cwd: 'bower_components/vis/dist/img'
+                        cwd: 'assets/images/'
                     },
                     {dest: '<%= distdir %>/ico', src: '**', expand: true, cwd: 'assets/ico'}
                 ]
@@ -154,11 +148,12 @@ module.exports = function (grunt) {
             angular: {
                 src: ['bower_components/angular/angular.js',
                     'bower_components/angular-sanitize/angular-sanitize.js',
+                    'bower_components/angular-cookies/angular-cookies.js',
                     'bower_components/angular-route/angular-route.js',
+                    'bower_components/angular-ui-router/release/angular-ui-router.js',
                     'bower_components/angular-resource/angular-resource.js',
                     'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-                    'bower_components/angular-oboe/dist/angular-oboe.js',
-                    'bower_components/angular-visjs/angular-vis.js'],
+                    'bower_components/angular-oboe/dist/angular-oboe.js'],
                 dest: '<%= distdir %>/angular.js'
             }
         },
@@ -222,6 +217,10 @@ module.exports = function (grunt) {
                  * Tried using a host volume with -v, copying files with `docker cp`, restating container, none worked
                  * Rebuilding image on each change was only method that worked, takes ~4s per change to update
                  */
+            },
+            buildSwarm: {
+                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
+                tasks: ['build', 'shell:buildImage', 'shell:runSwarm', 'shell:cleanImages']
             }
         },
         jshint: {
@@ -265,7 +264,7 @@ module.exports = function (grunt) {
                 command: [
                     'docker stop ui-for-docker',
                     'docker rm ui-for-docker',
-                    'docker run --net=host -d --name ui-for-docker ui-for-docker -e http://127.0.0.1:2374'
+                    'docker run --net=host -d --name ui-for-docker ui-for-docker -e http://10.0.7.11:4000'
                 ].join(';')
             },
             cleanImages: {
