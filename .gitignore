@@ -6,3 +6,5 @@ bower_components
 .idea
 *.iml
 dist/uifordocker.js
+doc
+doc/*
