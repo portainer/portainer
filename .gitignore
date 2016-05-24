@@ -5,3 +5,4 @@ node_modules
 bower_components
 .idea
 *.iml
+dist/uifordocker.js
