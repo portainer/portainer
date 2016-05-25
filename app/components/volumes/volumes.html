@@ -5,8 +5,8 @@
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
         <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-default">Remove</button>
-          <button type="button" class="btn btn-default">Create new volume...</button>
+          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
+          <button type="button" class="btn btn-default" disabled>Create new volume...</button>
         </div>
       </div>
       <div class="pull-right">
@@ -44,7 +44,7 @@
           </thead>
           <tbody>
             <tr ng-repeat="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse))">
-              <td><input type="checkbox" ng-model="volume.Checked"/></td>
+              <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
               <td>{{ volume.Name|truncate:20 }}</td>
               <td>{{ volume.Driver }}</td>
               <td>{{ volume.Mountpoint }}</td>
