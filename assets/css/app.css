@@ -116,4 +116,6 @@
 
 .logo {
   display: inline;
+  width: 160px;
+  max-height: 38px;
 }
