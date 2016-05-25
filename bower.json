@@ -36,8 +36,9 @@
     "font-awesome": "~4.5.0",
     "jquery": "1.11.1",
     "jquery.gritter": "1.7.4",
-    "spin.js": "1.3",
-    "rdash-ui": "1.0.*"
+    "lodash": "4.12.0",
+    "rdash-ui": "1.0.*",
+    "spin.js": "1.3"
   },
   "resolutions": {
     "angular": "1.5.5"

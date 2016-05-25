@@ -70,6 +70,7 @@ module.exports = function (grunt) {
                 'bower_components/bootstrap/dist/js/bootstrap.js',
                 'bower_components/spin.js/spin.js',
                 'bower_components/Chart.js/Chart.js',
+                'bower_components/lodash/dist/lodash.js',
                 'bower_components/oboe/dist/oboe-browser.js',
                 'assets/js/legend.js' // Not a bower package
             ],
