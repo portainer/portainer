@@ -5,8 +5,8 @@
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
         <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-default">Remove</button>
-          <button type="button" class="btn btn-default">Create new network...</button>
+          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
+          <button type="button" class="btn btn-default" disabled>Create new network...</button>
         </div>
       </div>
       <div class="pull-right">
@@ -72,7 +72,7 @@
           </thead>
           <tbody>
             <tr ng-repeat="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse))">
-              <td><input type="checkbox" ng-model="network.Checked"/></td>
+              <td><input type="checkbox" ng-model="network.Checked" ng-change="selectItem(network)"/></td>
               <td><a href="#/networks/{{ network.Id }}/">{{ network.Name|truncate:20}}</a></td>
               <td>{{ network.Id }}</td>
               <td>{{ network.Scope }}</td>
