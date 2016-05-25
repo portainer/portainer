@@ -5,13 +5,13 @@
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
         <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-default">Start</button>
-          <button type="button" class="btn btn-default">Stop</button>
-          <button type="button" class="btn btn-default">Restart</button>
-          <button type="button" class="btn btn-default">Kill</button>
-          <button type="button" class="btn btn-default">Pause</button>
-          <button type="button" class="btn btn-default">Unpause</button>
-          <button type="button" class="btn btn-default">Remove</button>
+          <button type="button" class="btn btn-primary" ng-click="startAction()" ng-disabled="!state.selectedItemCount">Start</button>
+          <button type="button" class="btn btn-primary" ng-click="stopAction()" ng-disabled="!state.selectedItemCount">Stop</button>
+          <button type="button" class="btn btn-primary" ng-click="restartAction()" ng-disabled="!state.selectedItemCount">Restart</button>
+          <button type="button" class="btn btn-primary" ng-click="pauseAction()" ng-disabled="!state.selectedItemCount">Pause</button>
+          <button type="button" class="btn btn-primary" ng-click="unpauseAction()" ng-disabled="!state.selectedItemCount">Unpause</button>
+          <button type="button" class="btn btn-primary" ng-click="killAction()" ng-disabled="!state.selectedItemCount">Kill</button>
+          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
         </div>
       </div>
       <div class="pull-right">
@@ -64,7 +64,7 @@
           </thead>
           <tbody>
             <tr ng-repeat="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse))">
-              <td><input type="checkbox" ng-model="container.Checked" /></td>
+              <td><input type="checkbox" ng-model="container.Checked" ng-change="selectItem(container)"/></td>
               <td><a href="#/containers/{{ container.Id }}/">{{ container|containername}}</a></td>
               <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
               <td>{{ container.Command|truncate:40 }}</td>
