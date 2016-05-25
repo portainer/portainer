@@ -5,8 +5,8 @@
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
         <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-default">Remove</button>
-          <button type="button" class="btn btn-default">Pull new image...</button>
+          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
+          <button type="button" class="btn btn-default" disabled>Pull new image...</button>
         </div>
       </div>
       <div class="pull-right">
@@ -51,7 +51,7 @@
           </thead>
           <tbody>
             <tr ng-repeat="image in (state.filteredImages = (images | filter:state.filter | orderBy:sortType:sortReverse))">
-              <td><input type="checkbox" ng-model="image.Checked" /></td>
+              <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
               <td><a href="#/images/{{ image.Id }}/?tag={{ image|repotag }}">{{ image.Id|truncate:20}}</a></td>
               <td>{{ image|repotag }}</td>
               <td>{{ image.VirtualSize|humansize }}</td>
