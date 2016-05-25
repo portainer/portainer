@@ -7,3 +7,5 @@ bower_components
 *.iml
 doc
 doc/*
+dist
+dist/
