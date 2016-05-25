@@ -113,3 +113,7 @@
 .dropdown {
     cursor: pointer;
 }
+
+.logo {
+  display: inline;
+}

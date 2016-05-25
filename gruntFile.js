@@ -39,6 +39,7 @@ module.exports = function (grunt) {
     grunt.registerTask('run', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
     grunt.registerTask('runSwarm', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
     grunt.registerTask('run-dev', ['if:binaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
+    grunt.registerTask('clear', ['clean:app']);
 
     // Print a timestamp (useful for when watching)
     grunt.registerTask('timestamp', function () {
