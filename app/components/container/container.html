@@ -2,12 +2,173 @@
   <div class="col-lg-3 col-md-6 col-xs-12">
     <rd-widget>
       <rd-widget-body>
+        <div class="widget-icon grey pull-left">
+          <i class="fa fa-tasks"></i>
+        </div>
+        <div class="title">{{ container.Name|trimcontainername }}</div>
+        <div class="comment">Name</div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-3 col-md-6 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
         <div ng-class="{true: 'widget-icon green pull-left', false: 'widget-icon red pull-left'}[container.State.Running]">
           <i class="fa fa-heartbeat"></i>
         </div>
         <div class="title">{{ container.State|getstatetext }}</div>
-        <div class="comment">Container state</div>
+        <div class="comment">State</div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-6 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="widget-icon grey pull-left">
+          <i class="fa fa-cogs"></i>
+        </div>
+        <div class="title">
+          <div class="btn-group" role="group" aria-label="...">
+            <button class="btn btn-default" disabled="">Rename</button>
+            <button class="btn btn-primary" ng-click="commit()">Commit</button>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="btn-group" role="group" aria-label="...">
+            <button class="btn btn-primary" ng-click="start()" ng-disabled="container.State.Running">Start</button>
+            <button class="btn btn-primary" ng-click="stop()" ng-disabled="!container.State.Running">Stop</button>
+            <button class="btn btn-primary" ng-click="kill()" ng-disabled="!container.State.Running">Kill</button>
+            <button class="btn btn-primary" ng-click="restart()">Restart</button>
+            <button class="btn btn-primary" ng-click="pause()" ng-disabled="!container.State.Running && !container.State.Paused">Pause</button>
+            <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Running && container.State.Paused">Unpause</button>
+            <button class="btn btn-danger" ng-click="remove()" ng-disabled="container.State.Running">Remove</button>
+          </div>
+        </div>
       </rd-widget-body>
     </rd-widget>
   </div>
 </div>
+
+<div class="row">
+  <div class="col-lg-9">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title="Container status"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Created</td>
+              <td>{{ container.Created | date: 'medium' }}</td>
+            </tr>
+            <tr>
+              <td>Path</td>
+              <td>{{ container.Path }}</td>
+            </tr>
+            <tr>
+              <td>Args</td>
+              <td>{{ container.Args.join(' ') || 'None' }}</td>
+            </tr>
+            <tr>
+              <td>Exposed Ports</td>
+              <td>
+                <ul>
+                  <li ng-repeat="(k, v) in container.Config.ExposedPorts">{{ k }}</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>Environment</td>
+              <td>
+                <ul>
+                  <li ng-repeat="k in container.Config.Env">{{ k }}</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>Labels</td>
+              <td>
+                <table role="table" class="table">
+                  <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                  </tr>
+                  <tr ng-repeat="(k, v) in container.Config.Labels">
+                    <td>{{ k }}</td>
+                    <td>{{ v }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td>Publish all ports</td>
+              <td>{{ container.HostConfig.PublishAllPorts }}</td>
+            </tr>
+            <tr>
+              <td>Ports</td>
+              <td>
+                <ul>
+                  <li ng-repeat="(containerport, hostports) in container.NetworkSettings.Ports">
+                    {{ containerport }} =>
+                    <span class="label label-default" style="margin-right: 5px;" ng-repeat="(k,v) in hostports">{{ v.HostIp }}:{{ v.HostPort }}</span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>Hostname</td>
+              <td>{{ container.Config.Hostname }}</td>
+            </tr>
+            <tr>
+              <td>IPAddress</td>
+              <td>{{ container.NetworkSettings.IPAddress }}</td>
+            </tr>
+            <tr>
+              <td>Cmd</td>
+              <td>{{ container.Config.Cmd }}</td>
+            </tr>
+            <tr>
+              <td>Entrypoint</td>
+              <td>{{ container.Config.Entrypoint.join(' ') }}</td>
+            </tr>
+            <tr>
+              <td>Bindings</td>
+              <td>
+                <ul>
+                  <li ng-repeat="b in container.HostConfig.Binds">{{ b }}</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>Volumes</td>
+              <td>{{ container.Volumes }}</td>
+            </tr>
+
+            <tr>
+              <td>SysInitpath</td>
+              <td>{{ container.SysInitPath }}</td>
+            </tr>
+            <tr>
+              <td>Image</td>
+              <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-3">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title="Container state details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr ng-repeat="(key, val) in container.State">
+              <td>{{key}}</td>
+              <td>{{ val }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+<div>

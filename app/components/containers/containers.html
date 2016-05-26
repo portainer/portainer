@@ -7,10 +7,10 @@
         <div class="btn-group" role="group" aria-label="...">
           <button type="button" class="btn btn-primary" ng-click="startAction()" ng-disabled="!state.selectedItemCount">Start</button>
           <button type="button" class="btn btn-primary" ng-click="stopAction()" ng-disabled="!state.selectedItemCount">Stop</button>
+          <button type="button" class="btn btn-primary" ng-click="killAction()" ng-disabled="!state.selectedItemCount">Kill</button>
           <button type="button" class="btn btn-primary" ng-click="restartAction()" ng-disabled="!state.selectedItemCount">Restart</button>
           <button type="button" class="btn btn-primary" ng-click="pauseAction()" ng-disabled="!state.selectedItemCount">Pause</button>
           <button type="button" class="btn btn-primary" ng-click="unpauseAction()" ng-disabled="!state.selectedItemCount">Unpause</button>
-          <button type="button" class="btn btn-primary" ng-click="killAction()" ng-disabled="!state.selectedItemCount">Kill</button>
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
         </div>
       </div>
