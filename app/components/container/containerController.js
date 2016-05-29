@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$stateParams', '$location', 'Container', 'ContainerCommit', 'Image', 'Messages', 'ViewSpinner', '$timeout',
-function ($scope, $stateParams, $location, Container, ContainerCommit, Image, Messages, ViewSpinner, $timeout) {
+.controller('ContainerController', ['$scope', '$stateParams', '$location', '$filter', 'Container', 'ContainerCommit', 'Image', 'Messages', 'ViewSpinner', '$timeout',
+function ($scope, $stateParams, $location, $filter, Container, ContainerCommit, Image, Messages, ViewSpinner, $timeout) {
   $scope.changes = [];
   $scope.editEnv = false;
   $scope.editPorts = false;
@@ -15,7 +15,7 @@ function ($scope, $stateParams, $location, Container, ContainerCommit, Image, Me
     Container.get({id: $stateParams.id}, function (d) {
       $scope.container = d;
       $scope.container.edit = false;
-      $scope.container.newContainerName = d.Name;
+      $scope.container.newContainerName = $filter('trimcontainername')(d.Name);
 
       // fill up env
       if (d.Config.Env) {
