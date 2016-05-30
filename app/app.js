@@ -65,6 +65,11 @@ angular.module('uifordocker', [
           templateUrl: 'app/components/networks/networks.html',
           controller: 'NetworksController'
         })
+        .state('network', {
+          url: '^/networks/:id/',
+          templateUrl: 'app/components/network/network.html',
+          controller: 'NetworkController'
+        })
         .state('volumes', {
           url: '/volumes/',
           templateUrl: 'app/components/volumes/volumes.html',

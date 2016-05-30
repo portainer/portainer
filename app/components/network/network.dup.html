@@ -1,0 +1,110 @@
+<div class="detail">
+
+    <h4>Network: {{ network.Name }}</h4>
+
+    <table class="table table-striped">
+        <tbody>
+        <tr>
+            <td>Name:</td>
+            <td>{{ network.Name }}</td>
+        </tr>
+        <tr>
+            <td>Id:</td>
+            <td>{{ network.Id }}</td>
+        </tr>
+        <tr>
+            <td>Scope:</td>
+            <td>{{ network.Scope }}</td>
+        </tr>
+        <tr>
+            <td>Driver:</td>
+            <td>{{ network.Driver }}</td>
+        </tr>
+        <tr>
+            <td>IPAM:</td>
+            <td>
+                <table class="table table-striped">
+                    <tr>
+                        <td>Driver:</td>
+                        <td>{{ network.IPAM.Driver }}</td>
+                    </tr>
+                    <tr>
+                        <td>Subnet:</td>
+                        <td>{{ network.IPAM.Config[0].Subnet }}</td>
+                    </tr>
+                    <tr>
+                        <td>Gateway:</td>
+                        <td>{{ network.IPAM.Config[0].Gateway }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Containers:</td>
+            <td>
+                <table class="table table-striped" ng-repeat="(Id, container) in network.Containers">
+                    <tr>
+                        <td>Id:</td>
+                        <td><a href="#/containers/{{ Id }}">{{ Id }}</a></td>
+                        <td>
+                            <button ng-click="disconnect(network.Id, Id)" class="btn btn-danger btn-sm">
+                                Disconnect from network
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>EndpointID:</td>
+                        <td>{{ container.EndpointID}}</td>
+                    </tr>
+                    <tr>
+                        <td>MacAddress:</td>
+                        <td>{{ container.MacAddress}}</td>
+                    </tr>
+                    <tr>
+                        <td>IPv4Address:</td>
+                        <td>{{ container.IPv4Address}}</td>
+                    </tr>
+                    <tr>
+                        <td>IPv6Address:</td>
+                        <td>{{ container.IPv6Address}}</td>
+                    </tr>
+                </table>
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label>Container ID:
+                            <input ng-model="containerId" placeholder="3613f73ba0e4" class="form-control">
+                        </label>
+                    </div>
+                    <button ng-click="connect(network.Id, containerId)" class="btn btn-primary">
+                        Connect
+                    </button>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>Options:</td>
+            <td>
+                <table role="table" class="table table-striped">
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr ng-repeat="(k, v) in network.Options">
+                        <td>{{ k }}</td>
+                        <td>{{ v }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+
+    <hr/>
+
+
+    <div class="btn-remove">
+        <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="removeImage(id)">Remove Network
+        </button>
+    </div>
+</div>
