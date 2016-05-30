@@ -1,17 +1,10 @@
 angular.module('image', [])
-    .controller('ImageController', ['$scope', '$q', '$stateParams', '$location', 'Image', 'Container', 'Messages', 'LineChart',
-        function ($scope, $q, $stateParams, $location, Image, Container, Messages, LineChart) {
+    .controller('ImageController', ['$scope', '$q', '$routeParams', '$location', 'Image', 'Container', 'Messages', 'LineChart',
+        function ($scope, $q, $routeParams, $location, Image, Container, Messages, LineChart) {
+            $scope.history = [];
             $scope.tagInfo = {repo: '', version: '', force: false};
             $scope.id = '';
             $scope.repoTags = [];
-
-            var buildCharts = function() {
-              getContainersFromImage($q, Container, $scope.id).then(function (containers) {
-                  LineChart.build('#containers-started-chart', containers, function (c) {
-                      return new Date(c.Created * 1000).toLocaleDateString();
-                  });
-              });
-            };
 
             $scope.removeImage = function (id) {
                 Image.remove({id: id}, function (d) {
@@ -31,15 +24,21 @@ angular.module('image', [])
                 });
             };
 
+            $scope.getHistory = function () {
+                Image.history({id: $routeParams.id}, function (d) {
+                    $scope.history = d;
+                });
+            };
+
             $scope.addTag = function () {
                 var tag = $scope.tagInfo;
                 Image.tag({
-                    id: $stateParams.id,
+                    id: $routeParams.id,
                     repo: tag.repo,
                     tag: tag.version,
                     force: tag.force ? 1 : 0
                 }, function (d) {
-                    Messages.send("Tag Added", $stateParams.id);
+                    Messages.send("Tag Added", $routeParams.id);
                     $location.path('/images/' + $scope.id);
                 }, function (e) {
                     $scope.error = e.data;
@@ -79,7 +78,7 @@ angular.module('image', [])
                 });
             }
 
-            Image.get({id: $stateParams.id}, function (d) {
+            Image.get({id: $routeParams.id}, function (d) {
                 $scope.image = d;
                 $scope.id = d.Id;
                 if (d.RepoTags) {
@@ -87,15 +86,21 @@ angular.module('image', [])
                 } else {
                     getRepoTags($scope.id);
                 }
-                buildCharts();
+
+                getContainersFromImage($q, Container, $scope.id).then(function (containers) {
+                    LineChart.build('#containers-started-chart', containers, function (c) {
+                        return new Date(c.Created * 1000).toLocaleDateString();
+                    });
+                });
             }, function (e) {
                 if (e.status === 404) {
                     $('.detail').hide();
-                    $scope.error = "Image not found.<br />" + $stateParams.id;
+                    $scope.error = "Image not found.<br />" + $routeParams.id;
                 } else {
                     $scope.error = e.data;
                 }
                 $('#error-message').show();
             });
 
+            $scope.getHistory();
         }]);

@@ -1,120 +1,108 @@
-<div ng-include="template" ng-controller="StartContainerController"></div>
-
-<div class="alert alert-error" id="error-message" style="display:none">
-    {{ error }}
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="widget-icon grey pull-left">
+          <i class="fa fa-clone"></i>
+        </div>
+        <div class="title">{{ id }}</div>
+        <div class="comment">
+          Image ID
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
 </div>
-
-<div class="detail">
-
-    <h4>Image: {{ id }}</h4>
-
-    <div class="btn-group detail">
-        <button class="btn btn-success" data-toggle="modal" data-target="#create-modal">Start Container</button>
-    </div>
-
-    <div>
-        <h4>Containers created:</h4>
-        <canvas id="containers-started-chart" width="750">
-            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
-                    href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        </canvas>
-    </div>
-
-    <table class="table table-striped">
-        <tbody>
-        <tr>
-            <td>Tags:</td>
-            <td>
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="widget-icon grey pull-left">
+          <i class="fa fa-cogs"></i>
+        </div>
+        <div class="title">
+          <div class="btn-group" role="group" aria-label="...">
+            <button class="btn btn-default" disabled>Tag image...</button>
+            <button class="btn btn-danger" ng-click="removeImage(id)">Remove</button>
+          </div>
+        </div>
+        <div class="comment">
+          Actions
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title="Image details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Created</td>
+              <td>{{ image.Created | date: 'medium'}}</td>
+            </tr>
+            <tr>
+              <td>Tags</td>
+              <td>
                 <ul>
-                    <li ng-repeat="tag in RepoTags">{{ tag }}
-                        <button ng-click="removeImage(tag)" class="btn btn-sm btn-danger">Remove tag</button>
-                    </li>
+                  <li ng-repeat="tag in RepoTags">{{ tag }}
+                    <button ng-click="removeImage(tag)" class="btn btn-sm btn-danger">Remove tag</button>
+                  </li>
                 </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>Created:</td>
-            <td>{{ image.Created | date: 'medium'}}</td>
-        </tr>
-        <tr>
-            <td>Parent:</td>
-            <td><a href="#/images/{{ image.Parent }}/">{{ image.Parent }}</a></td>
-        </tr>
-        <tr>
-            <td>Size (Virtual Size):</td>
-            <td>{{ image.Size|humansize }} ({{ image.VirtualSize|humansize }})</td>
-        </tr>
+              </td>
+            </tr>
+            <tr>
+                <td>Parent</td>
+                <td><a href="#/images/{{ image.Parent }}/">{{ image.Parent }}</a></td>
+            </tr>
+            <tr>
+                <td>Size (Virtual Size)</td>
+                <td>{{ image.Size|humansize }} ({{ image.VirtualSize|humansize }})</td>
+            </tr>
 
-        <tr>
-            <td>Hostname:</td>
-            <td>{{ image.ContainerConfig.Hostname }}</td>
-        </tr>
-        <tr>
-            <td>User:</td>
-            <td>{{ image.ContainerConfig.User }}</td>
-        </tr>
-        <tr>
-            <td>Cmd:</td>
-            <td>{{ image.ContainerConfig.Cmd }}</td>
-        </tr>
-        <tr>
-            <td>Volumes:</td>
-            <td>{{ image.ContainerConfig.Volumes }}</td>
-        </tr>
-        <tr>
-            <td>Volumes from:</td>
-            <td>{{ image.ContainerConfig.VolumesFrom }}</td>
-        </tr>
-        <tr>
-            <td>Built with:</td>
-            <td>Docker {{ image.DockerVersion }} on {{ image.Os}}, {{ image.Architecture }}</td>
-        </tr>
-
-        </tbody>
-    </table>
-
-    <div class="row-fluid">
-        <div class="span1">
-            History:
-        </div>
-        <div class="span5">
-            <i class="icon-refresh" style="width:32px;height:32px;" ng-click="getHistory()"></i>
-        </div>
-    </div>
-
-    <div class="well well-large">
-        <ul>
-            <li ng-repeat="change in history">
-                <strong>{{ change.Id }}</strong>: Created: {{ change.Created|getdate }} Created by: {{ change.CreatedBy
-                }}
-            </li>
-        </ul>
-    </div>
-
-    <hr/>
-
-    <div class="row-fluid">
-        <form class="form-inline" role="form">
-            <fieldset>
-                <legend>Tag image</legend>
-                <div class="form-group">
-                    <label>Tag:</label>
-                    <input type="text" placeholder="repo" ng-model="tagInfo.repo" class="form-control">
-                    <input type="text" placeholder="version" ng-model="tagInfo.version" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label class="checkbox">
-                        <input type="checkbox" ng-model="tagInfo.force" class="form-control"/> Force?
-                    </label>
-                </div>
-                <input type="button" ng-click="addTag()" value="Add Tag" class="btn btn-primary"/>
-            </fieldset>
-        </form>
-    </div>
-
-    <hr/>
-
-    <div class="btn-remove">
-        <button class="btn btn-large btn-block btn-primary btn-danger" ng-click="removeImage(id)">Remove Image</button>
-    </div>
+            <tr>
+                <td>Hostname</td>
+                <td>{{ image.ContainerConfig.Hostname }}</td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>{{ image.ContainerConfig.User }}</td>
+            </tr>
+            <tr>
+                <td>Cmd</td>
+                <td>{{ image.ContainerConfig.Cmd }}</td>
+            </tr>
+            <tr>
+                <td>Volumes</td>
+                <td>{{ image.ContainerConfig.Volumes }}</td>
+            </tr>
+            <tr>
+                <td>Volumes from</td>
+                <td>{{ image.ContainerConfig.VolumesFrom }}</td>
+            </tr>
+            <tr>
+                <td>Built with</td>
+                <td>Docker {{ image.DockerVersion }} on {{ image.Os}}, {{ image.Architecture }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-area-chart" title="Containers using this image"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <canvas id="containers-started-chart" width="770" height="230">
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
+              href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        </canvas>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
 </div>
