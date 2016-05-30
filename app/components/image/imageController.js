@@ -97,5 +97,4 @@ function ($scope, $q, $stateParams, $location, Image, Container, Messages, LineC
     }
     $('#error-message').show();
   });
-
 }]);
