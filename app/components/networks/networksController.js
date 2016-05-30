@@ -1,6 +1,6 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', 'Network', 'ViewSpinner', 'Messages', '$route', 'errorMsgFilter',
-function ($scope, Network, ViewSpinner, Messages, $route, errorMsgFilter) {
+.controller('NetworksController', ['$scope', 'Network', 'ViewSpinner', 'Messages', 'errorMsgFilter',
+function ($scope, Network, ViewSpinner, Messages, errorMsgFilter) {
 
   $scope.state = {};
   $scope.state.toggle = false;
