@@ -1,3 +1,5 @@
+<div ng-include="template" ng-controller="CreateVolumeController"></div>
+
 <div class="col-lg-12">
   <rd-widget>
     <rd-widget-header icon="fa-cubes" title="Volumes">
@@ -6,7 +8,7 @@
       <div class="pull-left">
         <div class="btn-group" role="group" aria-label="...">
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
-          <button type="button" class="btn btn-default" disabled>Create new volume...</button>
+          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create-volume-modal">Create new volume...</button>
         </div>
       </div>
       <div class="pull-right">
