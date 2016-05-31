@@ -1,3 +1,5 @@
+<div ng-include="template" ng-controller="StartContainerController"></div>
+
 <div class="col-lg-12">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title="Containers">
@@ -12,6 +14,7 @@
           <button type="button" class="btn btn-primary" ng-click="pauseAction()" ng-disabled="!state.selectedItemCount">Pause</button>
           <button type="button" class="btn btn-primary" ng-click="unpauseAction()" ng-disabled="!state.selectedItemCount">Unpause</button>
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
+          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create-modal">Start a new container...</button>
         </div>
       </div>
       <div class="pull-right">
