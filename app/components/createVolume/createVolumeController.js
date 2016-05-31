@@ -14,14 +14,13 @@ function ($scope, $state, Messages, Volume, ViewSpinner, errorMsgFilter) {
 
   $scope.init();
 
-  $scope.addNewOption = function() {
-    var newItemNo = $scope.driverOptions.length+1;
+  $scope.addOption = function() {
     $scope.driverOptions.push({});
   };
 
-  $scope.removeOption = function() {
-    var lastItem = $scope.driverOptions.length-1;
-    $scope.driverOptions.splice(lastItem);
+  $scope.removeOption = function(entry) {
+    var idx = $scope.driverOptions.indexOf(entry);
+    $scope.driverOptions.splice(idx, 1);
   };
 
   $scope.addVolume = function addVolume(createVolumeConfig) {

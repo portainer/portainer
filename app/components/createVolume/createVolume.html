@@ -19,12 +19,14 @@
           </div>
           <div class="form-group">
               <label>Options:</label>
-              <a href="" ng-click="addNewOption()"><i class="fa fa-plus" aria-hidden="true"></i></a>
-              <a href="" ng-click="removeOption()"><i class="fa fa-minus" aria-hidden="true"></i></a>
+              <br />
               <fieldset  data-ng-repeat="option in driverOptions">
-                Name: <input type="text" ng-model="option.name" name="" placeholder="Option name" class="form-control">
-                Value: <input type="text" ng-model="option.value" name="" placeholder="Option value" class="form-control">
+                Name (<a href="" ng-click="removeOption(option)"><i class="fa fa-minus" aria-hidden="true"></i></a>):
+                <input type="text" ng-model="option.name" name="" placeholder="Option name" class="form-control">
+                Value:
+                <input type="text" ng-model="option.value" name="" placeholder="Option value" class="form-control">
               </fieldset>
+              <a href="" ng-click="addOption()"><i class="fa fa-plus" aria-hidden="true"></i></a>
           </div>
         </form>
       </div>
