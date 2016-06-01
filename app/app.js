@@ -76,7 +76,8 @@ angular.module('uifordocker', [
         $httpProvider.interceptors.push(function() {
             return {
                 'response': function(response) {
-                    if (typeof(response.data) === 'string' && response.data.startsWith('Conflict.')) {
+                    if (typeof(response.data) === 'string' &&
+                            (response.data.startsWith('Conflict.') || response.data.startsWith('conflict:'))) {
                         $.gritter.add({
                             title: 'Error',
                             text: $('<div>').text(response.data).html(),
