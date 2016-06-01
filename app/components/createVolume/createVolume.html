@@ -14,19 +14,18 @@
           </div>
           <div class="form-group">
             <label>Driver:</label>
-            <input type="text" placeholder='bridge'
-            ng-model="createVolumeConfig.Driver" class="form-control"/>
+            <ui-select ng-model="selectedDriver.value" theme="bootstrap">
+              <ui-select-match>
+                  <span ng-bind="$select.selected"></span>
+              </ui-select-match>
+              <ui-select-choices repeat="driver in availableDrivers">
+                  <span ng-bind="driver"></span>
+              </ui-select-choices>
+          </ui-select>
           </div>
-          <div class="form-group">
-              <label>Options:</label>
-              <br />
-              <fieldset  data-ng-repeat="option in driverOptions">
-                Name (<a href="" ng-click="removeOption(option)"><i class="fa fa-minus" aria-hidden="true"></i></a>):
-                <input type="text" ng-model="option.name" name="" placeholder="Option name" class="form-control">
-                Value:
-                <input type="text" ng-model="option.value" name="" placeholder="Option value" class="form-control">
-              </fieldset>
-              <a href="" ng-click="addOption()"><i class="fa fa-plus" aria-hidden="true"></i></a>
+          <div class="form-group" ng-show="selectedDriver.value == 'local-persist'">
+              <label>Mount point:</label>
+              <input type="text" ng-model="createVolumeConfig.DriverOpts.mountpoint" name="" placeholder="/volume/my_volume" class="form-control">
           </div>
         </form>
       </div>

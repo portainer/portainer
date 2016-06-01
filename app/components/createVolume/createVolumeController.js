@@ -9,25 +9,18 @@ function ($scope, $state, Messages, Volume, ViewSpinner, errorMsgFilter) {
       "Driver": "",
       "DriverOpts": {}
     };
-    $scope.driverOptions = [];
+    $scope.availableDrivers = ['local', 'local-persist'];
+    $scope.selectedDriver = { value: $scope.availableDrivers[0] };
   };
 
   $scope.init();
-
-  $scope.addOption = function() {
-    $scope.driverOptions.push({});
-  };
-
-  $scope.removeOption = function(entry) {
-    var idx = $scope.driverOptions.indexOf(entry);
-    $scope.driverOptions.splice(idx, 1);
-  };
 
   $scope.addVolume = function addVolume(createVolumeConfig) {
     $('#error-message').hide();
     ViewSpinner.spin();
     $('#create-volume-modal').modal('hide');
-    assignOptions(createVolumeConfig);
+    createVolumeConfig.Driver = $scope.selectedDriver.value;
+    console.log(JSON.stringify(createVolumeConfig, null, 4));
     Volume.create(createVolumeConfig, function (d) {
       if (d.Name) {
         Messages.send("Volume created", d.Name);
@@ -43,11 +36,4 @@ function ($scope, $state, Messages, Volume, ViewSpinner, errorMsgFilter) {
       $('#error-message').show();
     });
   };
-
-  function assignOptions(createVolumeConfig) {
-    createVolumeConfig.DriverOpts = {};
-    angular.forEach($scope.driverOptions, function (option) {
-      createVolumeConfig.DriverOpts[option.name] = option.value;
-    });
-  }
 }]);

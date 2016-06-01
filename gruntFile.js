@@ -83,7 +83,8 @@ module.exports = function (grunt) {
                 'bower_components/bootstrap/dist/css/bootstrap.css',
                 'bower_components/jquery.gritter/css/jquery.gritter.css',
                 'bower_components/font-awesome/css/font-awesome.min.css',
-                'bower_components/rdash-ui/dist/css/rdash.css'
+                'bower_components/rdash-ui/dist/css/rdash.css',
+                'bower_components/angular-ui-select/dist/select.css'
             ]
         },
         clean: {
@@ -155,7 +156,8 @@ module.exports = function (grunt) {
                     'bower_components/angular-ui-router/release/angular-ui-router.js',
                     'bower_components/angular-resource/angular-resource.js',
                     'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-                    'bower_components/angular-oboe/dist/angular-oboe.js'],
+                    'bower_components/angular-oboe/dist/angular-oboe.js',
+                    'bower_components/angular-ui-select/dist/select.js'],
                 dest: '<%= distdir %>/angular.js'
             }
         },
