@@ -5,14 +5,6 @@ function ($scope, $q, $stateParams, $location, Image, Container, Messages, LineC
   $scope.id = '';
   $scope.repoTags = [];
 
-  var buildCharts = function() {
-    getContainersFromImage($q, Container, $scope.id).then(function (containers) {
-      LineChart.build('#containers-started-chart', containers, function (c) {
-        return new Date(c.Created * 1000).toLocaleDateString();
-      });
-    });
-  };
-
   $scope.removeImage = function (id) {
     Image.remove({id: id}, function (d) {
       d.forEach(function(msg){
@@ -47,23 +39,6 @@ function ($scope, $q, $stateParams, $location, Image, Container, Messages, LineC
     });
   };
 
-  function getContainersFromImage($q, Container, imageId) {
-    var defer = $q.defer();
-
-    Container.query({all: 1, notruc: 1}, function (d) {
-      var containers = [];
-      for (var i = 0; i < d.length; i++) {
-        var c = d[i];
-        if (c.ImageID === imageId) {
-          containers.push(new ContainerViewModel(c));
-        }
-      }
-      defer.resolve(containers);
-    });
-
-    return defer.promise;
-  }
-
   /**
   * Get RepoTags from the /images/query endpoint instead of /image/json,
   * for backwards compatibility with Docker API versions older than 1.21
@@ -87,7 +62,6 @@ function ($scope, $q, $stateParams, $location, Image, Container, Messages, LineC
     } else {
       getRepoTags($scope.id);
     }
-    buildCharts();
   }, function (e) {
     if (e.status === 404) {
       $('.detail').hide();
