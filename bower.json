@@ -1,10 +1,11 @@
 {
   "name": "uifordocker",
-  "version": "0.10.1-beta",
+  "version": "1.0.0",
   "homepage": "https://github.com/kevana/ui-for-docker",
   "authors": [
     "Michael Crosby <crosbymichael@gmail.com>",
-    "Kevan Ahlquist <ahlquistkd@gmail.com>"
+    "Kevan Ahlquist <ahlquistkd@gmail.com>",
+    "Anthony Lapenna <anthony.lapenna@cloudinovasi.id>"
   ],
   "description": "A web interface for the Docker Remote API.",
   "keywords": [
