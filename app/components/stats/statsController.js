@@ -1,8 +1,16 @@
 angular.module('stats', [])
-.controller('StatsController', ['Settings', '$scope', 'Messages', '$timeout', 'Container', '$stateParams', 'humansizeFilter', '$sce', '$document',
-function (Settings, $scope, Messages, $timeout, Container, $stateParams, humansizeFilter, $sce, $document) {
+.controller('StatsController', ['Settings', '$scope', 'Messages', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
+function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateParams, humansizeFilter, $sce, $document) {
   // TODO: Force scale to 0-100 for cpu, fix charts on dashboard,
   // TODO: Force memory scale to 0 - max memory
+  $scope.ps_args = '';
+  $scope.getTop = function () {
+      ContainerTop.get($stateParams.id, {
+          ps_args: $scope.ps_args
+      }, function (data) {
+          $scope.containerTop = data;
+      });
+  };
   $document.ready(function(){
     var cpuLabels = [];
     var cpuData = [];
@@ -182,4 +190,5 @@ function (Settings, $scope, Messages, $timeout, Container, $stateParams, humansi
   }, function (e) {
     Messages.error("Failure", e.data);
   });
+  $scope.getTop();
 }]);

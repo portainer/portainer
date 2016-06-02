@@ -17,16 +17,16 @@
 <div class="row">
   <div class="col-lg-6">
     <rd-widget>
-      <rd-widget-header icon="fa-tasks" title="CPU usage"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
+      <rd-widget-header icon="fa-area-chart" title="CPU usage"></rd-widget-header>
+      <rd-widget-body>
         <canvas id="cpu-stats-chart" width="770" height="230"></canvas>
       </rd-widget-body>
     </rd-widget>
   </div>
   <div class="col-lg-6">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Memory usage"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
+      <rd-widget-header icon="fa-area-chart" title="Memory usage"></rd-widget-header>
+      <rd-widget-body>
         <canvas id="memory-stats-chart" width="770" height="230"></canvas>
       </rd-widget-body>
     </rd-widget>
@@ -36,12 +36,31 @@
 <div class="row">
   <div class="col-lg-6">
     <rd-widget>
-      <rd-widget-header icon="fa-tasks" title="Network usage"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
+      <rd-widget-header icon="fa-area-chart" title="Network usage"></rd-widget-header>
+      <rd-widget-body>
         <canvas id="network-stats-chart" width="770" height="230"></canvas>
         <div class="comment">
           <div id="network-legend" style="margin-bottom: 20px;"></div>
         </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-6">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title="Processes"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th ng-repeat="title in containerTop.Titles">{{title}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="processInfos in containerTop.Processes">
+              <td ng-repeat="processInfo in processInfos track by $index">{{processInfo}}</td>
+            </tr>
+          </tbody>
+        </table>
       </rd-widget-body>
     </rd-widget>
   </div>
