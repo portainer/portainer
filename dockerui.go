@@ -1,4 +1,4 @@
-package main // import "github.com/kevana/ui-for-docker"
+package main // import "github.com/cloudinovasi/cloudinovasi-ui"
 
 import (
 	"flag"
