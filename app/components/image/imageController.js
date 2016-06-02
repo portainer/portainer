@@ -1,6 +1,6 @@
 angular.module('image', [])
-.controller('ImageController', ['$scope', '$q', '$stateParams', '$location', 'Image', 'Container', 'Messages', 'LineChart',
-function ($scope, $q, $stateParams, $location, Image, Container, Messages, LineChart) {
+.controller('ImageController', ['$scope', '$q', '$stateParams', '$state', 'Image', 'Container', 'Messages', 'LineChart',
+function ($scope, $q, $stateParams, $state, Image, Container, Messages, LineChart) {
   $scope.tagInfo = {repo: '', version: '', force: false};
   $scope.id = '';
   $scope.repoTags = [];
@@ -13,26 +13,10 @@ function ($scope, $q, $stateParams, $location, Image, Container, Messages, LineC
       });
       // If last message key is 'Deleted' then assume the image is gone and send to images page
       if (d[d.length-1].Deleted) {
-        $location.path('/images');
+        $state.go('images', {}, {reload: true});
       } else {
-        $location.path('/images/' + $scope.id); // Refresh the current page.
+        $state.go('image', {id: $scope.id}, {reload: true});
       }
-    }, function (e) {
-      $scope.error = e.data;
-      $('#error-message').show();
-    });
-  };
-
-  $scope.addTag = function () {
-    var tag = $scope.tagInfo;
-    Image.tag({
-      id: $stateParams.id,
-      repo: tag.repo,
-      tag: tag.version,
-      force: tag.force ? 1 : 0
-    }, function (d) {
-      Messages.send("Tag Added", $stateParams.id);
-      $location.path('/images/' + $scope.id);
     }, function (e) {
       $scope.error = e.data;
       $('#error-message').show();

@@ -1,6 +1,6 @@
 angular.module('containerLogs', [])
-.controller('ContainerLogsController', ['$scope', '$stateParams', '$location', '$anchorScroll', 'ContainerLogs', 'Container', 'ViewSpinner',
-function ($scope, $stateParams, $location, $anchorScroll, ContainerLogs, Container, ViewSpinner) {
+.controller('ContainerLogsController', ['$scope', '$stateParams', '$anchorScroll', 'ContainerLogs', 'Container', 'ViewSpinner',
+function ($scope, $stateParams, $anchorScroll, ContainerLogs, Container, ViewSpinner) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;

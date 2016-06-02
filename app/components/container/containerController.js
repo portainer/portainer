@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$stateParams', '$location', '$filter', 'Container', 'ContainerCommit', 'Image', 'Messages', 'ViewSpinner', '$timeout',
-function ($scope, $stateParams, $location, $filter, Container, ContainerCommit, Image, Messages, ViewSpinner, $timeout) {
+.controller('ContainerController', ['$scope', '$stateParams', '$state', '$filter', 'Container', 'ContainerCommit', 'Image', 'Messages', 'ViewSpinner', '$timeout',
+function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Image, Messages, ViewSpinner, $timeout) {
   $scope.changes = [];
   $scope.editEnv = false;
   $scope.editPorts = false;
@@ -110,109 +110,6 @@ function ($scope, $stateParams, $location, $filter, Container, ContainerCommit, 
     });
   };
 
-  $scope.restartEnv = function () {
-    var config = angular.copy($scope.container.Config);
-
-    config.Env = $scope.newCfg.Env.map(function(entry) {
-      return entry.name+"="+entry.value;
-    });
-
-    var portBindings = angular.copy($scope.newCfg.Ports);
-    angular.forEach(portBindings, function(item, key) {
-      if (item.length === 0) {
-        delete portBindings[key];
-      }
-    });
-
-
-    var binds = [];
-    angular.forEach($scope.newCfg.Binds, function(b) {
-      if (b.ContPath !== '') {
-        var bindLine = '';
-        if (b.HostPath !== '') {
-          bindLine = b.HostPath + ':';
-        }
-        bindLine += b.ContPath;
-        if (b.ReadOnly) {
-          bindLine += ':ro';
-        }
-        if (b.HostPath !== '' || !b.DefaultBind) {
-          binds.push(bindLine);
-        }
-      }
-    });
-
-
-    ViewSpinner.spin();
-    ContainerCommit.commit({id: $stateParams.id, tag: $scope.container.Config.Image, config: config }, function (d) {
-      if ('Id' in d) {
-        var imageId = d.Id;
-        Image.inspect({id: imageId}, function(imageData) {
-          // Append current host config to image with new port bindings
-          imageData.Config.HostConfig = angular.copy($scope.container.HostConfig);
-          imageData.Config.HostConfig.PortBindings = portBindings;
-          imageData.Config.HostConfig.Binds = binds;
-          if (imageData.Config.HostConfig.NetworkMode === 'host') {
-            imageData.Config.Hostname = '';
-          }
-
-          Container.create(imageData.Config, function(containerData) {
-            if (!('Id' in containerData)) {
-              Messages.error("Failure", "Container failed to create.");
-              return;
-            }
-            // Stop current if running
-            if ($scope.container.State.Running) {
-              Container.stop({id: $stateParams.id}, function (d) {
-                Messages.send("Container stopped", $stateParams.id);
-                // start new
-                Container.start({
-                  id: containerData.Id
-                }, function (d) {
-                  $location.url('/containers/' + containerData.Id + '/');
-                  Messages.send("Container started", $stateParams.id);
-                }, function (e) {
-                  update();
-                  Messages.error("Failure", "Container failed to start." + e.data);
-                });
-              }, function (e) {
-                update();
-                Messages.error("Failure", "Container failed to stop." + e.data);
-              });
-            } else {
-              // start new
-              Container.start({
-                id: containerData.Id
-              }, function (d) {
-                $location.url('/containers/'+containerData.Id+'/');
-                Messages.send("Container started", $stateParams.id);
-              }, function (e) {
-                update();
-                Messages.error("Failure", "Container failed to start." + e.data);
-              });
-            }
-
-          }, function(e) {
-            update();
-            Messages.error("Failure", "Image failed to get." + e.data);
-          });
-        }, function (e) {
-          update();
-          Messages.error("Failure", "Image failed to get." + e.data);
-        });
-
-      } else {
-        update();
-        Messages.error("Failure", "Container commit failed.");
-      }
-
-
-    }, function (e) {
-      update();
-      Messages.error("Failure", "Container failed to commit." + e.data);
-    });
-  };
-
   $scope.commit = function () {
     ViewSpinner.spin();
     ContainerCommit.commit({id: $stateParams.id, repo: $scope.container.Config.Image}, function (d) {
@@ -249,7 +146,7 @@ function ($scope, $stateParams, $location, $filter, Container, ContainerCommit, 
     ViewSpinner.spin();
     Container.remove({id: $stateParams.id}, function (d) {
       update();
-      $location.path('/containers');
+      $state.go('containers', {}, {reload: true});
       Messages.send("Container removed", $stateParams.id);
     }, function (e) {
       update();

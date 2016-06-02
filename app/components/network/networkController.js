@@ -1,6 +1,6 @@
 angular.module('network', []).config(['$routeProvider', function ($routeProvider) {
-}]).controller('NetworkController', ['$scope', 'Network', 'ViewSpinner', 'Messages', '$state', '$stateParams', '$location', 'errorMsgFilter',
-function ($scope, Network, ViewSpinner, Messages, $state, $stateParams, $location, errorMsgFilter) {
+}]).controller('NetworkController', ['$scope', 'Network', 'ViewSpinner', 'Messages', '$state', '$stateParams', 'errorMsgFilter',
+function ($scope, Network, ViewSpinner, Messages, $state, $stateParams, errorMsgFilter) {
 
   $scope.disconnect = function disconnect(networkId, containerId) {
     ViewSpinner.spin();
