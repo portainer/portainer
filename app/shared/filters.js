@@ -34,7 +34,10 @@ angular.module('dockerui.filters', [])
     .filter('trimcontainername', function () {
       'use strict';
       return function (name) {
-        return (name.indexOf('/') === 0 ? name.replace('/','') : name);
+        if (name) {
+          return (name.indexOf('/') === 0 ? name.replace('/','') : name);          
+        }
+        return '';
       };
     })
     .filter('getstatetext', function () {
