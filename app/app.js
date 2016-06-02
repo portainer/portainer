@@ -59,6 +59,11 @@ angular.module('uifordocker', [
           templateUrl: 'app/components/stats/stats.html',
           controller: 'StatsController'
         })
+        .state('logs', {
+          url: "^/containers/:id/logs",
+          templateUrl: 'app/components/containerLogs/containerlogs.html',
+          controller: 'ContainerLogsController'
+        })
         .state('images', {
           url: '/images/',
           templateUrl: 'app/components/images/images.html',
@@ -89,41 +94,6 @@ angular.module('uifordocker', [
           templateUrl: 'app/components/swarm/swarm.html',
           controller: 'SwarmController'
         });
-
-        // $routeProvider.when('/containers/', {
-        //     templateUrl: 'app/components/containers/containers.html',
-        //     controller: 'ContainersController'
-        // });
-        // $routeProvider.when('/containers/:id/', {
-        //     templateUrl: 'app/components/container/container.html',
-        //     controller: 'ContainerController'
-        // });
-        // $routeProvider.when('/containers/:id/logs/', {
-        //     templateUrl: 'app/components/containerLogs/containerlogs.html',
-        //     controller: 'ContainerLogsController'
-        // });
-        // $routeProvider.when('/containers/:id/top', {
-        //     templateUrl: 'app/components/containerTop/containerTop.html',
-        //     controller: 'ContainerTopController'
-        // });
-        // $routeProvider.when('/containers/:id/stats', {
-        //     templateUrl: 'app/components/stats/stats.html',
-        //     controller: 'StatsController'
-        // });
-        // $routeProvider.when('/images/', {
-        //     templateUrl: 'app/components/images/images.html',
-        //     controller: 'ImagesController'
-        // });
-        // $routeProvider.when('/images/:id*/', {
-        //     templateUrl: 'app/components/image/image.html',
-        //     controller: 'ImageController'
-        // });
-        // $routeProvider.when('/info', {templateUrl: 'app/components/info/info.html', controller: 'InfoController'});
-        // $routeProvider.when('/events', {
-        //     templateUrl: 'app/components/events/events.html',
-        //     controller: 'EventsController'
-        // });
-        // $routeProvider.otherwise({redirectTo: '/'});
 
         // The Docker API likes to return plaintext errors, this catches them and disp
         $httpProvider.interceptors.push(function() {
