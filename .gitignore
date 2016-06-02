@@ -4,6 +4,6 @@ logs/*
 node_modules
 bower_components
 .idea
-dist
-dockerui
 *.iml
+dist
+dist/*

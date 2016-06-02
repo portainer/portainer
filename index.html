@@ -1,41 +1,92 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="<%= pkg.name %>">
 <head>
-    <meta charset="utf-8">
-    <title>UI For Docker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="<%= pkg.author %>">
+  <meta charset="utf-8">
+  <title>CloudInovasi UI for Docker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="<%= pkg.author %>">
 
-    <link href="vendor.css" rel="stylesheet">
-    <link href="<%= pkg.name %>.css" rel="stylesheet">
+  <link href="vendor.css" rel="stylesheet">
+  <link href="<%= pkg.name %>.css" rel="stylesheet">
 
+  <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+  <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
 
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+  <script src="angular.js"></script>
+  <script src="vendor.js"></script>
+  <script src="<%= pkg.name %>.js"></script>
 
-    <script src="angular.js"></script>
-    <script src="vendor.js"></script>
-    <script src="<%= pkg.name %>.js"></script>
-
-    <!-- Fav and touch icons -->
-    <link rel="shortcut icon" href="ico/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-precomposed.png">
+  <!-- Fav and touch icons -->
+  <link rel="shortcut icon" href="ico/favicon.ico">
+  <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-precomposed.png">
 </head>
 
-<body>
+<body ng-controller="MasterCtrl">
+  <div id="page-wrapper" ng-class="{'open': toggle}" ng-cloak>
 
-<div class="container">
-    <div ng-include="template" ng-controller="MastheadController"></div>
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+      <ul class="sidebar">
+        <li class="sidebar-main">
+          <a ng-click="toggleSidebar()">
+            <img src="images/logo.png" class="img-responsive logo" alt="logo">
+            <span class="menu-icon glyphicon glyphicon-transfer"></span>
+          </a>
+        </li>
+        <li class="sidebar-title"><span>NAVIGATION</span></li>
+        <li class="sidebar-list">
+          <a href="#">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
+        </li>
+        <li class="sidebar-list">
+          <a href="#/containers/">Containers <span class="menu-icon fa fa-server"></span></a>
+        </li>
+        <li class="sidebar-list">
+          <a href="#/images/">Images <span class="menu-icon fa fa-clone"></span></a>
+        </li>
+        <li class="sidebar-list">
+          <a href="#/networks/">Networks <span class="menu-icon fa fa-sitemap"></span></a>
+        </li>
+        <li class="sidebar-list">
+          <a href="#/volumes/">Volumes <span class="menu-icon fa fa-cubes"></span></a>
+        </li>
+        <li class="sidebar-list">
+          <a href="#/swarm/">Swarm <span class="menu-icon fa fa-object-group"></span></a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <div class="col-xs-12">
+          <a href="https://github.com/cloud-inovasi/cloudinovasi-ui" target="_blank">CloudInovasi UI {{ uiVersion }}</a>
+        </div>
+      </div>
+    </div>
+    <!-- End Sidebar -->
 
-    <div id="view" ng-view></div>
+    <div id="content-wrapper">
+      <div class="page-content">
 
-    <div class="container-bottom"></div>
-    <div ng-include="template" ng-controller="FooterController"></div>
-</div>
+        <!-- Header Bar -->
+        <div class="row header">
+          <div class="col-xs-12">
+            <div class="meta">
+              <div class="page">
+                Dashboard
+              </div>
+              <div class="breadcrumb-links">
+                Home / Dashboard
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Header Bar -->
 
+        <!-- Main Content -->
+        <div id="view" ui-view></div>
 
+      </div><!-- End Page Content -->
+    </div><!-- End Content Wrapper -->
+  </div><!-- End Page Wrapper -->
 </body>
 </html>

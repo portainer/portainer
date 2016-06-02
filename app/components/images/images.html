@@ -1,64 +1,67 @@
-<div ng-include="template" ng-controller="BuilderController"></div>
 <div ng-include="template" ng-controller="PullImageController"></div>
 
-<h2>Images:</h2>
-
-<div>
-    <ul class="nav nav-pills pull-left">
-        <li class="dropdown">
-            <a class="dropdown-toggle" id="drop4" role="button" data-toggle="dropdown" data-target="#">Actions <b class="caret"></b></a>
-            <ul id="menu1" class="dropdown-menu" role="menu" aria-labelledby="drop4">
-                <li><a tabindex="-1" href="" ng-click="removeAction()">Remove</a></li>
-            </ul>
-        </li>
-        <li><a data-toggle="modal" data-target="#pull-modal" href="">Pull</a></li>
-    </ul>
-
-    <div class="pull-right form-inline">
-        <input type="text" class="form-control" id="filter" placeholder="Filter" ng-model="filter"/> <label class="sr-only" for="filter">Filter</label>
-    </div>
-</div>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th><label><input type="checkbox" ng-model="toggle" ng-change="toggleSelectAll()" /> Select</label></th>
-            <th>
+<div class="col-lg-12">
+  <rd-widget>
+    <rd-widget-header icon="fa-clone" title="Images">
+    </rd-widget-header>
+    <rd-widget-taskbar classes="col-lg-12">
+      <div class="pull-left">
+        <div class="btn-group" role="group" aria-label="...">
+          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
+          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#pull-modal">Pull new image...</button>
+        </div>
+      </div>
+      <div class="pull-right">
+        <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
+      </div>
+    </rd-widget-taskbar>
+    <rd-widget-body classes="no-padding">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th><label><input type="checkbox" ng-model="state.toggle" ng-change="toggleSelectAll()" /> Select</label></th>
+              <th>
                 <a href="#/images/" ng-click="order('Id')">
-                    Id
-                    <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  Id
+                  <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-            </th>
-            <th>
+              </th>
+              <th>
                 <a href="#/images/" ng-click="order('RepoTags')">
-                    Repository
-                    <span ng-show="sortType == 'RepoTags' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'RepoTags' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  Repository
+                  <span ng-show="sortType == 'RepoTags' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'RepoTags' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-            </th>
-            <th>
+              </th>
+              <th>
                 <a href="#/images/" ng-click="order('VirtualSize')">
-                    VirtualSize
-                    <span ng-show="sortType == 'VirtualSize' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'VirtualSize' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  VirtualSize
+                  <span ng-show="sortType == 'VirtualSize' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'VirtualSize' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-            </th>
-            <th>
+              </th>
+              <th>
                 <a href="#/images/" ng-click="order('Created')">
-                    Created
-                    <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  Created
+                  <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="image in (filteredImages = (images | filter:filter | orderBy:sortType:sortReverse))">
-            <td><input type="checkbox" ng-model="image.Checked" /></td>
-            <td><a href="#/images/{{ image.Id }}/?tag={{ image|repotag }}">{{ image.Id|truncate:20}}</a></td>
-            <td>{{ image|repotag }}</td>
-            <td>{{ image.VirtualSize|humansize }}</td>
-            <td>{{ image.Created|getdate }}</td>
-        </tr>
-    </tbody>
-</table>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="image in (state.filteredImages = (images | filter:state.filter | orderBy:sortType:sortReverse))">
+              <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
+              <td><a href="#/images/{{ image.Id }}/?tag={{ image|repotag }}">{{ image.Id|truncate:20}}</a></td>
+              <td>{{ image|repotag }}</td>
+              <td>{{ image.VirtualSize|humansize }}</td>
+              <td>{{ image.Created|getdate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </rd-widget-body>
+  <rd-widget>
+</div>

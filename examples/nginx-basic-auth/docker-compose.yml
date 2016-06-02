@@ -1,8 +1,6 @@
 dockerui:
-  image: dockerui/dockerui
-  privileged: true
-  volumes:
-   - /var/run/docker.sock:/var/run/docker.sock
+  image: cloudinovasi/ui-for-docker
+  command: -e http://<SWARM_HOST>:<SWARM_PORT>
 
 nginx:
   build: .

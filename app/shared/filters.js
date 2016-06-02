@@ -23,11 +23,22 @@ angular.module('dockerui.filters', [])
         return function (text) {
             if (text === 'Ghost') {
                 return 'important';
+            } else if (text === 'Unhealthy') {
+                return 'danger';
             } else if (text.indexOf('Exit') !== -1 && text !== 'Exit 0') {
                 return 'warning';
             }
             return 'success';
         };
+    })
+    .filter('trimcontainername', function () {
+      'use strict';
+      return function (name) {
+        if (name) {
+          return (name.indexOf('/') === 0 ? name.replace('/','') : name);          
+        }
+        return '';
+      };
     })
     .filter('getstatetext', function () {
         'use strict';

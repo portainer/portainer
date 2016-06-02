@@ -114,3 +114,28 @@
     cursor: pointer;
 }
 
+.logo {
+  display: inline;
+  width: 110px;
+  max-height: 38px;
+}
+
+.containerNameInput {
+  width: 85%;
+  border:none;
+  background:none;
+  border-bottom: 1px solid black;
+}
+
+.containerNameInput:active, .containerNameInput:focus {
+  outline:none;
+}
+
+#network-legend {
+  text-align: center;
+}
+
+#network-legend span {
+  display: inline;
+  font-size: 18px;
+}

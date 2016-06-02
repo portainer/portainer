@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>Create And Start Container From Image</h3>
+                <h3>Start a new container</h3>
             </div>
             <div class="modal-body">
                 <form role="form">
@@ -12,6 +12,11 @@
                             <fieldset>
                                 <div class="row">
                                     <div class="col-xs-6">
+                                      <div class="form-group">
+                                          <label>Image:</label>
+                                          <input type="text" placeholder='ubuntu:latest'
+                                                 ng-model="config.Image" class="form-control"/>
+                                      </div>
                                         <div class="form-group">
                                             <label>Cmd:</label>
                                             <input type="text" placeholder='["/bin/echo", "Hello world"]'
@@ -45,19 +50,18 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Volumes:</label>
-
                                             <div ng-repeat="volume in config.Volumes">
                                                 <div class="form-group form-inline">
                                                     <input type="text" ng-model="volume.name" class="form-control"
                                                            placeholder="/var/data"/>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                            ng-click="rmEntry(config.Volumes, volume)">Remove
-                                                    </button>
+                                                    <a href="" ng-click="rmEntry(config.Volumes, volume)">
+                                                      <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn btn-success btn-sm"
-                                                    ng-click="addEntry(config.Volumes, {name: ''})">Add Volume
-                                            </button>
+                                            <a href="" ng-click="addEntry(config.Volumes, {name: ''})">
+                                              <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                     </div>
                                     <div class="col-xs-6">
@@ -109,14 +113,14 @@
                                                 <div class="form-group form-inline">
                                                     <input type="text" ng-model="opt.name" class="form-control"
                                                            placeholder="label:type:svirt_apache"/>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                            ng-click="rmEntry(config.SecurityOpts, opt)">Remove
-                                                    </button>
+                                                    <a href="" ng-click="rmEntry(config.SecurityOpts, opt)">
+                                                      <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn btn-success btn-sm"
-                                                    ng-click="addEntry(config.SecurityOpts, {name: ''})">Add Option
-                                            </button>
+                                            <a href="" ng-click="addEntry(config.SecurityOpts, {name: ''})">
+                                              <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -137,16 +141,15 @@
                                                        placeholder="value"/>
                                             </div>
                                             <div class="form-group">
-                                                <button class="btn btn-danger btn-xs form-control"
-                                                        ng-click="rmEntry(config.Env, envar)">Remove
-                                                </button>
+                                                <a href="" ng-click="rmEntry(config.Env, envar)">
+                                                  <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-success btn-sm"
-                                            ng-click="addEntry(config.Env, {name: '', value: ''})">Add environment
-                                        variable
-                                    </button>
+                                    <a href="" ng-click="addEntry(config.Env, {name: '', value: ''})">
+                                      <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </a>
                                 </div>
                                 <div class="form-group">
                                     <label>Labels:</label>
@@ -164,15 +167,15 @@
                                                        placeholder="value"/>
                                             </div>
                                             <div class="form-group">
-                                                <button class="btn btn-danger btn-xs form-control"
-                                                        ng-click="rmEntry(config.Labels, label)">Remove
-                                                </button>
+                                                <a href="" ng-click="rmEntry(config.Labels, label)">
+                                                  <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-success btn-sm"
-                                            ng-click="addEntry(config.Labels, {key: '', value: ''})">Add Label
-                                    </button>
+                                    <a href="" ng-click="addEntry(config.Labels, {key: '', value: ''})">
+                                      <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </a>
                                 </div>
                             </fieldset>
                         </accordion-group>
@@ -187,14 +190,14 @@
                                                 <div class="form-group form-inline">
                                                     <input type="text" ng-model="bind.name" class="form-control"
                                                            placeholder="/host:/container"/>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                            ng-click="rmEntry(config.HostConfig.Binds, bind)">Remove
-                                                    </button>
+                                                    <a href="" ng-click="rmEntry(config.HostConfig.Binds, bind)">
+                                                      <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn btn-success btn-sm"
-                                                    ng-click="addEntry(config.HostConfig.Binds, {name: ''})">Add Bind
-                                            </button>
+                                            <a href="" ng-click="addEntry(config.HostConfig.Binds, {name: ''})">
+                                              <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                         <div class="form-group">
                                             <label>Links:</label>
@@ -203,14 +206,14 @@
                                                 <div class="form-group form-inline">
                                                     <input type="text" ng-model="link.name" class="form-control"
                                                            placeholder="web:db">
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                            ng-click="rmEntry(config.HostConfig.Links, link)">Remove
-                                                    </button>
+                                                    <a href="" ng-click="rmEntry(config.HostConfig.Links, link)">
+                                                      <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn btn-success btn-sm"
-                                                    ng-click="addEntry(config.HostConfig.Links, {name: ''})">Add Link
-                                            </button>
+                                            <a href="" ng-click="addEntry(config.HostConfig.Links, {name: ''})">
+                                              <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                         <div class="form-group">
                                             <label>Dns:</label>
@@ -219,14 +222,14 @@
                                                 <div class="form-group form-inline">
                                                     <input type="text" ng-model="entry.name" class="form-control"
                                                            placeholder="8.8.8.8"/>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                            ng-click="rmEntry(config.HostConfig.Dns, entry)">Remove
-                                                    </button>
+                                                    <a href="" ng-click="rmEntry(config.HostConfig.Dns, entry)">
+                                                      <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn btn-success btn-sm"
-                                                    ng-click="addEntry(config.HostConfig.Dns, {name: ''})">Add entry
-                                            </button>
+                                            <a href="" ng-click="addEntry(config.HostConfig.Dns, {name: ''})">
+                                              <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                         <div class="form-group">
                                             <label>DnsSearch:</label>
@@ -235,16 +238,14 @@
                                                 <div class="form-group form-inline">
                                                     <input type="text" ng-model="entry.name" class="form-control"
                                                            placeholder="example.com"/>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                            ng-click="rmEntry(config.HostConfig.DnsSearch, entry)">
-                                                        Remove
-                                                    </button>
+                                                    <a href="" ng-click="rmEntry(config.HostConfig.DnsSearch, entry)">
+                                                      <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn btn-success btn-sm"
-                                                    ng-click="addEntry(config.HostConfig.DnsSearch, {name: ''})">Add
-                                                entry
-                                            </button>
+                                            <a href="" ng-click="addEntry(config.HostConfig.DnsSearch, {name: ''})">
+                                              <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                         <div class="form-group">
                                             <label>CapAdd:</label>
@@ -253,14 +254,14 @@
                                                 <div class="form-group form-inline">
                                                     <input type="text" ng-model="entry.name" class="form-control"
                                                            placeholder="cap_sys_admin"/>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                            ng-click="rmEntry(config.HostConfig.CapAdd, entry)">Remove
-                                                    </button>
+                                                    <a href="" ng-click="rmEntry(config.HostConfig.CapAdd, entry)">
+                                                      <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn btn-success btn-sm"
-                                                    ng-click="addEntry(config.HostConfig.CapAdd, {name: ''})">Add entry
-                                            </button>
+                                            <a href="" ng-click="addEntry(config.HostConfig.CapAdd, {name: ''})">
+                                              <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                         <div class="form-group">
                                             <label>CapDrop:</label>
@@ -269,14 +270,14 @@
                                                 <div class="form-group form-inline">
                                                     <input type="text" ng-model="entry.name" class="form-control"
                                                            placeholder="cap_sys_admin"/>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                            ng-click="rmEntry(config.HostConfig.CapDrop, entry)">Remove
-                                                    </button>
+                                                    <a href="" ng-click="rmEntry(config.HostConfig.CapDrop, entry)">
+                                                      <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn btn-success btn-sm"
-                                                    ng-click="addEntry(config.HostConfig.CapDrop, {name: ''})">Add entry
-                                            </button>
+                                            <a href="" ng-click="addEntry(config.HostConfig.CapDrop, {name: ''})">
+                                              <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                     </div>
                                     <div class="col-xs-6">
@@ -304,16 +305,14 @@
                                                             ng-options="name for name in containerNames track by name"
                                                             class="form-control">
                                                     </select>
-                                                    <button class="btn btn-danger btn-xs form-control"
-                                                            ng-click="rmEntry(config.HostConfig.VolumesFrom, volume)">
-                                                        Remove
-                                                    </button>
+                                                    <a href="" ng-click="rmEntry(config.HostConfig.VolumesFrom, volume)">
+                                                      <i class="fa fa-minus" aria-hidden="true"></i>
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn btn-success btn-sm"
-                                                    ng-click="addEntry(config.HostConfig.VolumesFrom, {name: ''})">Add
-                                                volume
-                                            </button>
+                                            <a href="" ng-click="addEntry(config.HostConfig.VolumesFrom, {name: ''})">
+                                              <i class="fa fa-plus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
 
                                         <div class="form-group">
@@ -346,16 +345,15 @@
                                                        placeholder="127.0.0.1"/>
                                             </div>
                                             <div class="form-group">
-                                                <button class="btn btn-danger btn-xs form-control"
-                                                        ng-click="rmEntry(config.HostConfig.ExtraHosts, entry)">Remove
-                                                </button>
+                                                <a href="" ng-click="rmEntry(config.HostConfig.ExtraHosts, entry)">
+                                                  <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-success btn-sm"
-                                            ng-click="addEntry(config.HostConfig.ExtraHosts, {host: '', ip: ''})">Add
-                                        extra host
-                                    </button>
+                                    <a href="" ng-click="addEntry(config.HostConfig.ExtraHosts, {host: '', ip: ''})">
+                                      <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </a>
                                 </div>
                                 <div class="form-group">
                                     <label>LxcConf:</label>
@@ -373,16 +371,15 @@
                                                        placeholder="docker"/>
                                             </div>
                                             <div class="form-group">
-                                                <button class="btn btn-danger btn-xs form-control"
-                                                        ng-click="rmEntry(config.HostConfig.LxcConf, entry)">Remove
-                                                </button>
+                                                <a href="" ng-click="rmEntry(config.HostConfig.LxcConf, entry)">
+                                                  <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-success btn-sm"
-                                            ng-click="addEntry(config.HostConfig.LxcConf, {name: '', value: ''})">Add
-                                        Entry
-                                    </button>
+                                    <a href="" ng-click="addEntry(config.HostConfig.LxcConf, {name: '', value: ''})">
+                                      <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </a>
                                 </div>
                                 <div class="form-group">
                                     <label>Devices:</label>
@@ -398,15 +395,14 @@
                                             <label class="sr-only">CgroupPermissions:</label>
                                             <input type="text" ng-model="device.CgroupPermissions" class="form-control"
                                                    placeholder="CgroupPermissions"/>
-                                            <button class="btn btn-danger btn-xs form-control"
-                                                    ng-click="rmEntry(config.HostConfig.Devices, device)">Remove
-                                            </button>
+                                            <a href="" ng-click="rmEntry(config.HostConfig.Devices, device)">
+                                              <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-success btn-sm"
-                                            ng-click="addEntry(config.HostConfig.Devices, { PathOnHost: '', PathInContainer: '', CgroupPermissions: ''})">
-                                        Add Device
-                                    </button>
+                                    <a href="" ng-click="addEntry(config.HostConfig.Devices, { PathOnHost: '', PathInContainer: '', CgroupPermissions: ''})">
+                                      <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </a>
                                 </div>
                                 <div class="form-group">
                                     <label>PortBindings:</label>
@@ -426,16 +422,14 @@
                                                 <option value="">tcp</option>
                                                 <option value="udp">udp</option>
                                             </select>
-                                            <button class="btn btn-danger btn-xs form-control"
-                                                    ng-click="rmEntry(config.HostConfig.PortBindings, portBinding)">
-                                                Remove
-                                            </button>
+                                            <a href="" ng-click="rmEntry(config.HostConfig.PortBindings, portBinding)">
+                                              <i class="fa fa-minus" aria-hidden="true"></i>
+                                            </a>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-success btn-sm"
-                                            ng-click="addEntry(config.HostConfig.PortBindings, {ip: '', extPort: '', intPort: ''})">
-                                        Add Port Binding
-                                    </button>
+                                    <a href="" ng-click="addEntry(config.HostConfig.PortBindings, {ip: '', extPort: '', intPort: ''})">
+                                      <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </a>
                                 </div>
                             </fieldset>
                         </accordion-group>
