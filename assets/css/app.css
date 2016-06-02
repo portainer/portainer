@@ -130,3 +130,12 @@
 .containerNameInput:active, .containerNameInput:focus {
   outline:none;
 }
+
+#network-legend {
+  text-align: center;
+}
+
+#network-legend span {
+  display: inline;
+  font-size: 18px;
+}

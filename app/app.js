@@ -54,6 +54,11 @@ angular.module('uifordocker', [
           templateUrl: 'app/components/container/container.html',
           controller: 'ContainerController'
         })
+        .state('stats', {
+          url: "^/containers/:id/stats",
+          templateUrl: 'app/components/stats/stats.html',
+          controller: 'StatsController'
+        })
         .state('images', {
           url: '/images/',
           templateUrl: 'app/components/images/images.html',

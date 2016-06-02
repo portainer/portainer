@@ -52,6 +52,10 @@
             <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Paused">Unpause</button>
             <button class="btn btn-danger" ng-click="remove()" ng-disabled="container.State.Running">Remove</button>
           </div>
+          <div class="btn-group" role="group" aria-label="...">
+            <a class="btn btn-default" type="button" href="#/containers/{{ container.Id }}/stats">Stats</a>
+            <a class="btn btn-default" type="button" href="#">Logs</a>
+          </div>
         </div>
         <div class="comment">
           Actions
