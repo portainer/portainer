@@ -135,11 +135,11 @@ module.exports = function (grunt) {
                     process: true
                 },
                 src: ['<%= src.js %>', '<%= src.jsTpl %>'],
-                dest: '<%= distdir %>/<%= pkg.name %>.js'
+                dest: '<%= distdir %>/js/<%= pkg.name %>.js'
             },
             vendor: {
                 src: ['<%= src.jsVendor %>'],
-                dest: '<%= distdir %>/vendor.js'
+                dest: '<%= distdir %>/js/vendor.js'
             },
             index: {
                 src: ['index.html'],
@@ -158,7 +158,7 @@ module.exports = function (grunt) {
                     'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
                     'bower_components/angular-oboe/dist/angular-oboe.js',
                     'bower_components/angular-ui-select/dist/select.js'],
-                dest: '<%= distdir %>/angular.js'
+                dest: '<%= distdir %>/js/angular.js'
             }
         },
         uglify: {
@@ -167,28 +167,28 @@ module.exports = function (grunt) {
                     banner: "<%= banner %>"
                 },
                 src: ['<%= src.js %>', '<%= src.jsTpl %>'],
-                dest: '<%= distdir %>/<%= pkg.name %>.js'
+                dest: '<%= distdir %>/js/<%= pkg.name %>.js'
             },
             vendor: {
                 options: {
                     preserveComments: 'some' // Preserve license comments
                 },
                 src: ['<%= src.jsVendor %>'],
-                dest: '<%= distdir %>/vendor.js'
+                dest: '<%= distdir %>/js/vendor.js'
             },
             angular: {
                 options: {
                     preserveComments: 'some' // Preserve license comments
                 },
                 src: ['<%= concat.angular.src %>'],
-                dest: '<%= distdir %>/angular.js'
+                dest: '<%= distdir %>/js/angular.js'
             }
         },
         recess: { // TODO: not maintained, unable to preserve license comments, switch out for something better.
             build: {
                 files: {
-                    '<%= distdir %>/<%= pkg.name %>.css': ['<%= src.css %>'],
-                    '<%= distdir %>/vendor.css': ['<%= src.cssVendor %>']
+                    '<%= distdir %>/css/<%= pkg.name %>.css': ['<%= src.css %>'],
+                    '<%= distdir %>/css/vendor.css': ['<%= src.cssVendor %>']
                 },
                 options: {
                     compile: true,
@@ -197,8 +197,8 @@ module.exports = function (grunt) {
             },
             min: {
                 files: {
-                    '<%= distdir %>/<%= pkg.name %>.css': ['<%= src.css %>'],
-                    '<%= distdir %>/vendor.css': ['<%= src.cssVendor %>']
+                    '<%= distdir %>/css/<%= pkg.name %>.css': ['<%= src.css %>'],
+                    '<%= distdir %>/css/vendor.css': ['<%= src.cssVendor %>']
                 },
                 options: {
                     compile: true,
