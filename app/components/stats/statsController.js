@@ -186,7 +186,7 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
   });
 
   Container.get({id: $stateParams.id}, function (d) {
-    $scope.containerName = d.Name.substring(1);
+    $scope.container = d;
   }, function (e) {
     Messages.error("Failure", e.data);
   });
