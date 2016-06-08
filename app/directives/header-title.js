@@ -4,7 +4,7 @@ angular
   var directive = {
     requires: '^rdHeader',
     scope: {
-      title: '@',
+      title: '@'
     },
     transclude: true,
     template: '<div class="page">{{title}}</div>',
