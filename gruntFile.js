@@ -65,12 +65,12 @@ module.exports = function (grunt) {
             js: ['app/**/*.js', '!app/**/*.spec.js'],
             jsTpl: ['<%= distdir %>/templates/**/*.js'],
             jsVendor: [
-                'bower_components/jquery/dist/jquery.js',
+                'bower_components/jquery/dist/jquery.min.js',
                 'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
-                'bower_components/bootstrap/dist/js/bootstrap.js',
+                'bower_components/bootstrap/dist/js/bootstrap.min.js',
                 'bower_components/spin.js/spin.js',
-                'bower_components/Chart.js/Chart.js',
-                'bower_components/lodash/dist/lodash.js',
+                'bower_components/Chart.js/Chart.min.js',
+                'bower_components/lodash/dist/lodash.min.js',
                 'bower_components/oboe/dist/oboe-browser.js',
                 'assets/js/legend.js' // Not a bower package
             ],
@@ -83,8 +83,8 @@ module.exports = function (grunt) {
                 'bower_components/bootstrap/dist/css/bootstrap.css',
                 'bower_components/jquery.gritter/css/jquery.gritter.css',
                 'bower_components/font-awesome/css/font-awesome.min.css',
-                'bower_components/rdash-ui/dist/css/rdash.css',
-                'bower_components/angular-ui-select/dist/select.css'
+                'bower_components/rdash-ui/dist/css/rdash.min.css',
+                'bower_components/angular-ui-select/dist/select.min.css'
             ]
         },
         clean: {
@@ -149,15 +149,15 @@ module.exports = function (grunt) {
                 }
             },
             angular: {
-                src: ['bower_components/angular/angular.js',
-                    'bower_components/angular-sanitize/angular-sanitize.js',
-                    'bower_components/angular-cookies/angular-cookies.js',
-                    'bower_components/angular-route/angular-route.js',
-                    'bower_components/angular-ui-router/release/angular-ui-router.js',
-                    'bower_components/angular-resource/angular-resource.js',
-                    'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-                    'bower_components/angular-oboe/dist/angular-oboe.js',
-                    'bower_components/angular-ui-select/dist/select.js'],
+                src: ['bower_components/angular/angular.min.js',
+                    'bower_components/angular-sanitize/angular-sanitize.min.js',
+                    'bower_components/angular-cookies/angular-cookies.min.js',
+                    'bower_components/angular-route/angular-route.min.js',
+                    'bower_components/angular-ui-router/release/angular-ui-router.min.js',
+                    'bower_components/angular-resource/angular-resource.min.js',
+                    'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+                    'bower_components/angular-oboe/dist/angular-oboe.min.js',
+                    'bower_components/angular-ui-select/dist/select.min.js'],
                 dest: '<%= distdir %>/js/angular.js'
             }
         },
