@@ -7,17 +7,17 @@
   <meta name="description" content="">
   <meta name="author" content="<%= pkg.author %>">
 
-  <link href="vendor.css" rel="stylesheet">
-  <link href="<%= pkg.name %>.css" rel="stylesheet">
+  <link href="css/vendor.css" rel="stylesheet">
+  <link href="css/<%= pkg.name %>.css" rel="stylesheet">
 
   <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
   <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
 
-  <script src="angular.js"></script>
-  <script src="vendor.js"></script>
-  <script src="<%= pkg.name %>.js"></script>
+  <script src="js/angular.js"></script>
+  <script src="js/vendor.js"></script>
+  <script src="js/<%= pkg.name %>.js"></script>
 
   <!-- Fav and touch icons -->
   <link rel="shortcut icon" href="ico/favicon.ico">
@@ -66,21 +66,6 @@
 
     <div id="content-wrapper">
       <div class="page-content">
-
-        <!-- Header Bar -->
-        <div class="row header">
-          <div class="col-xs-12">
-            <div class="meta">
-              <div class="page">
-                Dashboard
-              </div>
-              <div class="breadcrumb-links">
-                Home / Dashboard
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- End Header Bar -->
 
         <!-- Main Content -->
         <div id="view" ui-view></div>

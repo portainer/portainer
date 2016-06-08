@@ -92,7 +92,8 @@ angular.module('uifordocker', [
     $httpProvider.interceptors.push(function() {
       return {
         'response': function(response) {
-          if (typeof(response.data) === 'string' && response.data.startsWith('Conflict.')) {
+          if (typeof(response.data) === 'string' &&
+                  (response.data.startsWith('Conflict.') || response.data.startsWith('conflict:'))) {
             $.gritter.add({
               title: 'Error',
               text: $('<div>').text(response.data).html(),
@@ -113,4 +114,4 @@ angular.module('uifordocker', [
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
   .constant('DOCKER_ENDPOINT', 'dockerapi')
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
-  .constant('UI_VERSION', 'v1.0.0');
+  .constant('UI_VERSION', 'v1.0.1');
