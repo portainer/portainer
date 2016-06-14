@@ -61,8 +61,8 @@
             <button class="btn btn-danger" ng-click="remove()" ng-disabled="container.State.Running">Remove</button>
           </div>
           <div class="btn-group" role="group" aria-label="...">
-            <a class="btn btn-default" type="button" href="#/containers/{{ container.Id }}/stats">Stats</a>
-            <a class="btn btn-default" type="button" href="#/containers/{{ container.Id }}/logs">Logs</a>
+            <a class="btn btn-default" type="button" ui-sref="stats({id: container.Id})">Stats</a>
+            <a class="btn btn-default" type="button" ui-sref="logs({id: container.Id})">Logs</a>
           </div>
         </div>
         <div class="comment">
@@ -169,7 +169,7 @@
             </tr>
             <tr>
               <td>Image</td>
-              <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
+              <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
             </tr>
           </tbody>
         </table>

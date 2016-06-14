@@ -32,7 +32,6 @@
     "angular-mocks": "~1.5.0",
     "angular-oboe": "*",
     "angular-resource": "~1.5.0",
-    "angular-route": "~1.5.0",
     "angular-ui-select": "~0.17.1",
     "bootstrap": "~3.3.6",
     "font-awesome": "~4.5.0",
