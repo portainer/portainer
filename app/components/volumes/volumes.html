@@ -1,7 +1,11 @@
 <div ng-include="template" ng-controller="CreateVolumeController"></div>
 
 <rd-header>
-  <rd-header-title title="Volume list"></rd-header-title>
+  <rd-header-title title="Volume list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="volumes" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
   <rd-header-content>Volumes</rd-header-content>
 </rd-header>
 
@@ -27,21 +31,21 @@
             <tr>
               <th><label><input type="checkbox" ng-model="state.toggle" ng-change="toggleSelectAll()"/> Select</label></th>
               <th>
-                <a href="#/volumes/" ng-click="order('Name')">
+                <a ui-sref="volumes" ng-click="order('Name')">
                   Name
                   <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a href="#/volumes/" ng-click="order('Driver')">
+                <a ui-sref="volumes" ng-click="order('Driver')">
                   Driver
                   <span ng-show="sortType == 'Driver' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a href="#/volumes/" ng-click="order('Mountpoint')">
+                <a ui-sref="volumes" ng-click="order('Mountpoint')">
                   Mountpoint
                   <span ng-show="sortType == 'Mountpoint' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Mountpoint' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>

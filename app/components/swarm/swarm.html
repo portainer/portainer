@@ -1,5 +1,9 @@
 <rd-header>
-  <rd-header-title title="Cluster overview"></rd-header-title>
+  <rd-header-title title="Cluster overview">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="swarm" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
   <rd-header-content>Swarm</rd-header-content>
 </rd-header>
 
@@ -91,28 +95,28 @@
           <thead>
             <tr>
               <th>
-                <a href="#/swarm/" ng-click="order('Name')">
+                <a ui-sref="swarm" ng-click="order('Name')">
                   Name
                   <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a href="#/swarm/" ng-click="order('IP')">
+                <a ui-sref="swarm" ng-click="order('IP')">
                   IP
                   <span ng-show="sortType == 'IP' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'IP' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a href="#/swarm/" ng-click="order('Containers')">
+                <a ui-sref="swarm" ng-click="order('Containers')">
                   Containers
                   <span ng-show="sortType == 'Containers' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Containers' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a href="#/swarm/" ng-click="order('Status')">
+                <a ui-sref="swarm" ng-click="order('Status')">
                   Status
                   <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>

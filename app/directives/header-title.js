@@ -4,10 +4,10 @@ angular
   var directive = {
     requires: '^rdHeader',
     scope: {
-      title: '@',
+      title: '@'
     },
     transclude: true,
-    template: '<div class="page">{{title}}</div>',
+    template: '<div class="page">{{title}}<span class="header_title_content" ng-transclude><span></div>',
     restrict: 'E'
   };
   return directive;

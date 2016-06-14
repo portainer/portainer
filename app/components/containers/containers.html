@@ -1,7 +1,11 @@
 <div ng-include="template" ng-controller="StartContainerController"></div>
 
 <rd-header>
-  <rd-header-title title="Container list"></rd-header-title>
+  <rd-header-title title="Container list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="containers" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
   <rd-header-content>Containers</rd-header-content>
 </rd-header>
 
@@ -34,35 +38,35 @@
             <tr>
               <th><label><input type="checkbox" ng-model="state.toggle" ng-change="toggleSelectAll()" /> Select</label></th>
               <th>
-                <a href="#/containers/" ng-click="order('Names')">
+                <a ui-sref="containers" ng-click="order('Names')">
                   Name
                   <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a href="#/containers/" ng-click="order('Image')">
+                <a ui-sref="containers" ng-click="order('Image')">
                   Image
                   <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a href="#/containers/" ng-click="order('Command')">
+                <a ui-sref="containers" ng-click="order('Command')">
                   Command
                   <span ng-show="sortType == 'Command' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Command' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a href="#/containers/" ng-click="order('Created')">
+                <a ui-sref="containers" ng-click="order('Created')">
                   Created
                   <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a href="#/containers/" ng-click="order('Status')">
+                <a ui-sref="containers" ng-click="order('Status')">
                   Status
                   <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
@@ -73,8 +77,8 @@
           <tbody>
             <tr ng-repeat="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse))">
               <td><input type="checkbox" ng-model="container.Checked" ng-change="selectItem(container)"/></td>
-              <td><a href="#/containers/{{ container.Id }}">{{ container|containername}}</a></td>
-              <td><a href="#/images/{{ container.Image }}/">{{ container.Image }}</a></td>
+              <td><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
+              <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
               <td>{{ container.Command|truncate:40 }}</td>
               <td>{{ container.Created|getdate }}</td>
               <td><span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span></td>
