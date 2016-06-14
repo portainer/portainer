@@ -113,4 +113,4 @@ angular.module('uifordocker', [
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
   .constant('DOCKER_ENDPOINT', 'dockerapi')
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
-  .constant('UI_VERSION', 'v1.0.1');
+  .constant('UI_VERSION', 'v1.0.2');
