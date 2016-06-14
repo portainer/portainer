@@ -139,3 +139,7 @@
   display: inline;
   font-size: 18px;
 }
+
+.header_title_content {
+  margin-left: 5px;
+}

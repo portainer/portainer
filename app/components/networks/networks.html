@@ -1,7 +1,11 @@
 <div ng-include="template" ng-controller="CreateNetworkController"></div>
 
 <rd-header>
-  <rd-header-title title="Network list"></rd-header-title>
+  <rd-header-title title="Network list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="networks" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
   <rd-header-content>Networks</rd-header-content>
 </rd-header>
 
