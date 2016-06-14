@@ -80,7 +80,7 @@
                 <table class="table table-striped" ng-repeat="(Id, container) in network.Containers">
                   <tr>
                     <td>Id</td>
-                    <td><a href="#/containers/{{ Id }}">{{ Id }}</a></td>
+                    <td><a ui-sref="container({id: Id})">{{ Id }}</a></td>
                   </tr>
                   <tr>
                     <td>EndpointID</td>

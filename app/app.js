@@ -4,7 +4,6 @@ angular.module('uifordocker', [
   'ui.router',
   'ui.select',
   'ngCookies',
-  'ngRoute',
   'ngSanitize',
   'dockerui.services',
   'dockerui.filters',

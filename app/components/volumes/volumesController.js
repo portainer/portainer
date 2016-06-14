@@ -1,6 +1,6 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', 'Volume', 'ViewSpinner', 'Messages', '$route', 'errorMsgFilter',
-function ($scope, Volume, ViewSpinner, Messages, $route, errorMsgFilter) {
+.controller('VolumesController', ['$scope', 'Volume', 'ViewSpinner', 'Messages', 'errorMsgFilter',
+function ($scope, Volume, ViewSpinner, Messages, errorMsgFilter) {
   $scope.state = {};
   $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
