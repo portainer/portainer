@@ -1,5 +1,5 @@
 angular.module('dashboard')
-.controller('MasterCtrl', ['$scope', '$cookieStore', 'Settings', function ($scope, $cookieStore, Settings) {
+.controller('MasterCtrl', ['$scope', '$cookieStore', 'Settings', 'Config', function ($scope, $cookieStore, Settings, Config) {
   /**
   * Sidebar Toggle & Cookie Control
   */
@@ -8,6 +8,8 @@ angular.module('dashboard')
   $scope.getWidth = function() {
     return window.innerWidth;
   };
+
+  $scope.config = Config.get();
 
   $scope.$watch($scope.getWidth, function(newValue, oldValue) {
     if (newValue >= mobileView) {

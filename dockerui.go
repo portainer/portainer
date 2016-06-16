@@ -1,4 +1,4 @@
-package main // import "github.com/cloudinovasi/cloudinovasi-ui"
+package main // import "github.com/cloudinovasi/ui-for-docker"
 
 import (
 	"flag"
@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"encoding/json"
 	"os"
 	"strings"
 	"github.com/gorilla/csrf"
@@ -20,12 +21,17 @@ var (
 	endpoint = flag.String("e", "/var/run/docker.sock", "Dockerd endpoint")
 	addr     = flag.String("p", ":9000", "Address and port to serve UI For Docker")
 	assets   = flag.String("a", ".", "Path to the assets")
+	swarm		 = flag.Bool("s", false, "Swarm mode")
 	authKey  []byte
 	authKeyFile = "authKey.dat"
 )
 
 type UnixHandler struct {
 	path string
+}
+
+type Config struct {
+	Swarm bool `json:"swarm"`
 }
 
 func (h *UnixHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -60,6 +66,10 @@ func copyHeader(dst, src http.Header) {
 	}
 }
 
+func configurationHandler(w http.ResponseWriter, r *http.Request, c Config) {
+    json.NewEncoder(w).Encode(c)
+}
+
 func createTcpHandler(e string) http.Handler {
 	u, err := url.Parse(e)
 	if err != nil {
@@ -72,7 +82,7 @@ func createUnixHandler(e string) http.Handler {
 	return &UnixHandler{e}
 }
 
-func createHandler(dir string, e string) http.Handler {
+func createHandler(dir string, e string, s bool) http.Handler {
 	var (
 		mux         = http.NewServeMux()
 		fileHandler = http.FileServer(http.Dir(dir))
@@ -110,8 +120,15 @@ func createHandler(dir string, e string) http.Handler {
 		csrf.Secure(false),
 	)
 
+	configuration := Config{
+		Swarm: s,
+	}
+
 	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", h))
 	mux.Handle("/", fileHandler)
+	mux.HandleFunc("/config", func(w http.ResponseWriter, r *http.Request) {
+  	configurationHandler(w, r, configuration)
+  })
 	return CSRF(csrfWrapper(mux))
 }
 
@@ -125,7 +142,7 @@ func csrfWrapper(h http.Handler) http.Handler {
 func main() {
 	flag.Parse()
 
-	handler := createHandler(*assets, *endpoint)
+	handler := createHandler(*assets, *endpoint, *swarm)
 	if err := http.ListenAndServe(*addr, handler); err != nil {
 		log.Fatal(err)
 	}
