@@ -52,8 +52,11 @@
         <li class="sidebar-list">
           <a ui-sref="volumes">Volumes <span class="menu-icon fa fa-cubes"></span></a>
         </li>
-        <li class="sidebar-list">
+        <li class="sidebar-list" ng-if="config.swarm">
           <a ui-sref="swarm">Swarm <span class="menu-icon fa fa-object-group"></span></a>
+        </li>
+        <li class="sidebar-list" ng-if="!config.swarm">
+          <a ui-sref="docker">Docker <span class="menu-icon fa fa-cogs"></span></a>
         </li>
       </ul>
       <div class="sidebar-footer">
