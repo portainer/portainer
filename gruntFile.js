@@ -24,7 +24,7 @@ module.exports = function (grunt) {
         'copy'
     ]);
     grunt.registerTask('release', [
-        'clean:app',
+        'clean:all',
         'if:binaryNotExist',
         'html2js',
         'uglify',
