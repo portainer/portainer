@@ -142,6 +142,9 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
             remove: {method: 'DELETE'}
         });
     }])
+    .factory('Config', ['$resource', 'CONFIG_ENDPOINT', function($resource, CONFIG_ENDPOINT) {
+      return $resource(CONFIG_ENDPOINT);
+    }])
     .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, UI_VERSION) {
         'use strict';
         var url = DOCKER_ENDPOINT;
@@ -150,11 +153,11 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
         }
         var firstLoad = (localStorage.getItem('firstLoad') || 'true') === 'true';
         return {
-            displayAll: false,
-            endpoint: DOCKER_ENDPOINT,
-            uiVersion: UI_VERSION,
-            url: url,
-            firstLoad: firstLoad
+          displayAll: false,
+          endpoint: DOCKER_ENDPOINT,
+          uiVersion: UI_VERSION,
+          url: url,
+          firstLoad: firstLoad
         };
     }])
     .factory('ViewSpinner', function ViewSpinnerFactory() {

@@ -10,6 +10,7 @@ angular.module('uifordocker', [
   'dashboard',
   'container',
   'containers',
+  'docker',
   'images',
   'image',
   'pullImage',
@@ -55,6 +56,11 @@ angular.module('uifordocker', [
       url: "^/containers/:id/logs",
       templateUrl: 'app/components/containerLogs/containerlogs.html',
       controller: 'ContainerLogsController'
+    })
+    .state('docker', {
+      url: '/docker/',
+      templateUrl: 'app/components/docker/docker.html',
+      controller: 'DockerController'
     })
     .state('images', {
       url: '/images/',
@@ -113,4 +119,5 @@ angular.module('uifordocker', [
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
   .constant('DOCKER_ENDPOINT', 'dockerapi')
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
-  .constant('UI_VERSION', 'v1.0.2');
+  .constant('CONFIG_ENDPOINT', '/config')
+  .constant('UI_VERSION', 'v1.0.3');

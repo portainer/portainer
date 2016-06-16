@@ -37,7 +37,7 @@ module.exports = function (grunt) {
     ]);
     grunt.registerTask('test-watch', ['karma:watch']);
     grunt.registerTask('run', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
-    grunt.registerTask('runSwarm', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
+    grunt.registerTask('run-swarm', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
     grunt.registerTask('run-dev', ['if:binaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
     grunt.registerTask('clear', ['clean:app']);
 
@@ -267,7 +267,7 @@ module.exports = function (grunt) {
                 command: [
                     'docker stop ui-for-docker',
                     'docker rm ui-for-docker',
-                    'docker run --net=host -d --name ui-for-docker ui-for-docker -e http://10.0.7.11:4000'
+                    'docker run --privileged -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name ui-for-docker ui-for-docker -s'
                 ].join(';')
             },
             cleanImages: {
