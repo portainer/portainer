@@ -26,15 +26,16 @@ By default UI For Docker connects to the Docker daemon with`/var/run/docker.sock
 You can use the `-e` flag to change this socket:
 
     # Connect to a tcp socket:
-    $ docker run -d -p 9000:9000 --privileged cloudinovasi/cloudinovasi-ui -e http://127.0.0.1:2375
+    $ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -e http://127.0.0.1:2375
 
 ### Swarm support
 
-You can access a specific view for you Swarm cluster by defining the `-s` option:
+You can access a specific view for you Swarm cluster by defining the `-swarm` flag:
 
     # Connect to a tcp socket and enable Swarm:
-    $ docker run -d -p 9000:9000 --privileged cloudinovasi/cloudinovasi-ui -e http://<SWARM_HOST>:<SWARM_PORT> -s
+    $ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -e http://<SWARM_HOST>:<SWARM_PORT> -swarm
 
+*NOTE*: At the moment, only *Swarm 1.2.0* is supported.
 
 ### Change address/port UI For Docker is served on
 UI For Docker listens on port 9000 by default. If you run UI For Docker inside a container then you can bind the container's internal port to any external address and port:

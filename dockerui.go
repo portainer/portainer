@@ -21,7 +21,7 @@ var (
 	endpoint = flag.String("e", "/var/run/docker.sock", "Dockerd endpoint")
 	addr     = flag.String("p", ":9000", "Address and port to serve UI For Docker")
 	assets   = flag.String("a", ".", "Path to the assets")
-	swarm		 = flag.Bool("s", false, "Swarm mode")
+	swarm		 = flag.Bool("swarm", false, "Swarm mode")
 	authKey  []byte
 	authKeyFile = "authKey.dat"
 )
