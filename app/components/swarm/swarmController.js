@@ -42,7 +42,7 @@ angular.module('swarm', [])
         var node_offset = 4;
         for (i = 0; i < node_count; i++) {
           extractNodeInfo(info, node_offset);
-          node_offset += 9;
+          node_offset += 10;
         }
       }
 
@@ -50,13 +50,15 @@ angular.module('swarm', [])
         var node = {};
         node.name = info[offset][0];
         node.ip = info[offset][1];
-        node.status = info[offset + 1][1];
+        node.id = info[offset + 1][1];
+        node.status = info[offset + 2][1];
         node.containers = info[offset + 2][1];
         node.cpu = info[offset + 3][1];
         node.memory = info[offset + 4][1];
         node.labels = info[offset + 5][1];
         node.error = info[offset + 6][1];
         node.version = info[offset + 8][1];
+        console.log(JSON.stringify(node, null, 4));
         $scope.swarm.Status.push(node);
       }
     }]);
