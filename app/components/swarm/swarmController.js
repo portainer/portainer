@@ -58,7 +58,6 @@ angular.module('swarm', [])
         node.labels = info[offset + 5][1];
         node.error = info[offset + 6][1];
         node.version = info[offset + 8][1];
-        console.log(JSON.stringify(node, null, 4));
         $scope.swarm.Status.push(node);
       }
     }]);
