@@ -1,7 +1,6 @@
 package main // import "github.com/cloudinovasi/ui-for-docker"
 
 import (
-	"flag"
 	"io"
 	"log"
 	"net"
@@ -15,13 +14,15 @@ import (
 	"io/ioutil"
 	"fmt"
 	"github.com/gorilla/securecookie"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
-	endpoint = flag.String("e", "/var/run/docker.sock", "Dockerd endpoint")
-	addr     = flag.String("p", ":9000", "Address and port to serve UI For Docker")
-	assets   = flag.String("a", ".", "Path to the assets")
-	swarm		 = flag.Bool("swarm", false, "Swarm mode")
+	endpoint = kingpin.Flag("endpoint", "Dockerd endpoint").Default("/var/run/docker.sock").Short('e').String()
+	addr 		 = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
+	assets   = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
+	swarm	   = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
+	labels   = LabelParser(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
 	authKey  []byte
 	authKeyFile = "authKey.dat"
 )
@@ -32,6 +33,40 @@ type UnixHandler struct {
 
 type Config struct {
 	Swarm bool `json:"swarm"`
+	HiddenLabels Labels `json:"hiddenLabels"`
+}
+
+type Label struct {
+	Name string `json:"name"`
+	Value string `json:"value"`
+}
+
+type Labels []Label
+
+func (l *Labels) Set(value string) error {
+  parts := strings.SplitN(value, "=", 2)
+  if len(parts) != 2 {
+    return fmt.Errorf("expected HEADER=VALUE got '%s'", value)
+  }
+	label := new(Label)
+  label.Name = parts[0]
+	label.Value = parts[1]
+	*l = append(*l, *label)
+  return nil
+}
+
+func (l *Labels) String() string {
+  return ""
+}
+
+func (l *Labels) IsCumulative() bool {
+  return true
+}
+
+func LabelParser(s kingpin.Settings) (target *[]Label) {
+	target = new([]Label)
+  s.SetValue((*Labels)(target))
+  return
 }
 
 func (h *UnixHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +117,7 @@ func createUnixHandler(e string) http.Handler {
 	return &UnixHandler{e}
 }
 
-func createHandler(dir string, e string, s bool) http.Handler {
+func createHandler(dir string, e string, c Config) http.Handler {
 	var (
 		mux         = http.NewServeMux()
 		fileHandler = http.FileServer(http.Dir(dir))
@@ -120,14 +155,10 @@ func createHandler(dir string, e string, s bool) http.Handler {
 		csrf.Secure(false),
 	)
 
-	configuration := Config{
-		Swarm: s,
-	}
-
 	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", h))
 	mux.Handle("/", fileHandler)
 	mux.HandleFunc("/config", func(w http.ResponseWriter, r *http.Request) {
-  	configurationHandler(w, r, configuration)
+  	configurationHandler(w, r, c)
   })
 	return CSRF(csrfWrapper(mux))
 }
@@ -140,9 +171,15 @@ func csrfWrapper(h http.Handler) http.Handler {
 }
 
 func main() {
-	flag.Parse()
+	kingpin.Version("1.0.3")
+	kingpin.Parse()
 
-	handler := createHandler(*assets, *endpoint, *swarm)
+	configuration := Config{
+		Swarm: *swarm,
+		HiddenLabels: *labels,
+	}
+
+	handler := createHandler(*assets, *endpoint, configuration)
 	if err := http.ListenAndServe(*addr, handler); err != nil {
 		log.Fatal(err)
 	}
