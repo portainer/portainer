@@ -9,7 +9,7 @@ angular.module('dashboard')
     return window.innerWidth;
   };
 
-  $scope.config = Config.get();
+  $scope.config = Config;
 
   $scope.$watch($scope.getWidth, function(newValue, oldValue) {
     if (newValue >= mobileView) {

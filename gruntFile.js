@@ -24,7 +24,7 @@ module.exports = function (grunt) {
         'copy'
     ]);
     grunt.registerTask('release', [
-        'clean:app',
+        'clean:all',
         'if:binaryNotExist',
         'html2js',
         'uglify',
@@ -267,7 +267,7 @@ module.exports = function (grunt) {
                 command: [
                     'docker stop ui-for-docker',
                     'docker rm ui-for-docker',
-                    'docker run --privileged -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name ui-for-docker ui-for-docker -s'
+                    'docker run --privileged -d -p 9000:9000 --name ui-for-docker ui-for-docker -e http://10.0.7.10:4000 -swarm'
                 ].join(';')
             },
             cleanImages: {

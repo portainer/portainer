@@ -1,6 +1,6 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner',
-function ($scope, Container, Settings, Messages, ViewSpinner) {
+.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner', 'Config',
+function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
@@ -18,9 +18,11 @@ function ($scope, Container, Settings, Messages, ViewSpinner) {
     ViewSpinner.spin();
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
-      $scope.containers = d.filter(function (container) {
-        return container.Image !== 'swarm';
-      }).map(function (container) {
+      var containers = d;
+      if (hiddenLabels) {
+        containers = hideContainers(d);
+      }
+      $scope.containers = containers.map(function (container) {
         return new ContainerViewModel(container);
       });
       ViewSpinner.stop();
@@ -134,5 +136,24 @@ function ($scope, Container, Settings, Messages, ViewSpinner) {
     batch($scope.containers, Container.remove, "Removed");
   };
 
-  update({all: Settings.displayAll ? 1 : 0});
+  var hideContainers = function (containers) {
+    return containers.filter(function (container) {
+      var filterContainer = false;
+      hiddenLabels.forEach(function(label, index) {
+        if (_.has(container.Labels, label.name) &&
+        container.Labels[label.name] === label.value) {
+          filterContainer = true;
+        }
+      });
+      if (!filterContainer) {
+        return container;
+      }
+    });
+  };
+
+  var hiddenLabels;
+  Config.$promise.then(function (c) {
+    hiddenLabels = c.hiddenLabels;
+    update({all: Settings.displayAll ? 1 : 0});
+  });
 }]);
