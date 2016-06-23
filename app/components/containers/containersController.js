@@ -143,8 +143,6 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
         if (_.has(container.Labels, label.name) &&
         container.Labels[label.name] === label.value) {
           filterContainer = true;
-          console.log('Hide: ' + container.Names[0]);
-
         }
       });
       if (!filterContainer) {
