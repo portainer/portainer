@@ -1,6 +1,6 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner',
-function ($scope, Container, Settings, Messages, ViewSpinner) {
+.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner', 'Config',
+function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
@@ -18,9 +18,13 @@ function ($scope, Container, Settings, Messages, ViewSpinner) {
     ViewSpinner.spin();
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
-      $scope.containers = d.filter(function (container) {
-        return container.Image !== 'swarm';
-      }).map(function (container) {
+      var containers = d;
+      if (config.swarm) {
+        containers = d.filter(function (container) {
+          return (container.Image.indexOf('swarm') !== 0 && container.Image !== 'consul');
+        });
+      }
+      $scope.containers = containers.map(function (container) {
         return new ContainerViewModel(container);
       });
       ViewSpinner.stop();
@@ -134,5 +138,9 @@ function ($scope, Container, Settings, Messages, ViewSpinner) {
     batch($scope.containers, Container.remove, "Removed");
   };
 
-  update({all: Settings.displayAll ? 1 : 0});
+  var config;
+  Config.$promise.then(function (c) {
+    config = c;
+    update({all: Settings.displayAll ? 1 : 0});
+  });
 }]);
