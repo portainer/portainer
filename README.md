@@ -42,3 +42,19 @@ UI For Docker listens on port 9000 by default. If you run UI For Docker inside a
 
     # Expose UI For Docker on 10.20.30.1:80
     $ docker run -d -p 10.20.30.1:80:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui
+
+### Hide containers with specifc labels
+
+You can hide specific containers from the containers view by using the `-hide-label` or `-l` options and specifying a label.
+
+For example, take a container started with the label `owner=acme`:
+
+```
+$ docker run -d --label owner=acme nginx
+```
+
+You can hide it in the view by starting the ui with:
+
+```
+$ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui -l owner=acme
+```
