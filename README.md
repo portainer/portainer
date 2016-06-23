@@ -30,12 +30,14 @@ You can use the `-e` flag to change this socket:
 
 ### Swarm support
 
+**Supported Swarm version: 1.2.3**
+
 You can access a specific view for you Swarm cluster by defining the `-swarm` flag:
 
     # Connect to a tcp socket and enable Swarm:
     $ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -e http://<SWARM_HOST>:<SWARM_PORT> -swarm
 
-*NOTE*: At the moment, only *Swarm 1.2.0* is supported.
+*NOTE*: Due to Swarm not exposing information in a machine readable way, the app is bound to a specific version of Swarm at the moment.
 
 ### Change address/port UI For Docker is served on
 UI For Docker listens on port 9000 by default. If you run UI For Docker inside a container then you can bind the container's internal port to any external address and port:
