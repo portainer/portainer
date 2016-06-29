@@ -1,6 +1,6 @@
 angular.module('startContainer', ['ui.bootstrap'])
-.controller('StartContainerController', ['$scope', '$state', 'Container', 'Messages', 'containernameFilter', 'errorMsgFilter', 'ViewSpinner',
-function ($scope, $state, Container, Messages, containernameFilter, errorMsgFilter, ViewSpinner) {
+.controller('StartContainerController', ['$scope', '$state', 'Container', 'Image', 'Messages', 'containernameFilter', 'errorMsgFilter', 'ViewSpinner',
+function ($scope, $state, Container, Image, Messages, containernameFilter, errorMsgFilter, ViewSpinner) {
   $scope.template = 'app/components/startContainer/startcontainer.html';
 
   Container.query({all: 1}, function (d) {
@@ -52,8 +52,38 @@ function ($scope, $state, Container, Messages, containernameFilter, errorMsgFilt
     });
   }
 
+  function createContainer(config) {
+    Container.create(config, function (d) {
+      if (d.Id) {
+        var reqBody = config.HostConfig || {};
+        reqBody.id = d.Id;
+        Container.start(reqBody, function (cd) {
+          if (cd.id) {
+            ViewSpinner.stop();
+            Messages.send('Container Started', d.Id);
+            $state.go('container', {id: d.Id}, {reload: true});
+          } else {
+            ViewSpinner.stop();
+            failedRequestHandler(cd, Messages);
+            Container.remove({id: d.Id}, function () {
+              Messages.send('Container Removed', d.Id);
+            });
+          }
+        }, function (e) {
+          ViewSpinner.stop();
+          failedRequestHandler(e, Messages);
+        });
+      } else {
+        ViewSpinner.stop();
+        failedRequestHandler(d, Messages);
+      }
+    }, function (e) {
+      ViewSpinner.stop();
+      failedRequestHandler(e, Messages);
+    });
+  }
+
   $scope.create = function () {
-    // Copy the config before transforming fields to the remote API format
     $('#create-modal').modal('hide');
     ViewSpinner.spin();
 
@@ -121,35 +151,26 @@ function ($scope, $state, Container, Messages, containernameFilter, errorMsgFilt
     rmEmptyKeys(config.HostConfig);
     rmEmptyKeys(config);
 
-    var ctor = Container;
-    var s = $scope;
-    Container.create(config, function (d) {
-      if (d.Id) {
-        var reqBody = config.HostConfig || {};
-        reqBody.id = d.Id;
-        ctor.start(reqBody, function (cd) {
-          if (cd.id) {
-            ViewSpinner.stop();
-            Messages.send('Container Started', d.Id);
-            $state.go('container', {id: d.Id}, {reload: true});
-          } else {
-            ViewSpinner.stop();
-            failedRequestHandler(cd, Messages);
-            ctor.remove({id: d.Id}, function () {
-              Messages.send('Container Removed', d.Id);
-            });
-          }
-        }, function (e) {
+    var image = _.toLower(config.Image);
+    var imageNameAndTag = image.split(':');
+    var imageConfig = {
+      fromImage: imageNameAndTag[0],
+      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest',
+    };
+
+    Image.create(imageConfig, function (data) {
+        var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
+        if (err) {
+          var detail = data[data.length - 1];
           ViewSpinner.stop();
-          failedRequestHandler(e, Messages);
-        });
-      } else {
-        ViewSpinner.stop();
-        failedRequestHandler(d, Messages);
-      }
+          Messages.error('Error', detail.error);
+        } else {
+          Messages.send("Image successfully pulled", image);
+          createContainer(config);
+        }
     }, function (e) {
       ViewSpinner.stop();
-      failedRequestHandler(e, Messages);
+      Messages.error('Error', 'Unable to pull image ' + image);
     });
   };
 
