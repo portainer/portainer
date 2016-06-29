@@ -76,6 +76,7 @@ The following options are available for the `ui-for-docker` binary:
 
 * `-endpoint`, `-e`: Docker deamon endpoint (default: *"/var/run/docker.sock"*)
 * `-bind`, `-p`: Address and port to serve UI For Docker (default: *":9000"*)
+* `-data`, `-d`: Path to the data folder (default: *"."*) 
 * `-assets`, `-a`: Path to the assets (default: *"."*)
 * `-swarm`, `-s`: Swarm cluster support (default: *false*)
 * `-hide-label`, `-l`: Hide containers with a specific label in the UI
