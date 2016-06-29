@@ -1,6 +1,6 @@
 angular.module('startContainer', ['ui.bootstrap'])
-.controller('StartContainerController', ['$scope', '$state', 'Container', 'Messages', 'containernameFilter', 'errorMsgFilter', 'ViewSpinner',
-function ($scope, $state, Container, Messages, containernameFilter, errorMsgFilter, ViewSpinner) {
+.controller('StartContainerController', ['$scope', '$state', 'Container', 'Image', 'Messages', 'containernameFilter', 'errorMsgFilter', 'ViewSpinner',
+function ($scope, $state, Container, Image, Messages, containernameFilter, errorMsgFilter, ViewSpinner) {
   $scope.template = 'app/components/startContainer/startcontainer.html';
 
   Container.query({all: 1}, function (d) {
@@ -121,36 +121,67 @@ function ($scope, $state, Container, Messages, containernameFilter, errorMsgFilt
     rmEmptyKeys(config.HostConfig);
     rmEmptyKeys(config);
 
+
     var ctor = Container;
     var s = $scope;
-    Container.create(config, function (d) {
-      if (d.Id) {
-        var reqBody = config.HostConfig || {};
-        reqBody.id = d.Id;
-        ctor.start(reqBody, function (cd) {
-          if (cd.id) {
-            ViewSpinner.stop();
-            Messages.send('Container Started', d.Id);
-            $state.go('container', {id: d.Id}, {reload: true});
-          } else {
-            ViewSpinner.stop();
-            failedRequestHandler(cd, Messages);
-            ctor.remove({id: d.Id}, function () {
-              Messages.send('Container Removed', d.Id);
-            });
-          }
-        }, function (e) {
+
+    Image.create(config.Image, function (data) {
+      console.log('Data:');
+      console.log(JSON.stringify(data, null, 4));
+      if (data.constructor === Array) {
+        var f = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
+        //check for error
+        if (f) {
+          var d = data[data.length - 1];
+          // $scope.error = "Cannot pull image " + imageName + " Reason: " + d.error;
+          // $('#pull-modal').modal('show');
+          // $('#error-message').show();
+          console.log('Error A');
           ViewSpinner.stop();
-          failedRequestHandler(e, Messages);
-        });
+          failedRequestHandler(d, Messages);
+        } else {
+          console.log('Success A');
+          Messages.send("Image Added", imageName);
+        }
       } else {
-        ViewSpinner.stop();
-        failedRequestHandler(d, Messages);
+        console.log('Success B');
+        Messages.send("Image Added", imageName);
       }
     }, function (e) {
+      console.log('Error B');
       ViewSpinner.stop();
       failedRequestHandler(e, Messages);
     });
+
+    // Container.create(config, function (d) {
+    //   if (d.Id) {
+    //     var reqBody = config.HostConfig || {};
+    //     reqBody.id = d.Id;
+    //     ctor.start(reqBody, function (cd) {
+    //       if (cd.id) {
+    //         ViewSpinner.stop();
+    //         Messages.send('Container Started', d.Id);
+    //         $state.go('container', {id: d.Id}, {reload: true});
+    //       } else {
+    //         ViewSpinner.stop();
+    //         failedRequestHandler(cd, Messages);
+    //         ctor.remove({id: d.Id}, function () {
+    //           Messages.send('Container Removed', d.Id);
+    //         });
+    //       }
+    //     }, function (e) {
+    //       ViewSpinner.stop();
+    //       failedRequestHandler(e, Messages);
+    //     });
+    //   } else {
+    //     ViewSpinner.stop();
+    //     failedRequestHandler(d, Messages);
+    //   }
+    // }, function (e) {
+    //   ViewSpinner.stop();
+    //   failedRequestHandler(e, Messages);
+    // });
+
   };
 
   $scope.addEntry = function (array, entry) {
