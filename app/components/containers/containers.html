@@ -33,15 +33,36 @@
     </rd-widget-taskbar>
     <rd-widget-body classes="no-padding">
       <div class="table-responsive">
-        <table class="table">
+        <table class="table table-hover">
           <thead>
             <tr>
-              <th><label><input type="checkbox" ng-model="state.toggle" ng-change="toggleSelectAll()" /> Select</label></th>
+              <th></th>
+              <th>
+                <a ui-sref="containers" ng-click="order('State')">
+                  State
+                  <span ng-show="sortType == 'State' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'State' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
               <th>
                 <a ui-sref="containers" ng-click="order('Names')">
                   Name
                   <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="containers" ng-click="order('IP')">
+                  IP Address
+                  <span ng-show="sortType == 'IP' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'IP' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th ng-if="swarm">
+                <a ui-sref="containers" ng-click="order('Host')">
+                  Host
+                  <span ng-show="sortType == 'Host' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Host' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
@@ -58,30 +79,18 @@
                   <span ng-show="sortType == 'Command' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
-              <th>
-                <a ui-sref="containers" ng-click="order('Created')">
-                  Created
-                  <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="containers" ng-click="order('Status')">
-                  Status
-                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse))">
               <td><input type="checkbox" ng-model="container.Checked" ng-change="selectItem(container)"/></td>
-              <td><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
+              <td><span class="label label-{{ container.State|containerstatusbadge }}">{{ container.State }}</span></td>
+              <td ng-if="swarm"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
+              <td ng-if="!swarm"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
+              <td>{{ container.IP ? container.IP : '-' }}</td>
+              <td ng-if="swarm">{{ container|swarmhostname}}</td>
               <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
-              <td>{{ container.Command|truncate:40 }}</td>
-              <td>{{ container.Created|getdate }}</td>
-              <td><span class="label label-{{ container.Status|statusbadge }}">{{ container.Status }}</span></td>
+              <td>{{ container.Command|truncate:60 }}</td>
             </tr>
           </tbody>
         </table>

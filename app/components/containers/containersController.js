@@ -4,9 +4,8 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
-  $scope.sortType = 'Created';
+  $scope.sortType = 'State';
   $scope.sortReverse = true;
-  $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
 
   $scope.order = function (sortType) {
@@ -91,18 +90,6 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
     }
   };
 
-  $scope.toggleSelectAll = function () {
-    $scope.state.selectedItem = $scope.state.toggle;
-    angular.forEach($scope.state.filteredContainers, function (i) {
-      i.Checked = $scope.state.toggle;
-    });
-    if ($scope.state.toggle) {
-      $scope.state.selectedItemCount = $scope.state.filteredContainers.length;
-    } else {
-      $scope.state.selectedItemCount = 0;
-    }
-  };
-
   $scope.toggleGetAll = function () {
     Settings.displayAll = $scope.state.displayAll;
     update({all: Settings.displayAll ? 1 : 0});
@@ -151,9 +138,10 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
     });
   };
 
-  var hiddenLabels;
+  $scope.swarm = false;
   Config.$promise.then(function (c) {
     hiddenLabels = c.hiddenLabels;
+    $scope.swarm = c.swarm;
     update({all: Settings.displayAll ? 1 : 0});
   });
 }]);
