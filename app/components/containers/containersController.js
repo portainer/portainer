@@ -4,7 +4,7 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
-  $scope.sortType = 'Created';
+  $scope.sortType = 'State';
   $scope.sortReverse = true;
   $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
@@ -151,9 +151,10 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
     });
   };
 
-  var hiddenLabels;
+  $scope.swarm = false;
   Config.$promise.then(function (c) {
     hiddenLabels = c.hiddenLabels;
+    $scope.swarm = c.swarm;
     update({all: Settings.displayAll ? 1 : 0});
   });
 }]);

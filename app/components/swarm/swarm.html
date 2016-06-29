@@ -137,7 +137,7 @@
               <td>{{ node.ip }}</td>
               <td>{{ node.containers }}</td>
               <td>{{ node.version }}</td>
-              <td><span class="label label-{{ node.status|statusbadge }}">{{ node.status }}</span></td>
+              <td><span class="label label-{{ node.status|nodestatusbadge }}">{{ node.status }}</span></td>
             </tr>
           </tbody>
         </table>

@@ -15,20 +15,6 @@ describe('filters', function () {
         }));
     });
 
-    describe('statusbadge', function () {
-        it('should be "important" when input is "Ghost"', inject(function (statusbadgeFilter) {
-            expect(statusbadgeFilter('Ghost')).toBe('important');
-        }));
-
-        it('should be "success" when input is "Exit 0"', inject(function (statusbadgeFilter) {
-            expect(statusbadgeFilter('Exit 0')).toBe('success');
-        }));
-
-        it('should be "warning" when exit code is non-zero', inject(function (statusbadgeFilter) {
-            expect(statusbadgeFilter('Exit 1')).toBe('warning');
-        }));
-    });
-
     describe('getstatetext', function () {
 
         it('should return an empty string when state is undefined', inject(function (getstatetextFilter) {
