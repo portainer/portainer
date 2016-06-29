@@ -6,7 +6,6 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
   $scope.state.displayAll = Settings.displayAll;
   $scope.sortType = 'State';
   $scope.sortReverse = true;
-  $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
 
   $scope.order = function (sortType) {
@@ -88,18 +87,6 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
       $scope.state.selectedItemCount++;
     } else {
       $scope.state.selectedItemCount--;
-    }
-  };
-
-  $scope.toggleSelectAll = function () {
-    $scope.state.selectedItem = $scope.state.toggle;
-    angular.forEach($scope.state.filteredContainers, function (i) {
-      i.Checked = $scope.state.toggle;
-    });
-    if ($scope.state.toggle) {
-      $scope.state.selectedItemCount = $scope.state.filteredContainers.length;
-    } else {
-      $scope.state.selectedItemCount = 0;
     }
   };
 
