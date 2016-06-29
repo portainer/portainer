@@ -52,8 +52,38 @@ function ($scope, $state, Container, Image, Messages, containernameFilter, error
     });
   }
 
+  function createContainer(config) {
+    Container.create(config, function (d) {
+      if (d.Id) {
+        var reqBody = config.HostConfig || {};
+        reqBody.id = d.Id;
+        Container.start(reqBody, function (cd) {
+          if (cd.id) {
+            ViewSpinner.stop();
+            Messages.send('Container Started', d.Id);
+            $state.go('container', {id: d.Id}, {reload: true});
+          } else {
+            ViewSpinner.stop();
+            failedRequestHandler(cd, Messages);
+            Container.remove({id: d.Id}, function () {
+              Messages.send('Container Removed', d.Id);
+            });
+          }
+        }, function (e) {
+          ViewSpinner.stop();
+          failedRequestHandler(e, Messages);
+        });
+      } else {
+        ViewSpinner.stop();
+        failedRequestHandler(d, Messages);
+      }
+    }, function (e) {
+      ViewSpinner.stop();
+      failedRequestHandler(e, Messages);
+    });
+  }
+
   $scope.create = function () {
-    // Copy the config before transforming fields to the remote API format
     $('#create-modal').modal('hide');
     ViewSpinner.spin();
 
@@ -121,67 +151,27 @@ function ($scope, $state, Container, Image, Messages, containernameFilter, error
     rmEmptyKeys(config.HostConfig);
     rmEmptyKeys(config);
 
+    var image = _.toLower(config.Image);
+    var imageNameAndTag = image.split(':');
+    var imageConfig = {
+      fromImage: imageNameAndTag[0],
+      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest',
+    };
 
-    var ctor = Container;
-    var s = $scope;
-
-    Image.create(config.Image, function (data) {
-      console.log('Data:');
-      console.log(JSON.stringify(data, null, 4));
-      if (data.constructor === Array) {
-        var f = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
-        //check for error
-        if (f) {
-          var d = data[data.length - 1];
-          // $scope.error = "Cannot pull image " + imageName + " Reason: " + d.error;
-          // $('#pull-modal').modal('show');
-          // $('#error-message').show();
-          console.log('Error A');
+    Image.create(imageConfig, function (data) {
+        var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
+        if (err) {
+          var detail = data[data.length - 1];
           ViewSpinner.stop();
-          failedRequestHandler(d, Messages);
+          Messages.error('Error', detail.error);
         } else {
-          console.log('Success A');
-          Messages.send("Image Added", imageName);
+          Messages.send("Image successfully pulled", image);
+          createContainer(config);
         }
-      } else {
-        console.log('Success B');
-        Messages.send("Image Added", imageName);
-      }
     }, function (e) {
-      console.log('Error B');
       ViewSpinner.stop();
-      failedRequestHandler(e, Messages);
+      Messages.error('Error', 'Unable to pull image ' + image);
     });
-
-    // Container.create(config, function (d) {
-    //   if (d.Id) {
-    //     var reqBody = config.HostConfig || {};
-    //     reqBody.id = d.Id;
-    //     ctor.start(reqBody, function (cd) {
-    //       if (cd.id) {
-    //         ViewSpinner.stop();
-    //         Messages.send('Container Started', d.Id);
-    //         $state.go('container', {id: d.Id}, {reload: true});
-    //       } else {
-    //         ViewSpinner.stop();
-    //         failedRequestHandler(cd, Messages);
-    //         ctor.remove({id: d.Id}, function () {
-    //           Messages.send('Container Removed', d.Id);
-    //         });
-    //       }
-    //     }, function (e) {
-    //       ViewSpinner.stop();
-    //       failedRequestHandler(e, Messages);
-    //     });
-    //   } else {
-    //     ViewSpinner.stop();
-    //     failedRequestHandler(d, Messages);
-    //   }
-    // }, function (e) {
-    //   ViewSpinner.stop();
-    //   failedRequestHandler(e, Messages);
-    // });
-
   };
 
   $scope.addEntry = function (array, entry) {
