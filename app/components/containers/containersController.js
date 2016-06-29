@@ -1,6 +1,6 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner', 'Config',
-function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
+.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner', 'Config', 'errorMsgFilter',
+function ($scope, Container, Settings, Messages, ViewSpinner, Config, errorMsgFilter) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
@@ -40,13 +40,12 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
     };
     angular.forEach(items, function (c) {
       if (c.Checked) {
+        counter = counter + 1;
         if (action === Container.start) {
           Container.get({id: c.Id}, function (d) {
             c = d;
-            counter = counter + 1;
             action({id: c.Id, HostConfig: c.HostConfig || {}}, function (d) {
               Messages.send("Container " + msg, c.Id);
-              var index = $scope.containers.indexOf(c);
               complete();
             }, function (e) {
               Messages.error("Failure", e.data);
@@ -62,11 +61,24 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
             complete();
           });
         }
+        else if (action === Container.remove) {
+          action({id: c.Id}, function (d) {
+            var error = errorMsgFilter(d);
+            if (error) {
+              Messages.send("Error", "Unable to remove running container");
+            }
+            else {
+              Messages.send("Container " + msg, c.Id);
+            }
+            complete();
+          }, function (e) {
+            Messages.error("Failure", e.data);
+            complete();
+          });
+        }
         else {
-          counter = counter + 1;
           action({id: c.Id}, function (d) {
             Messages.send("Container " + msg, c.Id);
-            var index = $scope.containers.indexOf(c);
             complete();
           }, function (e) {
             Messages.error("Failure", e.data);
@@ -74,7 +86,6 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
           });
 
         }
-
       }
     });
     if (counter === 0) {
