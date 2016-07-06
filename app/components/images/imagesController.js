@@ -1,11 +1,15 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', 'Image', 'ViewSpinner', 'Messages',
-function ($scope, Image, ViewSpinner, Messages) {
+.controller('ImagesController', ['$scope', '$state', 'Image', 'ViewSpinner', 'Messages',
+function ($scope, $state, Image, ViewSpinner, Messages) {
   $scope.state = {};
   $scope.sortType = 'Created';
   $scope.sortReverse = true;
   $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
+
+  $scope.config = {
+    Image: ''
+  };
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
@@ -29,6 +33,35 @@ function ($scope, Image, ViewSpinner, Messages) {
     } else {
       $scope.state.selectedItemCount--;
     }
+  };
+
+  function createImageConfig(imageName) {
+    var imageNameAndTag = imageName.split(':');
+    var imageConfig = {
+      fromImage: imageNameAndTag[0],
+      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
+    };
+    return imageConfig;
+  }
+
+  $scope.pullImage = function() {
+    ViewSpinner.spin();
+    var image = _.toLower($scope.config.Image);
+    var imageConfig = createImageConfig(image);
+    Image.create(imageConfig, function (data) {
+        var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
+        if (err) {
+          var detail = data[data.length - 1];
+          ViewSpinner.stop();
+          Messages.error('Error', detail.error);
+        } else {
+          ViewSpinner.stop();
+          $state.go('images', {}, {reload: true});
+        }
+    }, function (e) {
+      ViewSpinner.stop();
+      Messages.error('Error', 'Unable to pull image ' + image);
+    });
   };
 
   $scope.removeAction = function () {

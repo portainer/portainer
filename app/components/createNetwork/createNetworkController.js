@@ -52,7 +52,6 @@ function ($scope, $state, Messages, Network, ViewSpinner, errorMsgFilter) {
 
   $scope.create = function () {
     var config = prepareConfiguration();
-    console.log(JSON.stringify(config, null, 4));
     createNetwork(config);
   };
 }]);
