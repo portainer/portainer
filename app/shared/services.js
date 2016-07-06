@@ -86,10 +86,10 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
             history: {method: 'GET', params: {action: 'history'}, isArray: true},
             create: {
                 method: 'POST', isArray: true, transformResponse: [function f(data) {
-                    var str = data.replace(/\n/g, " ").replace(/\}\W*\{/g, "}, {");
-                    return angular.fromJson("[" + str + "]");
+                    var str = "[" + data.replace(/\n/g, " ").replace(/\}\s*\{/g, "}, {") + "]";
+                    return angular.fromJson(str);
                 }],
-                params: {action: 'create', fromImage: '@fromImage', repo: '@repo', tag: '@tag', registry: '@registry'}
+                params: {action: 'create', fromImage: '@fromImage', tag: '@tag'}
             },
             insert: {method: 'POST', params: {id: '@id', action: 'insert'}},
             push: {method: 'POST', params: {id: '@id', action: 'push'}},

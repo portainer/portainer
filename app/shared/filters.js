@@ -49,6 +49,12 @@ angular.module('dockerui.filters', [])
     return '';
   };
 })
+.filter('capitalize', function () {
+  'use strict';
+  return function (text) {
+    return _.capitalize(text);
+  };
+})
 .filter('getstatetext', function () {
   'use strict';
   return function (state) {

@@ -1,5 +1,3 @@
-<div ng-include="template" ng-controller="StartContainerController"></div>
-
 <rd-header>
   <rd-header-title title="Container list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="containers" ui-sref-opts="{reload: true}">
@@ -23,8 +21,8 @@
           <button type="button" class="btn btn-primary" ng-click="pauseAction()" ng-disabled="!state.selectedItemCount">Pause</button>
           <button type="button" class="btn btn-primary" ng-click="unpauseAction()" ng-disabled="!state.selectedItemCount">Unpause</button>
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
-          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create-modal">Start a new container...</button>
         </div>
+        <a class="btn btn-default" type="button" ui-sref="actions.create.container">Add container</a>
       </div>
       <div class="pull-right">
         <input type="checkbox" ng-model="state.displayAll" id="displayAll" ng-change="toggleGetAll()"/><label for="displayAll">Display All</label>

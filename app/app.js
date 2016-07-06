@@ -10,11 +10,11 @@ angular.module('uifordocker', [
   'dashboard',
   'container',
   'containers',
+  'createContainer',
   'docker',
   'images',
   'image',
   'pullImage',
-  'startContainer',
   'containerLogs',
   'stats',
   'swarm',
@@ -56,6 +56,21 @@ angular.module('uifordocker', [
       url: "^/containers/:id/logs",
       templateUrl: 'app/components/containerLogs/containerlogs.html',
       controller: 'ContainerLogsController'
+    })
+    .state('actions', {
+      abstract: true,
+      url: "/actions",
+      template: '<ui-view/>'
+    })
+    .state('actions.create', {
+      abstract: true,
+      url: "/create",
+      template: '<ui-view/>'
+    })
+    .state('actions.create.container', {
+      url: "/container",
+      templateUrl: 'app/components/createContainer/createcontainer.html',
+      controller: 'CreateContainerController'
     })
     .state('docker', {
       url: '/docker/',
