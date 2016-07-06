@@ -8,7 +8,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
 
   $scope.formValues = {
     Console: 'none',
-    Volumes: [],
+    Volumes: []
   };
 
   $scope.config = {
