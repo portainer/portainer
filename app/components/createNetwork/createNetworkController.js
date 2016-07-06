@@ -1,41 +1,58 @@
 angular.module('createNetwork', [])
 .controller('CreateNetworkController', ['$scope', '$state', 'Messages', 'Network', 'ViewSpinner', 'errorMsgFilter',
 function ($scope, $state, Messages, Network, ViewSpinner, errorMsgFilter) {
-  $scope.template = 'app/components/createNetwork/createNetwork.html';
-
-  $scope.init = function () {
-    $scope.createNetworkConfig = {
-      "Name": '',
-      "Driver": '',
-      "IPAM": {
-        "Config": [{}]
-      }
-    };
+  $scope.formValues = {
+    DriverOptions: []
   };
 
-  $scope.init();
+  $scope.config = {
+    Driver: 'bridge',
+    CheckDuplicate: true,
+    Internal: false
+  };
 
-  $scope.createNetwork = function addNetwork(createNetworkConfig) {
-    if (_.isEmpty(createNetworkConfig.IPAM.Config[0])) {
-      delete createNetworkConfig.IPAM;
-    }
-    $('#error-message').hide();
+  $scope.addDriverOption = function() {
+    $scope.formValues.DriverOptions.push({ name: '', value: '' });
+  };
+
+  $scope.removeDriverOption = function(index) {
+    $scope.formValues.DriverOptions.splice(index, 1);
+  };
+
+  function createNetwork(config) {
     ViewSpinner.spin();
-    $('#create-network-modal').modal('hide');
-    Network.create(createNetworkConfig, function (d) {
+    Network.create(config, function (d) {
       if (d.Id) {
         Messages.send("Network created", d.Id);
+        ViewSpinner.stop();
+        $state.go('networks', {}, {reload: true});
       } else {
-        Messages.error('Failure', errorMsgFilter(d));
+        ViewSpinner.stop();
+        Messages.error('Unable to create network', errorMsgFilter(d));
       }
-      ViewSpinner.stop();
-      $scope.init();
-      $state.go('networks', {}, {reload: true});
     }, function (e) {
       ViewSpinner.stop();
-      $scope.error = "Cannot pull image " + imageName + " Reason: " + e.data;
-      $('#create-network-modal').modal('show');
-      $('#error-message').show();
+      Messages.error('Unable to create network', e.data);
     });
+  }
+
+  function prepareDriverOptions(config) {
+    var options = {};
+    $scope.formValues.DriverOptions.forEach(function (option) {
+      options[option.name] = option.value;
+    });
+    config.Options = options;
+  }
+
+  function prepareConfiguration() {
+    var config = angular.copy($scope.config);
+    prepareDriverOptions(config);
+    return config;
+  }
+
+  $scope.create = function () {
+    var config = prepareConfiguration();
+    console.log(JSON.stringify(config, null, 4));
+    createNetwork(config);
   };
 }]);
