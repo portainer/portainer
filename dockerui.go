@@ -21,6 +21,7 @@ var (
 	endpoint = kingpin.Flag("endpoint", "Dockerd endpoint").Default("/var/run/docker.sock").Short('e').String()
 	addr 		 = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
 	assets   = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
+	data		 = kingpin.Flag("data", "Path to the data").Default(".").Short('d').String()
 	swarm	   = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
 	labels   = LabelParser(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
 	authKey  []byte
@@ -117,7 +118,7 @@ func createUnixHandler(e string) http.Handler {
 	return &UnixHandler{e}
 }
 
-func createHandler(dir string, e string, c Config) http.Handler {
+func createHandler(dir string, d string, e string, c Config) http.Handler {
 	var (
 		mux         = http.NewServeMux()
 		fileHandler = http.FileServer(http.Dir(dir))
@@ -137,11 +138,12 @@ func createHandler(dir string, e string, c Config) http.Handler {
 	}
 
 	// Use existing csrf authKey if present or generate a new one.
-	dat, err := ioutil.ReadFile(authKeyFile)
+	var authKeyPath = d + "/" + authKeyFile
+	dat, err := ioutil.ReadFile(authKeyPath)
 	if err != nil {
 		fmt.Println(err)
 		authKey = securecookie.GenerateRandomKey(32)
-		err := ioutil.WriteFile(authKeyFile, authKey, 0644)
+		err := ioutil.WriteFile(authKeyPath, authKey, 0644)
 		if err != nil {
 			fmt.Println("unable to persist auth key", err)
 		}
@@ -171,7 +173,7 @@ func csrfWrapper(h http.Handler) http.Handler {
 }
 
 func main() {
-	kingpin.Version("1.0.4")
+	kingpin.Version("1.1.0")
 	kingpin.Parse()
 
 	configuration := Config{
@@ -179,7 +181,7 @@ func main() {
 		HiddenLabels: *labels,
 	}
 
-	handler := createHandler(*assets, *endpoint, configuration)
+	handler := createHandler(*assets, *data, *endpoint, configuration)
 	if err := http.ListenAndServe(*addr, handler); err != nil {
 		log.Fatal(err)
 	}

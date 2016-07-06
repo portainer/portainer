@@ -146,3 +146,22 @@
 .header_title_content {
   margin-left: 5px;
 }
+
+.form-horizontal .control-label.text-left{
+    text-align: left;
+    font-size: 0.9em;
+}
+
+input[type="checkbox"] {
+  margin-top: 1px;
+  vertical-align: middle;
+}
+
+input[type="radio"] {
+  margin-top: 1px;
+  vertical-align: middle;
+}
+
+.clickable {
+  cursor: pointer;
+}

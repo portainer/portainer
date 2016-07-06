@@ -37,11 +37,11 @@ $ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -e http://127.0.0.1:23
 
 **Supported Swarm version: 1.2.3**
 
-You can access a specific view for you Swarm cluster by defining the `-swarm` flag:
+You can access a specific view for you Swarm cluster by defining the `--swarm` flag:
 
 ```
 # Connect to a tcp socket and enable Swarm:
-$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -e http://<SWARM_HOST>:<SWARM_PORT> -swarm
+$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -e http://<SWARM_HOST>:<SWARM_PORT> --swarm
 ```
 
 *NOTE*: Due to Swarm not exposing information in a machine readable way, the app is bound to a specific version of Swarm at the moment.
@@ -74,8 +74,9 @@ $ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docke
 
 The following options are available for the `ui-for-docker` binary:
 
-* `-endpoint`, `-e`: Docker deamon endpoint (default: *"/var/run/docker.sock"*)
-* `-bind`, `-p`: Address and port to serve UI For Docker (default: *":9000"*)
-* `-assets`, `-a`: Path to the assets (default: *"."*)
-* `-swarm`, `-s`: Swarm cluster support (default: *false*)
-* `-hide-label`, `-l`: Hide containers with a specific label in the UI
+* `--endpoint`, `-e`: Docker deamon endpoint (default: *"/var/run/docker.sock"*)
+* `--bind`, `-p`: Address and port to serve UI For Docker (default: *":9000"*)
+* `--data`, `-d`: Path to the data folder (default: *"."*)
+* `--assets`, `-a`: Path to the assets (default: *"."*)
+* `--swarm`, `-s`: Swarm cluster support (default: *false*)
+* `--hide-label`, `-l`: Hide containers with a specific label in the UI

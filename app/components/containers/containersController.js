@@ -1,12 +1,11 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner', 'Config',
-function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
+.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner', 'Config', 'errorMsgFilter',
+function ($scope, Container, Settings, Messages, ViewSpinner, Config, errorMsgFilter) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
-  $scope.sortType = 'Created';
+  $scope.sortType = 'State';
   $scope.sortReverse = true;
-  $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
 
   $scope.order = function (sortType) {
@@ -41,13 +40,12 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
     };
     angular.forEach(items, function (c) {
       if (c.Checked) {
+        counter = counter + 1;
         if (action === Container.start) {
           Container.get({id: c.Id}, function (d) {
             c = d;
-            counter = counter + 1;
             action({id: c.Id, HostConfig: c.HostConfig || {}}, function (d) {
               Messages.send("Container " + msg, c.Id);
-              var index = $scope.containers.indexOf(c);
               complete();
             }, function (e) {
               Messages.error("Failure", e.data);
@@ -63,11 +61,24 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
             complete();
           });
         }
+        else if (action === Container.remove) {
+          action({id: c.Id}, function (d) {
+            var error = errorMsgFilter(d);
+            if (error) {
+              Messages.send("Error", "Unable to remove running container");
+            }
+            else {
+              Messages.send("Container " + msg, c.Id);
+            }
+            complete();
+          }, function (e) {
+            Messages.error("Failure", e.data);
+            complete();
+          });
+        }
         else {
-          counter = counter + 1;
           action({id: c.Id}, function (d) {
             Messages.send("Container " + msg, c.Id);
-            var index = $scope.containers.indexOf(c);
             complete();
           }, function (e) {
             Messages.error("Failure", e.data);
@@ -75,7 +86,6 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
           });
 
         }
-
       }
     });
     if (counter === 0) {
@@ -88,18 +98,6 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
       $scope.state.selectedItemCount++;
     } else {
       $scope.state.selectedItemCount--;
-    }
-  };
-
-  $scope.toggleSelectAll = function () {
-    $scope.state.selectedItem = $scope.state.toggle;
-    angular.forEach($scope.state.filteredContainers, function (i) {
-      i.Checked = $scope.state.toggle;
-    });
-    if ($scope.state.toggle) {
-      $scope.state.selectedItemCount = $scope.state.filteredContainers.length;
-    } else {
-      $scope.state.selectedItemCount = 0;
     }
   };
 
@@ -151,9 +149,10 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config) {
     });
   };
 
-  var hiddenLabels;
+  $scope.swarm = false;
   Config.$promise.then(function (c) {
     hiddenLabels = c.hiddenLabels;
+    $scope.swarm = c.swarm;
     update({all: Settings.displayAll ? 1 : 0});
   });
 }]);
