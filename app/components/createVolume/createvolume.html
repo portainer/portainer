@@ -1,0 +1,69 @@
+<rd-header>
+  <rd-header-title title="Create volume"></rd-header-title>
+  <rd-header-content>
+    Volumes > Add volume
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="volume_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="config.Name" id="volume_name" placeholder="e.g. myVolume">
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- driver-input -->
+          <div class="form-group">
+            <label for="volume_driver" class="col-sm-1 control-label text-left">Driver</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="config.Driver" id="volume_driver" placeholder="e.g. driverName">
+            </div>
+          </div>
+          <!-- !driver-input -->
+          <!-- driver-options -->
+          <div class="form-group">
+            <label for="volume_driveropts" class="col-sm-1 control-label text-left">Driver options</label>
+            <div class="col-sm-11">
+              <span class="label label-default clickable" ng-click="addDriverOption()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> driver option
+              </span>
+            </div>
+            <!-- driver-options-input-list -->
+            <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+              <div ng-repeat="option in formValues.DriverOptions" style="margin-top: 2px;">
+                <div class="input-group col-sm-5 input-group-sm">
+                  <span class="input-group-addon">name</span>
+                  <input type="text" class="form-control" ng-model="option.name" placeholder="e.g. mountpoint">
+                </div>
+                <div class="input-group col-sm-5 input-group-sm">
+                  <span class="input-group-addon">value</span>
+                  <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. /path/on/host">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="removeDriverOption($index)">
+                      <i class="fa fa-minus" aria-hidden="true"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <!-- !driver-options-input-list -->
+          </div>
+          <!-- !driver-options -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12" style="text-align: center;">
+    <button type="button" class="btn btn-default btn-lg" ng-click="create()">Create</button>
+    <a type="button" class="btn btn-default btn-lg" ui-sref="volumes">Cancel</a>
+  </div>
+</div>

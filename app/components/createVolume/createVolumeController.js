@@ -1,39 +1,56 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$scope', '$state', 'Messages', 'Volume', 'ViewSpinner', 'errorMsgFilter',
-function ($scope, $state, Messages, Volume, ViewSpinner, errorMsgFilter) {
-  $scope.template = 'app/components/createVolume/createVolume.html';
+.controller('CreateVolumeController', ['$scope', '$state', 'Volume', 'Messages', 'ViewSpinner', 'errorMsgFilter',
+function ($scope, $state, Volume, Messages, ViewSpinner, errorMsgFilter) {
 
-  $scope.init = function () {
-    $scope.createVolumeConfig = {
-      "Name": "",
-      "Driver": "",
-      "DriverOpts": {}
-    };
-    $scope.availableDrivers = ['local', 'local-persist'];
-    $scope.selectedDriver = { value: $scope.availableDrivers[0] };
+  $scope.formValues = {
+    DriverOptions: []
   };
 
-  $scope.init();
+  $scope.config = {
+    Driver: 'local'
+  };
 
-  $scope.addVolume = function addVolume(createVolumeConfig) {
-    $('#error-message').hide();
+  $scope.addDriverOption = function() {
+    $scope.formValues.DriverOptions.push({ name: '', value: '' });
+  };
+
+  $scope.removeDriverOption = function(index) {
+    $scope.formValues.DriverOptions.splice(index, 1);
+  };
+
+  function createVolume(config) {
     ViewSpinner.spin();
-    $('#create-volume-modal').modal('hide');
-    createVolumeConfig.Driver = $scope.selectedDriver.value;
-    console.log(JSON.stringify(createVolumeConfig, null, 4));
-    Volume.create(createVolumeConfig, function (d) {
+    Volume.create(config, function (d) {
       if (d.Name) {
         Messages.send("Volume created", d.Name);
+        ViewSpinner.stop();
+        $state.go('volumes', {}, {reload: true});
       } else {
-        Messages.error('Failure', errorMsgFilter(d));
+        ViewSpinner.stop();
+        Messages.error('Unable to create volume', errorMsgFilter(d));
       }
-      ViewSpinner.stop();
-      $state.go('volumes', {}, {reload: true});
     }, function (e) {
       ViewSpinner.stop();
-      $scope.error = "Cannot create volume " + createVolumeConfig.Name + " Reason: " + e.data;
-      $('#create-volume-modal').modal('show');
-      $('#error-message').show();
+      Messages.error('Unable to create volume', e.data);
     });
+  }
+
+  function prepareDriverOptions(config) {
+    var options = {};
+    $scope.formValues.DriverOptions.forEach(function (option) {
+      options[option.name] = option.value;
+    });
+    config.DriverOpts = options;
+  }
+
+  function prepareConfiguration() {
+    var config = angular.copy($scope.config);
+    prepareDriverOptions(config);
+    return config;
+  }
+
+  $scope.create = function () {
+    var config = prepareConfiguration();
+    createVolume(config);
   };
 }]);

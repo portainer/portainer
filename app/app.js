@@ -72,6 +72,11 @@ angular.module('uifordocker', [
       templateUrl: 'app/components/createContainer/createcontainer.html',
       controller: 'CreateContainerController'
     })
+    .state('actions.create.volume', {
+      url: "/volume",
+      templateUrl: 'app/components/createVolume/createvolume.html',
+      controller: 'CreateVolumeController'
+    })
     .state('docker', {
       url: '/docker/',
       templateUrl: 'app/components/docker/docker.html',
