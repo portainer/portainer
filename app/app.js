@@ -14,7 +14,6 @@ angular.module('uifordocker', [
   'docker',
   'images',
   'image',
-  'pullImage',
   'containerLogs',
   'stats',
   'swarm',
