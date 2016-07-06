@@ -35,6 +35,7 @@ module.exports = function (grunt) {
         'recess:min',
         'copy'
     ]);
+    grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test-watch', ['karma:watch']);
     grunt.registerTask('run', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
     grunt.registerTask('run-swarm', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);

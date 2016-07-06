@@ -14,7 +14,6 @@ angular.module('uifordocker', [
   'docker',
   'images',
   'image',
-  'pullImage',
   'containerLogs',
   'stats',
   'swarm',
@@ -71,6 +70,16 @@ angular.module('uifordocker', [
       url: "/container",
       templateUrl: 'app/components/createContainer/createcontainer.html',
       controller: 'CreateContainerController'
+    })
+    .state('actions.create.volume', {
+      url: "/volume",
+      templateUrl: 'app/components/createVolume/createvolume.html',
+      controller: 'CreateVolumeController'
+    })
+    .state('actions.create.network', {
+      url: "/network",
+      templateUrl: 'app/components/createNetwork/createnetwork.html',
+      controller: 'CreateNetworkController'
     })
     .state('docker', {
       url: '/docker/',
@@ -135,4 +144,4 @@ angular.module('uifordocker', [
   .constant('DOCKER_ENDPOINT', 'dockerapi')
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('CONFIG_ENDPOINT', '/config')
-  .constant('UI_VERSION', 'v1.1.0');
+  .constant('UI_VERSION', 'v1.2.0');

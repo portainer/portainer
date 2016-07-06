@@ -1,5 +1,3 @@
-<div ng-include="template" ng-controller="PullImageController"></div>
-
 <rd-header>
   <rd-header-title title="Image list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="images" ui-sref-opts="{reload: true}">
@@ -10,68 +8,100 @@
   <rd-header-content>Images</rd-header-content>
 </rd-header>
 
-<div class="col-lg-12">
-  <rd-widget>
-    <rd-widget-header icon="fa-clone" title="Images">
-    </rd-widget-header>
-    <rd-widget-taskbar classes="col-lg-12">
-      <div class="pull-left">
-        <div class="btn-group" role="group" aria-label="...">
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-download" title="Pull image ">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="config.Image" id="image_name" placeholder="e.g. ubuntu:trusty">
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">Note: if you don't specify the tag in the image name, <span class="label label-default">latest</span> will be used.</span>
+            </div>
+          </div>
+          <!-- !tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-default btn-sm" ng-disabled="!config.Image" ng-click="pullImage()">Pull</button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title="Images">
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-lg-12">
+        <div class="pull-left">
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
-          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#pull-modal">Pull new image...</button>
         </div>
-      </div>
-      <div class="pull-right">
-        <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
-      </div>
-    </rd-widget-taskbar>
-    <rd-widget-body classes="no-padding">
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th><label><input type="checkbox" ng-model="state.toggle" ng-change="toggleSelectAll()" /> Select</label></th>
-              <th>
-                <a ui-sref="images" ng-click="order('Id')">
-                  Id
-                  <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="images" ng-click="order('RepoTags')">
-                  Repository
-                  <span ng-show="sortType == 'RepoTags' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'RepoTags' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="images" ng-click="order('VirtualSize')">
-                  VirtualSize
-                  <span ng-show="sortType == 'VirtualSize' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'VirtualSize' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="images" ng-click="order('Created')">
-                  Created
-                  <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="image in (state.filteredImages = (images | filter:state.filter | orderBy:sortType:sortReverse))">
-              <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
-              <td><a ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a></td>
-              <td>{{ image|repotag }}</td>
-              <td>{{ image.VirtualSize|humansize }}</td>
-              <td>{{ image.Created|getdate }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </rd-widget-body>
-  <rd-widget>
+        <div class="pull-right">
+          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th><label><input type="checkbox" ng-model="state.toggle" ng-change="toggleSelectAll()" /> Select</label></th>
+                <th>
+                  <a ui-sref="images" ng-click="order('Id')">
+                    Id
+                    <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ui-sref="images" ng-click="order('RepoTags')">
+                    Repository
+                    <span ng-show="sortType == 'RepoTags' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'RepoTags' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ui-sref="images" ng-click="order('VirtualSize')">
+                    VirtualSize
+                    <span ng-show="sortType == 'VirtualSize' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'VirtualSize' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ui-sref="images" ng-click="order('Created')">
+                    Created
+                    <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="image in (state.filteredImages = (images | filter:state.filter | orderBy:sortType:sortReverse))">
+                <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
+                <td><a ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a></td>
+                <td>{{ image|repotag }}</td>
+                <td>{{ image.VirtualSize|humansize }}</td>
+                <td>{{ image.Created|getdate }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </rd-widget-body>
+    <rd-widget>
+  </div>
 </div>

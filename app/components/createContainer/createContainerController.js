@@ -8,7 +8,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
 
   $scope.formValues = {
     Console: 'none',
-    Volumes: [],
+    Volumes: []
   };
 
   $scope.config = {
@@ -201,7 +201,6 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
 
   $scope.create = function () {
     var config = prepareConfiguration();
-    console.log(JSON.stringify(config, null, 4));
 
     if ($scope.state.alwaysPull) {
       pullImageAndCreateContainer(config);
