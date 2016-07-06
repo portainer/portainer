@@ -16,10 +16,8 @@
     </rd-widget-header>
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
-        <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
-          <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create-network-modal">Create new network...</button>
-        </div>
+        <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
+        <a class="btn btn-default" type="button" ui-sref="actions.create.network">Add network</a>
       </div>
       <div class="pull-right">
         <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
