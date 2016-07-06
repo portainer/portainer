@@ -76,16 +76,9 @@
                 </th>
                 <th>
                   <a ui-sref="images" ng-click="order('VirtualSize')">
-                    VirtualSize
+                    Size
                     <span ng-show="sortType == 'VirtualSize' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'VirtualSize' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
-                </th>
-                <th>
-                  <a ui-sref="images" ng-click="order('Created')">
-                    Created
-                    <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
               </tr>
@@ -96,7 +89,6 @@
                 <td><a ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a></td>
                 <td>{{ image|repotag }}</td>
                 <td>{{ image.VirtualSize|humansize }}</td>
-                <td>{{ image.Created|getdate }}</td>
               </tr>
             </tbody>
           </table>

@@ -1,12 +1,15 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', 'Network', 'ViewSpinner', 'Messages', 'errorMsgFilter',
-function ($scope, Network, ViewSpinner, Messages, errorMsgFilter) {
-
+.controller('NetworksController', ['$scope', '$state', 'Network', 'ViewSpinner', 'Messages', 'errorMsgFilter',
+function ($scope, $state, Network, ViewSpinner, Messages, errorMsgFilter) {
   $scope.state = {};
   $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
-  $scope.sortType = 'Name';
-  $scope.sortReverse = true;
+  $scope.sortType = 'Scope';
+  $scope.sortReverse = false;
+
+  $scope.config = {
+    Name: ''
+  };
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
@@ -30,6 +33,30 @@ function ($scope, Network, ViewSpinner, Messages, errorMsgFilter) {
     } else {
       $scope.state.selectedItemCount--;
     }
+  };
+
+  function prepareNetworkConfiguration() {
+    var config = angular.copy($scope.config);
+    config.Driver = 'overlay';
+    return config;
+  }
+
+  $scope.createNetwork = function() {
+    ViewSpinner.spin();
+    var config = prepareNetworkConfiguration();
+    Network.create(config, function (d) {
+      if (d.Id) {
+        Messages.send("Network created", d.Id);
+        ViewSpinner.stop();
+        $state.go('networks', {}, {reload: true});
+      } else {
+        ViewSpinner.stop();
+        Messages.error('Unable to create network', errorMsgFilter(d));
+      }
+    }, function (e) {
+      ViewSpinner.stop();
+      Messages.error('Unable to create network', e.data);
+    });
   };
 
   $scope.removeAction = function () {

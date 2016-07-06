@@ -1,11 +1,15 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', 'Volume', 'ViewSpinner', 'Messages', 'errorMsgFilter',
-function ($scope, Volume, ViewSpinner, Messages, errorMsgFilter) {
+.controller('VolumesController', ['$scope', '$state', 'Volume', 'ViewSpinner', 'Messages', 'errorMsgFilter',
+function ($scope, $state, Volume, ViewSpinner, Messages, errorMsgFilter) {
   $scope.state = {};
   $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
-  $scope.sortType = 'Name';
+  $scope.sortType = 'Driver';
   $scope.sortReverse = true;
+
+  $scope.config = {
+    Name: ''
+  };
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
@@ -29,6 +33,32 @@ function ($scope, Volume, ViewSpinner, Messages, errorMsgFilter) {
     } else {
       $scope.state.selectedItemCount--;
     }
+  };
+
+  function prepareVolumeConfiguration() {
+    var config = angular.copy($scope.config);
+    config.Driver = 'local-persist';
+    config.DriverOpts = {};
+    config.DriverOpts.mountpoint = '/volume/' + config.Name;
+    return config;
+  }
+
+  $scope.createVolume = function() {
+    ViewSpinner.spin();
+    var config = prepareVolumeConfiguration();
+    Volume.create(config, function (d) {
+      if (d.Name) {
+        Messages.send("Volume created", d.Name);
+        ViewSpinner.stop();
+        $state.go('volumes', {}, {reload: true});
+      } else {
+        ViewSpinner.stop();
+        Messages.error('Unable to create volume', errorMsgFilter(d));
+      }
+    }, function (e) {
+      ViewSpinner.stop();
+      Messages.error('Unable to create volume', e.data);
+    });
   };
 
   $scope.removeAction = function () {
@@ -59,7 +89,7 @@ function ($scope, Volume, ViewSpinner, Messages, errorMsgFilter) {
   function fetchVolumes() {
     ViewSpinner.spin();
     Volume.query({}, function (d) {
-      $scope.volumes = d.Volumes;
+      $scope.volumes = _.uniqBy(d.Volumes, 'Name');
       ViewSpinner.stop();
     }, function (e) {
       Messages.error("Failure", e.data);

@@ -2,7 +2,7 @@ angular.module('images', [])
 .controller('ImagesController', ['$scope', '$state', 'Image', 'ViewSpinner', 'Messages',
 function ($scope, $state, Image, ViewSpinner, Messages) {
   $scope.state = {};
-  $scope.sortType = 'Created';
+  $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
   $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;

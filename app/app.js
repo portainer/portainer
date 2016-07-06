@@ -19,9 +19,7 @@ angular.module('uifordocker', [
   'swarm',
   'network',
   'networks',
-  'createNetwork',
-  'volumes',
-  'createVolume'])
+  'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function ($stateProvider, $urlRouterProvider, $httpProvider) {
     'use strict';
 

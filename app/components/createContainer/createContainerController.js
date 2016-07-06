@@ -24,12 +24,8 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
     }
   };
 
-  $scope.resetVolumePath = function(index) {
-    $scope.formValues.Volumes[index].name = '';
-  };
-
   $scope.addVolume = function() {
-    $scope.formValues.Volumes.push({ name: '', containerPath: '', readOnly: false, isPath: false });
+    $scope.formValues.Volumes.push({ name: '', containerPath: '' });
   };
 
   $scope.removeVolume = function(index) {
@@ -56,7 +52,12 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
     var swarm = c.swarm;
 
     Volume.query({}, function (d) {
-      $scope.availableVolumes = d.Volumes;
+      var persistedVolumes = d.Volumes.filter(function (volume) {
+        if (volume.Driver === 'local-persist') {
+          return volume;
+        }
+      });
+      $scope.availableVolumes = _.uniqBy(persistedVolumes, 'Name');
     }, function (e) {
       Messages.error("Failure", e.data);
     });
@@ -69,6 +70,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
             return network;
           }
         });
+        $scope.globalNetworkCount = networks.length;
         networks.push({Name: "bridge"});
         networks.push({Name: "host"});
         networks.push({Name: "none"});

@@ -268,7 +268,7 @@ module.exports = function (grunt) {
                 command: [
                     'docker stop ui-for-docker',
                     'docker rm ui-for-docker',
-                    'docker run --privileged -d -p 9000:9000 -v /tmp/docker-ui:/data --name ui-for-docker ui-for-docker -e http://10.0.7.10:4000 --swarm -d /data'
+                    'docker run --privileged -d -p 9000:9000 -v /tmp/docker-ui:/data --name ui-for-docker ui-for-docker -e http://10.0.7.11:4000 --swarm -d /data'
                 ].join(';')
             },
             cleanImages: {

@@ -7,6 +7,39 @@
   <rd-header-content>Networks</rd-header-content>
 </rd-header>
 
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plus" title="Add a shared network">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="network_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="config.Name" id="network_name" placeholder="e.g. myNetwork">
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">Note: The network will be created using the overlay driver and will allow containers to communicate across the hosts of your cluster.</span>
+            </div>
+          </div>
+          <!-- !tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-default btn-sm" ng-disabled="!config.Name" ng-click="createNetwork()">Create</button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
 <div class="col-lg-12">
   <rd-widget>
     <rd-widget-header icon="fa-sitemap" title="Networks">
@@ -14,7 +47,6 @@
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
         <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
-        <a class="btn btn-default" type="button" ui-sref="actions.create.network">Add network</a>
       </div>
       <div class="pull-right">
         <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
@@ -34,13 +66,6 @@
                 </a>
               </th>
               <th>
-                <a ui-sref="networks" ng-click="order('Id')">
-                  Id
-                  <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
                 <a ui-sref="networks" ng-click="order('Scope')">
                   Scope
                   <span ng-show="sortType == 'Scope' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -48,29 +73,15 @@
                 </a>
               </th>
               <th>
-                <a ui-sref="networks" ng-click="order('Driver')">
-                  Driver
-                  <span ng-show="sortType == 'Driver' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="networks" ng-click="order('IPAM.Driver')">
-                  IPAM Driver
-                  <span ng-show="sortType == 'IPAM.Driver' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'IPAM.Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
                 <a ui-sref="networks" ng-click="order('IPAM.Config[0].Subnet')">
-                  IPAM Subnet
+                  Subnet
                   <span ng-show="sortType == 'IPAM.Config[0].Subnet' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'IPAM.Config[0].Subnet' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
                 <a ui-sref="networks" ng-click="order('IPAM.Config[0].Gateway')">
-                  IPAM Gateway
+                  Gateway
                   <span ng-show="sortType == 'IPAM.Config[0].Gateway' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'IPAM.Config[0].Gateway' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
@@ -80,13 +91,10 @@
           <tbody>
             <tr ng-repeat="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse))">
               <td><input type="checkbox" ng-model="network.Checked" ng-change="selectItem(network)"/></td>
-              <td><a ui-sref="network({id: network.Id})">{{ network.Name|truncate:20}}</a></td>
-              <td>{{ network.Id }}</td>
+              <td><a ui-sref="network({id: network.Id})">{{ network.Name|truncate:40}}</a></td>
               <td>{{ network.Scope }}</td>
-              <td>{{ network.Driver }}</td>
-              <td>{{ network.IPAM.Driver }}</td>
-              <td>{{ network.IPAM.Config[0].Subnet }}</td>
-              <td>{{ network.IPAM.Config[0].Gateway }}</td>
+              <td>{{ network.IPAM.Config[0].Subnet ? network.IPAM.Config[0].Subnet : '-' }}</td>
+              <td>{{ network.IPAM.Config[0].Gateway ? network.IPAM.Config[0].Gateway : '-' }}</td>
             </tr>
           </tbody>
         </table>

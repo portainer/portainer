@@ -7,6 +7,39 @@
   <rd-header-content>Volumes</rd-header-content>
 </rd-header>
 
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plus" title="Add a persistent volume">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="volume_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="config.Name" id="volume_name" placeholder="e.g. mysql-data">
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">Note: The volume will be created in our persisted storage and will be available across all the hosts of your cluster.</span>
+            </div>
+          </div>
+          <!-- !tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-default btn-sm" ng-disabled="!config.Name" ng-click="createVolume()">Create</button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
 <div class="col-lg-12">
   <rd-widget>
     <rd-widget-header icon="fa-cubes" title="Volumes">
@@ -14,7 +47,6 @@
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
         <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount">Remove</button>
-        <a class="btn btn-default" type="button" ui-sref="actions.create.volume">Add volume</a>
       </div>
       <div class="pull-right">
         <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
@@ -40,21 +72,13 @@
                   <span ng-show="sortType == 'Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
-              <th>
-                <a ui-sref="volumes" ng-click="order('Mountpoint')">
-                  Mountpoint
-                  <span ng-show="sortType == 'Mountpoint' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Mountpoint' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse))">
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
-              <td>{{ volume.Name|truncate:20 }}</td>
+              <td>{{ volume.Name|truncate:50 }}</td>
               <td>{{ volume.Driver }}</td>
-              <td>{{ volume.Mountpoint }}</td>
             </tr>
           </tbody>
         </table>
