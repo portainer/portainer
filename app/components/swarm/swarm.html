@@ -55,10 +55,6 @@
               <td>{{ swarm.Nodes }}</td>
             </tr>
             <tr>
-              <td>Containers</td>
-              <td>{{ info.Containers }}</td>
-            </tr>
-            <tr>
               <td>Images</td>
               <td>{{ info.Images }}</td>
             </tr>
@@ -109,13 +105,6 @@
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('Containers')">
-                  Containers
-                  <span ng-show="sortType == 'Containers' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Containers' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
                 <a ui-sref="swarm" ng-click="order('Engine')">
                   Engine
                   <span ng-show="sortType == 'Engine' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -135,7 +124,6 @@
             <tr ng-repeat="node in (state.filteredNodes = (swarm.Status | filter:state.filter | orderBy:sortType:sortReverse))">
               <td>{{ node.name }}</td>
               <td>{{ node.ip }}</td>
-              <td>{{ node.containers }}</td>
               <td>{{ node.version }}</td>
               <td><span class="label label-{{ node.status|nodestatusbadge }}">{{ node.status }}</span></td>
             </tr>
