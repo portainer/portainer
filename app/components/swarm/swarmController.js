@@ -42,7 +42,7 @@ angular.module('swarm', [])
         var node_offset = 4;
         for (i = 0; i < node_count; i++) {
           extractNodeInfo(info, node_offset);
-          node_offset += 10;
+          node_offset += 9;
         }
       }
 
