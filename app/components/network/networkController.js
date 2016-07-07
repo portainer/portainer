@@ -1,37 +1,37 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', 'Network', 'ViewSpinner', 'Messages', '$state', '$stateParams', 'errorMsgFilter',
-function ($scope, Network, ViewSpinner, Messages, $state, $stateParams, errorMsgFilter) {
+.controller('NetworkController', ['$scope', 'Network', 'Messages', '$state', '$stateParams', 'errorMsgFilter',
+function ($scope, Network, Messages, $state, $stateParams, errorMsgFilter) {
 
   $scope.disconnect = function disconnect(networkId, containerId) {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Network.disconnect({id: $stateParams.id}, {Container: containerId}, function (d) {
-      ViewSpinner.stop();
+      $('#loadingViewSpinner').hide();
       Messages.send("Container disconnected", containerId);
       $state.go('network', {id: $stateParams.id}, {reload: true});
     }, function (e) {
-      ViewSpinner.stop();
+      $('#loadingViewSpinner').hide();
       Messages.error("Failure", e.data);
     });
   };
 
   $scope.remove = function remove(networkId) {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Network.remove({id: $stateParams.id}, function (d) {
-      ViewSpinner.stop();
+      $('#loadingViewSpinner').hide();
       Messages.send("Network removed", "");
       $state.go('networks', {});
     }, function (e) {
-      ViewSpinner.stop();
+      $('#loadingViewSpinner').hide();
       Messages.error("Failure", e.data);
     });
   };
 
-  ViewSpinner.spin();
+  $('#loadingViewSpinner').show();
   Network.get({id: $stateParams.id}, function (d) {
     $scope.network = d;
-    ViewSpinner.stop();
+    $('#loadingViewSpinner').hide();
   }, function (e) {
     Messages.error("Failure", e.data);
-    ViewSpinner.stop();
+    $('#loadingViewSpinner').hide();
   });
 }]);

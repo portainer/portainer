@@ -1,5 +1,7 @@
 <rd-header>
-  <rd-header-title title="Container logs"></rd-header-title>
+  <rd-header-title title="Container logs">
+      <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
   <rd-header-content>
     Containers > <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a> > Logs
   </rd-header-content>

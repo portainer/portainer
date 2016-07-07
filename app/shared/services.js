@@ -160,20 +160,6 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
           firstLoad: firstLoad
         };
     }])
-    .factory('ViewSpinner', function ViewSpinnerFactory() {
-        'use strict';
-        var spinner = new Spinner();
-        var target = document.getElementById('view');
-
-        return {
-            spin: function () {
-                spinner.spin(target);
-            },
-            stop: function () {
-                spinner.stop();
-            }
-        };
-    })
     .factory('Messages', ['$rootScope', '$sanitize', function MessagesFactory($rootScope, $sanitize) {
         'use strict';
         return {
