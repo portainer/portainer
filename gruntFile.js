@@ -69,7 +69,6 @@ module.exports = function (grunt) {
                 'bower_components/jquery/dist/jquery.min.js',
                 'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
                 'bower_components/bootstrap/dist/js/bootstrap.min.js',
-                'bower_components/spin.js/spin.js',
                 'bower_components/Chart.js/Chart.min.js',
                 'bower_components/lodash/dist/lodash.min.js',
                 'bower_components/oboe/dist/oboe-browser.js',

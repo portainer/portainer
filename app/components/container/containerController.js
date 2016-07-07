@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$stateParams', '$state', '$filter', 'Container', 'ContainerCommit', 'Image', 'Messages', 'ViewSpinner', '$timeout',
-function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Image, Messages, ViewSpinner, $timeout) {
+.controller('ContainerController', ['$scope', '$stateParams', '$state', '$filter', 'Container', 'ContainerCommit', 'Image', 'Messages', '$timeout',
+function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Image, Messages, $timeout) {
   $scope.changes = [];
   $scope.editEnv = false;
   $scope.editPorts = false;
@@ -11,7 +11,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
   };
 
   var update = function () {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Container.get({id: $stateParams.id}, function (d) {
       $scope.container = d;
       $scope.container.edit = false;
@@ -61,7 +61,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
         $scope.newCfg.Binds.push(bind);
       });
 
-      ViewSpinner.stop();
+      $('#loadingViewSpinner').hide();
     }, function (e) {
       if (e.status === 404) {
         $('.detail').hide();
@@ -69,13 +69,13 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
       } else {
         Messages.error("Failure", e.data);
       }
-      ViewSpinner.stop();
+      $('#loadingViewSpinner').hide();
     });
 
   };
 
   $scope.start = function () {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Container.start({
       id: $scope.container.Id,
       HostConfig: $scope.container.HostConfig
@@ -89,7 +89,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.stop = function () {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Container.stop({id: $stateParams.id}, function (d) {
       update();
       Messages.send("Container stopped", $stateParams.id);
@@ -100,7 +100,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.kill = function () {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Container.kill({id: $stateParams.id}, function (d) {
       update();
       Messages.send("Container killed", $stateParams.id);
@@ -111,7 +111,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.commit = function () {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     ContainerCommit.commit({id: $stateParams.id, repo: $scope.container.Config.Image}, function (d) {
       update();
       Messages.send("Container commited", $stateParams.id);
@@ -121,7 +121,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
     });
   };
   $scope.pause = function () {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Container.pause({id: $stateParams.id}, function (d) {
       update();
       Messages.send("Container paused", $stateParams.id);
@@ -132,7 +132,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.unpause = function () {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Container.unpause({id: $stateParams.id}, function (d) {
       update();
       Messages.send("Container unpaused", $stateParams.id);
@@ -143,7 +143,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.remove = function () {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Container.remove({id: $stateParams.id}, function (d) {
       update();
       $state.go('containers', {}, {reload: true});
@@ -155,7 +155,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.restart = function () {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Container.restart({id: $stateParams.id}, function (d) {
       update();
       Messages.send("Container restarted", $stateParams.id);
@@ -170,10 +170,10 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.getChanges = function () {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     Container.changes({id: $stateParams.id}, function (d) {
       $scope.changes = d;
-      ViewSpinner.stop();
+      $('#loadingViewSpinner').hide();
     });
   };
 

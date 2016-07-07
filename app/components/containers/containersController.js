@@ -1,6 +1,6 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'ViewSpinner', 'Config', 'errorMsgFilter',
-function ($scope, Container, Settings, Messages, ViewSpinner, Config, errorMsgFilter) {
+.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'Config', 'errorMsgFilter',
+function ($scope, Container, Settings, Messages, Config, errorMsgFilter) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
@@ -14,7 +14,7 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config, errorMsgFi
   };
 
   var update = function (data) {
-    ViewSpinner.spin();
+    $('#loadContainersSpinner').show();
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
@@ -24,17 +24,17 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config, errorMsgFi
       $scope.containers = containers.map(function (container) {
         return new ContainerViewModel(container);
       });
-      ViewSpinner.stop();
+      $('#loadContainersSpinner').hide();
     });
   };
 
   var batch = function (items, action, msg) {
-    ViewSpinner.spin();
+    $('#loadContainersSpinner').show();
     var counter = 0;
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        ViewSpinner.stop();
+        $('#loadContainersSpinner').hide();
         update({all: Settings.displayAll ? 1 : 0});
       }
     };
@@ -89,7 +89,7 @@ function ($scope, Container, Settings, Messages, ViewSpinner, Config, errorMsgFi
       }
     });
     if (counter === 0) {
-      ViewSpinner.stop();
+      $('#loadContainersSpinner').hide();
     }
   };
 

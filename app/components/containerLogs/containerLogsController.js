@@ -1,6 +1,6 @@
 angular.module('containerLogs', [])
-.controller('ContainerLogsController', ['$scope', '$stateParams', '$anchorScroll', 'ContainerLogs', 'Container', 'ViewSpinner',
-function ($scope, $stateParams, $anchorScroll, ContainerLogs, Container, ViewSpinner) {
+.controller('ContainerLogsController', ['$scope', '$stateParams', '$anchorScroll', 'ContainerLogs', 'Container',
+function ($scope, $stateParams, $anchorScroll, ContainerLogs, Container) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
@@ -8,24 +8,24 @@ function ($scope, $stateParams, $anchorScroll, ContainerLogs, Container, ViewSpi
   $scope.stderr = '';
   $scope.tailLines = 2000;
 
-  ViewSpinner.spin();
+  $('#loadingViewSpinner').show();
   Container.get({id: $stateParams.id}, function (d) {
     $scope.container = d;
-    ViewSpinner.stop();
+    $('#loadingViewSpinner').hide();
   }, function (e) {
     if (e.status === 404) {
       Messages.error("Not found", "Container not found.");
     } else {
       Messages.error("Failure", e.data);
     }
-    ViewSpinner.stop();
+    $('#loadingViewSpinner').hide();
   });
 
   function getLogs() {
-    ViewSpinner.spin();
+    $('#loadingViewSpinner').show();
     getLogsStdout();
     getLogsStderr();
-    ViewSpinner.stop();
+    $('#loadingViewSpinner').hide();
   }
 
   function getLogsStderr() {

@@ -1,6 +1,6 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', 'Volume', 'ViewSpinner', 'Messages', 'errorMsgFilter',
-function ($scope, Volume, ViewSpinner, Messages, errorMsgFilter) {
+.controller('VolumesController', ['$scope', 'Volume', 'Messages', 'errorMsgFilter',
+function ($scope, Volume, Messages, errorMsgFilter) {
   $scope.state = {};
   $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
@@ -32,12 +32,12 @@ function ($scope, Volume, ViewSpinner, Messages, errorMsgFilter) {
   };
 
   $scope.removeAction = function () {
-    ViewSpinner.spin();
+    $('#loadVolumesSpinner').show();
     var counter = 0;
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        ViewSpinner.stop();
+        $('#loadVolumesSpinner').hide();
       }
     };
     angular.forEach($scope.volumes, function (volume) {
@@ -57,13 +57,13 @@ function ($scope, Volume, ViewSpinner, Messages, errorMsgFilter) {
   };
 
   function fetchVolumes() {
-    ViewSpinner.spin();
+    $('#loadVolumesSpinner').show();
     Volume.query({}, function (d) {
       $scope.volumes = d.Volumes;
-      ViewSpinner.stop();
+      $('#loadVolumesSpinner').hide();
     }, function (e) {
       Messages.error("Failure", e.data);
-      ViewSpinner.stop();
+      $('#loadVolumesSpinner').hide();
     });
   }
   fetchVolumes();

@@ -1,6 +1,6 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', 'Network', 'ViewSpinner', 'Messages', 'errorMsgFilter',
-function ($scope, Network, ViewSpinner, Messages, errorMsgFilter) {
+.controller('NetworksController', ['$scope', 'Network', 'Messages', 'errorMsgFilter',
+function ($scope, Network, Messages, errorMsgFilter) {
 
   $scope.state = {};
   $scope.state.toggle = false;
@@ -33,12 +33,12 @@ function ($scope, Network, ViewSpinner, Messages, errorMsgFilter) {
   };
 
   $scope.removeAction = function () {
-    ViewSpinner.spin();
+    $('#loadNetworksSpinner').show();
     var counter = 0;
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        ViewSpinner.stop();
+        $('#loadNetworksSpinner').hide();
       }
     };
     angular.forEach($scope.networks, function (network) {
@@ -58,13 +58,13 @@ function ($scope, Network, ViewSpinner, Messages, errorMsgFilter) {
   };
 
   function fetchNetworks() {
-    ViewSpinner.spin();
+    $('#loadNetworksSpinner').show();
     Network.query({}, function (d) {
       $scope.networks = d;
-      ViewSpinner.stop();
+      $('#loadNetworksSpinner').hide();
     }, function (e) {
       Messages.error("Failure", e.data);
-      ViewSpinner.stop();
+      $('#loadNetworksSpinner').hide();
     });
   }
   fetchNetworks();
