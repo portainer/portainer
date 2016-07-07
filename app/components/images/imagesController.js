@@ -8,7 +8,8 @@ function ($scope, $state, Image, Messages) {
   $scope.state.selectedItemCount = 0;
 
   $scope.config = {
-    Image: ''
+    Image: '',
+    Registry: '',
   };
 
   $scope.order = function(sortType) {
@@ -35,10 +36,14 @@ function ($scope, $state, Image, Messages) {
     }
   };
 
-  function createImageConfig(imageName) {
+  function createImageConfig(imageName, registry) {
     var imageNameAndTag = imageName.split(':');
+    var image = imageNameAndTag[0];
+    if (registry) {
+      image = registry + '/' + imageNameAndTag[0];
+    }
     var imageConfig = {
-      fromImage: imageNameAndTag[0],
+      fromImage: image,
       tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
     };
     return imageConfig;
@@ -47,7 +52,8 @@ function ($scope, $state, Image, Messages) {
   $scope.pullImage = function() {
     $('#pullImageSpinner').show();
     var image = _.toLower($scope.config.Image);
-    var imageConfig = createImageConfig(image);
+    var registry = _.toLower($scope.config.Registry);
+    var imageConfig = createImageConfig(image, registry);
     Image.create(imageConfig, function (data) {
         var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
         if (err) {
