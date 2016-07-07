@@ -153,7 +153,7 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
         }
         var firstLoad = (localStorage.getItem('firstLoad') || 'true') === 'true';
         return {
-          displayAll: false,
+          displayAll: true,
           endpoint: DOCKER_ENDPOINT,
           uiVersion: UI_VERSION,
           url: url,
