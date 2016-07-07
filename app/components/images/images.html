@@ -33,6 +33,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-default btn-sm" ng-disabled="!config.Image" ng-click="pullImage()">Pull</button>
+              <i id="pullImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
         </form>
@@ -45,6 +46,9 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-clone" title="Images">
+        <div class="pull-right">
+          <i id="loadImagesSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+        </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12">
         <div class="pull-left">

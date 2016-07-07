@@ -1,6 +1,6 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', '$state', 'Volume', 'ViewSpinner', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Volume, ViewSpinner, Messages, errorMsgFilter) {
+.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'errorMsgFilter',
+function ($scope, $state, Volume, Messages, errorMsgFilter) {
   $scope.state = {};
   $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
@@ -44,30 +44,30 @@ function ($scope, $state, Volume, ViewSpinner, Messages, errorMsgFilter) {
   }
 
   $scope.createVolume = function() {
-    ViewSpinner.spin();
+    $('#createVolumeSpinner').show();
     var config = prepareVolumeConfiguration();
     Volume.create(config, function (d) {
       if (d.Name) {
         Messages.send("Volume created", d.Name);
-        ViewSpinner.stop();
+        $('#createVolumeSpinner').hide();
         $state.go('volumes', {}, {reload: true});
       } else {
-        ViewSpinner.stop();
+        $('#createVolumeSpinner').hide();
         Messages.error('Unable to create volume', errorMsgFilter(d));
       }
     }, function (e) {
-      ViewSpinner.stop();
+      $('#createVolumeSpinner').hide();
       Messages.error('Unable to create volume', e.data);
     });
   };
 
   $scope.removeAction = function () {
-    ViewSpinner.spin();
+    $('#loadVolumesSpinner').show();
     var counter = 0;
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        ViewSpinner.stop();
+        $('#loadVolumesSpinner').hide();
       }
     };
     angular.forEach($scope.volumes, function (volume) {
@@ -87,13 +87,13 @@ function ($scope, $state, Volume, ViewSpinner, Messages, errorMsgFilter) {
   };
 
   function fetchVolumes() {
-    ViewSpinner.spin();
+    $('#loadVolumesSpinner').show();
     Volume.query({}, function (d) {
       $scope.volumes = _.uniqBy(d.Volumes, 'Name');
-      ViewSpinner.stop();
+      $('#loadVolumesSpinner').hide();
     }, function (e) {
       Messages.error("Failure", e.data);
-      ViewSpinner.stop();
+      $('#loadVolumesSpinner').hide();
     });
   }
   fetchVolumes();

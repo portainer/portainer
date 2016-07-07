@@ -1,6 +1,6 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Messages', 'ViewSpinner', 'errorMsgFilter',
-function ($scope, $state, Config, Container, Image, Volume, Network, Messages, ViewSpinner, errorMsgFilter) {
+.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Messages', 'errorMsgFilter',
+function ($scope, $state, Config, Container, Image, Volume, Network, Messages, errorMsgFilter) {
 
   $scope.state = {
     alwaysPull: true
@@ -82,25 +82,25 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
   });
 
   function createContainer(config) {
-    ViewSpinner.spin();
+    $('#createContainerSpinner').show();
     Container.create(config, function (d) {
       if (d.Id) {
         var reqBody = config.HostConfig || {};
         reqBody.id = d.Id;
         Container.start(reqBody, function (cd) {
-          ViewSpinner.stop();
+          $('#createContainerSpinner').hide();
           Messages.send('Container Started', d.Id);
           $state.go('containers', {}, {reload: true});
         }, function (e) {
-          ViewSpinner.stop();
+          $('#createContainerSpinner').hide();
           Messages.error('Error', errorMsgFilter(e));
         });
       } else {
-        ViewSpinner.stop();
+        $('#createContainerSpinner').hide();
         Messages.error('Error', errorMsgFilter(d));
       }
     }, function (e) {
-      ViewSpinner.stop();
+      $('#createContainerSpinner').hide();
       Messages.error('Error', errorMsgFilter(e));
     });
   }
@@ -115,7 +115,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
   }
 
   function pullImageAndCreateContainer(config) {
-    ViewSpinner.spin();
+    $('#createContainerSpinner').show();
 
     var image = _.toLower(config.Image);
     var imageConfig = createImageConfig(image);
@@ -124,13 +124,13 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
         var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
         if (err) {
           var detail = data[data.length - 1];
-          ViewSpinner.stop();
+          $('#createContainerSpinner').hide();
           Messages.error('Error', detail.error);
         } else {
           createContainer(config);
         }
     }, function (e) {
-      ViewSpinner.stop();
+      $('#createContainerSpinner').hide();
       Messages.error('Error', 'Unable to pull image ' + image);
     });
   }

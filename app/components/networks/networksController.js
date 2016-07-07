@@ -1,6 +1,6 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'ViewSpinner', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Network, ViewSpinner, Messages, errorMsgFilter) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Messages', 'errorMsgFilter',
+function ($scope, $state, Network, Messages, errorMsgFilter) {
   $scope.state = {};
   $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
@@ -42,30 +42,30 @@ function ($scope, $state, Network, ViewSpinner, Messages, errorMsgFilter) {
   }
 
   $scope.createNetwork = function() {
-    ViewSpinner.spin();
+    $('#createNetworkSpinner').show();
     var config = prepareNetworkConfiguration();
     Network.create(config, function (d) {
       if (d.Id) {
         Messages.send("Network created", d.Id);
-        ViewSpinner.stop();
+        $('#createNetworkSpinner').hide();
         $state.go('networks', {}, {reload: true});
       } else {
-        ViewSpinner.stop();
+        $('#createNetworkSpinner').hide();
         Messages.error('Unable to create network', errorMsgFilter(d));
       }
     }, function (e) {
-      ViewSpinner.stop();
+      $('#createNetworkSpinner').hide();
       Messages.error('Unable to create network', e.data);
     });
   };
 
   $scope.removeAction = function () {
-    ViewSpinner.spin();
+    $('#loadNetworksSpinner').show();
     var counter = 0;
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        ViewSpinner.stop();
+        $('#loadNetworksSpinner').hide();
       }
     };
     angular.forEach($scope.networks, function (network) {
@@ -85,13 +85,13 @@ function ($scope, $state, Network, ViewSpinner, Messages, errorMsgFilter) {
   };
 
   function fetchNetworks() {
-    ViewSpinner.spin();
+    $('#loadNetworksSpinner').show();
     Network.query({}, function (d) {
       $scope.networks = d;
-      ViewSpinner.stop();
+      $('#loadNetworksSpinner').hide();
     }, function (e) {
       Messages.error("Failure", e.data);
-      ViewSpinner.stop();
+      $('#loadNetworksSpinner').hide();
     });
   }
   fetchNetworks();

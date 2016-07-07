@@ -1,6 +1,6 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Image', 'ViewSpinner', 'Messages',
-function ($scope, $state, Image, ViewSpinner, Messages) {
+.controller('ImagesController', ['$scope', '$state', 'Image', 'Messages',
+function ($scope, $state, Image, Messages) {
   $scope.state = {};
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
@@ -45,32 +45,32 @@ function ($scope, $state, Image, ViewSpinner, Messages) {
   }
 
   $scope.pullImage = function() {
-    ViewSpinner.spin();
+    $('#pullImageSpinner').show();
     var image = _.toLower($scope.config.Image);
     var imageConfig = createImageConfig(image);
     Image.create(imageConfig, function (data) {
         var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
         if (err) {
           var detail = data[data.length - 1];
-          ViewSpinner.stop();
+          $('#pullImageSpinner').hide();
           Messages.error('Error', detail.error);
         } else {
-          ViewSpinner.stop();
+          $('#pullImageSpinner').hide();
           $state.go('images', {}, {reload: true});
         }
     }, function (e) {
-      ViewSpinner.stop();
+      $('#pullImageSpinner').hide();
       Messages.error('Error', 'Unable to pull image ' + image);
     });
   };
 
   $scope.removeAction = function () {
-    ViewSpinner.spin();
+    $('#loadImagesSpinner').show();
     var counter = 0;
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        ViewSpinner.stop();
+        $('#loadImagesSpinner').hide();
       }
     };
     angular.forEach($scope.images, function (i) {
@@ -85,6 +85,7 @@ function ($scope, $state, Image, ViewSpinner, Messages) {
           complete();
         }, function (e) {
           Messages.error("Failure", e.data);
+          $('#loadImagesSpinner').hide();
           complete();
         });
       }
@@ -92,15 +93,14 @@ function ($scope, $state, Image, ViewSpinner, Messages) {
   };
 
   function fetchImages() {
-    ViewSpinner.spin();
     Image.query({}, function (d) {
       $scope.images = d.map(function (item) {
         return new ImageViewModel(item);
       });
-      ViewSpinner.stop();
+      $('#loadImagesSpinner').hide();
     }, function (e) {
       Messages.error("Failure", e.data);
-      ViewSpinner.stop();
+      $('#loadImagesSpinner').hide();
     });
   }
 
