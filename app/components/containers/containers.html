@@ -28,7 +28,7 @@
         <a class="btn btn-default" type="button" ui-sref="actions.create.container">Add container</a>
       </div>
       <div class="pull-right">
-        <input type="checkbox" ng-model="state.displayAll" id="displayAll" ng-change="toggleGetAll()"/><label for="displayAll">Display All</label>
+        <input type="checkbox" ng-model="state.displayAll" id="displayAll" ng-change="toggleGetAll()" style="margin-top: -2px; margin-right: 5px;"/><label for="displayAll">Show all containers</label>
         <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
       </div>
     </rd-widget-taskbar>
