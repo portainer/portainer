@@ -4,11 +4,20 @@ function ($scope, $state, Network, Messages, errorMsgFilter) {
   $scope.state = {};
   $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
+  $scope.state.advancedSettings = false;
   $scope.sortType = 'Scope';
   $scope.sortReverse = false;
 
+  $scope.formValues = {
+    Subnet: '',
+    Gateway: ''
+  };
+
   $scope.config = {
-    Name: ''
+    Name: '',
+    IPAM: {
+      Config: []
+    }
   };
 
   $scope.order = function(sortType) {
@@ -35,8 +44,20 @@ function ($scope, $state, Network, Messages, errorMsgFilter) {
     }
   };
 
+  function prepareIPAMConfiguration(config) {
+    if ($scope.formValues.Subnet) {
+      var ipamConfig = {};
+      ipamConfig.Subnet = $scope.formValues.Subnet;
+      if ($scope.formValues.Gateway) {
+        ipamConfig.Gateway = $scope.formValues.Gateway  ;
+      }
+      config.IPAM.Config.push(ipamConfig);
+    }
+  }
+
   function prepareNetworkConfiguration() {
     var config = angular.copy($scope.config);
+    prepareIPAMConfiguration(config);
     config.Driver = 'overlay';
     return config;
   }
