@@ -10,7 +10,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     Console: 'none',
     Volumes: [],
     AvailableRegistries: [],
-    Registry: '',
+    Registry: ''
   };
 
   $scope.imageConfig = {};
