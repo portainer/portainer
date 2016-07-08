@@ -18,6 +18,18 @@
             </div>
           </div>
           <!-- !name-input -->
+          <!-- subnet-gateway-inputs -->
+          <div class="form-group">
+            <label for="network_subnet" class="col-sm-1 control-label text-left">Subnet</label>
+            <div class="col-sm-5">
+              <input type="text" class="form-control" ng-model="formValues.Subnet" id="network_subnet" placeholder="e.g. 172.20.0.0/16">
+            </div>
+            <label for="network_gateway" class="col-sm-1 control-label text-left">Gateway</label>
+            <div class="col-sm-5">
+              <input type="text" class="form-control" ng-model="formValues.Gateway" id="network_gateway" placeholder="e.g. 172.20.10.11">
+            </div>
+          </div>
+          <!-- !subnet-gateway-inputs -->
           <!-- driver-input -->
           <div class="form-group">
             <label for="network_driver" class="col-sm-1 control-label text-left">Driver</label>
