@@ -8,7 +8,8 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
 
   $scope.formValues = {
     Console: 'none',
-    Volumes: []
+    Volumes: [],
+    Registry: ''
   };
 
   $scope.config = {
@@ -103,10 +104,14 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     });
   }
 
-  function createImageConfig(imageName) {
+  function createImageConfig(imageName, registry) {
     var imageNameAndTag = imageName.split(':');
+    var image = imageNameAndTag[0];
+    if (registry) {
+      image = registry + '/' + imageNameAndTag[0];
+    }
     var imageConfig = {
-      fromImage: imageNameAndTag[0],
+      fromImage: image,
       tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
     };
     return imageConfig;
@@ -116,7 +121,9 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     $('#createContainerSpinner').show();
 
     var image = _.toLower(config.Image);
-    var imageConfig = createImageConfig(image);
+    var registry = _.toLower($scope.formValues.Registry);
+    var imageConfig = createImageConfig(image, registry);
+    config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
 
     Image.create(imageConfig, function (data) {
         var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
