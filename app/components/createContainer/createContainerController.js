@@ -12,6 +12,8 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     Registry: ''
   };
 
+  $scope.imageConfig = {};
+
   $scope.config = {
     Env: [],
     HostConfig: {
@@ -104,6 +106,23 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     });
   }
 
+  function pullImageAndCreateContainer(config) {
+    $('#createContainerSpinner').show();
+    Image.create($scope.imageConfig, function (data) {
+        var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
+        if (err) {
+          var detail = data[data.length - 1];
+          $('#createContainerSpinner').hide();
+          Messages.error('Error', detail.error);
+        } else {
+          createContainer(config);
+        }
+    }, function (e) {
+      $('#createContainerSpinner').hide();
+      Messages.error('Error', 'Unable to pull image ' + image);
+    });
+  }
+
   function createImageConfig(imageName, registry) {
     var imageNameAndTag = imageName.split(':');
     var image = imageNameAndTag[0];
@@ -117,27 +136,12 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     return imageConfig;
   }
 
-  function pullImageAndCreateContainer(config) {
-    $('#createContainerSpinner').show();
-
+  function prepareImageConfig(config) {
     var image = _.toLower(config.Image);
-    var registry = _.toLower($scope.formValues.Registry);
+    var registry = $scope.formValues.Registry;
     var imageConfig = createImageConfig(image, registry);
     config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
-
-    Image.create(imageConfig, function (data) {
-        var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
-        if (err) {
-          var detail = data[data.length - 1];
-          $('#createContainerSpinner').hide();
-          Messages.error('Error', detail.error);
-        } else {
-          createContainer(config);
-        }
-    }, function (e) {
-      $('#createContainerSpinner').hide();
-      Messages.error('Error', 'Unable to pull image ' + image);
-    });
+    $scope.imageConfig = imageConfig;
   }
 
   function preparePortBindings(config) {
@@ -199,6 +203,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
 
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
+    prepareImageConfig(config);
     preparePortBindings(config);
     prepareConsole(config);
     prepareEnvironmentVariables(config);
