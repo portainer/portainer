@@ -18,11 +18,15 @@
             </div>
           </div>
           <!-- !name-input -->
-          <!-- image input -->
+          <!-- image-and-registry-inputs -->
           <div class="form-group">
-            <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="config.Image" id="container_image" placeholder="ubuntu:trusty">
+            <label for="container_image" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-7">
+              <input type="text" class="form-control" ng-model="config.Image" id="container_image" placeholder="e.g. ubuntu:trusty">
+            </div>
+            <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
+            <div class="col-sm-3">
+              <input type="text" class="form-control" ng-model="formValues.Registry" id="image_registry" placeholder="leave empty to use DockerHub">
             </div>
             <div class="col-sm-offset-1 col-sm-11">
               <div class="checkbox">
@@ -32,7 +36,7 @@
               </div>
             </div>
           </div>
-          <!-- !image-input -->
+          <!-- !image-and-registry-inputs -->
           <!-- restart-policy -->
           <div class="form-group">
             <label class="col-sm-1 control-label text-left">Restart policy</label>
@@ -306,6 +310,9 @@
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12" style="text-align: center;">
+    <div>
+      <i id="createContainerSpinner" class="fa fa-cog fa-3x fa-spin" style="margin-bottom: 5px; display: none;"></i>
+    </div>
     <button type="button" class="btn btn-default btn-lg" ng-click="create()">Create</button>
     <a type="button" class="btn btn-default btn-lg" ui-sref="containers">Cancel</a>
   </div>

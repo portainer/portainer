@@ -10,6 +10,9 @@
 <div class="col-lg-12">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title="Containers">
+      <div class="pull-right">
+        <i id="loadContainersSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+      </div>
     </rd-widget-header>
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
@@ -25,7 +28,7 @@
         <a class="btn btn-default" type="button" ui-sref="actions.create.container">Add container</a>
       </div>
       <div class="pull-right">
-        <input type="checkbox" ng-model="state.displayAll" id="displayAll" ng-change="toggleGetAll()"/><label for="displayAll">Display All</label>
+        <input type="checkbox" ng-model="state.displayAll" id="displayAll" ng-change="toggleGetAll()" style="margin-top: -2px; margin-right: 5px;"/><label for="displayAll">Show all containers</label>
         <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
       </div>
     </rd-widget-taskbar>

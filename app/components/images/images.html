@@ -4,7 +4,6 @@
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-
   <rd-header-content>Images</rd-header-content>
 </rd-header>
 
@@ -15,14 +14,18 @@
       </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
-          <!-- name-input -->
+          <!-- name-and-registry-inputs -->
           <div class="form-group">
             <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11">
+            <div class="col-sm-7">
               <input type="text" class="form-control" ng-model="config.Image" id="image_name" placeholder="e.g. ubuntu:trusty">
             </div>
+            <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
+            <div class="col-sm-3">
+              <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="leave empty to use DockerHub">
+            </div>
           </div>
-          <!-- !name-input -->
+          <!-- !name-and-registry-inputs -->
           <!-- tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
@@ -33,6 +36,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-default btn-sm" ng-disabled="!config.Image" ng-click="pullImage()">Pull</button>
+              <i id="pullImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
         </form>
@@ -45,6 +49,9 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-clone" title="Images">
+        <div class="pull-right">
+          <i id="loadImagesSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+        </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12">
         <div class="pull-left">

@@ -153,27 +153,13 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
         }
         var firstLoad = (localStorage.getItem('firstLoad') || 'true') === 'true';
         return {
-          displayAll: false,
+          displayAll: true,
           endpoint: DOCKER_ENDPOINT,
           uiVersion: UI_VERSION,
           url: url,
           firstLoad: firstLoad
         };
     }])
-    .factory('ViewSpinner', function ViewSpinnerFactory() {
-        'use strict';
-        var spinner = new Spinner();
-        var target = document.getElementById('view');
-
-        return {
-            spin: function () {
-                spinner.spin(target);
-            },
-            stop: function () {
-                spinner.stop();
-            }
-        };
-    })
     .factory('Messages', ['$rootScope', '$sanitize', function MessagesFactory($rootScope, $sanitize) {
         'use strict';
         return {

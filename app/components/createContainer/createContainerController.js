@@ -1,6 +1,6 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Messages', 'ViewSpinner', 'errorMsgFilter',
-function ($scope, $state, Config, Container, Image, Volume, Network, Messages, ViewSpinner, errorMsgFilter) {
+.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Messages', 'errorMsgFilter',
+function ($scope, $state, Config, Container, Image, Volume, Network, Messages, errorMsgFilter) {
 
   $scope.state = {
     alwaysPull: true
@@ -8,8 +8,11 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
 
   $scope.formValues = {
     Console: 'none',
-    Volumes: []
+    Volumes: [],
+    Registry: ''
   };
+
+  $scope.imageConfig = {};
 
   $scope.config = {
     Env: [],
@@ -80,57 +83,65 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
   });
 
   function createContainer(config) {
-    ViewSpinner.spin();
+    $('#createContainerSpinner').show();
     Container.create(config, function (d) {
       if (d.Id) {
         var reqBody = config.HostConfig || {};
         reqBody.id = d.Id;
         Container.start(reqBody, function (cd) {
-          ViewSpinner.stop();
+          $('#createContainerSpinner').hide();
           Messages.send('Container Started', d.Id);
           $state.go('containers', {}, {reload: true});
         }, function (e) {
-          ViewSpinner.stop();
+          $('#createContainerSpinner').hide();
           Messages.error('Error', errorMsgFilter(e));
         });
       } else {
-        ViewSpinner.stop();
+        $('#createContainerSpinner').hide();
         Messages.error('Error', errorMsgFilter(d));
       }
     }, function (e) {
-      ViewSpinner.stop();
+      $('#createContainerSpinner').hide();
       Messages.error('Error', errorMsgFilter(e));
     });
   }
 
-  function createImageConfig(imageName) {
-    var imageNameAndTag = imageName.split(':');
-    var imageConfig = {
-      fromImage: imageNameAndTag[0],
-      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
-    };
-    return imageConfig;
-  }
-
   function pullImageAndCreateContainer(config) {
-    ViewSpinner.spin();
-
-    var image = _.toLower(config.Image);
-    var imageConfig = createImageConfig(image);
-
-    Image.create(imageConfig, function (data) {
+    $('#createContainerSpinner').show();
+    Image.create($scope.imageConfig, function (data) {
         var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
         if (err) {
           var detail = data[data.length - 1];
-          ViewSpinner.stop();
+          $('#createContainerSpinner').hide();
           Messages.error('Error', detail.error);
         } else {
           createContainer(config);
         }
     }, function (e) {
-      ViewSpinner.stop();
+      $('#createContainerSpinner').hide();
       Messages.error('Error', 'Unable to pull image ' + image);
     });
+  }
+
+  function createImageConfig(imageName, registry) {
+    var imageNameAndTag = imageName.split(':');
+    var image = imageNameAndTag[0];
+    if (registry) {
+      image = registry + '/' + imageNameAndTag[0];
+    }
+    var imageConfig = {
+      fromImage: image,
+      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
+    };
+    return imageConfig;
+  }
+
+  function prepareImageConfig(config) {
+    var image = _.toLower(config.Image);
+    var registry = $scope.formValues.Registry;
+    var imageConfig = createImageConfig(image, registry);
+    config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
+    $scope.imageConfig = imageConfig;
   }
 
   function preparePortBindings(config) {
@@ -192,6 +203,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, V
 
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
+    prepareImageConfig(config);
     preparePortBindings(config);
     prepareConsole(config);
     prepareEnvironmentVariables(config);
