@@ -9,7 +9,7 @@ function ($scope, $state, Image, Messages) {
 
   $scope.config = {
     Image: '',
-    Registry: '',
+    Registry: ''
   };
 
   $scope.order = function(sortType) {
