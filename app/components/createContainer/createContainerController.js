@@ -8,9 +8,12 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
 
   $scope.formValues = {
     Console: 'none',
-    Volumes: []
+    Volumes: [],
+    AvailableRegistries: [],
+    Registry: '',
   };
 
+  $scope.imageConfig = {};
   $scope.config = {
     Env: [],
     HostConfig: {
@@ -50,6 +53,8 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
 
   Config.$promise.then(function (c) {
     var swarm = c.swarm;
+
+    $scope.formValues.AvailableRegistries = c.registries;
 
     Volume.query({}, function (d) {
       var persistedVolumes = d.Volumes.filter(function (volume) {
@@ -105,22 +110,9 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     });
   }
 
-  function createImageConfig(imageName) {
-    var imageNameAndTag = imageName.split(':');
-    var imageConfig = {
-      fromImage: imageNameAndTag[0],
-      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
-    };
-    return imageConfig;
-  }
-
   function pullImageAndCreateContainer(config) {
     $('#createContainerSpinner').show();
-
-    var image = _.toLower(config.Image);
-    var imageConfig = createImageConfig(image);
-
-    Image.create(imageConfig, function (data) {
+    Image.create($scope.imageConfig, function (data) {
         var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
         if (err) {
           var detail = data[data.length - 1];
@@ -133,6 +125,28 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
       $('#createContainerSpinner').hide();
       Messages.error('Error', 'Unable to pull image ' + image);
     });
+  }
+
+  function createImageConfig(imageName, registry) {
+    var imageNameAndTag = imageName.split(':');
+    var image = imageNameAndTag[0];
+    if (registry) {
+      image = registry + '/' + imageNameAndTag[0];
+    }
+    var imageConfig = {
+      fromImage: image,
+      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
+    };
+    return imageConfig;
+  }
+
+  function prepareImageConfig(config) {
+    var image = _.toLower(config.Image);
+    var registry = $scope.formValues.Registry;
+    var imageConfig = createImageConfig(image, registry);
+    console.log(JSON.stringify(imageConfig, null, 4));
+    config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
+    $scope.imageConfig = imageConfig;
   }
 
   function preparePortBindings(config) {
@@ -194,6 +208,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
 
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
+    prepareImageConfig(config);
     preparePortBindings(config);
     prepareConsole(config);
     prepareEnvironmentVariables(config);

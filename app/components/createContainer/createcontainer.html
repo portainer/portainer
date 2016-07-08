@@ -18,11 +18,18 @@
             </div>
           </div>
           <!-- !name-input -->
-          <!-- image input -->
+          <!-- image-and-registry-inputs -->
           <div class="form-group">
             <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="config.Image" id="container_image" placeholder="ubuntu:trusty">
+            <div class="col-sm-7">
+              <input type="text" class="form-control" ng-model="config.Image" id="container_image" placeholder="e.g. ubuntu:trusty">
+            </div>
+            <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
+            <div class="col-sm-3">
+              <select class="selectpicker form-control" ng-model="formValues.Registry">
+                <option value="">Docker Hub</option>
+                <option ng-repeat="registry in formValues.AvailableRegistries" ng-value="registry.value">{{ registry.name }}</option>
+              </select>
             </div>
             <div class="col-sm-offset-1 col-sm-11">
               <div class="checkbox">
@@ -32,7 +39,7 @@
               </div>
             </div>
           </div>
-          <!-- !image-input -->
+          <!-- !image-and-registry-inputs -->
           <!-- restart-policy -->
           <div class="form-group">
             <label class="col-sm-1 control-label text-left">Restart policy</label>

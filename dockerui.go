@@ -18,12 +18,13 @@ import (
 )
 
 var (
-	endpoint = kingpin.Flag("endpoint", "Dockerd endpoint").Default("/var/run/docker.sock").Short('e').String()
-	addr 		 = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
-	assets   = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
-	data		 = kingpin.Flag("data", "Path to the data").Default(".").Short('d').String()
-	swarm	   = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
-	labels   = LabelParser(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
+	endpoint   = kingpin.Flag("endpoint", "Dockerd endpoint").Default("/var/run/docker.sock").Short('e').String()
+	addr 		   = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
+	assets     = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
+	data		   = kingpin.Flag("data", "Path to the data").Default(".").Short('d').String()
+	swarm	     = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
+	labels     = LabelParser(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
+	registries = LabelParser(kingpin.Flag("registries", "Supported Docker registries").Short('r'))
 	authKey  []byte
 	authKeyFile = "authKey.dat"
 )
@@ -35,6 +36,7 @@ type UnixHandler struct {
 type Config struct {
 	Swarm bool `json:"swarm"`
 	HiddenLabels Labels `json:"hiddenLabels"`
+	Registries Labels `json:"registries"`
 }
 
 type Label struct {
@@ -47,7 +49,7 @@ type Labels []Label
 func (l *Labels) Set(value string) error {
   parts := strings.SplitN(value, "=", 2)
   if len(parts) != 2 {
-    return fmt.Errorf("expected HEADER=VALUE got '%s'", value)
+    return fmt.Errorf("expected NAME=VALUE got '%s'", value)
   }
 	label := new(Label)
   label.Name = parts[0]
@@ -179,6 +181,7 @@ func main() {
 	configuration := Config{
 		Swarm: *swarm,
 		HiddenLabels: *labels,
+		Registries: *registries,
 	}
 
 	handler := createHandler(*assets, *data, *endpoint, configuration)

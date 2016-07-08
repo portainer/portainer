@@ -1,5 +1,7 @@
 # Cloudinovasi UI for Docker
 
+This UI is dedicated to CloudInovasi internal usage.
+
 A fork of the amazing UI for Docker by Michael Crosby and Kevan Ahlquist (https://github.com/kevana/ui-for-docker) using the rdash-angular theme (https://github.com/rdash/rdash-angular).
 
 ![Dashboard](/dashboard.png)
@@ -56,7 +58,7 @@ $ docker run -d -p 10.20.30.1:80:9000 --privileged -v /var/run/docker.sock:/var/
 
 ### Hide containers with specific labels
 
-You can hide specific containers in the containers view by using the `-hide-label` or `-l` options and specifying a label.
+You can hide specific containers in the containers view by using the `--hide-label` or `-l` options and specifying a label.
 
 For example, take a container started with the label `owner=acme`:
 
@@ -70,6 +72,16 @@ You can hide it in the view by starting the ui with:
 $ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui -l owner=acme
 ```
 
+### Custom Docker registries support
+
+You can specify the support of others registries than DockerHub by using the `--registries` or `-r` options and specifying a registry using the format *REGISTRY_NAME=REGISTRY_ADDRESS*.
+
+For example, if I want the registry 'myCustomRegistry' pointing to *myregistry.domain.com:5000* available in the UI:
+
+```
+$ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui -r myCustomRegistry=myregistry.domain.com:5000
+```
+
 ### Available options
 
 The following options are available for the `ui-for-docker` binary:
@@ -79,4 +91,5 @@ The following options are available for the `ui-for-docker` binary:
 * `--data`, `-d`: Path to the data folder (default: *"."*)
 * `--assets`, `-a`: Path to the assets (default: *"."*)
 * `--swarm`, `-s`: Swarm cluster support (default: *false*)
-* `--hide-label`, `-l`: Hide containers with a specific label in the UI
+* `--hide-label`, `-l`: Hide containers with a specific label in the UI (format *LABEL_NAME=LABEL_VALUE*)
+* `--registries`, `-r`: Available registries in the UI (format *REGISTRY_NAME=REGISTRY_ADDRESS*)

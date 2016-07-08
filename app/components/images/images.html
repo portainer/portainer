@@ -15,14 +15,21 @@
       </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
-          <!-- name-input -->
+          <!-- name-and-registry-inputs -->
           <div class="form-group">
             <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11">
+            <div class="col-sm-7">
               <input type="text" class="form-control" ng-model="config.Image" id="image_name" placeholder="e.g. ubuntu:trusty">
             </div>
+            <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
+            <div class="col-sm-3">
+              <select class="selectpicker form-control" ng-model="config.Registry">
+                <option value="">Docker Hub</option>
+                <option ng-repeat="registry in availableRegistries" ng-value="registry.value">{{ registry.name }}</option>
+              </select>
+            </div>
           </div>
-          <!-- !name-input -->
+          <!-- !name-and-registry-inputs -->
           <!-- tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
