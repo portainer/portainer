@@ -144,7 +144,6 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     var image = _.toLower(config.Image);
     var registry = $scope.formValues.Registry;
     var imageConfig = createImageConfig(image, registry);
-    console.log(JSON.stringify(imageConfig, null, 4));
     config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
     $scope.imageConfig = imageConfig;
   }
