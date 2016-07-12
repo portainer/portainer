@@ -21,14 +21,29 @@ angular.module('dockerui.filters', [])
 .filter('containerstatusbadge', function () {
   'use strict';
   return function (text) {
-    if (text === 'paused') {
+    var status = _.toLower(text);
+    if (status.indexOf('paused') !== -1) {
       return 'warning';
-    } else if (text === 'created') {
+    } else if (status.indexOf('created') !== -1) {
       return 'info';
-    } else if (text === 'exited') {
+    } else if (status.indexOf('exited') !== -1) {
       return 'danger';
     }
     return 'success';
+  };
+})
+.filter('containerstatus', function () {
+  'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (status.indexOf('paused') !== -1) {
+      return 'paused';
+    } else if (status.indexOf('created') !== -1) {
+      return 'created';
+    } else if (status.indexOf('exited') !== -1) {
+      return 'stopped';
+    }
+    return 'running';
   };
 })
 .filter('nodestatusbadge', function () {

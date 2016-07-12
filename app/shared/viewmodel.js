@@ -10,9 +10,12 @@ function ImageViewModel(data) {
 
 function ContainerViewModel(data) {
     this.Id = data.Id;
-    this.State = data.State;
+    this.Status = data.Status;
     this.Names = data.Names;
-    this.IP = data.NetworkSettings.Networks[Object.keys(data.NetworkSettings.Networks)[0]].IPAddress;
+    // Unavailable in Docker < 1.10
+    if (data.NetworkSettings) {
+      this.IP = data.NetworkSettings.Networks[Object.keys(data.NetworkSettings.Networks)[0]].IPAddress;
+    }
     this.Image = data.Image;
     this.Command = data.Command;
     this.Checked = false;
