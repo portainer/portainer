@@ -15,6 +15,8 @@ import (
 	"fmt"
 	"github.com/gorilla/securecookie"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"crypto/tls"
+	"crypto/x509"
 )
 
 var (
@@ -22,6 +24,7 @@ var (
 	addr 		 = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
 	assets   = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
 	data		 = kingpin.Flag("data", "Path to the data").Default(".").Short('d').String()
+	certs    = kingpin.Flag("certs", "Path to the certs").Default("/certs").Short('c').String()
 	swarm	   = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
 	labels   = LabelParser(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
 	authKey  []byte
@@ -114,18 +117,50 @@ func createTcpHandler(e string) http.Handler {
 	return httputil.NewSingleHostReverseProxy(u)
 }
 
+func createTlsConfig(c string) *tls.Config {
+	cert, err := tls.LoadX509KeyPair(c + "/" + "cert.pem", c + "/" + "key.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
+	caCert, err := ioutil.ReadFile(c + "/" + "ca.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      caCertPool,
+	}
+	return tlsConfig;
+}
+
+func createTcpHandlerWithTLS(e string, c string) http.Handler {
+	u, err := url.Parse(e)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var tlsConfig = createTlsConfig(c)
+	proxy := httputil.NewSingleHostReverseProxy(u)
+	proxy.Transport = &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+	return proxy;
+}
+
 func createUnixHandler(e string) http.Handler {
 	return &UnixHandler{e}
 }
 
-func createHandler(dir string, d string, e string, c Config) http.Handler {
+func createHandler(dir string, d string, certs string, e string, c Config) http.Handler {
 	var (
 		mux         = http.NewServeMux()
 		fileHandler = http.FileServer(http.Dir(dir))
 		h           http.Handler
 	)
-
-	if strings.Contains(e, "http") {
+	if strings.Contains(e, "https") {
+		h = createTcpHandlerWithTLS(e, certs)
+	} else if strings.Contains(e, "http") {
 		h = createTcpHandler(e)
 	} else {
 		if _, err := os.Stat(e); err != nil {
@@ -181,7 +216,7 @@ func main() {
 		HiddenLabels: *labels,
 	}
 
-	handler := createHandler(*assets, *data, *endpoint, configuration)
+	handler := createHandler(*assets, *data, *certs, *endpoint, configuration)
 	if err := http.ListenAndServe(*addr, handler); err != nil {
 		log.Fatal(err)
 	}

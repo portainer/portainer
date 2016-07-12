@@ -40,6 +40,7 @@ module.exports = function (grunt) {
     grunt.registerTask('run', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
     grunt.registerTask('run-swarm', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
     grunt.registerTask('run-dev', ['if:binaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
+    grunt.registerTask('run-ssl', ['if:binaryNotExist', 'shell:buildImage', 'shell:runSsl', 'watch:buildSsl']);
     grunt.registerTask('clear', ['clean:app']);
 
     // Print a timestamp (useful for when watching)
@@ -224,6 +225,10 @@ module.exports = function (grunt) {
             buildSwarm: {
                 files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
                 tasks: ['build', 'shell:buildImage', 'shell:runSwarm', 'shell:cleanImages']
+            },
+            buildSsl: {
+                files: ['<%= src.js %>', '<%= src.specs %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
+                tasks: ['build', 'shell:buildImage', 'shell:runSsl', 'shell:cleanImages']
             }
         },
         jshint: {
@@ -267,7 +272,14 @@ module.exports = function (grunt) {
                 command: [
                     'docker stop ui-for-docker',
                     'docker rm ui-for-docker',
-                    'docker run --privileged -d -p 9000:9000 -v /tmp/docker-ui:/data --name ui-for-docker ui-for-docker -e http://10.0.7.10:4000 --swarm -d /data'
+                    'docker run -d -p 9000:9000 -v /tmp/docker-ui:/data --name ui-for-docker ui-for-docker -e http://10.0.7.10:4000 --swarm -d /data'
+                ].join(';')
+            },
+            runSsl: {
+                command: [
+                    'docker stop ui-for-docker',
+                    'docker rm ui-for-docker',
+                    'docker run -d -p 9000:9000 -v /tmp/docker-ui:/data -v /tmp/docker-ssl:/certs --name ui-for-docker ui-for-docker -e https://10.0.7.10:2376 -d /data'
                 ].join(';')
             },
             cleanImages: {

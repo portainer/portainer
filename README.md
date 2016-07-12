@@ -54,6 +54,19 @@ UI For Docker listens on port 9000 by default. If you run UI For Docker inside a
 $ docker run -d -p 10.20.30.1:80:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui
 ```
 
+### Access a Docker engine protected via TLS
+
+Ensure that you have access to the CA, the cert and the public key used to access your Docker engine.  
+
+These files will need to be named `ca.pem`, `cert.pem` and `key.pem` respectively. Store them somewhere on your disk and mount a volume containing these files inside the UI container:
+
+```
+# Note the access to the endpoint via https
+$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -v /path/to/certs:/certs -e https://my-docker-host.domain:2376
+```
+
+*Note*: Replace `/path/to/certs` to the path to the certificate files on your disk.
+
 ### Hide containers with specific labels
 
 You can hide specific containers in the containers view by using the `-hide-label` or `-l` options and specifying a label.
@@ -77,6 +90,7 @@ The following options are available for the `ui-for-docker` binary:
 * `--endpoint`, `-e`: Docker deamon endpoint (default: *"/var/run/docker.sock"*)
 * `--bind`, `-p`: Address and port to serve UI For Docker (default: *":9000"*)
 * `--data`, `-d`: Path to the data folder (default: *"."*)
+* `--certs`, `-c`: Path to the certificates used for TLS (default: *"/certs"*)
 * `--assets`, `-a`: Path to the assets (default: *"."*)
 * `--swarm`, `-s`: Swarm cluster support (default: *false*)
 * `--hide-label`, `-l`: Hide containers with a specific label in the UI
