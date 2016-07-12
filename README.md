@@ -10,6 +10,12 @@ UI For Docker is a web interface for the Docker Remote API.  The goal is to prov
 * Minimal dependencies - I really want to keep this project a pure html/js app.
 * Consistency - The web UI should be consistent with the commands found on the docker CLI.
 
+## Supported Docker versions
+
+The current Docker version support policy is the following: `N` to `N-2` included where `N` is the latest version.
+
+At the moment, the following versions are supported: 1.9, 1.10 & 1.11. 
+
 ## Run
 
 ### Quickstart
