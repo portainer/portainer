@@ -130,6 +130,12 @@ angular.module('dockerui.filters', [])
     return _.split(container.Names[0], '/')[2];
   };
 })
+.filter('swarmversion', function () {
+  'use strict';
+  return function (text) {
+    return _.split(text, '/')[1];
+  };
+})
 .filter('swarmhostname', function () {
   'use strict';
   return function (container) {
