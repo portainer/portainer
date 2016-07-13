@@ -144,4 +144,4 @@ angular.module('uifordocker', [
   .constant('DOCKER_ENDPOINT', 'dockerapi')
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('CONFIG_ENDPOINT', '/config')
-  .constant('UI_VERSION', 'v1.3.0');
+  .constant('UI_VERSION', 'v1.4.0');
