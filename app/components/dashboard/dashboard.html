@@ -1,76 +1,131 @@
 <rd-header>
-  <rd-header-title title="Home"></rd-header-title>
+  <rd-header-title title="Home">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
   <rd-header-content>Dashboard</rd-header-content>
 </rd-header>
 
 <div class="row">
-  <div class="col-lg-3 col-md-6 col-xs-12">
+  <div class="col-lg-12 col-md-12 col-xs-12" ng-if="!swarm">
     <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon blue pull-left">
-          <i class="fa fa-tasks"></i>
-        </div>
-        <div class="title">{{ containerData.total }}</div>
-        <div class="comment">Containers</div>
+      <rd-widget-header icon="fa-cogs" title="Node info"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>{{ infoData.Name }}</td>
+            </tr>
+            <tr>
+              <td>Docker version</td>
+              <td>{{ infoData.ServerVersion }}</td>
+            </tr>
+            <tr>
+              <td>CPU</td>
+              <td>{{ infoData.NCPU }}</td>
+            </tr>
+            <tr>
+              <td>Memory</td>
+              <td>{{ infoData.MemTotal|humansize }}</td>
+            </tr>
+          </tbody>
+        </table>
       </rd-widget-body>
     </rd-widget>
   </div>
-  <div class="col-lg-3 col-md-6 col-xs-12">
+  <div class="col-lg-12 col-md-12 col-xs-12" ng-if="swarm">
     <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon green pull-left">
-          <i class="fa fa-tasks"></i>
-        </div>
-        <div class="title">{{ containerData.running }}</div>
-        <div class="comment">Running</div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-  <div class="col-lg-3 col-md-6 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon red pull-left">
-          <i class="fa fa-tasks"></i>
-        </div>
-        <div class="title">{{ containerData.stopped }}</div>
-        <div class="comment">Stopped</div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-  <div class="col-lg-3 col-md-6 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon gray pull-left">
-          <i class="fa fa-tasks"></i>
-        </div>
-        <div class="title">{{ containerData.ghost }}</div>
-        <div class="comment">Ghost</div>
+      <rd-widget-header icon="fa-cogs" title="Cluster info"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Nodes</td>
+              <td>{{ infoData.SystemStatus[3][1] }}</td>
+            </tr>
+            <tr>
+              <td>Swarm version</td>
+              <td>{{ infoData.ServerVersion|swarmversion }}</td>
+            </tr>
+            <tr>
+              <td>Total CPU</td>
+              <td>{{ infoData.NCPU }}</td>
+            </tr>
+            <tr>
+              <td>Total memory</td>
+              <td>{{ infoData.MemTotal|humansize }}</td>
+            </tr>
+          </tbody>
+        </table>
       </rd-widget-body>
     </rd-widget>
   </div>
 </div>
 
 <div class="row">
-  <div class="col-lg-6">
-    <rd-widget>
-      <rd-widget-header icon="fa-tasks" title="Containers created"></rd-widget-header>
-      <rd-widget-body>
-        <canvas id="containers-started-chart" width="770" height="230">
-            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
-                    href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        </canvas>
-      </rd-widget-body>
-    </rd-widget>
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <a ui-sref="containers">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon blue pull-left">
+            <i class="fa fa-tasks"></i>
+          </div>
+          <div class="pull-right">
+            <div><i class="fa fa-heartbeat text-icon green-icon"></i>{{ containerData.running }} running</div>
+            <div><i class="fa fa-heartbeat text-icon red-icon"></i>{{ containerData.stopped }} stopped</div>
+          </div>
+          <div class="title">{{ containerData.total }}</div>
+          <div class="comment">Containers</div>
+        </rd-widget-body>
+      </rd-widget>
+    </a>
   </div>
-  <div class="col-lg-6">
-    <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Images created"></rd-widget-header>
-      <rd-widget-body>
-        <canvas id="images-created-chart" width="770" height="230">
-            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a
-                    href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        </canvas>
-      </rd-widget-body>
-    </rd-widget>
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <a ui-sref="images">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon blue pull-left">
+            <i class="fa fa-clone"></i>
+          </div>
+          <div class="pull-right">
+            <div><i class="fa fa-pie-chart text-icon"></i>{{ imageData.size|humansize }}</div>
+          </div>
+          <div class="title">{{ imageData.total }}</div>
+          <div class="comment">Images</div>
+        </rd-widget-body>
+      </rd-widget>
+    </a>
   </div>
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <a ui-sref="volumes">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon blue pull-left">
+            <i class="fa fa-cubes"></i>
+          </div>
+          <div class="pull-right" ng-if="infoData.Driver">
+            <div><i class="fa fa-hdd-o text-icon"></i>{{ infoData.Driver }} driver</div>
+          </div>
+          <div class="title">{{ volumeData.total }}</div>
+          <div class="comment">Volumes</div>
+        </rd-widget-body>
+      </rd-widget>
+    </a>
+  </div>
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <a ui-sref="networks">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon blue pull-left">
+            <i class="fa fa-sitemap"></i>
+          </div>
+          <div class="title">{{ networkData.total }}</div>
+          <div class="comment">Networks</div>
+        </rd-widget-body>
+      </rd-widget>
+    </a>
+  </div>
+</div>
+
+<div class="row">
 </div>
