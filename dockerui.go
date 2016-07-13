@@ -20,19 +20,29 @@ import (
 )
 
 var (
-	endpoint = kingpin.Flag("endpoint", "Dockerd endpoint").Default("/var/run/docker.sock").Short('e').String()
-	addr 		 = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
-	assets   = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
-	data		 = kingpin.Flag("data", "Path to the data").Default(".").Short('d').String()
-	certs    = kingpin.Flag("certs", "Path to the certs").Default("/certs").Short('c').String()
-	swarm	   = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
-	labels   = LabelParser(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
+	endpoint 	= kingpin.Flag("host", "Dockerd endpoint").Default("unix:///var/run/docker.sock").Short('H').String()
+	addr 		 	= kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
+	assets   	= kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
+	data		 	= kingpin.Flag("data", "Path to the data").Default(".").Short('d').String()
+	swarm	   	= kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
+	tlsverify	= kingpin.Flag("tlsverify", "TLS support").Default("false").Bool()
+	tlscacert = kingpin.Flag("tlscacert", "Path to the CA").Default("/certs/ca.pem").String()
+	tlscert   = kingpin.Flag("tlscert", "Path to the TLS certificate file").Default("/certs/cert.pem").String()
+	tlskey    = kingpin.Flag("tlskey", "Path to the TLS key").Default("/certs/key.pem").String()
+	labels    = LabelParser(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
 	authKey  []byte
 	authKeyFile = "authKey.dat"
 )
 
 type UnixHandler struct {
 	path string
+}
+
+type TlsFlags struct {
+	tls bool
+	caPath string
+	certPath string
+	keyPath string
 }
 
 type Config struct {
@@ -109,20 +119,17 @@ func configurationHandler(w http.ResponseWriter, r *http.Request, c Config) {
     json.NewEncoder(w).Encode(c)
 }
 
-func createTcpHandler(e string) http.Handler {
-	u, err := url.Parse(e)
-	if err != nil {
-		log.Fatal(err)
-	}
+func createTcpHandler(u *url.URL) http.Handler {
+	u.Scheme = "http";
 	return httputil.NewSingleHostReverseProxy(u)
 }
 
-func createTlsConfig(c string) *tls.Config {
-	cert, err := tls.LoadX509KeyPair(c + "/" + "cert.pem", c + "/" + "key.pem")
+func createTlsConfig(tlsFlags TlsFlags) *tls.Config {
+	cert, err := tls.LoadX509KeyPair(tlsFlags.certPath, tlsFlags.keyPath)
 	if err != nil {
 		log.Fatal(err)
 	}
-	caCert, err := ioutil.ReadFile(c + "/" + "ca.pem")
+	caCert, err := ioutil.ReadFile(tlsFlags.caPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -135,12 +142,9 @@ func createTlsConfig(c string) *tls.Config {
 	return tlsConfig;
 }
 
-func createTcpHandlerWithTLS(e string, c string) http.Handler {
-	u, err := url.Parse(e)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var tlsConfig = createTlsConfig(c)
+func createTcpHandlerWithTLS(u *url.URL, tlsFlags TlsFlags) http.Handler {
+	u.Scheme = "https";
+	var tlsConfig = createTlsConfig(tlsFlags)
 	proxy := httputil.NewSingleHostReverseProxy(u)
 	proxy.Transport = &http.Transport{
 		TLSClientConfig: tlsConfig,
@@ -152,24 +156,33 @@ func createUnixHandler(e string) http.Handler {
 	return &UnixHandler{e}
 }
 
-func createHandler(dir string, d string, certs string, e string, c Config) http.Handler {
+func createHandler(dir string, d string, e string, c Config, tlsFlags TlsFlags) http.Handler {
 	var (
 		mux         = http.NewServeMux()
 		fileHandler = http.FileServer(http.Dir(dir))
 		h           http.Handler
 	)
-	if strings.Contains(e, "https") {
-		h = createTcpHandlerWithTLS(e, certs)
-	} else if strings.Contains(e, "http") {
-		h = createTcpHandler(e)
-	} else {
-		if _, err := os.Stat(e); err != nil {
+	u, perr := url.Parse(e)
+	if perr != nil {
+		log.Fatal(perr)
+	}
+	if u.Scheme == "tcp" {
+		if tlsFlags.tls {
+			h = createTcpHandlerWithTLS(u, tlsFlags)
+		} else {
+			h = createTcpHandler(u)
+		}
+	} else if u.Scheme == "unix" {
+		var socketPath = u.Path
+		if _, err := os.Stat(socketPath); err != nil {
 			if os.IsNotExist(err) {
-				log.Fatalf("unix socket %s does not exist", e)
+				log.Fatalf("unix socket %s does not exist", socketPath)
 			}
 			log.Fatal(err)
 		}
-		h = createUnixHandler(e)
+		h = createUnixHandler(socketPath)
+	} else {
+		log.Fatalf("Bad Docker enpoint: %s. Only unix:// and tcp:// are supported.", e)
 	}
 
 	// Use existing csrf authKey if present or generate a new one.
@@ -216,7 +229,14 @@ func main() {
 		HiddenLabels: *labels,
 	}
 
-	handler := createHandler(*assets, *data, *certs, *endpoint, configuration)
+	tlsFlags := TlsFlags{
+		tls: *tlsverify,
+		caPath: *tlscacert,
+		certPath: *tlscert,
+		keyPath: *tlskey,
+	}
+
+	handler := createHandler(*assets, *data, *endpoint, configuration, tlsFlags)
 	if err := http.ListenAndServe(*addr, handler); err != nil {
 		log.Fatal(err)
 	}
