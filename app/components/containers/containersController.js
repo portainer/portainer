@@ -4,6 +4,7 @@ function ($scope, Container, Settings, Messages, Config, errorMsgFilter) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
+  $scope.state.displayIP = false;
   $scope.sortType = 'State';
   $scope.sortReverse = true;
   $scope.state.selectedItemCount = 0;
@@ -22,7 +23,11 @@ function ($scope, Container, Settings, Messages, Config, errorMsgFilter) {
         containers = hideContainers(d);
       }
       $scope.containers = containers.map(function (container) {
-        return new ContainerViewModel(container);
+        var model = new ContainerViewModel(container);
+        if (model.IP) {
+          $scope.state.displayIP = true;
+        }
+        return model;
       });
       $('#loadContainersSpinner').hide();
     });

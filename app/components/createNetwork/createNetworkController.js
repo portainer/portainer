@@ -2,13 +2,18 @@ angular.module('createNetwork', [])
 .controller('CreateNetworkController', ['$scope', '$state', 'Messages', 'Network', 'errorMsgFilter',
 function ($scope, $state, Messages, Network, errorMsgFilter) {
   $scope.formValues = {
-    DriverOptions: []
+    DriverOptions: [],
+    Subnet: '',
+    Gateway: ''
   };
 
   $scope.config = {
     Driver: 'bridge',
     CheckDuplicate: true,
-    Internal: false
+    Internal: false,
+    IPAM: {
+      Config: []
+    }
   };
 
   $scope.addDriverOption = function() {
@@ -36,6 +41,17 @@ function ($scope, $state, Messages, Network, errorMsgFilter) {
     });
   }
 
+  function prepareIPAMConfiguration(config) {
+    if ($scope.formValues.Subnet) {
+      var ipamConfig = {};
+      ipamConfig.Subnet = $scope.formValues.Subnet;
+      if ($scope.formValues.Gateway) {
+        ipamConfig.Gateway = $scope.formValues.Gateway  ;
+      }
+      config.IPAM.Config.push(ipamConfig);
+    }
+  }
+
   function prepareDriverOptions(config) {
     var options = {};
     $scope.formValues.DriverOptions.forEach(function (option) {
@@ -46,6 +62,7 @@ function ($scope, $state, Messages, Network, errorMsgFilter) {
 
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
+    prepareIPAMConfiguration(config);
     prepareDriverOptions(config);
     return config;
   }
