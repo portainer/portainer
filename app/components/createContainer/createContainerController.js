@@ -14,6 +14,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
   };
 
   $scope.imageConfig = {};
+
   $scope.config = {
     Env: [],
     HostConfig: {
