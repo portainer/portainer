@@ -26,11 +26,16 @@ The `--privileged` flag is required for hosts using SELinux.
 
 By default UI For Docker connects to the Docker daemon with`/var/run/docker.sock`. For this to work you need to bind mount the unix socket into the container with `-v /var/run/docker.sock:/var/run/docker.sock`.
 
-You can use the `-e` flag to change this socket:
+You can use the `--host`, `-H` flags to change this socket:
 
 ```
 # Connect to a tcp socket:
-$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -e http://127.0.0.1:2375
+$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -H tcp://127.0.0.1:2375
+```
+
+```
+# Connect to another unix socket:
+$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -H unix:///path/to/docker.sock
 ```
 
 ### Swarm support
@@ -41,7 +46,7 @@ You can access a specific view for you Swarm cluster by defining the `--swarm` f
 
 ```
 # Connect to a tcp socket and enable Swarm:
-$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -e http://<SWARM_HOST>:<SWARM_PORT> --swarm
+$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -H tcp://<SWARM_HOST>:<SWARM_PORT> --swarm
 ```
 
 *NOTE*: Due to Swarm not exposing information in a machine readable way, the app is bound to a specific version of Swarm at the moment.
@@ -61,8 +66,13 @@ Ensure that you have access to the CA, the cert and the public key used to acces
 These files will need to be named `ca.pem`, `cert.pem` and `key.pem` respectively. Store them somewhere on your disk and mount a volume containing these files inside the UI container:
 
 ```
-# Note the access to the endpoint via https
-$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -v /path/to/certs:/certs -e https://my-docker-host.domain:2376
+$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -v /path/to/certs:/certs -H https://my-docker-host.domain:2376 --tlsverify
+```
+
+You can also use the `--tlscacert`, `--tlscert` and `--tlskey` flags if you want to change the default path to the CA, certificate and key file respectively:
+
+```
+$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -v /path/to/certs:/certs -H https://my-docker-host.domain:2376 --tlsverify --tlscacert /certs/myCa.pem --tlscert /certs/myCert.pem --tlskey /certs/myKey.pem
 ```
 
 *Note*: Replace `/path/to/certs` to the path to the certificate files on your disk.
@@ -87,10 +97,13 @@ $ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docke
 
 The following options are available for the `ui-for-docker` binary:
 
-* `--endpoint`, `-e`: Docker deamon endpoint (default: *"/var/run/docker.sock"*)
-* `--bind`, `-p`: Address and port to serve UI For Docker (default: *":9000"*)
-* `--data`, `-d`: Path to the data folder (default: *"."*)
-* `--certs`, `-c`: Path to the certificates used for TLS (default: *"/certs"*)
-* `--assets`, `-a`: Path to the assets (default: *"."*)
-* `--swarm`, `-s`: Swarm cluster support (default: *false*)
+* `--host`, `-H`: Docker daemon endpoint (default: `"unix:///var/run/docker.sock"`)
+* `--bind`, `-p`: Address and port to serve UI For Docker (default: `":9000"`)
+* `--data`, `-d`: Path to the data folder (default: `"."`)
+* `--assets`, `-a`: Path to the assets (default: `"."`)
+* `--swarm`, `-s`: Swarm cluster support (default: `false`)
 * `--hide-label`, `-l`: Hide containers with a specific label in the UI
+* `--tlsverify`: TLS support (default: `false`)
+* `--tlscacert`: Path to the CA (default `/certs/ca.pem`)
+* `--tlscert`: Path to the TLS certificate file (default `/certs/cert.pem`)
+* `--tlskey`: Path to the TLS key (default `/certs/key.pem`)
