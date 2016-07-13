@@ -70,7 +70,7 @@ function ($scope, $q, Config, Container, Image, Network, Volume, Info) {
       Image.query({}).$promise,
       Volume.query({}).$promise,
       Network.query({}).$promise,
-      Info.get({}).$promise,
+      Info.get({}).$promise
     ]).then(function (d) {
       prepareContainerData(d[0]);
       prepareImageData(d[1]);
