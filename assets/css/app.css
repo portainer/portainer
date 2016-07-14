@@ -165,3 +165,23 @@ input[type="radio"] {
 .clickable {
   cursor: pointer;
 }
+
+.text-icon {
+  margin-right: 5px;
+}
+
+.green-icon {
+  color: #23ae89;
+}
+
+.red-icon {
+  color: #ae2323;
+}
+
+.image-tag {
+  margin-right: 5px;
+}
+
+.widget .widget-body table tbody .image-tag {
+  font-size: 90% !important;    
+}

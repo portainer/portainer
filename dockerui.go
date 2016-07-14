@@ -221,7 +221,7 @@ func csrfWrapper(h http.Handler) http.Handler {
 }
 
 func main() {
-	kingpin.Version("1.4.0")
+	kingpin.Version("1.5.0")
 	kingpin.Parse()
 
 	configuration := Config{

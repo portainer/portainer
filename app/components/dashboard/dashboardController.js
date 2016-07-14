@@ -1,49 +1,83 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$scope', 'Config', 'Container', 'Image', 'Settings', 'LineChart',
-function ($scope, Config, Container, Image, Settings, LineChart) {
+.controller('DashboardController', ['$scope', '$q', 'Config', 'Container', 'Image', 'Network', 'Volume', 'Info',
+function ($scope, $q, Config, Container, Image, Network, Volume, Info) {
 
-  $scope.containerData = {};
-
-  var buildCharts = function (data) {
-    $scope.containerData.total = data.length;
-    LineChart.build('#containers-started-chart', data, function (c) {
-      return new Date(c.Created * 1000).toLocaleDateString();
-    });
-    var s = $scope;
-    Image.query({}, function (d) {
-      s.totalImages = d.length;
-      LineChart.build('#images-created-chart', d, function (c) {
-        return new Date(c.Created * 1000).toLocaleDateString();
-      });
-    });
+  $scope.containerData = {
+    total: 0
+  };
+  $scope.imageData = {
+    total: 0
+  };
+  $scope.networkData = {
+    total: 0
+  };
+  $scope.volumeData = {
+    total: 0
   };
 
+  function prepareContainerData(d) {
+    var running = 0;
+    var stopped = 0;
+
+    var containers = d;
+    if (hiddenLabels) {
+      containers = hideContainers(d);
+    }
+
+    for (var i = 0; i < containers.length; i++) {
+      var item = containers[i];
+      if (item.Status.indexOf('Up') !== -1) {
+        running += 1;
+      } else if (item.Status.indexOf('Exit') !== -1) {
+        stopped += 1;
+      }
+    }
+    $scope.containerData.running = running;
+    $scope.containerData.stopped = stopped;
+    $scope.containerData.total = containers.length;
+  }
+
+  function prepareImageData(d) {
+    var images = d;
+    var totalImageSize = 0;
+    for (var i = 0; i < images.length; i++) {
+      var item = images[i];
+      totalImageSize += item.VirtualSize;
+    }
+    $scope.imageData.total = images.length;
+    $scope.imageData.size = totalImageSize;
+  }
+
+  function prepareVolumeData(d) {
+    var volumes = d.Volumes;
+    $scope.volumeData.total = volumes.length;
+  }
+
+  function prepareNetworkData(d) {
+    var networks = d;
+    $scope.networkData.total = networks.length;
+  }
+
+  function prepareInfoData(d) {
+    var info = d;
+    $scope.infoData = info;
+  }
+
   function fetchDashboardData() {
-    Container.query({all: 1}, function (d) {
-      var running = 0;
-      var ghost = 0;
-      var stopped = 0;
-
-      var containers = d;
-      if (hiddenLabels) {
-        containers = hideContainers(d);
-      }
-
-      for (var i = 0; i < containers.length; i++) {
-        var item = containers[i];
-        if (item.Status === "Ghost") {
-          ghost += 1;
-        } else if (item.Status.indexOf('Exit') !== -1) {
-          stopped += 1;
-        } else {
-          running += 1;
-        }
-      }
-      $scope.containerData.running = running;
-      $scope.containerData.stopped = stopped;
-      $scope.containerData.ghost = ghost;
-
-      buildCharts(containers);
+    $('#loadingViewSpinner').show();
+    $q.all([
+      Container.query({all: 1}).$promise,
+      Image.query({}).$promise,
+      Volume.query({}).$promise,
+      Network.query({}).$promise,
+      Info.get({}).$promise
+    ]).then(function (d) {
+      prepareContainerData(d[0]);
+      prepareImageData(d[1]);
+      prepareVolumeData(d[2]);
+      prepareNetworkData(d[3]);
+      prepareInfoData(d[4]);
+      $('#loadingViewSpinner').hide();
     });
   }
 
@@ -63,6 +97,7 @@ function ($scope, Config, Container, Image, Settings, LineChart) {
   };
 
   Config.$promise.then(function (c) {
+    $scope.swarm = c.swarm;
     hiddenLabels = c.hiddenLabels;
     fetchDashboardData();
   });
