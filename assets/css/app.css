@@ -177,3 +177,11 @@ input[type="radio"] {
 .red-icon {
   color: #ae2323;
 }
+
+.image-tag {
+  margin-right: 5px;
+}
+
+.widget .widget-body table tbody .image-tag {
+  font-size: 90% !important;    
+}

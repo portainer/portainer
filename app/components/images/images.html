@@ -76,7 +76,7 @@
                 </th>
                 <th>
                   <a ui-sref="images" ng-click="order('RepoTags')">
-                    Repository
+                    Tags
                     <span ng-show="sortType == 'RepoTags' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'RepoTags' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
@@ -101,7 +101,9 @@
               <tr ng-repeat="image in (state.filteredImages = (images | filter:state.filter | orderBy:sortType:sortReverse))">
                 <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
                 <td><a ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a></td>
-                <td>{{ image|repotag }}</td>
+                <td>
+                  <span class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>
+                </td>
                 <td>{{ image.VirtualSize|humansize }}</td>
                 <td>{{ image.Created|getdate }}</td>
               </tr>

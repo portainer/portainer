@@ -1,4 +1,5 @@
 function ImageViewModel(data) {
+  console.log(JSON.stringify(data, null, 4));
     this.Id = data.Id;
     this.Tag = data.Tag;
     this.Repository = data.Repository;
