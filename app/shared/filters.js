@@ -142,17 +142,17 @@ angular.module('dockerui.filters', [])
     return _.split(container.Names[0], '/')[1];
   };
 })
-.filter('repotag', function () {
+.filter('repotags', function () {
   'use strict';
   return function (image) {
     if (image.RepoTags && image.RepoTags.length > 0) {
       var tag = image.RepoTags[0];
       if (tag === '<none>:<none>') {
-        tag = '';
+        return [];
       }
-      return tag;
+      return image.RepoTags;
     }
-    return '';
+    return [];
   };
 })
 .filter('getdate', function () {
