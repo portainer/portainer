@@ -68,11 +68,11 @@ module.exports = function (grunt) {
             jsTpl: ['<%= distdir %>/templates/**/*.js'],
             jsVendor: [
                 'bower_components/jquery/dist/jquery.min.js',
-                'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
                 'bower_components/bootstrap/dist/js/bootstrap.min.js',
                 'bower_components/Chart.js/Chart.min.js',
                 'bower_components/lodash/dist/lodash.min.js',
-                'bower_components/oboe/dist/oboe-browser.js',
+                'bower_components/moment/min/moment.min.js',
+                'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
                 'assets/js/legend.js' // Not a bower package
             ],
             specs: ['test/**/*.spec.js'],
@@ -150,13 +150,12 @@ module.exports = function (grunt) {
                 }
             },
             angular: {
-                src: ['bower_components/angular/angular.min.js',
+                src: ['bower_components/angular/angular.js',
                     'bower_components/angular-sanitize/angular-sanitize.min.js',
                     'bower_components/angular-cookies/angular-cookies.min.js',
                     'bower_components/angular-ui-router/release/angular-ui-router.min.js',
                     'bower_components/angular-resource/angular-resource.min.js',
                     'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-                    'bower_components/angular-oboe/dist/angular-oboe.min.js',
                     'bower_components/angular-ui-select/dist/select.min.js'],
                 dest: '<%= distdir %>/js/angular.js'
             }

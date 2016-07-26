@@ -30,7 +30,6 @@
     "angular-ui-router": "^0.2.15",
     "angular-sanitize": "~1.5.0",
     "angular-mocks": "~1.5.0",
-    "angular-oboe": "*",
     "angular-resource": "~1.5.0",
     "angular-ui-select": "~0.17.1",
     "bootstrap": "~3.3.6",
@@ -39,6 +38,7 @@
     "jquery.gritter": "1.7.4",
     "lodash": "4.12.0",
     "rdash-ui": "1.0.*",
+    "moment": "~2.14.1"
   },
   "resolutions": {
     "angular": "1.5.5"

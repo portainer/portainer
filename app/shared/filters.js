@@ -163,6 +163,12 @@ angular.module('dockerui.filters', [])
     return date.toDateString();
   };
 })
+.filter('getdatefromtimestamp', function () {
+  'use strict';
+  return function (timestamp) {
+    return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+  };
+})
 .filter('errorMsg', function () {
   return function (object) {
     var idx = 0;
