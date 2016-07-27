@@ -12,6 +12,7 @@ angular.module('uifordocker', [
   'containers',
   'createContainer',
   'docker',
+  'events',
   'images',
   'image',
   'containerLogs',
@@ -85,6 +86,11 @@ angular.module('uifordocker', [
       url: '/docker/',
       templateUrl: 'app/components/docker/docker.html',
       controller: 'DockerController'
+    })
+    .state('events', {
+      url: '/events/',
+      templateUrl: 'app/components/events/events.html',
+      controller: 'EventsController'
     })
     .state('images', {
       url: '/images/',
