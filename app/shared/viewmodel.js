@@ -21,18 +21,6 @@ function ContainerViewModel(data) {
   this.Checked = false;
 }
 
-function EventViewModel(data) {
-  // Type, Action, Actor unavailable in Docker < 1.10
-  this.Time = data.time;
-  if (data.Type) {
-    this.Type = data.Type;
-    this.Details = createEventDetails(data);
-  } else {
-    this.Type = data.status;
-    this.Details = data.from;  
-  }
-}
-
 function createEventDetails(event) {
   var eventAttr = event.Actor.Attributes;
   var details = '';
@@ -125,4 +113,16 @@ function createEventDetails(event) {
     details = 'Unsupported event';
   }
   return details;
+}
+
+function EventViewModel(data) {
+  // Type, Action, Actor unavailable in Docker < 1.10
+  this.Time = data.time;
+  if (data.Type) {
+    this.Type = data.Type;
+    this.Details = createEventDetails(data);
+  } else {
+    this.Type = data.status;
+    this.Details = data.from;
+  }
 }
