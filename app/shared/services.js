@@ -98,6 +98,16 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
             inspect: {method: 'GET', params: {id: '@id', action: 'json'}}
         });
     }])
+    .factory('Events', ['$resource', 'Settings', function EventFactory($resource, Settings) {
+        'use strict';
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/monitor-docker-s-events
+        return $resource(Settings.url + '/events', {}, {
+            query: {method: 'GET', params: {since: '@since', until: '@until'}, isArray: true, transformResponse: [function f(data) {
+                var str = "[" + data.replace(/\n/g, " ").replace(/\}\s*\{/g, "}, {") + "]";
+                return angular.fromJson(str);
+            }]}
+        });
+    }])
     .factory('Version', ['$resource', 'Settings', function VersionFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#show-the-docker-version-information
