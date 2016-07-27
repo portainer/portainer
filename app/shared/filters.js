@@ -1,4 +1,4 @@
-angular.module('dockerui.filters', [])
+angular.module('uifordocker.filters', [])
 .filter('truncate', function () {
   'use strict';
   return function (text, length, end) {
