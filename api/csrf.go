@@ -8,10 +8,10 @@ import (
 	"net/http"
 )
 
-const authKeyFile = "authKey.dat"
+const keyFile = "authKey.dat"
 
 // newAuthKey reuses an existing CSRF authkey if present or generates a new one
-func newAuthKey(path string, keyFile string) []byte {
+func newAuthKey(path string) []byte {
 	var authKey []byte
 	authKeyPath := path + "/" + keyFile
 	data, err := ioutil.ReadFile(authKeyPath)
@@ -30,8 +30,8 @@ func newAuthKey(path string, keyFile string) []byte {
 }
 
 // newCSRF initializes a new CSRF handler
-func newCSRFHandler(path string, keyFile string) func(h http.Handler) http.Handler {
-	authKey := newAuthKey(path, keyFile)
+func newCSRFHandler(keyPath string) func(h http.Handler) http.Handler {
+	authKey := newAuthKey(keyPath)
 	return csrf.Protect(
 		authKey,
 		csrf.HttpOnly(false),

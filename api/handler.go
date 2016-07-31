@@ -21,7 +21,7 @@ func newHandler(dir string, d string, e string, c Config, tlsFlags TLSFlags) htt
 	}
 
 	handler := newAPIHandler(u, tlsFlags)
-	CSRFHandler := newCSRFHandler(d, authKeyFile)
+	CSRFHandler := newCSRFHandler(d)
 
 	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", handler))
 	mux.Handle("/", fileHandler)
