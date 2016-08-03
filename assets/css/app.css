@@ -183,5 +183,10 @@ input[type="radio"] {
 }
 
 .widget .widget-body table tbody .image-tag {
-  font-size: 90% !important;    
+  font-size: 90% !important;
+}
+
+.terminal-container {
+  width: 100%;
+  padding: 10px 5px;
 }

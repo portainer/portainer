@@ -1,33 +1,57 @@
-package main // import "github.com/cloudinovasi/ui-for-docker"
+package main
 
 import (
-	"gopkg.in/alecthomas/kingpin.v2"
+	"crypto/tls"
 	"log"
 	"net/http"
+	"net/url"
 )
 
-// main is the entry point of the program
-func main() {
-	kingpin.Version("1.5.0")
-	var (
-		endpoint  = kingpin.Flag("host", "Dockerd endpoint").Default("unix:///var/run/docker.sock").Short('H').String()
-		addr      = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
-		assets    = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
-		data      = kingpin.Flag("data", "Path to the data").Default(".").Short('d').String()
-		swarm     = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
-		tlsverify = kingpin.Flag("tlsverify", "TLS support").Default("false").Bool()
-		tlscacert = kingpin.Flag("tlscacert", "Path to the CA").Default("/certs/ca.pem").String()
-		tlscert   = kingpin.Flag("tlscert", "Path to the TLS certificate file").Default("/certs/cert.pem").String()
-		tlskey    = kingpin.Flag("tlskey", "Path to the TLS key").Default("/certs/key.pem").String()
-		labels    = pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
-	)
-	kingpin.Parse()
+type (
+	api struct {
+		endpoint    *url.URL
+		bindAddress string
+		assetPath   string
+		dataPath    string
+		tlsConfig   *tls.Config
+	}
 
-	configuration := newConfig(*swarm, *labels)
-	tlsFlags := newTLSFlags(*tlsverify, *tlscacert, *tlscert, *tlskey)
+	apiConfig struct {
+		Endpoint      string
+		BindAddress   string
+		AssetPath     string
+		DataPath      string
+		SwarmSupport  bool
+		TLSEnabled    bool
+		TLSCACertPath string
+		TLSCertPath   string
+		TLSKeyPath    string
+	}
+)
 
-	handler := newHandler(*assets, *data, *endpoint, configuration, tlsFlags)
-	if err := http.ListenAndServe(*addr, handler); err != nil {
+func (a *api) run(configuration *Config) {
+	handler := a.newHandler(configuration)
+	if err := http.ListenAndServe(a.bindAddress, handler); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func newAPI(apiConfig apiConfig) *api {
+	endpointURL, err := url.Parse(apiConfig.Endpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var tlsConfig *tls.Config
+	if apiConfig.TLSEnabled {
+		tlsConfig = newTLSConfig(apiConfig.TLSCACertPath, apiConfig.TLSCertPath, apiConfig.TLSKeyPath)
+	}
+
+	return &api{
+		endpoint:    endpointURL,
+		bindAddress: apiConfig.BindAddress,
+		assetPath:   apiConfig.AssetPath,
+		dataPath:    apiConfig.DataPath,
+		tlsConfig:   tlsConfig,
 	}
 }

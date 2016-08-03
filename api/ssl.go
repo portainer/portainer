@@ -7,13 +7,13 @@ import (
 	"log"
 )
 
-// newTLSConfig initializes a tls.Config from the TLS flags
-func newTLSConfig(tlsFlags TLSFlags) *tls.Config {
-	cert, err := tls.LoadX509KeyPair(tlsFlags.certPath, tlsFlags.keyPath)
+// newTLSConfig initializes a tls.Config using a CA certificate, a certificate and a key
+func newTLSConfig(caCertPath, certPath, keyPath string) *tls.Config {
+	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
 	if err != nil {
 		log.Fatal(err)
 	}
-	caCert, err := ioutil.ReadFile(tlsFlags.caPath)
+	caCert, err := ioutil.ReadFile(caCertPath)
 	if err != nil {
 		log.Fatal(err)
 	}

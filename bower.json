@@ -38,7 +38,8 @@
     "jquery.gritter": "1.7.4",
     "lodash": "4.12.0",
     "rdash-ui": "1.0.*",
-    "moment": "~2.14.1"
+    "moment": "~2.14.1",
+    "xterm.js": "~1.0.0"
   },
   "resolutions": {
     "angular": "1.5.5"
