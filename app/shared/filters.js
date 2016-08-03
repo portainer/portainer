@@ -1,4 +1,4 @@
-angular.module('dockerui.filters', [])
+angular.module('uifordocker.filters', [])
 .filter('truncate', function () {
   'use strict';
   return function (text, length, end) {
@@ -161,6 +161,12 @@ angular.module('dockerui.filters', [])
     //Multiply by 1000 for the unix format
     var date = new Date(data * 1000);
     return date.toDateString();
+  };
+})
+.filter('getdatefromtimestamp', function () {
+  'use strict';
+  return function (timestamp) {
+    return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
   };
 })
 .filter('errorMsg', function () {

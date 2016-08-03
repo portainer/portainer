@@ -8,43 +8,7 @@
 </rd-header>
 
 <div class="row">
-  <div class="col-lg-3 col-md-6 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon pull-left">
-          <i class="fa fa-code"></i>
-        </div>
-        <div class="title">{{ docker.Version }}</div>
-        <div class="comment">Swarm version</div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-  <div class="col-lg-3 col-md-6 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon pull-left">
-          <i class="fa fa-code"></i>
-        </div>
-        <div class="title">{{ docker.ApiVersion }}</div>
-        <div class="comment">API version</div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-  <div class="col-lg-3 col-md-6 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon pull-left">
-          <i class="fa fa-code"></i>
-        </div>
-        <div class="title">{{ docker.GoVersion }}</div>
-        <div class="comment">Go version</div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-lg-6">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-object-group" title="Cluster status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
@@ -59,33 +23,47 @@
               <td>{{ info.Images }}</td>
             </tr>
             <tr>
+              <td>Swarm version</td>
+              <td>{{ docker.Version|swarmversion }}</td>
+            </tr>
+            <tr>
+              <td>Docker API version</td>
+              <td>{{ docker.ApiVersion }}</td>
+            </tr>
+            <tr>
               <td>Strategy</td>
               <td>{{ swarm.Strategy }}</td>
             </tr>
             <tr>
-              <td>CPUs</td>
+              <td>Total CPU</td>
               <td>{{ info.NCPU }}</td>
             </tr>
             <tr>
-              <td>Total Memory</td>
+              <td>Total memory</td>
               <td>{{ info.MemTotal|humansize }}</td>
             </tr>
             <tr>
-              <td>Operating System</td>
+              <td>Operating system</td>
               <td>{{ info.OperatingSystem }}</td>
             </tr>
             <tr>
-              <td>Kernel Version</td>
+              <td>Kernel version</td>
               <td>{{ info.KernelVersion }}</td>
+            </tr>
+            <tr>
+              <td>Go version</td>
+              <td>{{ docker.GoVersion }}</td>
             </tr>
           </tbody>
         </table>
       </rd-widget-body>
     </rd-widget>
   </div>
-  <div class="col-lg-6">
+</div>
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-hdd-o" title="Nodes status"></rd-widget-header>
+      <rd-widget-header icon="fa-hdd-o" title="Node status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table table-striped">
           <thead>
@@ -95,6 +73,20 @@
                   Name
                   <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('cpu')">
+                  CPU
+                  <span ng-show="sortType == 'cpu' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'cpu' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('memory')">
+                  Memory
+                  <span ng-show="sortType == 'memory' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'memory' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
@@ -123,6 +115,8 @@
           <tbody>
             <tr ng-repeat="node in (state.filteredNodes = (swarm.Status | filter:state.filter | orderBy:sortType:sortReverse))">
               <td>{{ node.name }}</td>
+              <td>{{ node.cpu }}</td>
+              <td>{{ node.memory }}</td>
               <td>{{ node.ip }}</td>
               <td>{{ node.version }}</td>
               <td><span class="label label-{{ node.status|nodestatusbadge }}">{{ node.status }}</span></td>

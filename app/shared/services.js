@@ -1,4 +1,4 @@
-angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
+angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
     .factory('Container', ['$resource', 'Settings', function ContainerFactory($resource, Settings) {
         'use strict';
         // Resource for interacting with the docker containers
@@ -18,8 +18,16 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
             create: {method: 'POST', params: {action: 'create'}},
             remove: {method: 'DELETE', params: {id: '@id', v: 0}},
             rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false},
-            stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000}
+            stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000},
+            exec: {method: 'POST', params: {id: '@id', action: 'exec'}}
         });
+    }])
+    .factory('Exec', ['$resource', 'Settings', function ExecFactory($resource, Settings) {
+      'use strict';
+      // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/exec-resize
+      return $resource(Settings.url + '/exec/:id/:action', {}, {
+        resize: {method: 'POST', params: {id: '@id', action: 'resize', h: '@height', w: '@width'}}
+      });
     }])
     .factory('ContainerCommit', ['$resource', '$http', 'Settings', function ContainerCommitFactory($resource, $http, Settings) {
         'use strict';
@@ -98,6 +106,16 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
             inspect: {method: 'GET', params: {id: '@id', action: 'json'}}
         });
     }])
+    .factory('Events', ['$resource', 'Settings', function EventFactory($resource, Settings) {
+        'use strict';
+        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/monitor-docker-s-events
+        return $resource(Settings.url + '/events', {}, {
+            query: {method: 'GET', params: {since: '@since', until: '@until'}, isArray: true, transformResponse: [function f(data) {
+                var str = "[" + data.replace(/\n/g, " ").replace(/\}\s*\{/g, "}, {") + "]";
+                return angular.fromJson(str);
+            }]}
+        });
+    }])
     .factory('Version', ['$resource', 'Settings', function VersionFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#show-the-docker-version-information
@@ -142,7 +160,7 @@ angular.module('dockerui.services', ['ngResource', 'ngSanitize'])
             remove: {method: 'DELETE'}
         });
     }])
-    .factory('Config', ['$resource', 'CONFIG_ENDPOINT', function($resource, CONFIG_ENDPOINT) {
+    .factory('Config', ['$resource', 'CONFIG_ENDPOINT', function ConfigFactory($resource, CONFIG_ENDPOINT) {
       return $resource(CONFIG_ENDPOINT).get();
     }])
     .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, UI_VERSION) {

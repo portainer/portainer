@@ -68,11 +68,12 @@ module.exports = function (grunt) {
             jsTpl: ['<%= distdir %>/templates/**/*.js'],
             jsVendor: [
                 'bower_components/jquery/dist/jquery.min.js',
-                'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
                 'bower_components/bootstrap/dist/js/bootstrap.min.js',
                 'bower_components/Chart.js/Chart.min.js',
                 'bower_components/lodash/dist/lodash.min.js',
-                'bower_components/oboe/dist/oboe-browser.js',
+                'bower_components/moment/min/moment.min.js',
+                'bower_components/xterm.js/src/xterm.js',
+                'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
                 'assets/js/legend.js' // Not a bower package
             ],
             specs: ['test/**/*.spec.js'],
@@ -85,7 +86,8 @@ module.exports = function (grunt) {
                 'bower_components/jquery.gritter/css/jquery.gritter.css',
                 'bower_components/font-awesome/css/font-awesome.min.css',
                 'bower_components/rdash-ui/dist/css/rdash.min.css',
-                'bower_components/angular-ui-select/dist/select.min.css'
+                'bower_components/angular-ui-select/dist/select.min.css',
+                'bower_components/xterm.js/src/xterm.css'
             ]
         },
         clean: {
@@ -156,7 +158,6 @@ module.exports = function (grunt) {
                     'bower_components/angular-ui-router/release/angular-ui-router.min.js',
                     'bower_components/angular-resource/angular-resource.min.js',
                     'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-                    'bower_components/angular-oboe/dist/angular-oboe.min.js',
                     'bower_components/angular-ui-select/dist/select.min.js'],
                 dest: '<%= distdir %>/js/angular.js'
             }
@@ -255,10 +256,10 @@ module.exports = function (grunt) {
             },
             buildBinary: {
                 command: [
-                    'docker run --rm -v $(pwd):/src centurylink/golang-builder',
-                    'shasum ui-for-docker > ui-for-docker-checksum.txt',
+                    'docker run --rm -v $(pwd)/api:/src centurylink/golang-builder',
+                    'shasum api/ui-for-docker > ui-for-docker-checksum.txt',
                     'mkdir -p dist',
-                    'mv ui-for-docker dist/'
+                    'mv api/ui-for-docker dist/'
                 ].join(' && ')
             },
             run: {

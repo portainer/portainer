@@ -53,8 +53,8 @@ angular.module('swarm', [])
         node.id = info[offset + 1][1];
         node.status = info[offset + 2][1];
         node.containers = info[offset + 3][1];
-        node.cpu = info[offset + 4][1];
-        node.memory = info[offset + 5][1];
+        node.cpu = info[offset + 4][1].split('/')[1];
+        node.memory = info[offset + 5][1].split('/')[1];
         node.labels = info[offset + 6][1];
         node.version = info[offset + 8][1];
         $scope.swarm.Status.push(node);

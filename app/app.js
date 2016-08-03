@@ -5,16 +5,18 @@ angular.module('uifordocker', [
   'ui.select',
   'ngCookies',
   'ngSanitize',
-  'dockerui.services',
-  'dockerui.filters',
+  'uifordocker.services',
+  'uifordocker.filters',
   'dashboard',
   'container',
+  'containerConsole',
+  'containerLogs',
   'containers',
   'createContainer',
   'docker',
+  'events',
   'images',
   'image',
-  'containerLogs',
   'stats',
   'swarm',
   'network',
@@ -56,6 +58,11 @@ angular.module('uifordocker', [
       templateUrl: 'app/components/containerLogs/containerlogs.html',
       controller: 'ContainerLogsController'
     })
+    .state('console', {
+      url: "^/containers/:id/console",
+      templateUrl: 'app/components/containerConsole/containerConsole.html',
+      controller: 'ContainerConsoleController'
+    })
     .state('actions', {
       abstract: true,
       url: "/actions",
@@ -85,6 +92,11 @@ angular.module('uifordocker', [
       url: '/docker/',
       templateUrl: 'app/components/docker/docker.html',
       controller: 'DockerController'
+    })
+    .state('events', {
+      url: '/events/',
+      templateUrl: 'app/components/events/events.html',
+      controller: 'EventsController'
     })
     .state('images', {
       url: '/images/',
@@ -143,5 +155,5 @@ angular.module('uifordocker', [
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
   .constant('DOCKER_ENDPOINT', 'dockerapi')
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
-  .constant('CONFIG_ENDPOINT', '/config')
-  .constant('UI_VERSION', 'v1.5.0');
+  .constant('CONFIG_ENDPOINT', 'settings')
+  .constant('UI_VERSION', 'v1.6.0');
