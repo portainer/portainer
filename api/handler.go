@@ -10,7 +10,7 @@ import (
 )
 
 // newHandler creates a new http.Handler with CSRF protection
-func (a *api) newHandler(c *Config) http.Handler {
+func (a *api) newHandler(settings *Settings) http.Handler {
 	var (
 		mux         = http.NewServeMux()
 		fileHandler = http.FileServer(http.Dir(a.assetPath))
@@ -22,8 +22,8 @@ func (a *api) newHandler(c *Config) http.Handler {
 	mux.Handle("/", fileHandler)
 	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", handler))
 	mux.Handle("/ws/exec", websocket.Handler(a.execContainer))
-	mux.HandleFunc("/config", func(w http.ResponseWriter, r *http.Request) {
-		configurationHandler(w, r, c)
+	mux.HandleFunc("/settings", func(w http.ResponseWriter, r *http.Request) {
+		settingsHandler(w, r, settings)
 	})
 	return CSRFHandler(newCSRFWrapper(mux))
 }

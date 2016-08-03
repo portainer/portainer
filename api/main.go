@@ -33,11 +33,11 @@ func main() {
 		TLSKeyPath:    *tlskey,
 	}
 
-	configuration := &Config{
+	settings := &Settings{
 		Swarm:        *swarm,
 		HiddenLabels: *labels,
 	}
 
 	api := newAPI(apiConfig)
-	api.run(configuration)
+	api.run(settings)
 }
