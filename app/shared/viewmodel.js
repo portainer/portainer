@@ -58,7 +58,13 @@ function createEventDetails(event) {
       details = 'Container ' + eventAttr.name + ' unpaused';
       break;
       default:
-      details = 'Unsupported event';
+      if (event.Action.indexOf('exec_create') === 0) {
+        details = 'Exec instance created';
+      } else if (event.Action.indexOf('exec_start') === 0) {
+        details = 'Exec instance started';
+      } else {
+        details = 'Unsupported event';
+      }
     }
     break;
     case 'image':
