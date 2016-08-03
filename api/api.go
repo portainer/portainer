@@ -29,8 +29,8 @@ type (
 	}
 )
 
-func (a *api) run(configuration *Config) {
-	handler := a.newHandler(configuration)
+func (a *api) run(settings *Settings) {
+	handler := a.newHandler(settings)
 	if err := http.ListenAndServe(a.bindAddress, handler); err != nil {
 		log.Fatal(err)
 	}
