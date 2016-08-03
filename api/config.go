@@ -22,6 +22,6 @@ func newConfig(swarm bool, labels, registries pairList) Config {
 }
 
 // configurationHandler defines a handler function used to encode the configuration in JSON
-func configurationHandler(w http.ResponseWriter, r *http.Request, c Config) {
-	json.NewEncoder(w).Encode(c)
+func configurationHandler(w http.ResponseWriter, r *http.Request, c *Config) {
+	json.NewEncoder(w).Encode(*c)
 }

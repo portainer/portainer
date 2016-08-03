@@ -9,13 +9,14 @@ angular.module('uifordocker', [
   'uifordocker.filters',
   'dashboard',
   'container',
+  'containerConsole',
+  'containerLogs',
   'containers',
   'createContainer',
   'docker',
   'events',
   'images',
   'image',
-  'containerLogs',
   'stats',
   'swarm',
   'network',
@@ -54,6 +55,11 @@ angular.module('uifordocker', [
       url: "^/containers/:id/logs",
       templateUrl: 'app/components/containerLogs/containerlogs.html',
       controller: 'ContainerLogsController'
+    })
+    .state('console', {
+      url: "^/containers/:id/console",
+      templateUrl: 'app/components/containerConsole/containerConsole.html',
+      controller: 'ContainerConsoleController'
     })
     .state('actions', {
       abstract: true,

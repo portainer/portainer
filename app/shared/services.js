@@ -18,8 +18,16 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
             create: {method: 'POST', params: {action: 'create'}},
             remove: {method: 'DELETE', params: {id: '@id', v: 0}},
             rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false},
-            stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000}
+            stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000},
+            exec: {method: 'POST', params: {id: '@id', action: 'exec'}}
         });
+    }])
+    .factory('Exec', ['$resource', 'Settings', function ExecFactory($resource, Settings) {
+      'use strict';
+      // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/exec-resize
+      return $resource(Settings.url + '/exec/:id/:action', {}, {
+        resize: {method: 'POST', params: {id: '@id', action: 'resize', h: '@height', w: '@width'}}
+      });
     }])
     .factory('ContainerCommit', ['$resource', '$http', 'Settings', function ContainerCommitFactory($resource, $http, Settings) {
         'use strict';
