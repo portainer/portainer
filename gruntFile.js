@@ -254,10 +254,10 @@ module.exports = function (grunt) {
             },
             buildBinary: {
                 command: [
-                    'docker run --rm -v $(pwd):/src centurylink/golang-builder',
-                    'shasum ui-for-docker > ui-for-docker-checksum.txt',
+                    'docker run --rm -v $(pwd)/api:/src centurylink/golang-builder',
+                    'shasum api/ui-for-docker > ui-for-docker-checksum.txt',
                     'mkdir -p dist',
-                    'mv ui-for-docker dist/'
+                    'mv api/ui-for-docker dist/'
                 ].join(' && ')
             },
             run: {
