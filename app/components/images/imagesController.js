@@ -4,7 +4,6 @@ function ($scope, $state, Config, Image, Messages) {
   $scope.state = {};
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
-  $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
 
   $scope.config = {
@@ -15,17 +14,6 @@ function ($scope, $state, Config, Image, Messages) {
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
-  };
-
-  $scope.toggleSelectAll = function () {
-    angular.forEach($scope.state.filteredImages, function (i) {
-      i.Checked = $scope.state.toggle;
-    });
-    if ($scope.state.toggle) {
-      $scope.state.selectedItemCount = $scope.state.filteredImages.length;
-    } else {
-      $scope.state.selectedItemCount = 0;
-    }
   };
 
   $scope.selectItem = function (item) {

@@ -2,7 +2,6 @@ angular.module('networks', [])
 .controller('NetworksController', ['$scope', '$state', 'Network', 'Messages', 'errorMsgFilter',
 function ($scope, $state, Network, Messages, errorMsgFilter) {
   $scope.state = {};
-  $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
   $scope.state.advancedSettings = false;
   $scope.sortType = 'Scope';
@@ -23,17 +22,6 @@ function ($scope, $state, Network, Messages, errorMsgFilter) {
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
-  };
-
-  $scope.toggleSelectAll = function () {
-    angular.forEach($scope.state.filteredNetworks, function (i) {
-      i.Checked = $scope.state.toggle;
-    });
-    if ($scope.state.toggle) {
-      $scope.state.selectedItemCount = $scope.state.filteredNetworks.length;
-    } else {
-      $scope.state.selectedItemCount = 0;
-    }
   };
 
   $scope.selectItem = function (item) {
