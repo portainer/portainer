@@ -2,7 +2,7 @@
   "author": "Michael Crosby & Kevan Ahlquist",
   "name": "uifordocker",
   "homepage": "https://github.com/kevana/ui-for-docker",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:kevana/ui-for-docker.git"
