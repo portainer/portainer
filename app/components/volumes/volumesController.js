@@ -2,7 +2,6 @@ angular.module('volumes', [])
 .controller('VolumesController', ['$scope', 'Volume', 'Messages', 'errorMsgFilter',
 function ($scope, Volume, Messages, errorMsgFilter) {
   $scope.state = {};
-  $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
@@ -10,17 +9,6 @@ function ($scope, Volume, Messages, errorMsgFilter) {
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
-  };
-
-  $scope.toggleSelectAll = function () {
-    angular.forEach($scope.state.filteredVolumes, function (i) {
-      i.Checked = $scope.state.toggle;
-    });
-    if ($scope.state.toggle) {
-      $scope.state.selectedItemCount = $scope.state.filteredVolumes.length;
-    } else {
-      $scope.state.selectedItemCount = 0;
-    }
   };
 
   $scope.selectItem = function (item) {
