@@ -160,7 +160,7 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
             remove: {method: 'DELETE'}
         });
     }])
-    .factory('Config', ['$resource', 'CONFIG_ENDPOINT', function($resource, CONFIG_ENDPOINT) {
+    .factory('Config', ['$resource', 'CONFIG_ENDPOINT', function ConfigFactory($resource, CONFIG_ENDPOINT) {
       return $resource(CONFIG_ENDPOINT).get();
     }])
     .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, UI_VERSION) {
