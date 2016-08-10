@@ -134,12 +134,6 @@ describe('filters', function () {
         }));
     });
 
-    describe('getdate', function () {
-        it('should convert the Docker date to a human readable form', inject(function (getdateFilter) {
-            expect(getdateFilter(1420424998)).toBe('Sun Jan 04 2015');
-        }));
-    });
-
     describe('errorMsgFilter', function () {
         it('should convert the $resource object to a string message',
             inject(function (errorMsgFilter) {
