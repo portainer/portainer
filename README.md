@@ -14,7 +14,7 @@ UI For Docker is a web interface for the Docker Remote API.  The goal is to prov
 
 The current Docker version support policy is the following: `N` to `N-2` included where `N` is the latest version.
 
-At the moment, the following versions are supported: 1.9, 1.10 & 1.11. 
+At the moment, the following versions are supported: 1.9, 1.10 & 1.11.
 
 ## Run
 
@@ -113,3 +113,4 @@ The following options are available for the `ui-for-docker` binary:
 * `--tlscacert`: Path to the CA (default `/certs/ca.pem`)
 * `--tlscert`: Path to the TLS certificate file (default `/certs/cert.pem`)
 * `--tlskey`: Path to the TLS key (default `/certs/key.pem`)
+* `--logo`: URL to a picture to be displayed as a logo in the UI
