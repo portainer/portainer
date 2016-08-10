@@ -19,6 +19,7 @@ func main() {
 		swarm      = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
 		labels     = pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
 		registries = pairs(kingpin.Flag("registries", "Supported Docker registries").Short('r'))
+		logo      = kingpin.Flag("logo", "URL for the logo displayed in the UI").String()
 	)
 	kingpin.Parse()
 
@@ -38,6 +39,7 @@ func main() {
 		Swarm:        *swarm,
 		HiddenLabels: *labels,
 		Registries:   *registries,
+		Logo:         *logo,
 	}
 
 	api := newAPI(apiConfig)

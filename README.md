@@ -126,3 +126,4 @@ The following options are available for the `ui-for-docker` binary:
 * `--tlscert`: Path to the TLS certificate file (default `/certs/cert.pem`)
 * `--tlskey`: Path to the TLS key (default `/certs/key.pem`)
 * `--hide-label`, `-l`: Hide containers with a specific label in the UI
+* `--logo`: URL to a picture to be displayed as a logo in the UI

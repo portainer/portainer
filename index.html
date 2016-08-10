@@ -32,7 +32,8 @@
       <ul class="sidebar">
         <li class="sidebar-main">
           <a ng-click="toggleSidebar()">
-            <img src="images/logo.png" class="img-responsive logo" alt="logo">
+            <img ng-if="config.logo" ng-src="{{ config.logo }}" class="img-responsive logo" alt="CloudInovasi UI">
+            <img ng-if="!config.logo" src="images/logo.png" class="img-responsive logo" alt="CloudInovasi UI">
             <span class="menu-icon glyphicon glyphicon-transfer"></span>
           </a>
         </li>
