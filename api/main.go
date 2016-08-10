@@ -18,6 +18,7 @@ func main() {
 		tlskey    = kingpin.Flag("tlskey", "Path to the TLS key").Default("/certs/key.pem").String()
 		swarm     = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
 		labels    = pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
+		logo      = kingpin.Flag("logo", "URL for the logo displayed in the UI").String()
 	)
 	kingpin.Parse()
 
@@ -36,6 +37,7 @@ func main() {
 	settings := &Settings{
 		Swarm:        *swarm,
 		HiddenLabels: *labels,
+		Logo:         *logo,
 	}
 
 	api := newAPI(apiConfig)
