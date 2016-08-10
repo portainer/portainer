@@ -105,7 +105,7 @@
                   <span class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>
                 </td>
                 <td>{{ image.VirtualSize|humansize }}</td>
-                <td>{{ image.Created|getdate }}</td>
+                <td>{{ image.Created|getisodatefromtimestamp }}</td>
               </tr>
             </tbody>
           </table>
