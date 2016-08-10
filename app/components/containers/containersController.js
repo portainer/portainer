@@ -1,6 +1,6 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', 'Container', 'Settings', 'Messages', 'Config', 'errorMsgFilter',
-function ($scope, Container, Settings, Messages, Config, errorMsgFilter) {
+.controller('ContainersController', ['$scope', 'Container', 'Info', 'Settings', 'Messages', 'Config', 'errorMsgFilter',
+function ($scope, Container, Info, Settings, Messages, Config, errorMsgFilter) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
@@ -26,6 +26,9 @@ function ($scope, Container, Settings, Messages, Config, errorMsgFilter) {
         var model = new ContainerViewModel(container);
         if (model.IP) {
           $scope.state.displayIP = true;
+        }
+        if ($scope.swarm) {
+          model.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
         }
         return model;
       });
@@ -154,10 +157,32 @@ function ($scope, Container, Settings, Messages, Config, errorMsgFilter) {
     });
   };
 
+  function retrieveSwarmHostsInfo(data) {
+    var swarm_hosts = {};
+    var systemStatus = data.SystemStatus;
+    var node_count = parseInt(systemStatus[3][1], 10);
+    var node_offset = 4;
+    for (i = 0; i < node_count; i++) {
+      var host = {};
+      host.name = _.trim(systemStatus[node_offset][0]);
+      host.ip = _.split(systemStatus[node_offset][1], ':')[0];
+      swarm_hosts[host.name] = host.ip;
+      node_offset += 9;
+    }
+    return swarm_hosts;
+  }
+
   $scope.swarm = false;
   Config.$promise.then(function (c) {
     hiddenLabels = c.hiddenLabels;
     $scope.swarm = c.swarm;
-    update({all: Settings.displayAll ? 1 : 0});
+    if (c.swarm) {
+      Info.get({}, function (d) {
+        $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
+        update({all: Settings.displayAll ? 1 : 0});
+      });
+    } else {
+      update({all: Settings.displayAll ? 1 : 0});
+    }
   });
 }]);
