@@ -170,15 +170,23 @@ input[type="radio"] {
   margin-right: 5px;
 }
 
-.green-icon {
+.fa.green-icon {
   color: #23ae89;
 }
 
-.red-icon {
+.fa.red-icon {
   color: #ae2323;
 }
 
+.fa.white-icon {
+  color: white;
+}
+
 .image-tag {
+  margin-right: 5px;
+}
+
+.label.tag {
   margin-right: 5px;
 }
 
@@ -189,4 +197,8 @@ input[type="radio"] {
 .terminal-container {
   width: 100%;
   padding: 10px 5px;
+}
+
+.interactive {
+  cursor: pointer;
 }
