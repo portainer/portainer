@@ -98,7 +98,7 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
             inspect: {method: 'GET', params: {id: '@id', action: 'json'}},
             create: {
                 method: 'POST', params: {action: 'create', fromImage: '@fromImage', tag: '@tag'},
-                isArray: true, transformResponse: createImageHandler,
+                isArray: true, transformResponse: createImageHandler
             },
             remove: {
               method: 'DELETE', params: {id: '@id'},
@@ -112,7 +112,7 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
         return $resource(Settings.url + '/events', {}, {
             query: {
               method: 'GET', params: {since: '@since', until: '@until'},
-              isArray: true, transformResponse: queryEventsHandler,
+              isArray: true, transformResponse: queryEventsHandler
             }
         });
     }])
