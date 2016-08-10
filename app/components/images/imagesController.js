@@ -71,15 +71,17 @@ function ($scope, $state, Config, Image, Messages) {
       if (i.Checked) {
         counter = counter + 1;
         Image.remove({id: i.Id}, function (d) {
-          angular.forEach(d, function (resource) {
-            Messages.send("Image deleted", resource.Deleted);
-          });
-          var index = $scope.images.indexOf(i);
-          $scope.images.splice(index, 1);
+          if (d[0].message) {
+            $('#loadingViewSpinner').hide();
+            Messages.error("Unable to remove image", d[0].message);
+          } else {
+            Messages.send("Image deleted", i.Id);
+            var index = $scope.images.indexOf(i);
+            $scope.images.splice(index, 1);
+          }
           complete();
         }, function (e) {
-          Messages.error("Failure", e.data);
-          $('#loadImagesSpinner').hide();
+          Messages.error("Unable to remove image", e.data);
           complete();
         });
       }
