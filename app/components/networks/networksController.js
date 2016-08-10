@@ -1,6 +1,6 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Network, Messages, errorMsgFilter) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'errorMsgFilter',
+function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.advancedSettings = false;
@@ -46,7 +46,9 @@ function ($scope, $state, Network, Messages, errorMsgFilter) {
   function prepareNetworkConfiguration() {
     var config = angular.copy($scope.config);
     prepareIPAMConfiguration(config);
-    config.Driver = 'overlay';
+    if ($scope.swarm) {
+      config.Driver = 'overlay';
+    }
     return config;
   }
 
@@ -108,5 +110,9 @@ function ($scope, $state, Network, Messages, errorMsgFilter) {
       $('#loadNetworksSpinner').hide();
     });
   }
-  fetchNetworks();
+
+  Config.$promise.then(function (c) {
+    $scope.swarm = c.swarm;
+    fetchNetworks();
+  });
 }]);
