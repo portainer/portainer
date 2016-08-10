@@ -50,7 +50,9 @@ function ($scope, $q, Config, Container, Image, Network, Volume, Info) {
 
   function prepareVolumeData(d) {
     var volumes = d.Volumes;
-    $scope.volumeData.total = volumes.length;
+    if (volumes) {
+      $scope.volumeData.total = volumes.length;
+    }
   }
 
   function prepareNetworkData(d) {
