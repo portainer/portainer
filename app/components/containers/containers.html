@@ -89,7 +89,7 @@
               <td ng-if="swarm"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
               <td ng-if="!swarm"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
-              <td ng-if="swarm">{{ container|swarmhostname}}</td>
+              <td ng-if="swarm">{{ container.hostIP }}</td>
               <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
               <td>{{ container.Command|truncate:60 }}</td>
             </tr>
