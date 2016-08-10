@@ -154,15 +154,7 @@ angular.module('uifordocker.filters', [])
     return [];
   };
 })
-.filter('getdate', function () {
-  'use strict';
-  return function (data) {
-    //Multiply by 1000 for the unix format
-    var date = new Date(data * 1000);
-    return date.toDateString();
-  };
-})
-.filter('getdatefromtimestamp', function () {
+.filter('getisodatefromtimestamp', function () {
   'use strict';
   return function (timestamp) {
     return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');

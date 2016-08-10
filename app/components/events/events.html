@@ -50,7 +50,7 @@
             </thead>
             <tbody>
               <tr ng-repeat="event in (events | filter:state.filter | orderBy:sortType:sortReverse)">
-                <td>{{ event.Time|getdatefromtimestamp }}</td>
+                <td>{{ event.Time|getisodatefromtimestamp }}</td>
                 <td>{{ event.Type }}</td>
                 <td>{{ event.Details }}</td>
               </tr>

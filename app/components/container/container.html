@@ -84,7 +84,7 @@
           <tbody>
             <tr>
               <td>Created</td>
-              <td>{{ container.Created | date: 'medium' }}</td>
+              <td>{{ container.Created|getisodate }}</td>
             </tr>
             <tr>
               <td>Path</td>
@@ -186,7 +186,8 @@
           <tbody>
             <tr ng-repeat="(key, val) in container.State">
               <td>{{key}}</td>
-              <td>{{ val }}</td>
+              <td ng-if="key === 'StartedAt' || key ===  'FinishedAt'">{{val|getisodate}}</td>
+              <td ng-if="key !== 'StartedAt' && key !==  'FinishedAt'">{{val}}</td>
             </tr>
           </tbody>
         </table>
