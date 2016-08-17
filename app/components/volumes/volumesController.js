@@ -3,7 +3,7 @@ angular.module('volumes', [])
 function ($scope, $state, Volume, Messages, errorMsgFilter) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
-  $scope.sortType = 'Name';
+  $scope.sortType = 'Driver';
   $scope.sortReverse = true;
 
   $scope.config = {
@@ -21,6 +21,32 @@ function ($scope, $state, Volume, Messages, errorMsgFilter) {
     } else {
       $scope.state.selectedItemCount--;
     }
+  };
+
+  function prepareVolumeConfiguration() {
+    var config = angular.copy($scope.config);
+    config.Driver = 'local-persist';
+    config.DriverOpts = {};
+    config.DriverOpts.mountpoint = '/volume/' + config.Name;
+    return config;
+  }
+
+  $scope.createVolume = function() {
+    $('#createVolumeSpinner').show();
+    var config = prepareVolumeConfiguration();
+    Volume.create(config, function (d) {
+      if (d.Name) {
+        Messages.send("Volume created", d.Name);
+        $('#createVolumeSpinner').hide();
+        $state.go('volumes', {}, {reload: true});
+      } else {
+        $('#createVolumeSpinner').hide();
+        Messages.error('Unable to create volume', errorMsgFilter(d));
+      }
+    }, function (e) {
+      $('#createVolumeSpinner').hide();
+      Messages.error('Unable to create volume', e.data);
+    });
   };
 
   $scope.removeAction = function () {
@@ -51,7 +77,7 @@ function ($scope, $state, Volume, Messages, errorMsgFilter) {
   function fetchVolumes() {
     $('#loadVolumesSpinner').show();
     Volume.query({}, function (d) {
-      $scope.volumes = d.Volumes;
+      $scope.volumes = _.uniqBy(d.Volumes, 'Name');
       $('#loadVolumesSpinner').hide();
     }, function (e) {
       Messages.error("Failure", e.data);

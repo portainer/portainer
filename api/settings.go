@@ -9,6 +9,7 @@ import (
 type Settings struct {
 	Swarm        bool     `json:"swarm"`
 	HiddenLabels pairList `json:"hiddenLabels"`
+	Registries   pairList `json:"registries"`
 	Logo         string   `json:"logo"`
 }
 

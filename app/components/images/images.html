@@ -22,7 +22,10 @@
             </div>
             <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
             <div class="col-sm-3">
-              <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="leave empty to use DockerHub">
+              <select class="selectpicker form-control" ng-model="config.Registry">
+                <option value="">Docker Hub</option>
+                <option ng-repeat="registry in availableRegistries" ng-value="registry.value">{{ registry.name }}</option>
+              </select>
             </div>
           </div>
           <!-- !name-and-registry-inputs -->
@@ -88,13 +91,6 @@
                     <span ng-show="sortType == 'VirtualSize' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
-                <th>
-                  <a ui-sref="images" ng-click="order('Created')">
-                    Created
-                    <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Created' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
-                </th>
               </tr>
             </thead>
             <tbody>
@@ -105,12 +101,11 @@
                   <span class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>
                 </td>
                 <td>{{ image.VirtualSize|humansize }}</td>
-                <td>{{ image.Created|getisodatefromtimestamp }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </rd-widget-body>
-      <rd-widget>
-      </div>
-    </div>
+    <rd-widget>
+  </div>
+</div>
