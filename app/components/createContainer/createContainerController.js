@@ -17,6 +17,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
 
   $scope.config = {
     Env: [],
+    ExposedPorts: {},
     HostConfig: {
       RestartPolicy: {
         Name: 'no'
@@ -58,12 +59,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     $scope.formValues.AvailableRegistries = c.registries;
 
     Volume.query({}, function (d) {
-      var persistedVolumes = d.Volumes.filter(function (volume) {
-        if (volume.Driver === 'local-persist') {
-          return volume;
-        }
-      });
-      $scope.availableVolumes = _.uniqBy(persistedVolumes, 'Name');
+      $scope.availableVolumes = d.Volumes;
     }, function (e) {
       Messages.error("Failure", e.data);
     });
@@ -155,6 +151,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
       if (portBinding.hostPort && portBinding.containerPort) {
         var key = portBinding.containerPort + "/" + portBinding.protocol;
         bindings[key] = [{ HostPort: portBinding.hostPort }];
+        config.ExposedPorts[key] = {};
       }
     });
     config.HostConfig.PortBindings = bindings;
