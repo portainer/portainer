@@ -17,6 +17,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
 
   $scope.config = {
     Env: [],
+    ExposedPorts: {},
     HostConfig: {
       RestartPolicy: {
         Name: 'no'
@@ -150,6 +151,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
       if (portBinding.hostPort && portBinding.containerPort) {
         var key = portBinding.containerPort + "/" + portBinding.protocol;
         bindings[key] = [{ HostPort: portBinding.hostPort }];
+        config.ExposedPorts[key] = {};
       }
     });
     config.HostConfig.PortBindings = bindings;
