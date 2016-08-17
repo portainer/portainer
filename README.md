@@ -1,7 +1,5 @@
 # Cloudinovasi UI for Docker
 
-This UI is dedicated to CloudInovasi internal usage.
-
 A fork of the amazing UI for Docker by Michael Crosby and Kevan Ahlquist (https://github.com/kevana/ui-for-docker) using the rdash-angular theme (https://github.com/rdash/rdash-angular).
 
 ![Dashboard](/dashboard.png)
@@ -9,6 +7,7 @@ A fork of the amazing UI for Docker by Michael Crosby and Kevan Ahlquist (https:
 UI For Docker is a web interface for the Docker Remote API.  The goal is to provide a pure client side implementation so it is effortless to connect and manage docker.
 
 ## Goals
+
 * Minimal dependencies - I really want to keep this project a pure html/js app.
 * Consistency - The web UI should be consistent with the commands found on the docker CLI.
 
