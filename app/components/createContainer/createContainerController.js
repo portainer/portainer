@@ -150,7 +150,15 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     config.HostConfig.PortBindings.forEach(function (portBinding) {
       if (portBinding.hostPort && portBinding.containerPort) {
         var key = portBinding.containerPort + "/" + portBinding.protocol;
-        bindings[key] = [{ HostPort: portBinding.hostPort }];
+        var binding = {};
+        if (portBinding.hostPort.indexOf(':') > -1) {
+          var hostAndPort = portBinding.hostPort.split(':');
+          binding.HostIp = hostAndPort[0];
+          binding.HostPort = hostAndPort[1];
+        } else {
+          binding.HostPort = portBinding.hostPort;
+        }
+        bindings[key] = [binding];
         config.ExposedPorts[key] = {};
       }
     });
