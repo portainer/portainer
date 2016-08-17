@@ -1,11 +1,15 @@
 angular.module('image', [])
-.controller('ImageController', ['$scope', '$stateParams', '$state', 'Image', 'Messages',
-function ($scope, $stateParams, $state, Image, Messages) {
+.controller('ImageController', ['$scope', '$stateParams', '$state', 'Config', 'Image', 'Messages',
+function ($scope, $stateParams, $state, Config, Image, Messages) {
   $scope.RepoTags = [];
 
   $scope.config = {
     Image: '',
     Registry: ''
+  };
+
+  $scope.formValues = {
+    AvailableRegistries: [],
   };
 
   // Get RepoTags from the /images/query endpoint instead of /image/json,
@@ -86,22 +90,26 @@ function ($scope, $stateParams, $state, Image, Messages) {
     });
   };
 
-  $('#loadingViewSpinner').show();
-  Image.get({id: $stateParams.id}, function (d) {
-    $scope.image = d;
-    if (d.RepoTags) {
-      $scope.RepoTags = d.RepoTags;
-    } else {
-      getRepoTags(d.Id);
-    }
-    $('#loadingViewSpinner').hide();
-    $scope.exposedPorts = d.ContainerConfig.ExposedPorts ? Object.keys(d.ContainerConfig.ExposedPorts) : [];
-    $scope.volumes = d.ContainerConfig.Volumes ? Object.keys(d.ContainerConfig.Volumes) : [];
-  }, function (e) {
-    if (e.status === 404) {
-      Messages.error("Unable to find image", $stateParams.id);
-    } else {
-      Messages.error("Unable to retrieve image info", e.data);
-    }
+  Config.$promise.then(function (c) {
+    $scope.formValues.AvailableRegistries = c.registries;
+
+    $('#loadingViewSpinner').show();
+    Image.get({id: $stateParams.id}, function (d) {
+      $scope.image = d;
+      if (d.RepoTags) {
+        $scope.RepoTags = d.RepoTags;
+      } else {
+        getRepoTags(d.Id);
+      }
+      $('#loadingViewSpinner').hide();
+      $scope.exposedPorts = d.ContainerConfig.ExposedPorts ? Object.keys(d.ContainerConfig.ExposedPorts) : [];
+      $scope.volumes = d.ContainerConfig.Volumes ? Object.keys(d.ContainerConfig.Volumes) : [];
+    }, function (e) {
+      if (e.status === 404) {
+        Messages.error("Unable to find image", $stateParams.id);
+      } else {
+        Messages.error("Unable to retrieve image info", e.data);
+      }
+    });
   });
 }]);

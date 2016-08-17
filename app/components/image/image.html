@@ -48,7 +48,10 @@
             </div>
             <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
             <div class="col-sm-3">
-              <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="optional">
+              <select class="selectpicker form-control" ng-model="config.Registry">
+                <option value="">Docker Hub</option>
+                <option ng-repeat="registry in formValues.AvailableRegistries" ng-value="registry.value">{{ registry.name }}</option>
+              </select>
             </div>
           </div>
           <!-- !name-and-registry-inputs -->
