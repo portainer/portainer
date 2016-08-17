@@ -38,10 +38,7 @@ func main() {
 	settings := &Settings{
 		Swarm:        *swarm,
 		HiddenLabels: *labels,
-<<<<<<< HEAD
 		Registries:   *registries,
-=======
->>>>>>> feat107-push-registry
 		Logo:         *logo,
 	}
 
