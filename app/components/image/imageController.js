@@ -3,6 +3,11 @@ angular.module('image', [])
 function ($scope, $stateParams, $state, Image, Messages) {
   $scope.RepoTags = [];
 
+  $scope.config = {
+    Image: '',
+    Registry: ''
+  };
+
   // Get RepoTags from the /images/query endpoint instead of /image/json,
   // for backwards compatibility with Docker API versions older than 1.21
   function getRepoTags(imageId) {
@@ -14,6 +19,34 @@ function ($scope, $stateParams, $state, Image, Messages) {
       });
     });
   }
+
+  function createImageConfig(imageName, registry) {
+    var imageNameAndTag = imageName.split(':');
+    var image = imageNameAndTag[0];
+    if (registry) {
+      image = registry + '/' + imageNameAndTag[0];
+    }
+    var imageConfig = {
+      repo: image,
+      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
+    };
+    return imageConfig;
+  }
+
+  $scope.tagImage = function() {
+    $('#loadingViewSpinner').show();
+    var image = _.toLower($scope.config.Image);
+    var registry = _.toLower($scope.config.Registry);
+    var imageConfig = createImageConfig(image, registry);
+    Image.tag({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
+      Messages.send('Image successfully tagged');
+      $('#loadingViewSpinner').hide();
+      $state.go('image', {id: $stateParams.id}, {reload: true});
+    }, function(e) {
+      $('#loadingViewSpinner').hide();
+      Messages.error("Unable to tag image", e.data);
+    });
+  };
 
   $scope.pushImage = function(tag) {
     $('#loadingViewSpinner').show();
