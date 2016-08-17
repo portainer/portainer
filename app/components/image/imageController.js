@@ -15,6 +15,21 @@ function ($scope, $stateParams, $state, Image, Messages) {
     });
   }
 
+  $scope.pushImage = function(tag) {
+    $('#loadingViewSpinner').show();
+    Image.push({tag: tag}, function (d) {
+      if (d[d.length-1].error) {
+        Messages.error("Unable to push image", d[d.length-1].error);
+      } else {
+        Messages.send('Image successfully pushed');
+      }
+      $('#loadingViewSpinner').hide();
+    }, function (e) {
+      $('#loadingViewSpinner').hide();
+      Messages.error("Unable to push image", e.data);
+    });
+  };
+
   $scope.removeImage = function (id) {
     $('#loadingViewSpinner').show();
     Image.remove({id: id}, function (d) {
