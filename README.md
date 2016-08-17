@@ -111,6 +111,36 @@ For example, if I want the registry 'myCustomRegistry' pointing to *myregistry.d
 $ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui -r myCustomRegistry=myregistry.domain.com:5000
 ```
 
+### Reverse proxy configuration
+
+Has been tested with Nginx 1.11.
+
+Use the following configuration to host the UI at `myhost.mydomain.com/dockerui`:
+
+```nginx
+upstream cloudinovasi-ui {
+    server ADDRESS:PORT;
+}
+
+server {
+  listen 80;
+
+  location /dockerui/ {
+      proxy_http_version 1.1;
+      proxy_set_header Connection "";
+      proxy_pass http://cloudinovasi-ui/;
+  }
+  location /dockerui/ws/ {
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_http_version 1.1;
+      proxy_pass http://cloudinovasi-ui/ws/;
+  }
+}
+```
+
+Replace `ADDRESS:PORT` with the CloudInovasi UI container details.
+
 ### Available options
 
 The following options are available for the `ui-for-docker` binary:
