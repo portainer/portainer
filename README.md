@@ -85,6 +85,18 @@ $ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -v /path/to/certs:/cer
 
 *Note*: Replace `/path/to/certs` to the path to the certificate files on your disk.
 
+### Use your own logo
+
+You can use the `--logo` flag to specify an URL to your own logo.
+
+For example, using the Docker logo:
+
+```
+$ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui --logo "https://www.docker.com/sites/all/themes/docker/assets/images/brand-full.svg"
+```
+
+The custom logo will replace the CloudInovasi logo in the UI.
+
 ### Hide containers with specific labels
 
 You can hide specific containers in the containers view by using the `--hide-label` or `-l` options and specifying a label.
