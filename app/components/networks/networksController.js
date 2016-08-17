@@ -4,7 +4,7 @@ function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.advancedSettings = false;
-  $scope.sortType = 'Scope';
+  $scope.sortType = 'Name';
   $scope.sortReverse = false;
 
   $scope.formValues = {
@@ -30,44 +30,6 @@ function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
     } else {
       $scope.state.selectedItemCount--;
     }
-  };
-
-  function prepareIPAMConfiguration(config) {
-    if ($scope.formValues.Subnet) {
-      var ipamConfig = {};
-      ipamConfig.Subnet = $scope.formValues.Subnet;
-      if ($scope.formValues.Gateway) {
-        ipamConfig.Gateway = $scope.formValues.Gateway  ;
-      }
-      config.IPAM.Config.push(ipamConfig);
-    }
-  }
-
-  function prepareNetworkConfiguration() {
-    var config = angular.copy($scope.config);
-    prepareIPAMConfiguration(config);
-    if ($scope.swarm) {
-      config.Driver = 'overlay';
-    }
-    return config;
-  }
-
-  $scope.createNetwork = function() {
-    $('#createNetworkSpinner').show();
-    var config = prepareNetworkConfiguration();
-    Network.create(config, function (d) {
-      if (d.Id) {
-        Messages.send("Network created", d.Id);
-        $('#createNetworkSpinner').hide();
-        $state.go('networks', {}, {reload: true});
-      } else {
-        $('#createNetworkSpinner').hide();
-        Messages.error('Unable to create network', errorMsgFilter(d));
-      }
-    }, function (e) {
-      $('#createNetworkSpinner').hide();
-      Messages.error('Unable to create network', e.data);
-    });
   };
 
   $scope.removeAction = function () {
@@ -111,8 +73,5 @@ function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
     });
   }
 
-  Config.$promise.then(function (c) {
-    $scope.swarm = c.swarm;
-    fetchNetworks();
-  });
+  fetchNetworks();
 }]);
