@@ -111,9 +111,21 @@ $ docker run -d -p 10.20.30.1:80:9000 --privileged -v /var/run/docker.sock:/var/
 <p><em>Note</em>: Replace <code>/path/to/certs</code> to the path to the certificate files on your disk.</p>
 
 <h3>
+<a id="use-your-own-logo" class="anchor" href="#use-your-own-logo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Use your own logo</h3>
+
+<p>You can use the <code>--logo</code> flag to specify an URL to your own logo.</p>
+
+<p>For example, using the Docker logo:</p>
+
+<pre><code>$ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui --logo "https://www.docker.com/sites/all/themes/docker/assets/images/brand-full.svg"
+</code></pre>
+
+<p>The custom logo will replace the CloudInovasi logo in the UI.</p>
+
+<h3>
 <a id="hide-containers-with-specific-labels" class="anchor" href="#hide-containers-with-specific-labels" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hide containers with specific labels</h3>
 
-<p>You can hide specific containers in the containers view by using the <code>-hide-label</code> or <code>-l</code> options and specifying a label.</p>
+<p>You can hide specific containers in the containers view by using the <code>--hide-label</code> or <code>-l</code> options and specifying a label.</p>
 
 <p>For example, take a container started with the label <code>owner=acme</code>:</p>
 
@@ -124,6 +136,35 @@ $ docker run -d -p 10.20.30.1:80:9000 --privileged -v /var/run/docker.sock:/var/
 
 <pre><code>$ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui -l owner=acme
 </code></pre>
+
+<h3>
+<a id="reverse-proxy-configuration" class="anchor" href="#reverse-proxy-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reverse proxy configuration</h3>
+
+<p>Has been tested with Nginx 1.11.</p>
+
+<p>Use the following configuration to host the UI at <code>myhost.mydomain.com/dockerui</code>:</p>
+
+<div class="highlight highlight-source-nginx"><pre><span class="pl-k">upstream</span> <span class="pl-en">cloudinovasi-ui </span>{
+    <span class="pl-k">server</span> ADDRESS:PORT;
+}
+
+<span class="pl-k">server</span> {
+  <span class="pl-k">listen</span> <span class="pl-s">80</span>;
+
+  <span class="pl-k">location</span> <span class="pl-en">/dockerui/ </span>{
+      <span class="pl-k">proxy_http_version</span> <span class="pl-c1">1.1</span>;
+      <span class="pl-k">proxy_set_header</span> Connection <span class="pl-s">""</span>;
+      <span class="pl-k">proxy_pass</span> http://cloudinovasi-ui/;
+  }
+  <span class="pl-k">location</span> <span class="pl-en">/dockerui/ws/ </span>{
+      <span class="pl-k">proxy_set_header</span> Upgrade <span class="pl-smi">$http_upgrade</span>;
+      <span class="pl-k">proxy_set_header</span> Connection <span class="pl-s">"upgrade"</span>;
+      <span class="pl-k">proxy_http_version</span> <span class="pl-c1">1.1</span>;
+      <span class="pl-k">proxy_pass</span> http://cloudinovasi-ui/ws/;
+  }
+}</pre></div>
+
+<p>Replace <code>ADDRESS:PORT</code> with the CloudInovasi UI container details.</p>
 
 <h3>
 <a id="available-options" class="anchor" href="#available-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Available options</h3>
@@ -142,8 +183,6 @@ $ docker run -d -p 10.20.30.1:80:9000 --privileged -v /var/run/docker.sock:/var/
 <li>
 <code>--swarm</code>, <code>-s</code>: Swarm cluster support (default: <code>false</code>)</li>
 <li>
-<code>--hide-label</code>, <code>-l</code>: Hide containers with a specific label in the UI</li>
-<li>
 <code>--tlsverify</code>: TLS support (default: <code>false</code>)</li>
 <li>
 <code>--tlscacert</code>: Path to the CA (default <code>/certs/ca.pem</code>)</li>
@@ -151,6 +190,8 @@ $ docker run -d -p 10.20.30.1:80:9000 --privileged -v /var/run/docker.sock:/var/
 <code>--tlscert</code>: Path to the TLS certificate file (default <code>/certs/cert.pem</code>)</li>
 <li>
 <code>--tlskey</code>: Path to the TLS key (default <code>/certs/key.pem</code>)</li>
+<li>
+<code>--hide-label</code>, <code>-l</code>: Hide containers with a specific label in the UI</li>
 <li>
 <code>--logo</code>: URL to a picture to be displayed as a logo in the UI</li>
 </ul>
