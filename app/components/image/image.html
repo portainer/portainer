@@ -37,6 +37,43 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
+      <rd-widget-header icon="fa-tag" title="Tag the image"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-and-registry-inputs -->
+          <div class="form-group">
+            <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-7">
+              <input type="text" class="form-control" ng-model="config.Image" id="image_name" placeholder="e.g. myImage:myTag">
+            </div>
+            <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
+            <div class="col-sm-3">
+              <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="optional">
+            </div>
+          </div>
+          <!-- !name-and-registry-inputs -->
+          <!-- tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">Note: if you don't specify the tag in the image name, <span class="label label-default">latest</span> will be used.</span>
+            </div>
+          </div>
+          <!-- !tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-default btn-sm" ng-disabled="!config.Image" ng-click="tagImage()">Tag</button>
+              <i id="pullImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
       <rd-widget-header icon="fa-clone" title="Image details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">

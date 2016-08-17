@@ -101,16 +101,6 @@ You can hide it in the view by starting the ui with:
 $ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui -l owner=acme
 ```
 
-### Custom Docker registries support
-
-You can specify the support of others registries than DockerHub by using the `--registries` or `-r` options and specifying a registry using the format *REGISTRY_NAME=REGISTRY_ADDRESS*.
-
-For example, if I want the registry 'myCustomRegistry' pointing to *myregistry.domain.com:5000* available in the UI:
-
-```
-$ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui -r myCustomRegistry=myregistry.domain.com:5000
-```
-
 ### Available options
 
 The following options are available for the `ui-for-docker` binary:
@@ -120,7 +110,6 @@ The following options are available for the `ui-for-docker` binary:
 * `--data`, `-d`: Path to the data folder (default: `"."`)
 * `--assets`, `-a`: Path to the assets (default: `"."`)
 * `--swarm`, `-s`: Swarm cluster support (default: `false`)
-* `--registries`, `-r`: Available registries in the UI (format *REGISTRY_NAME=REGISTRY_ADDRESS*)
 * `--tlsverify`: TLS support (default: `false`)
 * `--tlscacert`: Path to the CA (default `/certs/ca.pem`)
 * `--tlscert`: Path to the TLS certificate file (default `/certs/cert.pem`)
