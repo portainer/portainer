@@ -36,7 +36,12 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages, e
       if (d.Id) {
         var execId = d.Id;
         resizeTTY(execId, termHeight, termWidth);
-        var url = window.location.href.split('#')[0].replace('http://', 'ws://') + 'ws/exec?id=' + execId;
+        var url = window.location.href.split('#')[0] + 'ws/exec?id=' + execId;
+        if (url.indexOf('https') > -1) {
+          url = url.replace('https://', 'wss://');
+        } else {
+          url = url.replace('http://', 'ws://');
+        }
         initTerm(url, termHeight, termWidth);
       } else {
         $('#loadConsoleSpinner').hide();
