@@ -1,20 +1,7 @@
-// Events query API return a list of JSON object.
+// The Docker API often returns a list of JSON object.
 // This handler wrap the JSON objects in an array.
-function queryEventsHandler(data) {
-  var str = "[" + data.replace(/\n/g, " ").replace(/\}\s*\{/g, "}, {") + "]";
-  return angular.fromJson(str);
-}
-
-// Image create API return a list of JSON object.
-// This handler wrap the JSON objects in an array.
-function createImageHandler(data) {
-  var str = "[" + data.replace(/\n/g, " ").replace(/\}\s*\{/g, "}, {") + "]";
-  return angular.fromJson(str);
-}
-
-// Image push API return a list of JSON object.
-// This handler wrap the JSON objects in an array.
-function pushImageHandler(data) {
+// Used by the API in: Image push, Image create, Events query.
+function jsonObjectsToArrayHandler(data) {
   var str = "[" + data.replace(/\n/g, " ").replace(/\}\s*\{/g, "}, {") + "]";
   return angular.fromJson(str);
 }
