@@ -58,12 +58,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     $scope.formValues.AvailableRegistries = c.registries;
 
     Volume.query({}, function (d) {
-      var persistedVolumes = d.Volumes.filter(function (volume) {
-        if (volume.Driver === 'local-persist') {
-          return volume;
-        }
-      });
-      $scope.availableVolumes = _.uniqBy(persistedVolumes, 'Name');
+      $scope.availableVolumes = d.Volumes;
     }, function (e) {
       Messages.error("Failure", e.data);
     });
