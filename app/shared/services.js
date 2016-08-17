@@ -93,9 +93,12 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
             search: {method: 'GET', params: {action: 'search'}},
             history: {method: 'GET', params: {action: 'history'}, isArray: true},
             insert: {method: 'POST', params: {id: '@id', action: 'insert'}},
-            push: {method: 'POST', params: {id: '@id', action: 'push'}},
             tag: {method: 'POST', params: {id: '@id', action: 'tag', force: 0, repo: '@repo', tag: '@tag'}},
             inspect: {method: 'GET', params: {id: '@id', action: 'json'}},
+            push: {
+                method: 'POST', params: {action: 'push', id: '@tag'},
+                isArray: true, transformResponse: pushImageHandler
+            },
             create: {
                 method: 'POST', params: {action: 'create', fromImage: '@fromImage', tag: '@tag'},
                 isArray: true, transformResponse: createImageHandler
