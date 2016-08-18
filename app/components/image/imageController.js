@@ -9,7 +9,7 @@ function ($scope, $stateParams, $state, Config, Image, Messages) {
   };
 
   $scope.formValues = {
-    AvailableRegistries: [],
+    AvailableRegistries: []
   };
 
   // Get RepoTags from the /images/query endpoint instead of /image/json,
