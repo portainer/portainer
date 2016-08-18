@@ -6,7 +6,7 @@ import (
 
 // main is the entry point of the program
 func main() {
-	kingpin.Version("1.6.0")
+	kingpin.Version("1.7.0")
 	var (
 		endpoint   = kingpin.Flag("host", "Dockerd endpoint").Default("unix:///var/run/docker.sock").Short('H').String()
 		addr       = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
