@@ -92,28 +92,31 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
             get: {method: 'GET', params: {action: 'json'}},
             search: {method: 'GET', params: {action: 'search'}},
             history: {method: 'GET', params: {action: 'history'}, isArray: true},
-            create: {
-                method: 'POST', isArray: true, transformResponse: [function f(data) {
-                    var str = "[" + data.replace(/\n/g, " ").replace(/\}\s*\{/g, "}, {") + "]";
-                    return angular.fromJson(str);
-                }],
-                params: {action: 'create', fromImage: '@fromImage', tag: '@tag'}
-            },
             insert: {method: 'POST', params: {id: '@id', action: 'insert'}},
-            push: {method: 'POST', params: {id: '@id', action: 'push'}},
             tag: {method: 'POST', params: {id: '@id', action: 'tag', force: 0, repo: '@repo', tag: '@tag'}},
-            remove: {method: 'DELETE', params: {id: '@id'}, isArray: true},
-            inspect: {method: 'GET', params: {id: '@id', action: 'json'}}
+            inspect: {method: 'GET', params: {id: '@id', action: 'json'}},
+            push: {
+                method: 'POST', params: {action: 'push', id: '@tag'},
+                isArray: true, transformResponse: jsonObjectsToArrayHandler
+            },
+            create: {
+                method: 'POST', params: {action: 'create', fromImage: '@fromImage', tag: '@tag'},
+                isArray: true, transformResponse: jsonObjectsToArrayHandler
+            },
+            remove: {
+              method: 'DELETE', params: {id: '@id'},
+              isArray: true, transformResponse: deleteImageHandler
+            }
         });
     }])
     .factory('Events', ['$resource', 'Settings', function EventFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/monitor-docker-s-events
         return $resource(Settings.url + '/events', {}, {
-            query: {method: 'GET', params: {since: '@since', until: '@until'}, isArray: true, transformResponse: [function f(data) {
-                var str = "[" + data.replace(/\n/g, " ").replace(/\}\s*\{/g, "}, {") + "]";
-                return angular.fromJson(str);
-            }]}
+            query: {
+              method: 'GET', params: {since: '@since', until: '@until'},
+              isArray: true, transformResponse: jsonObjectsToArrayHandler
+            }
         });
     }])
     .factory('Version', ['$resource', 'Settings', function VersionFactory($resource, Settings) {

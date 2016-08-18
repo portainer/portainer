@@ -9,6 +9,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
   $scope.formValues = {
     Console: 'none',
     Volumes: [],
+    AvailableRegistries: [],
     Registry: ''
   };
 
@@ -16,6 +17,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
 
   $scope.config = {
     Env: [],
+    ExposedPorts: {},
     HostConfig: {
       RestartPolicy: {
         Name: 'no'
@@ -27,12 +29,8 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     }
   };
 
-  $scope.resetVolumePath = function(index) {
-    $scope.formValues.Volumes[index].name = '';
-  };
-
   $scope.addVolume = function() {
-    $scope.formValues.Volumes.push({ name: '', containerPath: '', readOnly: false, isPath: false });
+    $scope.formValues.Volumes.push({ name: '', containerPath: '' });
   };
 
   $scope.removeVolume = function(index) {
@@ -58,6 +56,8 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
   Config.$promise.then(function (c) {
     var swarm = c.swarm;
 
+    $scope.formValues.AvailableRegistries = c.registries;
+
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
     }, function (e) {
@@ -72,6 +72,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
             return network;
           }
         });
+        $scope.globalNetworkCount = networks.length;
         networks.push({Name: "bridge"});
         networks.push({Name: "host"});
         networks.push({Name: "none"});
@@ -149,7 +150,16 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     config.HostConfig.PortBindings.forEach(function (portBinding) {
       if (portBinding.hostPort && portBinding.containerPort) {
         var key = portBinding.containerPort + "/" + portBinding.protocol;
-        bindings[key] = [{ HostPort: portBinding.hostPort }];
+        var binding = {};
+        if (portBinding.hostPort.indexOf(':') > -1) {
+          var hostAndPort = portBinding.hostPort.split(':');
+          binding.HostIp = hostAndPort[0];
+          binding.HostPort = hostAndPort[1];
+        } else {
+          binding.HostPort = portBinding.hostPort;
+        }
+        bindings[key] = [binding];
+        config.ExposedPorts[key] = {};
       }
     });
     config.HostConfig.PortBindings = bindings;

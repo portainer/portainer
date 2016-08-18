@@ -1,27 +1,27 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', 'Network', 'Messages', 'errorMsgFilter',
-function ($scope, Network, Messages, errorMsgFilter) {
-
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'errorMsgFilter',
+function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
   $scope.state = {};
-  $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
+  $scope.state.advancedSettings = false;
   $scope.sortType = 'Name';
-  $scope.sortReverse = true;
+  $scope.sortReverse = false;
+
+  $scope.formValues = {
+    Subnet: '',
+    Gateway: ''
+  };
+
+  $scope.config = {
+    Name: '',
+    IPAM: {
+      Config: []
+    }
+  };
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
-  };
-
-  $scope.toggleSelectAll = function () {
-    angular.forEach($scope.state.filteredNetworks, function (i) {
-      i.Checked = $scope.state.toggle;
-    });
-    if ($scope.state.toggle) {
-      $scope.state.selectedItemCount = $scope.state.filteredNetworks.length;
-    } else {
-      $scope.state.selectedItemCount = 0;
-    }
   };
 
   $scope.selectItem = function (item) {
@@ -72,5 +72,6 @@ function ($scope, Network, Messages, errorMsgFilter) {
       $('#loadNetworksSpinner').hide();
     });
   }
+
   fetchNetworks();
 }]);

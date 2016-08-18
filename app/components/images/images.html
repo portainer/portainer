@@ -66,7 +66,7 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th><label><input type="checkbox" ng-model="state.toggle" ng-change="toggleSelectAll()" /> Select</label></th>
+                <th></th>
                 <th>
                   <a ui-sref="images" ng-click="order('Id')">
                     Id
@@ -83,7 +83,7 @@
                 </th>
                 <th>
                   <a ui-sref="images" ng-click="order('VirtualSize')">
-                    VirtualSize
+                    Size
                     <span ng-show="sortType == 'VirtualSize' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'VirtualSize' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
@@ -105,12 +105,12 @@
                   <span class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>
                 </td>
                 <td>{{ image.VirtualSize|humansize }}</td>
-                <td>{{ image.Created|getdate }}</td>
+                <td>{{ image.Created|getisodatefromtimestamp }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </rd-widget-body>
-    <rd-widget>
-  </div>
-</div>
+      <rd-widget>
+      </div>
+    </div>

@@ -28,7 +28,7 @@
         <table class="table table-hover">
           <thead>
             <tr>
-              <th><label><input type="checkbox" ng-model="state.toggle" ng-change="toggleSelectAll()"/> Select</label></th>
+              <th></th>
               <th>
                 <a ui-sref="networks" ng-click="order('Name')">
                   Name
@@ -83,13 +83,13 @@
           <tbody>
             <tr ng-repeat="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse))">
               <td><input type="checkbox" ng-model="network.Checked" ng-change="selectItem(network)"/></td>
-              <td><a ui-sref="network({id: network.Id})">{{ network.Name|truncate:20}}</a></td>
+              <td><a ui-sref="network({id: network.Id})">{{ network.Name|truncate:40}}</a></td>
               <td>{{ network.Id }}</td>
               <td>{{ network.Scope }}</td>
               <td>{{ network.Driver }}</td>
               <td>{{ network.IPAM.Driver }}</td>
-              <td>{{ network.IPAM.Config[0].Subnet }}</td>
-              <td>{{ network.IPAM.Config[0].Gateway }}</td>
+              <td>{{ network.IPAM.Config[0].Subnet ? network.IPAM.Config[0].Subnet : '-' }}</td>
+              <td>{{ network.IPAM.Config[0].Gateway ? network.IPAM.Config[0].Gateway : '-' }}</td>
             </tr>
           </tbody>
         </table>

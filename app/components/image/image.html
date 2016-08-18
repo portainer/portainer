@@ -1,96 +1,158 @@
 <rd-header>
-  <rd-header-title title="Image details"></rd-header-title>
+  <rd-header-title title="Image details">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
   <rd-header-content>
-    Images > <a ui-sref="image({id: id})">{{ id }}</a>
+    Images > <a ui-sref="image({id: image.Id})">{{ image.Id }}</a>
   </rd-header-content>
 </rd-header>
 
+<div class="row" ng-if="RepoTags.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa fa-tags" title="Image tags"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <div style="margin: 5px 10px;">
+          <span ng-repeat="tag in RepoTags" class="label label-primary image-tag">
+            <a data-toggle="tooltip" class="interactive" title="Push to registry" ng-click="pushImage(tag)">
+              <i class="fa fa-upload white-icon" aria-hidden="true"></i>
+            </a>
+            {{ tag }}
+            <a data-toggle="tooltip" class="interactive" title="Remove tag" ng-click="removeImage(tag)">
+              <i class="fa fa-trash-o white-icon" aria-hidden="true"></i>
+            </a>
+          </span>
+        </div>
+        <div style="margin: 5px 10px;">
+          <span class="small text-muted">
+            Note: you can click on the upload icon to push an image
+            and on the trash icon to delete a tag
+          </span>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
+      <rd-widget-header icon="fa-tag" title="Tag the image"></rd-widget-header>
       <rd-widget-body>
-        <div class="widget-icon grey pull-left">
-          <i class="fa fa-clone"></i>
-        </div>
-        <div class="title">{{ id }}</div>
-        <div class="comment">Image ID</div>
+        <form class="form-horizontal">
+          <!-- name-and-registry-inputs -->
+          <div class="form-group">
+            <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-7">
+              <input type="text" class="form-control" ng-model="config.Image" id="image_name" placeholder="e.g. myImage:myTag">
+            </div>
+            <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
+            <div class="col-sm-3">
+              <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="optional">
+            </div>
+          </div>
+          <!-- !name-and-registry-inputs -->
+          <!-- tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">Note: if you don't specify the tag in the image name, <span class="label label-default">latest</span> will be used.</span>
+            </div>
+          </div>
+          <!-- !tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-default btn-sm" ng-disabled="!config.Image" ng-click="tagImage()">Tag</button>
+              <i id="pullImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+            </div>
+          </div>
+        </form>
       </rd-widget-body>
     </rd-widget>
   </div>
 </div>
+
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon grey pull-left">
-          <i class="fa fa-cogs"></i>
-        </div>
-        <div class="title">
-          <div class="btn-group" role="group" aria-label="...">
-            <button class="btn btn-danger" ng-click="removeImage(id)">Remove</button>
-          </div>
-        </div>
-        <div class="comment">
-          Actions
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-<div class="row">
-  <div class="col-lg-12">
     <rd-widget>
       <rd-widget-header icon="fa-clone" title="Image details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
             <tr>
-              <td>Created</td>
-              <td>{{ image.Created | date: 'medium'}}</td>
-            </tr>
-            <tr>
-              <td>Tags</td>
+              <td>ID</td>
               <td>
-                <ul>
-                  <li ng-repeat="tag in RepoTags">{{ tag }}
-                    <button ng-click="removeImage(tag)" class="btn btn-sm btn-danger">Remove tag</button>
-                  </li>
-                </ul>
+                {{ image.Id }}
+                <button class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)">Delete this image</button>
               </td>
             </tr>
-            <tr>
+            <tr ng-if="image.Parent">
               <td>Parent</td>
               <td><a ui-sref="image({id: image.Parent})">{{ image.Parent }}</a></td>
             </tr>
             <tr>
-              <td>Size (Virtual Size)</td>
-              <td>{{ image.Size|humansize }} ({{ image.VirtualSize|humansize }})</td>
-            </tr>
-
-            <tr>
-              <td>Hostname</td>
-              <td>{{ image.ContainerConfig.Hostname }}</td>
+              <td>Size</td>
+              <td>{{ image.VirtualSize|humansize }}</td>
             </tr>
             <tr>
-              <td>User</td>
-              <td>{{ image.ContainerConfig.User }}</td>
+              <td>Created</td>
+              <td>{{ image.Created|getisodate }}</td>
             </tr>
             <tr>
-              <td>Cmd</td>
-              <td>{{ image.ContainerConfig.Cmd }}</td>
-            </tr>
-            <tr>
-              <td>Volumes</td>
-              <td>{{ image.ContainerConfig.Volumes }}</td>
-            </tr>
-            <tr>
-              <td>Volumes from</td>
-              <td>{{ image.ContainerConfig.VolumesFrom }}</td>
-            </tr>
-            <tr>
-              <td>Built with</td>
+              <td>Build</td>
               <td>Docker {{ image.DockerVersion }} on {{ image.Os}}, {{ image.Architecture }}</td>
+            </tr>
+            <tr ng-if="image.Author">
+              <td>Author</td>
+              <td>{{ image.Author }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title="Dockerfile details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>CMD</td>
+              <td><code>{{ image.ContainerConfig.Cmd|command }}</code></td>
+            </tr>
+            <tr ng-if="image.ContainerConfig.Entrypoint">
+              <td>ENTRYPOINT</td>
+              <td><code>{{ image.ContainerConfig.Entrypoint|command }}</code></td>
+            </tr>
+            <tr ng-if="image.ContainerConfig.ExposedPorts">
+              <td>EXPOSE</td>
+              <td>
+                <span class="label label-default tag" ng-repeat="port in exposedPorts">
+                  {{ port }}
+                </span>
+              </td>
+            </tr>
+            <tr ng-if="image.ContainerConfig.Volumes">
+              <td>VOLUME</td>
+              <td>
+                <span class="label label-default tag" ng-repeat="volume in volumes">
+                  {{ volume }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>ENV</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="var in image.ContainerConfig.Env">
+                    <td>{{ var|key }}</td>
+                    <td>{{ var|value }}</td>
+                  </tr>
+                </table>
+              </td>
             </tr>
           </tbody>
         </table>

@@ -28,7 +28,7 @@
         <table class="table table-hover">
           <thead>
             <tr>
-              <th><label><input type="checkbox" ng-model="state.toggle" ng-change="toggleSelectAll()"/> Select</label></th>
+              <th></th>
               <th>
                 <a ui-sref="volumes" ng-click="order('Name')">
                   Name
@@ -55,7 +55,7 @@
           <tbody>
             <tr ng-repeat="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse))">
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
-              <td>{{ volume.Name|truncate:20 }}</td>
+              <td>{{ volume.Name|truncate:50 }}</td>
               <td>{{ volume.Driver }}</td>
               <td>{{ volume.Mountpoint }}</td>
             </tr>
@@ -63,5 +63,5 @@
         </table>
       </div>
     </rd-widget-body>
-  <rd-widget>
-</div>
+    <rd-widget>
+    </div>

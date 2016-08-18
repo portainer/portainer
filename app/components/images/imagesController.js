@@ -1,10 +1,9 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Image', 'Messages',
-function ($scope, $state, Image, Messages) {
+.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'Messages',
+function ($scope, $state, Config, Image, Messages) {
   $scope.state = {};
-  $scope.sortType = 'Created';
+  $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
-  $scope.state.toggle = false;
   $scope.state.selectedItemCount = 0;
 
   $scope.config = {
@@ -15,17 +14,6 @@ function ($scope, $state, Image, Messages) {
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
-  };
-
-  $scope.toggleSelectAll = function () {
-    angular.forEach($scope.state.filteredImages, function (i) {
-      i.Checked = $scope.state.toggle;
-    });
-    if ($scope.state.toggle) {
-      $scope.state.selectedItemCount = $scope.state.filteredImages.length;
-    } else {
-      $scope.state.selectedItemCount = 0;
-    }
   };
 
   $scope.selectItem = function (item) {
@@ -83,15 +71,17 @@ function ($scope, $state, Image, Messages) {
       if (i.Checked) {
         counter = counter + 1;
         Image.remove({id: i.Id}, function (d) {
-          angular.forEach(d, function (resource) {
-            Messages.send("Image deleted", resource.Deleted);
-          });
-          var index = $scope.images.indexOf(i);
-          $scope.images.splice(index, 1);
+          if (d[0].message) {
+            $('#loadingViewSpinner').hide();
+            Messages.error("Unable to remove image", d[0].message);
+          } else {
+            Messages.send("Image deleted", i.Id);
+            var index = $scope.images.indexOf(i);
+            $scope.images.splice(index, 1);
+          }
           complete();
         }, function (e) {
-          Messages.error("Failure", e.data);
-          $('#loadImagesSpinner').hide();
+          Messages.error("Unable to remove image", e.data);
           complete();
         });
       }
@@ -110,5 +100,9 @@ function ($scope, $state, Image, Messages) {
     });
   }
 
-  fetchImages();
+  Config.$promise.then(function (c) {
+    $scope.availableRegistries = c.registries;
+    fetchImages();
+  });
+
 }]);

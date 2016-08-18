@@ -94,7 +94,6 @@ angular.module('uifordocker.filters', [])
     if (state === undefined) {
       return 'label-default';
     }
-
     if (state.Ghost && state.Running) {
       return 'label-important';
     }
@@ -155,18 +154,36 @@ angular.module('uifordocker.filters', [])
     return [];
   };
 })
-.filter('getdate', function () {
-  'use strict';
-  return function (data) {
-    //Multiply by 1000 for the unix format
-    var date = new Date(data * 1000);
-    return date.toDateString();
-  };
-})
-.filter('getdatefromtimestamp', function () {
+.filter('getisodatefromtimestamp', function () {
   'use strict';
   return function (timestamp) {
     return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+  };
+})
+.filter('getisodate', function () {
+  'use strict';
+  return function (date) {
+    return moment(date).format('YYYY-MM-DD HH:mm:ss');
+  };
+})
+.filter('command', function () {
+  'use strict';
+  return function (command) {
+    if (command) {
+      return command.join(' ');
+    }
+  };
+})
+.filter('key', function () {
+  'use strict';
+  return function (pair) {
+    return pair.slice(0, pair.indexOf('='));
+  };
+})
+.filter('value', function () {
+  'use strict';
+  return function (pair) {
+    return pair.slice(pair.indexOf('=') + 1);
   };
 })
 .filter('errorMsg', function () {

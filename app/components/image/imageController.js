@@ -1,33 +1,15 @@
 angular.module('image', [])
-.controller('ImageController', ['$scope', '$q', '$stateParams', '$state', 'Image', 'Container', 'Messages', 'LineChart',
-function ($scope, $q, $stateParams, $state, Image, Container, Messages, LineChart) {
-  $scope.tagInfo = {repo: '', version: '', force: false};
-  $scope.id = '';
-  $scope.repoTags = [];
+.controller('ImageController', ['$scope', '$stateParams', '$state', 'Image', 'Messages',
+function ($scope, $stateParams, $state, Image, Messages) {
+  $scope.RepoTags = [];
 
-  $scope.removeImage = function (id) {
-    Image.remove({id: id}, function (d) {
-      d.forEach(function(msg){
-        var key = Object.keys(msg)[0];
-        Messages.send(key, msg[key]);
-      });
-      // If last message key is 'Deleted' then assume the image is gone and send to images page
-      if (d[d.length-1].Deleted) {
-        $state.go('images', {}, {reload: true});
-      } else {
-        $state.go('image', {id: $scope.id}, {reload: true});
-      }
-    }, function (e) {
-      $scope.error = e.data;
-      $('#error-message').show();
-    });
+  $scope.config = {
+    Image: '',
+    Registry: ''
   };
 
-  /**
-  * Get RepoTags from the /images/query endpoint instead of /image/json,
-  * for backwards compatibility with Docker API versions older than 1.21
-  * @param {string} imageId
-  */
+  // Get RepoTags from the /images/query endpoint instead of /image/json,
+  // for backwards compatibility with Docker API versions older than 1.21
   function getRepoTags(imageId) {
     Image.query({}, function (d) {
       d.forEach(function(image) {
@@ -38,21 +20,88 @@ function ($scope, $q, $stateParams, $state, Image, Container, Messages, LineChar
     });
   }
 
+  function createImageConfig(imageName, registry) {
+    var imageNameAndTag = imageName.split(':');
+    var image = imageNameAndTag[0];
+    if (registry) {
+      image = registry + '/' + imageNameAndTag[0];
+    }
+    var imageConfig = {
+      repo: image,
+      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
+    };
+    return imageConfig;
+  }
+
+  $scope.tagImage = function() {
+    $('#loadingViewSpinner').show();
+    var image = _.toLower($scope.config.Image);
+    var registry = _.toLower($scope.config.Registry);
+    var imageConfig = createImageConfig(image, registry);
+    Image.tag({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
+      Messages.send('Image successfully tagged');
+      $('#loadingViewSpinner').hide();
+      $state.go('image', {id: $stateParams.id}, {reload: true});
+    }, function(e) {
+      $('#loadingViewSpinner').hide();
+      Messages.error("Unable to tag image", e.data);
+    });
+  };
+
+  $scope.pushImage = function(tag) {
+    $('#loadingViewSpinner').show();
+    Image.push({tag: tag}, function (d) {
+      if (d[d.length-1].error) {
+        Messages.error("Unable to push image", d[d.length-1].error);
+      } else {
+        Messages.send('Image successfully pushed');
+      }
+      $('#loadingViewSpinner').hide();
+    }, function (e) {
+      $('#loadingViewSpinner').hide();
+      Messages.error("Unable to push image", e.data);
+    });
+  };
+
+  $scope.removeImage = function (id) {
+    $('#loadingViewSpinner').show();
+    Image.remove({id: id}, function (d) {
+      if (d[0].message) {
+        $('#loadingViewSpinner').hide();
+        Messages.error("Unable to remove image", d[0].message);
+      } else {
+        // If last message key is 'Deleted' or if it's 'Untagged' and there is only one tag associated to the image
+        // then assume the image is gone and send to images page
+        if (d[d.length-1].Deleted || (d[d.length-1].Untagged && $scope.RepoTags.length === 1)) {
+          Messages.send('Image successfully deleted');
+          $state.go('images', {}, {reload: true});
+        } else {
+          Messages.send('Tag successfully deleted');
+          $state.go('image', {id: $stateParams.id}, {reload: true});
+        }
+      }
+    }, function (e) {
+      $('#loadingViewSpinner').hide();
+      Messages.error("Unable to remove image", e.data);
+    });
+  };
+
+  $('#loadingViewSpinner').show();
   Image.get({id: $stateParams.id}, function (d) {
     $scope.image = d;
-    $scope.id = d.Id;
     if (d.RepoTags) {
       $scope.RepoTags = d.RepoTags;
     } else {
-      getRepoTags($scope.id);
+      getRepoTags(d.Id);
     }
+    $('#loadingViewSpinner').hide();
+    $scope.exposedPorts = d.ContainerConfig.ExposedPorts ? Object.keys(d.ContainerConfig.ExposedPorts) : [];
+    $scope.volumes = d.ContainerConfig.Volumes ? Object.keys(d.ContainerConfig.Volumes) : [];
   }, function (e) {
     if (e.status === 404) {
-      $('.detail').hide();
-      $scope.error = "Image not found.<br />" + $stateParams.id;
+      Messages.error("Unable to find image", $stateParams.id);
     } else {
-      $scope.error = e.data;
+      Messages.error("Unable to retrieve image info", e.data);
     }
-    $('#error-message').show();
   });
 }]);

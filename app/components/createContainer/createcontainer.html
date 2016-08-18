@@ -107,7 +107,6 @@
           <li class="clickable"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="clickable"><a data-target="#security" data-toggle="tab">Security/Host</a></li>
         </ul>
-
         <!-- tab-content -->
         <div class="tab-content">
           <!-- tab-command -->
@@ -255,6 +254,11 @@
           <!-- tab-network -->
           <div class="tab-pane" id="network">
             <form class="form-horizontal" style="margin-top: 15px;">
+              <div class="form-group" ng-if="globalNetworkCount === 0">
+                <div class="col-sm-12">
+                  <span class="small text-muted">You don't have any shared network. Head over the <a ui-sref="networks">networks view</a> to create one.</span>
+                </div>
+              </div>
               <!-- network-input -->
               <div class="form-group">
                 <label for="container_network" class="col-sm-1 control-label text-left">Network</label>

@@ -7,6 +7,7 @@ A fork of the amazing UI for Docker by Michael Crosby and Kevan Ahlquist (https:
 UI For Docker is a web interface for the Docker Remote API.  The goal is to provide a pure client side implementation so it is effortless to connect and manage docker.
 
 ## Goals
+
 * Minimal dependencies - I really want to keep this project a pure html/js app.
 * Consistency - The web UI should be consistent with the commands found on the docker CLI.
 
@@ -14,7 +15,7 @@ UI For Docker is a web interface for the Docker Remote API.  The goal is to prov
 
 The current Docker version support policy is the following: `N` to `N-2` included where `N` is the latest version.
 
-At the moment, the following versions are supported: 1.9, 1.10 & 1.11. 
+At the moment, the following versions are supported: 1.9, 1.10 & 1.11.
 
 ## Run
 
@@ -83,9 +84,21 @@ $ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -v /path/to/certs:/cer
 
 *Note*: Replace `/path/to/certs` to the path to the certificate files on your disk.
 
+### Use your own logo
+
+You can use the `--logo` flag to specify an URL to your own logo.
+
+For example, using the Docker logo:
+
+```
+$ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui --logo "https://www.docker.com/sites/all/themes/docker/assets/images/brand-full.svg"
+```
+
+The custom logo will replace the CloudInovasi logo in the UI.
+
 ### Hide containers with specific labels
 
-You can hide specific containers in the containers view by using the `-hide-label` or `-l` options and specifying a label.
+You can hide specific containers in the containers view by using the `--hide-label` or `-l` options and specifying a label.
 
 For example, take a container started with the label `owner=acme`:
 
@@ -99,6 +112,36 @@ You can hide it in the view by starting the ui with:
 $ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui -l owner=acme
 ```
 
+### Reverse proxy configuration
+
+Has been tested with Nginx 1.11.
+
+Use the following configuration to host the UI at `myhost.mydomain.com/dockerui`:
+
+```nginx
+upstream cloudinovasi-ui {
+    server ADDRESS:PORT;
+}
+
+server {
+  listen 80;
+
+  location /dockerui/ {
+      proxy_http_version 1.1;
+      proxy_set_header Connection "";
+      proxy_pass http://cloudinovasi-ui/;
+  }
+  location /dockerui/ws/ {
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_http_version 1.1;
+      proxy_pass http://cloudinovasi-ui/ws/;
+  }
+}
+```
+
+Replace `ADDRESS:PORT` with the CloudInovasi UI container details.
+
 ### Available options
 
 The following options are available for the `ui-for-docker` binary:
@@ -108,8 +151,9 @@ The following options are available for the `ui-for-docker` binary:
 * `--data`, `-d`: Path to the data folder (default: `"."`)
 * `--assets`, `-a`: Path to the assets (default: `"."`)
 * `--swarm`, `-s`: Swarm cluster support (default: `false`)
-* `--hide-label`, `-l`: Hide containers with a specific label in the UI
 * `--tlsverify`: TLS support (default: `false`)
 * `--tlscacert`: Path to the CA (default `/certs/ca.pem`)
 * `--tlscert`: Path to the TLS certificate file (default `/certs/cert.pem`)
 * `--tlskey`: Path to the TLS key (default `/certs/key.pem`)
+* `--hide-label`, `-l`: Hide containers with a specific label in the UI
+* `--logo`: URL to a picture to be displayed as a logo in the UI

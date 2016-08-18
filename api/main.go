@@ -6,7 +6,7 @@ import (
 
 // main is the entry point of the program
 func main() {
-	kingpin.Version("1.6.0")
+	kingpin.Version("1.7.0")
 	var (
 		endpoint  = kingpin.Flag("host", "Dockerd endpoint").Default("unix:///var/run/docker.sock").Short('H').String()
 		addr      = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
@@ -18,6 +18,7 @@ func main() {
 		tlskey    = kingpin.Flag("tlskey", "Path to the TLS key").Default("/certs/key.pem").String()
 		swarm     = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
 		labels    = pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
+		logo      = kingpin.Flag("logo", "URL for the logo displayed in the UI").String()
 	)
 	kingpin.Parse()
 
@@ -36,6 +37,7 @@ func main() {
 	settings := &Settings{
 		Swarm:        *swarm,
 		HiddenLabels: *labels,
+		Logo:         *logo,
 	}
 
 	api := newAPI(apiConfig)

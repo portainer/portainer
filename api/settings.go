@@ -9,6 +9,7 @@ import (
 type Settings struct {
 	Swarm        bool     `json:"swarm"`
 	HiddenLabels pairList `json:"hiddenLabels"`
+	Logo         string   `json:"logo"`
 }
 
 // configurationHandler defines a handler function used to encode the configuration in JSON
