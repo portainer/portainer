@@ -17,7 +17,7 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
             changes: {method: 'GET', params: {action: 'changes'}, isArray: true},
             create: {method: 'POST', params: {action: 'create'}},
             remove: {method: 'DELETE', params: {id: '@id', v: 0}},
-            rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false},
+            rename: {method: 'POST', params: {id: '@id', action: 'rename', name: '@name'}},
             stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000},
             exec: {method: 'POST', params: {id: '@id', action: 'exec'}}
         });
@@ -32,22 +32,9 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
     .factory('ContainerCommit', ['$resource', '$http', 'Settings', function ContainerCommitFactory($resource, $http, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#create-a-new-image-from-a-container-s-changes
-        return {
-            commit: function (params, callback) {
-                $http({
-                    method: 'POST',
-                    url: Settings.url + '/commit',
-                    params: {
-                        'container': params.id,
-                        'tag': params.tag || null,
-                        'repo': params.repo || null
-                    },
-                    data: params.config
-                }).success(callback).error(function (data, status, headers, config) {
-                    console.log(error, data);
-                });
-            }
-        };
+        return $resource(Settings.url + '/commit', {}, {
+          commit: {method: 'POST', params: {container: '@id', repo: '@repo', tag: '@tag'}}
+        });
     }])
     .factory('ContainerLogs', ['$resource', '$http', 'Settings', function ContainerLogsFactory($resource, $http, Settings) {
         'use strict';

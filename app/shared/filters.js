@@ -176,16 +176,23 @@ angular.module('uifordocker.filters', [])
 })
 .filter('key', function () {
   'use strict';
-  return function (pair) {
-    return pair.slice(0, pair.indexOf('='));
+  return function (pair, separator) {
+    return pair.slice(0, pair.indexOf(separator));
   };
 })
 .filter('value', function () {
   'use strict';
-  return function (pair) {
-    return pair.slice(pair.indexOf('=') + 1);
+  return function (pair, separator) {
+    return pair.slice(pair.indexOf(separator) + 1);
   };
 })
+.filter('emptyobject', function () {
+  'use strict';
+  return function (obj) {
+    return _.isEmpty(obj);
+  };
+})
+
 .filter('errorMsg', function () {
   return function (object) {
     var idx = 0;
