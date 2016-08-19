@@ -71,6 +71,7 @@ function ($scope, $state, Config, Image, Messages) {
       if (i.Checked) {
         counter = counter + 1;
         Image.remove({id: i.Id}, function (d) {
+          console.log(JSON.stringify(d, null, 4));
           if (d[0].message) {
             $('#loadingViewSpinner').hide();
             Messages.error("Unable to remove image", d[0].message);
