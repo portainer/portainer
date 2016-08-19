@@ -6,14 +6,18 @@ function jsonObjectsToArrayHandler(data) {
   return angular.fromJson(str);
 }
 
-// Image delete API returns an array on success and an object on error.
-// This handler creates an array from an object in case of error.
+// Image delete API returns an array on success and a string on error.
+// This handler creates an array composed of a single object with a field 'message'
+// from a string in case of error.
 function deleteImageHandler(data) {
-  var response = angular.fromJson(data);
-  if (!Array.isArray(response)) {
+  var response;
+  if (!Array.isArray(data)) {
     var arr = [];
+    response = {};
+    response.message = data;
     arr.push(response);
     return arr;
   }
+  response = angular.fromJson(data);
   return response;
 }
