@@ -2,7 +2,6 @@ angular.module('image', [])
 .controller('ImageController', ['$scope', '$stateParams', '$state', 'Config', 'Image', 'Messages',
 function ($scope, $stateParams, $state, Config, Image, Messages) {
   $scope.RepoTags = [];
-
   $scope.config = {
     Image: '',
     Registry: ''
@@ -24,6 +23,7 @@ function ($scope, $stateParams, $state, Config, Image, Messages) {
     });
   }
 
+  //TODO: centralize createImageConfig (also used in containerController)
   function createImageConfig(imageName, registry) {
     var imageNameAndTag = imageName.split(':');
     var image = imageNameAndTag[0];

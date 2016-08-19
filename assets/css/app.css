@@ -202,3 +202,11 @@ input[type="radio"] {
 .interactive {
   cursor: pointer;
 }
+
+.action-group {
+  margin: 10px;
+}
+
+.btn-ico {
+  margin-right: 5px;
+}
