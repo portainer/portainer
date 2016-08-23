@@ -19,6 +19,13 @@ function ContainerViewModel(data) {
   this.Image = data.Image;
   this.Command = data.Command;
   this.Checked = false;
+  this.Ports = [];
+  for (var i = 0; i < data.Ports.length; ++i) {
+    var p = data.Ports[i];
+    if (p.PublicPort) {
+      this.Ports.push({ host: p.IP, private: p.PrivatePort, public: p.PublicPort });
+    }
+  }
 }
 
 function createEventDetails(event) {

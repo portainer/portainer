@@ -6,7 +6,7 @@ function ($scope, Container, Info, Settings, Messages, Config, errorMsgFilter) {
   $scope.state.displayAll = Settings.displayAll;
   $scope.state.displayIP = false;
   $scope.sortType = 'State';
-  $scope.sortReverse = true;
+  $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
 
   $scope.order = function (sortType) {
