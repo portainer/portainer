@@ -9,11 +9,12 @@ import (
 
 type (
 	api struct {
-		endpoint    *url.URL
-		bindAddress string
-		assetPath   string
-		dataPath    string
-		tlsConfig   *tls.Config
+		endpoint     *url.URL
+		bindAddress  string
+		assetPath    string
+		dataPath     string
+		tlsConfig    *tls.Config
+		templatesURL string
 	}
 
 	apiConfig struct {
@@ -26,6 +27,7 @@ type (
 		TLSCACertPath string
 		TLSCertPath   string
 		TLSKeyPath    string
+		TemplatesURL  string
 	}
 )
 
@@ -48,10 +50,11 @@ func newAPI(apiConfig apiConfig) *api {
 	}
 
 	return &api{
-		endpoint:    endpointURL,
-		bindAddress: apiConfig.BindAddress,
-		assetPath:   apiConfig.AssetPath,
-		dataPath:    apiConfig.DataPath,
-		tlsConfig:   tlsConfig,
+		endpoint:     endpointURL,
+		bindAddress:  apiConfig.BindAddress,
+		assetPath:    apiConfig.AssetPath,
+		dataPath:     apiConfig.DataPath,
+		tlsConfig:    tlsConfig,
+		templatesURL: apiConfig.TemplatesURL,
 	}
 }

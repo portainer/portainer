@@ -22,6 +22,7 @@ angular.module('uifordocker', [
   'network',
   'networks',
   'createNetwork',
+  'templates',
   'volumes',
   'createVolume'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function ($stateProvider, $urlRouterProvider, $httpProvider) {
@@ -118,6 +119,11 @@ angular.module('uifordocker', [
       templateUrl: 'app/components/network/network.html',
       controller: 'NetworkController'
     })
+    .state('templates', {
+      url: '/templates/',
+      templateUrl: 'app/components/templates/templates.html',
+      controller: 'TemplatesController'
+    })
     .state('volumes', {
       url: '/volumes/',
       templateUrl: 'app/components/volumes/volumes.html',
@@ -156,4 +162,5 @@ angular.module('uifordocker', [
   .constant('DOCKER_ENDPOINT', 'dockerapi')
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('CONFIG_ENDPOINT', 'settings')
+  .constant('TEMPLATES_ENDPOINT', 'templates')
   .constant('UI_VERSION', 'v1.7.0');
