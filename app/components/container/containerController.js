@@ -103,7 +103,6 @@ function ($scope, $state, $stateParams, $filter, Config, Container, ContainerCom
     var registry = _.toLower($scope.config.Registry);
     var imageConfig = createImageConfig(image, registry);
     ContainerCommit.commit({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
-      console.log(JSON.stringify(d, null, 4));
       update();
       $('#createImageSpinner').hide();
       Messages.send("Container commited", $stateParams.id);
