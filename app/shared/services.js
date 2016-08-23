@@ -153,6 +153,11 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
     .factory('Config', ['$resource', 'CONFIG_ENDPOINT', function ConfigFactory($resource, CONFIG_ENDPOINT) {
       return $resource(CONFIG_ENDPOINT).get();
     }])
+    .factory('Templates', ['$resource', 'TEMPLATES_ENDPOINT', function TemplatesFactory($resource, TEMPLATES_ENDPOINT) {
+      return $resource(TEMPLATES_ENDPOINT, {}, {
+        get: {method: 'GET', isArray: true}
+      });
+    }])
     .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, UI_VERSION) {
         'use strict';
         var url = DOCKER_ENDPOINT;

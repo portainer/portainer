@@ -152,6 +152,14 @@ server {
 
 Replace `ADDRESS:PORT` with the CloudInovasi UI container details.
 
+### Host your own apps
+
+You can specify an URL to your own templates (**Apps**) definitions using the `--templates` or `-t` flags.
+
+By default, CloudInovasi templates will be used (https://raw.githubusercontent.com/cloud-inovasi/ui-templates/master/templates.json).
+
+For more information about hosting your own template definition and the format, see: https://github.com/cloud-inovasi/ui-templates
+
 ### Available options
 
 The following options are available for the `ui-for-docker` binary:
@@ -168,3 +176,4 @@ The following options are available for the `ui-for-docker` binary:
 * `--tlskey`: Path to the TLS key (default `/certs/key.pem`)
 * `--hide-label`, `-l`: Hide containers with a specific label in the UI
 * `--logo`: URL to a picture to be displayed as a logo in the UI
+* `--templates`, `-t`: URL to templates (apps) definitions

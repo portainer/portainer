@@ -87,7 +87,8 @@ module.exports = function (grunt) {
                 'bower_components/font-awesome/css/font-awesome.min.css',
                 'bower_components/rdash-ui/dist/css/rdash.min.css',
                 'bower_components/angular-ui-select/dist/select.min.css',
-                'bower_components/xterm.js/src/xterm.css'
+                'bower_components/xterm.js/src/xterm.css',
+                'bower_components/Hover/css/hover-min.css'
             ]
         },
         clean: {
@@ -273,7 +274,7 @@ module.exports = function (grunt) {
                 command: [
                     'docker stop ui-for-docker',
                     'docker rm ui-for-docker',
-                    'docker run -d -p 9000:9000 -v /tmp/docker-ui:/data --name ui-for-docker ui-for-docker -H tcp://10.0.7.10:4000 --swarm -d /data'
+                    'docker run -d -p 9000:9000 -v /tmp/docker-ui:/data --name ui-for-docker ui-for-docker -H tcp://10.0.7.11:4000 --swarm -d /data'
                 ].join(';')
             },
             runSsl: {
