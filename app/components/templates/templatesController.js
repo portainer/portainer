@@ -1,6 +1,6 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Templates', 'Messages', 'errorMsgFilter',
-function ($scope, $q, $state, Config, Container, Image, Volume, Network, Templates, Messages, errorMsgFilter) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Templates', 'Messages', 'errorMsgFilter',
+function ($scope, $q, $state, $filter, Config, Container, Image, Volume, Network, Templates, Messages, errorMsgFilter) {
 $scope.templates = [];
 $scope.selectedTemplate = null;
 $scope.formValues = {
@@ -51,8 +51,8 @@ function pullImageAndCreateContainer(imageConfig, containerConfig) {
   });
 }
 
-function createConfigFromTemplate(template) {
-  var containerConfig = {
+function getInitialConfiguration() {
+  return {
     Env: [],
     OpenStdin: false,
     Tty: false,
@@ -63,17 +63,31 @@ function createConfigFromTemplate(template) {
       },
       PortBindings: {},
       Binds: [],
-      NetworkMode: $scope.formValues.network,
+      NetworkMode: $scope.formValues.network.Name,
       Privileged: false
     },
-    Image: template.image,
     Volumes: {},
     name: $scope.formValues.name
   };
+}
+
+function createConfigFromTemplate(template) {
+  var containerConfig = getInitialConfiguration();
+  containerConfig.Image = template.image;
   if (template.env) {
     template.env.forEach(function (v) {
       if (v.value || v.default) {
-        var val = v.default ? v.default : v.value;
+        var val;
+        if (v.type && v.type === 'container') {
+          if ($scope.swarm && $scope.formValues.network.Scope === 'global') {
+            val = $filter('swarmcontainername')(v.value);
+          } else {
+            var container = v.value;
+            val = container.NetworkSettings.Networks[Object.keys(container.NetworkSettings.Networks)[0]].IPAddress;
+          }
+        } else {
+          val = v.default ? v.default : v.value;
+        }
         containerConfig.Env.push(v.name + "=" + val);
       }
     });
@@ -167,25 +181,30 @@ function initTemplates() {
 }
 
 Config.$promise.then(function (c) {
-  var swarm = c.swarm;
+  $scope.swarm = c.swarm;
   Network.query({}, function (d) {
     var networks = d;
-    if (swarm) {
+    if ($scope.swarm) {
       networks = d.filter(function (network) {
         if (network.Scope === 'global') {
           return network;
         }
       });
       $scope.globalNetworkCount = networks.length;
-      networks.push({Name: "bridge"});
-      networks.push({Name: "host"});
-      networks.push({Name: "none"});
+      networks.push({Scope: "local", Name: "bridge"});
+      networks.push({Scope: "local", Name: "host"});
+      networks.push({Scope: "local", Name: "none"});
     } else {
-      $scope.formValues.network = "bridge";
+      $scope.formValues.network = _.find(networks, function(o) { return o.Name === "bridge"; });
     }
     $scope.availableNetworks = networks;
   }, function (e) {
     Messages.error("Unable to retrieve available networks", e.data);
+  });
+  Container.query({all: 0}, function (d) {
+    $scope.runningContainers = d;
+  }, function (e) {
+    Messages.error("Unable to retrieve running containers", e.data);
   });
   initTemplates();
 });
