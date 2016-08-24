@@ -76,7 +76,7 @@ function createConfigFromTemplate(template) {
   containerConfig.Image = template.image;
   if (template.env) {
     template.env.forEach(function (v) {
-      if (v.value || v.default) {
+      if (v.value || v.set) {
         var val;
         if (v.type && v.type === 'container') {
           if ($scope.swarm && $scope.formValues.network.Scope === 'global') {
@@ -86,7 +86,7 @@ function createConfigFromTemplate(template) {
             val = container.NetworkSettings.Networks[Object.keys(container.NetworkSettings.Networks)[0]].IPAddress;
           }
         } else {
-          val = v.default ? v.default : v.value;
+          val = v.set ? v.set : v.value;
         }
         containerConfig.Env.push(v.name + "=" + val);
       }

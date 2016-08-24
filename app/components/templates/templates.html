@@ -53,7 +53,7 @@
             </div>
           </div>
           <!-- !name-and-network-inputs -->
-          <div ng-repeat="var in selectedTemplate.env" ng-if="!var.default" class="form-group">
+          <div ng-repeat="var in selectedTemplate.env" ng-if="!var.set" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
             <div class="col-sm-10">
               <select ng-if="!swarm && var.type === 'container'" ng-options="container|containername for container in runningContainers" class="selectpicker form-control" ng-model="var.value">
