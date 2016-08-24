@@ -47,17 +47,22 @@
             </div>
             <label for="container_network" class="col-sm-2 control-label text-right">Network</label>
             <div class="col-sm-4">
-              <select class="selectpicker form-control" ng-model="formValues.network">
-                <option selected disabled hidden value="">Select a network</option>
-                <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
+              <select class="selectpicker form-control" ng-options="net.Name for net in availableNetworks" ng-model="formValues.network">
+                <option disabled hidden value="">Select a network</option>
               </select>
             </div>
           </div>
           <!-- !name-and-network-inputs -->
-          <div ng-repeat="var in selectedTemplate.env" class="form-group">
-            <label ng-if="!var.default" for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
-            <div ng-if="!var.default" class="col-sm-10">
-              <input type="text" class="form-control" ng-model="var.value" id="field_{{ $index }}">
+          <div ng-repeat="var in selectedTemplate.env" ng-if="!var.default" class="form-group">
+            <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
+            <div class="col-sm-10">
+              <select ng-if="!swarm && var.type === 'container'" ng-options="container|containername for container in runningContainers" class="selectpicker form-control" ng-model="var.value">
+                <option selected disabled hidden value="">Select a container</option>
+              </select>
+              <select ng-if="swarm && var.type === 'container'" ng-options="container|swarmcontainername for container in runningContainers" class="selectpicker form-control" ng-model="var.value">
+                <option selected disabled hidden value="">Select a container</option>
+              </select>
+              <input ng-if="!var.type || !var.type === 'container'" type="text" class="form-control" ng-model="var.value" id="field_{{ $index }}">
             </div>
           </div>
         </form>
