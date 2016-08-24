@@ -142,6 +142,7 @@ function ($scope, Container, Info, Settings, Messages, Config, errorMsgFilter) {
     batch($scope.containers, Container.remove, "Removed");
   };
 
+  // TODO: centralize (already exist in TemplatesController)
   var hideContainers = function (containers) {
     return containers.filter(function (container) {
       var filterContainer = false;
