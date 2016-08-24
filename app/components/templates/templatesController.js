@@ -72,8 +72,9 @@ function createConfigFromTemplate(template) {
   };
   if (template.env) {
     template.env.forEach(function (v) {
-      if (v.value) {
-        containerConfig.Env.push(v.name + "=" + v.value);
+      if (v.value || v.default) {
+        var val = v.default ? v.default : v.value;
+        containerConfig.Env.push(v.name + "=" + val);
       }
     });
   }
