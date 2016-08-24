@@ -55,8 +55,8 @@
           </div>
           <!-- !name-and-network-inputs -->
           <div ng-repeat="var in selectedTemplate.env" class="form-group">
-            <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
-            <div class="col-sm-10">
+            <label ng-if="!var.default" for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
+            <div ng-if="!var.default" class="col-sm-10">
               <input type="text" class="form-control" ng-model="var.value" id="field_{{ $index }}">
             </div>
           </div>
