@@ -180,8 +180,25 @@ function initTemplates() {
   });
 }
 
+// TODO: centralize (already exist in containersController)
+var hideContainers = function (containers) {
+  return containers.filter(function (container) {
+    var filterContainer = false;
+    hiddenLabels.forEach(function(label, index) {
+      if (_.has(container.Labels, label.name) &&
+      container.Labels[label.name] === label.value) {
+        filterContainer = true;
+      }
+    });
+    if (!filterContainer) {
+      return container;
+    }
+  });
+};
+
 Config.$promise.then(function (c) {
   $scope.swarm = c.swarm;
+  hiddenLabels = c.hiddenLabels;
   Network.query({}, function (d) {
     var networks = d;
     if ($scope.swarm) {
@@ -202,7 +219,11 @@ Config.$promise.then(function (c) {
     Messages.error("Unable to retrieve available networks", e.data);
   });
   Container.query({all: 0}, function (d) {
-    $scope.runningContainers = d;
+    var containers = d;
+    if (hiddenLabels) {
+      containers = hideContainers(d);
+    }
+    $scope.runningContainers = containers;
   }, function (e) {
     Messages.error("Unable to retrieve running containers", e.data);
   });
