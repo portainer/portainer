@@ -1,3 +1,14 @@
+function isJSON(jsonString) {
+  try {
+    var o = JSON.parse(jsonString);
+    if (o && typeof o === "object") {
+        return o;
+    }
+  }
+  catch (e) { }
+  return false;
+}
+
 // The Docker API often returns a list of JSON object.
 // This handler wrap the JSON objects in an array.
 // Used by the API in: Image push, Image create, Events query.
@@ -11,11 +22,12 @@ function jsonObjectsToArrayHandler(data) {
 // from a string in case of error.
 function deleteImageHandler(data) {
   var response;
-  if (!Array.isArray(data)) {
+  if (!isJSON(data)) {
     var arr = [];
     response = {};
     response.message = data;
     arr.push(response);
+    console.log(JSON.stringify(arr, null, 4));
     return arr;
   }
   response = angular.fromJson(data);
