@@ -6,6 +6,7 @@ angular.module('uifordocker', [
   'ngCookies',
   'ngSanitize',
   'uifordocker.services',
+  'uifordocker.helpers',
   'uifordocker.filters',
   'dashboard',
   'container',
