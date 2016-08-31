@@ -1,6 +1,6 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$scope', '$q', 'Config', 'Container', 'Image', 'Network', 'Volume', 'Info',
-function ($scope, $q, Config, Container, Image, Network, Volume, Info) {
+.controller('DashboardController', ['$scope', '$q', 'Config', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'Info',
+function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume, Info) {
 
   $scope.containerData = {
     total: 0
@@ -15,13 +15,13 @@ function ($scope, $q, Config, Container, Image, Network, Volume, Info) {
     total: 0
   };
 
-  function prepareContainerData(d) {
+  function prepareContainerData(d, containersToHideLabels) {
     var running = 0;
     var stopped = 0;
 
     var containers = d;
-    if (hiddenLabels) {
-      containers = hideContainers(d);
+    if (containersToHideLabels) {
+      containers = ContainerHelper.hideContainers(d, containersToHideLabels);
     }
 
     for (var i = 0; i < containers.length; i++) {
@@ -65,7 +65,7 @@ function ($scope, $q, Config, Container, Image, Network, Volume, Info) {
     $scope.infoData = info;
   }
 
-  function fetchDashboardData() {
+  function fetchDashboardData(containersToHideLabels) {
     $('#loadingViewSpinner').show();
     $q.all([
       Container.query({all: 1}).$promise,
@@ -74,7 +74,7 @@ function ($scope, $q, Config, Container, Image, Network, Volume, Info) {
       Network.query({}).$promise,
       Info.get({}).$promise
     ]).then(function (d) {
-      prepareContainerData(d[0]);
+      prepareContainerData(d[0], containersToHideLabels);
       prepareImageData(d[1]);
       prepareVolumeData(d[2]);
       prepareNetworkData(d[3]);
@@ -83,24 +83,8 @@ function ($scope, $q, Config, Container, Image, Network, Volume, Info) {
     });
   }
 
-  var hideContainers = function (containers) {
-    return containers.filter(function (container) {
-      var filterContainer = false;
-      hiddenLabels.forEach(function(label, index) {
-        if (_.has(container.Labels, label.name) &&
-        container.Labels[label.name] === label.value) {
-          filterContainer = true;
-        }
-      });
-      if (!filterContainer) {
-        return container;
-      }
-    });
-  };
-
   Config.$promise.then(function (c) {
     $scope.swarm = c.swarm;
-    hiddenLabels = c.hiddenLabels;
-    fetchDashboardData();
+    fetchDashboardData(c.hiddenLabels);
   });
 }]);

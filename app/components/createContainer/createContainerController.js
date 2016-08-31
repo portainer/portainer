@@ -83,8 +83,8 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     });
   });
 
+  // TODO: centralize, already present in templatesController
   function createContainer(config) {
-    $('#createContainerSpinner').show();
     Container.create(config, function (d) {
       if (d.Id) {
         var reqBody = config.HostConfig || {};
@@ -107,17 +107,17 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     });
   }
 
+  // TODO: centralize, already present in templatesController
   function pullImageAndCreateContainer(config) {
-    $('#createContainerSpinner').show();
     Image.create($scope.imageConfig, function (data) {
-        var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
-        if (err) {
-          var detail = data[data.length - 1];
-          $('#createContainerSpinner').hide();
-          Messages.error('Error', detail.error);
-        } else {
-          createContainer(config);
-        }
+      var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
+      if (err) {
+        var detail = data[data.length - 1];
+        $('#createContainerSpinner').hide();
+        Messages.error('Error', detail.error);
+      } else {
+        createContainer(config);
+      }
     }, function (e) {
       $('#createContainerSpinner').hide();
       Messages.error('Error', 'Unable to pull image ' + image);
@@ -223,7 +223,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
 
   $scope.create = function () {
     var config = prepareConfiguration();
-
+    $('#createContainerSpinner').show();
     if ($scope.state.alwaysPull) {
       pullImageAndCreateContainer(config);
     } else {
