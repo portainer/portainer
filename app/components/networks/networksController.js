@@ -47,7 +47,7 @@ function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
         Network.remove({id: network.Id}, function (d) {
           var error = errorMsgFilter(d);
           if (error) {
-            Messages.send("Error", "Unable to remove network with active endpoints");
+            Messages.send("Error", error);
           } else {
             Messages.send("Network deleted", network.Id);
             var index = $scope.networks.indexOf(network);
