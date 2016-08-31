@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'Messages', 'errorMsgFilter',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Messages, errorMsgFilter) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Messages', 'errorMsgFilter',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Messages, errorMsgFilter) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -80,25 +80,11 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Mes
     });
   };
 
-  //TODO: centralize createImageConfig (also used in imageController)
-  function createImageConfig(imageName, registry) {
-    var imageNameAndTag = imageName.split(':');
-    var image = imageNameAndTag[0];
-    if (registry) {
-      image = registry + '/' + imageNameAndTag[0];
-    }
-    var imageConfig = {
-      repo: image,
-      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
-    };
-    return imageConfig;
-  }
-
   $scope.commit = function () {
     $('#createImageSpinner').show();
     var image = _.toLower($scope.config.Image);
     var registry = _.toLower($scope.config.Registry);
-    var imageConfig = createImageConfig(image, registry);
+    var imageConfig = ImageHelper.createImageConfig(image, registry);
     ContainerCommit.commit({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
       update();
       $('#createImageSpinner').hide();
