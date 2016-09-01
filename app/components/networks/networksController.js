@@ -54,7 +54,6 @@ function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
           }
           complete();
         }, function (e) {
-          console.log(JSON.stringify(e, null, 4));
           if (e.data.message) {
             Messages.error("Failure", e.data.message);
           } else {

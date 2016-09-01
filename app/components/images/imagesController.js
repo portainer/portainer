@@ -81,7 +81,11 @@ function ($scope, $state, Config, Image, Messages) {
           }
           complete();
         }, function (e) {
-          Messages.error("Unable to remove image", e.data);
+          if (e.data.message) {
+            Messages.error("Failure", e.data.message);
+          } else {
+            Messages.error("Failure", 'Unable to remove image');
+          }
           complete();
         });
       }
@@ -104,5 +108,4 @@ function ($scope, $state, Config, Image, Messages) {
     $scope.availableRegistries = c.registries;
     fetchImages();
   });
-
 }]);
