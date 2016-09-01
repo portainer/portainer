@@ -1,3 +1,7 @@
+function isJSONArray(jsonString) {
+    return Object.prototype.toString.call(jsonString) === '[object Array]';
+}
+
 function isJSON(jsonString) {
   try {
     var o = JSON.parse(jsonString);
@@ -17,30 +21,35 @@ function jsonObjectsToArrayHandler(data) {
   return angular.fromJson(str);
 }
 
-// Image delete API returns an array on success and a string on error.
-// This handler creates an array composed of a single object with a field 'message'
-// from a string in case of error.
+// Image delete API returns an array on success (Docker 1.9 -> Docker 1.12).
+// On error, it returns either an error message as a string (Docker < 1.12) or a JSON object with the field message
+// container the error (Docker = 1.12).
+// This handler returns the original array on success or a newly created array containing
+// only one JSON object with the field message filled with the error message on failure.
 function deleteImageHandler(data) {
-  var response;
+  var response = [];
+  // A string is returned on failure (Docker < 1.12)
   if (!isJSON(data)) {
-    var arr = [];
-    response = {};
-    response.message = data;
-    arr.push(response);
-    console.log(JSON.stringify(arr, null, 4));
-    return arr;
+    response.push({message: data});
   }
-  response = angular.fromJson(data);
+  // A JSON object is returned on failure (Docker = 1.12)
+  else if (!isJSONArray) {
+    var json = angular.fromJson(data);
+    response.push(json);
+  }
+  // An array is returned on success (Docker 1.9 -> 1.12)
+  else {
+    response = angular.fromJson(data);
+  }
   return response;
 }
 
-// Network delete API returns an empty string on success.
+// Network delete API returns an empty string on success (Docker 1.9 -> Docker 1.12).
 // On error, it returns either an error message as a string (Docker < 1.12) or a JSON object with the field message
 // container the error (Docker = 1.12).
-// This handler returns an empty object on success or a JSON object with the field message container the error message
-// on failure.
+// This handler returns an empty object on success or a newly created JSON object with
+// the field message containing the error message on failure.
 function deleteNetworkHandler(data) {
-  console.log(JSON.stringify(data, null, 4));
   var response = {};
   // No data is returned when deletion is successful (Docker 1.9 -> 1.12)
   if (!data) {

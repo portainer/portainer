@@ -72,7 +72,11 @@ function ($scope, $stateParams, $state, Config, Image, ImageHelper, Messages) {
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Unable to remove image", e.data);
+      if (e.data.message) {
+        Messages.error("Failure", e.data.message);
+      } else {
+        Messages.error("Failure", 'Unable to remove image');
+      }
     });
   };
 
