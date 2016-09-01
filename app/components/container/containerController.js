@@ -124,11 +124,21 @@ function ($scope, $state, $stateParams, $filter, Config, Container, ContainerCom
   $scope.remove = function () {
     $('#loadingViewSpinner').show();
     Container.remove({id: $stateParams.id}, function (d) {
-      $state.go('containers', {}, {reload: true});
-      Messages.send("Container removed", $stateParams.id);
+      if (d.message) {
+        $('#loadingViewSpinner').hide();
+        Messages.send("Error", d.message);
+      }
+      else {
+        $state.go('containers', {}, {reload: true});
+        Messages.send("Container removed", $stateParams.id);
+      }
     }, function (e) {
+      if (e.data.message) {
+        Messages.error("Failure", e.data.message);
+      } else {
+        Messages.error("Failure", 'Unable to remove container');
+      }
       update();
-      Messages.error("Failure", "Container failed to remove." + e.data);
     });
   };
 

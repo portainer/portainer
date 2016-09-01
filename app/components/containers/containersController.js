@@ -71,16 +71,19 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config, 
         }
         else if (action === Container.remove) {
           action({id: c.Id}, function (d) {
-            var error = errorMsgFilter(d);
-            if (error) {
-              Messages.send("Error", "Unable to remove running container");
+            if (d.message) {
+              Messages.send("Error", d.message);
             }
             else {
               Messages.send("Container " + msg, c.Id);
             }
             complete();
           }, function (e) {
-            Messages.error("Failure", e.data);
+            if (e.data.message) {
+              Messages.error("Failure", e.data.message);
+            } else {
+              Messages.error("Failure", 'Unable to remove container');
+            }
             complete();
           });
         }

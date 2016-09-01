@@ -21,6 +21,29 @@ function jsonObjectsToArrayHandler(data) {
   return angular.fromJson(str);
 }
 
+// The Docker API often returns an empty string on success (Docker 1.9 -> Docker 1.12).
+// On error, it returns either an error message as a string (Docker < 1.12) or a JSON object with the field message
+// container the error (Docker = 1.12).
+// This handler returns an empty object on success or a newly created JSON object with
+// the field message containing the error message on failure.
+// Used by the API in: container deletion, network deletion.
+function deleteGenericHandler(data) {
+  var response = {};
+  // No data is returned when deletion is successful (Docker 1.9 -> 1.12)
+  if (!data) {
+    return response;
+  }
+  // A string is returned on failure (Docker < 1.12)
+  else if (!isJSON(data)) {
+    response.message = data;
+  }
+  // Docker 1.12 returns a valid JSON object when an error occurs
+  else {
+    response = angular.fromJson(data);
+  }
+  return response;
+}
+
 // Image delete API returns an array on success (Docker 1.9 -> Docker 1.12).
 // On error, it returns either an error message as a string (Docker < 1.12) or a JSON object with the field message
 // container the error (Docker = 1.12).
@@ -38,29 +61,6 @@ function deleteImageHandler(data) {
     response.push(json);
   }
   // An array is returned on success (Docker 1.9 -> 1.12)
-  else {
-    response = angular.fromJson(data);
-  }
-  return response;
-}
-
-// Network delete API returns an empty string on success (Docker 1.9 -> Docker 1.12).
-// On error, it returns either an error message as a string (Docker < 1.12) or a JSON object with the field message
-// container the error (Docker = 1.12).
-// This handler returns an empty object on success or a newly created JSON object with
-// the field message containing the error message on failure.
-function deleteNetworkHandler(data) {
-  var response = {};
-  // No data is returned when deletion is successful (Docker 1.9 -> 1.12)
-  if (!data) {
-    return response;
-  }
-  // A string is returned when an error occurs (Docker < 1.12)
-  else if (data && !isJSON(data)) {
-    response.message = data;
-    return response;
-  }
-  // Docker 1.12 returns a valid JSON object when an error occurs
   else {
     response = angular.fromJson(data);
   }
