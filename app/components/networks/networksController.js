@@ -45,17 +45,21 @@ function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
       if (network.Checked) {
         counter = counter + 1;
         Network.remove({id: network.Id}, function (d) {
-          var error = errorMsgFilter(d);
-          if (error) {
-            Messages.send("Error", error);
+          if (d.message) {
+            Messages.send("Error", d.message);
           } else {
-            Messages.send("Network deleted", network.Id);
+            Messages.send("Network removed", network.Id);
             var index = $scope.networks.indexOf(network);
             $scope.networks.splice(index, 1);
           }
           complete();
         }, function (e) {
-          Messages.error("Failure", e.data);
+          console.log(JSON.stringify(e, null, 4));
+          if (e.data.message) {
+            Messages.error("Failure", e.data.message);
+          } else {
+            Messages.error("Failure", 'Unable to remove network');
+          }
           complete();
         });
       }

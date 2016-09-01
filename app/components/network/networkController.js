@@ -17,18 +17,21 @@ function ($scope, Network, Messages, $state, $stateParams, errorMsgFilter) {
   $scope.remove = function remove(networkId) {
     $('#loadingViewSpinner').show();
     Network.remove({id: $stateParams.id}, function (d) {
-      var error = errorMsgFilter(d);
-      if (error) {
+      if (d.message) {
         $('#loadingViewSpinner').hide();
-        Messages.send("Error", error);
+        Messages.send("Error", d.message);
       } else {
         $('#loadingViewSpinner').hide();
-        Messages.send("Network deleted", $stateParams.id);
+        Messages.send("Network removed", $stateParams.id);
         $state.go('networks', {});
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e.data);
+      if (e.data.message) {
+        Messages.error("Failure", e.data.message);
+      } else {
+        Messages.error("Failure", 'Unable to remove network');
+      }
     });
   };
 
