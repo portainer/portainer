@@ -135,7 +135,7 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
             query: {method: 'GET', isArray: true},
             get: {method: 'GET'},
             create: {method: 'POST', params: {action: 'create'}},
-            remove: {method: 'DELETE'},
+            remove: { method: 'DELETE', transformResponse: deleteNetworkHandler },
             connect: {method: 'POST', params: {action: 'connect'}},
             disconnect: {method: 'POST', params: {action: 'disconnect'}}
         });

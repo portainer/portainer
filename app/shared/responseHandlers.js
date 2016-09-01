@@ -33,3 +33,27 @@ function deleteImageHandler(data) {
   response = angular.fromJson(data);
   return response;
 }
+
+// Network delete API returns an empty string on success.
+// On error, it returns either an error message as a string (Docker < 1.12) or a JSON object with the field message
+// container the error (Docker = 1.12).
+// This handler returns an empty object on success or a JSON object with the field message container the error message
+// on failure.
+function deleteNetworkHandler(data) {
+  console.log(JSON.stringify(data, null, 4));
+  var response = {};
+  // No data is returned when deletion is successful (Docker 1.9 -> 1.12)
+  if (!data) {
+    return response;
+  }
+  // A string is returned when an error occurs (Docker < 1.12)
+  else if (data && !isJSON(data)) {
+    response.message = data;
+    return response;
+  }
+  // Docker 1.12 returns a valid JSON object when an error occurs
+  else {
+    response = angular.fromJson(data);
+  }
+  return response;
+}
