@@ -16,7 +16,10 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
             unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
             changes: {method: 'GET', params: {action: 'changes'}, isArray: true},
             create: {method: 'POST', params: {action: 'create'}},
-            remove: {method: 'DELETE', params: {id: '@id', v: 0}},
+            remove: {
+              method: 'DELETE', params: {id: '@id', v: 0},
+              transformResponse: deleteGenericHandler
+            },
             rename: {method: 'POST', params: {id: '@id', action: 'rename', name: '@name'}},
             stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000},
             exec: {method: 'POST', params: {id: '@id', action: 'exec'}}
@@ -135,7 +138,7 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
             query: {method: 'GET', isArray: true},
             get: {method: 'GET'},
             create: {method: 'POST', params: {action: 'create'}},
-            remove: { method: 'DELETE', transformResponse: deleteNetworkHandler },
+            remove: { method: 'DELETE', transformResponse: deleteGenericHandler },
             connect: {method: 'POST', params: {action: 'connect'}},
             disconnect: {method: 'POST', params: {action: 'disconnect'}}
         });
