@@ -191,16 +191,4 @@ angular.module('uifordocker.filters', [])
   return function (obj) {
     return _.isEmpty(obj);
   };
-})
-
-.filter('errorMsg', function () {
-  return function (object) {
-    var idx = 0;
-    var msg = '';
-    while (object[idx] && typeof(object[idx]) === 'string') {
-      msg += object[idx];
-      idx++;
-    }
-    return msg;
-  };
 });

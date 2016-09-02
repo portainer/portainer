@@ -1,6 +1,6 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', 'Network', 'Messages', '$state', '$stateParams', 'errorMsgFilter',
-function ($scope, Network, Messages, $state, $stateParams, errorMsgFilter) {
+.controller('NetworkController', ['$scope', 'Network', 'Messages', '$state', '$stateParams',
+function ($scope, Network, Messages, $state, $stateParams) {
 
   $scope.disconnect = function disconnect(networkId, containerId) {
     $('#loadingViewSpinner').show();

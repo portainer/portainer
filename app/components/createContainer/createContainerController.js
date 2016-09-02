@@ -1,6 +1,6 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Config, Container, Image, Volume, Network, Messages, errorMsgFilter) {
+.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Messages',
+function ($scope, $state, Config, Container, Image, Volume, Network, Messages) {
 
   $scope.state = {
     alwaysPull: true
@@ -91,22 +91,35 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
   // TODO: centralize, already present in templatesController
   function createContainer(config) {
     Container.create(config, function (d) {
-      if (d.Id) {
+      if (d.message) {
+        $('#createContainerSpinner').hide();
+        Messages.error('Error', d.message);
+      } else {
         Container.start({id: d.Id}, {}, function (cd) {
-          $('#createContainerSpinner').hide();
-          Messages.send('Container Started', d.Id);
-          $state.go('containers', {}, {reload: true});
+          if (cd.message) {
+            $('#createContainerSpinner').hide();
+            Messages.error('Error', cd.message);
+          } else {
+            $('#createContainerSpinner').hide();
+            Messages.send('Container Started', d.Id);
+            $state.go('containers', {}, {reload: true});
+          }
         }, function (e) {
           $('#createContainerSpinner').hide();
-          Messages.error('Error', errorMsgFilter(e));
+          if (e.data.message) {
+            Messages.error("Failure", e.data.message);
+          } else {
+            Messages.error("Failure", 'Unable to start container');
+          }
         });
-      } else {
-        $('#createContainerSpinner').hide();
-        Messages.error('Error', errorMsgFilter(d));
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Messages.error('Error', errorMsgFilter(e));
+      if (e.data.message) {
+        Messages.error("Failure", e.data.message);
+      } else {
+        Messages.error("Failure", 'Unable to create container');
+      }
     });
   }
 

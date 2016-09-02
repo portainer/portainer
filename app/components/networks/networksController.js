@@ -1,6 +1,6 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages',
+function ($scope, $state, Network, Config, Messages) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.advancedSettings = false;
@@ -56,17 +56,21 @@ function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
     $('#createNetworkSpinner').show();
     var config = prepareNetworkConfiguration();
     Network.create(config, function (d) {
-      if (d.Id) {
+      if (d.message) {
+        $('#createNetworkSpinner').hide();
+        Messages.error('Unable to create network', d.message);
+      } else {
         Messages.send("Network created", d.Id);
         $('#createNetworkSpinner').hide();
         $state.go('networks', {}, {reload: true});
-      } else {
-        $('#createNetworkSpinner').hide();
-        Messages.error('Unable to create network', errorMsgFilter(d));
       }
     }, function (e) {
       $('#createNetworkSpinner').hide();
-      Messages.error('Unable to create network', e.data);
+      if (e.data.message) {
+        Messages.error("Failure", e.data.message);
+      } else {
+        Messages.error("Failure", 'Unable to create network');
+      }
     });
   };
 
