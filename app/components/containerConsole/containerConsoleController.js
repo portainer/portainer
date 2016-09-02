@@ -35,7 +35,7 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
     Container.exec(execConfig, function(d) {
       if (d.message) {
         $('#loadConsoleSpinner').hide();
-        Messages.error('Error', d.message);
+        Messages.error("Error", {}, d.message);
       } else {
         var execId = d.Id;
         resizeTTY(execId, termHeight, termWidth);
@@ -49,11 +49,7 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
       }
     }, function (e) {
       $('#loadConsoleSpinner').hide();
-      if (e.data.message) {
-        Messages.error("Failure", e.data.message);
-      } else {
-        Messages.error("Failure", 'Unable to start an exec instance');
-      }
+      Messages.error("Failure", e, 'Unable to start an exec instance');
     });
   };
 
@@ -71,10 +67,10 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
     $timeout(function() {
       Exec.resize({id: execId, height: height, width: width}, function (d) {
         if (d.message) {
-          Messages.error('Error', 'Unable to resize TTY');
+          Messages.error('Error', {}, 'Unable to resize TTY');
         }
       }, function (e) {
-        Messages.error("Failure", 'Unable to resize TTY');
+        Messages.error("Failure", {}, 'Unable to resize TTY');
       });
     }, 2000);
 

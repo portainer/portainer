@@ -54,7 +54,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
             Messages.send("Container " + msg, c.Id);
             complete();
           }, function (e) {
-            Messages.error("Failure", e.data);
+            Messages.error("Failure", e, "Unable to start container");
             complete();
           });
         }
@@ -68,11 +68,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
             }
             complete();
           }, function (e) {
-            if (e.data.message) {
-              Messages.error("Failure", e.data.message);
-            } else {
-              Messages.error("Failure", 'Unable to remove container');
-            }
+            Messages.error("Failure", e, 'Unable to remove container');
             complete();
           });
         }
@@ -81,7 +77,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
             Messages.send("Container " + msg, c.Id);
             complete();
           }, function (e) {
-            Messages.error("Failure", e.data);
+            Messages.error("Failure", e, 'An error occured');
             complete();
           });
 

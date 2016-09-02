@@ -30,7 +30,7 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
       $state.go('image', {id: $stateParams.id}, {reload: true});
     }, function(e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Unable to tag image", e.data);
+      Messages.error("Failure", e, "Unable to tag image");
     });
   };
 
@@ -38,14 +38,14 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
     $('#loadingViewSpinner').show();
     Image.push({tag: tag}, function (d) {
       if (d[d.length-1].error) {
-        Messages.error("Unable to push image", d[d.length-1].error);
+        Messages.error("Unable to push image", {}, d[d.length-1].error);
       } else {
         Messages.send('Image successfully pushed');
       }
       $('#loadingViewSpinner').hide();
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Unable to push image", e.data);
+      Messages.error("Failure", e, "Unable to push image");
     });
   };
 
@@ -54,7 +54,7 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
     Image.remove({id: id}, function (d) {
       if (d[0].message) {
         $('#loadingViewSpinner').hide();
-        Messages.error("Unable to remove image", d[0].message);
+        Messages.error("Unable to remove image", {}, d[0].message);
       } else {
         // If last message key is 'Deleted' or if it's 'Untagged' and there is only one tag associated to the image
         // then assume the image is gone and send to images page
@@ -68,11 +68,7 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      if (e.data.message) {
-        Messages.error("Failure", e.data.message);
-      } else {
-        Messages.error("Failure", 'Unable to remove image');
-      }
+      Messages.error("Failure", e, 'Unable to remove image');
     });
   };
 
@@ -88,10 +84,6 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
     $scope.exposedPorts = d.ContainerConfig.ExposedPorts ? Object.keys(d.ContainerConfig.ExposedPorts) : [];
     $scope.volumes = d.ContainerConfig.Volumes ? Object.keys(d.ContainerConfig.Volumes) : [];
   }, function (e) {
-    if (e.status === 404) {
-      Messages.error("Unable to find image", $stateParams.id);
-    } else {
-      Messages.error("Unable to retrieve image info", e.data);
-    }
+    Messages.error("Failure", e, "Unable to retrieve image info");
   });
 }]);

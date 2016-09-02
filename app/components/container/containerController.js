@@ -34,13 +34,8 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       }
       $('#loadingViewSpinner').hide();
     }, function (e) {
-      if (e.status === 404) {
-        $('.detail').hide();
-        Messages.error("Not found", "Container not found.");
-      } else {
-        Messages.error("Failure", e.data);
-      }
       $('#loadingViewSpinner').hide();
+      Messages.error("Failure", e, "Unable to retrieve container info");
     });
   };
 
@@ -51,7 +46,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       Messages.send("Container started", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to start." + e.data);
+      Messages.error("Failure", e, "Unable to start container");
     });
   };
 
@@ -62,7 +57,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       Messages.send("Container stopped", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to stop." + e.data);
+      Messages.error("Failure", e, "Unable to stop container");
     });
   };
 
@@ -73,7 +68,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       Messages.send("Container killed", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to die." + e.data);
+      Messages.error("Failure", e, "Unable to kill container");
     });
   };
 
@@ -83,13 +78,13 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     var registry = _.toLower($scope.config.Registry);
     var imageConfig = ImageHelper.createImageConfig(image, registry);
     ContainerCommit.commit({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
-      update();
       $('#createImageSpinner').hide();
+      update();
       Messages.send("Container commited", $stateParams.id);
     }, function (e) {
-      update();
       $('#createImageSpinner').hide();
-      Messages.error("Failure", "Container failed to commit." + e.data);
+      update();
+      Messages.error("Failure", e, "Unable to commit container");
     });
   };
 
@@ -100,7 +95,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       Messages.send("Container paused", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to pause." + e.data);
+      Messages.error("Failure", e, "Unable to pause container");
     });
   };
 
@@ -111,7 +106,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       Messages.send("Container unpaused", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to unpause." + e.data);
+      Messages.error("Failure", e, "Unable to unpause container");
     });
   };
 
@@ -127,12 +122,8 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
         Messages.send("Container removed", $stateParams.id);
       }
     }, function (e) {
-      if (e.data.message) {
-        Messages.error("Failure", e.data.message);
-      } else {
-        Messages.error("Failure", 'Unable to remove container');
-      }
       update();
+      Messages.error("Failure", e, "Unable to remove container");
     });
   };
 
@@ -143,7 +134,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       Messages.send("Container restarted", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to restart." + e.data);
+      Messages.error("Failure", e, "Unable to restart container");
     });
   };
 
@@ -151,17 +142,13 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     Container.rename({id: $stateParams.id, 'name': $scope.container.newContainerName}, function (d) {
       if (d.message) {
         $scope.container.newContainerName = $scope.container.Name;
-        Messages.error("Unable to rename container", d.message);
+        Messages.error("Unable to rename container", {}, d.message);
       } else {
         $scope.container.Name = $scope.container.newContainerName;
         Messages.send("Container successfully renamed", d.name);
       }
     }, function (e) {
-      if (e.data.message) {
-        Messages.error("Failure", e.data.message);
-      } else {
-        Messages.error("Failure", 'Unable to rename container');
-      }
+      Messages.error("Failure", e, 'Unable to rename container');
     });
     $scope.container.edit = false;
   };
