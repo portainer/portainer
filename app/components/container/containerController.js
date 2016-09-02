@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Messages', 'errorMsgFilter',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Messages, errorMsgFilter) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Messages',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Messages) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -149,13 +149,18 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
 
   $scope.renameContainer = function () {
     Container.rename({id: $stateParams.id, 'name': $scope.container.newContainerName}, function (d) {
-      if (d.name) {
-        $scope.container.Name = d.name;
-        Messages.send("Container successfully renamed", d.name);
-      } else {
-        var error = errorMsgFilter(d);
+      if (d.message) {
         $scope.container.newContainerName = $scope.container.Name;
-        Messages.error("Unable to rename container", error);
+        Messages.error("Unable to rename container", d.message);
+      } else {
+        $scope.container.Name = $scope.container.newContainerName;
+        Messages.send("Container successfully renamed", d.name);
+      }
+    }, function (e) {
+      if (e.data.message) {
+        Messages.error("Failure", e.data.message);
+      } else {
+        Messages.error("Failure", 'Unable to rename container');
       }
     });
     $scope.container.edit = false;

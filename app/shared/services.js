@@ -8,28 +8,43 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
         }, {
             query: {method: 'GET', params: {all: 0, action: 'json'}, isArray: true},
             get: {method: 'GET', params: {action: 'json'}},
-            start: {method: 'POST', params: {id: '@id', action: 'start'}},
             stop: {method: 'POST', params: {id: '@id', t: 5, action: 'stop'}},
             restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart'}},
             kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
             pause: {method: 'POST', params: {id: '@id', action: 'pause'}},
             unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
             changes: {method: 'GET', params: {action: 'changes'}, isArray: true},
-            create: {method: 'POST', params: {action: 'create'}},
+            stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000},
+            start: {
+              method: 'POST', params: {id: '@id', action: 'start'},
+              transformResponse: genericHandler
+            },
+            create: {
+              method: 'POST', params: {action: 'create'},
+              transformResponse: genericHandler
+            },
             remove: {
               method: 'DELETE', params: {id: '@id', v: 0},
-              transformResponse: deleteGenericHandler
+              transformResponse: genericHandler
             },
-            rename: {method: 'POST', params: {id: '@id', action: 'rename', name: '@name'}},
-            stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000},
-            exec: {method: 'POST', params: {id: '@id', action: 'exec'}}
+            rename: {
+              method: 'POST', params: {id: '@id', action: 'rename', name: '@name'},
+              transformResponse: genericHandler
+            },
+            exec: {
+              method: 'POST', params: {id: '@id', action: 'exec'},
+              transformResponse: genericHandler
+            }
         });
     }])
     .factory('Exec', ['$resource', 'Settings', function ExecFactory($resource, Settings) {
       'use strict';
       // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/exec-resize
       return $resource(Settings.url + '/exec/:id/:action', {}, {
-        resize: {method: 'POST', params: {id: '@id', action: 'resize', h: '@height', w: '@width'}}
+        resize: {
+          method: 'POST', params: {id: '@id', action: 'resize', h: '@height', w: '@width'},
+          transformResponse: genericHandler
+        }
       });
     }])
     .factory('ContainerCommit', ['$resource', '$http', 'Settings', function ContainerCommitFactory($resource, $http, Settings) {
@@ -137,8 +152,8 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
         return $resource(Settings.url + '/networks/:id/:action', {id: '@id'}, {
             query: {method: 'GET', isArray: true},
             get: {method: 'GET'},
-            create: {method: 'POST', params: {action: 'create'}},
-            remove: { method: 'DELETE', transformResponse: deleteGenericHandler },
+            create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler},
+            remove: { method: 'DELETE', transformResponse: genericHandler },
             connect: {method: 'POST', params: {action: 'connect'}},
             disconnect: {method: 'POST', params: {action: 'disconnect'}}
         });
@@ -149,7 +164,7 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
         return $resource(Settings.url + '/volumes/:name/:action', {name: '@name'}, {
             query: {method: 'GET'},
             get: {method: 'GET'},
-            create: {method: 'POST', params: {action: 'create'}},
+            create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler},
             remove: {method: 'DELETE'}
         });
     }])

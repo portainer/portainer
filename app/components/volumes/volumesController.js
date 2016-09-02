@@ -1,6 +1,6 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Volume, Messages, errorMsgFilter) {
+.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages',
+function ($scope, $state, Volume, Messages) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Name';

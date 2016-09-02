@@ -21,13 +21,13 @@ function jsonObjectsToArrayHandler(data) {
   return angular.fromJson(str);
 }
 
-// The Docker API often returns an empty string on success (Docker 1.9 -> Docker 1.12).
+// The Docker API often returns an empty string or a valid JSON object on success (Docker 1.9 -> Docker 1.12).
 // On error, it returns either an error message as a string (Docker < 1.12) or a JSON object with the field message
-// container the error (Docker = 1.12).
-// This handler returns an empty object on success or a newly created JSON object with
-// the field message containing the error message on failure.
-// Used by the API in: container deletion, network deletion.
-function deleteGenericHandler(data) {
+// container the error (Docker = 1.12)
+// This handler ensure a valid JSON object is returned in any case.
+// Used by the API in: container deletion, network deletion, network creation, volume creation,
+// container exec, exec resize.
+function genericHandler(data) {
   var response = {};
   // No data is returned when deletion is successful (Docker 1.9 -> 1.12)
   if (!data) {
