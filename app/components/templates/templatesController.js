@@ -15,12 +15,12 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
     Container.create(config, function (d) {
       if (d.message) {
         $('#createContainerSpinner').hide();
-        Messages.error('Error', d.message);
+        Messages.error('Error', {}, d.message);
       } else {
         Container.start({id: d.Id}, {}, function (cd) {
           if (cd.message) {
             $('#createContainerSpinner').hide();
-            Messages.error('Error', cd.message);
+            Messages.error('Error', {}, cd.message);
           } else {
             $('#createContainerSpinner').hide();
             Messages.send('Container Started', d.Id);
@@ -28,20 +28,12 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
           }
         }, function (e) {
           $('#createContainerSpinner').hide();
-          if (e.data.message) {
-            Messages.error("Failure", e.data.message);
-          } else {
-            Messages.error("Failure", 'Unable to start container');
-          }
+          Messages.error("Failure", e, 'Unable to start container');
         });
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      if (e.data.message) {
-        Messages.error("Failure", e.data.message);
-      } else {
-        Messages.error("Failure", 'Unable to create container');
-      }
+      Messages.error("Failure", e, 'Unable to create container');
     });
   }
 
@@ -53,13 +45,13 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
       if (err) {
         var detail = data[data.length - 1];
         $('#createContainerSpinner').hide();
-        Messages.error('Error', detail.error);
+        Messages.error("Error", {}, detail.error);
       } else {
         createContainer(containerConfig);
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Messages.error('Error', 'Unable to pull image ' + image);
+      Messages.error("Failure", e, "Unable to pull image");
     });
   }
 
@@ -120,18 +112,14 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
         volumeQueries.push(
           Volume.create({}, function (d) {
             if (d.message) {
-              Messages.error('Unable to create volume', d.message);
+              Messages.error("Unable to create volume", {}, d.message);
             } else {
               Messages.send("Volume created", d.Name);
               containerConfig.Volumes[vol] = {};
               containerConfig.HostConfig.Binds.push(d.Name + ':' + vol);
             }
           }, function (e) {
-            if (e.data.message) {
-              Messages.error("Failure", e.data.message);
-            } else {
-              Messages.error("Failure", 'Unable to create volume');
-            }
+            Messages.error("Failure", e, "Unable to create volume");
           }).$promise
         );
       });
@@ -171,7 +159,7 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
       $('#loadTemplatesSpinner').hide();
     }, function (e) {
       $('#loadTemplatesSpinner').hide();
-      Messages.error("Unable to retrieve apps list", e.data);
+      Messages.error("Failure", e, "Unable to retrieve apps list");
     });
   }
 
@@ -195,7 +183,7 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
       }
       $scope.availableNetworks = networks;
     }, function (e) {
-      Messages.error("Unable to retrieve available networks", e.data);
+      Messages.error("Failure", e, "Unable to retrieve networks");
     });
     Container.query({all: 0}, function (d) {
       var containers = d;
@@ -204,7 +192,7 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
       }
       $scope.runningContainers = containers;
     }, function (e) {
-      Messages.error("Unable to retrieve running containers", e.data);
+      Messages.error("Failure", e, "Unable to retrieve running containers");
     });
     initTemplates();
   });
