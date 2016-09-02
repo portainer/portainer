@@ -1,6 +1,6 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', 'Config', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Templates', 'Messages', 'errorMsgFilter',
-function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image, Volume, Network, Templates, Messages, errorMsgFilter) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', 'Config', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Templates', 'Messages',
+function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image, Volume, Network, Templates, Messages) {
   $scope.templates = [];
   $scope.selectedTemplate = null;
   $scope.formValues = {
@@ -13,24 +13,38 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
   // TODO: centralize, already present in createContainerController
   function createContainer(config) {
     Container.create(config, function (d) {
-      if (d.Id) {
+      if (d.message) {
+        $('#createContainerSpinner').hide();
+        Messages.error('Error', d.message);
+      } else {
         Container.start({id: d.Id}, {}, function (cd) {
-          $('#createContainerSpinner').hide();
-          Messages.send('Container Started', d.Id);
-          $state.go('containers', {}, {reload: true});
+          if (cd.message) {
+            $('#createContainerSpinner').hide();
+            Messages.error('Error', cd.message);
+          } else {
+            $('#createContainerSpinner').hide();
+            Messages.send('Container Started', d.Id);
+            $state.go('containers', {}, {reload: true});
+          }
         }, function (e) {
           $('#createContainerSpinner').hide();
-          Messages.error('Error', errorMsgFilter(e));
+          if (e.data.message) {
+            Messages.error("Failure", e.data.message);
+          } else {
+            Messages.error("Failure", 'Unable to start container');
+          }
         });
-      } else {
-        $('#createContainerSpinner').hide();
-        Messages.error('Error', errorMsgFilter(d));
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Messages.error('Error', errorMsgFilter(e));
+      if (e.data.message) {
+        Messages.error("Failure", e.data.message);
+      } else {
+        Messages.error("Failure", 'Unable to create container');
+      }
     });
   }
+
 
   // TODO: centralize, already present in createContainerController
   function pullImageAndCreateContainer(imageConfig, containerConfig) {
@@ -105,15 +119,19 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
       template.volumes.forEach(function (vol) {
         volumeQueries.push(
           Volume.create({}, function (d) {
-            if (d.Name) {
+            if (d.message) {
+              Messages.error('Unable to create volume', d.message);
+            } else {
               Messages.send("Volume created", d.Name);
               containerConfig.Volumes[vol] = {};
               containerConfig.HostConfig.Binds.push(d.Name + ':' + vol);
-            } else {
-              Messages.error('Unable to create volume', errorMsgFilter(d));
             }
           }, function (e) {
-            Messages.error('Unable to create volume', e.data);
+            if (e.data.message) {
+              Messages.error("Failure", e.data.message);
+            } else {
+              Messages.error("Failure", 'Unable to create volume');
+            }
           }).$promise
         );
       });

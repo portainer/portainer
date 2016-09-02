@@ -1,6 +1,6 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'errorMsgFilter',
-function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config, errorMsgFilter) {
+.controller('ContainersController', ['$scope', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config',
+function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;

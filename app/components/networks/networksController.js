@@ -1,6 +1,6 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages',
+function ($scope, $state, Network, Config, Messages) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.advancedSettings = false;
