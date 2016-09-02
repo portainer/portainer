@@ -49,10 +49,7 @@ function ($scope, $state, $stateParams, $filter, Config, Container, ContainerCom
 
   $scope.start = function () {
     $('#loadingViewSpinner').show();
-    Container.start({
-      id: $scope.container.Id,
-      HostConfig: $scope.container.HostConfig
-    }, function (d) {
+    Container.start({id: $scope.container.Id}, {}, function (d) {
       update();
       Messages.send("Container started", $stateParams.id);
     }, function (e) {

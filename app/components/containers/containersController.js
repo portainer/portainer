@@ -50,22 +50,11 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config, 
       if (c.Checked) {
         counter = counter + 1;
         if (action === Container.start) {
-          Container.get({id: c.Id}, function (d) {
-            c = d;
-            action({id: c.Id, HostConfig: c.HostConfig || {}}, function (d) {
-              Messages.send("Container " + msg, c.Id);
-              complete();
-            }, function (e) {
-              Messages.error("Failure", e.data);
-              complete();
-            });
+          action({id: c.Id}, {}, function (d) {
+            Messages.send("Container " + msg, c.Id);
+            complete();
           }, function (e) {
-            if (e.status === 404) {
-              $('.detail').hide();
-              Messages.error("Not found", "Container not found.");
-            } else {
-              Messages.error("Failure", e.data);
-            }
+            Messages.error("Failure", e.data);
             complete();
           });
         }
