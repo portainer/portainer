@@ -112,7 +112,7 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
           return d[key];
         });
         if (arr.join('').indexOf('no such id') !== -1) {
-          Messages.error('Unable to retrieve stats', 'Is this container running?');
+          Messages.error('Unable to retrieve stats', {}, 'Is this container running?');
           return;
         }
 
@@ -123,7 +123,7 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
         updateNetworkChart(d);
         timeout = $timeout(updateStats, 5000);
       }, function () {
-        Messages.error('Unable to retrieve stats', 'Is this container running?');
+        Messages.error('Unable to retrieve stats', {}, 'Is this container running?');
         timeout = $timeout(updateStats, 5000);
       });
     }
@@ -188,7 +188,7 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
   Container.get({id: $stateParams.id}, function (d) {
     $scope.container = d;
   }, function (e) {
-    Messages.error("Failure", e.data);
+    Messages.error("Failure", e, "Unable to retrieve container info");
   });
   $scope.getTop();
 }]);

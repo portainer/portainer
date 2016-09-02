@@ -206,10 +206,17 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
                     }
                 });
             },
-            error: function (title, text) {
+            error: function (title, e, fallbackText) {
+                console.log(JSON.stringify(e, null, 4));
+                var msg = fallbackText;
+                if (e.data && e.data.message) {
+                  msg = e.data.message;
+                } else if (e.message) {
+                  msg = e.message;
+                }
                 $.gritter.add({
                     title: $sanitize(title),
-                    text: $sanitize(text),
+                    text: $sanitize(msg),
                     time: 10000,
                     before_open: function () {
                         if ($('.gritter-item-wrapper').length === 4) {

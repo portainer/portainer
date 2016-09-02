@@ -54,11 +54,7 @@ function ($scope, $state, Network, Config, Messages) {
           }
           complete();
         }, function (e) {
-          if (e.data.message) {
-            Messages.error("Failure", e.data.message);
-          } else {
-            Messages.error("Failure", 'Unable to remove network');
-          }
+          Messages.error("Failure", e, 'Unable to remove network');
           complete();
         });
       }
@@ -71,8 +67,8 @@ function ($scope, $state, Network, Config, Messages) {
       $scope.networks = d;
       $('#loadNetworksSpinner').hide();
     }, function (e) {
-      Messages.error("Failure", e.data);
       $('#loadNetworksSpinner').hide();
+      Messages.error("Failure", e, "Unable to retrieve networks");
     });
   }
 

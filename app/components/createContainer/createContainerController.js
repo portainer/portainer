@@ -61,7 +61,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages) {
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
     }, function (e) {
-      Messages.error("Failure", e.data);
+      Messages.error("Failure", e, "Unable to retrieve volumes");
     });
 
     Network.query({}, function (d) {
@@ -79,7 +79,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages) {
       }
       $scope.availableNetworks = networks;
     }, function (e) {
-      Messages.error("Failure", e.data);
+      Messages.error("Failure", e, "Unable to retrieve networks");
     });
   });
 
@@ -88,12 +88,12 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages) {
     Container.create(config, function (d) {
       if (d.message) {
         $('#createContainerSpinner').hide();
-        Messages.error('Error', d.message);
+        Messages.error('Error', {}, d.message);
       } else {
         Container.start({id: d.Id}, {}, function (cd) {
           if (cd.message) {
             $('#createContainerSpinner').hide();
-            Messages.error('Error', cd.message);
+            Messages.error('Error', {}, cd.message);
           } else {
             $('#createContainerSpinner').hide();
             Messages.send('Container Started', d.Id);
@@ -101,20 +101,12 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages) {
           }
         }, function (e) {
           $('#createContainerSpinner').hide();
-          if (e.data.message) {
-            Messages.error("Failure", e.data.message);
-          } else {
-            Messages.error("Failure", 'Unable to start container');
-          }
+          Messages.error("Failure", e, 'Unable to start container');
         });
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      if (e.data.message) {
-        Messages.error("Failure", e.data.message);
-      } else {
-        Messages.error("Failure", 'Unable to create container');
-      }
+      Messages.error("Failure", e, 'Unable to create container');
     });
   }
 
@@ -125,13 +117,13 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages) {
       if (err) {
         var detail = data[data.length - 1];
         $('#createContainerSpinner').hide();
-        Messages.error('Error', detail.error);
+        Messages.error('Error', {}, detail.error);
       } else {
         createContainer(config);
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Messages.error('Error', 'Unable to pull image ' + image);
+      Messages.error('Failure', e, 'Unable to pull image');
     });
   }
 
