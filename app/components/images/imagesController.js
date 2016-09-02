@@ -47,14 +47,14 @@ function ($scope, $state, Config, Image, Messages) {
         if (err) {
           var detail = data[data.length - 1];
           $('#pullImageSpinner').hide();
-          Messages.error('Error', detail.error);
+          Messages.error('Error', {}, detail.error);
         } else {
           $('#pullImageSpinner').hide();
           $state.go('images', {}, {reload: true});
         }
     }, function (e) {
       $('#pullImageSpinner').hide();
-      Messages.error('Error', 'Unable to pull image ' + image);
+      Messages.error("Failure", e, "Unable to pull image");
     });
   };
 
@@ -73,7 +73,7 @@ function ($scope, $state, Config, Image, Messages) {
         Image.remove({id: i.Id}, function (d) {
           if (d[0].message) {
             $('#loadingViewSpinner').hide();
-            Messages.error("Unable to remove image", d[0].message);
+            Messages.error("Unable to remove image", {}, d[0].message);
           } else {
             Messages.send("Image deleted", i.Id);
             var index = $scope.images.indexOf(i);
@@ -81,11 +81,7 @@ function ($scope, $state, Config, Image, Messages) {
           }
           complete();
         }, function (e) {
-          if (e.data.message) {
-            Messages.error("Failure", e.data.message);
-          } else {
-            Messages.error("Failure", 'Unable to remove image');
-          }
+          Messages.error("Failure", e, 'Unable to remove image');
           complete();
         });
       }
@@ -99,8 +95,8 @@ function ($scope, $state, Config, Image, Messages) {
       });
       $('#loadImagesSpinner').hide();
     }, function (e) {
-      Messages.error("Failure", e.data);
       $('#loadImagesSpinner').hide();
+      Messages.error("Failure", e, "Unable to retrieve images");
     });
   }
 

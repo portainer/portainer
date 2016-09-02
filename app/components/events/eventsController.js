@@ -21,7 +21,7 @@ function ($scope, Settings, Messages, Events) {
     $('#loadEventsSpinner').hide();
   },
   function (e) {
-    Messages.error("Unable to load events", e.data);
     $('#loadEventsSpinner').hide();
+    Messages.error("Failure", e, "Unable to load events");
   });
 }]);

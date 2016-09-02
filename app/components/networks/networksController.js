@@ -58,7 +58,7 @@ function ($scope, $state, Network, Config, Messages) {
     Network.create(config, function (d) {
       if (d.message) {
         $('#createNetworkSpinner').hide();
-        Messages.error('Unable to create network', d.message);
+        Messages.error('Unable to create network', {}, d.message);
       } else {
         Messages.send("Network created", d.Id);
         $('#createNetworkSpinner').hide();
@@ -66,11 +66,7 @@ function ($scope, $state, Network, Config, Messages) {
       }
     }, function (e) {
       $('#createNetworkSpinner').hide();
-      if (e.data.message) {
-        Messages.error("Failure", e.data.message);
-      } else {
-        Messages.error("Failure", 'Unable to create network');
-      }
+      Messages.error("Failure", e, 'Unable to create network');
     });
   };
 
@@ -96,11 +92,7 @@ function ($scope, $state, Network, Config, Messages) {
           }
           complete();
         }, function (e) {
-          if (e.data.message) {
-            Messages.error("Failure", e.data.message);
-          } else {
-            Messages.error("Failure", 'Unable to remove network');
-          }
+          Messages.error("Failure", e, 'Unable to remove network');
           complete();
         });
       }
@@ -113,8 +105,8 @@ function ($scope, $state, Network, Config, Messages) {
       $scope.networks = d;
       $('#loadNetworksSpinner').hide();
     }, function (e) {
-      Messages.error("Failure", e.data);
       $('#loadNetworksSpinner').hide();
+      Messages.error("Failure", e, "Unable to retrieve networks");
     });
   }
 

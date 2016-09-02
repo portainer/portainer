@@ -10,7 +10,7 @@ function ($scope, Network, Messages, $state, $stateParams) {
       $state.go('network', {id: $stateParams.id}, {reload: true});
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e.data);
+      Messages.error("Failure", e, "Unable to disconnect container");
     });
   };
 
@@ -27,11 +27,7 @@ function ($scope, Network, Messages, $state, $stateParams) {
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      if (e.data.message) {
-        Messages.error("Failure", e.data.message);
-      } else {
-        Messages.error("Failure", 'Unable to remove network');
-      }
+      Messages.error("Failure", e, 'Unable to remove network');
     });
   };
 
@@ -40,7 +36,7 @@ function ($scope, Network, Messages, $state, $stateParams) {
     $scope.network = d;
     $('#loadingViewSpinner').hide();
   }, function (e) {
-    Messages.error("Failure", e.data);
     $('#loadingViewSpinner').hide();
+    Messages.error("Failure", e, "Unable to retrieve network info");
   });
 }]);

@@ -37,7 +37,7 @@ function ($scope, $state, Volume, Messages) {
     Volume.create(config, function (d) {
       if (d.message) {
         $('#createVolumeSpinner').hide();
-        Messages.error('Unable to create volume', d.message);
+        Messages.error('Unable to create volume', {}, d.message);
       } else {
         Messages.send("Volume created", d.Name);
         $('#createVolumeSpinner').hide();
@@ -45,11 +45,7 @@ function ($scope, $state, Volume, Messages) {
       }
     }, function (e) {
       $('#createVolumeSpinner').hide();
-      if (e.data.message) {
-        Messages.error("Failure", e.data.message);
-      } else {
-        Messages.error("Failure", 'Unable to create volume');
-      }
+      Messages.error("Failure", e, 'Unable to create volume');
     });
   };
 
@@ -71,7 +67,7 @@ function ($scope, $state, Volume, Messages) {
           $scope.volumes.splice(index, 1);
           complete();
         }, function (e) {
-          Messages.error("Failure", e.data);
+          Messages.error("Failure", e, "Unable to remove volume");
           complete();
         });
       }
@@ -84,8 +80,8 @@ function ($scope, $state, Volume, Messages) {
       $scope.volumes = _.uniqBy(d.Volumes, 'Name');
       $('#loadVolumesSpinner').hide();
     }, function (e) {
-      Messages.error("Failure", e.data);
       $('#loadVolumesSpinner').hide();
+      Messages.error("Failure", e, "Unable to retrieve volumes");
     });
   }
   fetchVolumes();
