@@ -14,9 +14,7 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
   function createContainer(config) {
     Container.create(config, function (d) {
       if (d.Id) {
-        var reqBody = config.HostConfig || {};
-        reqBody.id = d.Id;
-        Container.start(reqBody, function (cd) {
+        Container.start({id: d.Id}, {}, function (cd) {
           $('#createContainerSpinner').hide();
           Messages.send('Container Started', d.Id);
           $state.go('containers', {}, {reload: true});
