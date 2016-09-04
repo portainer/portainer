@@ -19,7 +19,7 @@ function ($scope, Network, Messages, $state, $stateParams) {
     Network.remove({id: $stateParams.id}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Messages.send("Error", d.message);
+        Messages.send("Error", {}, d.message);
       } else {
         $('#loadingViewSpinner').hide();
         Messages.send("Network removed", $stateParams.id);
@@ -27,7 +27,7 @@ function ($scope, Network, Messages, $state, $stateParams) {
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, 'Unable to remove network');
+      Messages.error("Failure", e, "Unable to remove network");
     });
   };
 
