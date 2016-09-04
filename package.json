@@ -2,7 +2,7 @@
   "author": "Cloud Inovasi",
   "name": "portainer",
   "homepage": "https://github.com/cloud-inovasi/portainer",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:cloud-inovasi/portainer.git"
