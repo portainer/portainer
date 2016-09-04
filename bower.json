@@ -1,18 +1,18 @@
 {
-  "name": "uifordocker",
-  "version": "1.7.0",
-  "homepage": "https://github.com/kevana/ui-for-docker",
+  "name": "portainer",
+  "version": "1.8.0",
+  "homepage": "https://github.com/cloud-inovasi/portainer",
   "authors": [
-    "Michael Crosby <crosbymichael@gmail.com>",
-    "Kevan Ahlquist <ahlquistkd@gmail.com>",
     "Anthony Lapenna <anthony.lapenna@cloudinovasi.id>"
   ],
   "description": "A web interface for the Docker Remote API.",
   "keywords": [
-    "uifordocker",
-    "dockerui",
     "docker",
-    "api"
+    "ui",
+    "api",
+    "portainer",
+    "uifordocker",
+    "dockerui"
   ],
   "license": "MIT",
   "ignore": [
@@ -34,6 +34,7 @@
     "angular-ui-select": "~0.17.1",
     "bootstrap": "~3.3.6",
     "font-awesome": "~4.6.3",
+    "Hover": "2.0.2",
     "jquery": "1.11.1",
     "jquery.gritter": "1.7.4",
     "lodash": "4.12.0",

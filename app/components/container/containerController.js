@@ -1,13 +1,11 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$stateParams', '$state', '$filter', 'Container', 'ContainerCommit', 'Image', 'Messages', '$timeout',
-function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Image, Messages, $timeout) {
-  $scope.changes = [];
-  $scope.editEnv = false;
-  $scope.editPorts = false;
-  $scope.editBinds = false;
-  $scope.newCfg = {
-    Env: [],
-    Ports: {}
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Messages',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Messages) {
+  $scope.activityTime = 0;
+  $scope.portBindings = [];
+  $scope.config = {
+    Image: '',
+    Registry: ''
   };
 
   var update = function () {
@@ -17,74 +15,38 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
       $scope.container.edit = false;
       $scope.container.newContainerName = $filter('trimcontainername')(d.Name);
 
-      // fill up env
-      if (d.Config.Env) {
-        $scope.newCfg.Env = d.Config.Env.map(function (entry) {
-          return {name: entry.split('=')[0], value: entry.split('=')[1]};
+      if (d.State.Running) {
+        $scope.activityTime = moment.duration(moment(d.State.StartedAt).utc().diff(moment().utc())).humanize();
+      } else {
+        $scope.activityTime = moment.duration(moment().utc().diff(moment(d.State.FinishedAt).utc())).humanize();
+      }
+
+      $scope.portBindings = [];
+      if (d.NetworkSettings.Ports) {
+        angular.forEach(Object.keys(d.NetworkSettings.Ports), function(portMapping) {
+          if (d.NetworkSettings.Ports[portMapping]) {
+            var mapping = {};
+            mapping.container = portMapping;
+            mapping.host = d.NetworkSettings.Ports[portMapping][0].HostIp + ':' + d.NetworkSettings.Ports[portMapping][0].HostPort;
+            $scope.portBindings.push(mapping);
+          }
         });
       }
-
-      // fill up ports
-      $scope.newCfg.Ports = {};
-      angular.forEach(d.Config.ExposedPorts, function(i, port) {
-        if (d.HostConfig.PortBindings && port in d.HostConfig.PortBindings) {
-          $scope.newCfg.Ports[port] = d.HostConfig.PortBindings[port];
-        }
-        else {
-          $scope.newCfg.Ports[port] = [];
-        }
-      });
-
-      // fill up bindings
-      $scope.newCfg.Binds = [];
-      var defaultBinds = {};
-      angular.forEach(d.Config.Volumes, function(value, vol) {
-        defaultBinds[vol] = { ContPath: vol, HostPath: '', ReadOnly: false, DefaultBind: true };
-      });
-      angular.forEach(d.HostConfig.Binds, function(binding, i) {
-        var mountpoint = binding.split(':')[0];
-        var vol = binding.split(':')[1] || '';
-        var ro = binding.split(':').length > 2 && binding.split(':')[2] === 'ro';
-        var defaultBind = false;
-        if (vol === '') {
-          vol = mountpoint;
-          mountpoint = '';
-        }
-
-        if (vol in defaultBinds) {
-          delete defaultBinds[vol];
-          defaultBind = true;
-        }
-        $scope.newCfg.Binds.push({ ContPath: vol, HostPath: mountpoint, ReadOnly: ro, DefaultBind: defaultBind });
-      });
-      angular.forEach(defaultBinds, function(bind) {
-        $scope.newCfg.Binds.push(bind);
-      });
-
       $('#loadingViewSpinner').hide();
     }, function (e) {
-      if (e.status === 404) {
-        $('.detail').hide();
-        Messages.error("Not found", "Container not found.");
-      } else {
-        Messages.error("Failure", e.data);
-      }
       $('#loadingViewSpinner').hide();
+      Messages.error("Failure", e, "Unable to retrieve container info");
     });
-
   };
 
   $scope.start = function () {
     $('#loadingViewSpinner').show();
-    Container.start({
-      id: $scope.container.Id,
-      HostConfig: $scope.container.HostConfig
-    }, function (d) {
+    Container.start({id: $scope.container.Id}, {}, function (d) {
       update();
       Messages.send("Container started", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to start." + e.data);
+      Messages.error("Failure", e, "Unable to start container");
     });
   };
 
@@ -95,7 +57,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
       Messages.send("Container stopped", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to stop." + e.data);
+      Messages.error("Failure", e, "Unable to stop container");
     });
   };
 
@@ -106,20 +68,26 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
       Messages.send("Container killed", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to die." + e.data);
+      Messages.error("Failure", e, "Unable to kill container");
     });
   };
 
   $scope.commit = function () {
-    $('#loadingViewSpinner').show();
-    ContainerCommit.commit({id: $stateParams.id, repo: $scope.container.Config.Image}, function (d) {
+    $('#createImageSpinner').show();
+    var image = _.toLower($scope.config.Image);
+    var registry = _.toLower($scope.config.Registry);
+    var imageConfig = ImageHelper.createImageConfig(image, registry);
+    ContainerCommit.commit({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
+      $('#createImageSpinner').hide();
       update();
       Messages.send("Container commited", $stateParams.id);
     }, function (e) {
+      $('#createImageSpinner').hide();
       update();
-      Messages.error("Failure", "Container failed to commit." + e.data);
+      Messages.error("Failure", e, "Unable to commit container");
     });
   };
+
   $scope.pause = function () {
     $('#loadingViewSpinner').show();
     Container.pause({id: $stateParams.id}, function (d) {
@@ -127,7 +95,7 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
       Messages.send("Container paused", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to pause." + e.data);
+      Messages.error("Failure", e, "Unable to pause container");
     });
   };
 
@@ -138,19 +106,24 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
       Messages.send("Container unpaused", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to unpause." + e.data);
+      Messages.error("Failure", e, "Unable to unpause container");
     });
   };
 
   $scope.remove = function () {
     $('#loadingViewSpinner').show();
     Container.remove({id: $stateParams.id}, function (d) {
-      update();
-      $state.go('containers', {}, {reload: true});
-      Messages.send("Container removed", $stateParams.id);
+      if (d.message) {
+        $('#loadingViewSpinner').hide();
+        Messages.send("Error", d.message);
+      }
+      else {
+        $state.go('containers', {}, {reload: true});
+        Messages.send("Container removed", $stateParams.id);
+      }
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to remove." + e.data);
+      Messages.error("Failure", e, "Unable to remove container");
     });
   };
 
@@ -161,48 +134,24 @@ function ($scope, $stateParams, $state, $filter, Container, ContainerCommit, Ima
       Messages.send("Container restarted", $stateParams.id);
     }, function (e) {
       update();
-      Messages.error("Failure", "Container failed to restart." + e.data);
-    });
-  };
-
-  $scope.hasContent = function (data) {
-    return data !== null && data !== undefined;
-  };
-
-  $scope.getChanges = function () {
-    $('#loadingViewSpinner').show();
-    Container.changes({id: $stateParams.id}, function (d) {
-      $scope.changes = d;
-      $('#loadingViewSpinner').hide();
+      Messages.error("Failure", e, "Unable to restart container");
     });
   };
 
   $scope.renameContainer = function () {
-    // #FIXME fix me later to handle http status to show the correct error message
-    Container.rename({id: $stateParams.id, 'name': $scope.container.newContainerName}, function (data) {
-      if (data.name) {
-        $scope.container.Name = data.name;
-        Messages.send("Container renamed", $stateParams.id);
-      } else {
+    Container.rename({id: $stateParams.id, 'name': $scope.container.newContainerName}, function (d) {
+      if (d.message) {
         $scope.container.newContainerName = $scope.container.Name;
-        Messages.error("Failure", "Container failed to rename.");
+        Messages.error("Unable to rename container", {}, d.message);
+      } else {
+        $scope.container.Name = $scope.container.newContainerName;
+        Messages.send("Container successfully renamed", d.name);
       }
+    }, function (e) {
+      Messages.error("Failure", e, 'Unable to rename container');
     });
     $scope.container.edit = false;
   };
 
-  $scope.addEntry = function (array, entry) {
-    array.push(entry);
-  };
-  $scope.rmEntry = function (array, entry) {
-    var idx = array.indexOf(entry);
-    array.splice(idx, 1);
-  };
-
-  $scope.toggleEdit = function() {
-    $scope.edit = !$scope.edit;
-  };
-
   update();
-  $scope.getChanges();
 }]);

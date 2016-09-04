@@ -52,6 +52,13 @@
                   <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th>
+                <a ui-sref="containers" ng-click="order('Image')">
+                  Image
+                  <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
               <th ng-if="state.displayIP">
                 <a ui-sref="containers" ng-click="order('IP')">
                   IP Address
@@ -61,23 +68,16 @@
               </th>
               <th ng-if="swarm">
                 <a ui-sref="containers" ng-click="order('Host')">
-                  Host
+                  Host IP
                   <span ng-show="sortType == 'Host' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Host' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="containers" ng-click="order('Image')">
-                  Image
-                  <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="containers" ng-click="order('Command')">
-                  Command
-                  <span ng-show="sortType == 'Command' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Command' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                <a ui-sref="containers" ng-click="order('Ports')">
+                  Exposed Ports
+                  <span ng-show="sortType == 'Ports' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
@@ -88,10 +88,15 @@
               <td><span class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status|containerstatus }}</span></td>
               <td ng-if="swarm"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
               <td ng-if="!swarm"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
+              <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
               <td ng-if="swarm">{{ container.hostIP }}</td>
-              <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
-              <td>{{ container.Command|truncate:60 }}</td>
+              <td>
+                <a ng-if="container.Ports.length > 0" ng-repeat="p in container.Ports" class="image-tag" ng-href="http://{{p.host}}:{{p.public}}" target="_blank">
+                  <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.private }}
+                </a>
+                <span ng-if="container.Ports.length == 0" >-</span>
+              </td>
             </tr>
           </tbody>
         </table>

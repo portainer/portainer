@@ -7,4 +7,4 @@ bower_components
 *.iml
 dist
 dist/*
-ui-for-docker-checksum.txt
+portainer-checksum.txt

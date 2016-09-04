@@ -1,6 +1,6 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages',
+function ($scope, $state, Network, Config, Messages) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.advancedSettings = false;
@@ -45,17 +45,16 @@ function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
       if (network.Checked) {
         counter = counter + 1;
         Network.remove({id: network.Id}, function (d) {
-          var error = errorMsgFilter(d);
-          if (error) {
-            Messages.send("Error", "Unable to remove network with active endpoints");
+          if (d.message) {
+            Messages.send("Error", d.message);
           } else {
-            Messages.send("Network deleted", network.Id);
+            Messages.send("Network removed", network.Id);
             var index = $scope.networks.indexOf(network);
             $scope.networks.splice(index, 1);
           }
           complete();
         }, function (e) {
-          Messages.error("Failure", e.data);
+          Messages.error("Failure", e, 'Unable to remove network');
           complete();
         });
       }
@@ -68,8 +67,8 @@ function ($scope, $state, Network, Config, Messages, errorMsgFilter) {
       $scope.networks = d;
       $('#loadNetworksSpinner').hide();
     }, function (e) {
-      Messages.error("Failure", e.data);
       $('#loadNetworksSpinner').hide();
+      Messages.error("Failure", e, "Unable to retrieve networks");
     });
   }
 

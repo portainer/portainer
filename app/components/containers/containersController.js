@@ -1,12 +1,12 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', 'Container', 'Info', 'Settings', 'Messages', 'Config', 'errorMsgFilter',
-function ($scope, Container, Info, Settings, Messages, Config, errorMsgFilter) {
+.controller('ContainersController', ['$scope', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config',
+function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) {
 
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
   $scope.state.displayIP = false;
   $scope.sortType = 'State';
-  $scope.sortReverse = true;
+  $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
 
   $scope.order = function (sortType) {
@@ -14,13 +14,13 @@ function ($scope, Container, Info, Settings, Messages, Config, errorMsgFilter) {
     $scope.sortType = sortType;
   };
 
-  var update = function (data) {
+  var update = function (data, containersToHideLabels) {
     $('#loadContainersSpinner').show();
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
-      if (hiddenLabels) {
-        containers = hideContainers(d);
+      if (containersToHideLabels) {
+        containers = ContainerHelper.hideContainers(d, containersToHideLabels);
       }
       $scope.containers = containers.map(function (container) {
         var model = new ContainerViewModel(container);
@@ -50,37 +50,25 @@ function ($scope, Container, Info, Settings, Messages, Config, errorMsgFilter) {
       if (c.Checked) {
         counter = counter + 1;
         if (action === Container.start) {
-          Container.get({id: c.Id}, function (d) {
-            c = d;
-            action({id: c.Id, HostConfig: c.HostConfig || {}}, function (d) {
-              Messages.send("Container " + msg, c.Id);
-              complete();
-            }, function (e) {
-              Messages.error("Failure", e.data);
-              complete();
-            });
+          action({id: c.Id}, {}, function (d) {
+            Messages.send("Container " + msg, c.Id);
+            complete();
           }, function (e) {
-            if (e.status === 404) {
-              $('.detail').hide();
-              Messages.error("Not found", "Container not found.");
-            } else {
-              Messages.error("Failure", e.data);
-            }
+            Messages.error("Failure", e, "Unable to start container");
             complete();
           });
         }
         else if (action === Container.remove) {
           action({id: c.Id}, function (d) {
-            var error = errorMsgFilter(d);
-            if (error) {
-              Messages.send("Error", "Unable to remove running container");
+            if (d.message) {
+              Messages.send("Error", d.message);
             }
             else {
               Messages.send("Container " + msg, c.Id);
             }
             complete();
           }, function (e) {
-            Messages.error("Failure", e.data);
+            Messages.error("Failure", e, 'Unable to remove container');
             complete();
           });
         }
@@ -89,7 +77,7 @@ function ($scope, Container, Info, Settings, Messages, Config, errorMsgFilter) {
             Messages.send("Container " + msg, c.Id);
             complete();
           }, function (e) {
-            Messages.error("Failure", e.data);
+            Messages.error("Failure", e, 'An error occured');
             complete();
           });
 
@@ -142,21 +130,6 @@ function ($scope, Container, Info, Settings, Messages, Config, errorMsgFilter) {
     batch($scope.containers, Container.remove, "Removed");
   };
 
-  var hideContainers = function (containers) {
-    return containers.filter(function (container) {
-      var filterContainer = false;
-      hiddenLabels.forEach(function(label, index) {
-        if (_.has(container.Labels, label.name) &&
-        container.Labels[label.name] === label.value) {
-          filterContainer = true;
-        }
-      });
-      if (!filterContainer) {
-        return container;
-      }
-    });
-  };
-
   function retrieveSwarmHostsInfo(data) {
     var swarm_hosts = {};
     var systemStatus = data.SystemStatus;
@@ -174,15 +147,15 @@ function ($scope, Container, Info, Settings, Messages, Config, errorMsgFilter) {
 
   $scope.swarm = false;
   Config.$promise.then(function (c) {
-    hiddenLabels = c.hiddenLabels;
+    var containersToHideLabels = c.hiddenLabels;
     $scope.swarm = c.swarm;
     if (c.swarm) {
       Info.get({}, function (d) {
         $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
-        update({all: Settings.displayAll ? 1 : 0});
+        update({all: Settings.displayAll ? 1 : 0}, containersToHideLabels);
       });
     } else {
-      update({all: Settings.displayAll ? 1 : 0});
+      update({all: Settings.displayAll ? 1 : 0}, containersToHideLabels);
     }
   });
 }]);

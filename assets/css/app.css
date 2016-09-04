@@ -202,3 +202,56 @@ input[type="radio"] {
 .interactive {
   cursor: pointer;
 }
+
+.action-group {
+  margin: 10px;
+}
+
+.btn-ico {
+  margin-right: 5px;
+}
+
+.template-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.container-template {
+  font-size: 1em;
+  width: 256px;
+  height: 128px;
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 2px solid #f6f6f6;
+  color: #30426a;
+}
+
+.container-template--selected {
+  background-color: #f6f6f6;
+  color: #2d3e63;
+}
+
+.container-template:hover {
+  background-color: #f6f6f6;
+  color: #2d3e63;
+}
+
+.container-template .logo {
+  max-width: 48px;
+  max-height: 48px;
+}
+
+.container-template .title {
+  text-align: center;
+}
+
+.container-template .description {
+  text-align: center;
+  font-size: 0.8em;
+}

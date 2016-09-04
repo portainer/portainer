@@ -1,6 +1,6 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Config, Container, Image, Volume, Network, Messages, errorMsgFilter) {
+.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Messages',
+function ($scope, $state, Config, Container, Image, Volume, Network, Messages) {
 
   $scope.state = {
     alwaysPull: true
@@ -61,7 +61,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
     }, function (e) {
-      Messages.error("Failure", e.data);
+      Messages.error("Failure", e, "Unable to retrieve volumes");
     });
 
     Network.query({}, function (d) {
@@ -79,48 +79,51 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
       }
       $scope.availableNetworks = networks;
     }, function (e) {
-      Messages.error("Failure", e.data);
+      Messages.error("Failure", e, "Unable to retrieve networks");
     });
   });
 
+  // TODO: centralize, already present in templatesController
   function createContainer(config) {
-    $('#createContainerSpinner').show();
     Container.create(config, function (d) {
-      if (d.Id) {
-        var reqBody = config.HostConfig || {};
-        reqBody.id = d.Id;
-        Container.start(reqBody, function (cd) {
-          $('#createContainerSpinner').hide();
-          Messages.send('Container Started', d.Id);
-          $state.go('containers', {}, {reload: true});
+      if (d.message) {
+        $('#createContainerSpinner').hide();
+        Messages.error('Error', {}, d.message);
+      } else {
+        Container.start({id: d.Id}, {}, function (cd) {
+          if (cd.message) {
+            $('#createContainerSpinner').hide();
+            Messages.error('Error', {}, cd.message);
+          } else {
+            $('#createContainerSpinner').hide();
+            Messages.send('Container Started', d.Id);
+            $state.go('containers', {}, {reload: true});
+          }
         }, function (e) {
           $('#createContainerSpinner').hide();
-          Messages.error('Error', errorMsgFilter(e));
+          Messages.error("Failure", e, 'Unable to start container');
         });
-      } else {
-        $('#createContainerSpinner').hide();
-        Messages.error('Error', errorMsgFilter(d));
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Messages.error('Error', errorMsgFilter(e));
+      Messages.error("Failure", e, 'Unable to create container');
     });
   }
 
+  // TODO: centralize, already present in templatesController
   function pullImageAndCreateContainer(config) {
-    $('#createContainerSpinner').show();
     Image.create($scope.imageConfig, function (data) {
-        var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
-        if (err) {
-          var detail = data[data.length - 1];
-          $('#createContainerSpinner').hide();
-          Messages.error('Error', detail.error);
-        } else {
-          createContainer(config);
-        }
+      var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
+      if (err) {
+        var detail = data[data.length - 1];
+        $('#createContainerSpinner').hide();
+        Messages.error('Error', {}, detail.error);
+      } else {
+        createContainer(config);
+      }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Messages.error('Error', 'Unable to pull image ' + image);
+      Messages.error('Failure', e, 'Unable to pull image');
     });
   }
 
@@ -223,7 +226,7 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages, e
 
   $scope.create = function () {
     var config = prepareConfiguration();
-
+    $('#createContainerSpinner').show();
     if ($scope.state.alwaysPull) {
       pullImageAndCreateContainer(config);
     } else {

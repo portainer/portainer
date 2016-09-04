@@ -1,6 +1,6 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$scope', '$state', 'Volume', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Volume, Messages, errorMsgFilter) {
+.controller('CreateVolumeController', ['$scope', '$state', 'Volume', 'Messages',
+function ($scope, $state, Volume, Messages) {
 
   $scope.formValues = {
     DriverOptions: []
@@ -21,17 +21,17 @@ function ($scope, $state, Volume, Messages, errorMsgFilter) {
   function createVolume(config) {
     $('#createVolumeSpinner').show();
     Volume.create(config, function (d) {
-      if (d.Name) {
+      if (d.message) {
+        $('#createVolumeSpinner').hide();
+        Messages.error('Unable to create volume', {}, d.message);
+      } else {
         Messages.send("Volume created", d.Name);
         $('#createVolumeSpinner').hide();
         $state.go('volumes', {}, {reload: true});
-      } else {
-        $('#createVolumeSpinner').hide();
-        Messages.error('Unable to create volume', errorMsgFilter(d));
       }
     }, function (e) {
       $('#createVolumeSpinner').hide();
-      Messages.error('Unable to create volume', e.data);
+      Messages.error("Failure", e, 'Unable to create volume');
     });
   }
 

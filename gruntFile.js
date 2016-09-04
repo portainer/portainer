@@ -87,12 +87,13 @@ module.exports = function (grunt) {
                 'bower_components/font-awesome/css/font-awesome.min.css',
                 'bower_components/rdash-ui/dist/css/rdash.min.css',
                 'bower_components/angular-ui-select/dist/select.min.css',
-                'bower_components/xterm.js/src/xterm.css'
+                'bower_components/xterm.js/src/xterm.css',
+                'bower_components/Hover/css/hover-min.css'
             ]
         },
         clean: {
             all: ['<%= distdir %>/*'],
-            app: ['<%= distdir %>/*', '!<%= distdir %>/ui-for-docker'],
+            app: ['<%= distdir %>/*', '!<%= distdir %>/portainer'],
             tmpl: ['<%= distdir %>/templates']
         },
         copy: {
@@ -252,35 +253,35 @@ module.exports = function (grunt) {
         },
         shell: {
             buildImage: {
-                command: 'docker build --rm -t ui-for-docker .'
+                command: 'docker build --rm -t portainer .'
             },
             buildBinary: {
                 command: [
                     'docker run --rm -v $(pwd)/api:/src centurylink/golang-builder',
-                    'shasum api/ui-for-docker > ui-for-docker-checksum.txt',
+                    'shasum api/portainer > portainer-checksum.txt',
                     'mkdir -p dist',
-                    'mv api/ui-for-docker dist/'
+                    'mv api/portainer dist/'
                 ].join(' && ')
             },
             run: {
                 command: [
-                    'docker stop ui-for-docker',
-                    'docker rm ui-for-docker',
-                    'docker run --privileged -d -p 9000:9000 -v /tmp/docker-ui:/data -v /var/run/docker.sock:/var/run/docker.sock --name ui-for-docker ui-for-docker -d /data'
+                    'docker stop portainer',
+                    'docker rm portainer',
+                    'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer -d /data'
                 ].join(';')
             },
             runSwarm: {
                 command: [
-                    'docker stop ui-for-docker',
-                    'docker rm ui-for-docker',
-                    'docker run -d -p 9000:9000 -v /tmp/docker-ui:/data --name ui-for-docker ui-for-docker -H tcp://10.0.7.10:4000 --swarm -d /data'
+                    'docker stop portainer',
+                    'docker rm portainer',
+                    'docker run -d -p 9000:9000 -v /tmp/portainer:/data --name portainer portainer -H tcp://10.0.7.10:4000 --swarm -d /data'
                 ].join(';')
             },
             runSsl: {
                 command: [
-                    'docker stop ui-for-docker',
-                    'docker rm ui-for-docker',
-                    'docker run -d -p 9000:9000 -v /tmp/docker-ui:/data -v /tmp/docker-ssl:/certs --name ui-for-docker ui-for-docker -H tcp://10.0.7.10:2376 -d /data --tlsverify'
+                    'docker stop portainer',
+                    'docker rm portainer',
+                    'docker run -d -p 9000:9000 -v /tmp/portainer:/data -v /tmp/docker-ssl:/certs --name portainer portainer -H tcp://10.0.7.10:2376 -d /data --tlsverify'
                 ].join(';')
             },
             cleanImages: {
@@ -290,7 +291,7 @@ module.exports = function (grunt) {
         'if': {
             binaryNotExist: {
                 options: {
-                    executable: 'dist/ui-for-docker'
+                    executable: 'dist/portainer'
                 },
                 ifFalse: ['shell:buildBinary']
             }

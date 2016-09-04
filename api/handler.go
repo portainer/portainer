@@ -25,6 +25,9 @@ func (a *api) newHandler(settings *Settings) http.Handler {
 	mux.HandleFunc("/settings", func(w http.ResponseWriter, r *http.Request) {
 		settingsHandler(w, r, settings)
 	})
+	mux.HandleFunc("/templates", func(w http.ResponseWriter, r *http.Request) {
+		templatesHandler(w, r, a.templatesURL)
+	})
 	return CSRFHandler(newCSRFWrapper(mux))
 }
 

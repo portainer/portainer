@@ -1,6 +1,6 @@
 angular.module('containerConsole', [])
-.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Settings', 'Container', 'Exec', '$timeout', 'Messages', 'errorMsgFilter',
-function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages, errorMsgFilter) {
+.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Settings', 'Container', 'Exec', '$timeout', 'Messages',
+function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
   $scope.state = {};
   $scope.state.command = "bash";
   $scope.connected = false;
@@ -33,7 +33,10 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages, e
     };
 
     Container.exec(execConfig, function(d) {
-      if (d.Id) {
+      if (d.message) {
+        $('#loadConsoleSpinner').hide();
+        Messages.error("Error", {}, d.message);
+      } else {
         var execId = d.Id;
         resizeTTY(execId, termHeight, termWidth);
         var url = window.location.href.split('#')[0] + 'ws/exec?id=' + execId;
@@ -43,13 +46,10 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages, e
           url = url.replace('http://', 'ws://');
         }
         initTerm(url, termHeight, termWidth);
-      } else {
-        $('#loadConsoleSpinner').hide();
-        Messages.error('Error', errorMsgFilter(d));
       }
     }, function (e) {
       $('#loadConsoleSpinner').hide();
-      Messages.error("Failure", e.data);
+      Messages.error("Failure", e, 'Unable to start an exec instance');
     });
   };
 
@@ -66,10 +66,11 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages, e
   function resizeTTY(execId, height, width) {
     $timeout(function() {
       Exec.resize({id: execId, height: height, width: width}, function (d) {
-        var error = errorMsgFilter(d);
-        if (error) {
-          Messages.error('Error', 'Unable to resize TTY');
+        if (d.message) {
+          Messages.error('Error', {}, 'Unable to resize TTY');
         }
+      }, function (e) {
+        Messages.error("Failure", {}, 'Unable to resize TTY');
       });
     }, 2000);
 

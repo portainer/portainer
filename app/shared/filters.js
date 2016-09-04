@@ -1,4 +1,4 @@
-angular.module('uifordocker.filters', [])
+angular.module('portainer.filters', [])
 .filter('truncate', function () {
   'use strict';
   return function (text, length, end) {
@@ -176,24 +176,19 @@ angular.module('uifordocker.filters', [])
 })
 .filter('key', function () {
   'use strict';
-  return function (pair) {
-    return pair.slice(0, pair.indexOf('='));
+  return function (pair, separator) {
+    return pair.slice(0, pair.indexOf(separator));
   };
 })
 .filter('value', function () {
   'use strict';
-  return function (pair) {
-    return pair.slice(pair.indexOf('=') + 1);
+  return function (pair, separator) {
+    return pair.slice(pair.indexOf(separator) + 1);
   };
 })
-.filter('errorMsg', function () {
-  return function (object) {
-    var idx = 0;
-    var msg = '';
-    while (object[idx] && typeof(object[idx]) === 'string') {
-      msg += object[idx];
-      idx++;
-    }
-    return msg;
+.filter('emptyobject', function () {
+  'use strict';
+  return function (obj) {
+    return _.isEmpty(obj);
   };
 });

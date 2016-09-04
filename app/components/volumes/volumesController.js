@@ -1,6 +1,6 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'errorMsgFilter',
-function ($scope, $state, Volume, Messages, errorMsgFilter) {
+.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages',
+function ($scope, $state, Volume, Messages) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Name';
@@ -41,7 +41,7 @@ function ($scope, $state, Volume, Messages, errorMsgFilter) {
           $scope.volumes.splice(index, 1);
           complete();
         }, function (e) {
-          Messages.error("Failure", e.data);
+          Messages.error("Failure", e, "Unable to remove volume");
           complete();
         });
       }
@@ -54,8 +54,8 @@ function ($scope, $state, Volume, Messages, errorMsgFilter) {
       $scope.volumes = d.Volumes;
       $('#loadVolumesSpinner').hide();
     }, function (e) {
-      Messages.error("Failure", e.data);
       $('#loadVolumesSpinner').hide();
+      Messages.error("Failure", e, "Unable to retrieve volumes");
     });
   }
   fetchVolumes();

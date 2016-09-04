@@ -1,19 +1,19 @@
 {
-  "author": "Michael Crosby & Kevan Ahlquist",
-  "name": "uifordocker",
-  "homepage": "https://github.com/kevana/ui-for-docker",
-  "version": "1.7.0",
+  "author": "Cloud Inovasi",
+  "name": "portainer",
+  "homepage": "https://github.com/cloud-inovasi/portainer",
+  "version": "1.8.0",
   "repository": {
     "type": "git",
-    "url": "git@github.com:kevana/ui-for-docker.git"
+    "url": "git@github.com:cloud-inovasi/portainer.git"
   },
   "bugs": {
-    "url": "https://github.com/kevana/ui-for-docker/issues"
+    "url": "https://github.com/cloud-inovasi/portainer/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://raw.githubusercontent.com/kevana/ui-for-docker/master/LICENSE"
+      "url": "https://raw.githubusercontent.com/cloud-inovasi/portainer/develop/LICENSE"
     }
   ],
   "engines": {

@@ -13,12 +13,8 @@ function ($scope, $stateParams, $anchorScroll, ContainerLogs, Container) {
     $scope.container = d;
     $('#loadingViewSpinner').hide();
   }, function (e) {
-    if (e.status === 404) {
-      Messages.error("Not found", "Container not found.");
-    } else {
-      Messages.error("Failure", e.data);
-    }
     $('#loadingViewSpinner').hide();
+    Messages.error("Failure", e, "Unable to retrieve container info");
   });
 
   function getLogs() {

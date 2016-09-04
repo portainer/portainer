@@ -1,4 +1,4 @@
-angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
+angular.module('portainer.services', ['ngResource', 'ngSanitize'])
     .factory('Container', ['$resource', 'Settings', function ContainerFactory($resource, Settings) {
         'use strict';
         // Resource for interacting with the docker containers
@@ -8,46 +8,51 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
         }, {
             query: {method: 'GET', params: {all: 0, action: 'json'}, isArray: true},
             get: {method: 'GET', params: {action: 'json'}},
-            start: {method: 'POST', params: {id: '@id', action: 'start'}},
             stop: {method: 'POST', params: {id: '@id', t: 5, action: 'stop'}},
             restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart'}},
             kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
             pause: {method: 'POST', params: {id: '@id', action: 'pause'}},
             unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
             changes: {method: 'GET', params: {action: 'changes'}, isArray: true},
-            create: {method: 'POST', params: {action: 'create'}},
-            remove: {method: 'DELETE', params: {id: '@id', v: 0}},
-            rename: {method: 'POST', params: {id: '@id', action: 'rename'}, isArray: false},
             stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000},
-            exec: {method: 'POST', params: {id: '@id', action: 'exec'}}
+            start: {
+              method: 'POST', params: {id: '@id', action: 'start'},
+              transformResponse: genericHandler
+            },
+            create: {
+              method: 'POST', params: {action: 'create'},
+              transformResponse: genericHandler
+            },
+            remove: {
+              method: 'DELETE', params: {id: '@id', v: 0},
+              transformResponse: genericHandler
+            },
+            rename: {
+              method: 'POST', params: {id: '@id', action: 'rename', name: '@name'},
+              transformResponse: genericHandler
+            },
+            exec: {
+              method: 'POST', params: {id: '@id', action: 'exec'},
+              transformResponse: genericHandler
+            }
         });
     }])
     .factory('Exec', ['$resource', 'Settings', function ExecFactory($resource, Settings) {
       'use strict';
       // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/exec-resize
       return $resource(Settings.url + '/exec/:id/:action', {}, {
-        resize: {method: 'POST', params: {id: '@id', action: 'resize', h: '@height', w: '@width'}}
+        resize: {
+          method: 'POST', params: {id: '@id', action: 'resize', h: '@height', w: '@width'},
+          transformResponse: genericHandler
+        }
       });
     }])
     .factory('ContainerCommit', ['$resource', '$http', 'Settings', function ContainerCommitFactory($resource, $http, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#create-a-new-image-from-a-container-s-changes
-        return {
-            commit: function (params, callback) {
-                $http({
-                    method: 'POST',
-                    url: Settings.url + '/commit',
-                    params: {
-                        'container': params.id,
-                        'tag': params.tag || null,
-                        'repo': params.repo || null
-                    },
-                    data: params.config
-                }).success(callback).error(function (data, status, headers, config) {
-                    console.log(error, data);
-                });
-            }
-        };
+        return $resource(Settings.url + '/commit', {}, {
+          commit: {method: 'POST', params: {container: '@id', repo: '@repo', tag: '@tag'}}
+        });
     }])
     .factory('ContainerLogs', ['$resource', '$http', 'Settings', function ContainerLogsFactory($resource, $http, Settings) {
         'use strict';
@@ -147,8 +152,8 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
         return $resource(Settings.url + '/networks/:id/:action', {id: '@id'}, {
             query: {method: 'GET', isArray: true},
             get: {method: 'GET'},
-            create: {method: 'POST', params: {action: 'create'}},
-            remove: {method: 'DELETE'},
+            create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler},
+            remove: { method: 'DELETE', transformResponse: genericHandler },
             connect: {method: 'POST', params: {action: 'connect'}},
             disconnect: {method: 'POST', params: {action: 'disconnect'}}
         });
@@ -159,12 +164,17 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
         return $resource(Settings.url + '/volumes/:name/:action', {name: '@name'}, {
             query: {method: 'GET'},
             get: {method: 'GET'},
-            create: {method: 'POST', params: {action: 'create'}},
+            create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler},
             remove: {method: 'DELETE'}
         });
     }])
     .factory('Config', ['$resource', 'CONFIG_ENDPOINT', function ConfigFactory($resource, CONFIG_ENDPOINT) {
       return $resource(CONFIG_ENDPOINT).get();
+    }])
+    .factory('Templates', ['$resource', 'TEMPLATES_ENDPOINT', function TemplatesFactory($resource, TEMPLATES_ENDPOINT) {
+      return $resource(TEMPLATES_ENDPOINT, {}, {
+        get: {method: 'GET', isArray: true}
+      });
     }])
     .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, UI_VERSION) {
         'use strict';
@@ -196,10 +206,17 @@ angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
                     }
                 });
             },
-            error: function (title, text) {
+            error: function (title, e, fallbackText) {
+                console.log(JSON.stringify(e, null, 4));
+                var msg = fallbackText;
+                if (e.data && e.data.message) {
+                  msg = e.data.message;
+                } else if (e.message) {
+                  msg = e.message;
+                }
                 $.gritter.add({
                     title: $sanitize(title),
-                    text: $sanitize(text),
+                    text: $sanitize(msg),
                     time: 10000,
                     before_open: function () {
                         if ($('.gritter-item-wrapper').length === 4) {

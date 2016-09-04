@@ -1,6 +1,6 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', 'Network', 'Messages', '$state', '$stateParams', 'errorMsgFilter',
-function ($scope, Network, Messages, $state, $stateParams, errorMsgFilter) {
+.controller('NetworkController', ['$scope', 'Network', 'Messages', '$state', '$stateParams',
+function ($scope, Network, Messages, $state, $stateParams) {
 
   $scope.disconnect = function disconnect(networkId, containerId) {
     $('#loadingViewSpinner').show();
@@ -10,19 +10,24 @@ function ($scope, Network, Messages, $state, $stateParams, errorMsgFilter) {
       $state.go('network', {id: $stateParams.id}, {reload: true});
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e.data);
+      Messages.error("Failure", e, "Unable to disconnect container");
     });
   };
 
   $scope.remove = function remove(networkId) {
     $('#loadingViewSpinner').show();
     Network.remove({id: $stateParams.id}, function (d) {
-      $('#loadingViewSpinner').hide();
-      Messages.send("Network removed", "");
-      $state.go('networks', {});
+      if (d.message) {
+        $('#loadingViewSpinner').hide();
+        Messages.send("Error", {}, d.message);
+      } else {
+        $('#loadingViewSpinner').hide();
+        Messages.send("Network removed", $stateParams.id);
+        $state.go('networks', {});
+      }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e.data);
+      Messages.error("Failure", e, "Unable to remove network");
     });
   };
 
@@ -31,7 +36,7 @@ function ($scope, Network, Messages, $state, $stateParams, errorMsgFilter) {
     $scope.network = d;
     $('#loadingViewSpinner').hide();
   }, function (e) {
-    Messages.error("Failure", e.data);
     $('#loadingViewSpinner').hide();
+    Messages.error("Failure", e, "Unable to retrieve network info");
   });
 }]);

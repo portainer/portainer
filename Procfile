@@ -1,1 +1,1 @@
-web: dockerui -p ":$PORT" -e "$DOCKER_ENDPOINT"
+web: portainer -p ":$PORT" -e "$DOCKER_ENDPOINT"
