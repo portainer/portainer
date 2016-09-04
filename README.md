@@ -1,5 +1,6 @@
 # Portainer
 
+[![Microbadger](https://images.microbadger.com/badges/image/cloudinovasi/portainer.svg)](http://microbadger.com/images/cloudinovasi/portainer "Image size")
 [![Gitter](https://badges.gitter.im/portainer/Lobby.svg)](https://gitter.im/portainer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 Portainer is a web interface for the Docker remote API.
