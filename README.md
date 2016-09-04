@@ -1,6 +1,6 @@
 # Portainer
 
-Portainer is a web interface for the Docker Remote API.
+Portainer is a web interface for the Docker remote API.
 
 ![Dashboard](/dashboard.png)
 
