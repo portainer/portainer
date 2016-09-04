@@ -1,5 +1,5 @@
 angular
-.module('uifordocker')
+.module('portainer')
 .directive('rdLoading', function rdLoading() {
   var directive = {
     restrict: 'AE',

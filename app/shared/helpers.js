@@ -1,4 +1,4 @@
-angular.module('uifordocker.helpers', [])
+angular.module('portainer.helpers', [])
 .factory('ImageHelper', [function ImageHelperFactory() {
   'use strict';
   return {

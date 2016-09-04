@@ -1,5 +1,5 @@
 angular
-.module('uifordocker')
+.module('portainer')
 .directive('rdWidget', function rdWidget() {
   var directive = {
     scope: {

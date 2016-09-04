@@ -1,5 +1,5 @@
 angular
-.module('uifordocker')
+.module('portainer')
 .directive('rdWidgetBody', function rdWidgetBody() {
   var directive = {
     requires: '^rdWidget',
