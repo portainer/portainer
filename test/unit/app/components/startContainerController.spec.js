@@ -1,7 +1,7 @@
 describe('startContainerController', function () {
     var scope, $location, createController, mockContainer, $httpBackend;
 
-    beforeEach(angular.mock.module('dockerui'));
+    beforeEach(angular.mock.module('portainer'));
 
     beforeEach(inject(function ($rootScope, $controller, _$location_) {
         $location = _$location_;
@@ -20,11 +20,11 @@ describe('startContainerController', function () {
     }));
     function expectGetContainers() {
         $httpBackend.expectGET('dockerapi/containers/json?all=1').respond([{
-            'Command': './dockerui -e /docker.sock',
+            'Command': './portainer -e /docker.sock',
             'Created': 1421817232,
             'Id': 'b17882378cee8ec0136f482681b764cca430befd52a9bfd1bde031f49b8bba9f',
-            'Image': 'dockerui:latest',
-            'Names': ['/dockerui'],
+            'Image': 'portainer:latest',
+            'Names': ['/portainer'],
             'Ports': [{
                 'IP': '0.0.0.0',
                 'PrivatePort': 9000,

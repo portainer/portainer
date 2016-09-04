@@ -1,10 +1,10 @@
-dockerui:
-  image: cloudinovasi/ui-for-docker
+portainer:
+  image: cloudinovasi/portainer
   command: -e http://<SWARM_HOST>:<SWARM_PORT>
 
 nginx:
   build: .
   links:
-   - dockerui
+   - portainer
   ports:
    - 80:80

@@ -1,13 +1,13 @@
-angular.module('uifordocker', [
-  'uifordocker.templates',
+angular.module('portainer', [
+  'portainer.templates',
   'ui.bootstrap',
   'ui.router',
   'ui.select',
   'ngCookies',
   'ngSanitize',
-  'uifordocker.services',
-  'uifordocker.helpers',
-  'uifordocker.filters',
+  'portainer.services',
+  'portainer.helpers',
+  'portainer.filters',
   'dashboard',
   'container',
   'containerConsole',

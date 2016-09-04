@@ -1,4 +1,4 @@
-package main // import "github.com/cloudinovasi/ui-for-docker"
+package main // import "github.com/cloudinovasi/portainer"
 
 import (
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -9,7 +9,7 @@ func main() {
 	kingpin.Version("1.7.0")
 	var (
 		endpoint  = kingpin.Flag("host", "Dockerd endpoint").Default("unix:///var/run/docker.sock").Short('H').String()
-		addr      = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
+		addr      = kingpin.Flag("bind", "Address and port to serve Portainer").Default(":9000").Short('p').String()
 		assets    = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
 		data      = kingpin.Flag("data", "Path to the data").Default(".").Short('d').String()
 		tlsverify = kingpin.Flag("tlsverify", "TLS support").Default("false").Bool()

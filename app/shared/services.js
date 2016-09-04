@@ -1,4 +1,4 @@
-angular.module('uifordocker.services', ['ngResource', 'ngSanitize'])
+angular.module('portainer.services', ['ngResource', 'ngSanitize'])
     .factory('Container', ['$resource', 'Settings', function ContainerFactory($resource, Settings) {
         'use strict';
         // Resource for interacting with the docker containers

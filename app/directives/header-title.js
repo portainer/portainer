@@ -1,5 +1,5 @@
 angular
-.module('uifordocker')
+.module('portainer')
 .directive('rdHeaderTitle', function rdHeaderTitle() {
   var directive = {
     requires: '^rdHeader',
