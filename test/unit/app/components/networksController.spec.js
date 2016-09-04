@@ -1,7 +1,7 @@
 describe('NetworksController', function () {
     var $scope, $httpBackend, $routeParams;
 
-    beforeEach(module('dockerui'));
+    beforeEach(module('portainer'));
     beforeEach(inject(function (_$httpBackend_, $controller, _$routeParams_) {
         $scope = {};
         $httpBackend = _$httpBackend_;

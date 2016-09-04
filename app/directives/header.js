@@ -1,5 +1,5 @@
 angular
-.module('uifordocker')
+.module('portainer')
 .directive('rdHeader', function rdHeader() {
   var directive = {
     scope: {

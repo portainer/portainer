@@ -1,4 +1,4 @@
-package main // import "github.com/cloudinovasi/ui-for-docker"
+package main // import "github.com/cloudinovasi/portainer"
 
 import (
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -9,7 +9,7 @@ func main() {
 	kingpin.Version("1.7.0")
 	var (
 		endpoint   = kingpin.Flag("host", "Dockerd endpoint").Default("unix:///var/run/docker.sock").Short('H').String()
-		addr       = kingpin.Flag("bind", "Address and port to serve UI For Docker").Default(":9000").Short('p').String()
+		addr       = kingpin.Flag("bind", "Address and port to serve Portainer").Default(":9000").Short('p').String()
 		assets     = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
 		data       = kingpin.Flag("data", "Path to the data").Default(".").Short('d').String()
 		tlsverify  = kingpin.Flag("tlsverify", "TLS support").Default("false").Bool()
@@ -19,8 +19,8 @@ func main() {
 		swarm      = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
 		labels     = pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
 		registries = pairs(kingpin.Flag("registries", "Supported Docker registries").Short('r'))
-		logo      = kingpin.Flag("logo", "URL for the logo displayed in the UI").String()
-		templates = kingpin.Flag("templates", "URL to the templates (apps) definitions").Default("https://raw.githubusercontent.com/cloud-inovasi/ui-templates/master/templates.json").Short('t').String()
+		logo       = kingpin.Flag("logo", "URL for the logo displayed in the UI").String()
+		templates  = kingpin.Flag("templates", "URL to the templates (apps) definitions").Default("https://raw.githubusercontent.com/cloud-inovasi/ui-templates/master/templates.json").Short('t').String()
 	)
 	kingpin.Parse()
 
