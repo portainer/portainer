@@ -1,5 +1,7 @@
 # Portainer
 
+[![Gitter](https://badges.gitter.im/portainer/Lobby.svg)](https://gitter.im/portainer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 Portainer is a web interface for the Docker remote API.
 
 ![Dashboard](/dashboard.png)
