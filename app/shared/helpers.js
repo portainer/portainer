@@ -32,6 +32,6 @@ angular.module('portainer.helpers', [])
           return container;
         }
       });
-    },
+    }
   };
 }]);
