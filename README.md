@@ -13,9 +13,10 @@ UI For Docker is a web interface for the Docker Remote API.  The goal is to prov
 
 ## Supported Docker versions
 
-The current Docker version support policy is the following: `N` to `N-2` included where `N` is the latest version.
+The following Docker versions are supported:
 
-At the moment, the following versions are supported: 1.9, 1.10 & 1.11.
+* full support for Docker 1.10, 1.11 and 1.12
+* partial support for Docker 1.9 (some features won't be available)
 
 ## Run
 
