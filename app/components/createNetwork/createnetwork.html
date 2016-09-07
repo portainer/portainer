@@ -89,7 +89,7 @@
     <div>
       <i id="createNetworkSpinner" class="fa fa-cog fa-3x fa-spin" style="margin-bottom: 5px; display: none;"></i>
     </div>
-    <button type="button" class="btn btn-default btn-lg" ng-click="create()">Create</button>
+    <button type="button" class="btn btn-default btn-lg" ng-disabled="!config.Name" ng-click="create()">Create</button>
     <a type="button" class="btn btn-default btn-lg" ui-sref="networks">Cancel</a>
   </div>
 </div>
