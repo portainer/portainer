@@ -62,9 +62,13 @@ function ($scope, $state, Volume, Messages) {
       if (volume.Checked) {
         counter = counter + 1;
         Volume.remove({name: volume.Name}, function (d) {
-          Messages.send("Volume deleted", volume.Name);
-          var index = $scope.volumes.indexOf(volume);
-          $scope.volumes.splice(index, 1);
+          if (d.message) {
+            Messages.error("Unable to remove volume", {}, d.message);
+          } else {
+            Messages.send("Volume deleted", volume.Name);
+            var index = $scope.volumes.indexOf(volume);
+            $scope.volumes.splice(index, 1);
+          }
           complete();
         }, function (e) {
           Messages.error("Failure", e, "Unable to remove volume");
