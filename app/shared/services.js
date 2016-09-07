@@ -165,7 +165,9 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
             query: {method: 'GET'},
             get: {method: 'GET'},
             create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler},
-            remove: {method: 'DELETE'}
+            remove: {
+              method: 'DELETE', transformResponse: genericHandler
+            }
         });
     }])
     .factory('Config', ['$resource', 'CONFIG_ENDPOINT', function ConfigFactory($resource, CONFIG_ENDPOINT) {
@@ -207,12 +209,13 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
                 });
             },
             error: function (title, e, fallbackText) {
-                console.log(JSON.stringify(e, null, 4));
                 var msg = fallbackText;
                 if (e.data && e.data.message) {
                   msg = e.data.message;
                 } else if (e.message) {
                   msg = e.message;
+                } else if (e.data && e.data.length > 0 && e.data[0].message) {
+                  msg = e.data[0].message;
                 }
                 $.gritter.add({
                     title: $sanitize(title),
