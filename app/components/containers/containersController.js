@@ -14,13 +14,13 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
     $scope.sortType = sortType;
   };
 
-  var update = function (data, containersToHideLabels) {
+  var update = function (data) {
     $('#loadContainersSpinner').show();
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
-      if (containersToHideLabels) {
-        containers = ContainerHelper.hideContainers(d, containersToHideLabels);
+      if ($scope.containersToHideLabels) {
+        containers = ContainerHelper.hideContainers(d, $scope.containersToHideLabels);
       }
       $scope.containers = containers.map(function (container) {
         var model = new ContainerViewModel(container);
@@ -147,15 +147,15 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
 
   $scope.swarm = false;
   Config.$promise.then(function (c) {
-    var containersToHideLabels = c.hiddenLabels;
+    $scope.containersToHideLabels = c.hiddenLabels;
     $scope.swarm = c.swarm;
     if (c.swarm) {
       Info.get({}, function (d) {
         $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
-        update({all: Settings.displayAll ? 1 : 0}, containersToHideLabels);
+        update({all: Settings.displayAll ? 1 : 0});
       });
     } else {
-      update({all: Settings.displayAll ? 1 : 0}, containersToHideLabels);
+      update({all: Settings.displayAll ? 1 : 0});
     }
   });
 }]);
