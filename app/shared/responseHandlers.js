@@ -50,8 +50,8 @@ function genericHandler(data) {
 // This handler returns the original array on success or a newly created array containing
 // only one JSON object with the field message filled with the error message on failure.
 function deleteImageHandler(data) {
-  var response = [];
   // A string is returned on failure (Docker < 1.12)
+  var response = [];
   if (!isJSON(data)) {
     response.push({message: data});
   }

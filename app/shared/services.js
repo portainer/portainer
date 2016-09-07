@@ -207,12 +207,13 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
                 });
             },
             error: function (title, e, fallbackText) {
-                console.log(JSON.stringify(e, null, 4));
                 var msg = fallbackText;
                 if (e.data && e.data.message) {
                   msg = e.data.message;
                 } else if (e.message) {
                   msg = e.message;
+                } else if (e.data.length > 0 && e.data[0].message) {
+                  msg = e.data[0].message;
                 }
                 $.gritter.add({
                     title: $sanitize(title),
