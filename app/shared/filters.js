@@ -191,4 +191,10 @@ angular.module('portainer.filters', [])
   return function (obj) {
     return _.isEmpty(obj);
   };
+})
+.filter('ipaddress', function () {
+  'use strict';
+  return function (ip) {
+    return ip.slice(0, ip.indexOf('/'));
+  };
 });
