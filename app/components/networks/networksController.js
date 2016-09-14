@@ -7,16 +7,34 @@ function ($scope, $state, Network, Config, Messages) {
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
 
-  $scope.formValues = {
-    Subnet: '',
-    Gateway: ''
-  };
-
   $scope.config = {
     Name: '',
-    IPAM: {
-      Config: []
+  };
+
+  function prepareNetworkConfiguration() {
+    var config = angular.copy($scope.config);
+    if ($scope.swarm) {
+      config.Driver = 'overlay';
     }
+    return config;
+  }
+
+  $scope.createNetwork = function() {
+    $('#createNetworkSpinner').show();
+    var config = prepareNetworkConfiguration();
+    Network.create(config, function (d) {
+      if (d.message) {
+        $('#createNetworkSpinner').hide();
+        Messages.error('Unable to create network', {}, d.message);
+      } else {
+        Messages.send("Network created", d.Id);
+        $('#createNetworkSpinner').hide();
+        $state.go('networks', {}, {reload: true});
+      }
+    }, function (e) {
+      $('#createNetworkSpinner').hide();
+      Messages.error("Failure", e, 'Unable to create network');
+    });
   };
 
   $scope.order = function(sortType) {
@@ -72,5 +90,8 @@ function ($scope, $state, Network, Config, Messages) {
     });
   }
 
-  fetchNetworks();
+  Config.$promise.then(function (c) {
+    $scope.swarm = c.swarm;
+    fetchNetworks();
+  });
 }]);
