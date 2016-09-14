@@ -8,7 +8,7 @@ function ($scope, $state, Network, Config, Messages) {
   $scope.sortReverse = false;
 
   $scope.config = {
-    Name: '',
+    Name: ''
   };
 
   function prepareNetworkConfiguration() {
