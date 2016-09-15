@@ -131,6 +131,22 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
             get: {method: 'GET'}
         });
     }])
+    .factory('Nodes', ['$resource', 'Settings', function VersionFactory($resource, Settings) {
+        'use strict';
+        // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-7-nodes
+        return $resource(Settings.url + '/nodes', {}, {
+          query: {
+            method: 'GET', isArray: true
+          }
+        });
+    }])
+    .factory('Swarm', ['$resource', 'Settings', function VersionFactory($resource, Settings) {
+        'use strict';
+        // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-8-swarm
+        return $resource(Settings.url + '/swarm', {}, {
+            get: {method: 'GET'}
+        });
+    }])
     .factory('Auth', ['$resource', 'Settings', function AuthFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#check-auth-configuration
