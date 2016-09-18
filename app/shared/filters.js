@@ -18,6 +18,18 @@ angular.module('portainer.filters', [])
     }
   };
 })
+.filter('taskstatusbadge', function () {
+  'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (status.indexOf('preparing') !== -1) {
+      return 'info';
+    } else if (status.indexOf('failed') !== -1 || status.indexOf('rejected') !== -1) {
+      return 'danger';
+    }
+    return 'success';
+  };
+})
 .filter('containerstatusbadge', function () {
   'use strict';
   return function (text) {

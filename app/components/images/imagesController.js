@@ -72,7 +72,7 @@ function ($scope, $state, Config, Image, Messages) {
         counter = counter + 1;
         Image.remove({id: i.Id}, function (d) {
           if (d[0].message) {
-            $('#loadingViewSpinner').hide();
+            $('#loadImagesSpinner').hide();
             Messages.error("Unable to remove image", {}, d[0].message);
           } else {
             Messages.send("Image deleted", i.Id);

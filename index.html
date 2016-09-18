@@ -44,6 +44,9 @@
         <li class="sidebar-list">
           <a ui-sref="templates">App Templates <span class="menu-icon fa fa-rocket"></span></a>
         </li>
+        <li class="sidebar-list" ng-if="swarm_mode">
+          <a ui-sref="services">Services <span class="menu-icon fa fa-list-alt"></span></a>
+        </li>
         <li class="sidebar-list">
           <a ui-sref="containers">Containers <span class="menu-icon fa fa-server"></span></a>
         </li>

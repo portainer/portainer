@@ -1,0 +1,95 @@
+<rd-header>
+  <rd-header-title title="Service details">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
+  <rd-header-content>
+    Service > <a ui-sref="service({id: service.Id})">{{ service.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-list-alt" title="Service details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>{{ service.Name }}</td>
+            </tr>
+            <tr>
+              <td>ID</td>
+              <td>
+                {{ service.Id }}
+                <button class="btn btn-xs btn-danger" ng-click="removeService()"><i class="fa fa-trash btn-ico" aria-hidden="true"></i>Delete this service</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Replicas</td>
+              <td>{{ service.Replicas }}</td>
+            </tr>
+            <tr>
+              <td>Image</td>
+              <td>{{ service.Image }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="tasks.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title="Associated tasks"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>
+                <a ui-sref="service" ng-click="order('Status')">
+                  Status
+                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="service" ng-click="order('Slot')">
+                  Slot
+                  <span ng-show="sortType == 'Slot' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Slot' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th ng-if="displayNode">
+                <a ui-sref="service" ng-click="order('Node')">
+                  Node
+                  <span ng-show="sortType == 'Node' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Node' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="service" ng-click="order('CreatedAt')">
+                  Created
+                  <span ng-show="sortType == 'CreatedAt' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'CreatedAt' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="task in tasks">
+              <td><a ui-sref="task({ id: task.Id })"">{{ task.Id }}</a></td>
+              <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
+              <td>{{ task.Slot }}</td>
+              <td ng-if="displayNode">{{ task.Node }}</td>
+              <td>{{ task.CreatedAt|getisodate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

@@ -18,11 +18,14 @@ angular.module('portainer', [
   'events',
   'images',
   'image',
+  'service',
+  'services',
   'stats',
   'swarm',
   'network',
   'networks',
   'createNetwork',
+  'task',
   'templates',
   'volumes',
   'createVolume'])
@@ -119,6 +122,21 @@ angular.module('portainer', [
       url: '^/networks/:id/',
       templateUrl: 'app/components/network/network.html',
       controller: 'NetworkController'
+    })
+    .state('services', {
+      url: '/services/',
+      templateUrl: 'app/components/services/services.html',
+      controller: 'ServicesController'
+    })
+    .state('service', {
+      url: '^/service/:id/',
+      templateUrl: 'app/components/service/service.html',
+      controller: 'ServiceController'
+    })
+    .state('task', {
+      url: '^/task/:id',
+      templateUrl: 'app/components/task/task.html',
+      controller: 'TaskController'
     })
     .state('templates', {
       url: '/templates/',

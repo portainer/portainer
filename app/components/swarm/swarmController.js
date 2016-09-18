@@ -1,6 +1,6 @@
 angular.module('swarm', [])
-.controller('SwarmController', ['$scope', 'Info', 'Version', 'Nodes',
-function ($scope, Info, Version, Nodes) {
+.controller('SwarmController', ['$scope', 'Info', 'Version', 'Node',
+function ($scope, Info, Version, Node) {
 
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
@@ -24,7 +24,7 @@ function ($scope, Info, Version, Nodes) {
     $scope.info = d;
     if (d.Swarm) {
       $scope.swarm_mode = true;
-      Nodes.query({}, function(d) {
+      Node.query({}, function(d) {
         $scope.nodes = d;
         var CPU = 0, memory = 0;
         angular.forEach(d, function(node) {

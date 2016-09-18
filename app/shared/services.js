@@ -37,6 +37,23 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
             }
         });
     }])
+    .factory('Service', ['$resource', 'Settings', function ServiceFactory($resource, Settings) {
+      'use strict';
+      // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-9-services
+      return $resource(Settings.url + '/services/:id/:action', {}, {
+        get: { method: 'GET', params: {id: '@id'} },
+        query: { method: 'GET', isArray: true },
+        remove: { method: 'DELETE', params: {id: '@id'} },
+      });
+    }])
+    .factory('Task', ['$resource', 'Settings', function TaskFactory($resource, Settings) {
+      'use strict';
+      // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-9-services
+      return $resource(Settings.url + '/tasks/:id', {}, {
+        get: { method: 'GET', params: {id: '@id'} },
+        query: {method: 'GET', isArray: true},
+      });
+    }])
     .factory('Exec', ['$resource', 'Settings', function ExecFactory($resource, Settings) {
       'use strict';
       // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/exec-resize
@@ -131,7 +148,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
             get: {method: 'GET'}
         });
     }])
-    .factory('Nodes', ['$resource', 'Settings', function VersionFactory($resource, Settings) {
+    .factory('Node', ['$resource', 'Settings', function NodeFactory($resource, Settings) {
         'use strict';
         // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-7-nodes
         return $resource(Settings.url + '/nodes', {}, {
@@ -140,7 +157,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
           }
         });
     }])
-    .factory('Swarm', ['$resource', 'Settings', function VersionFactory($resource, Settings) {
+    .factory('Swarm', ['$resource', 'Settings', function SwarmFactory($resource, Settings) {
         'use strict';
         // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-8-swarm
         return $resource(Settings.url + '/swarm', {}, {
