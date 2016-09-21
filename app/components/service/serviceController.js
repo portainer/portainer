@@ -5,6 +5,13 @@ function ($scope, $stateParams, $state, Service, Task, Node, Messages) {
   $scope.service = {};
   $scope.tasks = [];
   $scope.displayNode = false;
+  $scope.sortType = 'Status';
+  $scope.sortReverse = false;
+
+  $scope.order = function (sortType) {
+    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+    $scope.sortType = sortType;
+  };
 
   $scope.removeService = function removeService() {
     $('#loadingViewSpinner').show();
