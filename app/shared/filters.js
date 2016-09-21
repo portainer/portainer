@@ -22,10 +22,16 @@ angular.module('portainer.filters', [])
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (status.indexOf('preparing') !== -1) {
+    if (status.indexOf('new') !== -1 || status.indexOf('allocated') !== -1 ||
+      status.indexOf('assigned') !== -1 || status.indexOf('accepted') !== -1) {
       return 'info';
-    } else if (status.indexOf('failed') !== -1 || status.indexOf('rejected') !== -1) {
+    } else if (status.indexOf('pending') !== -1) {
+      return 'warning';
+    } else if (status.indexOf('shutdown') !== -1 || status.indexOf('failed') !== -1 ||
+      status.indexOf('rejected') !== -1) {
       return 'danger';
+    } else if (status.indexOf('complete') !== -1) {
+      return 'primary';
     }
     return 'success';
   };
