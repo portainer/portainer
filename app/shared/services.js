@@ -52,7 +52,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
       // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-9-services
       return $resource(Settings.url + '/tasks/:id', {}, {
         get: { method: 'GET', params: {id: '@id'} },
-        query: {method: 'GET', isArray: true},
+        query: { method: 'GET', isArray: true, params: {filters: '@filters'} },
       });
     }])
     .factory('Exec', ['$resource', 'Settings', function ExecFactory($resource, Settings) {
