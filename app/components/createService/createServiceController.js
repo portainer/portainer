@@ -113,7 +113,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
   function prepareNetworks(config, input) {
     var networks = [];
     if (input.Network) {
-      networks.push({ Target: input.Network });      
+      networks.push({ Target: input.Network });
     }
     input.ExtraNetworks.forEach(function (network) {
       networks.push({ Target: network.Name });
@@ -157,7 +157,6 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
   $scope.create = function createService() {
     $('#createServiceSpinner').show();
     var config = prepareConfiguration();
-    console.log(JSON.stringify(config, null, 4));
     createNewService(config);
   };
 
