@@ -11,6 +11,7 @@ function ImageViewModel(data) {
 function TaskViewModel(data, node_data) {
   this.Id = data.ID;
   this.Created = data.CreatedAt;
+  this.Updated = data.UpdatedAt;
   this.Slot = data.Slot;
   this.Status = data.Status.State;
   if (node_data) {

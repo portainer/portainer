@@ -108,10 +108,10 @@
                 </a>
               </th>
               <th>
-                <a ui-sref="service" ng-click="order('CreatedAt')">
-                  Created
-                  <span ng-show="sortType == 'CreatedAt' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'CreatedAt' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                <a ui-sref="service" ng-click="order('UpdatedAt')">
+                  Last update
+                  <span ng-show="sortType == 'UpdatedAt' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'UpdatedAt' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
@@ -122,7 +122,7 @@
               <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
               <td>{{ task.Slot }}</td>
               <td ng-if="displayNode">{{ task.Node }}</td>
-              <td>{{ task.CreatedAt|getisodate }}</td>
+              <td>{{ task.Updated|getisodate }}</td>
             </tr>
           </tbody>
         </table>
