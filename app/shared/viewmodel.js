@@ -26,7 +26,9 @@ function ServiceViewModel(data) {
   this.Id = data.ID;
   this.Name = data.Spec.Name;
   this.Image = data.Spec.TaskTemplate.ContainerSpec.Image;
-  this.Replicas = data.Spec.Mode.Replicated.Replicas;
+  if (data.Spec.Mode.Replicated) {
+    this.Replicas = data.Spec.Mode.Replicated.Replicas;
+  }
   this.Checked = false;
 }
 

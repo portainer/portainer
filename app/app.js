@@ -20,6 +20,7 @@ angular.module('portainer', [
   'image',
   'service',
   'services',
+  'createService',
   'stats',
   'swarm',
   'network',
@@ -83,15 +84,20 @@ angular.module('portainer', [
       templateUrl: 'app/components/createContainer/createcontainer.html',
       controller: 'CreateContainerController'
     })
-    .state('actions.create.volume', {
-      url: "/volume",
-      templateUrl: 'app/components/createVolume/createvolume.html',
-      controller: 'CreateVolumeController'
-    })
     .state('actions.create.network', {
       url: "/network",
       templateUrl: 'app/components/createNetwork/createnetwork.html',
       controller: 'CreateNetworkController'
+    })
+    .state('actions.create.service', {
+      url: "/service",
+      templateUrl: 'app/components/createService/createservice.html',
+      controller: 'CreateServiceController'
+    })
+    .state('actions.create.volume', {
+      url: "/volume",
+      templateUrl: 'app/components/createVolume/createvolume.html',
+      controller: 'CreateVolumeController'
     })
     .state('docker', {
       url: '/docker/',

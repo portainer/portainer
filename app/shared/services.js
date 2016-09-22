@@ -43,6 +43,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
       return $resource(Settings.url + '/services/:id/:action', {}, {
         get: { method: 'GET', params: {id: '@id'} },
         query: { method: 'GET', isArray: true },
+        create: { method: 'POST', params: {action: 'create'} },
         remove: { method: 'DELETE', params: {id: '@id'} },
       });
     }])
