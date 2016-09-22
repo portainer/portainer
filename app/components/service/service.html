@@ -29,6 +29,10 @@
               </td>
             </tr>
             <tr>
+              <td>Scheduling mode</td>
+              <td>{{ service.Mode }}</td>
+            </tr>
+            <tr ng-if="service.Mode === 'replicated'">
               <td>Replicas</td>
               <td>{{ service.Replicas }}</td>
             </tr>
