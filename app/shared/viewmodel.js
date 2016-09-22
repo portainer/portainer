@@ -32,6 +32,15 @@ function ServiceViewModel(data) {
   } else {
     this.Mode = 'global';
   }
+  if (data.Spec.Labels) {
+    this.Labels = data.Spec.Labels;
+  }
+  if (data.Spec.TaskTemplate.ContainerSpec.Env) {
+    this.Env = data.Spec.TaskTemplate.ContainerSpec.Env;
+  }
+  if (data.Endpoint.Ports) {
+    this.Ports = data.Endpoint.Ports;
+  }
   this.Checked = false;
 }
 

@@ -40,6 +40,36 @@
               <td>Image</td>
               <td>{{ service.Image }}</td>
             </tr>
+            <tr ng-if="service.Ports">
+              <td>Published ports</td>
+              <td>
+                <div ng-repeat="mapping in service.Ports">
+                  {{ mapping.TargetPort }} <i class="fa fa-long-arrow-right"></i> {{ mapping.PublishedPort }}
+                </div>
+              </td>
+            </tr>
+            <tr ng-if="service.Env">
+              <td>Env</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="var in service.Env">
+                    <td>{{ var|key: '=' }}</td>
+                    <td>{{ var|value: '=' }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr ng-if="service.Labels">
+              <td>Labels</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="(k, v) in service.Labels">
+                    <td>{{ k }}</td>
+                    <td>{{ v }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
