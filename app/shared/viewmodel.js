@@ -46,6 +46,7 @@ function ServiceViewModel(data) {
   }
   this.Checked = false;
   this.Scale = false;
+  this.EditName = false;
 }
 
 function ContainerViewModel(data) {

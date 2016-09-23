@@ -19,7 +19,15 @@
           <tbody>
             <tr>
               <td>Name</td>
-              <td>{{ service.Name }}</td>
+              <td ng-if="!service.EditName">
+                {{ service.Name }}
+                <a href="" data-toggle="tooltip" title="Edit service name" ng-click="service.EditName = true;"><i class="fa fa-edit"></i></a>
+              </td>
+              <td ng-if="service.EditName">
+                <input type="text" class="containerNameInput" ng-model="service.newServiceName">
+                <a class="interactive" ng-click="service.EditName = false;"><i class="fa fa-times"></i></a>
+                <a class="interactive" ng-click="renameService(service)"><i class="fa fa-check-square-o"></i></a>
+              </td>
             </tr>
             <tr>
               <td>ID</td>

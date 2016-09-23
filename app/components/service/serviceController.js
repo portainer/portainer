@@ -13,6 +13,23 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     $scope.sortType = sortType;
   };
 
+  $scope.renameService = function renameService(service) {
+    $('#loadServicesSpinner').show();
+    var serviceName = service.Name;
+    var config = ServiceHelper.serviceToConfig(service.Model);
+    config.Name = service.newServiceName;
+    Service.update({ id: service.Id, version: service.Version }, config, function (data) {
+      $('#loadServicesSpinner').hide();
+      Messages.send("Service successfully renamed", "New name: " + service.newServiceName);
+      $state.go('service', {id: service.Id}, {reload: true});
+    }, function (e) {
+      $('#loadServicesSpinner').hide();
+      service.EditName = false;
+      service.Name = serviceName;
+      Messages.error("Failure", e, "Unable to rename service");
+    });
+  };
+
   $scope.scaleService = function scaleService(service) {
     $('#loadServicesSpinner').show();
     var config = ServiceHelper.serviceToConfig(service.Model);
@@ -50,6 +67,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     $('#loadingViewSpinner').show();
     Service.get({id: $stateParams.id}, function (d) {
       var service = new ServiceViewModel(d);
+      service.newServiceName = service.Name;
       $scope.service = service;
       Task.query({filters: {service: [service.Name]}}, function (tasks) {
         Node.query({}, function (nodes) {
