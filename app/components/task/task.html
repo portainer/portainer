@@ -3,7 +3,7 @@
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    Task > <a ui-sref="service({id: task.ServiceID})">{{ serviceName }}</a> > {{ task.ID }}
+    Services > <a ui-sref="service({id: task.ServiceID})">{{ serviceName }}</a> > {{ task.ID }}
   </rd-header-content>
 </rd-header>
 
@@ -20,7 +20,11 @@
             </tr>
             <tr>
               <td>State</td>
-              <td>{{ task.Status.State }}</td>
+              <td><span class="label label-{{ task.Status.State|taskstatusbadge }}">{{ task.Status.State }}</span></td>
+            </tr>
+            <tr ng-if="task.Status.Err">
+              <td>Error message</td>
+              <td><code>{{ task.Status.Err }}</code></td>
             </tr>
             <tr>
               <td>Image</td>
@@ -34,7 +38,7 @@
               <td>Created</td>
               <td>{{ task.CreatedAt|getisodate }}</td>
             </tr>
-            <tr>
+            <tr ng-if="task.Status.ContainerStatus.ContainerID">
               <td>Container ID</td>
               <td>{{ task.Status.ContainerStatus.ContainerID }}</td>
             </tr>
