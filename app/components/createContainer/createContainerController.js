@@ -56,7 +56,7 @@ function ($scope, $state, Config, Info, Container, Image, Volume, Network, Messa
   Config.$promise.then(function (c) {
     var swarm = c.swarm;
     Info.get({}, function(info) {
-      if (swarm && info.Swarm) {
+      if (swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
         $scope.swarm_mode = true;
       }
     });

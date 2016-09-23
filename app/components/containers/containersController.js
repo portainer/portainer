@@ -152,7 +152,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
     $scope.swarm = c.swarm;
     if (c.swarm) {
       Info.get({}, function (d) {
-        if (d.Swarm) {
+        if (!_.startsWith(d.ServerVersion, 'swarm')) {
           $scope.swarm_mode = true;
         } else {
           $scope.swarm_hosts = retrieveSwarmHostsInfo(d);

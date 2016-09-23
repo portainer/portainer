@@ -64,7 +64,7 @@ function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume
   function prepareInfoData(d) {
     var info = d;
     $scope.infoData = info;
-    if ($scope.swarm && info.Swarm) {
+    if ($scope.swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
       $scope.swarm_mode = true;
     }
   }

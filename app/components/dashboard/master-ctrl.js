@@ -15,7 +15,7 @@ function ($scope, $cookieStore, Settings, Config, Info) {
   Config.$promise.then(function (c) {
     $scope.swarm = c.swarm;
     Info.get({}, function(d) {
-      if ($scope.swarm && d.Swarm) {
+      if ($scope.swarm && !_.startsWith(d.ServerVersion, 'swarm')) {
         $scope.swarm_mode = true;
         $scope.swarm_manager = false;
         if (d.Swarm.ControlAvailable) {
