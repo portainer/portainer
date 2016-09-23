@@ -1,6 +1,6 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', 'Config', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Templates', 'Messages',
-function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image, Volume, Network, Templates, Messages) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Templates', 'Messages',
+function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper, Image, Volume, Network, Templates, Messages) {
   $scope.templates = [];
   $scope.selectedTemplate = null;
   $scope.formValues = {
@@ -165,6 +165,11 @@ function ($scope, $q, $state, $filter, Config, Container, ContainerHelper, Image
 
   Config.$promise.then(function (c) {
     $scope.swarm = c.swarm;
+    Info.get({}, function(info) {
+      if ($scope.swarm && info.Swarm) {
+        $scope.swarm_mode = true;
+      }
+    });
     var containersToHideLabels = c.hiddenLabels;
     Network.query({}, function (d) {
       var networks = d;
