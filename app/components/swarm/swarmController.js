@@ -22,7 +22,7 @@ function ($scope, Info, Version, Node) {
 
   Info.get({}, function (d) {
     $scope.info = d;
-    if (d.Swarm) {
+    if (!_.startsWith(d.ServerVersion, 'swarm')) {
       $scope.swarm_mode = true;
       Node.query({}, function(d) {
         $scope.nodes = d;
