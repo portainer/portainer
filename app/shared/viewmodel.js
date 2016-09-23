@@ -24,9 +24,11 @@ function TaskViewModel(data, node_data) {
 }
 
 function ServiceViewModel(data) {
+  this.Model = data;
   this.Id = data.ID;
   this.Name = data.Spec.Name;
   this.Image = data.Spec.TaskTemplate.ContainerSpec.Image;
+  this.Version = data.Version.Index;
   if (data.Spec.Mode.Replicated) {
     this.Mode = 'replicated' ;
     this.Replicas = data.Spec.Mode.Replicated.Replicas;
@@ -43,6 +45,7 @@ function ServiceViewModel(data) {
     this.Ports = data.Endpoint.Ports;
   }
   this.Checked = false;
+  this.Scale = false;
 }
 
 function ContainerViewModel(data) {

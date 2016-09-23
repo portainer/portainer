@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', 'Service', 'Task', 'Node', 'Messages',
-function ($scope, $stateParams, $state, Service, Task, Node, Messages) {
+.controller('ServiceController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages',
+function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Messages) {
 
   $scope.service = {};
   $scope.tasks = [];
@@ -11,6 +11,22 @@ function ($scope, $stateParams, $state, Service, Task, Node, Messages) {
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.scaleService = function scaleService(service) {
+    $('#loadServicesSpinner').show();
+    var config = ServiceHelper.serviceToConfig(service.Model);
+    config.Mode.Replicated.Replicas = service.Replicas;
+    Service.update({ id: service.Id, version: service.Version }, config, function (data) {
+      $('#loadServicesSpinner').hide();
+      Messages.send("Service successfully scaled", "New replica count: " + service.Replicas);
+      $state.go('service', {id: service.Id}, {reload: true});
+    }, function (e) {
+      $('#loadServicesSpinner').hide();
+      service.Scale = false;
+      service.Replicas = service.ReplicaCount;
+      Messages.error("Failure", e, "Unable to scale service");
+    });
   };
 
   $scope.removeService = function removeService() {

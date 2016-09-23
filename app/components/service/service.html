@@ -34,7 +34,17 @@
             </tr>
             <tr ng-if="service.Mode === 'replicated'">
               <td>Replicas</td>
-              <td>{{ service.Replicas }}</td>
+              <td>
+                <span ng-if="service.Mode === 'replicated' && !service.Scale">
+                  {{ service.Replicas }}
+                  <a class="interactive" ng-click="service.Scale = true; service.ReplicaCount = service.Replicas;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Scale</a>
+                </span>
+                <span ng-if="service.Mode === 'replicated' && service.Scale">
+                  <input class="input-sm" type="number" ng-model="service.Replicas" />
+                  <a class="interactive" ng-click="service.Scale = false;"><i class="fa fa-times"></i></a>
+                  <a class="interactive" ng-click="scaleService(service)"><i class="fa fa-check-square-o"></i></a>
+                </span>
+              </td>
             </tr>
             <tr>
               <td>Image</td>
@@ -118,7 +128,7 @@
           </thead>
           <tbody>
             <tr ng-repeat="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse))">
-              <td><a ui-sref="task({ id: task.Id })"">{{ task.Id }}</a></td>
+              <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
               <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
               <td>{{ task.Slot }}</td>
               <td ng-if="displayNode">{{ task.Node }}</td>

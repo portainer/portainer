@@ -1,12 +1,28 @@
 angular.module('services', [])
-.controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'Messages',
-function ($scope, $stateParams, $state, Service, Messages) {
+.controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages',
+function ($scope, $stateParams, $state, Service, ServiceHelper, Messages) {
 
   $scope.services = [];
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
+
+  $scope.scaleService = function scaleService(service) {
+    $('#loadServicesSpinner').show();
+    var config = ServiceHelper.serviceToConfig(service.Model);
+    config.Mode.Replicated.Replicas = service.Replicas;
+    Service.update({ id: service.Id, version: service.Version }, config, function (data) {
+      $('#loadServicesSpinner').hide();
+      Messages.send("Service successfully scaled", "New replica count: " + service.Replicas);
+      $state.go('services', {}, {reload: true});
+    }, function (e) {
+      $('#loadServicesSpinner').hide();
+      service.Scale = false;
+      service.Replicas = service.ReplicaCount;
+      Messages.error("Failure", e, "Unable to scale service");
+    });
+  };
 
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;

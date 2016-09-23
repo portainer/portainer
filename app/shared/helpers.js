@@ -34,4 +34,18 @@ angular.module('portainer.helpers', [])
       });
     }
   };
+}])
+.factory('ServiceHelper', [function ServiceHelperFactory() {
+  'use strict';
+  return {
+    serviceToConfig: function(service) {
+      return {
+        Name: service.Spec.Name,
+        TaskTemplate: service.Spec.TaskTemplate,
+        Mode: service.Spec.Mode,
+        Networks: service.Spec.Networks,
+        EndpointSpec: service.Spec.EndpointSpec
+      };
+    }
+  };
 }]);
