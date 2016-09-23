@@ -18,7 +18,7 @@ function ($scope, $state, Network, Config, Messages) {
       // Force IPAM Driver to 'default', should not be required.
       // See: https://github.com/docker/docker/issues/25735
       config.IPAM = {
-        Driver: 'default',
+        Driver: 'default'
       };
     }
     return config;

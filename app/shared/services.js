@@ -45,7 +45,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         query: { method: 'GET', isArray: true },
         create: { method: 'POST', params: {action: 'create'} },
         update: { method: 'POST', params: {id: '@id', action: 'update', version: '@version'} },
-        remove: { method: 'DELETE', params: {id: '@id'} },
+        remove: { method: 'DELETE', params: {id: '@id'} }
       });
     }])
     .factory('Task', ['$resource', 'Settings', function TaskFactory($resource, Settings) {
@@ -53,7 +53,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
       // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-9-services
       return $resource(Settings.url + '/tasks/:id', {}, {
         get: { method: 'GET', params: {id: '@id'} },
-        query: { method: 'GET', isArray: true, params: {filters: '@filters'} },
+        query: { method: 'GET', isArray: true, params: {filters: '@filters'} }
       });
     }])
     .factory('Exec', ['$resource', 'Settings', function ExecFactory($resource, Settings) {

@@ -15,7 +15,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     Volumes: [],
     Network: '',
     ExtraNetworks: [],
-    Ports: [],
+    Ports: []
   };
 
   $scope.addPortBinding = function() {
@@ -128,7 +128,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
       TaskTemplate: {
         ContainerSpec: {
           Mounts: []
-        },
+        }
       },
       Mode: {},
       EndpointSpec: {}
