@@ -11,7 +11,10 @@ function ($scope, $state, Messages, Network) {
     Driver: 'bridge',
     CheckDuplicate: true,
     Internal: false,
+    // Force IPAM Driver to 'default', should not be required.
+    // See: https://github.com/docker/docker/issues/25735
     IPAM: {
+      Driver: 'default',
       Config: []
     }
   };

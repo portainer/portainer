@@ -8,6 +8,47 @@ function ImageViewModel(data) {
   this.VirtualSize = data.VirtualSize;
 }
 
+function TaskViewModel(data, node_data) {
+  this.Id = data.ID;
+  this.Created = data.CreatedAt;
+  this.Updated = data.UpdatedAt;
+  this.Slot = data.Slot;
+  this.Status = data.Status.State;
+  if (node_data) {
+    for (var i = 0; i < node_data.length; ++i) {
+      if (data.NodeID === node_data[i].ID) {
+        this.Node = node_data[i].Description.Hostname;
+      }
+    }
+  }
+}
+
+function ServiceViewModel(data) {
+  this.Model = data;
+  this.Id = data.ID;
+  this.Name = data.Spec.Name;
+  this.Image = data.Spec.TaskTemplate.ContainerSpec.Image;
+  this.Version = data.Version.Index;
+  if (data.Spec.Mode.Replicated) {
+    this.Mode = 'replicated' ;
+    this.Replicas = data.Spec.Mode.Replicated.Replicas;
+  } else {
+    this.Mode = 'global';
+  }
+  if (data.Spec.Labels) {
+    this.Labels = data.Spec.Labels;
+  }
+  if (data.Spec.TaskTemplate.ContainerSpec.Env) {
+    this.Env = data.Spec.TaskTemplate.ContainerSpec.Env;
+  }
+  if (data.Endpoint.Ports) {
+    this.Ports = data.Endpoint.Ports;
+  }
+  this.Checked = false;
+  this.Scale = false;
+  this.EditName = false;
+}
+
 function ContainerViewModel(data) {
   this.Id = data.Id;
   this.Status = data.Status;

@@ -37,6 +37,25 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
             }
         });
     }])
+    .factory('Service', ['$resource', 'Settings', function ServiceFactory($resource, Settings) {
+      'use strict';
+      // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-9-services
+      return $resource(Settings.url + '/services/:id/:action', {}, {
+        get: { method: 'GET', params: {id: '@id'} },
+        query: { method: 'GET', isArray: true },
+        create: { method: 'POST', params: {action: 'create'} },
+        update: { method: 'POST', params: {id: '@id', action: 'update', version: '@version'} },
+        remove: { method: 'DELETE', params: {id: '@id'} }
+      });
+    }])
+    .factory('Task', ['$resource', 'Settings', function TaskFactory($resource, Settings) {
+      'use strict';
+      // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-9-services
+      return $resource(Settings.url + '/tasks/:id', {}, {
+        get: { method: 'GET', params: {id: '@id'} },
+        query: { method: 'GET', isArray: true, params: {filters: '@filters'} }
+      });
+    }])
     .factory('Exec', ['$resource', 'Settings', function ExecFactory($resource, Settings) {
       'use strict';
       // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/exec-resize
@@ -128,6 +147,22 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#show-the-docker-version-information
         return $resource(Settings.url + '/version', {}, {
+            get: {method: 'GET'}
+        });
+    }])
+    .factory('Node', ['$resource', 'Settings', function NodeFactory($resource, Settings) {
+        'use strict';
+        // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-7-nodes
+        return $resource(Settings.url + '/nodes', {}, {
+          query: {
+            method: 'GET', isArray: true
+          }
+        });
+    }])
+    .factory('Swarm', ['$resource', 'Settings', function SwarmFactory($resource, Settings) {
+        'use strict';
+        // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-8-swarm
+        return $resource(Settings.url + '/swarm', {}, {
             get: {method: 'GET'}
         });
     }])

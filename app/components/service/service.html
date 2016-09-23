@@ -1,0 +1,150 @@
+<rd-header>
+  <rd-header-title title="Service details">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="service({id: service.Id})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
+  <rd-header-content>
+    Services > <a ui-sref="service({id: service.Id})">{{ service.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-list-alt" title="Service details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td ng-if="!service.EditName">
+                {{ service.Name }}
+                <a href="" data-toggle="tooltip" title="Edit service name" ng-click="service.EditName = true;"><i class="fa fa-edit"></i></a>
+              </td>
+              <td ng-if="service.EditName">
+                <input type="text" class="containerNameInput" ng-model="service.newServiceName">
+                <a class="interactive" ng-click="service.EditName = false;"><i class="fa fa-times"></i></a>
+                <a class="interactive" ng-click="renameService(service)"><i class="fa fa-check-square-o"></i></a>
+              </td>
+            </tr>
+            <tr>
+              <td>ID</td>
+              <td>
+                {{ service.Id }}
+                <button class="btn btn-xs btn-danger" ng-click="removeService()"><i class="fa fa-trash btn-ico" aria-hidden="true"></i>Delete this service</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Scheduling mode</td>
+              <td>{{ service.Mode }}</td>
+            </tr>
+            <tr ng-if="service.Mode === 'replicated'">
+              <td>Replicas</td>
+              <td>
+                <span ng-if="service.Mode === 'replicated' && !service.Scale">
+                  {{ service.Replicas }}
+                  <a class="interactive" ng-click="service.Scale = true; service.ReplicaCount = service.Replicas;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Scale</a>
+                </span>
+                <span ng-if="service.Mode === 'replicated' && service.Scale">
+                  <input class="input-sm" type="number" ng-model="service.Replicas" />
+                  <a class="interactive" ng-click="service.Scale = false;"><i class="fa fa-times"></i></a>
+                  <a class="interactive" ng-click="scaleService(service)"><i class="fa fa-check-square-o"></i></a>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Image</td>
+              <td>{{ service.Image }}</td>
+            </tr>
+            <tr ng-if="service.Ports">
+              <td>Published ports</td>
+              <td>
+                <div ng-repeat="mapping in service.Ports">
+                  {{ mapping.TargetPort }} <i class="fa fa-long-arrow-right"></i> {{ mapping.PublishedPort }}
+                </div>
+              </td>
+            </tr>
+            <tr ng-if="service.Env">
+              <td>Env</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="var in service.Env">
+                    <td>{{ var|key: '=' }}</td>
+                    <td>{{ var|value: '=' }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr ng-if="service.Labels">
+              <td>Labels</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="(k, v) in service.Labels">
+                    <td>{{ k }}</td>
+                    <td>{{ v }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="tasks.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title="Associated tasks"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>
+                <a ui-sref="service" ng-click="order('Status')">
+                  Status
+                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="service" ng-click="order('Slot')">
+                  Slot
+                  <span ng-show="sortType == 'Slot' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Slot' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th ng-if="displayNode">
+                <a ui-sref="service" ng-click="order('Node')">
+                  Node
+                  <span ng-show="sortType == 'Node' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Node' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="service" ng-click="order('UpdatedAt')">
+                  Last update
+                  <span ng-show="sortType == 'UpdatedAt' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'UpdatedAt' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse))">
+              <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
+              <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
+              <td>{{ task.Slot }}</td>
+              <td ng-if="displayNode">{{ task.Node }}</td>
+              <td>{{ task.Updated|getisodate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

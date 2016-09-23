@@ -34,9 +34,15 @@
       <rd-widget-header icon="fa-cogs" title="Configuration"></rd-widget-header>
       <rd-widget-body classes="padding">
         <form class="form-horizontal">
-          <div class="form-group" ng-if="globalNetworkCount === 0">
+          <div class="form-group" ng-if="globalNetworkCount === 0 && !swarm_mode">
             <div class="col-sm-12">
               <span class="small text-muted">When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref="networks">networks view</a> to create one.</span>
+            </div>
+          </div>
+          <div class="form-group" ng-if="swarm_mode">
+            <div class="col-sm-12">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+              <span class="small text-muted">App templates cannot be used with swarm-mode at the moment. You can still use them to quickly deploy containers to the Docker host.</span>
             </div>
           </div>
           <!-- name-and-network-inputs -->

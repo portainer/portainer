@@ -15,6 +15,11 @@ function ($scope, $state, Network, Config, Messages) {
     var config = angular.copy($scope.config);
     if ($scope.swarm) {
       config.Driver = 'overlay';
+      // Force IPAM Driver to 'default', should not be required.
+      // See: https://github.com/docker/docker/issues/25735
+      config.IPAM = {
+        Driver: 'default'
+      };
     }
     return config;
   }
