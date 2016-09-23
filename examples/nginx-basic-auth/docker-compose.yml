@@ -1,5 +1,5 @@
 portainer:
-  image: cloudinovasi/portainer
+  image: portainer/portainer
   command: -e http://<SWARM_HOST>:<SWARM_PORT>
 
 nginx:
