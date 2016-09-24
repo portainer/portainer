@@ -17,7 +17,7 @@ $ docker run -d -p 9000:9000 portainer/portainer -H tcp://<DOCKERHOST>:<DOCKERPO
 
 Just point it at your targeted Docker host and then access Portainer by hitting [http://localhost:9000](http://localhost:9000) with a web browser.
 
-If your target is a Swarm cluster, just add the flag `--swarm`:
+If your target is a Docker Swarm cluster or a Docker cluster using *swarm mode*, just add the flag `--swarm`:
 
 ```shell
 $ docker run -d -p 9000:9000 portainer/portainer -H tcp://<DOCKERHOST>:<DOCKERPORT> --swarm
@@ -53,7 +53,7 @@ $ docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portai
 
 Portainer allows you to rapidly deploy containers using `App Templates`.
 
-By default [Portainer templates](https://raw.githubusercontent.com/portainer/templates/master/templates.json) will be used but it also let you define your own templates.
+By default [Portainer templates](https://raw.githubusercontent.com/portainer/templates/master/templates.json) will be used but you can also define your own templates.
 
 Add the `--templates` flag and specify the external location of your templates when starting Portainer:
 
