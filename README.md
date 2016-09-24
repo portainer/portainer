@@ -9,7 +9,7 @@ Portainer is a lightweight management UI which allows you to **easily** manage y
 
 # Usage
 
-It's really simple to deploy using Docker:
+It's really simple to deploy it using Docker:
 
 ```shell
 $ docker run -d -p 9000:9000 portainer/portainer -H tcp://<DOCKERHOST>:<DOCKERPORT>
@@ -64,6 +64,10 @@ $ docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portai
 For more information about hosting your own template definitions and the format, see: https://github.com/portainer/templates
 
 Have a look at our [wiki](https://github.com/portainer/portainer/wiki/Configuration) for more configuration options.
+
+# FAQ
+
+Be sure to check our [FAQ](https://github.com/portainer/portainer/wiki/FAQ) if you are missing some information.
 
 # Limitations
 
