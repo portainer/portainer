@@ -1,4 +1,4 @@
-package main // import "github.com/cloudinovasi/portainer"
+package main // import "github.com/portainer/portainer"
 
 import (
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -6,7 +6,7 @@ import (
 
 // main is the entry point of the program
 func main() {
-	kingpin.Version("1.8.1")
+	kingpin.Version("1.9.0")
 	var (
 		endpoint  = kingpin.Flag("host", "Dockerd endpoint").Default("unix:///var/run/docker.sock").Short('H').String()
 		addr      = kingpin.Flag("bind", "Address and port to serve Portainer").Default(":9000").Short('p').String()
@@ -19,7 +19,7 @@ func main() {
 		swarm     = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
 		labels    = pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
 		logo      = kingpin.Flag("logo", "URL for the logo displayed in the UI").String()
-		templates = kingpin.Flag("templates", "URL to the templates (apps) definitions").Default("https://raw.githubusercontent.com/cloud-inovasi/ui-templates/master/templates.json").Short('t').String()
+		templates = kingpin.Flag("templates", "URL to the templates (apps) definitions").Default("https://raw.githubusercontent.com/portainer/templates/master/templates.json").Short('t').String()
 	)
 	kingpin.Parse()
 

@@ -18,11 +18,15 @@ angular.module('portainer', [
   'events',
   'images',
   'image',
+  'service',
+  'services',
+  'createService',
   'stats',
   'swarm',
   'network',
   'networks',
   'createNetwork',
+  'task',
   'templates',
   'volumes',
   'createVolume'])
@@ -80,15 +84,20 @@ angular.module('portainer', [
       templateUrl: 'app/components/createContainer/createcontainer.html',
       controller: 'CreateContainerController'
     })
-    .state('actions.create.volume', {
-      url: "/volume",
-      templateUrl: 'app/components/createVolume/createvolume.html',
-      controller: 'CreateVolumeController'
-    })
     .state('actions.create.network', {
       url: "/network",
       templateUrl: 'app/components/createNetwork/createnetwork.html',
       controller: 'CreateNetworkController'
+    })
+    .state('actions.create.service', {
+      url: "/service",
+      templateUrl: 'app/components/createService/createservice.html',
+      controller: 'CreateServiceController'
+    })
+    .state('actions.create.volume', {
+      url: "/volume",
+      templateUrl: 'app/components/createVolume/createvolume.html',
+      controller: 'CreateVolumeController'
     })
     .state('docker', {
       url: '/docker/',
@@ -119,6 +128,21 @@ angular.module('portainer', [
       url: '^/networks/:id/',
       templateUrl: 'app/components/network/network.html',
       controller: 'NetworkController'
+    })
+    .state('services', {
+      url: '/services/',
+      templateUrl: 'app/components/services/services.html',
+      controller: 'ServicesController'
+    })
+    .state('service', {
+      url: '^/service/:id/',
+      templateUrl: 'app/components/service/service.html',
+      controller: 'ServiceController'
+    })
+    .state('task', {
+      url: '^/task/:id',
+      templateUrl: 'app/components/task/task.html',
+      controller: 'TaskController'
     })
     .state('templates', {
       url: '/templates/',
@@ -164,4 +188,4 @@ angular.module('portainer', [
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('CONFIG_ENDPOINT', 'settings')
   .constant('TEMPLATES_ENDPOINT', 'templates')
-  .constant('UI_VERSION', 'v1.8.1');
+  .constant('UI_VERSION', 'v1.9.0');

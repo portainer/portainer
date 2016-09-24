@@ -1,6 +1,6 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Container', 'Image', 'Volume', 'Network', 'Messages',
-function ($scope, $state, Config, Container, Image, Volume, Network, Messages) {
+.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Info', 'Container', 'Image', 'Volume', 'Network', 'Messages',
+function ($scope, $state, Config, Info, Container, Image, Volume, Network, Messages) {
 
   $scope.state = {
     alwaysPull: true
@@ -55,6 +55,11 @@ function ($scope, $state, Config, Container, Image, Volume, Network, Messages) {
 
   Config.$promise.then(function (c) {
     var swarm = c.swarm;
+    Info.get({}, function(info) {
+      if (swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
+        $scope.swarm_mode = true;
+      }
+    });
 
     $scope.formValues.AvailableRegistries = c.registries;
 

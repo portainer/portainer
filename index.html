@@ -44,6 +44,9 @@
         <li class="sidebar-list">
           <a ui-sref="templates">App Templates <span class="menu-icon fa fa-rocket"></span></a>
         </li>
+        <li class="sidebar-list" ng-if="swarm_mode">
+          <a ui-sref="services">Services <span class="menu-icon fa fa-list-alt"></span></a>
+        </li>
         <li class="sidebar-list">
           <a ui-sref="containers">Containers <span class="menu-icon fa fa-server"></span></a>
         </li>
@@ -56,19 +59,22 @@
         <li class="sidebar-list">
           <a ui-sref="volumes">Volumes <span class="menu-icon fa fa-cubes"></span></a>
         </li>
-        <li class="sidebar-list" ng-if="!config.swarm">
+        <li class="sidebar-list" ng-if="swarm_mode || !swarm">
           <a ui-sref="events">Events <span class="menu-icon fa fa-history"></span></a>
         </li>
-        <li class="sidebar-list" ng-if="config.swarm">
+        <li class="sidebar-list" ng-if="(swarm && !swarm_mode) || (swarm_mode && swarm_manager)">
           <a ui-sref="swarm">Swarm <span class="menu-icon fa fa-object-group"></span></a>
         </li>
-        <li class="sidebar-list" ng-if="!config.swarm">
+        <li class="sidebar-list" ng-if="swarm_mode || !swarm">
           <a ui-sref="docker">Docker <span class="menu-icon fa fa-cogs"></span></a>
         </li>
       </ul>
       <div class="sidebar-footer">
         <div class="col-xs-12">
-          <a href="https://github.com/cloud-inovasi/portainer" target="_blank">Portainer {{ uiVersion }}</a>
+          <a href="https://github.com/portainer/portainer" target="_blank">
+            <i class="fa fa-github" aria-hidden="true"></i>
+            Portainer {{ uiVersion }}
+          </a>
         </div>
       </div>
     </div>

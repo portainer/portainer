@@ -18,6 +18,24 @@ angular.module('portainer.filters', [])
     }
   };
 })
+.filter('taskstatusbadge', function () {
+  'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (status.indexOf('new') !== -1 || status.indexOf('allocated') !== -1 ||
+      status.indexOf('assigned') !== -1 || status.indexOf('accepted') !== -1) {
+      return 'info';
+    } else if (status.indexOf('pending') !== -1) {
+      return 'warning';
+    } else if (status.indexOf('shutdown') !== -1 || status.indexOf('failed') !== -1 ||
+      status.indexOf('rejected') !== -1) {
+      return 'danger';
+    } else if (status.indexOf('complete') !== -1) {
+      return 'primary';
+    }
+    return 'success';
+  };
+})
 .filter('containerstatusbadge', function () {
   'use strict';
   return function (text) {
@@ -190,5 +208,11 @@ angular.module('portainer.filters', [])
   'use strict';
   return function (obj) {
     return _.isEmpty(obj);
+  };
+})
+.filter('ipaddress', function () {
+  'use strict';
+  return function (ip) {
+    return ip.slice(0, ip.indexOf('/'));
   };
 });

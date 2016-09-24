@@ -8,6 +8,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
   $scope.sortType = 'State';
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
+  $scope.swarm_mode = false;
 
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
@@ -27,7 +28,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
         if (model.IP) {
           $scope.state.displayIP = true;
         }
-        if ($scope.swarm) {
+        if ($scope.swarm && !$scope.swarm_mode) {
           model.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
         }
         return model;
@@ -151,7 +152,11 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
     $scope.swarm = c.swarm;
     if (c.swarm) {
       Info.get({}, function (d) {
-        $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
+        if (!_.startsWith(d.ServerVersion, 'swarm')) {
+          $scope.swarm_mode = true;
+        } else {
+          $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
+        }
         update({all: Settings.displayAll ? 1 : 0});
       });
     } else {

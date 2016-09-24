@@ -1,20 +1,8 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', 'Network', 'Messages', '$state', '$stateParams',
-function ($scope, Network, Messages, $state, $stateParams) {
+.controller('NetworkController', ['$scope', '$state', '$stateParams', 'Network', 'Messages',
+function ($scope, $state, $stateParams, Network, Messages) {
 
-  $scope.disconnect = function disconnect(networkId, containerId) {
-    $('#loadingViewSpinner').show();
-    Network.disconnect({id: $stateParams.id}, {Container: containerId}, function (d) {
-      $('#loadingViewSpinner').hide();
-      Messages.send("Container disconnected", containerId);
-      $state.go('network', {id: $stateParams.id}, {reload: true});
-    }, function (e) {
-      $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to disconnect container");
-    });
-  };
-
-  $scope.remove = function remove(networkId) {
+  $scope.removeNetwork = function removeNetwork(networkId) {
     $('#loadingViewSpinner').show();
     Network.remove({id: $stateParams.id}, function (d) {
       if (d.message) {

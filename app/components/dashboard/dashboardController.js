@@ -14,6 +14,7 @@ function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume
   $scope.volumeData = {
     total: 0
   };
+  $scope.swarm_mode = false;
 
   function prepareContainerData(d, containersToHideLabels) {
     var running = 0;
@@ -63,6 +64,9 @@ function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume
   function prepareInfoData(d) {
     var info = d;
     $scope.infoData = info;
+    if ($scope.swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
+      $scope.swarm_mode = true;
+    }
   }
 
   function fetchDashboardData(containersToHideLabels) {

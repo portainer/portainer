@@ -255,3 +255,19 @@ input[type="radio"] {
   text-align: center;
   font-size: 0.8em;
 }
+
+.btn-responsive {
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+
+@media screen and (min-width: 1107px) {
+  .btn-responsive {
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+  }
+}
