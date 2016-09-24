@@ -1,10 +1,4 @@
-logs/*
-!.gitkeep
-*.esproj/*
 node_modules
 bower_components
-.idea
-*.iml
 dist
-dist/*
 portainer-checksum.txt
