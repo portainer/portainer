@@ -12,7 +12,7 @@ Portainer is a lightweight management UI which allows you to **easily** manage y
 It's really simple to deploy it using Docker:
 
 ```shell
-$ docker run -d -p 9000:9000 portainer/portainer -H tcp://<DOCKERHOST>:<DOCKERPORT>
+$ docker run -d -p 9000:9000 portainer/portainer -H tcp://<DOCKER_HOST>:<DOCKER_PORT>
 ```
 
 Just point it at your targeted Docker host and then access Portainer by hitting [http://localhost:9000](http://localhost:9000) with a web browser.
@@ -20,7 +20,7 @@ Just point it at your targeted Docker host and then access Portainer by hitting 
 If your target is a Docker Swarm cluster or a Docker cluster using *swarm mode*, just add the flag `--swarm`:
 
 ```shell
-$ docker run -d -p 9000:9000 portainer/portainer -H tcp://<DOCKERHOST>:<DOCKERPORT> --swarm
+$ docker run -d -p 9000:9000 portainer/portainer -H tcp://<SWARM_HOST>:<SWARM_PORT> --swarm
 ```
 
 If you don't specify any target, its default behaviour is to use a bind mount on the Docker socket so you can easily deploy it to manage your local Docker host:
