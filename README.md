@@ -62,7 +62,7 @@ Add the `--templates` flag and specify the external location of your templates w
 $ docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer --templates http://my-host.my-domain/templates.json
 ```
 
-For more information about hosting your own template definitions and the format, see the [templates documentation](http://portainer.readthedocs.io/en/stable/templates.html)
+For more information about hosting your own template definitions and the format, see the [templates documentation](http://portainer.readthedocs.io/en/stable/templates.html).
 
 Check our [documentation](http://portainer.readthedocs.io/en/stable/configuration.html) for more configuration options.
 
