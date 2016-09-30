@@ -30,7 +30,7 @@ If you don't specify any target, its default behaviour is to use a bind mount on
 $ docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer
 ```
 
-Have a look at our [wiki](https://github.com/portainer/portainer/wiki/Deployment) for more deployment options.
+Have a look at our [documentation](http://portainer.readthedocs.io/en/stable/deployment.html) for more deployment options.
 
 # Configuration
 
@@ -62,13 +62,13 @@ Add the `--templates` flag and specify the external location of your templates w
 $ docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer --templates http://my-host.my-domain/templates.json
 ```
 
-For more information about hosting your own template definitions and the format, see: https://github.com/portainer/templates
+For more information about hosting your own template definitions and the format, see the [templates documentation](http://portainer.readthedocs.io/en/stable/templates.html)
 
-Have a look at our [wiki](https://github.com/portainer/portainer/wiki/Configuration) for more configuration options.
+Check our [documentation](http://portainer.readthedocs.io/en/stable/configuration.html) for more configuration options.
 
 # FAQ
 
-Be sure to check our [FAQ](https://github.com/portainer/portainer/wiki/FAQ) if you are missing some information.
+Be sure to check our [FAQ](http://portainer.readthedocs.io/en/stable/faq.html) if you are missing some information.
 
 # Limitations
 
