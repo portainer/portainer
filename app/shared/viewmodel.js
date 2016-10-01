@@ -105,6 +105,9 @@ function createEventDetails(event) {
       case 'unpause':
       details = 'Container ' + eventAttr.name + ' unpaused';
       break;
+      case 'attach':
+      details = 'Container ' + eventAttr.name + ' attached';
+      break;
       default:
       if (event.Action.indexOf('exec_create') === 0) {
         details = 'Exec instance created';
@@ -158,6 +161,12 @@ function createEventDetails(event) {
       break;
       case 'destroy':
       details = 'Volume ' + event.Actor.ID + ' deleted';
+      break;
+      case 'mount':
+      details = 'Volume ' + event.Actor.ID + ' mounted';
+      break;
+      case 'unmount':
+      details = 'Volume ' + event.Actor.ID + ' unmounted';
       break;
       default:
       details = 'Unsupported event';
