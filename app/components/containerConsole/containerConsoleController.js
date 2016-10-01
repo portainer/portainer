@@ -9,7 +9,7 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
 
   // Ensure the socket is closed before leaving the view
   $scope.$on('$stateChangeStart', function (event, next, current) {
-    if (socket !== null) {
+    if (socket && socket !== null) {
       socket.close();
     }
   });
