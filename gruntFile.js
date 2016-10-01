@@ -71,6 +71,7 @@ module.exports = function (grunt) {
                 'bower_components/bootstrap/dist/js/bootstrap.min.js',
                 'bower_components/Chart.js/Chart.min.js',
                 'bower_components/lodash/dist/lodash.min.js',
+                'bower_components/filesize/lib/filesize.min.js',
                 'bower_components/moment/min/moment.min.js',
                 'bower_components/xterm.js/src/xterm.js',
                 'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
