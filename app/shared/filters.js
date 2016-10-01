@@ -123,15 +123,13 @@ angular.module('portainer.filters', [])
 })
 .filter('humansize', function () {
   'use strict';
-  return function (bytes) {
-    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    if (bytes === 0) {
-      return 'n/a';
+  return function (bytes, round) {
+    if (!round) {
+      round = 1;
     }
-    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
-    var value = bytes / Math.pow(1024, i);
-    var decimalPlaces = (i < 1) ? 0 : (i - 1);
-    return value.toFixed(decimalPlaces) + ' ' + sizes[[i]];
+    if (bytes || bytes === 0) {
+      return filesize(bytes, {base: 10, round: round});
+    }
   };
 })
 .filter('containername', function () {

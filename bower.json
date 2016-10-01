@@ -34,6 +34,7 @@
     "angular-ui-select": "~0.17.1",
     "bootstrap": "~3.3.6",
     "font-awesome": "~4.6.3",
+    "filesize": "~3.3.0",
     "Hover": "2.0.2",
     "jquery": "1.11.1",
     "jquery.gritter": "1.7.4",
