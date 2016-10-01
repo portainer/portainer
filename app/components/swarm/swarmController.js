@@ -47,7 +47,8 @@ function ($scope, Info, Version, Node) {
     // Swarm filters
     $scope.swarm[systemStatus[2][0]] = systemStatus[2][1];
     // Swarm node count
-    var node_count = parseInt(systemStatus[3][1], 10);
+    var nodes = systemStatus[0][1] == 'primary' ? systemStatus[3][1] : systemStatus[4][1];
+    var node_count = parseInt(nodes, 10);
     $scope.swarm[systemStatus[3][0]] = node_count;
 
     $scope.swarm.Status = [];
@@ -55,9 +56,10 @@ function ($scope, Info, Version, Node) {
   }
 
   function extractNodesInfo(info, node_count) {
-    // First information for node1 available at element #4 of SystemStatus
+    // First information for node1 available at element #4 of SystemStatus if connected to a primary
+    // If connected to a replica, information for node1 is available at element #5
     // The next 10 elements are information related to the node
-    var node_offset = 4;
+    var node_offset = info[0][1] == 'primary' ? 4 : 5;
     for (i = 0; i < node_count; i++) {
       extractNodeInfo(info, node_offset);
       node_offset += 9;
