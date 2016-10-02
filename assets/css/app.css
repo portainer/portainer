@@ -216,6 +216,11 @@ input[type="radio"] {
   flex-wrap: wrap;
 }
 
+.custom-header-ico {
+  max-width: 16px;
+  max-height: 16px;
+}
+
 .container-template {
   font-size: 1em;
   width: 256px;
