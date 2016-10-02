@@ -42,8 +42,8 @@
             </tr>
             <tr>
               <td>Total memory</td>
-              <td ng-if="!swarm_mode">{{ info.MemTotal|humansize }}</td>
-              <td ng-if="swarm_mode">{{ totalMemory|humansize }}</td>
+              <td ng-if="!swarm_mode">{{ info.MemTotal|humansize: 2 }}</td>
+              <td ng-if="swarm_mode">{{ totalMemory|humansize: 2 }}</td>
             </tr>
             <tr ng-if="!swarm_mode">
               <td>Operating system</td>

@@ -82,32 +82,6 @@ describe('filters', function () {
         }));
     });
 
-    describe('humansize', function () {
-        it('should return n/a when size is zero', inject(function (humansizeFilter) {
-            expect(humansizeFilter(0)).toBe('n/a');
-        }));
-
-        it('should handle Bytes values', inject(function (humansizeFilter) {
-            expect(humansizeFilter(512)).toBe('512 Bytes');
-        }));
-
-        it('should handle KB values', inject(function (humansizeFilter) {
-            expect(humansizeFilter(5 * 1024)).toBe('5 KB');
-        }));
-
-        it('should handle MB values', inject(function (humansizeFilter) {
-            expect(humansizeFilter(5 * 1024 * 1024)).toBe('5.0 MB');
-        }));
-
-        it('should handle GB values', inject(function (humansizeFilter) {
-            expect(humansizeFilter(5 * 1024 * 1024 * 1024)).toBe('5.00 GB');
-        }));
-
-        it('should handle TB values', inject(function (humansizeFilter) {
-            expect(humansizeFilter(5 * 1024 * 1024 * 1024 * 1024)).toBe('5.000 TB');
-        }));
-    });
-
     describe('containername', function () {
         it('should strip the leading slash from container name', inject(function (containernameFilter) {
             var container = {

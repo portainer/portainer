@@ -87,7 +87,7 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
     },
     {
       scaleLabel: function (valueObj) {
-        return humansizeFilter(parseInt(valueObj.value, 10));
+        return humansizeFilter(parseInt(valueObj.value, 10), 2);
       },
       responsive: true
       //scaleOverride: true,
@@ -100,7 +100,7 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
       datasets: [networkRxDataset, networkTxDataset]
     }, {
       scaleLabel: function (valueObj) {
-        return humansizeFilter(parseInt(valueObj.value, 10));
+        return humansizeFilter(parseInt(valueObj.value, 10), 2);
       },
       responsive: true
     });

@@ -41,8 +41,8 @@
               <th>
                 <a ui-sref="containers" ng-click="order('Status')">
                   State
-                  <span ng-show="sortType == 'State' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'State' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
@@ -93,7 +93,7 @@
               <td ng-if="swarm && !swarm_mode">{{ container.hostIP }}</td>
               <td>
                 <a ng-if="container.Ports.length > 0" ng-repeat="p in container.Ports" class="image-tag" ng-href="http://{{p.host}}:{{p.public}}" target="_blank">
-                  <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.private }}
+                  <i class="fa fa-external-link" aria-hidden="true"></i> {{p.public}}:{{ p.private }}
                 </a>
                 <span ng-if="container.Ports.length == 0" >-</span>
               </td>

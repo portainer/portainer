@@ -71,6 +71,7 @@ module.exports = function (grunt) {
                 'bower_components/bootstrap/dist/js/bootstrap.min.js',
                 'bower_components/Chart.js/Chart.min.js',
                 'bower_components/lodash/dist/lodash.min.js',
+                'bower_components/filesize/lib/filesize.min.js',
                 'bower_components/moment/min/moment.min.js',
                 'bower_components/xterm.js/src/xterm.js',
                 'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
@@ -274,7 +275,7 @@ module.exports = function (grunt) {
                 command: [
                     'docker stop portainer',
                     'docker rm portainer',
-                    'docker run -d -p 9000:9000 -v /tmp/portainer:/data --name portainer portainer -H tcp://10.0.7.10:4000 --swarm -d /data'
+                    'docker run -d -p 9000:9000 -v /tmp/portainer:/data --name portainer portainer -H tcp://10.0.7.10:2375 --swarm -d /data'
                 ].join(';')
             },
             runSsl: {

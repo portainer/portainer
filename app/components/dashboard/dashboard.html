@@ -41,7 +41,7 @@
           <tbody>
             <tr>
               <td>Nodes</td>
-              <td>{{ infoData.SystemStatus[3][1] }}</td>
+              <td>{{ infoData.SystemStatus[0][1] == 'primary' ? infoData.SystemStatus[3][1] : infoData.SystemStatus[4][1] }}</td>
             </tr>
             <tr>
               <td>Swarm version</td>
@@ -53,7 +53,7 @@
             </tr>
             <tr>
               <td>Total memory</td>
-              <td>{{ infoData.MemTotal|humansize }}</td>
+              <td>{{ infoData.MemTotal|humansize: 2 }}</td>
             </tr>
           </tbody>
         </table>
