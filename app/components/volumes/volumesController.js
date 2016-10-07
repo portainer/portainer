@@ -5,6 +5,7 @@ function ($scope, $state, Volume, Messages) {
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
+  $scope.volumes = [];
 
   $scope.config = {
     Name: ''

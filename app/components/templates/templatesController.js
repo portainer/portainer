@@ -7,6 +7,7 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
     network: "",
     name: ""
   };
+  $scope.templates = [];
 
   var selectedItem = -1;
 

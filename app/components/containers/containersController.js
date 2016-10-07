@@ -1,7 +1,6 @@
 angular.module('containers', [])
 .controller('ContainersController', ['$scope', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config',
 function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) {
-
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
   $scope.state.displayIP = false;
@@ -9,6 +8,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
   $scope.swarm_mode = false;
+  $scope.containers = [];
 
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
