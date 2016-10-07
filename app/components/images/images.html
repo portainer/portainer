@@ -107,6 +107,9 @@
                 <td>{{ image.VirtualSize|humansize }}</td>
                 <td>{{ image.Created|getisodatefromtimestamp }}</td>
               </tr>
+              <tr ng-if="images.length == 0">
+                <td colspan="5" class="text-center text-muted">No images available.</td>
+              </tr>
             </tbody>
           </table>
         </div>

@@ -98,6 +98,9 @@
                 <span ng-if="container.Ports.length == 0" >-</span>
               </td>
             </tr>
+            <tr ng-if="containers.length == 0">
+              <td colspan="8" class="text-center text-muted">No containers available.</td>
+            </tr>
           </tbody>
         </table>
       </div>
