@@ -156,10 +156,10 @@ function ($scope, $state, Config, Info, Container, Image, Volume, Network, Messa
   function preparePortBindings(config) {
     var bindings = {};
     config.HostConfig.PortBindings.forEach(function (portBinding) {
-      if (portBinding.hostPort && portBinding.containerPort) {
+      if (portBinding.containerPort) {
         var key = portBinding.containerPort + "/" + portBinding.protocol;
         var binding = {};
-        if (portBinding.hostPort.indexOf(':') > -1) {
+        if (portBinding.hostPort && portBinding.hostPort.indexOf(':') > -1) {
           var hostAndPort = portBinding.hostPort.split(':');
           binding.HostIp = hostAndPort[0];
           binding.HostPort = hostAndPort[1];
