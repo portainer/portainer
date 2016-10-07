@@ -82,16 +82,14 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
     $scope.connected = true;
     socket.onopen = function(evt) {
       $('#loadConsoleSpinner').hide();
-      term = new Terminal({
-        cols: width,
-        rows: height,
-        cursorBlink: true
-      });
+      term = new Terminal();
 
       term.on('data', function (data) {
         socket.send(data);
       });
       term.open(document.getElementById('terminal-container'));
+      term.resize(width, height);
+      term.setOption('cursorBlink', true);
 
       socket.onmessage = function (e) {
         term.write(e.data);
@@ -102,8 +100,6 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
       };
       socket.onclose = function(evt) {
         $scope.connected = false;
-        // term.write("Session terminated");
-        // term.destroy();
       };
     };
   }
