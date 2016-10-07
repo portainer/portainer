@@ -59,6 +59,9 @@
               <td>{{ volume.Driver }}</td>
               <td>{{ volume.Mountpoint }}</td>
             </tr>
+            <tr ng-if="volumes.length == 0">
+              <td colspan="4" class="text-center text-muted">No volumes available.</td>
+            </tr>
           </tbody>
         </table>
       </div>

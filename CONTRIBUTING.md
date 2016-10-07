@@ -24,10 +24,9 @@ Each commit message should include a **type**, a **scope** and a **subject**:
 Lines should not exceed 100 characters. This allows the message to be easier to read on github as well as in various git tools and produces a nice, neat commit log ie:
 
 ```
- #271 feat(standard): add style config and refactor to match
- #270 fix(config): only override publicPath when served by webpack
- #269 feat(eslint-config-defaults): replace eslint-config-airbnb
- #268 feat(config): allow user to configure webpack stats output
+ #271 feat(containers): add exposed ports in the containers view
+ #270 fix(templates): fix a display issue in the templates view
+ #269 style(dashboard): update dashboard with new layout
 ```
 
 #### Type

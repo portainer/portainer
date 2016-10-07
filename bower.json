@@ -1,6 +1,6 @@
 {
   "name": "portainer",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "homepage": "https://github.com/portainer/portainer",
   "authors": [
     "Anthony Lapenna <anthony.lapenna at gmail dot com>"
@@ -41,7 +41,7 @@
     "lodash": "4.12.0",
     "rdash-ui": "1.0.*",
     "moment": "~2.14.1",
-    "xterm.js": "~1.1.3"
+    "xterm.js": "~2.0.1"
   },
   "resolutions": {
     "angular": "1.5.5"

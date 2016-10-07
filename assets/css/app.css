@@ -238,12 +238,12 @@ input[type="radio"] {
 }
 
 .container-template--selected {
-  background-color: #f6f6f6;
+  background-color: #ececec;
   color: #2d3e63;
 }
 
 .container-template:hover {
-  background-color: #f6f6f6;
+  background-color: #ececec;
   color: #2d3e63;
 }
 

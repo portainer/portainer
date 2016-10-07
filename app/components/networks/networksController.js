@@ -6,6 +6,7 @@ function ($scope, $state, Network, Config, Messages) {
   $scope.state.advancedSettings = false;
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
+  $scope.networks = [];
 
   $scope.config = {
     Name: ''
