@@ -82,6 +82,9 @@
             <div class="title">{{ tpl.title }}</div>
             <div class="description">{{ tpl.description }}</div>
           </div>
+          <div ng-if="!templates" class="text-center text-muted">
+            Loading...
+          </div>
           <div ng-if="templates.length == 0" class="text-center text-muted">
             No templates available.
           </div>

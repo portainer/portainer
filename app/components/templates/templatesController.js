@@ -1,13 +1,11 @@
 angular.module('templates', [])
 .controller('TemplatesController', ['$scope', '$q', '$state', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Templates', 'Messages',
 function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper, Image, Volume, Network, Templates, Messages) {
-  $scope.templates = [];
   $scope.selectedTemplate = null;
   $scope.formValues = {
     network: "",
     name: ""
   };
-  $scope.templates = [];
 
   var selectedItem = -1;
 
@@ -161,6 +159,7 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
     }, function (e) {
       $('#loadTemplatesSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve apps list");
+      $scope.templates = [];
     });
   }
 
