@@ -131,6 +131,9 @@
                 <td>{{ network.IPAM.Config[0].Subnet ? network.IPAM.Config[0].Subnet : '-' }}</td>
                 <td>{{ network.IPAM.Config[0].Gateway ? network.IPAM.Config[0].Gateway : '-' }}</td>
               </tr>
+              <tr ng-if="!networks">
+                <td colspan="8" class="text-center text-muted">Loading...</td>
+              </tr>
               <tr ng-if="networks.length == 0">
                 <td colspan="8" class="text-center text-muted">No networks available.</td>
               </tr>
