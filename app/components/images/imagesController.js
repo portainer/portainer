@@ -5,7 +5,6 @@ function ($scope, $state, Config, Image, Messages) {
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
   $scope.state.selectedItemCount = 0;
-  $scope.images = [];
 
   $scope.config = {
     Image: '',
@@ -98,6 +97,7 @@ function ($scope, $state, Config, Image, Messages) {
     }, function (e) {
       $('#loadImagesSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve images");
+      $scope.images = [];
     });
   }
 

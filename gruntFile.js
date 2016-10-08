@@ -88,8 +88,7 @@ module.exports = function (grunt) {
                 'bower_components/font-awesome/css/font-awesome.min.css',
                 'bower_components/rdash-ui/dist/css/rdash.min.css',
                 'bower_components/angular-ui-select/dist/select.min.css',
-                'bower_components/xterm.js/dist/xterm.css',
-                'bower_components/Hover/css/hover-min.css'
+                'bower_components/xterm.js/dist/xterm.css'
             ]
         },
         clean: {

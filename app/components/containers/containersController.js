@@ -8,7 +8,6 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
   $scope.swarm_mode = false;
-  $scope.containers = [];
 
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
@@ -34,6 +33,10 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
         return model;
       });
       $('#loadContainersSpinner').hide();
+    }, function (e) {
+      $('#loadContainersSpinner').hide();
+      Messages.error("Failure", e, "Unable to retrieve containers");
+      $scope.containers = [];
     });
   };
 

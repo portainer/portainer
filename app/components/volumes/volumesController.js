@@ -5,8 +5,6 @@ function ($scope, $state, Volume, Messages) {
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
-  $scope.volumes = [];
-
   $scope.config = {
     Name: ''
   };
@@ -61,6 +59,7 @@ function ($scope, $state, Volume, Messages) {
     }, function (e) {
       $('#loadVolumesSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve volumes");
+      $scope.volumes = [];
     });
   }
   fetchVolumes();

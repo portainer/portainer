@@ -1,79 +1,47 @@
-# Portainer
 
-The easiest way to manage Docker.
+<p align="center">
+  <img title="portainer" src='http://portainer.io/images/logo_alt.png' />
+</p>
 
 [![Microbadger version](https://images.microbadger.com/badges/version/portainer/portainer.svg)](https://microbadger.com/images/portainer/portainer "Latest version on Docker Hub")
 [![Microbadger](https://images.microbadger.com/badges/image/portainer/portainer.svg)](http://microbadger.com/images/portainer/portainer "Image size")
-[![Documentation Status](https://readthedocs.org/projects/portainer/badge/?version=stable)](http://portainer.readthedocs.io/en/stable/?badge=stable)
+[![Documentation Status](https://readthedocs.org/projects/portainer/badge/?version=latest)](http://portainer.readthedocs.io/en/latest/?badge=latest)
 [![Gitter](https://badges.gitter.im/portainer/Lobby.svg)](https://gitter.im/portainer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Portainer is a lightweight management UI which allows you to **easily** manage your Docker host or Swarm cluster.
+**_Portainer_** is a lightweight management UI which allows you to **easily** manage your Docker host or Swarm cluster.
 
-# Usage
+**_Portainer_** is meant to be as **simple** to deploy as it is to use. It consists of a single container that can run on any Docker for Linux engine. A Docker for Windows version is on its way !
 
-It's really simple to deploy it using Docker:
+**_Portainer_** allows you to manage your Docker containers, images, volumes, networks and more ! It is compatible with the *standalone Docker* engine and with *Docker Swarm*.
 
-```shell
-$ docker run -d -p 9000:9000 portainer/portainer -H tcp://<DOCKER_HOST>:<DOCKER_PORT>
-```
+## Demo
 
-Just point it at your targeted Docker host and then access Portainer by hitting [http://localhost:9000](http://localhost:9000) with a web browser.
+<img src="http://portainer.io/images/screenshots/portainer.gif" width="77%"/>
 
-If your target is a Docker Swarm cluster or a Docker cluster using *swarm mode*, just add the flag `--swarm`:
+You can try out the public demo instance: http://demo.portainer.io/ (login with the username **demo** and the password **tryportainer**).
 
-```shell
-$ docker run -d -p 9000:9000 portainer/portainer -H tcp://<SWARM_HOST>:<SWARM_PORT> --swarm
-```
+Please note that the public demo cluster is **reset every 15min**.
 
-If you don't specify any target, its default behaviour is to use a bind mount on the Docker socket so you can easily deploy it to manage your local Docker host:
+## Getting started
 
-```shell
-$ docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer
-```
+* [Deploy Portainer](https://portainer.readthedocs.io/en/latest/deployment.html)
+* [Documentation](https://portainer.readthedocs.io)
 
-Have a look at our [documentation](http://portainer.readthedocs.io/en/stable/deployment.html) for more deployment options.
+## Getting help
 
-# Configuration
+* Issues: https://github.com/portainer/portainer/issues
+* FAQ: https://portainer.readthedocs.io/en/latest/faq.html
+* Gitter (chat): https://gitter.im/portainer/Lobby
+* Slack: http://portainer.io/slack/
 
-Portainer is easy to tune using CLI flags.
+## Reporting bugs and contributing
 
-## Hiding specific containers
+* Want to report a bug or request a feature? Please open [an issue](https://github.com/portainer/portainer/issues/new).
+* Want to help us build **_portainer_**? Follow our [contribution guidelines](https://portainer.readthedocs.io/en/latest/contribute.html) to build it  locally and make a pull request. We need all the help we can get!
 
-Portainer allows you to hide container with a specific label by using the `-l` flag.
+## Limitations
 
-For example, take a container started with the label `owner=acme`:
-```shell
-$ docker run -d --label owner=acme nginx
-```
-
-Simply add the `-l owner=acme` option on the CLI when starting Portainer:
-```shell
-$ docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer -l owner=acme
-```
-
-## Use your own templates
-
-Portainer allows you to rapidly deploy containers using `App Templates`.
-
-By default [Portainer templates](https://raw.githubusercontent.com/portainer/templates/master/templates.json) will be used but you can also define your own templates.
-
-Add the `--templates` flag and specify the external location of your templates when starting Portainer:
-
-```shell
-$ docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer --templates http://my-host.my-domain/templates.json
-```
-
-For more information about hosting your own template definitions and the format, see the [templates documentation](http://portainer.readthedocs.io/en/stable/templates.html).
-
-Check our [documentation](http://portainer.readthedocs.io/en/stable/configuration.html) for more configuration options.
-
-# FAQ
-
-Be sure to check our [FAQ](http://portainer.readthedocs.io/en/stable/faq.html) if you are missing some information.
-
-# Limitations
-
-Portainer has full support for the following Docker versions:
+**_Portainer_** has full support for the following Docker versions:
 
 * Docker 1.10 to Docker 1.12 (including `swarm-mode`)
 * Docker Swarm >= 1.2.3
