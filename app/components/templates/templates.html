@@ -77,7 +77,7 @@
       </rd-widget-header>
       <rd-widget-body classes="padding">
         <div class="template-list">
-          <div ng-repeat="tpl in templates" class="container-template hvr-grow" id="template_{{ $index }}" ng-click="selectTemplate($index)">
+          <div ng-repeat="tpl in templates" class="container-template hvr-underline-from-center" id="template_{{ $index }}" ng-click="selectTemplate($index)">
             <img class="logo" ng-src="{{ tpl.logo }}" />
             <div class="title">{{ tpl.title }}</div>
             <div class="description">{{ tpl.description }}</div>
