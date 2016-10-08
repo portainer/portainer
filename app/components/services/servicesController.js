@@ -1,8 +1,6 @@
 angular.module('services', [])
 .controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages',
 function ($scope, $stateParams, $state, Service, ServiceHelper, Messages) {
-
-  $scope.services = [];
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Name';
@@ -77,6 +75,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Messages) {
     }, function(e) {
       $('#loadServicesSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve services");
+      $scope.services = [];
     });
   }
 

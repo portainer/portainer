@@ -6,8 +6,6 @@ function ($scope, $state, Network, Config, Messages) {
   $scope.state.advancedSettings = false;
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
-  $scope.networks = [];
-
   $scope.config = {
     Name: ''
   };
@@ -93,6 +91,7 @@ function ($scope, $state, Network, Config, Messages) {
     }, function (e) {
       $('#loadNetworksSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve networks");
+      $scope.networks = [];
     });
   }
 

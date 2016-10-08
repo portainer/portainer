@@ -69,6 +69,12 @@
                   </span>
                 </td>
               </tr>
+              <tr ng-if="!services">
+                <td colspan="4" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="services.length == 0">
+                <td colspan="4" class="text-center text-muted">No services available.</td>
+              </tr>
             </tbody>
           </table>
         </div>
