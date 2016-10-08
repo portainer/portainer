@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>Cloudinovasi-ui by cloud-inovasi</title>
+    <title>Portainer by portainer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -11,193 +11,86 @@
   </head>
   <body>
     <section class="page-header">
-      <h1 class="project-name">Cloudinovasi-ui</h1>
-      <h2 class="project-tagline">Cloudinovasi UI for Docker/Swarm</h2>
-      <a href="https://github.com/cloud-inovasi/cloudinovasi-ui" class="btn">View on GitHub</a>
-      <a href="https://github.com/cloud-inovasi/cloudinovasi-ui/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/cloud-inovasi/cloudinovasi-ui/tarball/master" class="btn">Download .tar.gz</a>
+      <h1 class="project-name">Portainer</h1>
+      <h2 class="project-tagline">http://portainer.io</h2>
+      <a href="https://github.com/portainer/portainer" class="btn">View on GitHub</a>
+      <a href="https://github.com/portainer/portainer/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/portainer/portainer/tarball/master" class="btn">Download .tar.gz</a>
     </section>
 
     <section class="main-content">
-      <h1>
-<a id="cloudinovasi-ui-for-docker" class="anchor" href="#cloudinovasi-ui-for-docker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Cloudinovasi UI for Docker</h1>
+      <p align="center">
+  <img title="portainer" src="http://portainer.io/images/logo_alt.png">
+</p>
 
-<p><img src="https://raw.githubusercontent.com/cloud-inovasi/cloudinovasi-ui/develop/dashboard.png" alt="Dashboard"></p>
+<p><a href="https://microbadger.com/images/portainer/portainer" title="Latest version on Docker Hub"><img src="https://images.microbadger.com/badges/version/portainer/portainer.svg" alt="Microbadger version"></a>
+<a href="http://microbadger.com/images/portainer/portainer" title="Image size"><img src="https://images.microbadger.com/badges/image/portainer/portainer.svg" alt="Microbadger"></a>
+<a href="http://portainer.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/portainer/badge/?version=latest" alt="Documentation Status"></a>
+<a href="https://gitter.im/portainer/Lobby?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://badges.gitter.im/portainer/Lobby.svg" alt="Gitter"></a></p>
 
-<p>CloudInovasi UI is a web interface for the Docker Remote API.  The goal is to provide a pure client side implementation so it is effortless to connect and manage Docker.</p>
+<p><strong><em>Portainer</em></strong> is a lightweight management UI which allows you to <strong>easily</strong> manage your Docker host or Swarm cluster.</p>
+
+<p><strong><em>Portainer</em></strong> is meant to be as <strong>simple</strong> to deploy as it is to use. It consists of a single container that can run on any Docker for Linux engine. A Docker for Windows version is on its way !</p>
+
+<p><strong><em>Portainer</em></strong> allows you to manage your Docker containers, images, volumes, networks and more ! It is compatible with the <em>standalone Docker</em> engine and with <em>Docker Swarm</em>.</p>
 
 <h2>
-<a id="goals" class="anchor" href="#goals" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Goals</h2>
+<a id="demo" class="anchor" href="#demo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Demo</h2>
+
+<p><img src="http://portainer.io/images/screenshots/portainer.gif" width="77%"></p>
+
+<p>You can try out the public demo instance: <a href="http://demo.portainer.io/">http://demo.portainer.io/</a> (login with the username <strong>demo</strong> and the password <strong>tryportainer</strong>).</p>
+
+<p>Please note that the public demo cluster is <strong>reset every 15min</strong>.</p>
+
+<h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting started</h2>
 
 <ul>
-<li>Minimal dependencies - I really want to keep this project a pure html/js app.</li>
-<li>Consistency - The web UI should be consistent with the commands found on the docker CLI.</li>
+<li><a href="https://portainer.readthedocs.io/en/latest/deployment.html">Deploy Portainer</a></li>
+<li><a href="https://portainer.readthedocs.io">Documentation</a></li>
 </ul>
 
 <h2>
-<a id="supported-docker-versions" class="anchor" href="#supported-docker-versions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Supported Docker versions</h2>
-
-<p>The current Docker version support policy is the following: <code>N</code> to <code>N-2</code> included where <code>N</code> is the latest version.</p>
-
-<p>At the moment, the following versions are supported: 1.9, 1.10 &amp; 1.11.</p>
-
-<h2>
-<a id="run" class="anchor" href="#run" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run</h2>
-
-<h3>
-<a id="quickstart" class="anchor" href="#quickstart" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quickstart</h3>
-
-<ol>
-<li><p>Run: <code>docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui</code></p></li>
-<li><p>Open your browser to <code>http://&lt;dockerd host ip&gt;:9000</code></p></li>
-</ol>
-
-<p>Bind mounting the Unix socket into the UI For Docker container is much more secure than exposing your docker daemon over TCP.</p>
-
-<p>The <code>--privileged</code> flag is required for hosts using SELinux.</p>
-
-<h3>
-<a id="specify-socket-to-connect-to-docker-daemon" class="anchor" href="#specify-socket-to-connect-to-docker-daemon" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Specify socket to connect to Docker daemon</h3>
-
-<p>By default UI For Docker connects to the Docker daemon with<code>/var/run/docker.sock</code>. For this to work you need to bind mount the unix socket into the container with <code>-v /var/run/docker.sock:/var/run/docker.sock</code>.</p>
-
-<p>You can use the <code>--host</code>, <code>-H</code> flags to change this socket:</p>
-
-<pre><code># Connect to a tcp socket:
-$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -H tcp://127.0.0.1:2375
-</code></pre>
-
-<pre><code># Connect to another unix socket:
-$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -H unix:///path/to/docker.sock
-</code></pre>
-
-<h3>
-<a id="swarm-support" class="anchor" href="#swarm-support" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Swarm support</h3>
-
-<p><strong>Supported Swarm version: 1.2.3</strong></p>
-
-<p>You can access a specific view for you Swarm cluster by defining the <code>--swarm</code> flag:</p>
-
-<pre><code># Connect to a tcp socket and enable Swarm:
-$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -H tcp://&lt;SWARM_HOST&gt;:&lt;SWARM_PORT&gt; --swarm
-</code></pre>
-
-<p><em>NOTE</em>: Due to Swarm not exposing information in a machine readable way, the app is bound to a specific version of Swarm at the moment.</p>
-
-<h3>
-<a id="change-addressport-ui-for-docker-is-served-on" class="anchor" href="#change-addressport-ui-for-docker-is-served-on" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Change address/port UI For Docker is served on</h3>
-
-<p>UI For Docker listens on port 9000 by default. If you run UI For Docker inside a container then you can bind the container's internal port to any external address and port:</p>
-
-<pre><code># Expose UI For Docker on 10.20.30.1:80
-$ docker run -d -p 10.20.30.1:80:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui
-</code></pre>
-
-<h3>
-<a id="access-a-docker-engine-protected-via-tls" class="anchor" href="#access-a-docker-engine-protected-via-tls" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Access a Docker engine protected via TLS</h3>
-
-<p>Ensure that you have access to the CA, the cert and the public key used to access your Docker engine.  </p>
-
-<p>These files will need to be named <code>ca.pem</code>, <code>cert.pem</code> and <code>key.pem</code> respectively. Store them somewhere on your disk and mount a volume containing these files inside the UI container:</p>
-
-<pre><code>$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -v /path/to/certs:/certs -H https://my-docker-host.domain:2376 --tlsverify
-</code></pre>
-
-<p>You can also use the <code>--tlscacert</code>, <code>--tlscert</code> and <code>--tlskey</code> flags if you want to change the default path to the CA, certificate and key file respectively:</p>
-
-<pre><code>$ docker run -d -p 9000:9000 cloudinovasi/cloudinovasi-ui -v /path/to/certs:/certs -H https://my-docker-host.domain:2376 --tlsverify --tlscacert /certs/myCa.pem --tlscert /certs/myCert.pem --tlskey /certs/myKey.pem
-</code></pre>
-
-<p><em>Note</em>: Replace <code>/path/to/certs</code> to the path to the certificate files on your disk.</p>
-
-<h3>
-<a id="use-your-own-logo" class="anchor" href="#use-your-own-logo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Use your own logo</h3>
-
-<p>You can use the <code>--logo</code> flag to specify an URL to your own logo.</p>
-
-<p>For example, using the Docker logo:</p>
-
-<pre><code>$ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui --logo "https://www.docker.com/sites/all/themes/docker/assets/images/brand-full.svg"
-</code></pre>
-
-<p>The custom logo will replace the CloudInovasi logo in the UI.</p>
-
-<h3>
-<a id="hide-containers-with-specific-labels" class="anchor" href="#hide-containers-with-specific-labels" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hide containers with specific labels</h3>
-
-<p>You can hide specific containers in the containers view by using the <code>--hide-label</code> or <code>-l</code> options and specifying a label.</p>
-
-<p>For example, take a container started with the label <code>owner=acme</code>:</p>
-
-<pre><code>$ docker run -d --label owner=acme nginx
-</code></pre>
-
-<p>You can hide it in the view by starting the ui with:</p>
-
-<pre><code>$ docker run -d -p 9000:9000 --privileged -v /var/run/docker.sock:/var/run/docker.sock cloudinovasi/cloudinovasi-ui -l owner=acme
-</code></pre>
-
-<h3>
-<a id="reverse-proxy-configuration" class="anchor" href="#reverse-proxy-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reverse proxy configuration</h3>
-
-<p>Has been tested with Nginx 1.11.</p>
-
-<p>Use the following configuration to host the UI at <code>myhost.mydomain.com/dockerui</code>:</p>
-
-<div class="highlight highlight-source-nginx"><pre><span class="pl-k">upstream</span> <span class="pl-en">cloudinovasi-ui </span>{
-    <span class="pl-k">server</span> ADDRESS:PORT;
-}
-
-<span class="pl-k">server</span> {
-  <span class="pl-k">listen</span> <span class="pl-s">80</span>;
-
-  <span class="pl-k">location</span> <span class="pl-en">/dockerui/ </span>{
-      <span class="pl-k">proxy_http_version</span> <span class="pl-c1">1.1</span>;
-      <span class="pl-k">proxy_set_header</span> Connection <span class="pl-s">""</span>;
-      <span class="pl-k">proxy_pass</span> http://cloudinovasi-ui/;
-  }
-  <span class="pl-k">location</span> <span class="pl-en">/dockerui/ws/ </span>{
-      <span class="pl-k">proxy_set_header</span> Upgrade <span class="pl-smi">$http_upgrade</span>;
-      <span class="pl-k">proxy_set_header</span> Connection <span class="pl-s">"upgrade"</span>;
-      <span class="pl-k">proxy_http_version</span> <span class="pl-c1">1.1</span>;
-      <span class="pl-k">proxy_pass</span> http://cloudinovasi-ui/ws/;
-  }
-}</pre></div>
-
-<p>Replace <code>ADDRESS:PORT</code> with the CloudInovasi UI container details.</p>
-
-<h3>
-<a id="available-options" class="anchor" href="#available-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Available options</h3>
-
-<p>The following options are available for the <code>ui-for-docker</code> binary:</p>
+<a id="getting-help" class="anchor" href="#getting-help" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting help</h2>
 
 <ul>
-<li>
-<code>--host</code>, <code>-H</code>: Docker daemon endpoint (default: <code>"unix:///var/run/docker.sock"</code>)</li>
-<li>
-<code>--bind</code>, <code>-p</code>: Address and port to serve UI For Docker (default: <code>":9000"</code>)</li>
-<li>
-<code>--data</code>, <code>-d</code>: Path to the data folder (default: <code>"."</code>)</li>
-<li>
-<code>--assets</code>, <code>-a</code>: Path to the assets (default: <code>"."</code>)</li>
-<li>
-<code>--swarm</code>, <code>-s</code>: Swarm cluster support (default: <code>false</code>)</li>
-<li>
-<code>--tlsverify</code>: TLS support (default: <code>false</code>)</li>
-<li>
-<code>--tlscacert</code>: Path to the CA (default <code>/certs/ca.pem</code>)</li>
-<li>
-<code>--tlscert</code>: Path to the TLS certificate file (default <code>/certs/cert.pem</code>)</li>
-<li>
-<code>--tlskey</code>: Path to the TLS key (default <code>/certs/key.pem</code>)</li>
-<li>
-<code>--hide-label</code>, <code>-l</code>: Hide containers with a specific label in the UI</li>
-<li>
-<code>--logo</code>: URL to a picture to be displayed as a logo in the UI</li>
+<li>Issues: <a href="https://github.com/portainer/portainer/issues">https://github.com/portainer/portainer/issues</a>
+</li>
+<li>FAQ: <a href="https://portainer.readthedocs.io/en/latest/faq.html">https://portainer.readthedocs.io/en/latest/faq.html</a>
+</li>
+<li>Gitter (chat): <a href="https://gitter.im/portainer/Lobby">https://gitter.im/portainer/Lobby</a>
+</li>
+<li>Slack: <a href="http://portainer.io/slack/">http://portainer.io/slack/</a>
+</li>
+</ul>
+
+<h2>
+<a id="reporting-bugs-and-contributing" class="anchor" href="#reporting-bugs-and-contributing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reporting bugs and contributing</h2>
+
+<ul>
+<li>Want to report a bug or request a feature? Please open <a href="https://github.com/portainer/portainer/issues/new">an issue</a>.</li>
+<li>Want to help us build <strong><em>portainer</em></strong>? Follow our <a href="https://portainer.readthedocs.io/en/latest/contribute.html">contribution guidelines</a> to build it  locally and make a pull request. We need all the help we can get!</li>
+</ul>
+
+<h2>
+<a id="limitations" class="anchor" href="#limitations" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Limitations</h2>
+
+<p><strong><em>Portainer</em></strong> has full support for the following Docker versions:</p>
+
+<ul>
+<li>Docker 1.10 to Docker 1.12 (including <code>swarm-mode</code>)</li>
+<li>Docker Swarm &gt;= 1.2.3</li>
+</ul>
+
+<p>Partial support for the following Docker versions (some features may not be available):</p>
+
+<ul>
+<li>Docker 1.9</li>
 </ul>
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/cloud-inovasi/cloudinovasi-ui">Cloudinovasi-ui</a> is maintained by <a href="https://github.com/cloud-inovasi">cloud-inovasi</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/portainer/portainer">Portainer</a> is maintained by <a href="https://github.com/portainer">portainer</a>.</span>
 
         <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
