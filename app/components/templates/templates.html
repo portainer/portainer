@@ -54,6 +54,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-default btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
+              <button type="button" class="btn btn-default btn-sm" ui-sref="actions.create.container({template: selectedTemplate})">Advanced configuration...</button>
               <i id="createContainerSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
