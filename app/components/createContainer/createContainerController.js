@@ -1,28 +1,29 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Info', 'Container', 'Image', 'Volume', 'Network', 'Messages',
-function ($scope, $state, Config, Info, Container, Image, Volume, Network, Messages) {
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', 'Config', 'Info', 'Container', 'Image', 'Volume', 'Network', 'TemplateHelper', 'Messages',
+function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, Network, TemplateHelper, Messages) {
 
-  $scope.state = {
-    alwaysPull: true
-  };
+  if ($stateParams.template) {
+    $scope.template = $stateParams.template;
+  }
 
   $scope.formValues = {
+    alwaysPull: true,
     Console: 'none',
-    Volumes: [],
-    AvailableRegistries: [],
+    Volumes: $scope.template && $scope.template.volumes ? TemplateHelper.getVolumeBindings($scope.template.volumes) : [],
     Registry: ''
   };
 
   $scope.imageConfig = {};
 
   $scope.config = {
-    Env: [],
+    Image: $scope.template ? $scope.template.image : '',
+    Env: $scope.template && $scope.template.env ? TemplateHelper.getEnvBindings($scope.template.env) : [],
     ExposedPorts: {},
     HostConfig: {
       RestartPolicy: {
         Name: 'no'
       },
-      PortBindings: [],
+      PortBindings: $scope.template ? TemplateHelper.getPortBindings($scope.template.ports) : [],
       Binds: [],
       NetworkMode: 'bridge',
       Privileged: false
@@ -60,8 +61,6 @@ function ($scope, $state, Config, Info, Container, Image, Volume, Network, Messa
         $scope.swarm_mode = true;
       }
     });
-
-    $scope.formValues.AvailableRegistries = c.registries;
 
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
@@ -232,7 +231,7 @@ function ($scope, $state, Config, Info, Container, Image, Volume, Network, Messa
   $scope.create = function () {
     var config = prepareConfiguration();
     $('#createContainerSpinner').show();
-    if ($scope.state.alwaysPull) {
+    if ($scope.formValues.alwaysPull) {
       pullImageAndCreateContainer(config);
     } else {
       createContainer(config);

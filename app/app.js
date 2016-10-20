@@ -81,6 +81,9 @@ angular.module('portainer', [
     })
     .state('actions.create.container', {
       url: "/container",
+      params: {
+        template: null
+      },
       templateUrl: 'app/components/createContainer/createcontainer.html',
       controller: 'CreateContainerController'
     })

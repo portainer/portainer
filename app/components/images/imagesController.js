@@ -102,7 +102,6 @@ function ($scope, $state, Config, Image, Messages) {
   }
 
   Config.$promise.then(function (c) {
-    $scope.availableRegistries = c.registries;
     fetchImages();
   });
 }]);
