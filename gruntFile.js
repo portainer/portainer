@@ -49,10 +49,10 @@ module.exports = function (grunt) {
     ]);
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test-watch', ['karma:watch']);
-    grunt.registerTask('run', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
-    grunt.registerTask('run-swarm', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
-    grunt.registerTask('run-dev', ['if:binaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
-    grunt.registerTask('run-ssl', ['if:binaryNotExist', 'shell:buildImage', 'shell:runSsl', 'watch:buildSsl']);
+    grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
+    grunt.registerTask('run-swarm', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
+    grunt.registerTask('run-dev', ['if:unixBinaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
+    grunt.registerTask('run-ssl', ['if:unixBinaryNotExist', 'shell:buildImage', 'shell:runSsl', 'watch:buildSsl']);
     grunt.registerTask('clear', ['clean:app']);
 
     // Print a timestamp (useful for when watching)
