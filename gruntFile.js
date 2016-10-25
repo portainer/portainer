@@ -16,7 +16,7 @@ module.exports = function (grunt) {
     grunt.registerTask('default', ['jshint', 'build', 'karma:unit']);
     grunt.registerTask('build', [
         'clean:app',
-        'if:binaryNotExist',
+        'if:unixBinaryNotExist',
         'html2js',
         'concat',
         'clean:tmpl',
@@ -25,7 +25,19 @@ module.exports = function (grunt) {
     ]);
     grunt.registerTask('release', [
         'clean:all',
-        'if:binaryNotExist',
+        'if:unixBinaryNotExist',
+        'html2js',
+        'uglify',
+        'clean:tmpl',
+        'jshint',
+        //'karma:unit',
+        'concat:index',
+        'recess:min',
+        'copy'
+    ]);
+    grunt.registerTask('release-win', [
+        'clean:all',
+        'if:windowsBinaryNotExist',
         'html2js',
         'uglify',
         'clean:tmpl',
@@ -263,6 +275,14 @@ module.exports = function (grunt) {
                     'mv api/portainer dist/'
                 ].join(' && ')
             },
+            buildWindowsBinary: {
+                command: [
+                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="windows" -e BUILD_GOARCH="amd64" centurylink/golang-builder-cross',
+                    'shasum api/portainer-windows-amd64 > portainer-checksum.txt',
+                    'mkdir -p dist',
+                    'mv api/portainer-windows-amd64 dist/portainer.exe'
+                ].join(' && ')
+            },
             run: {
                 command: [
                     'docker stop portainer',
@@ -289,11 +309,17 @@ module.exports = function (grunt) {
             }
         },
         'if': {
-            binaryNotExist: {
-                options: {
-                    executable: 'dist/portainer'
-                },
-                ifFalse: ['shell:buildBinary']
+            unixBinaryNotExist: {
+              options: {
+                  executable: 'dist/portainer'
+              },
+              ifFalse: ['shell:buildBinary']
+            },
+            windowsBinaryNotExist: {
+              options: {
+                  executable: 'dist/portainer.exe'
+              },
+              ifFalse: ['shell:buildWindowsBinary']
             }
         }
     });
