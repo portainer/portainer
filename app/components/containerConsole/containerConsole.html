@@ -2,12 +2,12 @@
   <rd-header-title title="Container console">
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
-  <rd-header-content>
+  <rd-header-content ng-if="state.loaded">
     Containers > <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a> > Console
   </rd-header-content>
 </rd-header>
 
-<div class="row">
+<div class="row" ng-if="state.loaded">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-terminal" title="Console">
@@ -16,18 +16,27 @@
         </div>
       </rd-widget-header>
       <rd-widget-body>
-        <form class="form-horizontal">
-          <!-- command-list -->
-          <div class="form-group">
-            <div class="col-sm-3">
-              <select class="selectpicker form-control" ng-model="state.command">
-                <option value="bash">/bin/bash</option>
-                <option value="sh">/bin/sh</option>
-              </select>
+        <form>
+          <div class="row">
+            <!-- command-list -->
+            <div class="col-sm-4">
+              <div class="input-group">
+                <span class="input-group-addon">
+                  <i class="fa fa-linux" aria-hidden="true" ng-if="imageOS == 'linux'"></i>
+                  <i class="fa fa-windows" aria-hidden="true" ng-if="imageOS == 'windows'"></i>
+                </span>
+                <select class="form-control" ng-model="state.command" id="command">
+                  <option value="bash" ng-if="imageOS == 'linux'">/bin/bash</option>
+                  <option value="sh" ng-if="imageOS == 'linux'">/bin/sh</option>
+                  <option value="powershell" ng-if="imageOS == 'windows'">powershell</option>
+                  <option value="cmd.exe" ng-if="imageOS == 'windows'">cmd.exe</option>
+                </select>
+              </div>
             </div>
-            <div class="col-sm-9 pull-left">
-              <button type="button" class="btn btn-primary" ng-click="connect()" ng-disabled="connected">Connect</button>
-              <button type="button" class="btn btn-default" ng-click="disconnect()" ng-disabled="!connected">Disconnect</button>
+            <!-- !command-list -->
+            <div class="col-sm-8">
+              <button type="button" class="btn btn-primary" ng-click="connect()" ng-disabled="state.connected">Connect</button>
+              <button type="button" class="btn btn-default" ng-click="disconnect()" ng-disabled="!state.connected">Disconnect</button>
             </div>
           </div>
         </form>
