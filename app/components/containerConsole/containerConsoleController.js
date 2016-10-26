@@ -1,9 +1,9 @@
 angular.module('containerConsole', [])
-.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Settings', 'Container', 'Exec', '$timeout', 'Messages',
-function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
+.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Settings', 'Container', 'Image', 'Exec', '$timeout', 'Messages',
+function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, Messages) {
   $scope.state = {};
-  $scope.state.command = "bash";
-  $scope.connected = false;
+  $scope.state.loaded = false;
+  $scope.state.connected = false;
 
   var socket, term;
 
@@ -16,6 +16,22 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
 
   Container.get({id: $stateParams.id}, function(d) {
     $scope.container = d;
+    if (d.message) {
+      Messages.error("Error", d, 'Unable to retrieve container details');
+      $('#loadingViewSpinner').hide();
+    } else {
+      Image.get({id: d.Image}, function(imgData) {
+        $scope.imageOS = imgData.Os;
+        $scope.state.command = imgData.Os === 'windows' ? 'powershell' : 'bash';
+        $scope.state.loaded = true;
+        $('#loadingViewSpinner').hide();
+      }, function (e) {
+        Messages.error("Failure", e, 'Unable to retrieve image details');
+        $('#loadingViewSpinner').hide();
+      });
+    }
+  }, function (e) {
+    Messages.error("Failure", e, 'Unable to retrieve container details');
     $('#loadingViewSpinner').hide();
   });
 
@@ -54,7 +70,7 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
   };
 
   $scope.disconnect = function() {
-    $scope.connected = false;
+    $scope.state.connected = false;
     if (socket !== null) {
       socket.close();
     }
@@ -79,7 +95,7 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
   function initTerm(url, height, width) {
     socket = new WebSocket(url);
 
-    $scope.connected = true;
+    $scope.state.connected = true;
     socket.onopen = function(evt) {
       $('#loadConsoleSpinner').hide();
       term = new Terminal();
@@ -95,11 +111,10 @@ function ($scope, $stateParams, Settings, Container, Exec, $timeout, Messages) {
         term.write(e.data);
       };
       socket.onerror = function (error) {
-        $scope.connected = false;
-
+        $scope.state.connected = false;
       };
       socket.onclose = function(evt) {
-        $scope.connected = false;
+        $scope.state.connected = false;
       };
     };
   }
