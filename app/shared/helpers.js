@@ -87,5 +87,4 @@ angular.module('portainer.helpers', [])
       return bindings;
     }
   };
-}])
-;
+}]);

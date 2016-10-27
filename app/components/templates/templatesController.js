@@ -8,7 +8,7 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
   $scope.formValues = {
     network: "",
     name: "",
-    ports: [],
+    ports: []
   };
 
   var selectedItem = -1;
