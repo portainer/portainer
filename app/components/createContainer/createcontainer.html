@@ -53,6 +53,10 @@
                 <input type="radio" name="container_restart_policy" ng-model="config.HostConfig.RestartPolicy.Name" value="on-failure">
                 <span class="radio-value">On failure</span>
               </label>
+              <label class="radio-inline">
+                <input type="radio" name="container_restart_policy" ng-model="config.HostConfig.RestartPolicy.Name" value="unless-stopped">
+                <span class="radio-value">Unless stopped</span>
+              </label>
             </div>
           </div>
           <!-- !restart-policy -->
