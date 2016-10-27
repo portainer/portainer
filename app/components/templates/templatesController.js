@@ -1,13 +1,25 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Templates', 'Messages',
-function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper, Image, Volume, Network, Templates, Messages) {
-  $scope.selectedTemplate = null;
+.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Templates', 'TemplateHelper', 'Messages',
+function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper, Image, Volume, Network, Templates, TemplateHelper, Messages) {
+  $scope.state = {
+    selectedTemplate: null,
+    showAdvancedOptions: false
+  };
   $scope.formValues = {
     network: "",
-    name: ""
+    name: "",
+    ports: [],
   };
 
   var selectedItem = -1;
+
+  $scope.addPortBinding = function() {
+    $scope.formValues.ports.push({ hostPort: '', containerPort: '', protocol: 'tcp' });
+  };
+
+  $scope.removePortBinding = function(index) {
+    $scope.formValues.ports.splice(index, 1);
+  };
 
   // TODO: centralize, already present in createContainerController
   function createContainer(config) {
@@ -74,6 +86,26 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
     };
   }
 
+  function preparePortBindings(config, ports) {
+    var bindings = {};
+    ports.forEach(function (portBinding) {
+      if (portBinding.containerPort) {
+        var key = portBinding.containerPort + "/" + portBinding.protocol;
+        var binding = {};
+        if (portBinding.hostPort && portBinding.hostPort.indexOf(':') > -1) {
+          var hostAndPort = portBinding.hostPort.split(':');
+          binding.HostIp = hostAndPort[0];
+          binding.HostPort = hostAndPort[1];
+        } else {
+          binding.HostPort = portBinding.hostPort;
+        }
+        bindings[key] = [binding];
+        config.ExposedPorts[key] = {};
+      }
+    });
+    config.HostConfig.PortBindings = bindings;
+  }
+
   function createConfigFromTemplate(template) {
     var containerConfig = getInitialConfiguration();
     containerConfig.Image = template.image;
@@ -95,12 +127,7 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
         }
       });
     }
-    if (template.ports) {
-      template.ports.forEach(function (p) {
-        containerConfig.ExposedPorts[p] = {};
-        containerConfig.HostConfig.PortBindings[p] = [{ HostPort: ""}];
-      });
-    }
+    preparePortBindings(containerConfig, $scope.formValues.ports);
     return containerConfig;
   }
 
@@ -128,7 +155,7 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
 
   $scope.createTemplate = function() {
     $('#createContainerSpinner').show();
-    var template = $scope.selectedTemplate;
+    var template = $scope.state.selectedTemplate;
     var containerConfig = createConfigFromTemplate(template);
     var imageConfig = {
       fromImage: template.image.split(':')[0],
@@ -144,11 +171,13 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
     $('#template_' + id).toggleClass("container-template--selected");
     if (selectedItem === id) {
       selectedItem = -1;
-      $scope.selectedTemplate = null;
+      $scope.state.selectedTemplate = null;
     } else {
       $('#template_' + selectedItem).toggleClass("container-template--selected");
       selectedItem = id;
-      $scope.selectedTemplate = $scope.templates[id];
+      var selectedTemplate = $scope.templates[id];
+      $scope.state.selectedTemplate = selectedTemplate;
+      $scope.formValues.ports = selectedTemplate.ports ? TemplateHelper.getPortBindings(selectedTemplate.ports) : [];
     }
   };
 
