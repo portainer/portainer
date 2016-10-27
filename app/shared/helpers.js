@@ -64,6 +64,7 @@ angular.module('portainer.helpers', [])
       });
       return bindings;
     },
+    //Not used atm, may prove useful later
     getVolumeBindings: function(volumes) {
       var bindings = [];
       volumes.forEach(function (volume) {
@@ -71,6 +72,7 @@ angular.module('portainer.helpers', [])
       });
       return bindings;
     },
+    //Not used atm, may prove useful later
     getEnvBindings: function(env) {
       var bindings = [];
       env.forEach(function (envvar) {

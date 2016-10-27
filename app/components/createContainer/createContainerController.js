@@ -1,29 +1,25 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', 'Config', 'Info', 'Container', 'Image', 'Volume', 'Network', 'TemplateHelper', 'Messages',
-function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, Network, TemplateHelper, Messages) {
-
-  if ($stateParams.template) {
-    $scope.template = $stateParams.template;
-  }
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', 'Config', 'Info', 'Container', 'Image', 'Volume', 'Network', 'Messages',
+function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, Network, Messages) {
 
   $scope.formValues = {
     alwaysPull: true,
     Console: 'none',
-    Volumes: $scope.template && $scope.template.volumes ? TemplateHelper.getVolumeBindings($scope.template.volumes) : [],
+    Volumes: [],
     Registry: ''
   };
 
   $scope.imageConfig = {};
 
   $scope.config = {
-    Image: $scope.template ? $scope.template.image : '',
-    Env: $scope.template && $scope.template.env ? TemplateHelper.getEnvBindings($scope.template.env) : [],
+    Image: '',
+    Env: [],
     ExposedPorts: {},
     HostConfig: {
       RestartPolicy: {
         Name: 'no'
       },
-      PortBindings: $scope.template ? TemplateHelper.getPortBindings($scope.template.ports) : [],
+      PortBindings: [],
       Binds: [],
       NetworkMode: 'bridge',
       Privileged: false
@@ -237,5 +233,4 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
       createContainer(config);
     }
   };
-
 }]);
