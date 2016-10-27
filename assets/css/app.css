@@ -63,11 +63,7 @@ input[type="radio"] {
   vertical-align: middle;
 }
 
-.clickable {
-  cursor: pointer;
-}
-
-.text-icon {
+.space-right {
   margin-right: 5px;
 }
 
@@ -83,16 +79,9 @@ input[type="radio"] {
   color: white;
 }
 
-.image-tag {
-  margin-right: 5px;
-}
-
-.label.tag {
-  margin-right: 5px;
-}
-
 .widget .widget-body table tbody .image-tag {
   font-size: 90% !important;
+  margin-right: 5px;
 }
 
 .terminal-container {
@@ -102,10 +91,6 @@ input[type="radio"] {
 
 .interactive {
   cursor: pointer;
-}
-
-.btn-ico {
-  margin-right: 5px;
 }
 
 .template-list {

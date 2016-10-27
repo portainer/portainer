@@ -93,8 +93,8 @@
             <i class="fa fa-server"></i>
           </div>
           <div class="pull-right">
-            <div><i class="fa fa-heartbeat text-icon green-icon"></i>{{ containerData.running }} running</div>
-            <div><i class="fa fa-heartbeat text-icon red-icon"></i>{{ containerData.stopped }} stopped</div>
+            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containerData.running }} running</div>
+            <div><i class="fa fa-heartbeat space-right red-icon"></i>{{ containerData.stopped }} stopped</div>
           </div>
           <div class="title">{{ containerData.total }}</div>
           <div class="comment">Containers</div>
@@ -110,7 +110,7 @@
             <i class="fa fa-clone"></i>
           </div>
           <div class="pull-right">
-            <div><i class="fa fa-pie-chart text-icon"></i>{{ imageData.size|humansize }}</div>
+            <div><i class="fa fa-pie-chart space-right"></i>{{ imageData.size|humansize }}</div>
           </div>
           <div class="title">{{ imageData.total }}</div>
           <div class="comment">Images</div>
@@ -126,7 +126,7 @@
             <i class="fa fa-cubes"></i>
           </div>
           <div class="pull-right" ng-if="infoData.Driver">
-            <div><i class="fa fa-hdd-o text-icon"></i>{{ infoData.Driver }} driver</div>
+            <div><i class="fa fa-hdd-o space-right"></i>{{ infoData.Driver }} driver</div>
           </div>
           <div class="title">{{ volumeData.total }}</div>
           <div class="comment">Volumes</div>

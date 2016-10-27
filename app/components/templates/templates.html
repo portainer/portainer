@@ -54,17 +54,17 @@
           <div class="form-group">
             <div class="col-sm-12">
               <a class="small interactive" ng-if="!state.showAdvancedOptions" ng-click="state.showAdvancedOptions = true;">
-                <i class="fa fa-plus text-icon" aria-hidden="true"></i> Show advanced options
+                <i class="fa fa-plus space-right" aria-hidden="true"></i> Show advanced options
               </a>
               <a class="small interactive" ng-if="state.showAdvancedOptions" ng-click="state.showAdvancedOptions = false;">
-                <i class="fa fa-minus text-icon" aria-hidden="true"></i> Hide advanced options
+                <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide advanced options
               </a>
             </div>
           </div>
           <div class="form-group" ng-if="state.showAdvancedOptions">
             <label for="container_ports" class="col-sm-1 control-label text-left">Port mapping</label>
             <div class="col-sm-11" style="margin-top: 5px;">
-              <span class="label label-default clickable" ng-click="addPortBinding()">
+              <span class="label label-default interactive" ng-click="addPortBinding()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional port
               </span>
             </div>
