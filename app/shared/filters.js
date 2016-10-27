@@ -213,4 +213,13 @@ angular.module('portainer.filters', [])
   return function (ip) {
     return ip.slice(0, ip.indexOf('/'));
   };
+})
+.filter('arraytostr', function () {
+  'use strict';
+  return function (arr, separator) {
+    if (arr) {
+      return _.join(arr, separator);
+    }
+    return '';
+  };
 });
