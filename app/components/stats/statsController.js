@@ -4,6 +4,13 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
   // TODO: Force scale to 0-100 for cpu, fix charts on dashboard,
   // TODO: Force memory scale to 0 - max memory
   $scope.ps_args = '';
+  $scope.state = {};
+  $scope.sortType = 'CMD';
+  $scope.sortReverse = false;
+  $scope.order = function (sortType) {
+    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+    $scope.sortType = sortType;
+  };
   $scope.getTop = function () {
       ContainerTop.get($stateParams.id, {
           ps_args: $scope.ps_args

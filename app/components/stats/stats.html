@@ -59,11 +59,17 @@
         <table class="table table-striped">
           <thead>
             <tr>
-              <th ng-repeat="title in containerTop.Titles">{{title}}</th>
+              <th ng-repeat="title in containerTop.Titles">
+                <a ui-sref="stats({id: container.Id})" ng-click="order(title)">
+                  {{title}}
+                  <span ng-show="sortType == title && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == title && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="processInfos in containerTop.Processes">
+            <tr ng-repeat="processInfos in state.filteredProcesses = (containerTop.Processes | orderBy:sortType:sortReverse)">
               <td ng-repeat="processInfo in processInfos track by $index">{{processInfo}}</td>
             </tr>
           </tbody>
