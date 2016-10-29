@@ -78,6 +78,9 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
         networks.push({Name: "none"});
       }
       $scope.availableNetworks = networks;
+      if (!_.find(networks, {'Name': 'bridge'})) {
+        $scope.config.HostConfig.NetworkMode = 'nat';
+      }
     }, function (e) {
       Messages.error("Failure", e, "Unable to retrieve networks");
     });
