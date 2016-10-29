@@ -1,4 +1,4 @@
-FROM golang:nanoserver
+FROM microsoft/nanoserver
 
 COPY dist /
 

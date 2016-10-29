@@ -1,4 +1,4 @@
-FROM golang:windowsservercore
+FROM microsoft/windowsservercore
 
 COPY dist /
 
