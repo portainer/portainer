@@ -47,6 +47,18 @@ module.exports = function (grunt) {
         'recess:min',
         'copy'
     ]);
+    grunt.registerTask('release-arm', [
+        'clean:all',
+        'if:unixArmBinaryNotExist',
+        'html2js',
+        'uglify',
+        'clean:tmpl',
+        'jshint',
+        //'karma:unit',
+        'concat:index',
+        'recess:min',
+        'copy'
+    ]);
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test-watch', ['karma:watch']);
     grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
@@ -275,6 +287,14 @@ module.exports = function (grunt) {
                     'mv api/portainer dist/'
                 ].join(' && ')
             },
+            buildUnixArmBinary: {
+                command: [
+                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm" centurylink/golang-builder-cross',
+                    'shasum api/portainer-linux-arm > portainer-checksum.txt',
+                    'mkdir -p dist',
+                    'mv api/portainer-linux-arm dist/portainer'
+                ].join(' && ')
+            },
             buildWindowsBinary: {
                 command: [
                     'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="windows" -e BUILD_GOARCH="amd64" centurylink/golang-builder-cross',
@@ -314,6 +334,12 @@ module.exports = function (grunt) {
                   executable: 'dist/portainer'
               },
               ifFalse: ['shell:buildBinary']
+            },
+            unixArmBinaryNotExist: {
+              options: {
+                  executable: 'dist/portainer'
+              },
+              ifFalse: ['shell:buildUnixArmBinary']
             },
             windowsBinaryNotExist: {
               options: {
