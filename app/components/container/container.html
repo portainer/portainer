@@ -161,15 +161,6 @@
                 </table>
               </td>
             </tr>
-            <tr>
-              <td>Networks</td>
-              <td>
-                <div ng-repeat="(networkName, networkId) in networks">
-                  <a ng-if="networkId" ui-sref="network({id: networkId})">{{ networkName }}</a>
-                  <span ng-if="!networkId">{{ networkName }}</span>
-                </div>
-              </td>
-            </tr>
             <tr ng-if="!(container.Config.Labels | emptyobject)">
               <td>Labels</td>
               <td>
