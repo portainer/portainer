@@ -39,6 +39,17 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
   $scope.updateEnvironmentVariable = function updateEnvironmentVariable(service, variable) {
     service.hasChanges = service.hasChanges || variable.value !== variable.originalValue;
   };
+  $scope.addLabel = function addLabel(service) {
+    service.hasChanges = true;
+    service.ServiceLabels.push({ key: '', value: '', originalValue: '' });
+  };
+  $scope.removeLabel = function removeLabel(service, index) {
+    var removedElement = service.ServiceLabels.splice(index, 1);
+    service.hasChanges = service.hasChanges || removedElement !== null;
+  };
+  $scope.updateLabel = function updateLabel(service, label) {
+    service.hasChanges = service.hasChanges || label.value !== label.originalValue;
+  };
 
   $scope.cancelChanges = function changeServiceImage(service) {
     Object.keys(previousServiceValues).forEach(function(attribute) {
@@ -48,7 +59,8 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     previousServiceValues = {}; // clear out all changes
     // clear out environment variable changes
     service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
-    
+    service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
+
     service.hasChanges = false;
   };
 
@@ -57,6 +69,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Name = service.newServiceName;
     config.TaskTemplate.ContainerSpec.Env = translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
+    config.TaskTemplate.ContainerSpec.Labels = translateServiceLabelsToLabels(service.ServiceLabels);
     config.TaskTemplate.ContainerSpec.Image = service.newServiceImage;
     config.Mode.Replicated.Replicas = service.Replicas;
 
@@ -96,6 +109,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
       service.newServiceImage = service.Image;
       service.newServiceReplicas = service.Replicas;
       service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
+      service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
 
       $scope.service = service;
       Task.query({filters: {service: [service.Name]}}, function (tasks) {
@@ -155,6 +169,25 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
       return variables;
     }
     return [];
+  }
+
+  function translateLabelsToServiceLabels(Labels) {
+    var labels = [];
+    if (Labels) {
+      Object.keys(Labels).forEach(function(key) {
+        labels.push({ key: key, value: Labels[key], originalValue: Labels[key], added: true});
+      });
+    }
+    return labels;
+  }
+  function translateServiceLabelsToLabels(labels) {
+    var Labels = {};
+    if (labels) {
+      labels.forEach(function(label) {
+        Labels[label.key] = label.value;
+      });
+    }
+    return Labels;
   }
 
   fetchServiceDetails();

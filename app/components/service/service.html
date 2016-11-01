@@ -106,15 +106,35 @@
                 </div>
               </td>
             </tr>
-            <tr ng-if="service.Labels">
+            <tr>
               <td>Labels</td>
               <td>
-                <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="(k, v) in service.Labels">
-                    <td>{{ k }}</td>
-                    <td>{{ v }}</td>
-                  </tr>
-                </table>
+                <div class="form-group">
+                  <div class="col-sm-11">
+                    <span class="label label-default interactive" ng-click="addLabel(service)">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> label
+                    </span>
+                  </div>
+                  <!-- labels-input-list -->
+                  <div class="col-sm-11 form-inline" style="margin-top: 10px;">
+                    <div ng-repeat="label in service.ServiceLabels" style="margin-top: 2px;">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">name</span>
+                        <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="updateLabel(service, label)">
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">value</span>
+                        <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateLabel(service, label)">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="button" ng-click="removeLabel(service, $index)">
+                            <i class="fa fa-minus" aria-hidden="true"></i>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- !labels-input-list -->
+                </div>
               </td>
             </tr>
           </tbody>
