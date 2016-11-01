@@ -267,13 +267,21 @@
               <div class="form-group">
                 <label for="container_network" class="col-sm-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="selectpicker form-control" ng-model="config.HostConfig.NetworkMode">
+                  <select class="selectpicker form-control" ng-model="network.Mode" id="container_network">
                     <option selected disabled hidden value="">Select a network</option>
                     <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
                 </div>
               </div>
               <!-- !network-input -->
+              <!-- container-name-input -->
+              <div class="form-group" ng-if="network.Mode == 'container'">
+                <label for="container_network_container_name" class="col-sm-1 control-label text-left">Container Name</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" ng-model="network.Container" id="container_network_container_name" placeholder="e.g. myContainer">
+                </div>
+              </div>
+              <!-- !container-name-input -->
               <!-- hostname-input -->
               <div class="form-group">
                 <label for="container_hostname" class="col-sm-1 control-label text-left">Hostname</label>

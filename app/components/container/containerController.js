@@ -32,6 +32,18 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
           }
         });
       }
+      $scope.networks = {};
+      $scope.networks[d.HostConfig.NetworkMode] = null;
+      if (d.NetworkSettings.Networks) {
+        var networks = d.NetworkSettings.Networks;
+        angular.forEach(Object.keys(networks), function(network) {
+          var networkObject = networks[network];
+          if (networkObject) {
+            var id = networkObject.NetworkID;
+            $scope.networks[network] = id;
+          }
+        })
+      }
       $('#loadingViewSpinner').hide();
     }, function (e) {
       $('#loadingViewSpinner').hide();

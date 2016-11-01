@@ -11,6 +11,11 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
 
   $scope.imageConfig = {};
 
+  $scope.network = {
+    Mode: 'bridge',
+    Container: ''
+  };
+
   $scope.config = {
     Image: '',
     Env: [],
@@ -77,6 +82,7 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
         networks.push({Name: "host"});
         networks.push({Name: "none"});
       }
+      networks.push({Name: "container"});
       $scope.availableNetworks = networks;
       if (!_.find(networks, {'Name': 'bridge'})) {
         $scope.config.HostConfig.NetworkMode = 'nat';
@@ -217,8 +223,19 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
     config.Volumes = volumes;
   }
 
+  function prepareNetworkConfig(config) {
+    var mode = $scope.network.Mode;
+    var container = $scope.network.Container;
+    var networkMode = mode;
+    if (container) {
+      networkMode += ':' + container;
+    }
+    config.HostConfig.NetworkMode = networkMode;
+  }
+
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
+    prepareNetworkConfig(config);
     prepareImageConfig(config);
     preparePortBindings(config);
     prepareConsole(config);
