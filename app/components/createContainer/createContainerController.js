@@ -1,6 +1,6 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', 'Config', 'Info', 'Container', 'Image', 'Volume', 'Network', 'Messages',
-function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, Network, Messages) {
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Messages',
+function ($scope, $state, $stateParams, Config, Info, Container, ContainerHelper, Image, Volume, Network, Messages) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -62,6 +62,7 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
         $scope.swarm_mode = true;
       }
     });
+    var containersToHideLabels = c.hiddenLabels;
 
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
@@ -90,10 +91,21 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
     }, function (e) {
       Messages.error("Failure", e, "Unable to retrieve networks");
     });
+
+    Container.query({}, function (d) {
+      var containers = d;
+      if (containersToHideLabels) {
+        containers = ContainerHelper.hideContainers(d, containersToHideLabels);
+      }
+      $scope.runningContainers = containers;
+    }, function(e) {
+      Messages.error("Failure", e, "Unable to retrieve running containers");
+    })
   });
 
   // TODO: centralize, already present in templatesController
   function createContainer(config) {
+    console.log(config);
     Container.create(config, function (d) {
       if (d.message) {
         $('#createContainerSpinner').hide();
@@ -226,9 +238,13 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
   function prepareNetworkConfig(config) {
     var mode = $scope.network.Mode;
     var container = $scope.network.Container;
+    var containerName = container;
+    if (container && typeof container == 'object') {
+      containerName = container.Names[0]
+    }
     var networkMode = mode;
-    if (container) {
-      networkMode += ':' + container;
+    if (containerName) {
+      networkMode += ':' + containerName;
     }
     config.HostConfig.NetworkMode = networkMode;
   }
