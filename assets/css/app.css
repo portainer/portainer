@@ -202,3 +202,7 @@ input[type="radio"] {
   font-size: 0.8em;
   margin-bottom: 5px;
 }
+
+input.ng-invalid.ng-touched {
+  border-color: #FA787E;
+}
