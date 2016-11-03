@@ -10,7 +10,7 @@
 
 **_Portainer_** is a lightweight management UI which allows you to **easily** manage your Docker host or Swarm cluster.
 
-**_Portainer_** is meant to be as **simple** to deploy as it is to use. It consists of a single container that can run on any Docker for Linux engine. A Docker for Windows version is on its way !
+**_Portainer_** is meant to be as **simple** to deploy as it is to use. It consists of a single container that can run on any Docker engine (Docker for Linux and Docker for Windows are supported).
 
 **_Portainer_** allows you to manage your Docker containers, images, volumes, networks and more ! It is compatible with the *standalone Docker* engine and with *Docker Swarm*.
 
