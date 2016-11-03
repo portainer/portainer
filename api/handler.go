@@ -17,7 +17,6 @@ func (a *api) newHandler(settings *Settings) http.Handler {
 	)
 
 	handler := a.newAPIHandler()
-	CSRFHandler := newCSRFHandler(a.dataPath)
 
 	mux.Handle("/", fileHandler)
 	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", handler))
@@ -28,7 +27,12 @@ func (a *api) newHandler(settings *Settings) http.Handler {
 	mux.HandleFunc("/templates", func(w http.ResponseWriter, r *http.Request) {
 		templatesHandler(w, r, a.templatesURL)
 	})
-	return CSRFHandler(newCSRFWrapper(mux))
+	// CSRF protection is disabled for the moment
+	// CSRFHandler := newCSRFHandler(a.dataPath)
+	// return CSRFHandler(newCSRFWrapper(mux))
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mux.ServeHTTP(w, r)
+	})
 }
 
 // newAPIHandler initializes a new http.Handler based on the URL scheme
