@@ -33,6 +33,7 @@ type (
 
 func (a *api) run(settings *Settings) {
 	handler := a.newHandler(settings)
+	log.Printf("Starting portainer on %s", a.bindAddress)
 	if err := http.ListenAndServe(a.bindAddress, handler); err != nil {
 		log.Fatal(err)
 	}
