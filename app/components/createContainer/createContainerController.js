@@ -100,12 +100,11 @@ function ($scope, $state, $stateParams, Config, Info, Container, ContainerHelper
       $scope.runningContainers = containers;
     }, function(e) {
       Messages.error("Failure", e, "Unable to retrieve running containers");
-    })
+    });
   });
 
   // TODO: centralize, already present in templatesController
   function createContainer(config) {
-    console.log(config);
     Container.create(config, function (d) {
       if (d.message) {
         $('#createContainerSpinner').hide();
@@ -239,8 +238,8 @@ function ($scope, $state, $stateParams, Config, Info, Container, ContainerHelper
     var mode = $scope.network.Mode;
     var container = $scope.network.Container;
     var containerName = container;
-    if (container && typeof container == 'object') {
-      containerName = container.Names[0]
+    if (container && typeof container === 'object') {
+      containerName = container.Names[0];
     }
     var networkMode = mode;
     if (containerName) {
