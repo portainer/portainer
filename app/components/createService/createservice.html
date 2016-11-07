@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title="Create service"></rd-header-title>
   <rd-header-content>
-    Services > Add service
+    <a ui-sref="services">Services</a> > Add service
   </rd-header-content>
 </rd-header>
 
@@ -101,6 +101,7 @@
           <li class="active interactive"><a data-target="#command" data-toggle="tab">Command</a></li>
           <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
+          <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -251,6 +252,42 @@
             </form>
           </div>
           <!-- !tab-network -->
+          <!-- tab-labels -->
+          <div class="tab-pane" id="labels">
+            <form class="form-horizontal" style="margin-top: 15px;">
+              <!-- labels -->
+              <div class="form-group">
+                <label for="service_env" class="col-sm-1 control-label text-left">Labels</label>
+                <div class="col-sm-11">
+                  <span class="label label-default interactive" ng-click="addLabel()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> label
+                  </span>
+                </div>
+                <!-- labels-input-list -->
+                <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="label in formValues.Labels" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">name</span>
+                      <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="removeLabel($index)">
+                          <i class="fa fa-minus" aria-hidden="true"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <!-- !labels-input-list -->
+              </div>
+              <!-- !labels-->
+            </form>
+          </div>
+          <!-- !tab-labels -->
+
           <!-- tab-security -->
           <div class="tab-pane" id="security">
           </div>

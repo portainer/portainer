@@ -13,6 +13,7 @@ function ($scope, $cookieStore, Settings, Config, Info) {
   $scope.swarm_mode = false;
 
   Config.$promise.then(function (c) {
+    $scope.logo = c.logo;
     $scope.swarm = c.swarm;
     Info.get({}, function(d) {
       if ($scope.swarm && !_.startsWith(d.ServerVersion, 'swarm')) {
