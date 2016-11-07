@@ -7,7 +7,7 @@ function ($scope, $state, $stateParams, Config, Info, Container, ContainerHelper
     Console: 'none',
     Volumes: [],
     Registry: '',
-    Container: ''
+    NetworkContainer: ''
   };
 
   $scope.imageConfig = {};
@@ -232,7 +232,7 @@ function ($scope, $state, $stateParams, Config, Info, Container, ContainerHelper
 
   function prepareNetworkConfig(config) {
     var mode = config.HostConfig.NetworkMode;
-    var container = $scope.formValues.Container;
+    var container = $scope.formValues.NetworkContainer;
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = container.Names[0];
