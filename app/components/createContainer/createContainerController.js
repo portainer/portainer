@@ -6,15 +6,11 @@ function ($scope, $state, $stateParams, Config, Info, Container, ContainerHelper
     alwaysPull: true,
     Console: 'none',
     Volumes: [],
-    Registry: ''
+    Registry: '',
+    Container: ''
   };
 
   $scope.imageConfig = {};
-
-  $scope.network = {
-    Mode: 'bridge',
-    Container: ''
-  };
 
   $scope.config = {
     Image: '',
@@ -235,8 +231,8 @@ function ($scope, $state, $stateParams, Config, Info, Container, ContainerHelper
   }
 
   function prepareNetworkConfig(config) {
-    var mode = $scope.network.Mode;
-    var container = $scope.network.Container;
+    var mode = config.HostConfig.NetworkMode;
+    var container = $scope.formValues.Container;
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = container.Names[0];
