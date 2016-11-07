@@ -54,7 +54,7 @@ function ContainerViewModel(data) {
   this.Status = data.Status;
   this.Names = data.Names;
   // Unavailable in Docker < 1.10
-  if (data.NetworkSettings) {
+  if (data.NetworkSettings && !_.isEmpty(data.NetworkSettings.Networks)) {
     this.IP = data.NetworkSettings.Networks[Object.keys(data.NetworkSettings.Networks)[0]].IPAddress;
   }
   this.Image = data.Image;
