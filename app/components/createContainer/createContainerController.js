@@ -1,6 +1,6 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Messages',
-function ($scope, $state, $stateParams, Config, Info, Container, ContainerHelper, Image, Volume, Network, Messages) {
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Messages',
+function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, Volume, Network, Messages) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -235,7 +235,10 @@ function ($scope, $state, $stateParams, Config, Info, Container, ContainerHelper
     var container = $scope.formValues.NetworkContainer;
     var containerName = container;
     if (container && typeof container === 'object') {
-      containerName = container.Names[0];
+      containerName = $filter('trimcontainername')(container.Names[0]);
+      if ($scope.swarm_mode) {
+        containerName = $filter('swarmcontainername')(containerName);
+      }
     }
     var networkMode = mode;
     if (containerName) {
