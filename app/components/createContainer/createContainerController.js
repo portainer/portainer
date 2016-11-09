@@ -27,6 +27,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     }
   };
 
+  $scope.swarm_mode = false;
+
   $scope.addVolume = function() {
     $scope.formValues.Volumes.push({ name: '', containerPath: '' });
   };

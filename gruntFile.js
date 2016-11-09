@@ -277,7 +277,7 @@ module.exports = function (grunt) {
         },
         shell: {
             buildImage: {
-                command: 'docker build --rm -t portainer -f build/linux/Dockerfile .'
+                command: 'docker build --rm --no-cache -t portainer -f build/linux/Dockerfile .'
             },
             buildBinary: {
                 command: [
