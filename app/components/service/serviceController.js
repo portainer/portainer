@@ -8,43 +8,81 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
   $scope.sortType = 'Status';
   $scope.sortReverse = false;
 
+  var previousServiceValues = {};
+
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
   };
 
   $scope.renameService = function renameService(service) {
+    updateServiceAttribute(service, 'Name', service.newServiceName || service.name);
+    service.EditName = false;
+  };
+  $scope.changeServiceImage = function changeServiceImage(service) {
+    updateServiceAttribute(service, 'Image', service.newServiceImage || service.image);
+    service.EditImage = false;
+  };
+  $scope.scaleService = function scaleService(service) {
+    updateServiceAttribute(service, 'Replicas', service.newServiceReplicas || service.Replicas);
+    service.EditReplicas = false;
+  };
+
+  $scope.addEnvironmentVariable = function addEnvironmentVariable(service) {
+    service.EnvironmentVariables.push({ key: '', value: '', originalValue: '' });
+    service.hasChanges = true;
+  };
+  $scope.removeEnvironmentVariable = function removeEnvironmentVariable(service, index) {
+    var removedElement = service.EnvironmentVariables.splice(index, 1);
+    service.hasChanges = service.hasChanges || removedElement !== null;
+  };
+  $scope.updateEnvironmentVariable = function updateEnvironmentVariable(service, variable) {
+    service.hasChanges = service.hasChanges || variable.value !== variable.originalValue;
+  };
+  $scope.addLabel = function addLabel(service) {
+    service.hasChanges = true;
+    service.ServiceLabels.push({ key: '', value: '', originalValue: '' });
+  };
+  $scope.removeLabel = function removeLabel(service, index) {
+    var removedElement = service.ServiceLabels.splice(index, 1);
+    service.hasChanges = service.hasChanges || removedElement !== null;
+  };
+  $scope.updateLabel = function updateLabel(service, label) {
+    service.hasChanges = service.hasChanges || label.value !== label.originalValue;
+  };
+
+  $scope.cancelChanges = function changeServiceImage(service) {
+    Object.keys(previousServiceValues).forEach(function(attribute) {
+      service[attribute] = previousServiceValues[attribute]; // reset service values
+      service['newService' + attribute] = previousServiceValues[attribute]; // reset edit fields
+    });
+    previousServiceValues = {}; // clear out all changes
+    // clear out environment variable changes
+    service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
+    service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
+
+    service.hasChanges = false;
+  };
+
+  $scope.updateService = function updateService(service) {
     $('#loadServicesSpinner').show();
-    var serviceName = service.Name;
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Name = service.newServiceName;
+    config.TaskTemplate.ContainerSpec.Env = translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
+    config.TaskTemplate.ContainerSpec.Labels = translateServiceLabelsToLabels(service.ServiceLabels);
+    config.TaskTemplate.ContainerSpec.Image = service.newServiceImage;
+    config.Mode.Replicated.Replicas = service.Replicas;
+
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadServicesSpinner').hide();
-      Messages.send("Service successfully renamed", "New name: " + service.newServiceName);
+      Messages.send("Service successfully updated", "Service updated");
       $state.go('service', {id: service.Id}, {reload: true});
     }, function (e) {
       $('#loadServicesSpinner').hide();
-      service.EditName = false;
-      service.Name = serviceName;
-      Messages.error("Failure", e, "Unable to rename service");
+      Messages.error("Failure", e, "Unable to update service");
     });
   };
 
-  $scope.scaleService = function scaleService(service) {
-    $('#loadServicesSpinner').show();
-    var config = ServiceHelper.serviceToConfig(service.Model);
-    config.Mode.Replicated.Replicas = service.Replicas;
-    Service.update({ id: service.Id, version: service.Version }, config, function (data) {
-      $('#loadServicesSpinner').hide();
-      Messages.send("Service successfully scaled", "New replica count: " + service.Replicas);
-      $state.go('service', {id: service.Id}, {reload: true});
-    }, function (e) {
-      $('#loadServicesSpinner').hide();
-      service.Scale = false;
-      service.Replicas = service.ReplicaCount;
-      Messages.error("Failure", e, "Unable to scale service");
-    });
-  };
 
   $scope.removeService = function removeService() {
     $('#loadingViewSpinner').show();
@@ -68,6 +106,11 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     Service.get({id: $stateParams.id}, function (d) {
       var service = new ServiceViewModel(d);
       service.newServiceName = service.Name;
+      service.newServiceImage = service.Image;
+      service.newServiceReplicas = service.Replicas;
+      service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
+      service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
+
       $scope.service = service;
       Task.query({filters: {service: [service.Name]}}, function (tasks) {
         Node.query({}, function (nodes) {
@@ -91,6 +134,60 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
       $('#loadingViewSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve service details");
     });
+  }
+
+  function updateServiceAttribute(service, name, newValue) {
+    // ensure we only capture the original previous value, in case we update the attribute multiple times
+    if (!previousServiceValues[name]) {
+      previousServiceValues[name] = service[name];
+    }
+    // update the attribute
+    service[name] = newValue;
+    service.hasChanges = true;
+  }
+
+  function translateEnvironmentVariables(env) {
+    if (env) {
+      var variables = [];
+      env.forEach(function(variable) {
+        var keyValue = variable.split('=');
+        var originalValue = (keyValue.length > 1) ? keyValue[1] : '';
+        variables.push({ key: keyValue[0], value: originalValue, originalValue: originalValue, added: true});
+      });
+      return variables;
+    }
+    return [];
+  }
+  function translateEnvironmentVariablesToEnv(env) {
+    if (env) {
+      var variables = [];
+      env.forEach(function(variable) {
+        if (variable.key && variable.key !== '' && variable.value && variable.value !== '') {
+          variables.push(variable.key + '=' + variable.value);
+        }
+      });
+      return variables;
+    }
+    return [];
+  }
+
+  function translateLabelsToServiceLabels(Labels) {
+    var labels = [];
+    if (Labels) {
+      Object.keys(Labels).forEach(function(key) {
+        labels.push({ key: key, value: Labels[key], originalValue: Labels[key], added: true});
+      });
+    }
+    return labels;
+  }
+  function translateServiceLabelsToLabels(labels) {
+    var Labels = {};
+    if (labels) {
+      labels.forEach(function(label) {
+        Labels[label.key] = label.value;
+      });
+    }
+    return Labels;
   }
 
   fetchServiceDetails();

@@ -43,20 +43,29 @@
             <tr ng-if="service.Mode === 'replicated'">
               <td>Replicas</td>
               <td>
-                <span ng-if="service.Mode === 'replicated' && !service.Scale">
+                <span ng-if="service.Mode === 'replicated' && !service.EditReplicas">
                   {{ service.Replicas }}
-                  <a class="interactive" ng-click="service.Scale = true; service.ReplicaCount = service.Replicas;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Scale</a>
+                  <a class="interactive" ng-click="service.EditReplicas = true;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Scale</a>
                 </span>
-                <span ng-if="service.Mode === 'replicated' && service.Scale">
-                  <input class="input-sm" type="number" ng-model="service.Replicas" />
-                  <a class="interactive" ng-click="service.Scale = false;"><i class="fa fa-times"></i></a>
+                <span ng-if="service.Mode === 'replicated' && service.EditReplicas">
+                  <input class="input-sm" type="number" ng-model="service.newServiceReplicas" />
+                  <a class="interactive" ng-click="service.EditReplicas = false;"><i class="fa fa-times"></i></a>
                   <a class="interactive" ng-click="scaleService(service)"><i class="fa fa-check-square-o"></i></a>
                 </span>
               </td>
             </tr>
             <tr>
               <td>Image</td>
-              <td>{{ service.Image }}</td>
+              <td ng-if="!service.EditImage">
+                {{ service.Image }}
+                <a href="" data-toggle="tooltip" title="Edit service image" ng-click="service.EditImage = true;"><i class="fa fa-edit"></i></a>
+              </td>
+
+              <td ng-if="service.EditImage">
+                <input type="text" class="containerNameInput" ng-model="service.newServiceImage">
+                <a class="interactive" ng-click="service.EditImage = false;"><i class="fa fa-times"></i></a>
+                <a class="interactive" ng-click="changeServiceImage(service)"><i class="fa fa-check-square-o"></i></a>
+              </td>
             </tr>
             <tr ng-if="service.Ports">
               <td>Published ports</td>
@@ -66,31 +75,77 @@
                 </div>
               </td>
             </tr>
-            <tr ng-if="service.Env">
-              <td>Env</td>
+            <tr ng-if="service.EnvironmentVariables">
+              <td>Environment variables</td>
               <td>
-                <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="var in service.Env">
-                    <td>{{ var|key: '=' }}</td>
-                    <td>{{ var|value: '=' }}</td>
-                  </tr>
-                </table>
+                <div class="form-group">
+                  <div class="col-sm-11 nopadding">
+                    <span class="label label-default interactive fit-text-size" ng-click="addEnvironmentVariable(service)">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> environment variable
+                    </span>
+                  </div>
+                  <!-- environment-variable-input-list -->
+                  <div class="col-sm-11 form-inline nopadding" style="margin-top: 10px;">
+                    <div ng-repeat="var in service.EnvironmentVariables" style="margin-top: 2px;">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon fit-text-size">name</span>
+                        <input type="text" class="form-control" ng-model="var.key" ng-disabled="var.added" placeholder="e.g. FOO">
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon fit-text-size">value</span>
+                        <input type="text" class="form-control" ng-model="var.value" ng-change="updateEnvironmentVariable(service, var)" placeholder="e.g. bar">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="button" ng-click="removeEnvironmentVariable(service, $index)">
+                            <i class="fa fa-minus" aria-hidden="true"></i>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- !environment-variable-input-list -->
+                </div>
               </td>
             </tr>
-            <tr ng-if="service.Labels">
+            <tr>
               <td>Labels</td>
               <td>
-                <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="(k, v) in service.Labels">
-                    <td>{{ k }}</td>
-                    <td>{{ v }}</td>
-                  </tr>
-                </table>
+                <div class="form-group">
+                  <div class="col-sm-11 nopadding">
+                    <span class="label label-default interactive fit-text-size" ng-click="addLabel(service)">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> label
+                    </span>
+                  </div>
+                  <!-- labels-input-list -->
+                  <div class="col-sm-11 form-inline nopadding" style="margin-top: 10px;">
+                    <div ng-repeat="label in service.ServiceLabels" style="margin-top: 2px;">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon fit-text-size">name</span>
+                        <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="updateLabel(service, label)">
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon fit-text-size">value</span>
+                        <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateLabel(service, label)">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="button" ng-click="removeLabel(service, $index)">
+                            <i class="fa fa-minus" aria-hidden="true"></i>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- !labels-input-list -->
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
       </rd-widget-body>
+      <rd-widget-footer ng-if="service.hasChanges">
+        <div>
+            <button type="button" class="btn btn-primary" ng-click="updateService(service)">Save changes</button>
+            <button type="button" class="btn btn-default" ng-click="cancelChanges(service)">Reset</button>
+        </div>
+      </rd-widget-footer>
     </rd-widget>
   </div>
 </div>

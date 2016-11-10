@@ -63,6 +63,7 @@ module.exports = function (grunt) {
     grunt.registerTask('test-watch', ['karma:watch']);
     grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
     grunt.registerTask('run-swarm', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
+    grunt.registerTask('run-swarm-local', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarmLocal', 'watch:buildSwarm']);
     grunt.registerTask('run-dev', ['if:unixBinaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
     grunt.registerTask('run-ssl', ['if:unixBinaryNotExist', 'shell:buildImage', 'shell:runSsl', 'watch:buildSsl']);
     grunt.registerTask('clear', ['clean:app']);
@@ -316,6 +317,13 @@ module.exports = function (grunt) {
                     'docker rm portainer',
                     'docker run -d -p 9000:9000 -v /tmp/portainer:/data --name portainer portainer -H tcp://10.0.7.10:2375 --swarm -d /data'
                 ].join(';')
+            },
+            runSwarmLocal: {
+              command: [
+                  'docker stop portainer',
+                  'docker rm portainer',
+                  'docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --swarm'
+              ].join(';')
             },
             runSsl: {
                 command: [

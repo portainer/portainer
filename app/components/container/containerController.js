@@ -162,7 +162,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       } else {
         $('#loadingViewSpinner').hide();
         Messages.send("Container left network", $stateParams.id);
-        $state.go('network', {id: network.Id}, {reload: true});
+        $state.go('container', {id: $stateParams.id}, {reload: true});
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
