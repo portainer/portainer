@@ -76,23 +76,23 @@
               </td>
             </tr>
             <tr ng-if="service.EnvironmentVariables">
-              <td>Environment Variables</td>
+              <td>Environment variables</td>
               <td>
                 <div class="form-group">
-                  <div class="col-sm-11">
-                    <span class="label label-default interactive" ng-click="addEnvironmentVariable(service)">
+                  <div class="col-sm-11 nopadding">
+                    <span class="label label-default interactive fit-text-size" ng-click="addEnvironmentVariable(service)">
                       <i class="fa fa-plus-circle" aria-hidden="true"></i> environment variable
                     </span>
                   </div>
                   <!-- environment-variable-input-list -->
-                  <div class="col-sm-11 form-inline" style="margin-top: 10px;">
+                  <div class="col-sm-11 form-inline nopadding" style="margin-top: 10px;">
                     <div ng-repeat="var in service.EnvironmentVariables" style="margin-top: 2px;">
                       <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon">name</span>
+                        <span class="input-group-addon fit-text-size">name</span>
                         <input type="text" class="form-control" ng-model="var.key" ng-disabled="var.added" placeholder="e.g. FOO">
                       </div>
                       <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon">value</span>
+                        <span class="input-group-addon fit-text-size">value</span>
                         <input type="text" class="form-control" ng-model="var.value" ng-change="updateEnvironmentVariable(service, var)" placeholder="e.g. bar">
                         <span class="input-group-btn">
                           <button class="btn btn-default" type="button" ng-click="removeEnvironmentVariable(service, $index)">
@@ -110,20 +110,20 @@
               <td>Labels</td>
               <td>
                 <div class="form-group">
-                  <div class="col-sm-11">
-                    <span class="label label-default interactive" ng-click="addLabel(service)">
+                  <div class="col-sm-11 nopadding">
+                    <span class="label label-default interactive fit-text-size" ng-click="addLabel(service)">
                       <i class="fa fa-plus-circle" aria-hidden="true"></i> label
                     </span>
                   </div>
                   <!-- labels-input-list -->
-                  <div class="col-sm-11 form-inline" style="margin-top: 10px;">
+                  <div class="col-sm-11 form-inline nopadding" style="margin-top: 10px;">
                     <div ng-repeat="label in service.ServiceLabels" style="margin-top: 2px;">
                       <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon">name</span>
+                        <span class="input-group-addon fit-text-size">name</span>
                         <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="updateLabel(service, label)">
                       </div>
                       <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon">value</span>
+                        <span class="input-group-addon fit-text-size">value</span>
                         <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateLabel(service, label)">
                         <span class="input-group-btn">
                           <button class="btn btn-default" type="button" ng-click="removeLabel(service, $index)">
@@ -142,7 +142,7 @@
       </rd-widget-body>
       <rd-widget-footer ng-if="service.hasChanges">
         <div>
-            <button type="button" class="btn btn-primary" ng-click="updateService(service)">Save Changes</button>
+            <button type="button" class="btn btn-primary" ng-click="updateService(service)">Save changes</button>
             <button type="button" class="btn btn-default" ng-click="cancelChanges(service)">Reset</button>
         </div>
       </rd-widget-footer>

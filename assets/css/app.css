@@ -84,6 +84,14 @@ input[type="radio"] {
   margin-right: 5px;
 }
 
+.widget .widget-body table tbody .fit-text-size {
+  font-size: 90% !important;
+}
+
+.nopadding {
+  padding: 0 !important;
+}
+
 .terminal-container {
   width: 100%;
   padding: 10px 5px;
