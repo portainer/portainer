@@ -68,7 +68,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
     Network.query({}, function (d) {
       var networks = d;
-      if (swarm) {
+      if ($scope.swarm) {
         networks = d.filter(function (network) {
           if (network.Scope === 'global') {
             return network;
@@ -236,8 +236,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = $filter('trimcontainername')(container.Names[0]);
-      if ($scope.swarm_mode) {
-        containerName = $filter('swarmcontainername')(containerName);
+      if ($scope.swarm_mode && containerName.indexOf('/') != -1) {
+        containerName = $filter('swarmcontainername')(container);
       }
     }
     var networkMode = mode;
