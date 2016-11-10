@@ -27,8 +27,6 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     }
   };
 
-  $scope.swarm_mode = false;
-
   $scope.addVolume = function() {
     $scope.formValues.Volumes.push({ name: '', containerPath: '' });
   };
@@ -54,9 +52,9 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   };
 
   Config.$promise.then(function (c) {
-    var swarm = c.swarm;
+    $scope.swarm = c.swarm;
     Info.get({}, function(info) {
-      if (swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
+      if ($scope.swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
         $scope.swarm_mode = true;
       }
     });
