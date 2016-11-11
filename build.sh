@@ -18,12 +18,14 @@ rm -rf /tmp/portainer-build-win && mkdir -pv /tmp/portainer-build-win/portainer
 mv dist/* /tmp/portainer-build-win/portainer
 cd /tmp/portainer-build-win
 tar cvpfz portainer-${VERSION}-windows-amd64.tar.gz portainer
+cd -
 
 grunt release-arm
 rm -rf /tmp/portainer-build-arm && mkdir -pv /tmp/portainer-build-arm/portainer
 mv dist/* /tmp/portainer-build-arm/portainer
 cd /tmp/portainer-build-arm
 tar cvpfz portainer-${VERSION}-linux-arm.tar.gz portainer
+cd -
 
 grunt release-macos
 rm -rf /tmp/portainer-build-darwin && mkdir -pv /tmp/portainer-build-darwin/portainer
