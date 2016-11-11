@@ -71,7 +71,9 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     config.TaskTemplate.ContainerSpec.Env = translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
     config.TaskTemplate.ContainerSpec.Labels = translateServiceLabelsToLabels(service.ServiceLabels);
     config.TaskTemplate.ContainerSpec.Image = service.newServiceImage;
-    config.Mode.Replicated.Replicas = service.Replicas;
+    if (service.Mode === 'replicated') {
+      config.Mode.Replicated.Replicas = service.Replicas;
+    }
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadServicesSpinner').hide();
