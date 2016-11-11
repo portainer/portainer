@@ -16,7 +16,7 @@ module.exports = function (grunt) {
     grunt.registerTask('default', ['jshint', 'build', 'karma:unit']);
     grunt.registerTask('build', [
         'clean:app',
-        'if:binaryNotExist',
+        'if:unixBinaryNotExist',
         'html2js',
         'concat',
         'clean:tmpl',
@@ -25,7 +25,43 @@ module.exports = function (grunt) {
     ]);
     grunt.registerTask('release', [
         'clean:all',
-        'if:binaryNotExist',
+        'if:unixBinaryNotExist',
+        'html2js',
+        'uglify',
+        'clean:tmpl',
+        'jshint',
+        //'karma:unit',
+        'concat:index',
+        'recess:min',
+        'copy'
+    ]);
+    grunt.registerTask('release-win', [
+        'clean:all',
+        'if:windowsBinaryNotExist',
+        'html2js',
+        'uglify',
+        'clean:tmpl',
+        'jshint',
+        //'karma:unit',
+        'concat:index',
+        'recess:min',
+        'copy'
+    ]);
+    grunt.registerTask('release-arm', [
+        'clean:all',
+        'if:unixArmBinaryNotExist',
+        'html2js',
+        'uglify',
+        'clean:tmpl',
+        'jshint',
+        //'karma:unit',
+        'concat:index',
+        'recess:min',
+        'copy'
+    ]);
+    grunt.registerTask('release-macos', [
+        'clean:all',
+        'if:darwinBinaryNotExist',
         'html2js',
         'uglify',
         'clean:tmpl',
@@ -37,10 +73,11 @@ module.exports = function (grunt) {
     ]);
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test-watch', ['karma:watch']);
-    grunt.registerTask('run', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
-    grunt.registerTask('run-swarm', ['if:binaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
-    grunt.registerTask('run-dev', ['if:binaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
-    grunt.registerTask('run-ssl', ['if:binaryNotExist', 'shell:buildImage', 'shell:runSsl', 'watch:buildSsl']);
+    grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
+    grunt.registerTask('run-swarm', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
+    grunt.registerTask('run-swarm-local', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarmLocal', 'watch:buildSwarm']);
+    grunt.registerTask('run-dev', ['if:unixBinaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
+    grunt.registerTask('run-ssl', ['if:unixBinaryNotExist', 'shell:buildImage', 'shell:runSsl', 'watch:buildSsl']);
     grunt.registerTask('clear', ['clean:app']);
 
     // Print a timestamp (useful for when watching)
@@ -253,7 +290,7 @@ module.exports = function (grunt) {
         },
         shell: {
             buildImage: {
-                command: 'docker build --rm -t portainer .'
+                command: 'docker build --rm -t portainer -f build/linux/Dockerfile .'
             },
             buildBinary: {
                 command: [
@@ -261,6 +298,30 @@ module.exports = function (grunt) {
                     'shasum api/portainer > portainer-checksum.txt',
                     'mkdir -p dist',
                     'mv api/portainer dist/'
+                ].join(' && ')
+            },
+            buildUnixArmBinary: {
+                command: [
+                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm" centurylink/golang-builder-cross',
+                    'shasum api/portainer-linux-arm > portainer-checksum.txt',
+                    'mkdir -p dist',
+                    'mv api/portainer-linux-arm dist/portainer'
+                ].join(' && ')
+            },
+            buildDarwinBinary: {
+                command: [
+                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="darwin" -e BUILD_GOARCH="amd64" centurylink/golang-builder-cross',
+                    'shasum api/portainer-darwin-amd64 > portainer-checksum.txt',
+                    'mkdir -p dist',
+                    'mv api/portainer-darwin-amd64 dist/portainer'
+                ].join(' && ')
+            },
+            buildWindowsBinary: {
+                command: [
+                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="windows" -e BUILD_GOARCH="amd64" centurylink/golang-builder-cross',
+                    'shasum api/portainer-windows-amd64 > portainer-checksum.txt',
+                    'mkdir -p dist',
+                    'mv api/portainer-windows-amd64 dist/portainer.exe'
                 ].join(' && ')
             },
             run: {
@@ -277,6 +338,13 @@ module.exports = function (grunt) {
                     'docker run -d -p 9000:9000 -v /tmp/portainer:/data --name portainer portainer -H tcp://10.0.7.10:2375 --swarm -d /data'
                 ].join(';')
             },
+            runSwarmLocal: {
+              command: [
+                  'docker stop portainer',
+                  'docker rm portainer',
+                  'docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --swarm'
+              ].join(';')
+            },
             runSsl: {
                 command: [
                     'docker stop portainer',
@@ -289,11 +357,29 @@ module.exports = function (grunt) {
             }
         },
         'if': {
-            binaryNotExist: {
-                options: {
-                    executable: 'dist/portainer'
-                },
-                ifFalse: ['shell:buildBinary']
+            unixBinaryNotExist: {
+              options: {
+                  executable: 'dist/portainer'
+              },
+              ifFalse: ['shell:buildBinary']
+            },
+            unixArmBinaryNotExist: {
+              options: {
+                  executable: 'dist/portainer'
+              },
+              ifFalse: ['shell:buildUnixArmBinary']
+            },
+            darwinBinaryNotExist: {
+              options: {
+                  executable: 'dist/portainer'
+              },
+              ifFalse: ['shell:buildDarwinBinary']
+            },
+            windowsBinaryNotExist: {
+              options: {
+                  executable: 'dist/portainer.exe'
+              },
+              ifFalse: ['shell:buildWindowsBinary']
             }
         }
     });

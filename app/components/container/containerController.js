@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Messages',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Messages) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Network', 'Messages',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Network, Messages) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -151,6 +151,23 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       Messages.error("Failure", e, 'Unable to rename container');
     });
     $scope.container.edit = false;
+  };
+
+  $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
+    $('#loadingViewSpinner').show();
+    Network.disconnect({id: networkId}, { Container: $stateParams.id, Force: false }, function (d) {
+      if (d.message) {
+        $('#loadingViewSpinner').hide();
+        Messages.send("Error", {}, d.message);
+      } else {
+        $('#loadingViewSpinner').hide();
+        Messages.send("Container left network", $stateParams.id);
+        $state.go('container', {id: $stateParams.id}, {reload: true});
+      }
+    }, function (e) {
+      $('#loadingViewSpinner').hide();
+      Messages.error("Failure", e, "Unable to disconnect container from network");
+    });
   };
 
   update();

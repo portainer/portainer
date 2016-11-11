@@ -1,21 +1,18 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', 'Config', 'Info', 'Container', 'Image', 'Volume', 'Network', 'Messages',
-function ($scope, $state, Config, Info, Container, Image, Volume, Network, Messages) {
-
-  $scope.state = {
-    alwaysPull: true
-  };
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', 'Config', 'Info', 'Container', 'Image', 'Volume', 'Network', 'Messages',
+function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, Network, Messages) {
 
   $scope.formValues = {
+    alwaysPull: true,
     Console: 'none',
     Volumes: [],
-    AvailableRegistries: [],
     Registry: ''
   };
 
   $scope.imageConfig = {};
 
   $scope.config = {
+    Image: '',
     Env: [],
     ExposedPorts: {},
     HostConfig: {
@@ -61,8 +58,6 @@ function ($scope, $state, Config, Info, Container, Image, Volume, Network, Messa
       }
     });
 
-    $scope.formValues.AvailableRegistries = c.registries;
-
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
     }, function (e) {
@@ -83,6 +78,9 @@ function ($scope, $state, Config, Info, Container, Image, Volume, Network, Messa
         networks.push({Name: "none"});
       }
       $scope.availableNetworks = networks;
+      if (!_.find(networks, {'Name': 'bridge'})) {
+        $scope.config.HostConfig.NetworkMode = 'nat';
+      }
     }, function (e) {
       Messages.error("Failure", e, "Unable to retrieve networks");
     });
@@ -232,11 +230,10 @@ function ($scope, $state, Config, Info, Container, Image, Volume, Network, Messa
   $scope.create = function () {
     var config = prepareConfiguration();
     $('#createContainerSpinner').show();
-    if ($scope.state.alwaysPull) {
+    if ($scope.formValues.alwaysPull) {
       pullImageAndCreateContainer(config);
     } else {
       createContainer(config);
     }
   };
-
 }]);

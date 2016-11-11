@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title="Create container"></rd-header-title>
   <rd-header-content>
-    Containers > Add container
+    <a ui-sref="containers">Containers</a> > Add container
   </rd-header-content>
 </rd-header>
 
@@ -31,7 +31,7 @@
             <div class="col-sm-offset-1 col-sm-11">
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="state.alwaysPull"> Always pull image before creating
+                  <input type="checkbox" ng-model="formValues.alwaysPull"> Always pull image before creating
                 </label>
               </div>
             </div>
@@ -53,6 +53,10 @@
                 <input type="radio" name="container_restart_policy" ng-model="config.HostConfig.RestartPolicy.Name" value="on-failure">
                 <span class="radio-value">On failure</span>
               </label>
+              <label class="radio-inline">
+                <input type="radio" name="container_restart_policy" ng-model="config.HostConfig.RestartPolicy.Name" value="unless-stopped">
+                <span class="radio-value">Unless stopped</span>
+              </label>
             </div>
           </div>
           <!-- !restart-policy -->
@@ -60,7 +64,7 @@
           <div class="form-group">
             <label for="container_ports" class="col-sm-1 control-label text-left">Port mapping</label>
             <div class="col-sm-11">
-              <span class="label label-default clickable" ng-click="addPortBinding()">
+              <span class="label label-default interactive" ng-click="addPortBinding()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> map port
               </span>
             </div>
@@ -102,10 +106,10 @@
     <rd-widget>
       <rd-widget-body>
         <ul class="nav nav-tabs">
-          <li class="active clickable"><a data-target="#command" data-toggle="tab">Command</a></li>
-          <li class="clickable"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
-          <li class="clickable"><a data-target="#network" data-toggle="tab">Network</a></li>
-          <li class="clickable"><a data-target="#security" data-toggle="tab">Security/Host</a></li>
+          <li class="active interactive"><a data-target="#command" data-toggle="tab">Command</a></li>
+          <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
+          <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
+          <li class="interactive"><a data-target="#security" data-toggle="tab">Security/Host</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -177,7 +181,7 @@
               <div class="form-group">
                 <label for="container_env" class="col-sm-1 control-label text-left">Environment variables</label>
                 <div class="col-sm-11">
-                  <span class="label label-default clickable" ng-click="addEnvironmentVariable()">
+                  <span class="label label-default interactive" ng-click="addEnvironmentVariable()">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i> environment variable
                   </span>
                 </div>
@@ -212,7 +216,7 @@
               <div class="form-group">
                 <label for="container_volumes" class="col-sm-1 control-label text-left">Volumes</label>
                 <div class="col-sm-11">
-                  <span class="label label-default clickable" ng-click="addVolume()">
+                  <span class="label label-default interactive" ng-click="addVolume()">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i> volume
                   </span>
                 </div>

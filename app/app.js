@@ -33,9 +33,6 @@ angular.module('portainer', [
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function ($stateProvider, $urlRouterProvider, $httpProvider) {
     'use strict';
 
-    $httpProvider.defaults.xsrfCookieName = 'csrfToken';
-    $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-Token';
-
     $urlRouterProvider.otherwise('/');
 
     $stateProvider
@@ -161,6 +158,8 @@ angular.module('portainer', [
     });
 
     // The Docker API likes to return plaintext errors, this catches them and disp
+    // $httpProvider.defaults.xsrfCookieName = 'csrfToken';
+    // $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-Token';
     $httpProvider.interceptors.push(function() {
       return {
         'response': function(response) {
@@ -172,10 +171,11 @@ angular.module('portainer', [
               time: 10000
             });
           }
-          var csrfToken = response.headers('X-Csrf-Token');
-          if (csrfToken) {
-            document.cookie = 'csrfToken=' + csrfToken;
-          }
+          // CSRF protection is disabled for the moment
+          // var csrfToken = response.headers('X-Csrf-Token');
+          // if (csrfToken) {
+          //   document.cookie = 'csrfToken=' + csrfToken;
+          // }
           return response;
         }
       };
@@ -188,4 +188,4 @@ angular.module('portainer', [
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('CONFIG_ENDPOINT', 'settings')
   .constant('TEMPLATES_ENDPOINT', 'templates')
-  .constant('UI_VERSION', 'v1.9.3');
+  .constant('UI_VERSION', 'v1.10.0');

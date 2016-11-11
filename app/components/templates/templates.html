@@ -7,10 +7,10 @@
   <rd-header-content>Templates</rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="selectedTemplate">
+<div class="row" ng-if="state.selectedTemplate">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-custom-header icon="selectedTemplate.logo" title="selectedTemplate.image">
+      <rd-widget-custom-header icon="state.selectedTemplate.logo" title="state.selectedTemplate.image">
       </rd-widget-custom-header>
       <rd-widget-body classes="padding">
         <form class="form-horizontal">
@@ -39,7 +39,7 @@
             </div>
           </div>
           <!-- !name-and-network-inputs -->
-          <div ng-repeat="var in selectedTemplate.env" ng-if="!var.set" class="form-group">
+          <div ng-repeat="var in state.selectedTemplate.env" ng-if="!var.set" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
             <div class="col-sm-10">
               <select ng-if="(!swarm || swarm && swarm_mode) && var.type === 'container'" ng-options="container|containername for container in runningContainers" class="selectpicker form-control" ng-model="var.value">
@@ -53,6 +53,50 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
+              <a class="small interactive" ng-if="!state.showAdvancedOptions" ng-click="state.showAdvancedOptions = true;">
+                <i class="fa fa-plus space-right" aria-hidden="true"></i> Show advanced options
+              </a>
+              <a class="small interactive" ng-if="state.showAdvancedOptions" ng-click="state.showAdvancedOptions = false;">
+                <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide advanced options
+              </a>
+            </div>
+          </div>
+          <div class="form-group" ng-if="state.showAdvancedOptions">
+            <label for="container_ports" class="col-sm-1 control-label text-left">Port mapping</label>
+            <div class="col-sm-11" style="margin-top: 5px;">
+              <span class="label label-default interactive" ng-click="addPortBinding()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional port
+              </span>
+            </div>
+            <!-- port-mapping-input-list -->
+            <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+              <div ng-repeat="portBinding in formValues.ports" style="margin-top: 2px;">
+                <div class="input-group col-sm-5 input-group-sm">
+                  <span class="input-group-addon">host</span>
+                  <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
+                </div>
+                <div class="input-group col-sm-5 input-group-sm">
+                  <span class="input-group-addon">container</span>
+                  <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
+                </div>
+                <div class="input-group col-sm-1 input-group-sm">
+                  <select class="selectpicker form-control" ng-model="portBinding.protocol">
+                    <option value="tcp">tcp</option>
+                    <option value="udp">udp</option>
+                  </select>
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="removePortBinding($index)">
+                      <i class="fa fa-minus" aria-hidden="true"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <!-- !port-mapping-input-list -->
+          </div>
+          <!-- !port-mapping -->
+          <div class="form-group">
+            <div class="col-sm-12">
               <button type="button" class="btn btn-default btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
               <i id="createContainerSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
@@ -63,7 +107,7 @@
   </div>
 </div>
 
-<div class="row" ng-if="selectedTemplate">
+<div class="row" ng-if="state.selectedTemplate">
 
 </div>
 

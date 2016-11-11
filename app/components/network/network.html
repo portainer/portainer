@@ -3,7 +3,7 @@
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    Networks > <a ui-sref="network({id: network.Id})">{{ network.Name }}</a>
+    <a ui-sref="networks">Networks</a> > <a ui-sref="network({id: network.Id})">{{ network.Name }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -22,7 +22,7 @@
               <td>ID</td>
               <td>
                 {{ network.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeNetwork(network.Id)"><i class="fa fa-trash btn-ico" aria-hidden="true"></i>Delete this network</button>
+                <button class="btn btn-xs btn-danger" ng-click="removeNetwork(network.Id)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this network</button>
               </td>
             </tr>
             <tr>

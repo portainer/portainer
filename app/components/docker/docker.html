@@ -3,139 +3,113 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>Docker</rd-header-content>
 </rd-header>
-<div class="row">
-  <div class="col-lg-3 col-md-6 col-xs-12">
+
+<div class="row" ng-if="state.loaded">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon pull-left">
-          <i class="fa fa-code"></i>
-        </div>
-        <div class="title">{{ docker.Version }}</div>
-        <div class="comment">Docker version</div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-  <div class="col-lg-3 col-md-6 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon pull-left">
-          <i class="fa fa-code"></i>
-        </div>
-        <div class="title">{{ docker.ApiVersion }}</div>
-        <div class="comment">API version</div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-  <div class="col-lg-3 col-md-6 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon pull-left">
-          <i class="fa fa-code"></i>
-        </div>
-        <div class="title">{{ docker.GoVersion }}</div>
-        <div class="comment">Go version</div>
+      <rd-widget-header icon="fa-code" title="Engine version"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Version</td>
+              <td>{{ version.Version }}</td>
+            </tr>
+            <tr>
+              <td>API version</td>
+              <td>{{ version.ApiVersion }}</td>
+            </tr>
+            <tr>
+              <td>Go version</td>
+              <td>{{ version.GoVersion }}</td>
+            </tr>
+            <tr>
+              <td>OS type</td>
+              <td>{{ version.Os }}</td>
+            </tr>
+            <tr>
+              <td>OS</td>
+              <td>{{ info.OperatingSystem }}</td>
+            </tr>
+            <tr>
+              <td>Architecture</td>
+              <td>{{ version.Arch }}</td>
+            </tr>
+            <tr>
+              <td>Kernel version</td>
+              <td>{{ version.KernelVersion }}</td>
+            </tr>
+          </tbody>
+        </table>
       </rd-widget-body>
     </rd-widget>
   </div>
 </div>
 
-<div class="row">
-  <div class="col-lg-12">
+<div class="row" ng-if="state.loaded">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-object-group" title="Engine status"></rd-widget-header>
+      <rd-widget-header icon="fa-th" title="Engine status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
             <tr>
-              <td>Containers</td>
-              <td>{{ info.Containers }}</td>
-            </tr>
-            <tr>
-              <td>Images</td>
-              <td>{{ info.Images }}</td>
-            </tr>
-            <tr>
-              <td>Debug</td>
-              <td>{{ info.Debug }}</td>
-            </tr>
-            <tr>
-              <td>CPUs</td>
+              <td>Total CPU</td>
               <td>{{ info.NCPU }}</td>
             </tr>
             <tr>
-              <td>Total Memory</td>
+              <td>Total memory</td>
               <td>{{ info.MemTotal|humansize }}</td>
             </tr>
             <tr>
-              <td>Operating System</td>
-              <td>{{ info.OperatingSystem }}</td>
-            </tr>
-            <tr>
-              <td>Kernel Version</td>
-              <td>{{ info.KernelVersion }}</td>
-            </tr>
-            <tr>
-              <td>ID</td>
-              <td>{{ info.ID }}</td>
-            </tr>
-            <tr>
-              <td>Labels</td>
-              <td>{{ info.Labels }}</td>
-            </tr>
-            <tr>
-              <td>File Descriptors</td>
-              <td>{{ info.NFd }}</td>
-            </tr>
-            <tr>
-              <td>Goroutines</td>
-              <td>{{ info.NGoroutines }}</td>
-            </tr>
-            <tr>
-              <td>Storage Driver</td>
-              <td>{{ info.Driver }}</td>
-            </tr>
-            <tr>
-              <td>Storage Driver Status</td>
-              <td>
-                <p ng-repeat="val in info.DriverStatus">
-                  {{ val[0] }}: {{ val[1] }}
-                </p>
-              </td>
-            </tr>
-            <tr>
-              <td>Execution Driver</td>
-              <td>{{ info.ExecutionDriver }}</td>
-            </tr>
-            <tr>
-              <td>IPv4 Forwarding</td>
-              <td>{{ info.IPv4Forwarding }}</td>
-            </tr>
-            <tr>
-              <td>Index Server Address</td>
-              <td>{{ info.IndexServerAddress }}</td>
-            </tr>
-            <tr>
-              <td>Init Path</td>
-              <td>{{ info.InitPath }}</td>
-            </tr>
-            <tr>
-              <td>Docker Root Directory</td>
+              <td>Docker root directory</td>
               <td>{{ info.DockerRootDir }}</td>
             </tr>
             <tr>
-              <td>Init SHA1</td>
-              <td>{{ info.InitSha1 }}</td>
+              <td>Storage driver</td>
+              <td>{{ info.Driver }}</td>
             </tr>
             <tr>
-              <td>Memory Limit</td>
-              <td>{{ info.MemoryLimit }}</td>
+              <td>Logging driver</td>
+              <td>{{ info.LoggingDriver }}</td>
             </tr>
-            <tr>
-              <td>Swap Limit</td>
-              <td>{{ info.SwapLimit }}</td>
+            <tr ng-if="info.CgroupDriver">
+              <td>Cgroup driver</td>
+              <td>{{ info.CgroupDriver }}</td>
+            </tr>
+            <tr ng-if="info.ExecutionDriver">
+              <td>Execution driver</td>
+              <td>{{ info.ExecutionDriver }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="state.loaded && info.Plugins">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plug" title="Engine plugins"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr ng-if="info.Plugins.Volume">
+              <td>Volume</td>
+              <td>{{ info.Plugins.Volume|arraytostr: ', '}}</td>
+            </tr>
+            <tr ng-if="info.Plugins.Network">
+              <td>Network</td>
+              <td>{{ info.Plugins.Network|arraytostr: ', '}}</td>
+            </tr>
+            <tr ng-if="info.Plugins.Authorization">
+              <td>Authorization</td>
+              <td>{{ info.Plugins.Authorization|arraytostr: ', '}}</td>
             </tr>
           </tbody>
         </table>

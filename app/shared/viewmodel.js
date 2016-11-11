@@ -35,8 +35,8 @@ function ServiceViewModel(data) {
   } else {
     this.Mode = 'global';
   }
-  if (data.Spec.Labels) {
-    this.Labels = data.Spec.Labels;
+  if (data.Spec.TaskTemplate.ContainerSpec) {
+    this.Labels = data.Spec.TaskTemplate.ContainerSpec.Labels;
   }
   if (data.Spec.TaskTemplate.ContainerSpec.Env) {
     this.Env = data.Spec.TaskTemplate.ContainerSpec.Env;
@@ -54,7 +54,7 @@ function ContainerViewModel(data) {
   this.Status = data.Status;
   this.Names = data.Names;
   // Unavailable in Docker < 1.10
-  if (data.NetworkSettings) {
+  if (data.NetworkSettings && !_.isEmpty(data.NetworkSettings.Networks)) {
     this.IP = data.NetworkSettings.Networks[Object.keys(data.NetworkSettings.Networks)[0]].IPAddress;
   }
   this.Image = data.Image;

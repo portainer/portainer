@@ -3,7 +3,7 @@
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    Images > <a ui-sref="image({id: image.Id})">{{ image.Id }}</a>
+    <a ui-sref="images">Images</a> > <a ui-sref="image({id: image.Id})">{{ image.Id }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -13,7 +13,7 @@
       <rd-widget-header icon="fa fa-tags" title="Image tags"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <div style="margin: 5px 10px;">
-          <span ng-repeat="tag in RepoTags" class="label label-primary image-tag">
+          <span ng-repeat="tag in RepoTags" class="label label-primary image-tag space-right">
             <a data-toggle="tooltip" class="interactive" title="Push to registry" ng-click="pushImage(tag)">
               <i class="fa fa-upload white-icon" aria-hidden="true"></i>
             </a>
@@ -82,7 +82,7 @@
               <td>ID</td>
               <td>
                 {{ image.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)"><i class="fa fa-trash btn-ico" aria-hidden="true"></i>Delete this image</button>
+                <button class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this image</button>
               </td>
             </tr>
             <tr ng-if="image.Parent">
@@ -130,7 +130,7 @@
             <tr ng-if="image.ContainerConfig.ExposedPorts">
               <td>EXPOSE</td>
               <td>
-                <span class="label label-default tag" ng-repeat="port in exposedPorts">
+                <span class="label label-default space-right" ng-repeat="port in exposedPorts">
                   {{ port }}
                 </span>
               </td>
@@ -138,7 +138,7 @@
             <tr ng-if="image.ContainerConfig.Volumes">
               <td>VOLUME</td>
               <td>
-                <span class="label label-default tag" ng-repeat="volume in volumes">
+                <span class="label label-default space-right" ng-repeat="volume in volumes">
                   {{ volume }}
                 </span>
               </td>
