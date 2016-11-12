@@ -45,6 +45,16 @@ function ServiceViewModel(data) {
   if (data.Endpoint.Ports) {
     this.Ports = data.Endpoint.Ports;
   }
+  if (data.Spec.UpdateConfig) {
+    this.UpdateParallelism = data.Spec.UpdateConfig.Parallelism || 1;
+    this.UpdateDelay = data.Spec.UpdateConfig.Delay || 0;
+    this.UpdateFailureAction = data.Spec.UpdateConfig.FailureAction || 'pause';
+  } else {
+    this.UpdateParallelism = 1;
+    this.UpdateDelay = 0;
+    this.UpdateFailureAction = 'pause';
+  }
+
   this.Checked = false;
   this.Scale = false;
   this.EditName = false;

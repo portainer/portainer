@@ -17,7 +17,10 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     Volumes: [],
     Network: '',
     ExtraNetworks: [],
-    Ports: []
+    Ports: [],
+    Parallelism: 1,
+    UpdateDelay: 0,
+    FailureAction: 'pause'
   };
 
   $scope.addPortBinding = function() {
@@ -157,6 +160,14 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     config.Networks = _.uniqWith(networks, _.isEqual);
   }
 
+  function prepareUpdateConfig(config, input) {
+    config.UpdateConfig = {
+      Parallelism: input.Parallelism || 1,
+      Delay: input.UpdateDelay || 0,
+      FailureAction: input.FailureAction
+    };
+  }
+
   function prepareConfiguration() {
     var input = $scope.formValues;
     var config = {
@@ -177,6 +188,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     prepareLabelsConfig(config, input);
     prepareVolumes(config, input);
     prepareNetworks(config, input);
+    prepareUpdateConfig(config, input);
     return config;
   }
 

@@ -102,6 +102,7 @@
           <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
+          <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -316,7 +317,55 @@
             </form>
           </div>
           <!-- !tab-labels -->
+          <!-- tab-security -->
+          <div class="tab-pane" id="update-config">
+            <form class="form-horizontal" style="margin-top: 15px;">
+              <!-- parallelism-input -->
+              <div class="form-group">
+                <label for="parallelism" class="col-sm-1 control-label text-left">Parallelism</label>
+                <div class="col-sm-1">
+                  <input type="number" class="form-control" ng-model="formValues.Parallelism" id="parallelism" placeholder="e.g. 1">
+                </div>
+                <div class="col-sm-10">
+                  <p class="small text-muted">
+                    Maximum number of tasks to be updated simultaneously (0 to update all at once).
+                  </p>
+                </div>
+              </div>
+              <!-- !parallelism-input -->
+              <!-- delay-input -->
+              <div class="form-group">
+                <label for="update-delay" class="col-sm-1 control-label text-left">Delay</label>
+                <div class="col-sm-2">
+                  <input type="number" class="form-control" ng-model="formValues.UpdateDelay" id="update-delay" placeholder="e.g. 10">
+                </div>
+                <div class="col-sm-9">
+                  <p class="small text-muted">
+                    Amount of time between updates.
+                  </p>
+                </div>
+              </div>
+              <!-- !delay-input -->
+              <!-- failureAction-input -->
+              <div class="form-group">
+                <label for="failure_action" class="col-sm-1 control-label text-left">Failure Action</label>
+                <div class="col-sm-3">
+                  <label class="radio-inline">
+                    <input type="radio" name="failure_action" ng-model="formValues.FailureAction" value="continue">
+                    Continue
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" name="failure_action" ng-model="formValues.FailureAction" value="pause">
+                    Pause
+                  </label>
+                </div>
+                <div class="col-sm-8"></div>
+              </div>
+              <!-- !failureAction-input -->
 
+            </form>
+          </div>
+          <!-- !tab-security -->
           <!-- tab-security -->
           <div class="tab-pane" id="security">
           </div>
