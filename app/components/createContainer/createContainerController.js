@@ -236,7 +236,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = $filter('trimcontainername')(container.Names[0]);
-      if ($scope.swarm_mode && containerName.indexOf('/') != -1) {
+      if ($scope.swarm && !$scope.swarm_mode) {
         containerName = $filter('swarmcontainername')(container);
       }
     }
