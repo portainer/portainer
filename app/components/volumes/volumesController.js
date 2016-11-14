@@ -22,6 +22,28 @@ function ($scope, $state, Volume, Messages) {
     }
   };
 
+  $scope.removeDanglingVolumes = function() {
+    $('#loadVolumesSpinner').show();
+    Volume.query({filters: { "dangling": [ "true" ] }}, function (d) {
+      angular.forEach(d.Volumes, function (volume) {
+        Volume.remove({name: volume.Name}, function (d) {
+          if (d.message) {
+            Messages.error("Unable to remove volume", {}, d.message);
+          } else {
+            Messages.send("Volume deleted", volume.Name);
+          }
+          $state.go('volumes', {}, {reload: true});
+        }, function (e) {
+          Messages.error("Failure", e, "Unable to remove volume");
+        });
+      });
+      $('#loadVolumesSpinner').hide();
+    }, function (e) {
+      $('#loadVolumesSpinner').hide();
+      Messages.error("Failure", e, "Unable to retrieve the list of dangling volumes");
+    });
+  };
+
   $scope.removeAction = function () {
     $('#loadVolumesSpinner').show();
     var counter = 0;

@@ -17,6 +17,7 @@
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
         <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+        <button type="button" class="btn btn-default" ng-click="removeDanglingVolumes()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove unused volumes</button>
         <a class="btn btn-default" type="button" ui-sref="actions.create.volume">Add volume</a>
       </div>
       <div class="pull-right">
