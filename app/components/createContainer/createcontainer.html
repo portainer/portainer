@@ -267,13 +267,26 @@
               <div class="form-group">
                 <label for="container_network" class="col-sm-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="selectpicker form-control" ng-model="config.HostConfig.NetworkMode">
+                  <select class="selectpicker form-control" ng-model="config.HostConfig.NetworkMode" id="container_network">
                     <option selected disabled hidden value="">Select a network</option>
                     <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
                 </div>
               </div>
               <!-- !network-input -->
+              <!-- container-name-input -->
+              <div class="form-group" ng-if="config.HostConfig.NetworkMode == 'container'">
+                <label for="container_network_container" class="col-sm-1 control-label text-left">Container</label>
+                <div class="col-sm-9">
+                  <select ng-if="(!swarm || swarm && swarm_mode)" ng-options="container|containername for container in runningContainers" class="selectpicker form-control" ng-model="formValues.NetworkContainer">
+                    <option selected disabled hidden value="">Select a container</option>
+                  </select>
+                  <select ng-if="swarm && !swarm_mode" ng-options="container|swarmcontainername for container in runningContainers" class="selectpicker form-control" ng-model="formValues.NetworkContainer">
+                    <option selected disabled hidden value="">Select a container</option>
+                  </select>
+                </div>
+              </div>
+              <!-- !container-name-input -->
               <!-- hostname-input -->
               <div class="form-group">
                 <label for="container_hostname" class="col-sm-1 control-label text-left">Hostname</label>
