@@ -4,306 +4,323 @@
     <a ui-sref="services">Services</a> > Add service
   </rd-header-content>
 </rd-header>
-
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <form class="form-horizontal">
-          <!-- name-input -->
-          <div class="form-group">
-            <label for="service_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="service_name" placeholder="e.g. myService">
-            </div>
-          </div>
-          <!-- !name-input -->
-          <!-- image-and-registry-inputs -->
-          <div class="form-group">
-            <label for="service_image" class="col-sm-1 control-label text-left">Image</label>
-            <div class="col-sm-7">
-              <input type="text" class="form-control" ng-model="formValues.Image" id="service_image" placeholder="e.g. nginx:latest">
-            </div>
-            <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
-            <div class="col-sm-3">
-              <input type="text" class="form-control" ng-model="formValues.Registry" id="image_registry" placeholder="leave empty to use DockerHub">
-            </div>
-          </div>
-          <!-- !image-and-registry-inputs -->
-          <!-- scheduling-mode -->
-          <div class="form-group">
-            <label class="col-sm-1 control-label text-left">Scheduling mode</label>
-            <div class="col-sm-11">
-              <label class="radio-inline">
-                <input type="radio" name="service_scheduling" ng-model="formValues.Mode" value="global">
-                Global
-              </label>
-              <label class="radio-inline">
-                <input type="radio" name="service_scheduling" ng-model="formValues.Mode" value="replicated">
-                Replicated
-              </label>
-            </div>
-          </div>
-          <div class="form-group" ng-if="formValues.Mode === 'replicated'">
-            <label for="replicas" class="col-sm-1 control-label text-left">Replicas</label>
-            <div class="col-sm-1">
-              <input type="number" class="form-control" ng-model="formValues.Replicas" id="replicas" placeholder="e.g. 3">
-            </div>
-            <div class="col-sm-10"></div>
-          </div>
-          <!-- !scheduling-mode -->
-          <!-- port-mapping -->
-          <div class="form-group">
-            <label for="container_ports" class="col-sm-1 control-label text-left">Port mapping</label>
-            <div class="col-sm-11">
-              <span class="label label-default interactive" ng-click="addPortBinding()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> map port
-              </span>
-            </div>
-            <!-- port-mapping-input-list -->
-            <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="portBinding in formValues.Ports" style="margin-top: 2px;">
-                <div class="input-group col-sm-5 input-group-sm">
-                  <span class="input-group-addon">host</span>
-                  <input type="text" class="form-control" ng-model="portBinding.PublishedPort" placeholder="e.g. 8080">
-                </div>
-                <div class="input-group col-sm-5 input-group-sm">
-                  <span class="input-group-addon">container</span>
-                  <input type="text" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80">
-                </div>
-                <div class="input-group col-sm-1 input-group-sm">
-                  <select class="selectpicker form-control" ng-model="portBinding.Protocol">
-                    <option value="tcp">tcp</option>
-                    <option value="udp">udp</option>
-                  </select>
-                  <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click="removePortBinding($index)">
-                      <i class="fa fa-minus" aria-hidden="true"></i>
-                    </button>
-                  </span>
-                </div>
+<form name="createServiceForm">
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+      <rd-widget>
+        <rd-widget-body>
+          <div ng-form="formName" class="form-horizontal">
+            <!-- name-input -->
+            <div class="form-group">
+              <label for="service_name" class="col-sm-1 control-label text-left">Name*</label>
+              <div class="col-sm-11">
+                <input type="text" class="form-control" ng-model="formValues.Name" id="service_name" placeholder="e.g. myService"
+                  ng-pattern="'\w'" required>
               </div>
             </div>
-            <!-- !port-mapping-input-list -->
-          </div>
-          <!-- !port-mapping -->
-        </form>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <ul class="nav nav-tabs">
-          <li class="active interactive"><a data-target="#command" data-toggle="tab">Command</a></li>
-          <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
-          <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
-          <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
-        </ul>
-        <!-- tab-content -->
-        <div class="tab-content">
-          <!-- tab-command -->
-          <div class="tab-pane active" id="command">
-            <form class="form-horizontal" style="margin-top: 15px;">
-              <!-- command-input -->
-              <div class="form-group">
-                <label for="service_command" class="col-sm-1 control-label text-left">Command</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" ng-model="formValues.Command" id="service_command" placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf">
-                </div>
+            <!-- !name-input -->
+            <!-- image-and-registry-inputs -->
+            <div class="form-group">
+              <label for="service_image" class="col-sm-1 control-label text-left">Image*</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" ng-model="formValues.Image" id="service_image" placeholder="e.g. nginx:latest"
+                  ng-pattern="'([a-zA-Z0-9_.-/]+|[a-zA-Z0-9_.-/]+:[a-zA-Z0-9_.-/]+)'" required>
               </div>
-              <!-- !command-input -->
-              <!-- workdir-user-input -->
-              <div class="form-group">
-                <label for="service_workingdir" class="col-sm-1 control-label text-left">Working Dir</label>
-                <div class="col-sm-4">
-                  <input type="text" class="form-control" ng-model="formValues.WorkingDir" id="service_workingdir" placeholder="e.g. /myapp">
-                </div>
-                <label for="service_user" class="col-sm-1 control-label text-left">User</label>
-                <div class="col-sm-4">
-                  <input type="text" class="form-control" ng-model="formValues.User" id="service_user" placeholder="e.g. nginx">
-                </div>
+              <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
+              <div class="col-sm-3">
+                <input type="text" class="form-control" ng-model="formValues.Registry" id="image_registry" placeholder="leave empty to use DockerHub">
               </div>
-              <!-- !workdir-user-input -->
-              <!-- environment-variables -->
-              <div class="form-group">
-                <label for="service_env" class="col-sm-1 control-label text-left">Environment variables</label>
-                <div class="col-sm-11">
-                  <span class="label label-default interactive" ng-click="addEnvironmentVariable()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> environment variable
-                  </span>
-                </div>
-                <!-- environment-variable-input-list -->
-                <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
-                  <div ng-repeat="variable in formValues.Env" style="margin-top: 2px;">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO">
-                    </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
-                      <span class="input-group-btn">
-                        <button class="btn btn-default" type="button" ng-click="removeEnvironmentVariable($index)">
-                          <i class="fa fa-minus" aria-hidden="true"></i>
-                        </button>
-                      </span>
-                    </div>
+            </div>
+            <!-- !image-and-registry-inputs -->
+            <!-- scheduling-mode -->
+            <div class="form-group">
+              <label class="col-sm-1 control-label text-left">Scheduling mode</label>
+              <div class="col-sm-11">
+                <label class="radio-inline">
+                  <input type="radio" name="service_scheduling" ng-model="formValues.Mode" value="global">
+                  Global
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="service_scheduling" ng-model="formValues.Mode" value="replicated">
+                  Replicated
+                </label>
+              </div>
+            </div>
+            <div class="form-group" ng-if="formValues.Mode === 'replicated'">
+              <label for="replicas" class="col-sm-1 control-label text-left">Replicas</label>
+              <div class="col-sm-1">
+                <input type="number" class="form-control" ng-model="formValues.Replicas" id="replicas" placeholder="e.g. 3">
+              </div>
+              <div class="col-sm-10"></div>
+            </div>
+            <!-- !scheduling-mode -->
+            <!-- port-mapping -->
+            <div class="form-group">
+              <label for="container_ports" class="col-sm-1 control-label text-left">Port mapping</label>
+              <div class="col-sm-11">
+                <span class="label label-default interactive" ng-click="addPortBinding()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> map port
+                </span>
+              </div>
+              <!-- port-mapping-input-list -->
+              <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+                <div ng-repeat="portBinding in formValues.Ports" style="margin-top: 2px;">
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">host</span>
+                    <input type="text" class="form-control" ng-model="portBinding.PublishedPort" placeholder="e.g. 8080">
+                  </div>
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">container</span>
+                    <input type="text" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80">
+                  </div>
+                  <div class="input-group col-sm-1 input-group-sm">
+                    <select class="selectpicker form-control" ng-model="portBinding.Protocol">
+                      <option value="tcp">tcp</option>
+                      <option value="udp">udp</option>
+                    </select>
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button" ng-click="removePortBinding($index)">
+                        <i class="fa fa-minus" aria-hidden="true"></i>
+                      </button>
+                    </span>
                   </div>
                 </div>
-                <!-- !environment-variable-input-list -->
               </div>
-              <!-- !environment-variables -->
-            </form>
+              <!-- !port-mapping-input-list -->
+            </div>
+            <!-- !port-mapping -->
           </div>
-          <!-- !tab-command -->
-          <!-- tab-volume -->
-          <div class="tab-pane" id="volumes">
-            <form class="form-horizontal" style="margin-top: 15px;">
-              <!-- volumes -->
-              <div class="form-group">
-                <label for="service_volumes" class="col-sm-1 control-label text-left">Volumes</label>
-                <div class="col-sm-11">
-                  <span class="label label-default interactive" ng-click="addVolume()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> volume
-                  </span>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+      <rd-widget>
+        <rd-widget-body>
+          <ul class="nav nav-tabs">
+            <li class="active interactive"><a data-target="#command" data-toggle="tab">Command</a></li>
+            <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
+            <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
+            <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
+          </ul>
+          <!-- tab-content -->
+          <div class="tab-content">
+            <!-- tab-command -->
+            <div class="tab-pane active" id="command">
+              <div ng-form="formName" class="form-horizontal" style="margin-top: 15px;">
+                <!-- command-input -->
+                <div class="form-group">
+                  <label for="service_command" class="col-sm-1 control-label text-left">Command</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" ng-model="formValues.Command" id="service_command" placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf">
+                  </div>
                 </div>
-                <!-- volumes-input-list -->
-                <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
-                  <div ng-repeat="volume in formValues.Volumes" style="margin-top: 2px;">
-                    <div class="input-group col-sm-1 input-group-sm">
-                      <div class="checkbox">
-                        <label>
-                          <input type="checkbox" ng-model="volume.ReadOnly"> Read-only
-                        </label>
+                <!-- !command-input -->
+                <!-- workdir-user-input -->
+                <div class="form-group">
+                  <label for="service_workingdir" class="col-sm-1 control-label text-left">Working Dir</label>
+                  <div class="col-sm-4">
+                    <input type="text" class="form-control" ng-model="formValues.WorkingDir" id="service_workingdir" placeholder="e.g. /myapp">
+                  </div>
+                  <label for="service_user" class="col-sm-1 control-label text-left">User</label>
+                  <div class="col-sm-4">
+                    <input type="text" class="form-control" ng-model="formValues.User" id="service_user" placeholder="e.g. nginx">
+                  </div>
+                </div>
+                <!-- !workdir-user-input -->
+                <!-- environment-variables -->
+                <div class="form-group">
+                  <label for="service_env" class="col-sm-1 control-label text-left">Environment variables</label>
+                  <div class="col-sm-11">
+                    <span class="label label-default interactive" ng-click="addEnvironmentVariable()">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> environment variable
+                    </span>
+                  </div>
+                  <!-- environment-variable-input-list -->
+                  <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+                    <div ng-repeat="variable in formValues.Env" style="margin-top: 2px;">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">name</span>
+                        <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO">
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">value</span>
+                        <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="button" ng-click="removeEnvironmentVariable($index)">
+                            <i class="fa fa-minus" aria-hidden="true"></i>
+                          </button>
+                        </span>
                       </div>
                     </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon"><input type="checkbox" ng-model="volume.Bind">bind</span>
-                      <select class="selectpicker form-control" ng-model="volume.Source" ng-if="!volume.Bind">
-                        <option selected disabled hidden value="">Select a volume</option>
-                        <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
-                      </select>
-                      <input ng-if="volume.Bind" type="text" class="form-control" ng-model="volume.Source" placeholder="e.g. /path/on/host">
-                    </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">container</span>
-                      <input type="text" class="form-control" ng-model="volume.Target" placeholder="e.g. /path/in/container">
-                      <span class="input-group-btn">
-                        <button class="btn btn-default" type="button" ng-click="removeVolume($index)">
-                          <i class="fa fa-minus" aria-hidden="true"></i>
-                        </button>
-                      </span>
+                  </div>
+                  <!-- !environment-variable-input-list -->
+                </div>
+                <!-- !environment-variables -->
+              </div>
+            </div>
+            <!-- !tab-command -->
+            <!-- tab-volume -->
+            <div class="tab-pane" id="volumes">
+              <div ng-form="formName" class="form-horizontal" style="margin-top: 15px;">
+                <!-- volumes -->
+                <div class="form-group">
+                  <label for="service_volumes" class="col-sm-1 control-label text-left">Volumes</label>
+                  <div class="col-sm-11">
+                    <span class="label label-default interactive" ng-click="addVolume()">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> volume
+                    </span>
+                  </div>
+                  <!-- volumes-input-list -->
+                  <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+                    <div ng-repeat="volume in formValues.Volumes" style="margin-top: 2px;">
+                      <div class="input-group col-sm-1 input-group-sm">
+                        <div class="checkbox">
+                          <label>
+                            <input type="checkbox" ng-model="volume.ReadOnly"> Read-only
+                          </label>
+                        </div>
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon"><input type="checkbox" ng-model="volume.Bind">bind</span>
+                        <select class="selectpicker form-control" ng-model="volume.Source" ng-if="!volume.Bind">
+                          <option selected disabled hidden value="">Select a volume</option>
+                          <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
+                        </select>
+                        <input ng-if="volume.Bind" type="text" class="form-control" ng-model="volume.Source" placeholder="e.g. /path/on/host">
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">container</span>
+                        <input type="text" class="form-control" ng-model="volume.Target" placeholder="e.g. /path/in/container">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="button" ng-click="removeVolume($index)">
+                            <i class="fa fa-minus" aria-hidden="true"></i>
+                          </button>
+                        </span>
+                      </div>
                     </div>
                   </div>
+                  <!-- !volumes-input-list -->
                 </div>
-                <!-- !volumes-input-list -->
+                <!-- !volumes -->
               </div>
-              <!-- !volumes -->
-            </form>
-          </div>
-          <!-- !tab-volume -->
-          <!-- tab-network -->
-          <div class="tab-pane" id="network">
-            <form class="form-horizontal" style="margin-top: 15px;">
-              <!-- network-input -->
-              <div class="form-group">
-                <label for="container_network" class="col-sm-1 control-label text-left">Network</label>
-                <div class="col-sm-9">
-                  <select class="selectpicker form-control" ng-model="formValues.Network">
-                    <option selected disabled hidden value="">Select a network</option>
-                    <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
-                  </select>
-                </div>
-                <div class="col-sm-2"></div>
-              </div>
-              <!-- !network-input -->
-              <!-- extra-networks -->
-              <div class="form-group">
-                <label for="service_extra_networks" class="col-sm-1 control-label text-left">Extra networks</label>
-                <div class="col-sm-11">
-                  <span class="label label-default interactive" ng-click="addExtraNetwork()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> network
-                  </span>
-                </div>
-                <!-- network-input-list -->
-                <div style="margin-top: 10px;">
-                  <div class="col-sm-12" ng-repeat="network in formValues.ExtraNetworks" style="margin-top: 5px;">
-                    <div class="input-group col-sm-9 input-group-sm col-sm-offset-1">
-                      <span class="input-group-btn">
-                        <button class="btn btn-default" type="button" ng-click="removeExtraNetwork($index)">
-                          <i class="fa fa-minus" aria-hidden="true"></i>
-                        </button>
-                      </span>
-                      <select class="selectpicker form-control" ng-model="network.Name">
-                        <option selected disabled hidden value="">Select a network</option>
-                        <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
-                      </select>
-                    </div>
-                    <div class="col-sm-2"></div>
+            </div>
+            <!-- !tab-volume -->
+            <!-- tab-network -->
+            <div class="tab-pane" id="network">
+              <div ng-form="formName" class="form-horizontal" style="margin-top: 15px;">
+                <!-- network-input -->
+                <div class="form-group">
+                  <label for="container_network" class="col-sm-1 control-label text-left">Network</label>
+                  <div class="col-sm-9">
+                    <select class="selectpicker form-control" ng-model="formValues.Network">
+                      <option selected disabled hidden value="">Select a network</option>
+                      <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
+                    </select>
                   </div>
+                  <div class="col-sm-2"></div>
                 </div>
-                <!-- !network-input-list -->
-              </div>
-              <!-- !extra-networks -->
-            </form>
-          </div>
-          <!-- !tab-network -->
-          <!-- tab-labels -->
-          <div class="tab-pane" id="labels">
-            <form class="form-horizontal" style="margin-top: 15px;">
-              <!-- labels -->
-              <div class="form-group">
-                <label for="service_env" class="col-sm-1 control-label text-left">Labels</label>
-                <div class="col-sm-11">
-                  <span class="label label-default interactive" ng-click="addLabel()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> label
-                  </span>
-                </div>
-                <!-- labels-input-list -->
-                <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
-                  <div ng-repeat="label in formValues.Labels" style="margin-top: 2px;">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
-                    </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
-                      <span class="input-group-btn">
-                        <button class="btn btn-default" type="button" ng-click="removeLabel($index)">
-                          <i class="fa fa-minus" aria-hidden="true"></i>
-                        </button>
-                      </span>
+                <!-- !network-input -->
+                <!-- extra-networks -->
+                <div class="form-group">
+                  <label for="service_extra_networks" class="col-sm-1 control-label text-left">Extra networks</label>
+                  <div class="col-sm-11">
+                    <span class="label label-default interactive" ng-click="addExtraNetwork()">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> network
+                    </span>
+                  </div>
+                  <!-- network-input-list -->
+                  <div style="margin-top: 10px;">
+                    <div class="col-sm-12" ng-repeat="network in formValues.ExtraNetworks" style="margin-top: 5px;">
+                      <div class="input-group col-sm-9 input-group-sm col-sm-offset-1">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="button" ng-click="removeExtraNetwork($index)">
+                            <i class="fa fa-minus" aria-hidden="true"></i>
+                          </button>
+                        </span>
+                        <select class="selectpicker form-control" ng-model="network.Name">
+                          <option selected disabled hidden value="">Select a network</option>
+                          <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
+                        </select>
+                      </div>
+                      <div class="col-sm-2"></div>
                     </div>
                   </div>
+                  <!-- !network-input-list -->
                 </div>
-                <!-- !labels-input-list -->
+                <!-- !extra-networks -->
               </div>
-              <!-- !labels-->
-            </form>
-          </div>
-          <!-- !tab-labels -->
+            </div>
+            <!-- !tab-network -->
+            <!-- tab-labels -->
+            <div class="tab-pane" id="labels">
+              <div ng-form="formName" class="form-horizontal" style="margin-top: 15px;" name="labelsForm">
 
-          <!-- tab-security -->
-          <div class="tab-pane" id="security">
-          </div>
-          <!-- !tab-security -->
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <p class="small text-muted">
+                      Labels must start with an alphanumericer Label keys should begin and end with a lower-case letter and
+                      should only contain lower-case alphanumeric characters, the period character (.),
+                      and the hyphen character (-). Consecutive periods or hyphens are not allowed.
+                    </p>
+                    <p class="small text-muted">
+                      See <a href="https://docs.docker.com/engine/userguide/labels-custom-metadata/" target="_blank">label documentation</a> for more information.
+                    </p>
+                  </div>
+                </div>
+                <!-- labels -->
+                <div class="form-group">
+                  <label for="service_env" class="col-sm-1 control-label text-left">Labels</label>
+                  <div class="col-sm-11">
+                    <span class="label label-default interactive" ng-click="addLabel()">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> label
+                    </span>
+                  </div>
+                  <!-- labels-input-list -->
+                  <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+                    <div ng-repeat="label in formValues.Labels" style="margin-top: 2px;">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">name</span>
+                        <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo"
+                          ng-pattern="'^(([a-z]{1}[a-z0-9\.-]+[a-z]{1})|([a-z]+))$'">
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">value</span>
+                        <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-pattern="'.+'">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="button" ng-click="removeLabel($index)">
+                            <i class="fa fa-minus" aria-hidden="true"></i>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- !labels-input-list -->
+                </div>
+                <!-- !labels-->
+              </div>
+            </div>
+            <!-- !tab-labels -->
 
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12" style="text-align: center;">
-    <div>
-      <i id="createServiceSpinner" class="fa fa-cog fa-3x fa-spin" style="margin-bottom: 5px; display: none;"></i>
+            <!-- tab-security -->
+            <div class="tab-pane" id="security">
+            </div>
+            <!-- !tab-security -->
+          </div>
+        </rd-widget-body>
+      </rd-widget>
     </div>
-    <button type="button" class="btn btn-default btn-lg" ng-click="create()">Create</button>
-    <a type="button" class="btn btn-default btn-lg" ui-sref="services">Cancel</a>
   </div>
-</div>
+
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12" style="text-align: center;">
+      <div>
+        <i id="createServiceSpinner" class="fa fa-cog fa-3x fa-spin" style="margin-bottom: 5px; display: none;"></i>
+      </div>
+      <button type="button" class="btn btn-default btn-lg" ng-click="create()" ng-disabled="createServiceForm.$invalid">Create</button>
+      <a type="button" class="btn btn-default btn-lg" ui-sref="services">Cancel</a>
+    </div>
+  </div>
+</form>
