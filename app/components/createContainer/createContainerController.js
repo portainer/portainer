@@ -1,12 +1,13 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', 'Config', 'Info', 'Container', 'Image', 'Volume', 'Network', 'Messages',
-function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, Network, Messages) {
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Messages',
+function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, Volume, Network, Messages) {
 
   $scope.formValues = {
     alwaysPull: true,
     Console: 'none',
     Volumes: [],
-    Registry: ''
+    Registry: '',
+    NetworkContainer: ''
   };
 
   $scope.imageConfig = {};
@@ -51,12 +52,13 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
   };
 
   Config.$promise.then(function (c) {
-    var swarm = c.swarm;
+    $scope.swarm = c.swarm;
     Info.get({}, function(info) {
-      if (swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
+      if ($scope.swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
         $scope.swarm_mode = true;
       }
     });
+    var containersToHideLabels = c.hiddenLabels;
 
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
@@ -66,7 +68,7 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
 
     Network.query({}, function (d) {
       var networks = d;
-      if (swarm) {
+      if ($scope.swarm) {
         networks = d.filter(function (network) {
           if (network.Scope === 'global') {
             return network;
@@ -77,12 +79,23 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
         networks.push({Name: "host"});
         networks.push({Name: "none"});
       }
+      networks.push({Name: "container"});
       $scope.availableNetworks = networks;
       if (!_.find(networks, {'Name': 'bridge'})) {
         $scope.config.HostConfig.NetworkMode = 'nat';
       }
     }, function (e) {
       Messages.error("Failure", e, "Unable to retrieve networks");
+    });
+
+    Container.query({}, function (d) {
+      var containers = d;
+      if (containersToHideLabels) {
+        containers = ContainerHelper.hideContainers(d, containersToHideLabels);
+      }
+      $scope.runningContainers = containers;
+    }, function(e) {
+      Messages.error("Failure", e, "Unable to retrieve running containers");
     });
   });
 
@@ -217,8 +230,26 @@ function ($scope, $state, $stateParams, Config, Info, Container, Image, Volume, 
     config.Volumes = volumes;
   }
 
+  function prepareNetworkConfig(config) {
+    var mode = config.HostConfig.NetworkMode;
+    var container = $scope.formValues.NetworkContainer;
+    var containerName = container;
+    if (container && typeof container === 'object') {
+      containerName = $filter('trimcontainername')(container.Names[0]);
+      if ($scope.swarm && !$scope.swarm_mode) {
+        containerName = $filter('swarmcontainername')(container);
+      }
+    }
+    var networkMode = mode;
+    if (containerName) {
+      networkMode += ':' + containerName;
+    }
+    config.HostConfig.NetworkMode = networkMode;
+  }
+
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
+    prepareNetworkConfig(config);
     prepareImageConfig(config);
     preparePortBindings(config);
     prepareConsole(config);
