@@ -41,6 +41,11 @@ angular.module('portainer', [
       templateUrl: 'app/components/dashboard/dashboard.html',
       controller: 'DashboardController'
     })
+    .state('auth', {
+      url: '/auth',
+      templateUrl: 'app/components/auth/auth.html',
+      controller: 'AuthenticationController'
+    })
     .state('containers', {
       url: '/containers/',
       templateUrl: 'app/components/containers/containers.html',
