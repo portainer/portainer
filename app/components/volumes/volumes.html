@@ -53,7 +53,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse))">
+            <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: 20))">
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
               <td>{{ volume.Name|truncate:50 }}</td>
               <td>{{ volume.Driver }}</td>
@@ -67,6 +67,9 @@
             </tr>
           </tbody>
         </table>
+        <div ng-if="volumes" class="pull-left pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
       </div>
     </rd-widget-body>
     <rd-widget>

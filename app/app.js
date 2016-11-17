@@ -5,6 +5,7 @@ angular.module('portainer', [
   'ui.select',
   'ngCookies',
   'ngSanitize',
+  'angularUtils.directives.dirPagination',
   'portainer.services',
   'portainer.helpers',
   'portainer.filters',

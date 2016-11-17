@@ -49,13 +49,16 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="event in (events | filter:state.filter | orderBy:sortType:sortReverse)">
+              <tr dir-paginate="event in (events | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: 20)">
                 <td>{{ event.Time|getisodatefromtimestamp }}</td>
                 <td>{{ event.Type }}</td>
                 <td>{{ event.Details }}</td>
               </tr>
             </tbody>
           </table>
+          <div ng-if="events" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
         </div>
       </rd-widget-body>
     <rd-widget>

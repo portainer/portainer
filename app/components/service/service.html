@@ -190,7 +190,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse))">
+            <tr dir-paginate="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse | itemsPerPage: 5))">
               <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
               <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
               <td>{{ task.Slot }}</td>
@@ -199,6 +199,9 @@
             </tr>
           </tbody>
         </table>
+        <div ng-if="tasks" class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
       </rd-widget-body>
     </rd-widget>
   </div>
