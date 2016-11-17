@@ -49,7 +49,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="event in (events | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: 20)">
+              <tr dir-paginate="event in (events | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count)">
                 <td>{{ event.Time|getisodatefromtimestamp }}</td>
                 <td>{{ event.Type }}</td>
                 <td>{{ event.Details }}</td>

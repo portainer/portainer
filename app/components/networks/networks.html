@@ -121,7 +121,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: 20))">
+              <tr dir-paginate="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
                 <td><input type="checkbox" ng-model="network.Checked" ng-change="selectItem(network)"/></td>
                 <td><a ui-sref="network({id: network.Id})">{{ network.Name|truncate:40}}</a></td>
                 <td>{{ network.Id }}</td>

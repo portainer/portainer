@@ -117,7 +117,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="node in (state.filteredNodes = (swarm.Status | filter:state.filter | orderBy:sortType:sortReverse))">
+            <tr dir-paginate="node in (state.filteredNodes = (swarm.Status | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
               <td>{{ node.name }}</td>
               <td>{{ node.cpu }}</td>
               <td>{{ node.memory }}</td>
@@ -127,6 +127,9 @@
             </tr>
           </tbody>
         </table>
+        <div class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
       </rd-widget-body>
     </rd-widget>
   </div>
@@ -182,7 +185,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="node in (state.filteredNodes = (nodes | filter:state.filter | orderBy:sortType:sortReverse))">
+            <tr dir-paginate="node in (state.filteredNodes = (nodes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
               <td>{{ node.Description.Hostname }}</td>
               <td>{{ node.Spec.Role }}</td>
               <td>{{ node.Description.Resources.NanoCPUs / 1000000000 }}</td>
@@ -192,6 +195,9 @@
             </tr>
           </tbody>
         </table>
+        <div class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
       </rd-widget-body>
     </rd-widget>
   </div>

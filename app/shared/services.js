@@ -213,7 +213,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         get: {method: 'GET', isArray: true}
       });
     }])
-    .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'UI_VERSION', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, UI_VERSION) {
+    .factory('Settings', ['DOCKER_ENDPOINT', 'DOCKER_PORT', 'UI_VERSION', 'PAGINATION_MAX_ITEMS', function SettingsFactory(DOCKER_ENDPOINT, DOCKER_PORT, UI_VERSION, PAGINATION_MAX_ITEMS) {
         'use strict';
         var url = DOCKER_ENDPOINT;
         if (DOCKER_PORT) {
@@ -225,7 +225,8 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
           endpoint: DOCKER_ENDPOINT,
           uiVersion: UI_VERSION,
           url: url,
-          firstLoad: firstLoad
+          firstLoad: firstLoad,
+          pagination_count: PAGINATION_MAX_ITEMS
         };
     }])
     .factory('Messages', ['$rootScope', '$sanitize', function MessagesFactory($rootScope, $sanitize) {

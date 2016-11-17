@@ -121,7 +121,7 @@
       </rd-widget-header>
       <rd-widget-body classes="padding">
         <div class="template-list">
-          <div dir-paginate="tpl in templates | itemsPerPage: 15" class="container-template hvr-underline-from-center" id="template_{{ $index }}" ng-click="selectTemplate($index)">
+          <div dir-paginate="tpl in templates | itemsPerPage: pagination_count" class="container-template hvr-underline-from-center" id="template_{{ $index }}" ng-click="selectTemplate($index)">
             <img class="logo" ng-src="{{ tpl.logo }}" />
             <div class="title">{{ tpl.title }}</div>
             <div class="description">{{ tpl.description }}</div>

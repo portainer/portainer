@@ -69,7 +69,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="processInfos in state.filteredProcesses = (containerTop.Processes | orderBy:sortType:sortReverse |  itemsPerPage: 10)">
+            <tr dir-paginate="processInfos in state.filteredProcesses = (containerTop.Processes | orderBy:sortType:sortReverse |  itemsPerPage: pagination_count)">
               <td ng-repeat="processInfo in processInfos track by $index">{{processInfo}}</td>
             </tr>
           </tbody>
