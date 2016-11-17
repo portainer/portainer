@@ -1,10 +1,11 @@
 angular.module('services', [])
-.controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages',
-function ($scope, $stateParams, $state, Service, ServiceHelper, Messages) {
+.controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Settings',
+function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Settings) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
+  $scope.pagination_count = Settings.pagination_count;
 
   $scope.scaleService = function scaleService(service) {
     $('#loadServicesSpinner').show();

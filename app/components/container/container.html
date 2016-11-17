@@ -207,7 +207,6 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-sitemap" title="Connected networks"></rd-widget-header>
-
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
@@ -218,7 +217,7 @@
             <th>Actions</th>
           </thead>
           <tbody>
-            <tr ng-repeat="(key, value) in container.NetworkSettings.Networks">
+            <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: pagination_count">
               <td><a ui-sref="network({id: value.NetworkID})">{{ key }}</a></td>
               <td>{{ value.IPAddress || '-' }}</td>
               <td>{{ value.Gateway || '-' }}</td>
@@ -229,6 +228,9 @@
             </tr>
           </tbody>
         </table>
+        <div class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
       </rd-widget-body>
     </rd-widget>
   </div>

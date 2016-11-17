@@ -52,7 +52,7 @@
               </th>
             </thead>
             <tbody>
-              <tr ng-repeat="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse))">
+              <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
                 <td><input type="checkbox" ng-model="service.Checked" ng-change="selectItem(service)"/></td>
                 <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
                 <td>{{ service.Image }}</td>
@@ -77,6 +77,9 @@
               </tr>
             </tbody>
           </table>
+          <div ng-if="services" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
         </div>
       </rd-widget-body>
     <rd-widget>

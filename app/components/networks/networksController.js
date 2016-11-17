@@ -1,11 +1,12 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages',
-function ($scope, $state, Network, Config, Messages) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'Settings',
+function ($scope, $state, Network, Config, Messages, Settings) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.advancedSettings = false;
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
+  $scope.pagination_count = Settings.pagination_count;
   $scope.config = {
     Name: ''
   };

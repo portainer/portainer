@@ -1,12 +1,13 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages',
-function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Messages) {
+.controller('ServiceController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Settings',
+function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Messages, Settings) {
 
   $scope.service = {};
   $scope.tasks = [];
   $scope.displayNode = false;
   $scope.sortType = 'Status';
   $scope.sortReverse = false;
+  $scope.pagination_count = Settings.pagination_count;
 
   var previousServiceValues = {};
 
