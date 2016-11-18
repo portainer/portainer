@@ -4,6 +4,7 @@ function ($scope, Settings, Messages, Events) {
   $scope.state = {};
   $scope.sortType = 'Time';
   $scope.sortReverse = true;
+  $scope.pagination_count = Settings.pagination_count;
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;

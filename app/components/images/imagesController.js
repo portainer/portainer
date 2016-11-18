@@ -1,10 +1,11 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'Messages',
-function ($scope, $state, Config, Image, Messages) {
+.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'Messages', 'Settings',
+function ($scope, $state, Config, Image, Messages, Settings) {
   $scope.state = {};
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
   $scope.state.selectedItemCount = 0;
+  $scope.pagination_count = Settings.pagination_count;
 
   $scope.config = {
     Image: '',

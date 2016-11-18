@@ -98,7 +98,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="image in (state.filteredImages = (images | filter:state.filter | orderBy:sortType:sortReverse))">
+              <tr dir-paginate="image in (state.filteredImages = (images | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
                 <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
                 <td><a ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a></td>
                 <td>
@@ -115,6 +115,9 @@
               </tr>
             </tbody>
           </table>
+          <div ng-if="images" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
         </div>
       </rd-widget-body>
       <rd-widget>

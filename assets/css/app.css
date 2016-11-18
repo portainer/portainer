@@ -203,6 +203,7 @@ input[type="radio"] {
   margin-bottom: 5px;
 }
 
+<<<<<<< HEAD
 .login-box {
   margin-top: 50px;
 }
@@ -230,4 +231,8 @@ input[type="radio"] {
 .panel-body {
   padding-top: 30px;
   background-color: #ffffff;
+}
+
+.pagination-controls {
+  margin-left: 10px;
 }

@@ -8,6 +8,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
   $scope.swarm_mode = false;
+  $scope.pagination_count = Settings.pagination_count;
 
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;

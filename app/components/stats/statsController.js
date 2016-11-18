@@ -7,6 +7,7 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
   $scope.state = {};
   $scope.sortType = 'CMD';
   $scope.sortReverse = false;
+  $scope.pagination_count = Settings.pagination_count;
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
