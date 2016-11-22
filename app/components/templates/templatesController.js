@@ -184,7 +184,10 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
 
   function initTemplates() {
     Templates.get(function (data) {
-      $scope.templates = data;
+      $scope.templates = data.map(function(tpl,index){
+        tpl.index = index;
+        return tpl;
+      });
       $('#loadTemplatesSpinner').hide();
     }, function (e) {
       $('#loadTemplatesSpinner').hide();
