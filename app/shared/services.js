@@ -229,6 +229,24 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
           pagination_count: PAGINATION_MAX_ITEMS
         };
     }])
+    .factory('Authentication', ['localStorageService', function AuthenticationFactory(localStorageService) {
+      'use strict';
+      return {
+        login: function(username, password) {
+          if (username === 'admin' && password === 'admin') {
+            localStorageService.set('userAuthenticated', true);
+            return true;
+          }
+          return false;
+        },
+        logout: function() {
+          localStorageService.remove('userAuthenticated');
+        },
+        isAuthenticated: function() {
+          return localStorageService.get('userAuthenticated');
+        }
+      };
+    }])
     .factory('Messages', ['$rootScope', '$sanitize', function MessagesFactory($rootScope, $sanitize) {
         'use strict';
         return {

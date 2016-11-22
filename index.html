@@ -25,10 +25,10 @@
 </head>
 
 <body ng-controller="MasterCtrl">
-  <div id="page-wrapper" ng-class="{'open': toggle}" ng-cloak>
+  <div id="page-wrapper" ng-class="{open: toggle && $state.current.name !== 'auth', nopadding: $state.current.name === 'auth'}" ng-cloak>
 
     <!-- Sidebar -->
-    <div id="sidebar-wrapper">
+    <div id="sidebar-wrapper" ng-show="$state.current.name !== 'auth'">
       <ul class="sidebar">
         <li class="sidebar-main">
           <a ng-click="toggleSidebar()">
@@ -39,7 +39,7 @@
         </li>
         <li class="sidebar-title"><span>NAVIGATION</span></li>
         <li class="sidebar-list">
-          <a ui-sref="index">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
+          <a ui-sref="dashboard">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
         </li>
         <li class="sidebar-list">
           <a ui-sref="templates">App Templates <span class="menu-icon fa fa-rocket"></span></a>

@@ -1,18 +1,27 @@
+html, body, #content-wrapper, .page-content, #view {
+  height: 100%;
+  width: 100%;
+}
+
+.white-space-normal {
+  white-space: normal !important;
+}
+
 .btn-group button {
-    margin: 3px;
+  margin: 3px;
 }
 
 .messages {
-    max-height: 50px;
-    overflow-x: hidden;
-    overflow-y: scroll;
+  max-height: 50px;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .legend .title {
-    padding: 0 0.3em;
-    margin: 0.5em;
-    border-style: solid;
-    border-width: 0 0 0 1em;
+  padding: 0 0.3em;
+  margin: 0.5em;
+  border-style: solid;
+  border-width: 0 0 0 1em;
 }
 
 .logo {
@@ -203,9 +212,15 @@ input[type="radio"] {
   margin-bottom: 5px;
 }
 
-<<<<<<< HEAD
+.login-wrapper {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
 .login-box {
-  margin-top: 50px;
+  margin-bottom: 80px;
 }
 
 .login-box > div:first-child {
@@ -216,7 +231,8 @@ input[type="radio"] {
   display: block;
   margin: auto;
   position: relative;
-  width: 200px;
+  width: 240px;
+  margin-bottom: 10px;
 }
 
 .login-form > div {
@@ -235,4 +251,8 @@ input[type="radio"] {
 
 .pagination-controls {
   margin-left: 10px;
+}
+
+.user-box {
+  margin-right: 25px;
 }

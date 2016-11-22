@@ -6,9 +6,11 @@ angular.module('portainer', [
   'ngCookies',
   'ngSanitize',
   'angularUtils.directives.dirPagination',
+  'LocalStorageModule',
   'portainer.services',
   'portainer.helpers',
   'portainer.filters',
+  'auth',
   'dashboard',
   'container',
   'containerConsole',
@@ -31,46 +33,58 @@ angular.module('portainer', [
   'templates',
   'volumes',
   'createVolume'])
-  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function ($stateProvider, $urlRouterProvider, $httpProvider) {
+  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider) {
     'use strict';
 
-    $urlRouterProvider.otherwise('/');
+    localStorageServiceProvider
+    .setPrefix('portainer');
+
+    $urlRouterProvider.otherwise('/dashboard');
 
     $stateProvider
-    .state('index', {
-      url: '/',
-      templateUrl: 'app/components/dashboard/dashboard.html',
-      controller: 'DashboardController'
-    })
     .state('auth', {
       url: '/auth',
+      params: {
+        logout: false
+      },
       templateUrl: 'app/components/auth/auth.html',
       controller: 'AuthenticationController'
     })
     .state('containers', {
       url: '/containers/',
       templateUrl: 'app/components/containers/containers.html',
-      controller: 'ContainersController'
+      controller: 'ContainersController',
+      authenticate: true
     })
     .state('container', {
       url: "^/containers/:id",
       templateUrl: 'app/components/container/container.html',
-      controller: 'ContainerController'
+      controller: 'ContainerController',
+      authenticate: true
     })
     .state('stats', {
       url: "^/containers/:id/stats",
       templateUrl: 'app/components/stats/stats.html',
-      controller: 'StatsController'
+      controller: 'StatsController',
+      authenticate: true
     })
     .state('logs', {
       url: "^/containers/:id/logs",
       templateUrl: 'app/components/containerLogs/containerlogs.html',
-      controller: 'ContainerLogsController'
+      controller: 'ContainerLogsController',
+      authenticate: true
     })
     .state('console', {
       url: "^/containers/:id/console",
       templateUrl: 'app/components/containerConsole/containerConsole.html',
-      controller: 'ContainerConsoleController'
+      controller: 'ContainerConsoleController',
+      authenticate: true
+    })
+    .state('dashboard', {
+      url: '/dashboard',
+      templateUrl: 'app/components/dashboard/dashboard.html',
+      controller: 'DashboardController',
+      authenticate: true
     })
     .state('actions', {
       abstract: true,
@@ -85,82 +99,98 @@ angular.module('portainer', [
     .state('actions.create.container', {
       url: "/container",
       templateUrl: 'app/components/createContainer/createcontainer.html',
-      controller: 'CreateContainerController'
+      controller: 'CreateContainerController',
+      authenticate: true
     })
     .state('actions.create.network', {
       url: "/network",
       templateUrl: 'app/components/createNetwork/createnetwork.html',
-      controller: 'CreateNetworkController'
+      controller: 'CreateNetworkController',
+      authenticate: true
     })
     .state('actions.create.service', {
       url: "/service",
       templateUrl: 'app/components/createService/createservice.html',
-      controller: 'CreateServiceController'
+      controller: 'CreateServiceController',
+      authenticate: true
     })
     .state('actions.create.volume', {
       url: "/volume",
       templateUrl: 'app/components/createVolume/createvolume.html',
-      controller: 'CreateVolumeController'
+      controller: 'CreateVolumeController',
+      authenticate: true
     })
     .state('docker', {
       url: '/docker/',
       templateUrl: 'app/components/docker/docker.html',
-      controller: 'DockerController'
+      controller: 'DockerController',
+      authenticate: true
     })
     .state('events', {
       url: '/events/',
       templateUrl: 'app/components/events/events.html',
-      controller: 'EventsController'
+      controller: 'EventsController',
+      authenticate: true
     })
     .state('images', {
       url: '/images/',
       templateUrl: 'app/components/images/images.html',
-      controller: 'ImagesController'
+      controller: 'ImagesController',
+      authenticate: true
     })
     .state('image', {
       url: '^/images/:id/',
       templateUrl: 'app/components/image/image.html',
-      controller: 'ImageController'
+      controller: 'ImageController',
+      authenticate: true
     })
     .state('networks', {
       url: '/networks/',
       templateUrl: 'app/components/networks/networks.html',
-      controller: 'NetworksController'
+      controller: 'NetworksController',
+      authenticate: true
     })
     .state('network', {
       url: '^/networks/:id/',
       templateUrl: 'app/components/network/network.html',
-      controller: 'NetworkController'
+      controller: 'NetworkController',
+      authenticate: true
     })
     .state('services', {
       url: '/services/',
       templateUrl: 'app/components/services/services.html',
-      controller: 'ServicesController'
+      controller: 'ServicesController',
+      authenticate: true
     })
     .state('service', {
       url: '^/service/:id/',
       templateUrl: 'app/components/service/service.html',
-      controller: 'ServiceController'
+      controller: 'ServiceController',
+      authenticate: true
     })
     .state('task', {
       url: '^/task/:id',
       templateUrl: 'app/components/task/task.html',
-      controller: 'TaskController'
+      controller: 'TaskController',
+      authenticate: true
     })
     .state('templates', {
       url: '/templates/',
       templateUrl: 'app/components/templates/templates.html',
-      controller: 'TemplatesController'
+      controller: 'TemplatesController',
+      authenticate: true
     })
     .state('volumes', {
       url: '/volumes/',
       templateUrl: 'app/components/volumes/volumes.html',
-      controller: 'VolumesController'
+      controller: 'VolumesController',
+      authenticate: true
     })
     .state('swarm', {
       url: '/swarm/',
       templateUrl: 'app/components/swarm/swarm.html',
-      controller: 'SwarmController'
+      controller: 'SwarmController',
+      authenticate: true
     });
 
     // The Docker API likes to return plaintext errors, this catches them and disp
@@ -187,7 +217,15 @@ angular.module('portainer', [
       };
     });
   }])
-
+  .run(function ($rootScope, $state, Authentication) {
+    $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+      if (toState.authenticate && !Authentication.isAuthenticated()){
+        $state.transitionTo("auth");
+        event.preventDefault();
+      }
+    });
+    $rootScope.$state = $state;
+  })
   // This is your docker url that the api will use to make requests
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
   .constant('DOCKER_ENDPOINT', 'dockerapi')

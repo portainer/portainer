@@ -1,38 +1,45 @@
-<div class="container login-box">
-  <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
-    <!-- login box logo -->
-    <div class="row">
-      <img class="login-logo" src="images/logo_alt.png" />
-    </div>
-    <!-- !login box logo -->
-    <!-- login panel -->
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <!-- login form -->
-        <form class="login-form form-horizontal" enctype="multipart/form-data" method="POST">
-          <!-- username input -->
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
-            <input id="user" type="text" class="form-control" name="user" value="" placeholder="Username">
-          </div>
-          <!-- !username input -->
-          <!-- password input -->
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-            <input id="password" type="password" class="form-control" name="password" placeholder="Password">
-          </div>
-          <!-- !password input -->
-          <!-- login button -->
-          <div class="form-group">
-            <div class="col-sm-12 controls">
-              <button type="submit" href="#" class="btn btn-primary pull-right"><i class="fa fa-sign-in" aria-hidden="true"></i> Log in</button>
-            </div>
-          </div>
-          <!-- !login button -->
-        </form>
-        <!-- !login form -->
+<div class="login-wrapper">
+  <!-- login box -->
+  <div class="container login-box">
+    <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+      <!-- login box logo -->
+      <div class="row">
+        <img class="login-logo" src="images/logo_alt.png" />
       </div>
+      <!-- !login box logo -->
+      <!-- login panel -->
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <!-- login form -->
+          <form class="login-form form-horizontal" enctype="multipart/form-data" method="POST">
+            <!-- username input -->
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
+              <input id="user" type="text" class="form-control" name="user" ng-model="username" placeholder="Username" autofocus>
+            </div>
+            <!-- !username input -->
+            <!-- password input -->
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+              <input id="password" type="password" class="form-control" name="password" ng-model="password" placeholder="Password">
+            </div>
+            <!-- !password input -->
+            <!-- login button -->
+            <div class="form-group">
+              <div class="col-sm-12 controls">
+                <p class="pull-left text-danger" ng-if="authenticationError" style="margin: 5px;">
+                  <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Invalid credentials
+                </p>
+                <button type="submit" class="btn btn-primary pull-right" ng-click="authenticateUser()"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</button>
+              </div>
+            </div>
+            <!-- !login button -->
+          </form>
+          <!-- !login form -->
+        </div>
+      </div>
+      <!-- !login panel -->
     </div>
-    <!-- !login panel -->
   </div>
+  <!-- !login box -->
 </div>

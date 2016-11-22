@@ -5,7 +5,6 @@ function ($scope, $cookieStore, Settings, Config, Info) {
   * Sidebar Toggle & Cookie Control
   */
   var mobileView = 992;
-
   $scope.getWidth = function() {
     return window.innerWidth;
   };

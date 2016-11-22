@@ -33,15 +33,16 @@
     "angular-resource": "~1.5.0",
     "angular-ui-select": "~0.17.1",
     "angular-utils-pagination": "~0.11.1",
+    "angular-local-storage": "~0.5.2",
     "bootstrap": "~3.3.6",
-    "font-awesome": "~4.6.3",
     "filesize": "~3.3.0",
     "jquery": "1.11.1",
     "jquery.gritter": "1.7.4",
     "lodash": "4.12.0",
     "rdash-ui": "1.0.*",
     "moment": "~2.14.1",
-    "xterm.js": "~2.0.1"
+    "xterm.js": "~2.0.1",
+    "font-awesome": "~4.7.0"
   },
   "resolutions": {
     "angular": "1.5.5"
