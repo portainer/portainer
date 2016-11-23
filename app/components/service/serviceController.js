@@ -50,6 +50,14 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
   $scope.updateLabel = function updateLabel(service, label) {
     service.hasChanges = service.hasChanges || label.value !== label.originalValue;
   };
+  $scope.addContainerLabel = function addContainerLabel(service) {
+    service.hasChanges = true;
+    service.ServiceContainerLabels.push({ key: '', value: '', originalValue: '' });
+  };
+  $scope.removeContainerLabel = function removeContainerLabel(service, index) {
+    var removedElement = service.ServiceContainerLabels.splice(index, 1);
+    service.hasChanges = service.hasChanges || removedElement !== null;
+  };
 
   $scope.cancelChanges = function changeServiceImage(service) {
     Object.keys(previousServiceValues).forEach(function(attribute) {
@@ -60,6 +68,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     // clear out environment variable changes
     service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
     service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
+    service.ServiceContainerLabels = translateLabelsToServiceLabels(service.ContainerLabels);
 
     service.hasChanges = false;
   };
@@ -68,8 +77,9 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     $('#loadServicesSpinner').show();
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Name = service.newServiceName;
+    config.Labels = translateServiceLabelsToLabels(service.ServiceLabels);
     config.TaskTemplate.ContainerSpec.Env = translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
-    config.TaskTemplate.ContainerSpec.Labels = translateServiceLabelsToLabels(service.ServiceLabels);
+    config.TaskTemplate.ContainerSpec.Labels = translateServiceLabelsToLabels(service.ServiceContainerLabels);
     config.TaskTemplate.ContainerSpec.Image = service.newServiceImage;
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
@@ -112,6 +122,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
       service.newServiceReplicas = service.Replicas;
       service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
       service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
+      service.ServiceContainerLabels = translateLabelsToServiceLabels(service.ContainerLabels);
 
       $scope.service = service;
       Task.query({filters: {service: [service.Name]}}, function (tasks) {
