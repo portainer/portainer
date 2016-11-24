@@ -218,6 +218,7 @@ angular.module('portainer', [
     });
   }])
   .run(function ($rootScope, $state, Authentication) {
+    Authentication.init();
     $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
       if (toState.authenticate && !Authentication.isAuthenticated()){
         $state.transitionTo("auth");
@@ -231,6 +232,7 @@ angular.module('portainer', [
   .constant('DOCKER_ENDPOINT', 'dockerapi')
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('CONFIG_ENDPOINT', 'settings')
+  .constant('AUTH_ENDPOINT', 'auth')
   .constant('TEMPLATES_ENDPOINT', 'templates')
   .constant('PAGINATION_MAX_ITEMS', 10)
   .constant('UI_VERSION', 'v1.10.1');

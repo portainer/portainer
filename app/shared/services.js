@@ -229,20 +229,40 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
           pagination_count: PAGINATION_MAX_ITEMS
         };
     }])
-    .factory('Authentication', ['localStorageService', function AuthenticationFactory(localStorageService) {
+    .factory('Auth', ['$resource', 'AUTH_ENDPOINT', function AuthFactory($resource, AUTH_ENDPOINT) {
+      return $resource(AUTH_ENDPOINT, {}, {
+        login: {
+          method: 'POST',
+        }
+      });
+    }])
+    .factory('Authentication', ['$q', '$rootScope', 'Auth', 'localStorageService', function AuthenticationFactory($q, $rootScope, Auth, localStorageService) {
       'use strict';
       return {
-        login: function(username, password) {
-          if (username === 'admin' && password === 'admin') {
-            localStorageService.set('userAuthenticated', true);
-            return true;
+        init: function() {
+          if (this.isAuthenticated()) {
+            // Should be retrieved from JWT
+            $rootScope.username = 'admin';
           }
-          return false;
+        },
+        login: function(username, password) {
+          return $q(function (resolve, reject) {
+            Auth.login({username: username, password: password}).$promise
+            .then(function(data) {
+              // Store JWT
+              localStorageService.set('userAuthenticated', true);
+              resolve();
+            }, function() {
+              reject();
+            });
+          });
         },
         logout: function() {
+          // Remove JWT
           localStorageService.remove('userAuthenticated');
         },
         isAuthenticated: function() {
+          // Should check if JWT is still valid
           return localStorageService.get('userAuthenticated');
         }
       };

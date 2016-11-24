@@ -15,10 +15,11 @@ function ($scope, $state, $stateParams, Config, Authentication) {
 
   $scope.authenticateUser = function() {
     $scope.authenticationError = false;
-    if (Authentication.login($scope.username, $scope.password)) {
+    Authentication.login($scope.username, $scope.password)
+    .then(function() {
       $state.go('dashboard');
-    } else {
+    }, function() {
       $scope.authenticationError = true;
-    }
+    });
   };
 }]);
