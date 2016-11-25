@@ -164,7 +164,8 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     if (env) {
       var variables = [];
       env.forEach(function(variable) {
-        var keyValue = variable.split('=');
+        var idx = variable.indexOf('=');
+        var keyValue = [variable.slice(0,idx), variable.slice(idx+1)];
         var originalValue = (keyValue.length > 1) ? keyValue[1] : '';
         variables.push({ key: keyValue[0], value: originalValue, originalValue: originalValue, added: true});
       });
