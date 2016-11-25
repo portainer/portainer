@@ -13,6 +13,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     User: '',
     Env: [],
     Labels: [],
+    ContainerLabels: [],
     Volumes: [],
     Network: '',
     ExtraNetworks: [],
@@ -57,6 +58,14 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
 
   $scope.removeLabel = function(index) {
     $scope.formValues.Labels.splice(index, 1);
+  };
+
+  $scope.addContainerLabel = function() {
+    $scope.formValues.ContainerLabels.push({ name: '', value: ''});
+  };
+
+  $scope.removeContainerLabel = function(index) {
+    $scope.formValues.ContainerLabels.splice(index, 1);
   };
 
   function prepareImageConfig(config, input) {
@@ -113,7 +122,15 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
           labels[label.name] = label.value;
       }
     });
-    config.TaskTemplate.ContainerSpec.Labels = labels;
+    config.Labels = labels;
+
+    var containerLabels = {};
+    input.ContainerLabels.forEach(function (label) {
+      if (label.name && label.value) {
+          containerLabels[label.name] = label.value;
+      }
+    });
+    config.TaskTemplate.ContainerSpec.Labels = containerLabels;
   }
 
   function prepareVolumes(config, input) {

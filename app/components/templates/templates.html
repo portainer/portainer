@@ -121,7 +121,7 @@
       </rd-widget-header>
       <rd-widget-body classes="padding">
         <div class="template-list">
-          <div ng-repeat="tpl in templates" class="container-template hvr-underline-from-center" id="template_{{ $index }}" ng-click="selectTemplate($index)">
+          <div dir-paginate="tpl in templates | itemsPerPage: pagination_count" class="container-template hvr-underline-from-center" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index)">
             <img class="logo" ng-src="{{ tpl.logo }}" />
             <div class="title">{{ tpl.title }}</div>
             <div class="description">{{ tpl.description }}</div>
@@ -132,6 +132,9 @@
           <div ng-if="templates.length == 0" class="text-center text-muted">
             No templates available.
           </div>
+        </div>
+        <div ng-if="templates">
+          <dir-pagination-controls></dir-pagination-controls>
         </div>
       </rd-widget-body>
     </rd-widget>

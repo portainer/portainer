@@ -284,6 +284,35 @@
                 <!-- !labels-input-list -->
               </div>
               <!-- !labels-->
+              <!-- container-labels -->
+              <div class="form-group">
+                <label for="service_env" class="col-sm-1 control-label text-left">Container labels</label>
+                <div class="col-sm-11">
+                  <span class="label label-default interactive" ng-click="addContainerLabel()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> container label
+                  </span>
+                </div>
+                <!-- container-labels-input-list -->
+                <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="label in formValues.ContainerLabels" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">name</span>
+                      <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="removeContainerLabel($index)">
+                          <i class="fa fa-minus" aria-hidden="true"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <!-- !container-labels-input-list -->
+              </div>
+              <!-- !container-labels-->
             </form>
           </div>
           <!-- !tab-labels -->

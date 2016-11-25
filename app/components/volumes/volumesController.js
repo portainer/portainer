@@ -1,6 +1,6 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages',
-function ($scope, $state, Volume, Messages) {
+.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'Settings',
+function ($scope, $state, Volume, Messages, Settings) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Name';
@@ -8,6 +8,7 @@ function ($scope, $state, Volume, Messages) {
   $scope.config = {
     Name: ''
   };
+  $scope.pagination_count = Settings.pagination_count;
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
@@ -54,7 +55,7 @@ function ($scope, $state, Volume, Messages) {
   function fetchVolumes() {
     $('#loadVolumesSpinner').show();
     Volume.query({}, function (d) {
-      $scope.volumes = d.Volumes;
+      $scope.volumes = d.Volumes || [];
       $('#loadVolumesSpinner').hide();
     }, function (e) {
       $('#loadVolumesSpinner').hide();

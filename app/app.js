@@ -5,6 +5,7 @@ angular.module('portainer', [
   'ui.select',
   'ngCookies',
   'ngSanitize',
+  'angularUtils.directives.dirPagination',
   'portainer.services',
   'portainer.helpers',
   'portainer.filters',
@@ -188,4 +189,5 @@ angular.module('portainer', [
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('CONFIG_ENDPOINT', 'settings')
   .constant('TEMPLATES_ENDPOINT', 'templates')
-  .constant('UI_VERSION', 'v1.10.1');
+  .constant('PAGINATION_MAX_ITEMS', 10)
+  .constant('UI_VERSION', 'v1.10.2');

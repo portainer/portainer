@@ -137,6 +137,37 @@
                 </div>
               </td>
             </tr>
+            <tr>
+              <td>Container labels</td>
+              <td>
+                <div class="form-group">
+                  <div class="col-sm-11 nopadding">
+                    <span class="label label-default interactive fit-text-size" ng-click="addContainerLabel(service)">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> container label
+                    </span>
+                  </div>
+                  <!-- labels-input-list -->
+                  <div class="col-sm-11 form-inline nopadding" style="margin-top: 10px;">
+                    <div ng-repeat="label in service.ServiceContainerLabels" style="margin-top: 2px;">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon fit-text-size">name</span>
+                        <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="updateLabel(service, label)">
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon fit-text-size">value</span>
+                        <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateLabel(service, label)">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="button" ng-click="removeContainerLabel(service, $index)">
+                            <i class="fa fa-minus" aria-hidden="true"></i>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- !labels-input-list -->
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
@@ -190,7 +221,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse))">
+            <tr dir-paginate="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
               <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
               <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
               <td>{{ task.Slot }}</td>
@@ -199,6 +230,9 @@
             </tr>
           </tbody>
         </table>
+        <div ng-if="tasks" class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
       </rd-widget-body>
     </rd-widget>
   </div>

@@ -69,11 +69,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="processInfos in state.filteredProcesses = (containerTop.Processes | orderBy:sortType:sortReverse)">
+            <tr dir-paginate="processInfos in state.filteredProcesses = (containerTop.Processes | orderBy:sortType:sortReverse |  itemsPerPage: pagination_count)">
               <td ng-repeat="processInfo in processInfos track by $index">{{processInfo}}</td>
             </tr>
           </tbody>
         </table>
+        <div ng-if="containerTop.Processes" class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
       </rd-widget-body>
     </rd-widget>
   </div>

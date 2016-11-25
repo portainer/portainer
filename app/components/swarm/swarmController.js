@@ -1,6 +1,6 @@
 angular.module('swarm', [])
-.controller('SwarmController', ['$scope', 'Info', 'Version', 'Node',
-function ($scope, Info, Version, Node) {
+.controller('SwarmController', ['$scope', 'Info', 'Version', 'Node', 'Settings',
+function ($scope, Info, Version, Node, Settings) {
 
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
@@ -10,6 +10,7 @@ function ($scope, Info, Version, Node) {
   $scope.swarm_mode = false;
   $scope.totalCPU = 0;
   $scope.totalMemory = 0;
+  $scope.pagination_count = Settings.pagination_count;
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;

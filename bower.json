@@ -1,6 +1,6 @@
 {
   "name": "portainer",
-  "version": "1.10.1",
+  "version": "1.10.2",
   "homepage": "https://github.com/portainer/portainer",
   "authors": [
     "Anthony Lapenna <anthony.lapenna at gmail dot com>"
@@ -32,6 +32,7 @@
     "angular-mocks": "~1.5.0",
     "angular-resource": "~1.5.0",
     "angular-ui-select": "~0.17.1",
+    "angular-utils-pagination": "~0.11.1",
     "bootstrap": "~3.3.6",
     "font-awesome": "~4.6.3",
     "filesize": "~3.3.0",
