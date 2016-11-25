@@ -232,7 +232,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
     .factory('Auth', ['$resource', 'AUTH_ENDPOINT', function AuthFactory($resource, AUTH_ENDPOINT) {
       return $resource(AUTH_ENDPOINT, {}, {
         login: {
-          method: 'POST',
+          method: 'POST'
         }
       });
     }])
@@ -251,6 +251,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
             .then(function(data) {
               // Store JWT
               localStorageService.set('userAuthenticated', true);
+              $rootScope.username = 'admin';
               resolve();
             }, function() {
               reject();

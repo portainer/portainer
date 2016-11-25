@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	// "fmt"
+	// "log"
 	"net/http"
 )
 
@@ -13,9 +15,10 @@ type User struct {
 
 // authHandler defines a handler function used to authenticate users
 func authHandler(w http.ResponseWriter, r *http.Request) {
-  user := &User{
-    Username: "admin",
-    Token: "TOKEN",
-  }
+
+	user := &User{
+		Username: "admin",
+		Token:    "TOKEN",
+	}
 	json.NewEncoder(w).Encode(*user)
 }

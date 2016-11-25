@@ -296,7 +296,7 @@ module.exports = function (grunt) {
             },
             buildBinary: {
                 command: [
-                    'docker run --rm -v $(pwd)/api:/src centurylink/golang-builder',
+                    'docker run --rm -v $(pwd)/api:/src portainer/golang-builder',
                     'shasum api/portainer > portainer-checksum.txt',
                     'mkdir -p dist',
                     'mv api/portainer dist/'
@@ -304,7 +304,7 @@ module.exports = function (grunt) {
             },
             buildUnixArmBinary: {
                 command: [
-                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm" centurylink/golang-builder-cross',
+                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm" portainer/golang-builder:cross-platform',
                     'shasum api/portainer-linux-arm > portainer-checksum.txt',
                     'mkdir -p dist',
                     'mv api/portainer-linux-arm dist/portainer'
@@ -312,7 +312,7 @@ module.exports = function (grunt) {
             },
             buildDarwinBinary: {
                 command: [
-                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="darwin" -e BUILD_GOARCH="amd64" centurylink/golang-builder-cross',
+                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="darwin" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform',
                     'shasum api/portainer-darwin-amd64 > portainer-checksum.txt',
                     'mkdir -p dist',
                     'mv api/portainer-darwin-amd64 dist/portainer'
@@ -320,7 +320,7 @@ module.exports = function (grunt) {
             },
             buildWindowsBinary: {
                 command: [
-                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="windows" -e BUILD_GOARCH="amd64" centurylink/golang-builder-cross',
+                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="windows" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform',
                     'shasum api/portainer-windows-amd64 > portainer-checksum.txt',
                     'mkdir -p dist',
                     'mv api/portainer-windows-amd64 dist/portainer.exe'
