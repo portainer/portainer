@@ -55,7 +55,7 @@ function ($scope, $state, Volume, Messages, Settings) {
   function fetchVolumes() {
     $('#loadVolumesSpinner').show();
     Volume.query({}, function (d) {
-      $scope.volumes = d.Volumes;
+      $scope.volumes = d.Volumes || [];
       $('#loadVolumesSpinner').hide();
     }, function (e) {
       $('#loadVolumesSpinner').hide();
