@@ -194,6 +194,7 @@ module.exports = function (grunt) {
                     'bower_components/angular-sanitize/angular-sanitize.min.js',
                     'bower_components/angular-cookies/angular-cookies.min.js',
                     'bower_components/angular-local-storage/dist/angular-local-storage.min.js',
+                    'bower_components/angular-jwt/dist/angular-jwt.min.js',
                     'bower_components/angular-ui-router/release/angular-ui-router.min.js',
                     'bower_components/angular-resource/angular-resource.min.js',
                     'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',

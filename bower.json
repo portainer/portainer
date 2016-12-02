@@ -34,6 +34,7 @@
     "angular-ui-select": "~0.17.1",
     "angular-utils-pagination": "~0.11.1",
     "angular-local-storage": "~0.5.2",
+    "angular-jwt": "~0.1.8",
     "bootstrap": "~3.3.6",
     "filesize": "~3.3.0",
     "jquery": "1.11.1",

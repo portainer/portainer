@@ -166,14 +166,6 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
             get: {method: 'GET'}
         });
     }])
-    .factory('Auth', ['$resource', 'Settings', function AuthFactory($resource, Settings) {
-        'use strict';
-        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#check-auth-configuration
-        return $resource(Settings.url + '/auth', {}, {
-            get: {method: 'GET'},
-            update: {method: 'POST'}
-        });
-    }])
     .factory('Info', ['$resource', 'Settings', function InfoFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#display-system-wide-information
@@ -236,22 +228,22 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         }
       });
     }])
-    .factory('Authentication', ['$q', '$rootScope', 'Auth', 'localStorageService', function AuthenticationFactory($q, $rootScope, Auth, localStorageService) {
+    .factory('Authentication', ['$q', '$rootScope', 'Auth', 'jwtHelper', 'localStorageService', function AuthenticationFactory($q, $rootScope, Auth, jwtHelper, localStorageService) {
       'use strict';
       return {
         init: function() {
           if (this.isAuthenticated()) {
-            // Should be retrieved from JWT
-            $rootScope.username = 'admin';
+            var jwt = localStorageService.get('JWT');
+            var tokenPayload = jwtHelper.decodeToken(jwt);
+            $rootScope.username = tokenPayload.username;
           }
         },
         login: function(username, password) {
           return $q(function (resolve, reject) {
             Auth.login({username: username, password: password}).$promise
             .then(function(data) {
-              // Store JWT
-              localStorageService.set('userAuthenticated', true);
-              $rootScope.username = 'admin';
+              localStorageService.set('JWT', data.jwt);
+              $rootScope.username = username;
               resolve();
             }, function() {
               reject();
@@ -259,12 +251,11 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
           });
         },
         logout: function() {
-          // Remove JWT
-          localStorageService.remove('userAuthenticated');
+          localStorageService.remove('JWT');
         },
         isAuthenticated: function() {
-          // Should check if JWT is still valid
-          return localStorageService.get('userAuthenticated');
+          var jwt = localStorageService.get('JWT');
+          return jwt && !jwtHelper.isTokenExpired(jwt);
         }
       };
     }])

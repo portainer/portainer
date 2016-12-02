@@ -6,6 +6,7 @@ angular.module('portainer', [
   'ngCookies',
   'ngSanitize',
   'angularUtils.directives.dirPagination',
+  'angular-jwt',
   'LocalStorageModule',
   'portainer.services',
   'portainer.helpers',

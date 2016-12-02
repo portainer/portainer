@@ -21,9 +21,7 @@ func (a *api) newHandler(settings *Settings) http.Handler {
 	mux.Handle("/", fileHandler)
 	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", handler))
 	mux.Handle("/ws/exec", websocket.Handler(a.execContainer))
-	mux.HandleFunc("/auth", func(w http.ResponseWriter, r *http.Request) {
-		authHandler(w, r)
-	})
+	mux.HandleFunc("/auth", a.authHandler)
 	mux.HandleFunc("/settings", func(w http.ResponseWriter, r *http.Request) {
 		settingsHandler(w, r, settings)
 	})
