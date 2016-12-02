@@ -6,8 +6,27 @@ Some basic conventions for contributing to this project.
 
 Please make sure that there aren't existing pull requests attempting to address the issue mentioned. Likewise, please check for issues related to update, as someone else may be working on the issue in a branch or fork.
 
-* Non-trivial changes should be discussed in an issue first
-* Develop in a topic branch, not master
+* Please open a discussion in a new issue / existing issue to talk about the changes you'd like to bring
+* Develop in a topic branch, not master/develop
+
+When creating a new branch, prefix it with the *type* of the change (see section **Commit Message Format** below), the associated opened issue number, a dash and some text describing the issue (using dash as a separator).
+
+For example, if you work on a bugfix for the issue #361, you could name the branch `fix361-template-selection`.
+
+### Issues open to contribution
+
+Want to contribute but don't know where to start?
+
+Some of the open issues are labeled with prefix `exp/`, this is used to mark them as available for contributors to work on. All of these have an attributed difficulty level:
+
+* **beginner**: a task that should be accessible with users not familiar with the codebase
+* **intermediate**: a task that require some understanding of the project codebase or some experience in
+either AngularJS or Golang
+
+You can have a use Github filters to list these issues:
+
+* beginner labeled issues: https://github.com/portainer/portainer/labels/exp%2Fbeginner
+* intermediate labeled issues: https://github.com/portainer/portainer/labels/exp%2Fintermediate
 
 ### Linting
 
@@ -47,6 +66,7 @@ Must be one of the following:
 
 The scope could be anything specifying place of the commit change. For example `networks`,
 `containers`, `images` etc...
+You can use the **area** label tag associated on the issue here (for `area/containers` use `containers` as a scope...)
 
 #### Subject
 
