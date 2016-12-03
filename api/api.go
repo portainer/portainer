@@ -66,7 +66,7 @@ func (a *api) initDatabase() error {
 	if err != nil {
 		return err
 	}
-	err = dataStore.initUsers()
+	err = dataStore.initDataStore()
 	if err != nil {
 		return err
 	}

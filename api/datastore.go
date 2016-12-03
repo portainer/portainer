@@ -7,9 +7,7 @@ import (
 )
 
 const (
-	administratorDefaultUsername = "admin"
-	administratorDefaultPassword = "admin"
-	userBucketName               = "users"
+	userBucketName = "users"
 )
 
 type (
@@ -27,7 +25,25 @@ var (
 	errUserNotFound = errors.New("User not found")
 )
 
-func (dataStore *dataStore) retrieveUser(username string) (*userItem, error) {
+func (dataStore *dataStore) getUsers() ([]string, error) {
+	users := []string{}
+	err := dataStore.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(userBucketName))
+		cursor := bucket.Cursor()
+
+		for k, _ := cursor.First(); k != nil; k, _ = cursor.Next() {
+			users = append(users, string(k[:]))
+		}
+
+		return nil
+	})
+	if err != nil {
+		return users, err
+	}
+	return users, nil
+}
+
+func (dataStore *dataStore) getUserByUsername(username string) (*userItem, error) {
 	var data []byte
 
 	err := dataStore.db.View(func(tx *bolt.Tx) error {
@@ -53,40 +69,33 @@ func (dataStore *dataStore) retrieveUser(username string) (*userItem, error) {
 	return &user, nil
 }
 
-func encodeDefaultUser() ([]byte, error) {
-	user := &userItem{
-		Username: administratorDefaultUsername,
-		Password: administratorDefaultPassword,
-	}
-
+func (dataStore *dataStore) updateUser(user userItem) error {
 	buffer, err := json.Marshal(user)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return buffer, nil
-}
-
-func (dataStore *dataStore) initUsers() error {
-	return dataStore.db.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists([]byte(userBucketName))
+	err = dataStore.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(userBucketName))
+		err = bucket.Put([]byte(user.Username), buffer)
 		if err != nil {
 			return err
 		}
+		return nil
+	})
 
-		value := bucket.Get([]byte(administratorDefaultUsername))
-		if value == nil {
-			user, err := encodeDefaultUser()
-			if err != nil {
-				return err
-			}
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-			err = bucket.Put([]byte(administratorDefaultUsername), user)
-			if err != nil {
-				return err
-			}
+func (dataStore *dataStore) initDataStore() error {
+	return dataStore.db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte(userBucketName))
+		if err != nil {
+			return err
 		}
-
 		return nil
 	})
 }

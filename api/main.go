@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	// Version number of the API
+	// Version number of portainer API
 	Version = "1.10.2"
 )
 

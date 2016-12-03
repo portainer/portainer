@@ -24,6 +24,7 @@ angular.module('portainer', [
   'image',
   'service',
   'services',
+  'settings',
   'createService',
   'stats',
   'swarm',
@@ -38,6 +39,7 @@ angular.module('portainer', [
     'use strict';
 
     localStorageServiceProvider
+    .setStorageType('sessionStorage')
     .setPrefix('portainer');
 
     $urlRouterProvider.otherwise('/dashboard');
@@ -167,6 +169,12 @@ angular.module('portainer', [
       url: '^/service/:id/',
       templateUrl: 'app/components/service/service.html',
       controller: 'ServiceController',
+      authenticate: true
+    })
+    .state('settings', {
+      url: '/settings/',
+      templateUrl: 'app/components/settings/settings.html',
+      controller: 'SettingsController',
       authenticate: true
     })
     .state('task', {

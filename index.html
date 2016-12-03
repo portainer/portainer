@@ -37,10 +37,6 @@
             <span class="menu-icon glyphicon glyphicon-transfer"></span>
           </a>
         </li>
-        <li class="sidebar-title"><span>User</span></li>
-        <li class="sidebar-list">
-          <a ui-sref="user">{{username}} <span class="menu-icon fa fa-user-circle-o"></span></a>
-        </li>
         <li class="sidebar-title"><span>NAVIGATION</span></li>
         <li class="sidebar-list">
           <a ui-sref="dashboard">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
@@ -71,6 +67,9 @@
         </li>
         <li class="sidebar-list" ng-if="!swarm">
           <a ui-sref="docker">Docker <span class="menu-icon fa fa-th"></span></a>
+        </li>
+        <li class="sidebar-list">
+          <a ui-sref="settings">Settings <span class="menu-icon fa fa-wrench"></span></a>
         </li>
       </ul>
       <div class="sidebar-footer">

@@ -11,7 +11,7 @@ type claims struct {
 }
 
 func (api *api) generateJWTToken(username string) (string, error) {
-	expireToken := time.Now().Add(time.Hour * 24 * 30).Unix()
+	expireToken := time.Now().Add(time.Hour * 8).Unix()
 	claims := claims{
 		username,
 		jwt.StandardClaims{

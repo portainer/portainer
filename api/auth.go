@@ -20,6 +20,7 @@ type (
 // authHandler defines a handler function used to authenticate users
 func (api *api) authHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
+		w.Header().Set("Allow", "POST")
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -39,7 +40,7 @@ func (api *api) authHandler(w http.ResponseWriter, r *http.Request) {
 
 	var username = credentials.Username
 	var password = credentials.Password
-	u, err := api.dataStore.retrieveUser(username)
+	u, err := api.dataStore.getUserByUsername(username)
 	if err != nil {
 		log.Printf("User not found: %s", username)
 		http.Error(w, "User not found", http.StatusNotFound)

@@ -228,6 +228,13 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         }
       });
     }])
+    .factory('Users', ['$resource', function UsersFactory($resource) {
+      return $resource('/users/:username/:action', {}, {
+        create: { method: 'POST' },
+        update: { method: 'PUT', params: { username: '@username' } },
+        checkPassword: { method: 'POST', params: { username: '@username', action: 'passwd' } }
+      });
+    }])
     .factory('Authentication', ['$q', '$rootScope', 'Auth', 'jwtHelper', 'localStorageService', function AuthenticationFactory($q, $rootScope, Auth, jwtHelper, localStorageService) {
       'use strict';
       return {
