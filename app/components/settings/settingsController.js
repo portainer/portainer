@@ -1,6 +1,6 @@
 angular.module('settings', [])
-.controller('SettingsController', ['$scope', 'Users', 'Messages',
-function ($scope, Users, Messages) {
+.controller('SettingsController', ['$scope', '$state', 'Users', 'Messages',
+function ($scope, $state, Users, Messages) {
   $scope.formValues = {
     currentPassword: '',
     newPassword: '',
@@ -14,6 +14,7 @@ function ($scope, Users, Messages) {
       if (d.valid) {
         Users.update({ username: $scope.username, password: $scope.formValues.newPassword }, function (d) {
           Messages.send("Success", "Password successfully updated");
+          $state.go('settings', {}, {reload: true});
         }, function (e) {
           Messages.error("Failure", e, "Unable to update password");
         });
