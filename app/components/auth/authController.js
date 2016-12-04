@@ -17,6 +17,10 @@ function ($scope, $state, $stateParams, Config, Authentication, Users, Messages)
     Authentication.logout();
   }
 
+  Config.$promise.then(function (c) {
+    $scope.logo = c.logo;
+  });
+
   Users.query({}, function (d) {
     if (_.isEmpty(d)) {
       $scope.initPassword = true;

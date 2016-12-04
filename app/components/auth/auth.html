@@ -4,7 +4,8 @@
     <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
       <!-- login box logo -->
       <div class="row">
-        <img class="login-logo" src="images/logo_alt.png" />
+        <img ng-if="logo" ng-src="{{ logo }}" class="login-logo">
+        <img ng-if="!logo" src="images/logo_alt.png" class="login-logo" alt="Portainer">
       </div>
       <!-- !login box logo -->
       <!-- init password panel -->
