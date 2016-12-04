@@ -231,6 +231,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
     .factory('Users', ['$resource', function UsersFactory($resource) {
       return $resource('/users/:username/:action', {}, {
         create: { method: 'POST' },
+        get: {method: 'GET', params: { username: '@username' } },
         update: { method: 'PUT', params: { username: '@username' } },
         checkPassword: { method: 'POST', params: { username: '@username', action: 'passwd' } }
       });

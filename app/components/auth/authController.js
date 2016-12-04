@@ -21,12 +21,13 @@ function ($scope, $state, $stateParams, Config, Authentication, Users, Messages)
     $scope.logo = c.logo;
   });
 
-  Users.query({}, function (d) {
-    if (_.isEmpty(d)) {
+  Users.get({username: "admin"}, function (d) {},
+  function (e) {
+    if (e.status === 404) {
       $scope.initPassword = true;
+    } else {
+      Messages.error("Failure", e, 'Unable to load existing users');
     }
-  }, function (e) {
-    Messages.error("Failure", e, 'Unable to load existing users');
   });
 
   $scope.createAdminUser = function() {

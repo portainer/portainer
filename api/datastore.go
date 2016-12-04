@@ -17,7 +17,7 @@ type (
 
 	userItem struct {
 		Username string `json:"username"`
-		Password string `json:"password"`
+		Password string `json:"password,omitempty"`
 	}
 )
 
@@ -25,22 +25,29 @@ var (
 	errUserNotFound = errors.New("User not found")
 )
 
-func (dataStore *dataStore) getUsers() ([]string, error) {
-	users := []string{}
-	err := dataStore.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(userBucketName))
-		cursor := bucket.Cursor()
-
-		for k, _ := cursor.First(); k != nil; k, _ = cursor.Next() {
-			users = append(users, string(k[:]))
+func (dataStore *dataStore) initDataStore() error {
+	return dataStore.db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte(userBucketName))
+		if err != nil {
+			return err
 		}
-
 		return nil
 	})
+}
+
+func (dataStore *dataStore) cleanUp() {
+	dataStore.db.Close()
+}
+
+func newDataStore(databasePath string) (*dataStore, error) {
+	db, err := bolt.Open(databasePath, 0600, nil)
 	if err != nil {
-		return users, err
+		return nil, err
 	}
-	return users, nil
+
+	return &dataStore{
+		db: db,
+	}, nil
 }
 
 func (dataStore *dataStore) getUserByUsername(username string) (*userItem, error) {
@@ -88,29 +95,4 @@ func (dataStore *dataStore) updateUser(user userItem) error {
 		return err
 	}
 	return nil
-}
-
-func (dataStore *dataStore) initDataStore() error {
-	return dataStore.db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(userBucketName))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-}
-
-func (dataStore *dataStore) cleanUp() {
-	dataStore.db.Close()
-}
-
-func newDataStore(databasePath string) (*dataStore, error) {
-	db, err := bolt.Open(databasePath, 0600, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return &dataStore{
-		db: db,
-	}, nil
 }
