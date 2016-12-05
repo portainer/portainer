@@ -17,6 +17,8 @@ type (
 	}
 )
 
+// handle /users
+// Allowed methods: POST
 func (api *api) usersHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.Header().Set("Allow", "POST")
@@ -45,6 +47,8 @@ func (api *api) usersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handle /users/{username}
+// Allowed methods: PUT, GET
 func (api *api) userHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "PUT" {
 		body, err := ioutil.ReadAll(r.Body)
@@ -91,6 +95,8 @@ func (api *api) userHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handle /users/{username}/passwd
+// Allowed methods: POST
 func (api *api) userPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.Header().Set("Allow", "POST")
