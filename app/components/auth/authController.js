@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', 'Config', 'Authentication', 'Users', 'Messages',
-function ($scope, $state, $stateParams, Config, Authentication, Users, Messages) {
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', 'Config', 'Authentication', 'Users', 'Messages',
+function ($scope, $state, $stateParams, $window, $timeout, Config, Authentication, Users, Messages) {
 
   $scope.authData = {
     username: 'admin',
@@ -33,6 +33,12 @@ function ($scope, $state, $stateParams, Config, Authentication, Users, Messages)
   $scope.createAdminUser = function() {
     Users.create({username: "admin", password: $scope.initPasswordData.password}, function (d) {
       $scope.initPassword = false;
+      $timeout(function() {
+        var element = $window.document.getElementById('password');
+        if(element) {
+          element.focus();
+        }
+      });
     }, function (e) {
       $scope.initPassword.error = true;
     });
