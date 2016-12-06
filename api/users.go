@@ -39,6 +39,12 @@ func (api *api) usersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user.Password, err = hashPassword(user.Password)
+	if err != nil {
+		http.Error(w, "Unable to hash user password", http.StatusInternalServerError)
+		return
+	}
+
 	err = api.dataStore.updateUser(user)
 	if err != nil {
 		log.Printf("Unable to persist user: %s", err.Error())
@@ -61,6 +67,12 @@ func (api *api) userHandler(w http.ResponseWriter, r *http.Request) {
 		err = json.Unmarshal(body, &user)
 		if err != nil {
 			http.Error(w, "Unable to parse user data", http.StatusBadRequest)
+			return
+		}
+
+		user.Password, err = hashPassword(user.Password)
+		if err != nil {
+			http.Error(w, "Unable to hash user password", http.StatusInternalServerError)
 			return
 		}
 
@@ -127,11 +139,14 @@ func (api *api) userPasswordHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := passwordCheckResponse{
-		Valid: false,
+	valid := true
+	err = checkPasswordValidity(data.Password, user.Password)
+	if err != nil {
+		valid = false
 	}
-	if data.Password == user.Password {
-		response.Valid = true
+
+	response := passwordCheckResponse{
+		Valid: valid,
 	}
 	json.NewEncoder(w).Encode(response)
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,6 +17,18 @@ type (
 		JWT string `json:"jwt"`
 	}
 )
+
+func hashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", nil
+	}
+	return string(hash), nil
+}
+
+func checkPasswordValidity(password string, hash string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+}
 
 // authHandler defines a handler function used to authenticate users
 func (api *api) authHandler(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +59,9 @@ func (api *api) authHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
-	if password != u.Password {
+
+	err = checkPasswordValidity(password, u.Password)
+	if err != nil {
 		log.Printf("Invalid credentials for user: %s", username)
 		http.Error(w, "Invalid credentials", http.StatusUnprocessableEntity)
 		return
