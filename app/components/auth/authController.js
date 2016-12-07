@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', 'Config', 'Authentication', 'Users', 'Messages',
-function ($scope, $state, $stateParams, $window, $timeout, Config, Authentication, Users, Messages) {
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'Messages',
+function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, Messages) {
 
   $scope.authData = {
     username: 'admin',
@@ -31,7 +31,8 @@ function ($scope, $state, $stateParams, $window, $timeout, Config, Authenticatio
   });
 
   $scope.createAdminUser = function() {
-    Users.create({username: "admin", password: $scope.initPasswordData.password}, function (d) {
+    var password = $sanitize($scope.initPasswordData.password);
+    Users.create({username: "admin", password: password}, function (d) {
       $scope.initPassword = false;
       $timeout(function() {
         var element = $window.document.getElementById('password');
@@ -46,7 +47,9 @@ function ($scope, $state, $stateParams, $window, $timeout, Config, Authenticatio
 
   $scope.authenticateUser = function() {
     $scope.authenticationError = false;
-    Authentication.login($scope.authData.username, $scope.authData.password)
+    var username = $sanitize($scope.authData.username);
+    var password = $sanitize($scope.authData.password);
+    Authentication.login(username, password)
     .then(function() {
       $state.go('dashboard');
     }, function() {

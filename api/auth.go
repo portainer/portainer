@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/asaskevich/govalidator"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"log"
@@ -10,8 +11,8 @@ import (
 
 type (
 	credentials struct {
-		Username string
-		Password string
+		Username string `valid:"alphanum,required"`
+		Password string `valid:"length(8)"`
 	}
 	authResponse struct {
 		JWT string `json:"jwt"`
@@ -48,6 +49,12 @@ func (api *api) authHandler(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &credentials)
 	if err != nil {
 		http.Error(w, "Unable to parse credentials", http.StatusBadRequest)
+		return
+	}
+
+	_, err = govalidator.ValidateStruct(credentials)
+	if err != nil {
+		http.Error(w, "Invalid credentials format", http.StatusBadRequest)
 		return
 	}
 
