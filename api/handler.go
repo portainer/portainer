@@ -20,9 +20,17 @@ func (a *api) newHandler(settings *Settings) http.Handler {
 
 	mux.Handle("/ws/exec", websocket.Handler(a.execContainer))
 	mux.HandleFunc("/auth", a.authHandler)
-	mux.HandleFunc("/users", a.usersHandler)
-	mux.HandleFunc("/users/{username}", a.userHandler)
-	mux.HandleFunc("/users/{username}/passwd", a.userPasswordHandler)
+	mux.Handle("/users", addMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a.usersHandler(w, r)
+	}), a.authenticate, secureHeaders))
+	mux.Handle("/users/{username}", addMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a.userHandler(w, r)
+	}), a.authenticate, secureHeaders))
+	mux.Handle("/users/{username}/passwd", addMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a.userPasswordHandler(w, r)
+	}), a.authenticate, secureHeaders))
+	mux.HandleFunc("/users/admin/check", a.checkAdminHandler)
+	mux.HandleFunc("/users/admin/init", a.initAdminHandler)
 	mux.HandleFunc("/settings", func(w http.ResponseWriter, r *http.Request) {
 		settingsHandler(w, r, settings)
 	})

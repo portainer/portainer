@@ -19,24 +19,29 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
 
   if ($stateParams.error) {
     $scope.authData.error = $stateParams.error;
+    Authentication.logout();
+  }
+
+  if (Authentication.isAuthenticated()) {
+    $state.go('dashboard');
   }
 
   Config.$promise.then(function (c) {
     $scope.logo = c.logo;
   });
 
-  Users.get({username: "admin"}, function (d) {},
+  Users.checkAdminUser({}, function (d) {},
   function (e) {
     if (e.status === 404) {
       $scope.initPassword = true;
     } else {
-      Messages.error("Failure", e, 'Unable to load existing users');
+      Messages.error("Failure", e, 'Unable to verify administrator account existence');
     }
   });
 
   $scope.createAdminUser = function() {
     var password = $sanitize($scope.initPasswordData.password);
-    Users.create({username: "admin", password: password}, function (d) {
+    Users.initAdminUser({password: password}, function (d) {
       $scope.initPassword = false;
       $timeout(function() {
         var element = $window.document.getElementById('password');

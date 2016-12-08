@@ -235,7 +235,9 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         create: { method: 'POST' },
         get: {method: 'GET', params: { username: '@username' } },
         update: { method: 'PUT', params: { username: '@username' } },
-        checkPassword: { method: 'POST', params: { username: '@username', action: 'passwd' } }
+        checkPassword: { method: 'POST', params: { username: '@username', action: 'passwd' } },
+        checkAdminUser: {method: 'GET', params: { username: 'admin', action: 'check' }},
+        initAdminUser: {method: 'POST', params: { username: 'admin', action: 'init' }}
       });
     }])
     .factory('EndpointMode', ['$rootScope', 'Info', function EndpointMode($rootScope, Info) {
@@ -295,6 +297,10 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         },
         logout: function() {
           localStorageService.remove('JWT');
+        },
+        isAuthenticated: function() {
+          var jwt = localStorageService.get('JWT');
+          return jwt && !jwtHelper.isTokenExpired(jwt)
         }
       };
     }])

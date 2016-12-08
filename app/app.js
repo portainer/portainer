@@ -49,13 +49,12 @@ angular.module('portainer', [
         return localStorageService.get('JWT');
       }],
       unauthenticatedRedirector: ['$state', function($state) {
-        $state.go('auth', {error: "Your session has expired"});
+        $state.go('auth', {error: 'Your session has expired'});
       }]
     });
-
     $httpProvider.interceptors.push('jwtInterceptor');
 
-    $urlRouterProvider.otherwise('/dashboard');
+    $urlRouterProvider.otherwise('/auth');
 
     $stateProvider
     .state('auth', {
@@ -499,7 +498,7 @@ angular.module('portainer', [
     });
 
     $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams) {
-      if (fromState.name === 'auth' || toState.name !== 'auth') {
+      if ((fromState.name === 'auth' || fromState.name === '') && Authentication.isAuthenticated()) {
         EndpointMode.determineEndpointMode();
       }
     });
