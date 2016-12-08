@@ -14,12 +14,12 @@
       </rd-widget-custom-header>
       <rd-widget-body classes="padding">
         <form class="form-horizontal">
-          <div class="form-group" ng-if="globalNetworkCount === 0 && !swarm_mode">
+          <div class="form-group" ng-if="globalNetworkCount === 0 && endpointMode.provider === 'DOCKER_SWARM'">
             <div class="col-sm-12">
               <span class="small text-muted">When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref="networks">networks view</a> to create one.</span>
             </div>
           </div>
-          <div class="form-group" ng-if="swarm_mode">
+          <div class="form-group" ng-if="endpointMode.provider === 'DOCKER_SWARM_MODE'">
             <div class="col-sm-12">
               <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
               <span class="small text-muted">App templates cannot be used with swarm-mode at the moment. You can still use them to quickly deploy containers to the Docker host.</span>
@@ -42,10 +42,10 @@
           <div ng-repeat="var in state.selectedTemplate.env" ng-if="!var.set" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
             <div class="col-sm-10">
-              <select ng-if="(!swarm || swarm && swarm_mode) && var.type === 'container'" ng-options="container|containername for container in runningContainers" class="selectpicker form-control" ng-model="var.value">
+              <select ng-if="endpointMode.provider !== 'DOCKER_SWARM' && var.type === 'container'" ng-options="container|containername for container in runningContainers" class="selectpicker form-control" ng-model="var.value">
                 <option selected disabled hidden value="">Select a container</option>
               </select>
-              <select ng-if="swarm && !swarm_mode && var.type === 'container'" ng-options="container|swarmcontainername for container in runningContainers" class="selectpicker form-control" ng-model="var.value">
+              <select ng-if="endpointMode.provider === 'DOCKER_SWARM' && var.type === 'container'" ng-options="container|swarmcontainername for container in runningContainers" class="selectpicker form-control" ng-model="var.value">
                 <option selected disabled hidden value="">Select a container</option>
               </select>
               <input ng-if="!var.type || !var.type === 'container'" type="text" class="form-control" ng-model="var.value" id="field_{{ $index }}">

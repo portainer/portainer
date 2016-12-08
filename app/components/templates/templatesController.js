@@ -198,11 +198,6 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
 
   Config.$promise.then(function (c) {
     $scope.swarm = c.swarm;
-    Info.get({}, function(info) {
-      if ($scope.swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
-        $scope.swarm_mode = true;
-      }
-    });
     var containersToHideLabels = c.hiddenLabels;
     Network.query({}, function (d) {
       var networks = d;

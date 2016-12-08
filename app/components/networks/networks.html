@@ -23,12 +23,12 @@
           </div>
           <!-- !name-input -->
           <!-- tag-note -->
-          <div class="form-group" ng-if="swarm">
+          <div class="form-group" ng-if="endpointMode.provider === 'DOCKER_SWARM' || endpointMode.provider === 'DOCKER_SWARM_MODE'">
             <div class="col-sm-12">
               <span class="small text-muted">Note: The network will be created using the overlay driver and will allow containers to communicate across the hosts of your cluster.</span>
             </div>
           </div>
-          <div class="form-group" ng-if="!swarm">
+          <div class="form-group" ng-if="endpointMode.provider === 'DOCKER_STANDALONE'">
             <div class="col-sm-12">
               <span class="small text-muted">Note: The network will be created using the bridge driver.</span>
             </div>

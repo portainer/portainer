@@ -15,7 +15,7 @@
     <li class="sidebar-list">
       <a ui-sref="templates">App Templates <span class="menu-icon fa fa-rocket"></span></a>
     </li>
-    <li class="sidebar-list" ng-if="swarm_mode">
+    <li class="sidebar-list" ng-if="endpointMode.provider === 'DOCKER_SWARM_MODE'">
       <a ui-sref="services">Services <span class="menu-icon fa fa-list-alt"></span></a>
     </li>
     <li class="sidebar-list">
@@ -30,13 +30,13 @@
     <li class="sidebar-list">
       <a ui-sref="volumes">Volumes <span class="menu-icon fa fa-cubes"></span></a>
     </li>
-    <li class="sidebar-list" ng-if="!swarm">
+    <li class="sidebar-list" ng-if="endpointMode.provider === 'DOCKER_STANDALONE'">
       <a ui-sref="events">Events <span class="menu-icon fa fa-history"></span></a>
     </li>
-    <li class="sidebar-list" ng-if="(swarm && !swarm_mode) || (swarm_mode && swarm_manager)">
+    <li class="sidebar-list" ng-if="endpointMode.provider === 'DOCKER_SWARM' || (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER')">
       <a ui-sref="swarm">Swarm <span class="menu-icon fa fa-object-group"></span></a>
     </li>
-    <li class="sidebar-list" ng-if="!swarm">
+    <li class="sidebar-list" ng-if="endpointMode.provider === 'DOCKER_STANDALONE'">
       <a ui-sref="docker">Docker <span class="menu-icon fa fa-th"></span></a>
     </li>
     <li class="sidebar-list">

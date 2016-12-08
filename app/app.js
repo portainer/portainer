@@ -488,23 +488,21 @@ angular.module('portainer', [
       };
     });
   }])
-  .run(function ($rootScope, $state, Authentication, authManager) {
+  .run(function ($rootScope, $state, Authentication, authManager, EndpointMode) {
     authManager.checkAuthOnRefresh();
     authManager.redirectWhenUnauthenticated();
-
-    $rootScope.$on('tokenHasExpired', function($state) {
-      $state.go('auth', {error: "Your session has expired"});
-    });
-
     Authentication.init();
     $rootScope.state = $state;
 
-    // $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
-    //   if (toState.authenticate && !Authentication.isAuthenticated()){
-    //     $state.transitionTo("auth");
-    //     event.preventDefault();
-    //   }
-    // });
+    $rootScope.$on('tokenHasExpired', function($state) {
+      $state.go('auth', {error: 'Your session has expired'});
+    });
+
+    $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams) {
+      if (fromState.name === 'auth' || toState.name !== 'auth') {
+        EndpointMode.determineEndpointMode();
+      }
+    });
   })
   // This is your docker url that the api will use to make requests
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9

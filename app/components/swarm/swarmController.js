@@ -7,7 +7,6 @@ function ($scope, Info, Version, Node, Settings) {
   $scope.info = {};
   $scope.docker = {};
   $scope.swarm = {};
-  $scope.swarm_mode = false;
   $scope.totalCPU = 0;
   $scope.totalMemory = 0;
   $scope.pagination_count = Settings.pagination_count;
@@ -23,8 +22,7 @@ function ($scope, Info, Version, Node, Settings) {
 
   Info.get({}, function (d) {
     $scope.info = d;
-    if (!_.startsWith(d.ServerVersion, 'swarm')) {
-      $scope.swarm_mode = true;
+    if ($scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
       Node.query({}, function(d) {
         $scope.nodes = d;
         var CPU = 0, memory = 0;

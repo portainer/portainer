@@ -222,6 +222,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         };
     }])
     .factory('Auth', ['$resource', 'AUTH_ENDPOINT', function AuthFactory($resource, AUTH_ENDPOINT) {
+      'use strict';
       return $resource(AUTH_ENDPOINT, {}, {
         login: {
           method: 'POST'
@@ -229,12 +230,46 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
       });
     }])
     .factory('Users', ['$resource', function UsersFactory($resource) {
+      'use strict';
       return $resource('/users/:username/:action', {}, {
         create: { method: 'POST' },
         get: {method: 'GET', params: { username: '@username' } },
         update: { method: 'PUT', params: { username: '@username' } },
         checkPassword: { method: 'POST', params: { username: '@username', action: 'passwd' } }
       });
+    }])
+    .factory('EndpointMode', ['$rootScope', 'Info', function EndpointMode($rootScope, Info) {
+      'use strict';
+      return {
+        determineEndpointMode: function() {
+          Info.get({}, function(d) {
+            var mode = {
+              provider: '',
+              role: ''
+            };
+            if (_.startsWith(d.ServerVersion, 'swarm')) {
+              mode.provider = "DOCKER_SWARM";
+              if (d.SystemStatus[0][1] === 'primary') {
+                mode.role = "PRIMARY";
+              } else {
+                mode.role = "REPLICA";
+              }
+            } else {
+              if (!d.Swarm || _.isEmpty(d.Swarm.NodeID)) {
+                mode.provider = "DOCKER_STANDALONE";
+              } else {
+                mode.provider = "DOCKER_SWARM_MODE";
+                if (d.Swarm.ControlAvailable) {
+                  mode.role = "MANAGER";
+                } else {
+                  mode.role = "WORKER";
+                }
+              }
+            }
+            $rootScope.endpointMode = mode;
+          });
+        }
+      };
     }])
     .factory('Authentication', ['$q', '$rootScope', 'Auth', 'jwtHelper', 'localStorageService', function AuthenticationFactory($q, $rootScope, Auth, jwtHelper, localStorageService) {
       'use strict';
