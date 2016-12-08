@@ -176,7 +176,7 @@ angular.module('portainer', [
         "sidebar": {
           template: '<div ui-view="sidebar"></div>'
         }
-      },
+      }
     })
     .state('actions.create', {
       abstract: true,
@@ -188,7 +188,7 @@ angular.module('portainer', [
         "sidebar": {
           template: '<div ui-view="sidebar"></div>'
         }
-      },
+      }
     })
     .state('actions.create.container', {
       url: "/container",

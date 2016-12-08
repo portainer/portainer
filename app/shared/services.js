@@ -300,7 +300,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         },
         isAuthenticated: function() {
           var jwt = localStorageService.get('JWT');
-          return jwt && !jwtHelper.isTokenExpired(jwt)
+          return jwt && !jwtHelper.isTokenExpired(jwt);
         }
       };
     }])
