@@ -29,7 +29,9 @@ func (a *api) newHandler(settings *Settings) http.Handler {
 	mux.HandleFunc("/templates", func(w http.ResponseWriter, r *http.Request) {
 		templatesHandler(w, r, a.templatesURL)
 	})
-	mux.PathPrefix("/dockerapi/").Handler(http.StripPrefix("/dockerapi", handler))
+	// mux.PathPrefix("/dockerapi/").Handler(http.StripPrefix("/dockerapi", handler))
+	mux.PathPrefix("/dockerapi/").Handler(http.StripPrefix("/dockerapi", addMiddleware(handler, a.authenticate, secureHeaders)))
+
 	mux.PathPrefix("/").Handler(http.StripPrefix("/", fileHandler))
 
 	// CSRF protection is disabled for the moment

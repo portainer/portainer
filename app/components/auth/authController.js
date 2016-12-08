@@ -5,7 +5,7 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
   $scope.authData = {
     username: 'admin',
     password: '',
-    error: false
+    error: ''
   };
   $scope.initPasswordData = {
     password: '',
@@ -15,6 +15,10 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
 
   if ($stateParams.logout) {
     Authentication.logout();
+  }
+
+  if ($stateParams.error) {
+    $scope.authData.error = $stateParams.error;
   }
 
   Config.$promise.then(function (c) {
@@ -53,7 +57,7 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
     .then(function() {
       $state.go('dashboard');
     }, function() {
-      $scope.authData.error = true;
+      $scope.authData.error = 'Invalid credentials';
     });
   };
 }]);

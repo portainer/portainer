@@ -240,8 +240,8 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
       'use strict';
       return {
         init: function() {
-          if (this.isAuthenticated()) {
-            var jwt = localStorageService.get('JWT');
+          var jwt = localStorageService.get('JWT');
+          if (jwt) {
             var tokenPayload = jwtHelper.decodeToken(jwt);
             $rootScope.username = tokenPayload.username;
           }
@@ -260,10 +260,6 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         },
         logout: function() {
           localStorageService.remove('JWT');
-        },
-        isAuthenticated: function() {
-          var jwt = localStorageService.get('JWT');
-          return jwt && !jwtHelper.isTokenExpired(jwt);
         }
       };
     }])

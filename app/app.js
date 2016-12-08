@@ -6,8 +6,8 @@ angular.module('portainer', [
   'ngCookies',
   'ngSanitize',
   'angularUtils.directives.dirPagination',
-  'angular-jwt',
   'LocalStorageModule',
+  'angular-jwt',
   'portainer.services',
   'portainer.helpers',
   'portainer.filters',
@@ -22,9 +22,11 @@ angular.module('portainer', [
   'events',
   'images',
   'image',
+  'main',
   'service',
   'services',
   'settings',
+  'sidebar',
   'createService',
   'stats',
   'swarm',
@@ -35,12 +37,23 @@ angular.module('portainer', [
   'templates',
   'volumes',
   'createVolume'])
-  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider) {
+  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider) {
     'use strict';
 
     localStorageServiceProvider
     .setStorageType('sessionStorage')
     .setPrefix('portainer');
+
+    jwtOptionsProvider.config({
+      tokenGetter: ['localStorageService', function(localStorageService) {
+        return localStorageService.get('JWT');
+      }],
+      unauthenticatedRedirector: ['$state', function($state) {
+        $state.go('auth', {error: "Your session has expired"});
+      }]
+    });
+
+    $httpProvider.interceptors.push('jwtInterceptor');
 
     $urlRouterProvider.otherwise('/dashboard');
 
@@ -48,158 +61,407 @@ angular.module('portainer', [
     .state('auth', {
       url: '/auth',
       params: {
-        logout: false
+        logout: false,
+        error: ''
       },
-      templateUrl: 'app/components/auth/auth.html',
-      controller: 'AuthenticationController'
+      views: {
+        "content": {
+          templateUrl: 'app/components/auth/auth.html',
+          controller: 'AuthenticationController'
+        }
+      }
     })
     .state('containers', {
       url: '/containers/',
-      templateUrl: 'app/components/containers/containers.html',
-      controller: 'ContainersController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/containers/containers.html',
+          controller: 'ContainersController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('container', {
       url: "^/containers/:id",
-      templateUrl: 'app/components/container/container.html',
-      controller: 'ContainerController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/container/container.html',
+          controller: 'ContainerController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('stats', {
       url: "^/containers/:id/stats",
-      templateUrl: 'app/components/stats/stats.html',
-      controller: 'StatsController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/stats/stats.html',
+          controller: 'StatsController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('logs', {
       url: "^/containers/:id/logs",
-      templateUrl: 'app/components/containerLogs/containerlogs.html',
-      controller: 'ContainerLogsController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/containerLogs/containerlogs.html',
+          controller: 'ContainerLogsController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('console', {
       url: "^/containers/:id/console",
-      templateUrl: 'app/components/containerConsole/containerConsole.html',
-      controller: 'ContainerConsoleController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/containerConsole/containerConsole.html',
+          controller: 'ContainerConsoleController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('dashboard', {
       url: '/dashboard',
-      templateUrl: 'app/components/dashboard/dashboard.html',
-      controller: 'DashboardController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/dashboard/dashboard.html',
+          controller: 'DashboardController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('actions', {
       abstract: true,
       url: "/actions",
-      template: '<ui-view/>'
+      views: {
+        "content": {
+          template: '<div ui-view="content"></div>'
+        },
+        "sidebar": {
+          template: '<div ui-view="sidebar"></div>'
+        }
+      },
     })
     .state('actions.create', {
       abstract: true,
       url: "/create",
-      template: '<ui-view/>'
+      views: {
+        "content": {
+          template: '<div ui-view="content"></div>'
+        },
+        "sidebar": {
+          template: '<div ui-view="sidebar"></div>'
+        }
+      },
     })
     .state('actions.create.container', {
       url: "/container",
-      templateUrl: 'app/components/createContainer/createcontainer.html',
-      controller: 'CreateContainerController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/createContainer/createcontainer.html',
+          controller: 'CreateContainerController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('actions.create.network', {
       url: "/network",
-      templateUrl: 'app/components/createNetwork/createnetwork.html',
-      controller: 'CreateNetworkController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/createNetwork/createnetwork.html',
+          controller: 'CreateNetworkController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('actions.create.service', {
       url: "/service",
-      templateUrl: 'app/components/createService/createservice.html',
-      controller: 'CreateServiceController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/createService/createservice.html',
+          controller: 'CreateServiceController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('actions.create.volume', {
       url: "/volume",
-      templateUrl: 'app/components/createVolume/createvolume.html',
-      controller: 'CreateVolumeController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/createVolume/createvolume.html',
+          controller: 'CreateVolumeController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('docker', {
       url: '/docker/',
-      templateUrl: 'app/components/docker/docker.html',
-      controller: 'DockerController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/docker/docker.html',
+          controller: 'DockerController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('events', {
       url: '/events/',
-      templateUrl: 'app/components/events/events.html',
-      controller: 'EventsController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/events/events.html',
+          controller: 'EventsController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('images', {
       url: '/images/',
-      templateUrl: 'app/components/images/images.html',
-      controller: 'ImagesController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/images/images.html',
+          controller: 'ImagesController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('image', {
       url: '^/images/:id/',
-      templateUrl: 'app/components/image/image.html',
-      controller: 'ImageController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/image/image.html',
+          controller: 'ImageController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('networks', {
       url: '/networks/',
-      templateUrl: 'app/components/networks/networks.html',
-      controller: 'NetworksController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/networks/networks.html',
+          controller: 'NetworksController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('network', {
       url: '^/networks/:id/',
-      templateUrl: 'app/components/network/network.html',
-      controller: 'NetworkController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/network/network.html',
+          controller: 'NetworkController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('services', {
       url: '/services/',
-      templateUrl: 'app/components/services/services.html',
-      controller: 'ServicesController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/services/services.html',
+          controller: 'ServicesController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('service', {
       url: '^/service/:id/',
-      templateUrl: 'app/components/service/service.html',
-      controller: 'ServiceController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/service/service.html',
+          controller: 'ServiceController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('settings', {
       url: '/settings/',
-      templateUrl: 'app/components/settings/settings.html',
-      controller: 'SettingsController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/settings/settings.html',
+          controller: 'SettingsController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('task', {
       url: '^/task/:id',
-      templateUrl: 'app/components/task/task.html',
-      controller: 'TaskController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/task/task.html',
+          controller: 'TaskController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('templates', {
       url: '/templates/',
-      templateUrl: 'app/components/templates/templates.html',
-      controller: 'TemplatesController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/templates/templates.html',
+          controller: 'TemplatesController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('volumes', {
       url: '/volumes/',
-      templateUrl: 'app/components/volumes/volumes.html',
-      controller: 'VolumesController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/volumes/volumes.html',
+          controller: 'VolumesController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     })
     .state('swarm', {
       url: '/swarm/',
-      templateUrl: 'app/components/swarm/swarm.html',
-      controller: 'SwarmController',
-      authenticate: true
+      views: {
+        "content": {
+          templateUrl: 'app/components/swarm/swarm.html',
+          controller: 'SwarmController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
     });
 
     // The Docker API likes to return plaintext errors, this catches them and disp
@@ -209,7 +471,7 @@ angular.module('portainer', [
       return {
         'response': function(response) {
           if (typeof(response.data) === 'string' &&
-                  (response.data.startsWith('Conflict.') || response.data.startsWith('conflict:'))) {
+          (response.data.startsWith('Conflict.') || response.data.startsWith('conflict:'))) {
             $.gritter.add({
               title: 'Error',
               text: $('<div>').text(response.data).html(),
@@ -226,20 +488,28 @@ angular.module('portainer', [
       };
     });
   }])
-  .run(function ($rootScope, $state, Authentication) {
-    Authentication.init();
-    $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
-      if (toState.authenticate && !Authentication.isAuthenticated()){
-        $state.transitionTo("auth");
-        event.preventDefault();
-      }
+  .run(function ($rootScope, $state, Authentication, authManager) {
+    authManager.checkAuthOnRefresh();
+    authManager.redirectWhenUnauthenticated();
+
+    $rootScope.$on('tokenHasExpired', function($state) {
+      $state.go('auth', {error: "Your session has expired"});
     });
-    $rootScope.$state = $state;
+
+    Authentication.init();
+    $rootScope.state = $state;
+
+    // $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+    //   if (toState.authenticate && !Authentication.isAuthenticated()){
+    //     $state.transitionTo("auth");
+    //     event.preventDefault();
+    //   }
+    // });
   })
   // This is your docker url that the api will use to make requests
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
   .constant('DOCKER_ENDPOINT', 'dockerapi')
-  .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is requred.  If you have a port, prefix it with a ':' i.e. :4243
+  .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is required.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('CONFIG_ENDPOINT', 'settings')
   .constant('AUTH_ENDPOINT', 'auth')
   .constant('TEMPLATES_ENDPOINT', 'templates')

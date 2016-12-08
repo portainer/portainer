@@ -84,6 +84,9 @@ function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume
       prepareNetworkData(d[3]);
       prepareInfoData(d[4]);
       $('#loadingViewSpinner').hide();
+    }, function(e) {
+      $('#loadingViewSpinner').hide();
+      Messages.error("Failure", e, "Unable to load dashboard data");
     });
   }
 

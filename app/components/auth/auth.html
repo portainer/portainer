@@ -84,7 +84,7 @@
             <div class="form-group">
               <div class="col-sm-12 controls">
                 <p class="pull-left text-danger" ng-if="authData.error" style="margin: 5px;">
-                  <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Invalid credentials
+                  <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ authData.error }}
                 </p>
                 <button type="submit" class="btn btn-primary pull-right" ng-click="authenticateUser()"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</button>
               </div>

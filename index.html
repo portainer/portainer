@@ -24,70 +24,16 @@
   <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-precomposed.png">
 </head>
 
-<body ng-controller="MasterCtrl">
+<body ng-controller="MainController">
   <div id="page-wrapper" ng-class="{open: toggle && $state.current.name !== 'auth', nopadding: $state.current.name === 'auth'}" ng-cloak>
 
-    <!-- Sidebar -->
-    <div id="sidebar-wrapper" ng-show="$state.current.name !== 'auth'">
-      <ul class="sidebar">
-        <li class="sidebar-main">
-          <a ng-click="toggleSidebar()">
-            <img ng-if="logo" ng-src="{{ logo }}" class="img-responsive logo">
-            <img ng-if="!logo" src="images/logo.png" class="img-responsive logo" alt="Portainer">
-            <span class="menu-icon glyphicon glyphicon-transfer"></span>
-          </a>
-        </li>
-        <li class="sidebar-title"><span>NAVIGATION</span></li>
-        <li class="sidebar-list">
-          <a ui-sref="dashboard">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
-        </li>
-        <li class="sidebar-list">
-          <a ui-sref="templates">App Templates <span class="menu-icon fa fa-rocket"></span></a>
-        </li>
-        <li class="sidebar-list" ng-if="swarm_mode">
-          <a ui-sref="services">Services <span class="menu-icon fa fa-list-alt"></span></a>
-        </li>
-        <li class="sidebar-list">
-          <a ui-sref="containers">Containers <span class="menu-icon fa fa-server"></span></a>
-        </li>
-        <li class="sidebar-list">
-          <a ui-sref="images">Images <span class="menu-icon fa fa-clone"></span></a>
-        </li>
-        <li class="sidebar-list">
-          <a ui-sref="networks">Networks <span class="menu-icon fa fa-sitemap"></span></a>
-        </li>
-        <li class="sidebar-list">
-          <a ui-sref="volumes">Volumes <span class="menu-icon fa fa-cubes"></span></a>
-        </li>
-        <li class="sidebar-list" ng-if="!swarm">
-          <a ui-sref="events">Events <span class="menu-icon fa fa-history"></span></a>
-        </li>
-        <li class="sidebar-list" ng-if="(swarm && !swarm_mode) || (swarm_mode && swarm_manager)">
-          <a ui-sref="swarm">Swarm <span class="menu-icon fa fa-object-group"></span></a>
-        </li>
-        <li class="sidebar-list" ng-if="!swarm">
-          <a ui-sref="docker">Docker <span class="menu-icon fa fa-th"></span></a>
-        </li>
-        <li class="sidebar-list">
-          <a ui-sref="settings">Settings <span class="menu-icon fa fa-wrench"></span></a>
-        </li>
-      </ul>
-      <div class="sidebar-footer">
-        <div class="col-xs-12">
-          <a href="https://github.com/portainer/portainer" target="_blank">
-            <i class="fa fa-github" aria-hidden="true"></i>
-            Portainer {{ uiVersion }}
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- End Sidebar -->
+    <div id="sideview" ui-view="sidebar"></div>
 
     <div id="content-wrapper">
       <div class="page-content">
 
         <!-- Main Content -->
-        <div id="view" ui-view></div>
+        <div id="view" ui-view="content"></div>
 
       </div><!-- End Page Content -->
     </div><!-- End Content Wrapper -->

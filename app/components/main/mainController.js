@@ -1,6 +1,7 @@
-angular.module('dashboard')
-.controller('MasterCtrl', ['$scope', '$cookieStore', 'Settings', 'Config', 'Info',
-function ($scope, $cookieStore, Settings, Config, Info) {
+angular.module('main', [])
+.controller('MainController', ['$scope', '$cookieStore',
+function ($scope, $cookieStore) {
+
   /**
   * Sidebar Toggle & Cookie Control
   */
@@ -8,22 +9,6 @@ function ($scope, $cookieStore, Settings, Config, Info) {
   $scope.getWidth = function() {
     return window.innerWidth;
   };
-
-  $scope.swarm_mode = false;
-
-  Config.$promise.then(function (c) {
-    $scope.logo = c.logo;
-    $scope.swarm = c.swarm;
-    Info.get({}, function(d) {
-      if ($scope.swarm && !_.startsWith(d.ServerVersion, 'swarm')) {
-        $scope.swarm_mode = true;
-        $scope.swarm_manager = false;
-        if (d.Swarm.ControlAvailable) {
-          $scope.swarm_manager = true;
-        }
-      }
-    });
-  });
 
   $scope.$watch($scope.getWidth, function(newValue, oldValue) {
     if (newValue >= mobileView) {
@@ -46,6 +31,4 @@ function ($scope, $cookieStore, Settings, Config, Info) {
   window.onresize = function() {
     $scope.$apply();
   };
-
-  $scope.uiVersion = Settings.uiVersion;
 }]);
