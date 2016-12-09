@@ -487,7 +487,7 @@ angular.module('portainer', [
       };
     });
   }])
-  .run(function ($rootScope, $state, Authentication, authManager, EndpointMode) {
+  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'EndpointMode', function ($rootScope, $state, Authentication, authManager, EndpointMode) {
     authManager.checkAuthOnRefresh();
     authManager.redirectWhenUnauthenticated();
     Authentication.init();
@@ -502,7 +502,7 @@ angular.module('portainer', [
         EndpointMode.determineEndpointMode();
       }
     });
-  })
+  }])
   // This is your docker url that the api will use to make requests
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
   .constant('DOCKER_ENDPOINT', 'dockerapi')
