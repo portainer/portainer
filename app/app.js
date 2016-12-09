@@ -491,7 +491,7 @@ angular.module('portainer', [
     authManager.checkAuthOnRefresh();
     authManager.redirectWhenUnauthenticated();
     Authentication.init();
-    $rootScope.state = $state;
+    $rootScope.$state = $state;
 
     $rootScope.$on('tokenHasExpired', function($state) {
       $state.go('auth', {error: 'Your session has expired'});
