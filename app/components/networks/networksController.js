@@ -3,6 +3,7 @@ angular.module('networks', [])
 function ($scope, $state, Network, Config, Messages, Settings) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
+  $scope.state.checkedAll = false;
   $scope.state.advancedSettings = false;
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
@@ -47,11 +48,33 @@ function ($scope, $state, Network, Config, Messages, Settings) {
     $scope.sortType = sortType;
   };
 
+  $scope.selectAllItem = function () {
+    if($scope.state.selectedItemCount==$scope.networks.length){
+      angular.forEach($scope.networks, function (i) {
+        i.Checked = false;
+        $scope.state.selectedItemCount--;
+      });
+    } else {
+      angular.forEach($scope.networks, function (i) {
+        if (!i.Checked) {
+          i.Checked = true;
+          $scope.state.selectedItemCount++;
+        }
+      });
+    }
+  };
+
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
+      if($scope.state.selectedItemCount==$scope.networks.length){
+        $scope.state.checkedAll = true;
+      }
     } else {
       $scope.state.selectedItemCount--;
+      if($scope.state.checkedAll){
+        $scope.state.checkedAll = false;
+      }
     }
   };
 
@@ -74,6 +97,8 @@ function ($scope, $state, Network, Config, Messages, Settings) {
             Messages.send("Network removed", network.Id);
             var index = $scope.networks.indexOf(network);
             $scope.networks.splice(index, 1);
+            $scope.state.selectedItemCount--;
+            $scope.state.checkedAll = false;
           }
           complete();
         }, function (e) {
