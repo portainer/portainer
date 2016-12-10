@@ -5,6 +5,7 @@ function ($scope, $state, Config, Image, Messages, Settings) {
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
   $scope.state.selectedItemCount = 0;
+  $scope.state.checkedAll = false;
   $scope.pagination_count = Settings.pagination_count;
 
   $scope.config = {
@@ -17,11 +18,33 @@ function ($scope, $state, Config, Image, Messages, Settings) {
     $scope.sortType = sortType;
   };
 
+  $scope.selectAllItem = function () {
+    if($scope.state.selectedItemCount==$scope.images.length){
+      angular.forEach($scope.images, function (i) {
+        i.Checked = false;
+        $scope.state.selectedItemCount--;
+      });
+    } else {
+      angular.forEach($scope.images, function (i) {
+        if (!i.Checked) {
+          i.Checked = true;
+          $scope.state.selectedItemCount++;
+        }
+      });
+    }
+  };
+
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
+      if($scope.state.selectedItemCount==$scope.images.length){
+        $scope.state.checkedAll = true;
+      }
     } else {
       $scope.state.selectedItemCount--;
+      if($scope.state.checkedAll){
+        $scope.state.checkedAll = false;
+      }
     }
   };
 
@@ -79,6 +102,8 @@ function ($scope, $state, Config, Image, Messages, Settings) {
             Messages.send("Image deleted", i.Id);
             var index = $scope.images.indexOf(i);
             $scope.images.splice(index, 1);
+            $scope.state.selectedItemCount--;
+            $scope.state.checkedAll = false;
           }
           complete();
         }, function (e) {

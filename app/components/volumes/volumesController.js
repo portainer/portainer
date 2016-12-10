@@ -3,6 +3,7 @@ angular.module('volumes', [])
 function ($scope, $state, Volume, Messages, Settings) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
+  $scope.state.checkedAll = false;
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
   $scope.config = {
@@ -14,12 +15,34 @@ function ($scope, $state, Volume, Messages, Settings) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
   };
+  
+  $scope.selectAllItem = function () {
+    if($scope.state.selectedItemCount==$scope.volumes.length){
+      angular.forEach($scope.volumes, function (i) {
+        i.Checked = false;
+        $scope.state.selectedItemCount--;
+      });
+    } else {
+      angular.forEach($scope.volumes, function (i) {
+        if (!i.Checked) {
+          i.Checked = true;
+          $scope.state.selectedItemCount++;
+        }
+      });
+    }
+  };
 
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
+      if($scope.state.selectedItemCount==$scope.volumes.length){
+        $scope.state.checkedAll = true;
+      }
     } else {
       $scope.state.selectedItemCount--;
+      if($scope.state.checkedAll){
+        $scope.state.checkedAll = false;
+      }
     }
   };
 
@@ -42,6 +65,8 @@ function ($scope, $state, Volume, Messages, Settings) {
             Messages.send("Volume deleted", volume.Name);
             var index = $scope.volumes.indexOf(volume);
             $scope.volumes.splice(index, 1);
+            $scope.state.selectedItemCount--;
+            $scope.state.checkedAll = false;
           }
           complete();
         }, function (e) {
