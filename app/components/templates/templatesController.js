@@ -1,6 +1,6 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', '$location', '$anchorScroll', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Templates', 'TemplateHelper', 'Messages', 'Settings',
-function ($scope, $q, $state, $filter, $location, $anchorScroll, Config, Info, Container, ContainerHelper, Image, Volume, Network, Templates, TemplateHelper, Messages, Settings) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', '$anchorScroll', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Templates', 'TemplateHelper', 'Messages', 'Settings',
+function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, ContainerHelper, Image, Volume, Network, Templates, TemplateHelper, Messages, Settings) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false
@@ -179,8 +179,7 @@ function ($scope, $q, $state, $filter, $location, $anchorScroll, Config, Info, C
       var selectedTemplate = $scope.templates[id];
       $scope.state.selectedTemplate = selectedTemplate;
       $scope.formValues.ports = selectedTemplate.ports ? TemplateHelper.getPortBindings(selectedTemplate.ports) : [];
-      $location.hash('selectedTemplate');
-      $anchorScroll();
+      $anchorScroll('selectedTemplate');
     }
   };
 
