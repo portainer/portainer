@@ -17,7 +17,7 @@ function ($scope, $state, Volume, Messages, Settings) {
   };
   
   $scope.selectAllItem = function () {
-    if($scope.state.selectedItemCount==$scope.volumes.length){
+    if($scope.state.selectedItemCount===$scope.volumes.length){
       angular.forEach($scope.volumes, function (i) {
         i.Checked = false;
         $scope.state.selectedItemCount--;
@@ -35,7 +35,7 @@ function ($scope, $state, Volume, Messages, Settings) {
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
-      if($scope.state.selectedItemCount==$scope.volumes.length){
+      if($scope.state.selectedItemCount===$scope.volumes.length){
         $scope.state.checkedAll = true;
       }
     } else {

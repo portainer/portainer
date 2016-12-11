@@ -19,7 +19,7 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
   };
 
   $scope.selectAllItem = function () {
-    if($scope.state.selectedItemCount==$scope.images.length){
+    if($scope.state.selectedItemCount===$scope.images.length){
       angular.forEach($scope.images, function (i) {
         i.Checked = false;
         $scope.state.selectedItemCount--;
@@ -37,7 +37,7 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
-      if($scope.state.selectedItemCount==$scope.images.length){
+      if($scope.state.selectedItemCount===$scope.images.length){
         $scope.state.checkedAll = true;
       }
     } else {

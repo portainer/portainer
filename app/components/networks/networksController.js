@@ -49,7 +49,7 @@ function ($scope, $state, Network, Config, Messages, Settings) {
   };
 
   $scope.selectAllItem = function () {
-    if($scope.state.selectedItemCount==$scope.networks.length){
+    if($scope.state.selectedItemCount===$scope.networks.length){
       angular.forEach($scope.networks, function (i) {
         i.Checked = false;
         $scope.state.selectedItemCount--;
@@ -67,7 +67,7 @@ function ($scope, $state, Network, Config, Messages, Settings) {
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
-      if($scope.state.selectedItemCount==$scope.networks.length){
+      if($scope.state.selectedItemCount===$scope.networks.length){
         $scope.state.checkedAll = true;
       }
     } else {

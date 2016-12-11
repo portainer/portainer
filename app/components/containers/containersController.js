@@ -96,7 +96,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
   };
 
   $scope.selectAllItem = function () {
-    if($scope.state.selectedItemCount==$scope.containers.length){
+    if($scope.state.selectedItemCount===$scope.containers.length){
       angular.forEach($scope.containers, function (i) {
         i.Checked = false;
         $scope.state.selectedItemCount--;
@@ -114,7 +114,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
-      if($scope.state.selectedItemCount==$scope.containers.length){
+      if($scope.state.selectedItemCount===$scope.containers.length){
         $scope.state.checkedAll = true;
       }
     } else {
