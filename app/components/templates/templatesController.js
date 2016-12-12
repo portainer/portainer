@@ -1,6 +1,6 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Templates', 'TemplateHelper', 'Messages', 'Settings',
-function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper, Image, Volume, Network, Templates, TemplateHelper, Messages, Settings) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'Templates', 'TemplateHelper', 'Messages', 'Settings',
+function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, Templates, TemplateHelper, Messages, Settings) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false
@@ -129,7 +129,16 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
       });
     }
     preparePortBindings(containerConfig, $scope.formValues.ports);
+    prepareImageConfig(containerConfig, template);
     return containerConfig;
+  }
+
+  function prepareImageConfig(config, template) {
+    var image = _.toLower(template.image);
+    var registry = template.registry;
+    var imageConfig = ImageHelper.createImageConfigForContainer(image, registry);
+    config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
+    $scope.imageConfig = imageConfig;
   }
 
   function prepareVolumeQueries(template, containerConfig) {
@@ -158,13 +167,9 @@ function ($scope, $q, $state, $filter, Config, Info, Container, ContainerHelper,
     $('#createContainerSpinner').show();
     var template = $scope.state.selectedTemplate;
     var containerConfig = createConfigFromTemplate(template);
-    var imageConfig = {
-      fromImage: template.image.split(':')[0],
-      tag: template.image.split(':')[1] ? template.image.split(':')[1] : 'latest'
-    };
     var createVolumeQueries = prepareVolumeQueries(template, containerConfig);
     $q.all(createVolumeQueries).then(function (d) {
-      pullImageAndCreateContainer(imageConfig, containerConfig);
+      pullImageAndCreateContainer($scope.imageConfig, containerConfig);
     });
   };
 
