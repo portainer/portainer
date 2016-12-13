@@ -23,7 +23,7 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
     $('#loadingViewSpinner').show();
     var image = _.toLower($scope.config.Image);
     var registry = _.toLower($scope.config.Registry);
-    var imageConfig = ImageHelper.createImageConfig(image, registry);
+    var imageConfig = ImageHelper.createImageConfigForCommit(image, registry);
     Image.tag({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
       Messages.send('Image successfully tagged');
       $('#loadingViewSpinner').hide();
