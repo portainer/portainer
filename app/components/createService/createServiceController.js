@@ -69,8 +69,8 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
   };
 
   function prepareImageConfig(config, input) {
-    var imageConfig = ImageHelper.createImageConfig(input.Image, input.Registry);
-    config.TaskTemplate.ContainerSpec.Image = imageConfig.repo + ':' + imageConfig.tag;
+    var imageConfig = ImageHelper.createImageConfigForContainer(input.Image, input.Registry);
+    config.TaskTemplate.ContainerSpec.Image = imageConfig.fromImage + ':' + imageConfig.tag;
   }
 
   function preparePortsConfig(config, input) {

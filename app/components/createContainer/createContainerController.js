@@ -1,6 +1,6 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Messages',
-function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, Volume, Network, Messages) {
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'Messages',
+function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, Messages) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -143,23 +143,10 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     });
   }
 
-  function createImageConfig(imageName, registry) {
-    var imageNameAndTag = imageName.split(':');
-    var image = imageNameAndTag[0];
-    if (registry) {
-      image = registry + '/' + imageNameAndTag[0];
-    }
-    var imageConfig = {
-      fromImage: image,
-      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
-    };
-    return imageConfig;
-  }
-
   function prepareImageConfig(config) {
     var image = _.toLower(config.Image);
     var registry = $scope.formValues.Registry;
-    var imageConfig = createImageConfig(image, registry);
+    var imageConfig = ImageHelper.createImageConfigForContainer(image, registry);
     config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
     $scope.imageConfig = imageConfig;
   }
