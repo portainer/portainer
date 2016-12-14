@@ -40,9 +40,11 @@
                 <a href="" data-toggle="tooltip" title="Edit container name" ng-click="container.edit = true;"><i class="fa fa-edit"></i></a>
               </td>
               <td ng-if="container.edit">
-                <input type="text" class="containerNameInput" ng-model="container.newContainerName">
-                <a href="" ng-click="container.edit = false;"><i class="fa fa-times"></i></a>
-                <a href="" ng-click="renameContainer()"><i class="fa fa-check-square-o"></i></a>
+                <form ng-submit="renameContainer()">
+                  <input type="text" class="containerNameInput" ng-model="container.newContainerName">
+                  <a href="" ng-click="container.edit = false;"><i class="fa fa-times"></i></a>
+                  <a href="" ng-click="renameContainer()"><i class="fa fa-check-square-o"></i></a>
+                </form>
               </td>
             </tr>
             <tr ng-if="container.NetworkSettings.IPAddress">
