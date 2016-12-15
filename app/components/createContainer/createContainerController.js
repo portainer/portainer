@@ -124,14 +124,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   // TODO: centralize, already present in templatesController
   function pullImageAndCreateContainer(config) {
     Image.create($scope.imageConfig, function (data) {
-      var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
-      if (err) {
-        var detail = data[data.length - 1];
-        $('#createContainerSpinner').hide();
-        Messages.error('Error', {}, detail.error);
-      } else {
-        createContainer(config);
-      }
+      createContainer(config);
     }, function (e) {
       $('#createContainerSpinner').hide();
       Messages.error('Failure', e, 'Unable to pull image');
