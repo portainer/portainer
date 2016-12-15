@@ -1,7 +1,7 @@
 package main // import "github.com/portainer/portainer"
 
 import (
-	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/portainer/portainer/cli"
 )
 
 const (
@@ -11,40 +11,26 @@ const (
 
 // main is the entry point of the program
 func main() {
-	kingpin.Version(Version)
-	var (
-		endpoint  = kingpin.Flag("host", "Dockerd endpoint").Default("unix:///var/run/docker.sock").Short('H').String()
-		addr      = kingpin.Flag("bind", "Address and port to serve Portainer").Default(":9000").Short('p').String()
-		assets    = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
-		data      = kingpin.Flag("data", "Path to the folder where the data is stored").Default("/data").Short('d').String()
-		tlsverify = kingpin.Flag("tlsverify", "TLS support").Default("false").Bool()
-		tlscacert = kingpin.Flag("tlscacert", "Path to the CA").Default("/certs/ca.pem").String()
-		tlscert   = kingpin.Flag("tlscert", "Path to the TLS certificate file").Default("/certs/cert.pem").String()
-		tlskey    = kingpin.Flag("tlskey", "Path to the TLS key").Default("/certs/key.pem").String()
-		swarm     = kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool()
-		labels    = pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l'))
-		logo      = kingpin.Flag("logo", "URL for the logo displayed in the UI").String()
-		templates = kingpin.Flag("templates", "URL to the templates (apps) definitions").Default("https://raw.githubusercontent.com/portainer/templates/master/templates.json").Short('t').String()
-	)
-	kingpin.Parse()
+
+	flags := cli.SetupCLIFlags(Version)
 
 	apiConfig := apiConfig{
-		Endpoint:      *endpoint,
-		BindAddress:   *addr,
-		AssetPath:     *assets,
-		DataPath:      *data,
-		SwarmSupport:  *swarm,
-		TLSEnabled:    *tlsverify,
-		TLSCACertPath: *tlscacert,
-		TLSCertPath:   *tlscert,
-		TLSKeyPath:    *tlskey,
-		TemplatesURL:  *templates,
+		Endpoint:      *flags.Endpoint,
+		BindAddress:   *flags.Addr,
+		AssetPath:     *flags.Assets,
+		DataPath:      *flags.Data,
+		SwarmSupport:  *flags.Swarm,
+		TLSEnabled:    *flags.TLSVerify,
+		TLSCACertPath: *flags.TLSCacert,
+		TLSCertPath:   *flags.TLSCert,
+		TLSKeyPath:    *flags.TLSKey,
+		TemplatesURL:  *flags.Templates,
 	}
 
 	settings := &Settings{
-		Swarm:        *swarm,
-		HiddenLabels: *labels,
-		Logo:         *logo,
+		Swarm:        *flags.Swarm,
+		HiddenLabels: *flags.Labels,
+		Logo:         *flags.Logo,
 	}
 
 	api := newAPI(apiConfig)

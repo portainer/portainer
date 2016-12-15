@@ -2,14 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/portainer/portainer/common"
 	"net/http"
 )
 
 // Settings defines the settings available under the /settings endpoint
 type Settings struct {
-	Swarm        bool     `json:"swarm"`
-	HiddenLabels pairList `json:"hiddenLabels"`
-	Logo         string   `json:"logo"`
+	Swarm        bool          `json:"swarm"`
+	HiddenLabels []common.Pair `json:"hiddenLabels"`
+	Logo         string        `json:"logo"`
 }
 
 // settingsHandler defines a handler function used to encode the configuration in JSON
