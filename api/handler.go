@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
 	"golang.org/x/net/websocket"
 	"log"
 	"net/http"
@@ -12,21 +13,35 @@ import (
 // newHandler creates a new http.Handler with CSRF protection
 func (a *api) newHandler(settings *Settings) http.Handler {
 	var (
-		mux         = http.NewServeMux()
+		mux         = mux.NewRouter()
 		fileHandler = http.FileServer(http.Dir(a.assetPath))
 	)
-
 	handler := a.newAPIHandler()
 
-	mux.Handle("/", fileHandler)
-	mux.Handle("/dockerapi/", http.StripPrefix("/dockerapi", handler))
 	mux.Handle("/ws/exec", websocket.Handler(a.execContainer))
+	mux.HandleFunc("/auth", a.authHandler)
+	mux.Handle("/users", addMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a.usersHandler(w, r)
+	}), a.authenticate, secureHeaders))
+	mux.Handle("/users/{username}", addMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a.userHandler(w, r)
+	}), a.authenticate, secureHeaders))
+	mux.Handle("/users/{username}/passwd", addMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a.userPasswordHandler(w, r)
+	}), a.authenticate, secureHeaders))
+	mux.HandleFunc("/users/admin/check", a.checkAdminHandler)
+	mux.HandleFunc("/users/admin/init", a.initAdminHandler)
 	mux.HandleFunc("/settings", func(w http.ResponseWriter, r *http.Request) {
 		settingsHandler(w, r, settings)
 	})
 	mux.HandleFunc("/templates", func(w http.ResponseWriter, r *http.Request) {
 		templatesHandler(w, r, a.templatesURL)
 	})
+	// mux.PathPrefix("/dockerapi/").Handler(http.StripPrefix("/dockerapi", handler))
+	mux.PathPrefix("/dockerapi/").Handler(http.StripPrefix("/dockerapi", addMiddleware(handler, a.authenticate, secureHeaders)))
+
+	mux.PathPrefix("/").Handler(http.StripPrefix("/", fileHandler))
+
 	// CSRF protection is disabled for the moment
 	// CSRFHandler := newCSRFHandler(a.dataPath)
 	// return CSRFHandler(newCSRFWrapper(mux))

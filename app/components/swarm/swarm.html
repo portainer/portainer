@@ -16,14 +16,14 @@
           <tbody>
             <tr>
               <td>Nodes</td>
-              <td ng-if="!swarm_mode">{{ swarm.Nodes }}</td>
-              <td ng-if="swarm_mode">{{ info.Swarm.Nodes }}</td>
+              <td ng-if="endpointMode.provider === 'DOCKER_SWARM'">{{ swarm.Nodes }}</td>
+              <td ng-if="endpointMode.provider === 'DOCKER_SWARM_MODE'">{{ info.Swarm.Nodes }}</td>
             </tr>
-            <tr ng-if="!swarm_mode">
+            <tr ng-if="endpointMode.provider === 'DOCKER_SWARM'">
               <td>Images</td>
               <td>{{ info.Images }}</td>
             </tr>
-            <tr ng-if="!swarm_mode">
+            <tr ng-if="endpointMode.provider === 'DOCKER_SWARM'">
               <td>Swarm version</td>
               <td>{{ docker.Version|swarmversion }}</td>
             </tr>
@@ -31,29 +31,29 @@
               <td>Docker API version</td>
               <td>{{ docker.ApiVersion }}</td>
             </tr>
-            <tr ng-if="!swarm_mode">
+            <tr ng-if="endpointMode.provider === 'DOCKER_SWARM'">
               <td>Strategy</td>
               <td>{{ swarm.Strategy }}</td>
             </tr>
             <tr>
               <td>Total CPU</td>
-              <td ng-if="!swarm_mode">{{ info.NCPU }}</td>
-              <td ng-if="swarm_mode">{{ totalCPU }}</td>
+              <td ng-if="endpointMode.provider === 'DOCKER_SWARM'">{{ info.NCPU }}</td>
+              <td ng-if="endpointMode.provider === 'DOCKER_SWARM_MODE'">{{ totalCPU }}</td>
             </tr>
             <tr>
               <td>Total memory</td>
-              <td ng-if="!swarm_mode">{{ info.MemTotal|humansize: 2 }}</td>
-              <td ng-if="swarm_mode">{{ totalMemory|humansize: 2 }}</td>
+              <td ng-if="endpointMode.provider === 'DOCKER_SWARM'">{{ info.MemTotal|humansize: 2 }}</td>
+              <td ng-if="endpointMode.provider === 'DOCKER_SWARM_MODE'">{{ totalMemory|humansize: 2 }}</td>
             </tr>
-            <tr ng-if="!swarm_mode">
+            <tr ng-if="endpointMode.provider === 'DOCKER_SWARM'">
               <td>Operating system</td>
               <td>{{ info.OperatingSystem }}</td>
             </tr>
-            <tr ng-if="!swarm_mode">
+            <tr ng-if="endpointMode.provider === 'DOCKER_SWARM'">
               <td>Kernel version</td>
               <td>{{ info.KernelVersion }}</td>
             </tr>
-            <tr ng-if="!swarm_mode">
+            <tr ng-if="endpointMode.provider === 'DOCKER_SWARM'">
               <td>Go version</td>
               <td>{{ docker.GoVersion }}</td>
             </tr>
@@ -65,7 +65,7 @@
 </div>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="!swarm_mode">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="endpointMode.provider === 'DOCKER_SWARM'">
     <rd-widget>
       <rd-widget-header icon="fa-hdd-o" title="Node status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
@@ -133,7 +133,7 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="swarm_mode">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="endpointMode.provider === 'DOCKER_SWARM_MODE'">
     <rd-widget>
       <rd-widget-header icon="fa-hdd-o" title="Node status"></rd-widget-header>
       <rd-widget-body classes="no-padding">

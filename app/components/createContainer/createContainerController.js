@@ -53,11 +53,6 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
   Config.$promise.then(function (c) {
     $scope.swarm = c.swarm;
-    Info.get({}, function(info) {
-      if ($scope.swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
-        $scope.swarm_mode = true;
-      }
-    });
     var containersToHideLabels = c.hiddenLabels;
 
     Volume.query({}, function (d) {
@@ -216,7 +211,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = $filter('trimcontainername')(container.Names[0]);
-      if ($scope.swarm && !$scope.swarm_mode) {
+      if ($scope.swarm && $scope.endpointMode.provider === 'DOCKER_SWARM') {
         containerName = $filter('swarmcontainername')(container);
       }
     }

@@ -4,14 +4,19 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const (
+	// Version number of portainer API
+	Version = "1.10.2"
+)
+
 // main is the entry point of the program
 func main() {
-	kingpin.Version("1.10.2")
+	kingpin.Version(Version)
 	var (
 		endpoint  = kingpin.Flag("host", "Dockerd endpoint").Default("unix:///var/run/docker.sock").Short('H').String()
 		addr      = kingpin.Flag("bind", "Address and port to serve Portainer").Default(":9000").Short('p').String()
 		assets    = kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String()
-		data      = kingpin.Flag("data", "Path to the data").Default(".").Short('d').String()
+		data      = kingpin.Flag("data", "Path to the folder where the data is stored").Default("/data").Short('d').String()
 		tlsverify = kingpin.Flag("tlsverify", "TLS support").Default("false").Bool()
 		tlscacert = kingpin.Flag("tlscacert", "Path to the CA").Default("/certs/ca.pem").String()
 		tlscert   = kingpin.Flag("tlscert", "Path to the TLS certificate file").Default("/certs/cert.pem").String()
