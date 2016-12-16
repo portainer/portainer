@@ -2,5 +2,4 @@ node_modules
 bower_components
 dist
 portainer-checksum.txt
-api/portainer
-api/api
+api/portainer-*
