@@ -464,8 +464,6 @@ angular.module('portainer', [
     });
 
     // The Docker API likes to return plaintext errors, this catches them and disp
-    // $httpProvider.defaults.xsrfCookieName = 'csrfToken';
-    // $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-Token';
     $httpProvider.interceptors.push(function() {
       return {
         'response': function(response) {
@@ -477,11 +475,6 @@ angular.module('portainer', [
               time: 10000
             });
           }
-          // CSRF protection is disabled for the moment
-          // var csrfToken = response.headers('X-Csrf-Token');
-          // if (csrfToken) {
-          //   document.cookie = 'csrfToken=' + csrfToken;
-          // }
           return response;
         }
       };

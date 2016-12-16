@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-// newHandler creates a new http.Handler with CSRF protection
+// newHandler creates a new http.Handler
 func (a *api) newHandler(settings *Settings) http.Handler {
 	var (
 		mux         = mux.NewRouter()
@@ -37,14 +37,9 @@ func (a *api) newHandler(settings *Settings) http.Handler {
 	mux.HandleFunc("/templates", func(w http.ResponseWriter, r *http.Request) {
 		templatesHandler(w, r, a.templatesURL)
 	})
-	// mux.PathPrefix("/dockerapi/").Handler(http.StripPrefix("/dockerapi", handler))
 	mux.PathPrefix("/dockerapi/").Handler(http.StripPrefix("/dockerapi", addMiddleware(handler, a.authenticate, secureHeaders)))
-
 	mux.PathPrefix("/").Handler(http.StripPrefix("/", fileHandler))
 
-	// CSRF protection is disabled for the moment
-	// CSRFHandler := newCSRFHandler(a.dataPath)
-	// return CSRFHandler(newCSRFWrapper(mux))
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		mux.ServeHTTP(w, r)
 	})
