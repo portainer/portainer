@@ -229,9 +229,9 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         }
       });
     }])
-    .factory('Users', ['$resource', function UsersFactory($resource) {
+    .factory('Users', ['$resource', 'USERS_ENDPOINT', function UsersFactory($resource, USERS_ENDPOINT) {
       'use strict';
-      return $resource('/users/:username/:action', {}, {
+      return $resource(USERS_ENDPOINT + '/:username/:action', {}, {
         create: { method: 'POST' },
         get: {method: 'GET', params: { username: '@username' } },
         update: { method: 'PUT', params: { username: '@username' } },
