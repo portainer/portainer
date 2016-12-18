@@ -1,16 +1,77 @@
-package main
+package http
 
 import (
+	"github.com/portainer/portainer"
+
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
+	"golang.org/x/net/websocket"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"net/http/httputil"
+	"net/url"
+	"os"
 	"time"
 )
+
+// WebSocketHandler represents an HTTP API handler for proxying requests to a web socket.
+type WebSocketHandler struct {
+	*mux.Router
+	Logger                *log.Logger
+	middleWareService     *middleWareService
+	endpointConfiguration *portainer.EndpointConfiguration
+}
+
+// NewWebSocketHandler returns a new instance of WebSocketHandler.
+func NewWebSocketHandler() *WebSocketHandler {
+	h := &WebSocketHandler{
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
+	}
+	h.Handle("/websocket/exec", websocket.Handler(h.webSocketDockerExec))
+	return h
+}
+
+func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
+	qry := ws.Request().URL.Query()
+	execID := qry.Get("id")
+
+	// Should not be managed here
+	endpoint, err := url.Parse(handler.endpointConfiguration.Endpoint)
+	if err != nil {
+		log.Fatalf("Unable to parse endpoint URL: %s", err)
+		return
+	}
+
+	var host string
+	if endpoint.Scheme == "tcp" {
+		host = endpoint.Host
+	} else if endpoint.Scheme == "unix" {
+		host = endpoint.Path
+	}
+
+	// Should not be managed here
+	var tlsConfig *tls.Config
+	if handler.endpointConfiguration.TLS {
+		tlsConfig, err = createTLSConfiguration(handler.endpointConfiguration.TLSCACertPath,
+			handler.endpointConfiguration.TLSCertPath,
+			handler.endpointConfiguration.TLSKeyPath)
+		if err != nil {
+			log.Fatalf("Unable to create TLS configuration: %s", err)
+			return
+		}
+	}
+
+	if err := hijack(host, endpoint.Scheme, "POST", "/exec/"+execID+"/start", tlsConfig, true, ws, ws, ws, nil, nil); err != nil {
+		log.Fatalf("error during hijack: %s", err)
+		return
+	}
+}
 
 type execConfig struct {
 	Tty    bool

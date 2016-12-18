@@ -297,34 +297,34 @@ module.exports = function (grunt) {
             },
             buildBinary: {
                 command: [
-                    'docker run --rm -v $(pwd)/api:/src portainer/golang-builder',
-                    'shasum api/portainer > portainer-checksum.txt',
+                    'docker run --rm -v $(pwd)/api:/src portainer/golang-builder /src/cmd/portainer',
+                    'shasum api/cmd/portainer/portainer > portainer-checksum.txt',
                     'mkdir -p dist',
-                    'mv api/portainer dist/'
+                    'mv api/cmd/portainer/portainer dist/'
                 ].join(' && ')
             },
             buildUnixArmBinary: {
                 command: [
-                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm" portainer/golang-builder:cross-platform',
-                    'shasum api/portainer-linux-arm > portainer-checksum.txt',
+                  'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm" portainer/golang-builder:cross-platform /src/cmd/portainer',
+                    'shasum api/cmd/portainer/portainer-linux-arm > portainer-checksum.txt',
                     'mkdir -p dist',
-                    'mv api/portainer-linux-arm dist/portainer'
+                    'mv api/cmd/portainer/portainer-linux-arm dist/portainer'
                 ].join(' && ')
             },
             buildDarwinBinary: {
                 command: [
-                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="darwin" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform',
-                    'shasum api/portainer-darwin-amd64 > portainer-checksum.txt',
+                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="darwin" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform /src/cmd/portainer',
+                    'shasum api/cmd/portainer/portainer-darwin-amd64 > portainer-checksum.txt',
                     'mkdir -p dist',
-                    'mv api/portainer-darwin-amd64 dist/portainer'
+                    'mv api/cmd/portainer/portainer-darwin-amd64 dist/portainer'
                 ].join(' && ')
             },
             buildWindowsBinary: {
                 command: [
-                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="windows" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform',
-                    'shasum api/portainer-windows-amd64 > portainer-checksum.txt',
+                    'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="windows" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform /src/cmd/portainer',
+                    'shasum api/cmd/portainer/portainer-windows-amd64 > portainer-checksum.txt',
                     'mkdir -p dist',
-                    'mv api/portainer-windows-amd64 dist/portainer.exe'
+                    'mv api/cmd/portainer/portainer-windows-amd64 dist/portainer.exe'
                 ].join(' && ')
             },
             run: {
