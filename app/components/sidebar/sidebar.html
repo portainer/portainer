@@ -8,7 +8,7 @@
         <span class="menu-icon glyphicon glyphicon-transfer"></span>
       </a>
     </li>
-    <li class="sidebar-title"><span>NAVIGATION</span></li>
+    <li class="sidebar-title"><span>ENDPOINT_NAME</span></li>
     <li class="sidebar-list">
       <a ui-sref="dashboard">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
     </li>
@@ -39,8 +39,12 @@
     <li class="sidebar-list" ng-if="endpointMode.provider === 'DOCKER_STANDALONE'">
       <a ui-sref="docker">Docker <span class="menu-icon fa fa-th"></span></a>
     </li>
+    <li class="sidebar-title"><span>SETTINGS</span></li>
     <li class="sidebar-list">
-      <a ui-sref="settings">Settings <span class="menu-icon fa fa-wrench"></span></a>
+      <a ui-sref="settings">General <span class="menu-icon fa fa-wrench"></span></a>
+    </li>
+    <li class="sidebar-list">
+      <a ui-sref="endpoints">Endpoints <span class="menu-icon fa fa-plug"></span></a>
     </li>
   </ul>
   <div class="sidebar-footer">

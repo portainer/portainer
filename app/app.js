@@ -5,6 +5,7 @@ angular.module('portainer', [
   'ui.select',
   'ngCookies',
   'ngSanitize',
+  'ngFileUpload',
   'angularUtils.directives.dirPagination',
   'LocalStorageModule',
   'angular-jwt',
@@ -19,6 +20,9 @@ angular.module('portainer', [
   'containers',
   'createContainer',
   'docker',
+  'endpoint',
+  'endpointInit',
+  'endpoints',
   'events',
   'images',
   'image',
@@ -268,6 +272,47 @@ angular.module('portainer', [
       },
       data: {
         requiresLogin: true
+      }
+    })
+    .state('endpoints', {
+      url: '/endpoints/',
+      views: {
+        "content": {
+          templateUrl: 'app/components/endpoints/endpoints.html',
+          controller: 'EndpointsController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: false
+      }
+    })
+    .state('endpoint', {
+      url: '^/endpoints/:id',
+      views: {
+        "content": {
+          templateUrl: 'app/components/endpoint/endpoint.html',
+          controller: 'EndpointController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: false
+      }
+    })
+    .state('endpointInit', {
+      url: '/init/endpoint',
+      views: {
+        "content": {
+          templateUrl: 'app/components/endpointInit/endpointInit.html',
+          controller: 'EndpointInitController'
+        }
       }
     })
     .state('events', {

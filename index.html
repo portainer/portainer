@@ -25,7 +25,7 @@
 </head>
 
 <body ng-controller="MainController">
-  <div id="page-wrapper" ng-class="{open: toggle && $state.current.name !== 'auth', nopadding: $state.current.name === 'auth'}" ng-cloak>
+  <div id="page-wrapper" ng-class="{open: toggle && $state.current.name !== 'auth' && $state.current.name !== 'endpointInit', nopadding: $state.current.name === 'auth' || $state.current.name === 'endpointInit'}" ng-cloak>
 
     <div id="sideview" ui-view="sidebar"></div>
 
