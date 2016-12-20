@@ -47,13 +47,13 @@
             <div class="form-group">
               <label class="col-sm-2 control-label text-left">TLS CA certificate</label>
               <div class="col-sm-10">
-                  <button class="btn btn-sm btn-default" ngf-select ng-model="formValues.TLSCACert">Select file</button>
-                  <span ng-if="formValues.TLSCACert" style="margin-left: 5px;">
-                    <i class="fa fa-check green-icon" aria-hidden="true"></i> {{ formValues.TLSCACert.name }}
-                  </span>
-                  <span ng-if="!formValues.TLSCACert" style="margin-left: 5px;">
-                    <i class="fa fa-times red-icon" aria-hidden="true"></i>
-                  </span>
+                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
+                <span ng-if="formValues.TLSCACert" style="margin-left: 5px;">
+                  <i class="fa fa-check green-icon" aria-hidden="true"></i> {{ formValues.TLSCACert.name }}
+                </span>
+                <span ng-if="!formValues.TLSCACert" style="margin-left: 5px;">
+                  <i class="fa fa-times red-icon" aria-hidden="true"></i>
+                </span>
               </div>
             </div>
             <!-- !ca-input -->
@@ -61,9 +61,13 @@
             <div class="form-group">
               <label for="tls_cert" class="col-sm-2 control-label text-left">TLS certificate</label>
               <div class="col-sm-10">
-                <input type="file" ngf-select ng-model="formValues.TLSCert" name="tls_cert"
-                required
-                ngf-model-invalid="errorFile" />
+                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
+                <span ng-if="formValues.TLSCert" style="margin-left: 5px;">
+                  <i class="fa fa-check green-icon" aria-hidden="true"></i> {{ formValues.TLSCert.name }}
+                </span>
+                <span ng-if="!formValues.TLSCert" style="margin-left: 5px;">
+                  <i class="fa fa-times red-icon" aria-hidden="true"></i>
+                </span>
               </div>
             </div>
             <!-- !cert-input -->
@@ -71,7 +75,7 @@
             <div class="form-group">
               <label class="col-sm-2 control-label text-left">TLS key</label>
               <div class="col-sm-10">
-                  <button class="btn btn-sm btn-default" ngf-select ng-model="formValues.TLSKey">Select file</button>
+                  <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
                   <span ng-if="formValues.TLSKey" style="margin-left: 5px;">
                     <i class="fa fa-check green-icon" aria-hidden="true"></i> {{ formValues.TLSKey.name }}
                   </span>
