@@ -1,6 +1,6 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$scope', '$q', 'Config', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'Info',
-function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume, Info) {
+.controller('DashboardController', ['$scope', '$q', 'Config', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'Info', 'Messages',
+function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume, Info, Messages) {
 
   $scope.containerData = {
     total: 0
