@@ -8,14 +8,15 @@ import (
 
 // Server implements the portainer.Server interface
 type Server struct {
-	BindAddress    string
-	AssetsPath     string
-	UserService    portainer.UserService
-	CryptoService  portainer.CryptoService
-	JWTService     portainer.JWTService
-	Settings       *portainer.Settings
-	TemplatesURL   string
-	EndpointConfig *portainer.EndpointConfiguration
+	BindAddress     string
+	AssetsPath      string
+	UserService     portainer.UserService
+	EndpointService portainer.EndpointService
+	CryptoService   portainer.CryptoService
+	JWTService      portainer.JWTService
+	Settings        *portainer.Settings
+	TemplatesURL    string
+	ActiveEndpoint  *portainer.Endpoint
 }
 
 // Start starts the HTTP server
@@ -23,6 +24,7 @@ func (server *Server) Start() error {
 	middleWareService := &middleWareService{
 		jwtService: server.JWTService,
 	}
+
 	var authHandler = NewAuthHandler()
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
@@ -35,14 +37,19 @@ func (server *Server) Start() error {
 	var templatesHandler = NewTemplatesHandler(middleWareService)
 	templatesHandler.templatesURL = server.TemplatesURL
 	var dockerHandler = NewDockerHandler(middleWareService)
-	dockerHandler.setupProxy(server.EndpointConfig)
+	if server.ActiveEndpoint != nil {
+		dockerHandler.setupProxy(server.ActiveEndpoint)
+	}
 	var websocketHandler = NewWebSocketHandler()
-	websocketHandler.endpointConfiguration = server.EndpointConfig
+	websocketHandler.endpoint = server.ActiveEndpoint
+	var endpointHandler = NewEndpointHandler(middleWareService)
+	endpointHandler.EndpointService = server.EndpointService
 	var fileHandler = http.FileServer(http.Dir(server.AssetsPath))
 
 	handler := &Handler{
 		AuthHandler:      authHandler,
 		UserHandler:      userHandler,
+		EndpointHandler:  endpointHandler,
 		SettingsHandler:  settingsHandler,
 		TemplatesHandler: templatesHandler,
 		DockerHandler:    dockerHandler,

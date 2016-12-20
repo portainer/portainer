@@ -4,11 +4,12 @@ import (
 	"github.com/portainer/portainer"
 
 	"encoding/json"
-	"github.com/asaskevich/govalidator"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/gorilla/mux"
 )
 
 // AuthHandler represents an HTTP API handler for managing authentication.
@@ -38,8 +39,8 @@ func NewAuthHandler() *AuthHandler {
 }
 
 func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		handleNotAllowed(w, []string{"POST"})
+	if r.Method != http.MethodPost {
+		handleNotAllowed(w, []string{http.MethodPost})
 		return
 	}
 

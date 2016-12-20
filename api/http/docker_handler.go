@@ -21,6 +21,11 @@ type DockerHandler struct {
 	proxy             http.Handler
 }
 
+const (
+	// ErrNoActiveEndpoint defines an error raised when no active endpoint is defined.
+	ErrNoActiveEndpoint = portainer.Error("Undefined Docker endpoint")
+)
+
 // NewDockerHandler returns a new instance of DockerHandler.
 func NewDockerHandler(middleWareService *middleWareService) *DockerHandler {
 	h := &DockerHandler{
@@ -35,18 +40,22 @@ func NewDockerHandler(middleWareService *middleWareService) *DockerHandler {
 }
 
 func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.Request) {
-	handler.proxy.ServeHTTP(w, r)
+	if handler.proxy != nil {
+		handler.proxy.ServeHTTP(w, r)
+	} else {
+		Error(w, ErrNoActiveEndpoint, http.StatusNotFound, handler.Logger)
+	}
 }
 
-func (handler *DockerHandler) setupProxy(config *portainer.EndpointConfiguration) error {
+func (handler *DockerHandler) setupProxy(endpoint *portainer.Endpoint) error {
 	var proxy http.Handler
-	endpointURL, err := url.Parse(config.Endpoint)
+	endpointURL, err := url.Parse(endpoint.URL)
 	if err != nil {
 		return err
 	}
 	if endpointURL.Scheme == "tcp" {
-		if config.TLS {
-			proxy, err = newHTTPSProxy(endpointURL, config)
+		if endpoint.TLS {
+			proxy, err = newHTTPSProxy(endpointURL, endpoint)
 			if err != nil {
 				return err
 			}
@@ -66,10 +75,10 @@ func newHTTPProxy(u *url.URL) http.Handler {
 	return httputil.NewSingleHostReverseProxy(u)
 }
 
-func newHTTPSProxy(u *url.URL, endpointConfig *portainer.EndpointConfiguration) (http.Handler, error) {
+func newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
 	u.Scheme = "https"
 	proxy := httputil.NewSingleHostReverseProxy(u)
-	config, err := createTLSConfiguration(endpointConfig.TLSCACertPath, endpointConfig.TLSCertPath, endpointConfig.TLSKeyPath)
+	config, err := createTLSConfiguration(endpoint.TLSCACertPath, endpoint.TLSCertPath, endpoint.TLSKeyPath)
 	if err != nil {
 		return nil, err
 	}

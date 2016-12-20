@@ -12,23 +12,27 @@ type Store struct {
 	Path string
 
 	// Services
-	UserService *UserService
+	UserService     *UserService
+	EndpointService *EndpointService
 
 	db *bolt.DB
 }
 
 const (
-	databaseFileName = "portainer.db"
-	userBucketName   = "users"
+	databaseFileName   = "portainer.db"
+	userBucketName     = "users"
+	endpointBucketName = "endpoints"
 )
 
 // NewStore initializes a new Store and the associated services
 func NewStore(storePath string) *Store {
 	store := &Store{
-		Path:        storePath,
-		UserService: &UserService{},
+		Path:            storePath,
+		UserService:     &UserService{},
+		EndpointService: &EndpointService{},
 	}
 	store.UserService.store = store
+	store.EndpointService.store = store
 	return store
 }
 

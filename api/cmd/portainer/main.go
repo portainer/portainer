@@ -43,23 +43,27 @@ func main() {
 
 	var cryptoService portainer.CryptoService = &crypto.Service{}
 
-	endpointConfiguration := &portainer.EndpointConfiguration{
-		Endpoint:      *flags.Endpoint,
-		TLS:           *flags.TLSVerify,
-		TLSCACertPath: *flags.TLSCacert,
-		TLSCertPath:   *flags.TLSCert,
-		TLSKeyPath:    *flags.TLSKey,
+	var activeEndpoint *portainer.Endpoint
+	if *flags.Endpoint != "" {
+		activeEndpoint = &portainer.Endpoint{
+			URL:           *flags.Endpoint,
+			TLS:           *flags.TLSVerify,
+			TLSCACertPath: *flags.TLSCacert,
+			TLSCertPath:   *flags.TLSCert,
+			TLSKeyPath:    *flags.TLSKey,
+		}
 	}
 
 	var server portainer.Server = &http.Server{
-		BindAddress:    *flags.Addr,
-		AssetsPath:     *flags.Assets,
-		Settings:       settings,
-		TemplatesURL:   *flags.Templates,
-		UserService:    store.UserService,
-		CryptoService:  cryptoService,
-		JWTService:     jwtService,
-		EndpointConfig: endpointConfiguration,
+		BindAddress:     *flags.Addr,
+		AssetsPath:      *flags.Assets,
+		Settings:        settings,
+		TemplatesURL:    *flags.Templates,
+		UserService:     store.UserService,
+		EndpointService: store.EndpointService,
+		CryptoService:   cryptoService,
+		JWTService:      jwtService,
+		ActiveEndpoint:  activeEndpoint,
 	}
 
 	log.Printf("Starting Portainer on %s", *flags.Addr)

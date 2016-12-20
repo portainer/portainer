@@ -10,6 +10,11 @@ const (
 	ErrUserNotFound = Error("User not found")
 )
 
+// Endpoint errors.
+const (
+	ErrEndpointNotFound = Error("Endpoint not found")
+)
+
 // Crypto errors.
 const (
 	ErrCryptoHashFailure = Error("Unable to hash data")

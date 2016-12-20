@@ -41,13 +41,19 @@ type (
 		Username string
 	}
 
-	// EndpointConfiguration represents the data required to connect to a Docker API endpoint.
-	EndpointConfiguration struct {
-		Endpoint      string
-		TLS           bool
-		TLSCACertPath string
-		TLSCertPath   string
-		TLSKeyPath    string
+	// EndpointID represents an endpoint identifier.
+	EndpointID int
+
+	// Endpoint represents a Docker endpoint with all the info required
+	// to connect to it.
+	Endpoint struct {
+		ID            EndpointID `json:"id"`
+		URL           string     `json:"url"`
+		Swarm         bool       `json:"swarm"`
+		TLS           bool       `json:"tls"`
+		TLSCACertPath string     `json:"tlscacert"`
+		TLSCertPath   string     `json:"tlscert"`
+		TLSKeyPath    string     `json:"tlskey"`
 	}
 
 	// CLIService represents a service for managing CLI.
@@ -71,6 +77,13 @@ type (
 	UserService interface {
 		User(username string) (*User, error)
 		UpdateUser(user *User) error
+	}
+
+	// EndpointService represents a service for managing endpoints.
+	EndpointService interface {
+		Endpoint(ID EndpointID) (*Endpoint, error)
+		UpdateEndpoint(endpoint *Endpoint) error
+		DeleteEndpoint(ID EndpointID) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data.

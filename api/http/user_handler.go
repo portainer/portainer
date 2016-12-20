@@ -4,11 +4,12 @@ import (
 	"github.com/portainer/portainer"
 
 	"encoding/json"
-	"github.com/asaskevich/govalidator"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/asaskevich/govalidator"
+	"github.com/gorilla/mux"
 )
 
 // UserHandler represents an HTTP API handler for managing users.
@@ -46,8 +47,8 @@ func NewUserHandler(middleWareService *middleWareService) *UserHandler {
 
 // handlePostUsers handles POST requests on /users
 func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		handleNotAllowed(w, []string{"POST"})
+	if r.Method != http.MethodPost {
+		handleNotAllowed(w, []string{http.MethodPost})
 		return
 	}
 
@@ -86,8 +87,8 @@ type postUsersRequest struct {
 
 // handlePostUserPasswd handles POST requests on /users/:username/passwd
 func (handler *UserHandler) handlePostUserPasswd(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		handleNotAllowed(w, []string{"POST"})
+	if r.Method != http.MethodPost {
+		handleNotAllowed(w, []string{http.MethodPost})
 		return
 	}
 
@@ -189,8 +190,8 @@ type putUserRequest struct {
 
 // handlePostAdminInit handles GET requests on /users/admin/check
 func (handler *UserHandler) handleGetAdminCheck(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		handleNotAllowed(w, []string{"GET"})
+	if r.Method != http.MethodGet {
+		handleNotAllowed(w, []string{http.MethodGet})
 		return
 	}
 
@@ -209,8 +210,8 @@ func (handler *UserHandler) handleGetAdminCheck(w http.ResponseWriter, r *http.R
 
 // handlePostAdminInit handles POST requests on /users/admin/init
 func (handler *UserHandler) handlePostAdminInit(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		handleNotAllowed(w, []string{"POST"})
+	if r.Method != http.MethodPost {
+		handleNotAllowed(w, []string{http.MethodPost})
 		return
 	}
 
