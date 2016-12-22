@@ -28,7 +28,7 @@ const (
 	ErrInvalidCredentials = portainer.Error("Invalid credentials")
 )
 
-// NewAuthHandler returns a new instance of DialHandler.
+// NewAuthHandler returns a new instance of AuthHandler.
 func NewAuthHandler() *AuthHandler {
 	h := &AuthHandler{
 		Router: mux.NewRouter(),

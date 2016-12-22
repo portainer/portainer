@@ -38,8 +38,54 @@ func (service *EndpointService) Endpoint(ID portainer.EndpointID) (*portainer.En
 	return &endpoint, nil
 }
 
-// UpdateEndpoint saves an endpoint.
-func (service *EndpointService) UpdateEndpoint(endpoint *portainer.Endpoint) error {
+// Endpoints return an array containing all the endpoints.
+func (service *EndpointService) Endpoints() ([]portainer.Endpoint, error) {
+	var endpoints []portainer.Endpoint
+	err := service.store.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(endpointBucketName))
+
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var endpoint portainer.Endpoint
+			err := internal.UnmarshalEndpoint(v, &endpoint)
+			if err != nil {
+				return err
+			}
+			endpoints = append(endpoints, endpoint)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return endpoints, nil
+}
+
+// CreateEndpoint assign an ID to a new endpoint and saves it.
+func (service *EndpointService) CreateEndpoint(endpoint *portainer.Endpoint) error {
+	return service.store.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(endpointBucketName))
+
+		id, _ := bucket.NextSequence()
+		endpoint.ID = portainer.EndpointID(id)
+
+		data, err := internal.MarshalEndpoint(endpoint)
+		if err != nil {
+			return err
+		}
+
+		err = bucket.Put([]byte(internal.Itob(int(endpoint.ID))), data)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+// UpdateEndpoint updates an endpoint.
+func (service *EndpointService) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
 	data, err := internal.MarshalEndpoint(endpoint)
 	if err != nil {
 		return err
@@ -47,7 +93,7 @@ func (service *EndpointService) UpdateEndpoint(endpoint *portainer.Endpoint) err
 
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(endpointBucketName))
-		err = bucket.Put([]byte(internal.Itob(int(endpoint.ID))), data)
+		err = bucket.Put([]byte(internal.Itob(int(ID))), data)
 		if err != nil {
 			return err
 		}

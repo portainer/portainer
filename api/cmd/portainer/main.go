@@ -5,6 +5,7 @@ import (
 	"github.com/portainer/portainer/bolt"
 	"github.com/portainer/portainer/cli"
 	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/file"
 	"github.com/portainer/portainer/http"
 	"github.com/portainer/portainer/jwt"
 
@@ -41,6 +42,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	fileService, err := file.NewService(*flags.Data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var cryptoService portainer.CryptoService = &crypto.Service{}
 
 	var activeEndpoint *portainer.Endpoint
@@ -63,6 +69,7 @@ func main() {
 		EndpointService: store.EndpointService,
 		CryptoService:   cryptoService,
 		JWTService:      jwtService,
+		FileService:     fileService,
 		ActiveEndpoint:  activeEndpoint,
 	}
 

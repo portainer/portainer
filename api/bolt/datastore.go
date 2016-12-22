@@ -1,8 +1,9 @@
 package bolt
 
 import (
-	"github.com/boltdb/bolt"
 	"time"
+
+	"github.com/boltdb/bolt"
 )
 
 // Store defines the implementation of portainer.DataStore using
@@ -46,6 +47,10 @@ func (store *Store) Open() error {
 	store.db = db
 	return db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(userBucketName))
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(endpointBucketName))
 		if err != nil {
 			return err
 		}

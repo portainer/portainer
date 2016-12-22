@@ -3,7 +3,6 @@ package http
 import (
 	"github.com/portainer/portainer"
 
-	"github.com/gorilla/mux"
 	"io"
 	"log"
 	"net"
@@ -11,6 +10,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+
+	"github.com/gorilla/mux"
 )
 
 // DockerHandler represents an HTTP API handler for proxying requests to the Docker API.
@@ -20,11 +21,6 @@ type DockerHandler struct {
 	middleWareService *middleWareService
 	proxy             http.Handler
 }
-
-const (
-	// ErrNoActiveEndpoint defines an error raised when no active endpoint is defined.
-	ErrNoActiveEndpoint = portainer.Error("Undefined Docker endpoint")
-)
 
 // NewDockerHandler returns a new instance of DockerHandler.
 func NewDockerHandler(middleWareService *middleWareService) *DockerHandler {
@@ -43,7 +39,7 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 	if handler.proxy != nil {
 		handler.proxy.ServeHTTP(w, r)
 	} else {
-		Error(w, ErrNoActiveEndpoint, http.StatusNotFound, handler.Logger)
+		Error(w, portainer.ErrNoActiveEndpoint, http.StatusNotFound, handler.Logger)
 	}
 }
 
@@ -80,6 +76,7 @@ func newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, erro
 	proxy := httputil.NewSingleHostReverseProxy(u)
 	config, err := createTLSConfiguration(endpoint.TLSCACertPath, endpoint.TLSCertPath, endpoint.TLSKeyPath)
 	if err != nil {
+		log.Printf("Shit happened here: %+v", endpoint)
 		return nil, err
 	}
 	proxy.Transport = &http.Transport{

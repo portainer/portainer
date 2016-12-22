@@ -18,6 +18,7 @@ type Handler struct {
 	TemplatesHandler *TemplatesHandler
 	DockerHandler    *DockerHandler
 	WebSocketHandler *WebSocketHandler
+	UploadHandler    *UploadHandler
 	FileHandler      http.Handler
 }
 
@@ -40,6 +41,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.SettingsHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/templates") {
 		http.StripPrefix("/api", h.TemplatesHandler).ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/api/upload") {
+		http.StripPrefix("/api", h.UploadHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/websocket") {
 		http.StripPrefix("/api", h.WebSocketHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/docker") {

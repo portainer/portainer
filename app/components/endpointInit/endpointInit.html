@@ -1,13 +1,13 @@
 <div class="page-wrapper">
-  <!-- login box -->
+  <!-- simple box -->
   <div class="container simple-box">
     <div class="col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
-      <!-- login box logo -->
+      <!-- simple box logo -->
       <div class="row">
         <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
         <img ng-if="!logo" src="images/logo_alt.png" class="simple-box-logo" alt="Portainer">
       </div>
-      <!-- !login box logo -->
+      <!-- !simple box logo -->
       <!-- init-endpoint panel -->
       <div class="panel panel-default">
         <div class="panel-body">
@@ -35,6 +35,16 @@
                   <span class="small text-muted">Note: ensure that the Docker socket is bind mounted in the Portainer container at <code>/var/run/docker.sock</code></span>
                 </div>
               </div>
+              <!-- connect button -->
+              <div class="form-group" style="margin-top: 10px;">
+                <div class="col-sm-12 controls">
+                  <p class="pull-left text-danger" ng-if="state.error" style="margin: 5px;">
+                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
+                  </p>
+                  <button type="submit" class="btn btn-primary pull-right" ng-click="createLocalEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+                </div>
+              </div>
+              <!-- !connect button -->
             </div>
             <!-- !local-endpoint -->
             <!-- remote-endpoint -->
@@ -43,7 +53,7 @@
               <div class="form-group">
                 <label for="container_name" class="col-sm-3 control-label text-left">Name</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" id="container_name" placeholder="e.g. docker-prod01">
+                  <input type="text" class="form-control" id="container_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01">
                 </div>
               </div>
               <!-- !name-input -->
@@ -51,12 +61,7 @@
               <div class="form-group">
                 <label for="endpoint_url" class="col-sm-3 control-label text-left">Endpoint URL</label>
                 <div class="col-sm-9">
-                  <div class="input-group">
-                    <input type="text" class="form-control" id="endpoint_url" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
-                    <span class="input-group-btn">
-                      <button class="btn btn-info" type="button">Test</button>
-                    </span>
-                  </div>
+                  <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
                 </div>
               </div>
               <!-- !endpoint-url-input -->
@@ -74,13 +79,12 @@
                 <div class="form-group">
                   <label class="col-sm-3 control-label text-left">TLS CA certificate</label>
                   <div class="col-sm-9">
-                      <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
-                      <span ng-if="formValues.TLSCACert" style="margin-left: 5px;">
-                        <i class="fa fa-check green-icon" aria-hidden="true"></i> {{ formValues.TLSCACert.name }}
-                      </span>
-                      <span ng-if="!formValues.TLSCACert" style="margin-left: 5px;">
-                        <i class="fa fa-times red-icon" aria-hidden="true"></i>
-                      </span>
+                    <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
+                    <span style="margin-left: 5px;">
+                      {{ formValues.TLSCACert.name }}
+                      <i class="fa fa-times red-icon" ng-if="!formValues.TLSCACert" aria-hidden="true"></i>
+                      <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+                    </span>
                   </div>
                 </div>
                 <!-- !ca-input -->
@@ -88,13 +92,12 @@
                 <div class="form-group">
                   <label for="tls_cert" class="col-sm-3 control-label text-left">TLS certificate</label>
                   <div class="col-sm-9">
-                      <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
-                      <span ng-if="formValues.TLSCert" style="margin-left: 5px;">
-                        <i class="fa fa-check green-icon" aria-hidden="true"></i> {{ formValues.TLSCert.name }}
-                      </span>
-                      <span ng-if="!formValues.TLSCert" style="margin-left: 5px;">
-                        <i class="fa fa-times red-icon" aria-hidden="true"></i>
-                      </span>
+                    <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
+                    <span style="margin-left: 5px;">
+                      {{ formValues.TLSCert.name }}
+                      <i class="fa fa-times red-icon" ng-if="!formValues.TLSCert" aria-hidden="true"></i>
+                      <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+                    </span>
                   </div>
                 </div>
                 <!-- !cert-input -->
@@ -102,30 +105,29 @@
                 <div class="form-group">
                   <label class="col-sm-3 control-label text-left">TLS key</label>
                   <div class="col-sm-9">
-                      <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
-                      <span ng-if="formValues.TLSKey" style="margin-left: 5px;">
-                        <i class="fa fa-check green-icon" aria-hidden="true"></i> {{ formValues.TLSKey.name }}
-                      </span>
-                      <span ng-if="!formValues.TLSKey" style="margin-left: 5px;">
-                        <i class="fa fa-times red-icon" aria-hidden="true"></i>
-                      </span>
+                    <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
+                    <span style="margin-left: 5px;">
+                      {{ formValues.TLSKey.name }}
+                      <i class="fa fa-times red-icon" ng-if="!formValues.TLSKey" aria-hidden="true"></i>
+                      <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+                    </span>
                   </div>
                 </div>
                 <!-- !key-input -->
               </div>
               <!-- !tls-certs -->
+              <!-- connect button -->
+              <div class="form-group" style="margin-top: 10px;">
+                <div class="col-sm-12 controls">
+                  <p class="pull-left text-danger" ng-if="state.error" style="margin: 5px;">
+                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
+                  </p>
+                  <button type="submit" class="btn btn-primary pull-right" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && (!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey))" ng-click="createRemoteEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+                </div>
+              </div>
+              <!-- !connect button -->
             </div>
             <!-- !remote-endpoint -->
-            <!-- create button -->
-            <div class="form-group" style="margin-top: 10px;">
-              <div class="col-sm-12 controls">
-                <p class="pull-left text-danger" ng-if="true" style="margin: 5px;">
-                  <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Any error will be displayed here
-                </p>
-                <button type="submit" class="btn btn-primary pull-right" ng-click="createPrimaryEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
-              </div>
-            </div>
-            <!-- !create button -->
           </form>
           <!-- !init-endpoint form -->
         </div>
@@ -133,5 +135,5 @@
       <!-- !init-endpoint panel -->
     </div>
   </div>
-  <!-- !login box -->
+  <!-- !simple box -->
 </div>

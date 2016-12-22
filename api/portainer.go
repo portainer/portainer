@@ -1,5 +1,9 @@
 package portainer
 
+import (
+	"io"
+)
+
 type (
 	// Pair defines a key/value string pair
 	Pair struct {
@@ -32,8 +36,8 @@ type (
 
 	// User represent a user account.
 	User struct {
-		Username string `json:"username"`
-		Password string `json:"password,omitempty"`
+		Username string `json:"Username"`
+		Password string `json:"Password,omitempty"`
 	}
 
 	// TokenData represents the data embedded in a JWT token.
@@ -47,14 +51,19 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
-		ID            EndpointID `json:"id"`
-		URL           string     `json:"url"`
-		Swarm         bool       `json:"swarm"`
-		TLS           bool       `json:"tls"`
-		TLSCACertPath string     `json:"tlscacert"`
-		TLSCertPath   string     `json:"tlscert"`
-		TLSKeyPath    string     `json:"tlskey"`
+		ID            EndpointID `json:"Id"`
+		Name          string     `json:"Name"`
+		URL           string     `json:"URL"`
+		Swarm         bool       `json:"Swarm"`
+		TLS           bool       `json:"TLS"`
+		TLSCACertPath string     `json:"TLSCACert,omitempty"`
+		TLSCertPath   string     `json:"TLSCert,omitempty"`
+		TLSKeyPath    string     `json:"TLSKey,omitempty"`
 	}
+
+	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
+	// It can be either a TLS CA file, a TLS certificate file or a TLS key file.
+	TLSFileType int
 
 	// CLIService represents a service for managing CLI.
 	CLIService interface {
@@ -82,7 +91,9 @@ type (
 	// EndpointService represents a service for managing endpoints.
 	EndpointService interface {
 		Endpoint(ID EndpointID) (*Endpoint, error)
-		UpdateEndpoint(endpoint *Endpoint) error
+		Endpoints() ([]Endpoint, error)
+		CreateEndpoint(endpoint *Endpoint) error
+		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
 	}
 
@@ -97,9 +108,25 @@ type (
 		GenerateToken(data *TokenData) (string, error)
 		VerifyToken(token string) error
 	}
+
+	// FileService represents a service for managing files.
+	FileService interface {
+		StoreTLSFile(endpointID EndpointID, fileType TLSFileType, r io.Reader) error
+		GetPathForTLSFile(endpointID EndpointID, fileType TLSFileType) (string, error)
+		DeleteTLSFiles(endpointID EndpointID) error
+	}
 )
 
 const (
 	// APIVersion is the version number of portainer API.
 	APIVersion = "1.10.2"
+)
+
+const (
+	// TLSFileCA represents a TLS CA certificate file.
+	TLSFileCA TLSFileType = iota
+	// TLSFileCert represents a TLS certificate file.
+	TLSFileCert
+	// TLSFileKey represents a TLS key file.
+	TLSFileKey
 )

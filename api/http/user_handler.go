@@ -33,10 +33,10 @@ func NewUserHandler(middleWareService *middleWareService) *UserHandler {
 	})))
 	h.Handle("/users/{username}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.handleGetUser(w, r)
-	}))).Methods("GET")
+	}))).Methods(http.MethodGet)
 	h.Handle("/users/{username}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.handlePutUser(w, r)
-	}))).Methods("PUT")
+	}))).Methods(http.MethodPut)
 	h.Handle("/users/{username}/passwd", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.handlePostUserPasswd(w, r)
 	})))

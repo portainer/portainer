@@ -14,9 +14,23 @@ type Server struct {
 	EndpointService portainer.EndpointService
 	CryptoService   portainer.CryptoService
 	JWTService      portainer.JWTService
+	FileService     portainer.FileService
 	Settings        *portainer.Settings
 	TemplatesURL    string
 	ActiveEndpoint  *portainer.Endpoint
+	Handler         *Handler
+}
+
+func (server *Server) updateActiveEndpoint(endpoint *portainer.Endpoint) error {
+	if endpoint != nil {
+		server.ActiveEndpoint = endpoint
+		server.Handler.WebSocketHandler.endpoint = endpoint
+		err := server.Handler.DockerHandler.setupProxy(endpoint)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Start starts the HTTP server
@@ -37,16 +51,17 @@ func (server *Server) Start() error {
 	var templatesHandler = NewTemplatesHandler(middleWareService)
 	templatesHandler.templatesURL = server.TemplatesURL
 	var dockerHandler = NewDockerHandler(middleWareService)
-	if server.ActiveEndpoint != nil {
-		dockerHandler.setupProxy(server.ActiveEndpoint)
-	}
 	var websocketHandler = NewWebSocketHandler()
-	websocketHandler.endpoint = server.ActiveEndpoint
+	// EndpointHandler requires a reference to the server to be able to update the active endpoint.
 	var endpointHandler = NewEndpointHandler(middleWareService)
 	endpointHandler.EndpointService = server.EndpointService
+	endpointHandler.FileService = server.FileService
+	endpointHandler.server = server
+	var uploadHandler = NewUploadHandler()
+	uploadHandler.FileService = server.FileService
 	var fileHandler = http.FileServer(http.Dir(server.AssetsPath))
 
-	handler := &Handler{
+	server.Handler = &Handler{
 		AuthHandler:      authHandler,
 		UserHandler:      userHandler,
 		EndpointHandler:  endpointHandler,
@@ -55,6 +70,12 @@ func (server *Server) Start() error {
 		DockerHandler:    dockerHandler,
 		WebSocketHandler: websocketHandler,
 		FileHandler:      fileHandler,
+		UploadHandler:    uploadHandler,
 	}
-	return http.ListenAndServe(server.BindAddress, handler)
+	err := server.updateActiveEndpoint(server.ActiveEndpoint)
+	if err != nil {
+		return err
+	}
+
+	return http.ListenAndServe(server.BindAddress, server.Handler)
 }
