@@ -1,6 +1,6 @@
 angular.module('sidebar', [])
-.controller('SidebarController', ['$scope', '$state', 'Settings', 'Config', 'EndpointService', 'Messages',
-function ($scope, $state, Settings, Config, EndpointService, Messages) {
+.controller('SidebarController', ['$scope', '$state', 'Settings', 'Config', 'EndpointService', 'EndpointMode', 'Messages',
+function ($scope, $state, Settings, Config, EndpointService, EndpointMode, Messages) {
 
   Config.$promise.then(function (c) {
     $scope.logo = c.logo;
@@ -10,6 +10,7 @@ function ($scope, $state, Settings, Config, EndpointService, Messages) {
 
   $scope.switchEndpoint = function(endpoint) {
     EndpointService.setActive(endpoint.Id).then(function success(data) {
+      EndpointMode.determineEndpointMode();
       $state.reload();
     }, function error(err) {
       Messages.error("Failure", err, "Unable to switch to new endpoint");
