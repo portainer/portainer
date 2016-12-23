@@ -145,10 +145,17 @@
             <tbody>
               <tr dir-paginate="endpoint in (state.filteredEndpoints = (endpoints | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
                 <td><input type="checkbox" ng-model="endpoint.Checked" ng-change="selectItem(endpoint)" /></td>
-                <td>{{ endpoint.Name }}</td>
+                <td><i class="fa fa-star" aria-hidden="true" ng-if="endpoint.Id === activeEndpoint.Id"></i> {{ endpoint.Name }}</td>
                 <td>{{ endpoint.URL | stripprotocol }}</td>
                 <td><i class="fa fa-shield" aria-hidden="true" ng-if="endpoint.TLS"></i></td>
-                <td><a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a></td>
+                <td>
+                  <span ng-if="endpoint.Id !== activeEndpoint.Id">
+                    <a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
+                  </span>
+                  <span class="small text-muted" ng-if="endpoint.Id === activeEndpoint.Id">
+                    <i class="fa fa-lock" aria-hidden="true"></i> You cannot edit the active endpoint
+                  </span>
+              </td>
               </tr>
               <tr ng-if="!endpoints">
                 <td colspan="5" class="text-center text-muted">Loading...</td>

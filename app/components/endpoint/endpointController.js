@@ -36,6 +36,11 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Messages) {
     EndpointService.endpoint($stateParams.id).then(function success(data) {
       $('#loadingViewSpinner').hide();
       $scope.endpoint = data;
+      if (data.URL.indexOf("unix://") === 0) {
+        $scope.endpointType = 'local';
+      } else {
+        $scope.endpointType = 'remote';
+      }
       $scope.endpoint.URL = $filter('stripprotocol')(data.URL);
       $scope.formValues.TLSCACert = data.TLSCACert;
       $scope.formValues.TLSCert = data.TLSCert;

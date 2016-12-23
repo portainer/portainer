@@ -30,7 +30,7 @@ function ($scope, $state, EndpointService, Messages) {
   $scope.createRemoteEndpoint = function() {
     $scope.state.error = '';
     var name = $scope.formValues.Name;
-    var URL = "tcp://" + $scope.formValues.URL;
+    var URL = $scope.formValues.URL;
     var TLS = $scope.formValues.TLS;
     var TLSCAFile = $scope.formValues.TLSCACert;
     var TLSCertFile = $scope.formValues.TLSCert;

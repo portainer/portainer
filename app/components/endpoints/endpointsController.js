@@ -35,7 +35,7 @@ function ($scope, $state, EndpointService, Settings, Messages) {
   $scope.addEndpoint = function() {
     $scope.state.error = '';
     var name = $scope.formValues.Name;
-    var URL = "tcp://" + $scope.formValues.URL;
+    var URL = $scope.formValues.URL;
     var TLS = $scope.formValues.TLS;
     var TLSCAFile = $scope.formValues.TLSCACert;
     var TLSCertFile = $scope.formValues.TLSCert;
@@ -81,7 +81,13 @@ function ($scope, $state, EndpointService, Settings, Messages) {
     $('#loadEndpointsSpinner').show();
     EndpointService.endpoints().then(function success(data) {
       $scope.endpoints = data;
-      $('#loadEndpointsSpinner').hide();
+      EndpointService.getActive().then(function success(data) {
+        $scope.activeEndpoint = data;
+        $('#loadEndpointsSpinner').hide();
+      }, function error(err) {
+        $('#loadEndpointsSpinner').hide();
+        Messages.error("Failure", err, "Unable to retrieve active endpoint");
+      });
     }, function error(err) {
       $('#loadEndpointsSpinner').hide();
       Messages.error("Failure", err, "Unable to retrieve endpoints");

@@ -409,7 +409,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         createRemoteEndpoint: function(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, active) {
           var endpoint = {
             Name: name,
-            URL: URL,
+            URL: 'tcp://' + URL,
             TLS: TLS
           };
           var deferred = $q.defer();
@@ -419,11 +419,13 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
               deferred.notify({upload: true});
               FileUploadService.uploadTLSFilesForEndpoint(endpointID, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
                 deferred.notify({upload: false});
-                Endpoints.setActiveEndpoint({}, {id: endpointID}, function success(data) {
-                  deferred.resolve(data);
-                }, function error(err) {
-                  deferred.reject({msg: 'Unable to create endpoint', err: err});
-                });
+                if (active) {
+                  Endpoints.setActiveEndpoint({}, {id: endpointID}, function success(data) {
+                    deferred.resolve(data);
+                  }, function error(err) {
+                    deferred.reject({msg: 'Unable to create endpoint', err: err});
+                  });
+                }
               }, function error(err) {
                 deferred.notify({upload: false});
                 deferred.reject({msg: 'Unable to upload TLS certs', err: err});

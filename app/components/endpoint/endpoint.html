@@ -24,12 +24,12 @@
           <div class="form-group">
             <label for="endpoint_url" class="col-sm-2 control-label text-left">Endpoint URL</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" id="endpoint_url" ng-model="endpoint.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
+              <input ng-disabled="endpointType === 'local'" type="text" class="form-control" id="endpoint_url" ng-model="endpoint.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
             </div>
           </div>
           <!-- !endpoint-url-input -->
           <!-- tls-checkbox -->
-          <div class="form-group">
+          <div class="form-group" ng-if="endpointType === 'remote'">
             <label for="tls" class="col-sm-2 control-label text-left">TLS</label>
             <div class="col-sm-10">
               <input type="checkbox" name="tls" ng-model="endpoint.TLS">
