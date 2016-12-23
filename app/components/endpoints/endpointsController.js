@@ -44,6 +44,7 @@ function ($scope, $state, EndpointService, Settings, Messages) {
       Messages.send("Endpoint created", name);
       $state.reload();
     }, function error(err) {
+      $scope.state.uploadInProgress = false;
       $scope.state.error = err.msg;
     }, function update(evt) {
       if (evt.upload) {

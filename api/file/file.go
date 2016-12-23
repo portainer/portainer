@@ -112,7 +112,7 @@ func (service *Service) createFolderInStoreIfNotExist(name string) error {
 // createFile creates a new file in the file store with the content from r.
 func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 	path := path.Join(service.fileStorePath, filePath)
-	out, err := os.Create(path)
+	out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
