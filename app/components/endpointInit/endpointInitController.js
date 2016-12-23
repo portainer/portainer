@@ -15,6 +15,14 @@ function ($scope, $state, EndpointService, Messages) {
     TLSKey: null
   };
 
+  EndpointService.getActive().then(function success(data) {
+    $state.go('dashboard');
+  }, function error(err) {
+    if (err.status !== 404) {
+      Messages.error("Failure", err, 'Unable to verify Docker endpoint existence');
+    }
+  });
+
   $scope.createLocalEndpoint = function() {
     $scope.state.error = '';
     var name = "local";
