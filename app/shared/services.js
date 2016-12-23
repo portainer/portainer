@@ -378,7 +378,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
           var endpoint = {
             id: ID,
             Name: name,
-            URL: URL,
+            URL: "tcp://" + URL,
             TLS: TLS
           };
           var deferred = $q.defer();
@@ -425,6 +425,8 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
                   }, function error(err) {
                     deferred.reject({msg: 'Unable to create endpoint', err: err});
                   });
+                } else {
+                  deferred.resolve(data);
                 }
               }, function error(err) {
                 deferred.notify({upload: false});
