@@ -32,7 +32,7 @@ type WebSocketHandler struct {
 func NewWebSocketHandler() *WebSocketHandler {
 	h := &WebSocketHandler{
 		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "websockethandler", log.LstdFlags),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/websocket/exec", websocket.Handler(h.webSocketDockerExec))
 	return h

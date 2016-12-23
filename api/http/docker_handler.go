@@ -26,7 +26,7 @@ type DockerHandler struct {
 func NewDockerHandler(middleWareService *middleWareService) *DockerHandler {
 	h := &DockerHandler{
 		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "dockerhandler", log.LstdFlags),
+		Logger:            log.New(os.Stderr, "", log.LstdFlags),
 		middleWareService: middleWareService,
 	}
 	h.PathPrefix("/").Handler(middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

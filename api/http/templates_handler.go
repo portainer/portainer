@@ -22,7 +22,7 @@ type TemplatesHandler struct {
 func NewTemplatesHandler(middleWareService *middleWareService) *TemplatesHandler {
 	h := &TemplatesHandler{
 		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "templateshandler", log.LstdFlags),
+		Logger:            log.New(os.Stderr, "", log.LstdFlags),
 		middleWareService: middleWareService,
 	}
 	h.Handle("/templates", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -32,7 +32,7 @@ const (
 func NewAuthHandler() *AuthHandler {
 	h := &AuthHandler{
 		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "authhandler", log.LstdFlags),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.HandleFunc("/auth", h.handlePostAuth)
 	return h

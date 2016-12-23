@@ -27,7 +27,7 @@ type EndpointHandler struct {
 func NewEndpointHandler(middleWareService *middleWareService) *EndpointHandler {
 	h := &EndpointHandler{
 		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "endpointhandler", log.LstdFlags),
+		Logger:            log.New(os.Stderr, "", log.LstdFlags),
 		middleWareService: middleWareService,
 	}
 	h.Handle("/endpoints", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
