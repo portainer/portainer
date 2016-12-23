@@ -29,6 +29,10 @@ func (server *Server) updateActiveEndpoint(endpoint *portainer.Endpoint) error {
 		if err != nil {
 			return err
 		}
+		err = server.EndpointService.SetActive(endpoint)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

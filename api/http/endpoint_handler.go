@@ -116,11 +116,6 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 				Error(w, err, http.StatusInternalServerError, handler.Logger)
 				return
 			}
-			err = handler.EndpointService.SetActive(endpoint)
-			if err != nil {
-				Error(w, err, http.StatusInternalServerError, handler.Logger)
-				return
-			}
 		}
 	}
 
@@ -201,11 +196,6 @@ func (handler *EndpointHandler) handlePostEndpoint(w http.ResponseWriter, r *htt
 	}
 
 	err = handler.server.updateActiveEndpoint(endpoint)
-	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-	err = handler.EndpointService.SetActive(endpoint)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 	}

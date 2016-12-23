@@ -52,12 +52,14 @@ func main() {
 	var activeEndpoint *portainer.Endpoint
 	if *flags.Endpoint != "" {
 		activeEndpoint = &portainer.Endpoint{
+			Name:          "primary",
 			URL:           *flags.Endpoint,
 			TLS:           *flags.TLSVerify,
 			TLSCACertPath: *flags.TLSCacert,
 			TLSCertPath:   *flags.TLSCert,
 			TLSKeyPath:    *flags.TLSKey,
 		}
+		store.EndpointService.CreateEndpoint(activeEndpoint)
 	}
 
 	var server portainer.Server = &http.Server{
