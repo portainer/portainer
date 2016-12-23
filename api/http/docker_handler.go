@@ -26,7 +26,7 @@ type DockerHandler struct {
 func NewDockerHandler(middleWareService *middleWareService) *DockerHandler {
 	h := &DockerHandler{
 		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
+		Logger:            log.New(os.Stderr, "dockerhandler", log.LstdFlags),
 		middleWareService: middleWareService,
 	}
 	h.PathPrefix("/").Handler(middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +76,6 @@ func newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, erro
 	proxy := httputil.NewSingleHostReverseProxy(u)
 	config, err := createTLSConfiguration(endpoint.TLSCACertPath, endpoint.TLSCertPath, endpoint.TLSKeyPath)
 	if err != nil {
-		log.Printf("Shit happened here: %+v", endpoint)
 		return nil, err
 	}
 	proxy.Transport = &http.Transport{

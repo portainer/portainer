@@ -22,7 +22,7 @@ type SettingsHandler struct {
 func NewSettingsHandler(middleWareService *middleWareService) *SettingsHandler {
 	h := &SettingsHandler{
 		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
+		Logger:            log.New(os.Stderr, "settingshandler", log.LstdFlags),
 		middleWareService: middleWareService,
 	}
 	h.HandleFunc("/settings", h.handleGetSettings)

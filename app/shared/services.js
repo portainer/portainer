@@ -240,18 +240,6 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         initAdminUser: { method: 'POST', params: { username: 'admin', action: 'init' } }
       });
     }])
-    .factory('Endpoints', ['$resource', 'ENDPOINTS_ENDPOINT', function EndpointsFactory($resource, ENDPOINTS_ENDPOINT) {
-      'use strict';
-      return $resource(ENDPOINTS_ENDPOINT + '/:id/:action', {}, {
-        create: { method: 'POST' },
-        query: { method: 'GET', isArray: true },
-        get: { method: 'GET', params: { id: '@id' } },
-        update: { method: 'PUT', params: { id: '@id' } },
-        remove: { method: 'DELETE', params: { id: '@id'} },
-        getActiveEndpoint: { method: 'GET', params: { id: '0' } },
-        setActiveEndpoint: { method: 'POST', params: { id: '@id', action: 'active' } }
-      });
-    }])
     .factory('EndpointMode', ['$rootScope', 'Info', function EndpointMode($rootScope, Info) {
       'use strict';
       return {
@@ -359,9 +347,27 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         }
       };
     }])
+    .factory('Endpoints', ['$resource', 'ENDPOINTS_ENDPOINT', function EndpointsFactory($resource, ENDPOINTS_ENDPOINT) {
+      'use strict';
+      return $resource(ENDPOINTS_ENDPOINT + '/:id/:action', {}, {
+        create: { method: 'POST' },
+        query: { method: 'GET', isArray: true },
+        get: { method: 'GET', params: { id: '@id' } },
+        update: { method: 'PUT', params: { id: '@id' } },
+        remove: { method: 'DELETE', params: { id: '@id'} },
+        getActiveEndpoint: { method: 'GET', params: { id: '0' } },
+        setActiveEndpoint: { method: 'POST', params: { id: '@id', action: 'active' } }
+      });
+    }])
     .factory('EndpointService', ['$q', '$timeout', 'Endpoints', 'FileUploadService', function EndpointServiceFactory($q, $timeout, Endpoints, FileUploadService) {
       'use strict';
       return {
+        getActive: function() {
+          return Endpoints.getActiveEndpoint().$promise;
+        },
+        setActive: function(endpointID) {
+          return Endpoints.setActiveEndpoint({id: endpointID}).$promise;
+        },
         endpoint: function(endpointID) {
           return Endpoints.get({id: endpointID}).$promise;
         },

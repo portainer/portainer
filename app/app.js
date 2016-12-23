@@ -287,7 +287,7 @@ angular.module('portainer', [
         }
       },
       data: {
-        requiresLogin: false
+        requiresLogin: true
       }
     })
     .state('endpoint', {
@@ -303,7 +303,7 @@ angular.module('portainer', [
         }
       },
       data: {
-        requiresLogin: false
+        requiresLogin: true
       }
     })
     .state('endpointInit', {
@@ -313,6 +313,9 @@ angular.module('portainer', [
           templateUrl: 'app/components/endpointInit/endpointInit.html',
           controller: 'EndpointInitController'
         }
+      },
+      data: {
+        requiresLogin: true
       }
     })
     .state('events', {

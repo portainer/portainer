@@ -4,7 +4,7 @@ function ($scope, $state, EndpointService, Settings, Messages) {
   $scope.state = {
     error: '',
     uploadInProgress: false,
-    selectedItemCount: 0,
+    selectedItemCount: 0
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
@@ -42,7 +42,7 @@ function ($scope, $state, EndpointService, Settings, Messages) {
     var TLSKeyFile = $scope.formValues.TLSKey;
     EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, false).then(function success(data) {
       Messages.send("Endpoint created", name);
-      $state.go('endpoints', {}, {reload: true});
+      $state.reload();
     }, function error(err) {
       $scope.state.error = err.msg;
     }, function update(evt) {
@@ -85,7 +85,7 @@ function ($scope, $state, EndpointService, Settings, Messages) {
     }, function error(err) {
       $('#loadEndpointsSpinner').hide();
       Messages.error("Failure", err, "Unable to retrieve endpoints");
-      $scope.networks = [];
+      $scope.endpoints = [];
     });
   }
 

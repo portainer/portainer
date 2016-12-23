@@ -27,7 +27,7 @@ type EndpointHandler struct {
 func NewEndpointHandler(middleWareService *middleWareService) *EndpointHandler {
 	h := &EndpointHandler{
 		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
+		Logger:            log.New(os.Stderr, "endpointhandler", log.LstdFlags),
 		middleWareService: middleWareService,
 	}
 	h.Handle("/endpoints", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -116,6 +116,11 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 				Error(w, err, http.StatusInternalServerError, handler.Logger)
 				return
 			}
+			err = handler.EndpointService.SetActive(endpoint)
+			if err != nil {
+				Error(w, err, http.StatusInternalServerError, handler.Logger)
+				return
+			}
 		}
 	}
 
@@ -146,10 +151,20 @@ func (handler *EndpointHandler) handleGetEndpoint(w http.ResponseWriter, r *http
 
 	var endpoint *portainer.Endpoint
 	if id == "0" {
-		endpoint = handler.server.ActiveEndpoint
-		if endpoint == nil {
-			Error(w, portainer.ErrNoActiveEndpoint, http.StatusNotFound, handler.Logger)
+		endpoint, err = handler.EndpointService.GetActive()
+		if err == portainer.ErrEndpointNotFound {
+			Error(w, err, http.StatusNotFound, handler.Logger)
 			return
+		} else if err != nil {
+			Error(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
+		if handler.server.ActiveEndpoint == nil {
+			err = handler.server.updateActiveEndpoint(endpoint)
+			if err != nil {
+				Error(w, err, http.StatusInternalServerError, handler.Logger)
+				return
+			}
 		}
 	} else {
 		endpoint, err = handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
@@ -187,9 +202,12 @@ func (handler *EndpointHandler) handlePostEndpoint(w http.ResponseWriter, r *htt
 
 	err = handler.server.updateActiveEndpoint(endpoint)
 	if err != nil {
-		log.Print("The failz")
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
+	}
+	err = handler.EndpointService.SetActive(endpoint)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
 	}
 }
 
@@ -230,6 +248,12 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		endpoint.TLSCertPath = certPath
 		keyPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileKey)
 		endpoint.TLSKeyPath = keyPath
+	} else {
+		err = handler.FileService.DeleteTLSFiles(endpoint.ID)
+		if err != nil {
+			Error(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
 	}
 
 	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)

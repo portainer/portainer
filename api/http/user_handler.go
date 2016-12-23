@@ -25,7 +25,7 @@ type UserHandler struct {
 func NewUserHandler(middleWareService *middleWareService) *UserHandler {
 	h := &UserHandler{
 		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
+		Logger:            log.New(os.Stderr, "userhandler", log.LstdFlags),
 		middleWareService: middleWareService,
 	}
 	h.Handle("/users", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -38,6 +38,7 @@ function ($scope, $state, EndpointService, Messages) {
     EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, TLS ? false : true).then(function success(data) {
       $state.go('dashboard');
     }, function error(err) {
+      $scope.state.uploadInProgress = false;
       $scope.state.error = err.msg;
     }, function update(evt) {
       if (evt.upload) {

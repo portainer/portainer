@@ -7,8 +7,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	"golang.org/x/net/websocket"
 	"io"
 	"log"
 	"net"
@@ -17,6 +15,9 @@ import (
 	"net/url"
 	"os"
 	"time"
+
+	"github.com/gorilla/mux"
+	"golang.org/x/net/websocket"
 )
 
 // WebSocketHandler represents an HTTP API handler for proxying requests to a web socket.
@@ -31,7 +32,7 @@ type WebSocketHandler struct {
 func NewWebSocketHandler() *WebSocketHandler {
 	h := &WebSocketHandler{
 		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		Logger: log.New(os.Stderr, "websockethandler", log.LstdFlags),
 	}
 	h.Handle("/websocket/exec", websocket.Handler(h.webSocketDockerExec))
 	return h

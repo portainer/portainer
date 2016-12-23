@@ -34,7 +34,7 @@ function ($scope, $state, Network, Config, Messages, Settings) {
       } else {
         Messages.send("Network created", d.Id);
         $('#createNetworkSpinner').hide();
-        $state.go('networks', {}, {reload: true});
+        $state.reload();
       }
     }, function (e) {
       $('#createNetworkSpinner').hide();

@@ -80,7 +80,7 @@
                   <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
                 </div>
                 <div class="input-group col-sm-1 input-group-sm">
-                  <select class="selectpicker form-control" ng-model="portBinding.protocol">
+                  <select class="form-control" ng-model="portBinding.protocol">
                     <option value="tcp">tcp</option>
                     <option value="udp">udp</option>
                   </select>
@@ -232,7 +232,7 @@
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon"><input type="checkbox" ng-model="volume.isPath" ng-click="resetVolumePath($index)">Path</span>
-                      <select class="selectpicker form-control" ng-model="volume.name" ng-if="!volume.isPath">
+                      <select class="form-control" ng-model="volume.name" ng-if="!volume.isPath">
                         <option selected disabled hidden value="">Select a volume</option>
                         <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
                       </select>
@@ -267,7 +267,7 @@
               <div class="form-group">
                 <label for="container_network" class="col-sm-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="selectpicker form-control" ng-model="config.HostConfig.NetworkMode" id="container_network">
+                  <select class="form-control" ng-model="config.HostConfig.NetworkMode" id="container_network">
                     <option selected disabled hidden value="">Select a network</option>
                     <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
@@ -278,10 +278,10 @@
               <div class="form-group" ng-if="config.HostConfig.NetworkMode == 'container'">
                 <label for="container_network_container" class="col-sm-1 control-label text-left">Container</label>
                 <div class="col-sm-9">
-                  <select ng-if="endpointMode.provider !== 'DOCKER_SWARM'" ng-options="container|containername for container in runningContainers" class="selectpicker form-control" ng-model="formValues.NetworkContainer">
+                  <select ng-if="endpointMode.provider !== 'DOCKER_SWARM'" ng-options="container|containername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
                     <option selected disabled hidden value="">Select a container</option>
                   </select>
-                  <select ng-if="endpointMode.provider === 'DOCKER_SWARM'" ng-options="container|swarmcontainername for container in runningContainers" class="selectpicker form-control" ng-model="formValues.NetworkContainer">
+                  <select ng-if="endpointMode.provider === 'DOCKER_SWARM'" ng-options="container|swarmcontainername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
                     <option selected disabled hidden value="">Select a container</option>
                   </select>
                 </div>

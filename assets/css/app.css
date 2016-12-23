@@ -257,3 +257,8 @@ input[type="radio"] {
 .user-box {
   margin-right: 25px;
 }
+
+.select-endpoint {
+  width: 80%;
+  margin: 0 auto;
+}

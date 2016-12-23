@@ -22,7 +22,7 @@ type UploadHandler struct {
 func NewUploadHandler() *UploadHandler {
 	h := &UploadHandler{
 		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		Logger: log.New(os.Stderr, "uploadhandler", log.LstdFlags),
 	}
 	h.HandleFunc("/upload/tls/{endpointID}/{certificate:(ca|cert|key)}", h.handlePostUploadTLS)
 	return h

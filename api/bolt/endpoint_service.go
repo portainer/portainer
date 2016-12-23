@@ -12,12 +12,16 @@ type EndpointService struct {
 	store *Store
 }
 
+const (
+	activeEndpointID = 0
+)
+
 // Endpoint returns an endpoint by ID.
 func (service *EndpointService) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	var data []byte
 	err := service.store.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(endpointBucketName))
-		value := bucket.Get([]byte(internal.Itob(int(ID))))
+		value := bucket.Get(internal.Itob(int(ID)))
 		if value == nil {
 			return portainer.ErrEndpointNotFound
 		}
@@ -76,7 +80,7 @@ func (service *EndpointService) CreateEndpoint(endpoint *portainer.Endpoint) err
 			return err
 		}
 
-		err = bucket.Put([]byte(internal.Itob(int(endpoint.ID))), data)
+		err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
 		if err != nil {
 			return err
 		}
@@ -93,7 +97,7 @@ func (service *EndpointService) UpdateEndpoint(ID portainer.EndpointID, endpoint
 
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(endpointBucketName))
-		err = bucket.Put([]byte(internal.Itob(int(ID))), data)
+		err = bucket.Put(internal.Itob(int(ID)), data)
 		if err != nil {
 			return err
 		}
@@ -105,7 +109,51 @@ func (service *EndpointService) UpdateEndpoint(ID portainer.EndpointID, endpoint
 func (service *EndpointService) DeleteEndpoint(ID portainer.EndpointID) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(endpointBucketName))
-		err := bucket.Delete([]byte(internal.Itob(int(ID))))
+		err := bucket.Delete(internal.Itob(int(ID)))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+// GetActive returns the active endpoint.
+func (service *EndpointService) GetActive() (*portainer.Endpoint, error) {
+	var data []byte
+	err := service.store.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(activeEndpointBucketName))
+		value := bucket.Get(internal.Itob(activeEndpointID))
+		if value == nil {
+			return portainer.ErrEndpointNotFound
+		}
+
+		data = make([]byte, len(value))
+		copy(data, value)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var endpoint portainer.Endpoint
+	err = internal.UnmarshalEndpoint(data, &endpoint)
+	if err != nil {
+		return nil, err
+	}
+	return &endpoint, nil
+}
+
+// SetActive saves an endpoint as active.
+func (service *EndpointService) SetActive(endpoint *portainer.Endpoint) error {
+	return service.store.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(activeEndpointBucketName))
+
+		data, err := internal.MarshalEndpoint(endpoint)
+		if err != nil {
+			return err
+		}
+
+		err = bucket.Put(internal.Itob(activeEndpointID), data)
 		if err != nil {
 			return err
 		}

@@ -20,9 +20,10 @@ type Store struct {
 }
 
 const (
-	databaseFileName   = "portainer.db"
-	userBucketName     = "users"
-	endpointBucketName = "endpoints"
+	databaseFileName         = "portainer.db"
+	userBucketName           = "users"
+	endpointBucketName       = "endpoints"
+	activeEndpointBucketName = "activeEndpoint"
 )
 
 // NewStore initializes a new Store and the associated services
@@ -51,6 +52,10 @@ func (store *Store) Open() error {
 			return err
 		}
 		_, err = tx.CreateBucketIfNotExists([]byte(endpointBucketName))
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(activeEndpointBucketName))
 		if err != nil {
 			return err
 		}

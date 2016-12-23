@@ -8,7 +8,11 @@
         <span class="menu-icon glyphicon glyphicon-transfer"></span>
       </a>
     </li>
-    <li class="sidebar-title"><span>ENDPOINT_NAME</span></li>
+    <li class="sidebar-title" ng-if="endpoints">
+      <select class="select-endpoint form-control" ng-options="endpoint.Name for endpoint in endpoints" ng-model="activeEndpoint" ng-change="switchEndpoint(activeEndpoint)">
+      </select>
+    </li>
+    <li class="sidebar-title"><span>Endpoint</span></li>
     <li class="sidebar-list">
       <a ui-sref="dashboard">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
     </li>
