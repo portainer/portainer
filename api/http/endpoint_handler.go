@@ -123,7 +123,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 }
 
 type postEndpointsRequest struct {
-	Name string `valid:"alphanum,required"`
+	Name string `valid:"required"`
 	URL  string `valid:"required"`
 	TLS  bool
 }
@@ -254,7 +254,7 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 }
 
 type putEndpointsRequest struct {
-	Name string `valid:"alphanum,required"`
+	Name string `valid:"required"`
 	URL  string `valid:"required"`
 	TLS  bool
 }
