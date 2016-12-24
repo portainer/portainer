@@ -150,7 +150,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
 
   Config.$promise.then(function (c) {
     $scope.containersToHideLabels = c.hiddenLabels;
-    if (c.swarm && $scope.endpointMode.provider === 'DOCKER_SWARM') {
+    if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
       Info.get({}, function (d) {
         $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
         update({all: Settings.displayAll ? 1 : 0});

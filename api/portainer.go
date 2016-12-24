@@ -19,7 +19,6 @@ type (
 		Endpoint  *string
 		Labels    *[]Pair
 		Logo      *string
-		Swarm     *bool
 		Templates *string
 		TLSVerify *bool
 		TLSCacert *string
@@ -29,7 +28,6 @@ type (
 
 	// Settings represents Portainer settings.
 	Settings struct {
-		Swarm        bool   `json:"swarm"`
 		HiddenLabels []Pair `json:"hiddenLabels"`
 		Logo         string `json:"logo"`
 	}
@@ -54,7 +52,6 @@ type (
 		ID            EndpointID `json:"Id"`
 		Name          string     `json:"Name"`
 		URL           string     `json:"URL"`
-		Swarm         bool       `json:"Swarm"`
 		TLS           bool       `json:"TLS"`
 		TLSCACertPath string     `json:"TLSCACert,omitempty"`
 		TLSCertPath   string     `json:"TLSCert,omitempty"`

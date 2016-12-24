@@ -3,9 +3,10 @@ package cli
 import (
 	"github.com/portainer/portainer"
 
-	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 	"strings"
+
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 // Service implements the CLIService interface
@@ -27,7 +28,6 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		Addr:      kingpin.Flag("bind", "Address and port to serve Portainer").Default(":9000").Short('p').String(),
 		Assets:    kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String(),
 		Data:      kingpin.Flag("data", "Path to the folder where the data is stored").Default("/data").Short('d').String(),
-		Swarm:     kingpin.Flag("swarm", "Swarm cluster support").Default("false").Short('s').Bool(),
 		Templates: kingpin.Flag("templates", "URL to the templates (apps) definitions").Default("https://raw.githubusercontent.com/portainer/templates/master/templates.json").Short('t').String(),
 		TLSVerify: kingpin.Flag("tlsverify", "TLS support").Default("false").Bool(),
 		TLSCacert: kingpin.Flag("tlscacert", "Path to the CA").Default("/certs/ca.pem").String(),

@@ -25,7 +25,6 @@ func main() {
 	}
 
 	settings := &portainer.Settings{
-		Swarm:        *flags.Swarm,
 		HiddenLabels: *flags.Labels,
 		Logo:         *flags.Logo,
 	}

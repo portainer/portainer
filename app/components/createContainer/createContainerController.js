@@ -52,7 +52,6 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   };
 
   Config.$promise.then(function (c) {
-    $scope.swarm = c.swarm;
     var containersToHideLabels = c.hiddenLabels;
 
     Volume.query({}, function (d) {
@@ -63,7 +62,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
     Network.query({}, function (d) {
       var networks = d;
-      if ($scope.swarm) {
+      if ($scope.endpointMode.provider === 'DOCKER_SWARM' || $scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
         networks = d.filter(function (network) {
           if (network.Scope === 'global') {
             return network;
@@ -211,7 +210,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = $filter('trimcontainername')(container.Names[0]);
-      if ($scope.swarm && $scope.endpointMode.provider === 'DOCKER_SWARM') {
+      if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
         containerName = $filter('swarmcontainername')(container);
       }
     }
