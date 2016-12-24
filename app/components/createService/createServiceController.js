@@ -162,7 +162,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
 
   function prepareUpdateConfig(config, input) {
     config.UpdateConfig = {
-      Parallelism: input.Parallelism || 1,
+      Parallelism: input.Parallelism || 0,
       Delay: input.UpdateDelay || 0,
       FailureAction: input.FailureAction
     };

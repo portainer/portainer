@@ -61,15 +61,15 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
   };
 
   $scope.changeParallelism = function changeParallelism(service) {
-    updateServiceAttribute(service, 'UpdateParallelism', service.newServiceUpdateParallelism || service.UpdateParallelism);
+    updateServiceAttribute(service, 'UpdateParallelism', service.newServiceUpdateParallelism);
     service.EditParallelism = false;
   };
   $scope.changeUpdateDelay = function changeUpdateDelay(service) {
-    updateServiceAttribute(service, 'UpdateDelay', service.newServiceUpdateDelay || service.UpdateDelay);
+    updateServiceAttribute(service, 'UpdateDelay', service.newServiceUpdateDelay);
     service.EditDelay = false;
   };
   $scope.changeUpdateFailureAction = function changeUpdateFailureAction(service) {
-    updateServiceAttribute(service, 'UpdateFailureAction', service.newServiceUpdateFailureAction || service.UpdateFailureAction);
+    updateServiceAttribute(service, 'UpdateFailureAction', service.newServiceUpdateFailureAction);
   };
 
   $scope.cancelChanges = function changeServiceImage(service) {
@@ -99,9 +99,9 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     }
 
     config.UpdateConfig = {
-      Parallelism: service.newServiceUpdateParallelism || 1,
-      Delay: service.newServiceUpdateDelay || 0,
-      FailureAction: service.newServiceUpdateFailureAction || 'pause'
+      Parallelism: service.newServiceUpdateParallelism,
+      Delay: service.newServiceUpdateDelay,
+      FailureAction: service.newServiceUpdateFailureAction
     };
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
@@ -139,9 +139,9 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
       service.newServiceName = service.Name;
       service.newServiceImage = service.Image;
       service.newServiceReplicas = service.Replicas;
-      service.newServiceUpdateParallelism = service.UpdateParallelism || 1;
-      service.newServiceUpdateDelay = service.UpdateDelay || 0;
-      service.newServiceUpdateFailureAction = service.UpdateFailureAction || 'pause';
+      service.newServiceUpdateParallelism = service.UpdateParallelism;
+      service.newServiceUpdateDelay = service.UpdateDelay;
+      service.newServiceUpdateFailureAction = service.UpdateFailureAction;
 
       service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
       service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
