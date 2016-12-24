@@ -49,17 +49,27 @@ func main() {
 
 	var cryptoService portainer.CryptoService = &crypto.Service{}
 
+	// Initialize the active endpoint from the CLI only if there is no
+	// active endpoint defined yet.
 	var activeEndpoint *portainer.Endpoint
 	if *flags.Endpoint != "" {
-		activeEndpoint = &portainer.Endpoint{
-			Name:          "primary",
-			URL:           *flags.Endpoint,
-			TLS:           *flags.TLSVerify,
-			TLSCACertPath: *flags.TLSCacert,
-			TLSCertPath:   *flags.TLSCert,
-			TLSKeyPath:    *flags.TLSKey,
+		activeEndpoint, err = store.EndpointService.GetActive()
+		if err == portainer.ErrEndpointNotFound {
+			activeEndpoint = &portainer.Endpoint{
+				Name:          "primary",
+				URL:           *flags.Endpoint,
+				TLS:           *flags.TLSVerify,
+				TLSCACertPath: *flags.TLSCacert,
+				TLSCertPath:   *flags.TLSCert,
+				TLSKeyPath:    *flags.TLSKey,
+			}
+			err = store.EndpointService.CreateEndpoint(activeEndpoint)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if err != nil {
+			log.Fatal(err)
 		}
-		store.EndpointService.CreateEndpoint(activeEndpoint)
 	}
 
 	var server portainer.Server = &http.Server{
