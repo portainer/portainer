@@ -60,6 +60,18 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     service.hasChanges = service.hasChanges || removedElement !== null;
   };
 
+  $scope.changeParallelism = function changeParallelism(service) {
+    updateServiceAttribute(service, 'UpdateParallelism', service.newServiceUpdateParallelism);
+    service.EditParallelism = false;
+  };
+  $scope.changeUpdateDelay = function changeUpdateDelay(service) {
+    updateServiceAttribute(service, 'UpdateDelay', service.newServiceUpdateDelay);
+    service.EditDelay = false;
+  };
+  $scope.changeUpdateFailureAction = function changeUpdateFailureAction(service) {
+    updateServiceAttribute(service, 'UpdateFailureAction', service.newServiceUpdateFailureAction);
+  };
+
   $scope.cancelChanges = function changeServiceImage(service) {
     Object.keys(previousServiceValues).forEach(function(attribute) {
       service[attribute] = previousServiceValues[attribute]; // reset service values
@@ -85,6 +97,12 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
     }
+
+    config.UpdateConfig = {
+      Parallelism: service.newServiceUpdateParallelism,
+      Delay: service.newServiceUpdateDelay,
+      FailureAction: service.newServiceUpdateFailureAction
+    };
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadServicesSpinner').hide();
@@ -121,6 +139,10 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
       service.newServiceName = service.Name;
       service.newServiceImage = service.Image;
       service.newServiceReplicas = service.Replicas;
+      service.newServiceUpdateParallelism = service.UpdateParallelism;
+      service.newServiceUpdateDelay = service.UpdateDelay;
+      service.newServiceUpdateFailureAction = service.UpdateFailureAction;
+
       service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
       service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
       service.ServiceContainerLabels = translateLabelsToServiceLabels(service.ContainerLabels);
