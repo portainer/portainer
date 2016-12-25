@@ -7,7 +7,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Console: 'none',
     Volumes: [],
     Registry: '',
-    NetworkContainer: ''
+    NetworkContainer: '',
+    Labels: []
   };
 
   $scope.imageConfig = {};
@@ -24,7 +25,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       Binds: [],
       NetworkMode: 'bridge',
       Privileged: false
-    }
+    },
+    Labels: {}
   };
 
   $scope.addVolume = function() {
@@ -49,6 +51,14 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
   $scope.removePortBinding = function(index) {
     $scope.config.HostConfig.PortBindings.splice(index, 1);
+  };
+
+  $scope.addLabel = function() {
+    $scope.formValues.Labels.push({ name: '', value: ''});
+  };
+
+  $scope.removeLabel = function(index) {
+    $scope.formValues.Labels.splice(index, 1);
   };
 
   Config.$promise.then(function (c) {
@@ -221,6 +231,16 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     config.HostConfig.NetworkMode = networkMode;
   }
 
+  function prepareLabels(config) {
+    var labels = {};
+    $scope.formValues.Labels.forEach(function (label) {
+      if (label.name && label.value) {
+        labels[label.name] = label.value;
+      }
+    });
+    config.Labels = labels;
+  }
+
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
     prepareNetworkConfig(config);
@@ -229,6 +249,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     prepareConsole(config);
     prepareEnvironmentVariables(config);
     prepareVolumes(config);
+    prepareLabels(config);
     return config;
   }
 
