@@ -4,7 +4,8 @@ function ($scope, $state, Messages, Network) {
   $scope.formValues = {
     DriverOptions: [],
     Subnet: '',
-    Gateway: ''
+    Gateway: '',
+    Labels: []
   };
 
   $scope.config = {
@@ -16,7 +17,8 @@ function ($scope, $state, Messages, Network) {
     IPAM: {
       Driver: 'default',
       Config: []
-    }
+    },
+    Labels: {}
   };
 
   $scope.addDriverOption = function() {
@@ -25,6 +27,14 @@ function ($scope, $state, Messages, Network) {
 
   $scope.removeDriverOption = function(index) {
     $scope.formValues.DriverOptions.splice(index, 1);
+  };
+
+  $scope.addLabel = function() {
+    $scope.formValues.Labels.push({ name: '', value: ''});
+  };
+
+  $scope.removeLabel = function(index) {
+    $scope.formValues.Labels.splice(index, 1);
   };
 
   function createNetwork(config) {
@@ -63,10 +73,21 @@ function ($scope, $state, Messages, Network) {
     config.Options = options;
   }
 
+  function prepareLabelsConfig(config) {
+    var labels = {};
+    $scope.formValues.Labels.forEach(function (label) {
+      if (label.name && label.value) {
+          labels[label.name] = label.value;
+      }
+    });
+    config.Labels = labels;
+  }
+
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
     prepareIPAMConfiguration(config);
     prepareDriverOptions(config);
+    prepareLabelsConfig(config);
     return config;
   }
 
