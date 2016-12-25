@@ -115,7 +115,7 @@ function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, C
         if (v.value || v.set) {
           var val;
           if (v.type && v.type === 'container') {
-            if ($scope.swarm && $scope.formValues.network.Scope === 'global') {
+            if ($scope.endpointMode.provider === 'DOCKER_SWARM' && $scope.formValues.network.Scope === 'global') {
               val = $filter('swarmcontainername')(v.value);
             } else {
               var container = v.value;
@@ -203,11 +203,10 @@ function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, C
   }
 
   Config.$promise.then(function (c) {
-    $scope.swarm = c.swarm;
     var containersToHideLabels = c.hiddenLabels;
     Network.query({}, function (d) {
       var networks = d;
-      if ($scope.swarm) {
+      if ($scope.endpointMode.provider === 'DOCKER_SWARM' || $scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
         networks = d.filter(function (network) {
           if (network.Scope === 'global') {
             return network;

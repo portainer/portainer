@@ -5,6 +5,7 @@ angular.module('portainer', [
   'ui.select',
   'ngCookies',
   'ngSanitize',
+  'ngFileUpload',
   'angularUtils.directives.dirPagination',
   'LocalStorageModule',
   'angular-jwt',
@@ -19,6 +20,9 @@ angular.module('portainer', [
   'containers',
   'createContainer',
   'docker',
+  'endpoint',
+  'endpointInit',
+  'endpoints',
   'events',
   'images',
   'image',
@@ -270,6 +274,50 @@ angular.module('portainer', [
         requiresLogin: true
       }
     })
+    .state('endpoints', {
+      url: '/endpoints/',
+      views: {
+        "content": {
+          templateUrl: 'app/components/endpoints/endpoints.html',
+          controller: 'EndpointsController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
+    })
+    .state('endpoint', {
+      url: '^/endpoints/:id',
+      views: {
+        "content": {
+          templateUrl: 'app/components/endpoint/endpoint.html',
+          controller: 'EndpointController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
+    })
+    .state('endpointInit', {
+      url: '/init/endpoint',
+      views: {
+        "content": {
+          templateUrl: 'app/components/endpointInit/endpointInit.html',
+          controller: 'EndpointInitController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
+    })
     .state('events', {
       url: '/events/',
       views: {
@@ -491,18 +539,19 @@ angular.module('portainer', [
     });
 
     $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams) {
-      if ((fromState.name === 'auth' || fromState.name === '') && Authentication.isAuthenticated()) {
+      if (toState.name !== 'endpointInit' && (fromState.name === 'auth' || fromState.name === '' || fromState.name === 'endpointInit') && Authentication.isAuthenticated()) {
         EndpointMode.determineEndpointMode();
       }
     });
   }])
   // This is your docker url that the api will use to make requests
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
-  .constant('DOCKER_ENDPOINT', '/api/docker')
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is required.  If you have a port, prefix it with a ':' i.e. :4243
+  .constant('DOCKER_ENDPOINT', '/api/docker')
   .constant('CONFIG_ENDPOINT', '/api/settings')
   .constant('AUTH_ENDPOINT', '/api/auth')
   .constant('USERS_ENDPOINT', '/api/users')
+  .constant('ENDPOINTS_ENDPOINT', '/api/endpoints')
   .constant('TEMPLATES_ENDPOINT', '/api/templates')
   .constant('PAGINATION_MAX_ITEMS', 10)
   .constant('UI_VERSION', 'v1.10.2');

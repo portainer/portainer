@@ -72,7 +72,7 @@
                   <input type="text" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80">
                 </div>
                 <div class="input-group col-sm-1 input-group-sm">
-                  <select class="selectpicker form-control" ng-model="portBinding.Protocol">
+                  <select class="form-control" ng-model="portBinding.Protocol">
                     <option value="tcp">tcp</option>
                     <option value="udp">udp</option>
                   </select>
@@ -192,7 +192,7 @@
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon"><input type="checkbox" ng-model="volume.Bind">bind</span>
-                      <select class="selectpicker form-control" ng-model="volume.Source" ng-if="!volume.Bind">
+                      <select class="form-control" ng-model="volume.Source" ng-if="!volume.Bind">
                         <option selected disabled hidden value="">Select a volume</option>
                         <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
                       </select>
@@ -222,7 +222,7 @@
               <div class="form-group">
                 <label for="container_network" class="col-sm-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="selectpicker form-control" ng-model="formValues.Network">
+                  <select class="form-control" ng-model="formValues.Network">
                     <option selected disabled hidden value="">Select a network</option>
                     <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
@@ -247,7 +247,7 @@
                           <i class="fa fa-minus" aria-hidden="true"></i>
                         </button>
                       </span>
-                      <select class="selectpicker form-control" ng-model="network.Name">
+                      <select class="form-control" ng-model="network.Name">
                         <option selected disabled hidden value="">Select a network</option>
                         <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                       </select>

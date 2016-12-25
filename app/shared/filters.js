@@ -106,6 +106,12 @@ angular.module('portainer.filters', [])
     return 'Stopped';
   };
 })
+.filter('stripprotocol', function() {
+  'use strict';
+  return function (url) {
+    return url.replace(/.*?:\/\//g, '');
+  };
+})
 .filter('getstatelabel', function () {
   'use strict';
   return function (state) {

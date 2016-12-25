@@ -2,11 +2,12 @@ package http
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gorilla/mux"
 )
 
 // TemplatesHandler represents an HTTP API handler for managing templates.
@@ -32,8 +33,8 @@ func NewTemplatesHandler(middleWareService *middleWareService) *TemplatesHandler
 
 // handleGetTemplates handles GET requests on /templates
 func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		handleNotAllowed(w, []string{"GET"})
+	if r.Method != http.MethodGet {
+		handleNotAllowed(w, []string{http.MethodGet})
 		return
 	}
 
