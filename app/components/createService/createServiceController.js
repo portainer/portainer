@@ -9,6 +9,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     Mode: 'replicated',
     Replicas: 1,
     Command: '',
+    EntryPoint: '',
     WorkingDir: '',
     User: '',
     Env: [],
@@ -93,9 +94,19 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     }
   }
 
+  function commandToArray(cmd) {
+    var tokens = [].concat.apply([], cmd.split('"').map(function(v,i) {
+       return i%2 ? v : v.split(' ');
+    })).filter(Boolean);
+    return tokens;
+  }
+
   function prepareCommandConfig(config, input) {
+    if (input.EntryPoint) {
+      config.TaskTemplate.ContainerSpec.Command = commandToArray(input.EntryPoint);
+    }
     if (input.Command) {
-      config.TaskTemplate.ContainerSpec.Command = _.split(input.Command, ' ');
+      config.TaskTemplate.ContainerSpec.Args = commandToArray(input.Command);
     }
     if (input.User) {
       config.TaskTemplate.ContainerSpec.User = input.User;
