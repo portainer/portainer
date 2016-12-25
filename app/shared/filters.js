@@ -44,7 +44,7 @@ angular.module('portainer.filters', [])
       return 'warning';
     } else if (status.indexOf('created') !== -1) {
       return 'info';
-    } else if (status.indexOf('exited') !== -1) {
+    } else if (status.indexOf('stopped') !== -1) {
       return 'danger';
     }
     return 'success';
