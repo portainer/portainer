@@ -53,6 +53,7 @@ function ServiceViewModel(data) {
 function ContainerViewModel(data) {
   this.Id = data.Id;
   this.Status = data.Status;
+  this.State = data.State;
   this.Names = data.Names;
   // Unavailable in Docker < 1.10
   if (data.NetworkSettings && !_.isEmpty(data.NetworkSettings.Networks)) {
