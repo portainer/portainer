@@ -208,7 +208,7 @@
           </thead>
           <tbody>
             <tr dir-paginate="node in (state.filteredNodes = (nodes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-              <td>{{ node.Description.Hostname }}</td>
+              <td><a ui-sref="node({id: node.ID})">{{ node.Description.Hostname }}</a></td>
               <td>{{ node.Spec.Role }}</td>
               <td>{{ node.Description.Resources.NanoCPUs / 1000000000 }}</td>
               <td>{{ node.Description.Resources.MemoryBytes|humansize }}</td>
