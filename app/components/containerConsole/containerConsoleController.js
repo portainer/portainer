@@ -55,7 +55,7 @@ function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, Mess
       } else {
         var execId = d.Id;
         resizeTTY(execId, termHeight, termWidth);
-        var url = window.location.href.split('#')[0] + 'ws/exec?id=' + execId;
+        var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId;
         if (url.indexOf('https') > -1) {
           url = url.replace('https://', 'wss://');
         } else {

@@ -1,15 +1,13 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config',
-function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) {
+.controller('ContainersController', ['$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config',
+function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config) {
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
   $scope.state.displayIP = false;
   $scope.sortType = 'State';
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
-  $scope.swarm_mode = false;
   $scope.pagination_count = Settings.pagination_count;
-
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
@@ -25,10 +23,12 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
       }
       $scope.containers = containers.map(function (container) {
         var model = new ContainerViewModel(container);
+        model.Status = $filter('containerstatus')(model.Status);
+
         if (model.IP) {
           $scope.state.displayIP = true;
         }
-        if ($scope.swarm && !$scope.swarm_mode) {
+        if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
           model.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
         }
         return model;
@@ -150,17 +150,11 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
     return swarm_hosts;
   }
 
-  $scope.swarm = false;
   Config.$promise.then(function (c) {
     $scope.containersToHideLabels = c.hiddenLabels;
-    $scope.swarm = c.swarm;
-    if (c.swarm) {
+    if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
       Info.get({}, function (d) {
-        if (!_.startsWith(d.ServerVersion, 'swarm')) {
-          $scope.swarm_mode = true;
-        } else {
-          $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
-        }
+        $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
         update({all: Settings.displayAll ? 1 : 0});
       });
     } else {

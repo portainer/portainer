@@ -1,13 +1,14 @@
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'Volume', 'Network', 'Messages',
-function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, Volume, Network, Messages) {
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'Messages',
+function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, Messages) {
 
   $scope.formValues = {
     alwaysPull: true,
     Console: 'none',
     Volumes: [],
     Registry: '',
-    NetworkContainer: ''
+    NetworkContainer: '',
+    Labels: []
   };
 
   $scope.imageConfig = {};
@@ -24,7 +25,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       Binds: [],
       NetworkMode: 'bridge',
       Privileged: false
-    }
+    },
+    Labels: {}
   };
 
   $scope.addVolume = function() {
@@ -51,13 +53,15 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     $scope.config.HostConfig.PortBindings.splice(index, 1);
   };
 
+  $scope.addLabel = function() {
+    $scope.formValues.Labels.push({ name: '', value: ''});
+  };
+
+  $scope.removeLabel = function(index) {
+    $scope.formValues.Labels.splice(index, 1);
+  };
+
   Config.$promise.then(function (c) {
-    $scope.swarm = c.swarm;
-    Info.get({}, function(info) {
-      if ($scope.swarm && !_.startsWith(info.ServerVersion, 'swarm')) {
-        $scope.swarm_mode = true;
-      }
-    });
     var containersToHideLabels = c.hiddenLabels;
 
     Volume.query({}, function (d) {
@@ -68,7 +72,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
     Network.query({}, function (d) {
       var networks = d;
-      if ($scope.swarm) {
+      if ($scope.endpointMode.provider === 'DOCKER_SWARM' || $scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
         networks = d.filter(function (network) {
           if (network.Scope === 'global') {
             return network;
@@ -129,37 +133,17 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   // TODO: centralize, already present in templatesController
   function pullImageAndCreateContainer(config) {
     Image.create($scope.imageConfig, function (data) {
-      var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
-      if (err) {
-        var detail = data[data.length - 1];
-        $('#createContainerSpinner').hide();
-        Messages.error('Error', {}, detail.error);
-      } else {
-        createContainer(config);
-      }
+      createContainer(config);
     }, function (e) {
       $('#createContainerSpinner').hide();
       Messages.error('Failure', e, 'Unable to pull image');
     });
   }
 
-  function createImageConfig(imageName, registry) {
-    var imageNameAndTag = imageName.split(':');
-    var image = imageNameAndTag[0];
-    if (registry) {
-      image = registry + '/' + imageNameAndTag[0];
-    }
-    var imageConfig = {
-      fromImage: image,
-      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
-    };
-    return imageConfig;
-  }
-
   function prepareImageConfig(config) {
     var image = _.toLower(config.Image);
     var registry = $scope.formValues.Registry;
-    var imageConfig = createImageConfig(image, registry);
+    var imageConfig = ImageHelper.createImageConfigForContainer(image, registry);
     config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
     $scope.imageConfig = imageConfig;
   }
@@ -236,7 +220,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = $filter('trimcontainername')(container.Names[0]);
-      if ($scope.swarm && !$scope.swarm_mode) {
+      if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
         containerName = $filter('swarmcontainername')(container);
       }
     }
@@ -247,6 +231,16 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     config.HostConfig.NetworkMode = networkMode;
   }
 
+  function prepareLabels(config) {
+    var labels = {};
+    $scope.formValues.Labels.forEach(function (label) {
+      if (label.name && label.value) {
+        labels[label.name] = label.value;
+      }
+    });
+    config.Labels = labels;
+  }
+
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
     prepareNetworkConfig(config);
@@ -255,6 +249,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     prepareConsole(config);
     prepareEnvironmentVariables(config);
     prepareVolumes(config);
+    prepareLabels(config);
     return config;
   }
 

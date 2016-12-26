@@ -80,7 +80,7 @@
                   <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
                 </div>
                 <div class="input-group col-sm-1 input-group-sm">
-                  <select class="selectpicker form-control" ng-model="portBinding.protocol">
+                  <select class="form-control" ng-model="portBinding.protocol">
                     <option value="tcp">tcp</option>
                     <option value="udp">udp</option>
                   </select>
@@ -95,6 +95,16 @@
             <!-- !port-mapping-input-list -->
           </div>
           <!-- !port-mapping -->
+          <!-- labels -->
+          <div class="form-group">
+            <label for="container_labels" class="col-sm-1 control-label text-left">Labels</label>
+            <div class="col-sm-11">
+              <span class="label label-default interactive" ng-click="addLabel()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> label
+              </span>
+            </div>
+          </div>
+          <!-- !labels-->
         </form>
       </rd-widget-body>
     </rd-widget>
@@ -109,6 +119,7 @@
           <li class="active interactive"><a data-target="#command" data-toggle="tab">Command</a></li>
           <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
+          <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#security" data-toggle="tab">Security/Host</a></li>
         </ul>
         <!-- tab-content -->
@@ -232,7 +243,7 @@
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon"><input type="checkbox" ng-model="volume.isPath" ng-click="resetVolumePath($index)">Path</span>
-                      <select class="selectpicker form-control" ng-model="volume.name" ng-if="!volume.isPath">
+                      <select class="form-control" ng-model="volume.name" ng-if="!volume.isPath">
                         <option selected disabled hidden value="">Select a volume</option>
                         <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
                       </select>
@@ -258,7 +269,7 @@
           <!-- tab-network -->
           <div class="tab-pane" id="network">
             <form class="form-horizontal" style="margin-top: 15px;">
-              <div class="form-group" ng-if="globalNetworkCount === 0 && !swarm_mode">
+              <div class="form-group" ng-if="globalNetworkCount === 0 && endpointMode.provider !== 'DOCKER_SWARM_MODE'">
                 <div class="col-sm-12">
                   <span class="small text-muted">You don't have any shared network. Head over the <a ui-sref="networks">networks view</a> to create one.</span>
                 </div>
@@ -267,7 +278,7 @@
               <div class="form-group">
                 <label for="container_network" class="col-sm-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="selectpicker form-control" ng-model="config.HostConfig.NetworkMode" id="container_network">
+                  <select class="form-control" ng-model="config.HostConfig.NetworkMode" id="container_network">
                     <option selected disabled hidden value="">Select a network</option>
                     <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
@@ -278,10 +289,10 @@
               <div class="form-group" ng-if="config.HostConfig.NetworkMode == 'container'">
                 <label for="container_network_container" class="col-sm-1 control-label text-left">Container</label>
                 <div class="col-sm-9">
-                  <select ng-if="(!swarm || swarm && swarm_mode)" ng-options="container|containername for container in runningContainers" class="selectpicker form-control" ng-model="formValues.NetworkContainer">
+                  <select ng-if="endpointMode.provider !== 'DOCKER_SWARM'" ng-options="container|containername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
                     <option selected disabled hidden value="">Select a container</option>
                   </select>
-                  <select ng-if="swarm && !swarm_mode" ng-options="container|swarmcontainername for container in runningContainers" class="selectpicker form-control" ng-model="formValues.NetworkContainer">
+                  <select ng-if="endpointMode.provider === 'DOCKER_SWARM'" ng-options="container|swarmcontainername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
                     <option selected disabled hidden value="">Select a container</option>
                   </select>
                 </div>
@@ -306,6 +317,41 @@
             </form>
           </div>
           <!-- !tab-network -->
+          <!-- tab-labels -->
+          <div class="tab-pane" id="labels">
+            <form class="form-horizontal" style="margin-top: 15px;">
+              <!-- labels -->
+              <div class="form-group">
+                <label for="container_labels" class="col-sm-1 control-label text-left">Labels</label>
+                <div class="col-sm-11">
+                  <span class="label label-default interactive" ng-click="addLabel()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> label
+                  </span>
+                </div>
+                <!-- labels-input-list -->
+                <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="label in formValues.Labels" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">name</span>
+                      <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="removeLabel($index)">
+                          <i class="fa fa-minus" aria-hidden="true"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <!-- !labels-input-list -->
+              </div>
+              <!-- !labels-->
+            </form>
+          </div>
+          <!-- !tab-labels -->
           <!-- tab-security -->
           <div class="tab-pane" id="security">
             <form class="form-horizontal" style="margin-top: 15px;">

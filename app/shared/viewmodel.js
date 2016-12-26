@@ -45,6 +45,16 @@ function ServiceViewModel(data) {
   if (data.Endpoint.Ports) {
     this.Ports = data.Endpoint.Ports;
   }
+  if (data.Spec.UpdateConfig) {
+    this.UpdateParallelism = (typeof data.Spec.UpdateConfig.Parallelism !== undefined) ? data.Spec.UpdateConfig.Parallelism || 0 : 1;
+    this.UpdateDelay = data.Spec.UpdateConfig.Delay || 0;
+    this.UpdateFailureAction = data.Spec.UpdateConfig.FailureAction || 'pause';
+  } else {
+    this.UpdateParallelism = 1;
+    this.UpdateDelay = 0;
+    this.UpdateFailureAction = 'pause';
+  }
+
   this.Checked = false;
   this.Scale = false;
   this.EditName = false;
@@ -53,6 +63,7 @@ function ServiceViewModel(data) {
 function ContainerViewModel(data) {
   this.Id = data.Id;
   this.Status = data.Status;
+  this.State = data.State;
   this.Names = data.Names;
   // Unavailable in Docker < 1.10
   if (data.NetworkSettings && !_.isEmpty(data.NetworkSettings.Networks)) {
