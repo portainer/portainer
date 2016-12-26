@@ -554,4 +554,4 @@ angular.module('portainer', [
   .constant('ENDPOINTS_ENDPOINT', '/api/endpoints')
   .constant('TEMPLATES_ENDPOINT', '/api/templates')
   .constant('PAGINATION_MAX_ITEMS', 10)
-  .constant('UI_VERSION', 'v1.10.2');
+  .constant('UI_VERSION', 'v1.11.0');

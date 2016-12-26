@@ -118,7 +118,7 @@ type (
 
 const (
 	// APIVersion is the version number of portainer API.
-	APIVersion = "1.10.2"
+	APIVersion = "1.11.0"
 )
 
 const (
