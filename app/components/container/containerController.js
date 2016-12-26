@@ -77,7 +77,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#createImageSpinner').show();
     var image = _.toLower($scope.config.Image);
     var registry = _.toLower($scope.config.Registry);
-    var imageConfig = ImageHelper.createImageConfig(image, registry);
+    var imageConfig = ImageHelper.createImageConfigForCommit(image, registry);
     ContainerCommit.commit({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
       $('#createImageSpinner').hide();
       update();

@@ -1,18 +1,27 @@
+html, body, #content-wrapper, .page-content, #view {
+  height: 100%;
+  width: 100%;
+}
+
+.white-space-normal {
+  white-space: normal !important;
+}
+
 .btn-group button {
-    margin: 3px;
+  margin: 3px;
 }
 
 .messages {
-    max-height: 50px;
-    overflow-x: hidden;
-    overflow-y: scroll;
+  max-height: 50px;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .legend .title {
-    padding: 0 0.3em;
-    margin: 0.5em;
-    border-style: solid;
-    border-width: 0 0 0 1em;
+  padding: 0 0.3em;
+  margin: 0.5em;
+  border-style: solid;
+  border-width: 0 0 0 1em;
 }
 
 .logo {
@@ -203,6 +212,53 @@ input[type="radio"] {
   margin-bottom: 5px;
 }
 
+.page-wrapper {
+  margin-top: 25px;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.simple-box {
+  margin-bottom: 80px;
+}
+
+.simple-box > div:first-child {
+  padding-bottom: 10px;
+}
+
+.simple-box-logo {
+  display: block;
+  margin: auto;
+  position: relative;
+  width: 240px;
+  margin-bottom: 10px;
+}
+
+.login-form > div {
+  margin-bottom: 25px;
+}
+
+.login-form > div:last-child {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.panel-body {
+  padding-top: 30px;
+  background-color: #ffffff;
+}
+
 .pagination-controls {
   margin-left: 10px;
+}
+
+.user-box {
+  margin-right: 25px;
+}
+
+.select-endpoint {
+  width: 80%;
+  margin: 0 auto;
 }

@@ -1,6 +1,6 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'Messages', 'Settings',
-function ($scope, $state, Config, Image, Messages, Settings) {
+.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'ImageHelper', 'Messages', 'Settings',
+function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
   $scope.state = {};
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
@@ -25,24 +25,11 @@ function ($scope, $state, Config, Image, Messages, Settings) {
     }
   };
 
-  function createImageConfig(imageName, registry) {
-    var imageNameAndTag = imageName.split(':');
-    var image = imageNameAndTag[0];
-    if (registry) {
-      image = registry + '/' + imageNameAndTag[0];
-    }
-    var imageConfig = {
-      fromImage: image,
-      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
-    };
-    return imageConfig;
-  }
-
   $scope.pullImage = function() {
     $('#pullImageSpinner').show();
     var image = _.toLower($scope.config.Image);
     var registry = _.toLower($scope.config.Registry);
-    var imageConfig = createImageConfig(image, registry);
+    var imageConfig = ImageHelper.createImageConfigForContainer(image, registry);
     Image.create(imageConfig, function (data) {
         var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
         if (err) {
@@ -51,7 +38,7 @@ function ($scope, $state, Config, Image, Messages, Settings) {
           Messages.error('Error', {}, detail.error);
         } else {
           $('#pullImageSpinner').hide();
-          $state.go('images', {}, {reload: true});
+          $state.reload();
         }
     }, function (e) {
       $('#pullImageSpinner').hide();

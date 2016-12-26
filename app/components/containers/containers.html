@@ -66,7 +66,7 @@
                   <span ng-show="sortType == 'IP' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
-              <th ng-if="swarm && !swarm_mode">
+              <th ng-if="endpointMode.provider === 'DOCKER_SWARM'">
                 <a ui-sref="containers" ng-click="order('Host')">
                   Host IP
                   <span ng-show="sortType == 'Host' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -85,12 +85,12 @@
           <tbody>
             <tr dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
               <td><input type="checkbox" ng-model="container.Checked" ng-change="selectItem(container)"/></td>
-              <td><span class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status|containerstatus }}</span></td>
-              <td ng-if="swarm && !swarm_mode"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
-              <td ng-if="!swarm || swarm_mode"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
+              <td><span class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span></td>
+              <td ng-if="endpointMode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
+              <td ng-if="endpointMode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
               <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
-              <td ng-if="swarm && !swarm_mode">{{ container.hostIP }}</td>
+              <td ng-if="endpointMode.provider === 'DOCKER_SWARM'">{{ container.hostIP }}</td>
               <td>
                 <a ng-if="container.Ports.length > 0" ng-repeat="p in container.Ports" class="image-tag" ng-href="http://{{p.host}}:{{p.public}}" target="_blank">
                   <i class="fa fa-external-link" aria-hidden="true"></i> {{p.public}}:{{ p.private }}

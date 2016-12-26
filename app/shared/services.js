@@ -6,7 +6,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         return $resource(Settings.url + '/containers/:id/:action', {
             name: '@name'
         }, {
-            query: {method: 'GET', params: {all: 0, action: 'json'}, isArray: true},
+            query: {method: 'GET', params: {all: 0, action: 'json', filters: '@filters' }, isArray: true},
             get: {method: 'GET', params: {action: 'json'}},
             stop: {method: 'POST', params: {id: '@id', t: 5, action: 'stop'}},
             restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart'}},
@@ -166,14 +166,6 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
             get: {method: 'GET'}
         });
     }])
-    .factory('Auth', ['$resource', 'Settings', function AuthFactory($resource, Settings) {
-        'use strict';
-        // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#check-auth-configuration
-        return $resource(Settings.url + '/auth', {}, {
-            get: {method: 'GET'},
-            update: {method: 'POST'}
-        });
-    }])
     .factory('Info', ['$resource', 'Settings', function InfoFactory($resource, Settings) {
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#display-system-wide-information
@@ -197,12 +189,12 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         'use strict';
         // http://docs.docker.com/reference/api/docker_remote_api_<%= remoteApiVersion %>/#2-5-networks
         return $resource(Settings.url + '/volumes/:name/:action', {name: '@name'}, {
-            query: {method: 'GET'},
-            get: {method: 'GET'},
-            create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler},
-            remove: {
-              method: 'DELETE', transformResponse: genericHandler
-            }
+          query: {method: 'GET'},
+          get: {method: 'GET'},
+          create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler},
+          remove: {
+            method: 'DELETE', transformResponse: genericHandler
+          }
         });
     }])
     .factory('Config', ['$resource', 'CONFIG_ENDPOINT', function ConfigFactory($resource, CONFIG_ENDPOINT) {
@@ -228,6 +220,227 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
           firstLoad: firstLoad,
           pagination_count: PAGINATION_MAX_ITEMS
         };
+    }])
+    .factory('Auth', ['$resource', 'AUTH_ENDPOINT', function AuthFactory($resource, AUTH_ENDPOINT) {
+      'use strict';
+      return $resource(AUTH_ENDPOINT, {}, {
+        login: {
+          method: 'POST'
+        }
+      });
+    }])
+    .factory('Users', ['$resource', 'USERS_ENDPOINT', function UsersFactory($resource, USERS_ENDPOINT) {
+      'use strict';
+      return $resource(USERS_ENDPOINT + '/:username/:action', {}, {
+        create: { method: 'POST' },
+        get: { method: 'GET', params: { username: '@username' } },
+        update: { method: 'PUT', params: { username: '@username' } },
+        checkPassword: { method: 'POST', params: { username: '@username', action: 'passwd' } },
+        checkAdminUser: { method: 'GET', params: { username: 'admin', action: 'check' } },
+        initAdminUser: { method: 'POST', params: { username: 'admin', action: 'init' } }
+      });
+    }])
+    .factory('EndpointMode', ['$rootScope', 'Info', function EndpointMode($rootScope, Info) {
+      'use strict';
+      return {
+        determineEndpointMode: function() {
+          Info.get({}, function(d) {
+            var mode = {
+              provider: '',
+              role: ''
+            };
+            if (_.startsWith(d.ServerVersion, 'swarm')) {
+              mode.provider = "DOCKER_SWARM";
+              if (d.SystemStatus[0][1] === 'primary') {
+                mode.role = "PRIMARY";
+              } else {
+                mode.role = "REPLICA";
+              }
+            } else {
+              if (!d.Swarm || _.isEmpty(d.Swarm.NodeID)) {
+                mode.provider = "DOCKER_STANDALONE";
+              } else {
+                mode.provider = "DOCKER_SWARM_MODE";
+                if (d.Swarm.ControlAvailable) {
+                  mode.role = "MANAGER";
+                } else {
+                  mode.role = "WORKER";
+                }
+              }
+            }
+            $rootScope.endpointMode = mode;
+          });
+        }
+      };
+    }])
+    .factory('Authentication', ['$q', '$rootScope', 'Auth', 'jwtHelper', 'localStorageService', function AuthenticationFactory($q, $rootScope, Auth, jwtHelper, localStorageService) {
+      'use strict';
+      return {
+        init: function() {
+          var jwt = localStorageService.get('JWT');
+          if (jwt) {
+            var tokenPayload = jwtHelper.decodeToken(jwt);
+            $rootScope.username = tokenPayload.username;
+          }
+        },
+        login: function(username, password) {
+          return $q(function (resolve, reject) {
+            Auth.login({username: username, password: password}).$promise
+            .then(function(data) {
+              localStorageService.set('JWT', data.jwt);
+              $rootScope.username = username;
+              resolve();
+            }, function() {
+              reject();
+            });
+          });
+        },
+        logout: function() {
+          localStorageService.remove('JWT');
+        },
+        isAuthenticated: function() {
+          var jwt = localStorageService.get('JWT');
+          return jwt && !jwtHelper.isTokenExpired(jwt);
+        }
+      };
+    }])
+    .factory('FileUploadService', ['$q', 'Upload', function FileUploadFactory($q, Upload) {
+      'use strict';
+      function uploadFile(url, file) {
+        var deferred = $q.defer();
+        Upload.upload({
+          url: url,
+          data: { file: file }
+        }).then(function success(data) {
+          deferred.resolve(data);
+        }, function error(e) {
+          deferred.reject(e);
+        }, function progress(evt) {
+        });
+        return deferred.promise;
+      }
+      return {
+        uploadTLSFilesForEndpoint: function(endpointID, TLSCAFile, TLSCertFile, TLSKeyFile) {
+          var deferred = $q.defer();
+          var queue = [];
+
+          if (TLSCAFile !== null) {
+            var uploadTLSCA = uploadFile('api/upload/tls/' + endpointID + '/ca', TLSCAFile);
+            queue.push(uploadTLSCA);
+          }
+          if (TLSCertFile !== null) {
+            var uploadTLSCert = uploadFile('api/upload/tls/' + endpointID + '/cert', TLSCertFile);
+            queue.push(uploadTLSCert);
+          }
+          if (TLSKeyFile !== null) {
+            var uploadTLSKey = uploadFile('api/upload/tls/' + endpointID + '/key', TLSKeyFile);
+            queue.push(uploadTLSKey);
+          }
+          $q.all(queue).then(function (data) {
+            deferred.resolve(data);
+          }, function (err) {
+            deferred.reject(err);
+          }, function update(evt) {
+            deferred.notify(evt);
+          });
+          return deferred.promise;
+        }
+      };
+    }])
+    .factory('Endpoints', ['$resource', 'ENDPOINTS_ENDPOINT', function EndpointsFactory($resource, ENDPOINTS_ENDPOINT) {
+      'use strict';
+      return $resource(ENDPOINTS_ENDPOINT + '/:id/:action', {}, {
+        create: { method: 'POST' },
+        query: { method: 'GET', isArray: true },
+        get: { method: 'GET', params: { id: '@id' } },
+        update: { method: 'PUT', params: { id: '@id' } },
+        remove: { method: 'DELETE', params: { id: '@id'} },
+        getActiveEndpoint: { method: 'GET', params: { id: '0' } },
+        setActiveEndpoint: { method: 'POST', params: { id: '@id', action: 'active' } }
+      });
+    }])
+    .factory('EndpointService', ['$q', '$timeout', 'Endpoints', 'FileUploadService', function EndpointServiceFactory($q, $timeout, Endpoints, FileUploadService) {
+      'use strict';
+      return {
+        getActive: function() {
+          return Endpoints.getActiveEndpoint().$promise;
+        },
+        setActive: function(endpointID) {
+          return Endpoints.setActiveEndpoint({id: endpointID}).$promise;
+        },
+        endpoint: function(endpointID) {
+          return Endpoints.get({id: endpointID}).$promise;
+        },
+        endpoints: function() {
+          return Endpoints.query({}).$promise;
+        },
+        updateEndpoint: function(ID, name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile) {
+          var endpoint = {
+            id: ID,
+            Name: name,
+            URL: "tcp://" + URL,
+            TLS: TLS
+          };
+          var deferred = $q.defer();
+          Endpoints.update({}, endpoint, function success(data) {
+            FileUploadService.uploadTLSFilesForEndpoint(ID, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
+              deferred.notify({upload: false});
+              deferred.resolve(data);
+            }, function error(err) {
+              deferred.notify({upload: false});
+              deferred.reject({msg: 'Unable to upload TLS certs', err: err});
+            });
+          }, function error(err) {
+            deferred.reject({msg: 'Unable to update endpoint', err: err});
+          });
+          return deferred.promise;
+        },
+        deleteEndpoint: function(endpointID) {
+          return Endpoints.remove({id: endpointID}).$promise;
+        },
+        createLocalEndpoint: function(name, URL, TLS, active) {
+          var endpoint = {
+            Name: "local",
+            URL: "unix:///var/run/docker.sock",
+            TLS: false
+          };
+          return Endpoints.create({active: active}, endpoint).$promise;
+        },
+        createRemoteEndpoint: function(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, active) {
+          var endpoint = {
+            Name: name,
+            URL: 'tcp://' + URL,
+            TLS: TLS
+          };
+          var deferred = $q.defer();
+          Endpoints.create({active: active}, endpoint, function success(data) {
+            var endpointID = data.Id;
+            if (TLS) {
+              deferred.notify({upload: true});
+              FileUploadService.uploadTLSFilesForEndpoint(endpointID, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
+                deferred.notify({upload: false});
+                if (active) {
+                  Endpoints.setActiveEndpoint({}, {id: endpointID}, function success(data) {
+                    deferred.resolve(data);
+                  }, function error(err) {
+                    deferred.reject({msg: 'Unable to create endpoint', err: err});
+                  });
+                } else {
+                  deferred.resolve(data);
+                }
+              }, function error(err) {
+                deferred.notify({upload: false});
+                deferred.reject({msg: 'Unable to upload TLS certs', err: err});
+              });
+            } else {
+              deferred.resolve(data);
+            }
+          }, function error(err) {
+            deferred.reject({msg: 'Unable to create endpoint', err: err});
+          });
+          return deferred.promise;
+        }
+      };
     }])
     .factory('Messages', ['$rootScope', '$sanitize', function MessagesFactory($rootScope, $sanitize) {
         'use strict';

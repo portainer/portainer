@@ -9,6 +9,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     Mode: 'replicated',
     Replicas: 1,
     Command: '',
+    EntryPoint: '',
     WorkingDir: '',
     User: '',
     Env: [],
@@ -17,7 +18,10 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     Volumes: [],
     Network: '',
     ExtraNetworks: [],
-    Ports: []
+    Ports: [],
+    Parallelism: 1,
+    UpdateDelay: 0,
+    FailureAction: 'pause'
   };
 
   $scope.addPortBinding = function() {
@@ -69,8 +73,8 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
   };
 
   function prepareImageConfig(config, input) {
-    var imageConfig = ImageHelper.createImageConfig(input.Image, input.Registry);
-    config.TaskTemplate.ContainerSpec.Image = imageConfig.repo + ':' + imageConfig.tag;
+    var imageConfig = ImageHelper.createImageConfigForContainer(input.Image, input.Registry);
+    config.TaskTemplate.ContainerSpec.Image = imageConfig.fromImage + ':' + imageConfig.tag;
   }
 
   function preparePortsConfig(config, input) {
@@ -93,9 +97,19 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     }
   }
 
+  function commandToArray(cmd) {
+    var tokens = [].concat.apply([], cmd.split('"').map(function(v,i) {
+       return i%2 ? v : v.split(' ');
+    })).filter(Boolean);
+    return tokens;
+  }
+
   function prepareCommandConfig(config, input) {
+    if (input.EntryPoint) {
+      config.TaskTemplate.ContainerSpec.Command = commandToArray(input.EntryPoint);
+    }
     if (input.Command) {
-      config.TaskTemplate.ContainerSpec.Command = _.split(input.Command, ' ');
+      config.TaskTemplate.ContainerSpec.Args = commandToArray(input.Command);
     }
     if (input.User) {
       config.TaskTemplate.ContainerSpec.User = input.User;
@@ -157,6 +171,14 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     config.Networks = _.uniqWith(networks, _.isEqual);
   }
 
+  function prepareUpdateConfig(config, input) {
+    config.UpdateConfig = {
+      Parallelism: input.Parallelism || 0,
+      Delay: input.UpdateDelay || 0,
+      FailureAction: input.FailureAction
+    };
+  }
+
   function prepareConfiguration() {
     var input = $scope.formValues;
     var config = {
@@ -177,6 +199,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
     prepareLabelsConfig(config, input);
     prepareVolumes(config, input);
     prepareNetworks(config, input);
+    prepareUpdateConfig(config, input);
     return config;
   }
 
