@@ -168,6 +168,52 @@
                 </div>
               </td>
             </tr>
+            <tr>
+              <td>Update Parallelism</td>
+              <td>
+                <span ng-if="!service.EditParallelism">
+                  {{ service.UpdateParallelism }}
+                  <a class="interactive" ng-click="service.EditParallelism = true;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Change</a>
+                </span>
+                <span ng-if="service.EditParallelism">
+                  <input class="input-sm" type="number" ng-model="service.newServiceUpdateParallelism" />
+                  <a class="interactive" ng-click="service.EditParallelism = false;"><i class="fa fa-times"></i></a>
+                  <a class="interactive" ng-click="changeParallelism(service)"><i class="fa fa-check-square-o"></i></a>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Update Delay</td>
+              <td>
+                <span ng-if="!service.EditDelay">
+                  {{ service.UpdateDelay }}
+                  <a class="interactive" ng-click="service.EditDelay = true;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Change</a>
+                </span>
+                <span ng-if="service.EditDelay">
+                  <input class="input-sm" type="number" ng-model="service.newServiceUpdateDelay" />
+                  <a class="interactive" ng-click="service.EditDelay = false;"><i class="fa fa-times"></i></a>
+                  <a class="interactive" ng-click="changeUpdateDelay(service)"><i class="fa fa-check-square-o"></i></a>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Update Failure Action</td>
+              <td>
+                <div class="form-group">
+                  <div class="col-sm-3">
+                    <label class="radio-inline">
+                      <input type="radio" name="failure_action" ng-model="service.newServiceUpdateFailureAction" value="continue" ng-change="changeUpdateFailureAction(service)">
+                      Continue
+                    </label>
+                    <label class="radio-inline">
+                      <input type="radio" name="failure_action" ng-model="service.newServiceUpdateFailureAction" value="pause" ng-change="changeUpdateFailureAction(service)">
+                      Pause
+                    </label>
+                  </div>
+                  <div class="col-sm-8"></div>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>

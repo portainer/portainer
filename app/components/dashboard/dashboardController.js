@@ -87,7 +87,6 @@ function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume
   }
 
   Config.$promise.then(function (c) {
-    $scope.swarm = c.swarm;
     fetchDashboardData(c.hiddenLabels);
   });
 }]);

@@ -3,10 +3,11 @@ package http
 import (
 	"github.com/portainer/portainer"
 
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gorilla/mux"
 )
 
 // SettingsHandler represents an HTTP API handler for managing settings.
@@ -30,8 +31,8 @@ func NewSettingsHandler(middleWareService *middleWareService) *SettingsHandler {
 
 // handleGetSettings handles GET requests on /settings
 func (handler *SettingsHandler) handleGetSettings(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		handleNotAllowed(w, []string{"GET"})
+	if r.Method != http.MethodGet {
+		handleNotAllowed(w, []string{http.MethodGet})
 		return
 	}
 

@@ -212,7 +212,7 @@ input[type="radio"] {
   margin-bottom: 5px;
 }
 
-.login-wrapper {
+.page-wrapper {
   margin-top: 25px;
   height: 100%;
   width: 100%;
@@ -220,15 +220,15 @@ input[type="radio"] {
   align-items: center;
 }
 
-.login-box {
+.simple-box {
   margin-bottom: 80px;
 }
 
-.login-box > div:first-child {
+.simple-box > div:first-child {
   padding-bottom: 10px;
 }
 
-.login-logo {
+.simple-box-logo {
   display: block;
   margin: auto;
   position: relative;
@@ -256,4 +256,9 @@ input[type="radio"] {
 
 .user-box {
   margin-right: 25px;
+}
+
+.select-endpoint {
+  width: 80%;
+  margin: 0 auto;
 }

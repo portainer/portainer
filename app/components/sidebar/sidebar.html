@@ -8,7 +8,14 @@
         <span class="menu-icon glyphicon glyphicon-transfer"></span>
       </a>
     </li>
-    <li class="sidebar-title"><span>NAVIGATION</span></li>
+    <li class="sidebar-title">
+      <span>Active endpoint</span>
+    </li>
+    <li class="sidebar-title">
+      <select class="select-endpoint form-control" ng-options="endpoint.Name for endpoint in endpoints" ng-model="activeEndpoint" ng-change="switchEndpoint(activeEndpoint)">
+      </select>
+    </li>
+    <li class="sidebar-title"><span>Endpoint actions</span></li>
     <li class="sidebar-list">
       <a ui-sref="dashboard">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
     </li>
@@ -39,8 +46,12 @@
     <li class="sidebar-list" ng-if="endpointMode.provider === 'DOCKER_STANDALONE'">
       <a ui-sref="docker">Docker <span class="menu-icon fa fa-th"></span></a>
     </li>
+    <li class="sidebar-title"><span>Portainer settings</span></li>
     <li class="sidebar-list">
-      <a ui-sref="settings">Settings <span class="menu-icon fa fa-wrench"></span></a>
+      <a ui-sref="settings">Password <span class="menu-icon fa fa-lock"></span></a>
+    </li>
+    <li class="sidebar-list">
+      <a ui-sref="endpoints">Endpoints <span class="menu-icon fa fa-plug"></span></a>
     </li>
   </ul>
   <div class="sidebar-footer">

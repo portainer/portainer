@@ -1,8 +1,9 @@
 package bolt
 
 import (
-	"github.com/boltdb/bolt"
 	"time"
+
+	"github.com/boltdb/bolt"
 )
 
 // Store defines the implementation of portainer.DataStore using
@@ -12,23 +13,28 @@ type Store struct {
 	Path string
 
 	// Services
-	UserService *UserService
+	UserService     *UserService
+	EndpointService *EndpointService
 
 	db *bolt.DB
 }
 
 const (
-	databaseFileName = "portainer.db"
-	userBucketName   = "users"
+	databaseFileName         = "portainer.db"
+	userBucketName           = "users"
+	endpointBucketName       = "endpoints"
+	activeEndpointBucketName = "activeEndpoint"
 )
 
 // NewStore initializes a new Store and the associated services
 func NewStore(storePath string) *Store {
 	store := &Store{
-		Path:        storePath,
-		UserService: &UserService{},
+		Path:            storePath,
+		UserService:     &UserService{},
+		EndpointService: &EndpointService{},
 	}
 	store.UserService.store = store
+	store.EndpointService.store = store
 	return store
 }
 
@@ -42,6 +48,14 @@ func (store *Store) Open() error {
 	store.db = db
 	return db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(userBucketName))
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(endpointBucketName))
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(activeEndpointBucketName))
 		if err != nil {
 			return err
 		}

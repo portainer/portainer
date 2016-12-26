@@ -1,6 +1,6 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config',
-function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) {
+.controller('ContainersController', ['$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config',
+function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config) {
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
   $scope.state.displayIP = false;
@@ -23,6 +23,8 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
       }
       $scope.containers = containers.map(function (container) {
         var model = new ContainerViewModel(container);
+        model.Status = $filter('containerstatus')(model.Status);
+
         if (model.IP) {
           $scope.state.displayIP = true;
         }
@@ -150,7 +152,7 @@ function ($scope, Container, ContainerHelper, Info, Settings, Messages, Config) 
 
   Config.$promise.then(function (c) {
     $scope.containersToHideLabels = c.hiddenLabels;
-    if (c.swarm && $scope.endpointMode.provider === 'DOCKER_SWARM') {
+    if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
       Info.get({}, function (d) {
         $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
         update({all: Settings.displayAll ? 1 : 0});

@@ -7,7 +7,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Console: 'none',
     Volumes: [],
     Registry: '',
-    NetworkContainer: ''
+    NetworkContainer: '',
+    Labels: []
   };
 
   $scope.imageConfig = {};
@@ -24,7 +25,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       Binds: [],
       NetworkMode: 'bridge',
       Privileged: false
-    }
+    },
+    Labels: {}
   };
 
   $scope.addVolume = function() {
@@ -51,8 +53,15 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     $scope.config.HostConfig.PortBindings.splice(index, 1);
   };
 
+  $scope.addLabel = function() {
+    $scope.formValues.Labels.push({ name: '', value: ''});
+  };
+
+  $scope.removeLabel = function(index) {
+    $scope.formValues.Labels.splice(index, 1);
+  };
+
   Config.$promise.then(function (c) {
-    $scope.swarm = c.swarm;
     var containersToHideLabels = c.hiddenLabels;
 
     Volume.query({}, function (d) {
@@ -63,7 +72,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
     Network.query({}, function (d) {
       var networks = d;
-      if ($scope.swarm) {
+      if ($scope.endpointMode.provider === 'DOCKER_SWARM' || $scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
         networks = d.filter(function (network) {
           if (network.Scope === 'global') {
             return network;
@@ -211,7 +220,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = $filter('trimcontainername')(container.Names[0]);
-      if ($scope.swarm && $scope.endpointMode.provider === 'DOCKER_SWARM') {
+      if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
         containerName = $filter('swarmcontainername')(container);
       }
     }
@@ -222,6 +231,16 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     config.HostConfig.NetworkMode = networkMode;
   }
 
+  function prepareLabels(config) {
+    var labels = {};
+    $scope.formValues.Labels.forEach(function (label) {
+      if (label.name && label.value) {
+        labels[label.name] = label.value;
+      }
+    });
+    config.Labels = labels;
+  }
+
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
     prepareNetworkConfig(config);
@@ -230,6 +249,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     prepareConsole(config);
     prepareEnvironmentVariables(config);
     prepareVolumes(config);
+    prepareLabels(config);
     return config;
   }
 

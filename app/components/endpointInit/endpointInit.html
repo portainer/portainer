@@ -1,0 +1,139 @@
+<div class="page-wrapper">
+  <!-- simple box -->
+  <div class="container simple-box">
+    <div class="col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
+      <!-- simple box logo -->
+      <div class="row">
+        <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
+        <img ng-if="!logo" src="images/logo_alt.png" class="simple-box-logo" alt="Portainer">
+      </div>
+      <!-- !simple box logo -->
+      <!-- init-endpoint panel -->
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <!-- init-endpoint form -->
+          <form class="form-horizontal" style="margin: 20px;" enctype="multipart/form-data" method="POST">
+            <!-- comment -->
+            <div class="form-group">
+              <p>Connect Portainer to a Docker engine or Swarm cluster endpoint.</p>
+            </div>
+            <!-- !comment input -->
+            <!-- endpoin-type radio -->
+            <div class="form-group">
+              <div class="radio">
+                <label><input type="radio" name="endpointType" value="local" ng-model="formValues.endpointType">Manage the Docker instance where Portainer is running</label>
+              </div>
+              <div class="radio">
+                <label><input type="radio" name="endpointType" value="remote" ng-model="formValues.endpointType">Manage a remote Docker instance</label>
+              </div>
+            </div>
+            <!-- endpoint-type radio -->
+            <!-- local-endpoint -->
+            <div ng-if="formValues.endpointType === 'local'" style="margin-top: 25px;">
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <span class="small text-muted">Note: ensure that the Docker socket is bind mounted in the Portainer container at <code>/var/run/docker.sock</code></span>
+                </div>
+              </div>
+              <!-- connect button -->
+              <div class="form-group" style="margin-top: 10px;">
+                <div class="col-sm-12 controls">
+                  <p class="pull-left text-danger" ng-if="state.error" style="margin: 5px;">
+                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
+                  </p>
+                  <button type="submit" class="btn btn-primary pull-right" ng-click="createLocalEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+                </div>
+              </div>
+              <!-- !connect button -->
+            </div>
+            <!-- !local-endpoint -->
+            <!-- remote-endpoint -->
+            <div ng-if="formValues.endpointType === 'remote'" style="margin-top: 25px;">
+              <!-- name-input -->
+              <div class="form-group">
+                <label for="container_name" class="col-sm-3 control-label text-left">Name</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="container_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01">
+                </div>
+              </div>
+              <!-- !name-input -->
+              <!-- endpoint-url-input -->
+              <div class="form-group">
+                <label for="endpoint_url" class="col-sm-3 control-label text-left">Endpoint URL</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
+                </div>
+              </div>
+              <!-- !endpoint-url-input -->
+              <!-- tls-checkbox -->
+              <div class="form-group">
+                <label for="tls" class="col-sm-3 control-label text-left">TLS</label>
+                <div class="col-sm-9">
+                  <input type="checkbox" name="tls" ng-model="formValues.TLS">
+                </div>
+              </div>
+              <!-- !tls-checkbox -->
+              <!-- tls-certs -->
+              <div ng-if="formValues.TLS">
+                <!-- ca-input -->
+                <div class="form-group">
+                  <label class="col-sm-3 control-label text-left">TLS CA certificate</label>
+                  <div class="col-sm-9">
+                    <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
+                    <span style="margin-left: 5px;">
+                      {{ formValues.TLSCACert.name }}
+                      <i class="fa fa-times red-icon" ng-if="!formValues.TLSCACert" aria-hidden="true"></i>
+                      <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+                    </span>
+                  </div>
+                </div>
+                <!-- !ca-input -->
+                <!-- cert-input -->
+                <div class="form-group">
+                  <label for="tls_cert" class="col-sm-3 control-label text-left">TLS certificate</label>
+                  <div class="col-sm-9">
+                    <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
+                    <span style="margin-left: 5px;">
+                      {{ formValues.TLSCert.name }}
+                      <i class="fa fa-times red-icon" ng-if="!formValues.TLSCert" aria-hidden="true"></i>
+                      <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+                    </span>
+                  </div>
+                </div>
+                <!-- !cert-input -->
+                <!-- key-input -->
+                <div class="form-group">
+                  <label class="col-sm-3 control-label text-left">TLS key</label>
+                  <div class="col-sm-9">
+                    <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
+                    <span style="margin-left: 5px;">
+                      {{ formValues.TLSKey.name }}
+                      <i class="fa fa-times red-icon" ng-if="!formValues.TLSKey" aria-hidden="true"></i>
+                      <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+                    </span>
+                  </div>
+                </div>
+                <!-- !key-input -->
+              </div>
+              <!-- !tls-certs -->
+              <!-- connect button -->
+              <div class="form-group" style="margin-top: 10px;">
+                <div class="col-sm-12 controls">
+                  <p class="pull-left text-danger" ng-if="state.error" style="margin: 5px;">
+                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
+                  </p>
+                  <button type="submit" class="btn btn-primary pull-right" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && (!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey))" ng-click="createRemoteEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+                </div>
+              </div>
+              <!-- !connect button -->
+            </div>
+            <!-- !remote-endpoint -->
+          </form>
+          <!-- !init-endpoint form -->
+        </div>
+      </div>
+      <!-- !init-endpoint panel -->
+    </div>
+  </div>
+  <!-- !simple box -->
+</div>

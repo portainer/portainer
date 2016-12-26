@@ -72,7 +72,7 @@
                   <input type="text" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80">
                 </div>
                 <div class="input-group col-sm-1 input-group-sm">
-                  <select class="selectpicker form-control" ng-model="portBinding.Protocol">
+                  <select class="form-control" ng-model="portBinding.Protocol">
                     <option value="tcp">tcp</option>
                     <option value="udp">udp</option>
                   </select>
@@ -102,6 +102,7 @@
           <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
+          <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -116,6 +117,14 @@
                 </div>
               </div>
               <!-- !command-input -->
+              <!-- entrypoint-input -->
+              <div class="form-group">
+                <label for="service_entrypoint" class="col-sm-1 control-label text-left">Entrypoint</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" ng-model="formValues.EntryPoint" id="service_entrypoint" placeholder="e.g. /bin/sh -c">
+                </div>
+              </div>
+              <!-- !entrypoint-input -->
               <!-- workdir-user-input -->
               <div class="form-group">
                 <label for="service_workingdir" class="col-sm-1 control-label text-left">Working Dir</label>
@@ -183,7 +192,7 @@
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon"><input type="checkbox" ng-model="volume.Bind">bind</span>
-                      <select class="selectpicker form-control" ng-model="volume.Source" ng-if="!volume.Bind">
+                      <select class="form-control" ng-model="volume.Source" ng-if="!volume.Bind">
                         <option selected disabled hidden value="">Select a volume</option>
                         <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
                       </select>
@@ -213,7 +222,7 @@
               <div class="form-group">
                 <label for="container_network" class="col-sm-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="selectpicker form-control" ng-model="formValues.Network">
+                  <select class="form-control" ng-model="formValues.Network">
                     <option selected disabled hidden value="">Select a network</option>
                     <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
@@ -238,7 +247,7 @@
                           <i class="fa fa-minus" aria-hidden="true"></i>
                         </button>
                       </span>
-                      <select class="selectpicker form-control" ng-model="network.Name">
+                      <select class="form-control" ng-model="network.Name">
                         <option selected disabled hidden value="">Select a network</option>
                         <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                       </select>
@@ -316,7 +325,55 @@
             </form>
           </div>
           <!-- !tab-labels -->
+          <!-- tab-update-config -->
+          <div class="tab-pane" id="update-config">
+            <form class="form-horizontal" style="margin-top: 15px;">
+              <!-- parallelism-input -->
+              <div class="form-group">
+                <label for="parallelism" class="col-sm-1 control-label text-left">Parallelism</label>
+                <div class="col-sm-1">
+                  <input type="number" class="form-control" ng-model="formValues.Parallelism" id="parallelism" placeholder="e.g. 1">
+                </div>
+                <div class="col-sm-10">
+                  <p class="small text-muted" style="margin-top: 10px;">
+                    Maximum number of tasks to be updated simultaneously (0 to update all at once).
+                  </p>
+                </div>
+              </div>
+              <!-- !parallelism-input -->
+              <!-- delay-input -->
+              <div class="form-group">
+                <label for="update-delay" class="col-sm-1 control-label text-left">Delay</label>
+                <div class="col-sm-2">
+                  <input type="number" class="form-control" ng-model="formValues.UpdateDelay" id="update-delay" placeholder="e.g. 10">
+                </div>
+                <div class="col-sm-9">
+                  <p class="small text-muted" style="margin-top: 10px;">
+                    Amount of time between updates.
+                  </p>
+                </div>
+              </div>
+              <!-- !delay-input -->
+              <!-- failureAction-input -->
+              <div class="form-group">
+                <label for="failure_action" class="col-sm-1 control-label text-left">Failure Action</label>
+                <div class="col-sm-3">
+                  <label class="radio-inline">
+                    <input type="radio" name="failure_action" ng-model="formValues.FailureAction" value="continue">
+                    Continue
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" name="failure_action" ng-model="formValues.FailureAction" value="pause">
+                    Pause
+                  </label>
+                </div>
+                <div class="col-sm-8"></div>
+              </div>
+              <!-- !failureAction-input -->
 
+            </form>
+          </div>
+          <!-- !tab-update-config -->
           <!-- tab-security -->
           <div class="tab-pane" id="security">
           </div>

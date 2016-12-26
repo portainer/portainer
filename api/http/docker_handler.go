@@ -3,7 +3,6 @@ package http
 import (
 	"github.com/portainer/portainer"
 
-	"github.com/gorilla/mux"
 	"io"
 	"log"
 	"net"
@@ -11,6 +10,9 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // DockerHandler represents an HTTP API handler for proxying requests to the Docker API.
@@ -35,18 +37,22 @@ func NewDockerHandler(middleWareService *middleWareService) *DockerHandler {
 }
 
 func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.Request) {
-	handler.proxy.ServeHTTP(w, r)
+	if handler.proxy != nil {
+		handler.proxy.ServeHTTP(w, r)
+	} else {
+		Error(w, portainer.ErrNoActiveEndpoint, http.StatusNotFound, handler.Logger)
+	}
 }
 
-func (handler *DockerHandler) setupProxy(config *portainer.EndpointConfiguration) error {
+func (handler *DockerHandler) setupProxy(endpoint *portainer.Endpoint) error {
 	var proxy http.Handler
-	endpointURL, err := url.Parse(config.Endpoint)
+	endpointURL, err := url.Parse(endpoint.URL)
 	if err != nil {
 		return err
 	}
 	if endpointURL.Scheme == "tcp" {
-		if config.TLS {
-			proxy, err = newHTTPSProxy(endpointURL, config)
+		if endpoint.TLS {
+			proxy, err = newHTTPSProxy(endpointURL, endpoint)
 			if err != nil {
 				return err
 			}
@@ -61,15 +67,53 @@ func (handler *DockerHandler) setupProxy(config *portainer.EndpointConfiguration
 	return nil
 }
 
-func newHTTPProxy(u *url.URL) http.Handler {
-	u.Scheme = "http"
-	return httputil.NewSingleHostReverseProxy(u)
+// singleJoiningSlash from golang.org/src/net/http/httputil/reverseproxy.go
+// included here for use in NewSingleHostReverseProxyWithHostHeader
+// because its used in NewSingleHostReverseProxy from golang.org/src/net/http/httputil/reverseproxy.go
+func singleJoiningSlash(a, b string) string {
+	aslash := strings.HasSuffix(a, "/")
+	bslash := strings.HasPrefix(b, "/")
+	switch {
+	case aslash && bslash:
+		return a + b[1:]
+	case !aslash && !bslash:
+		return a + "/" + b
+	}
+	return a + b
 }
 
-func newHTTPSProxy(u *url.URL, endpointConfig *portainer.EndpointConfiguration) (http.Handler, error) {
+// NewSingleHostReverseProxyWithHostHeader is based on NewSingleHostReverseProxy
+// from golang.org/src/net/http/httputil/reverseproxy.go and merely sets the Host
+// HTTP header, which NewSingleHostReverseProxy deliberately preserves
+func NewSingleHostReverseProxyWithHostHeader(target *url.URL) *httputil.ReverseProxy {
+	targetQuery := target.RawQuery
+	director := func(req *http.Request) {
+		req.URL.Scheme = target.Scheme
+		req.URL.Host = target.Host
+		req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
+		req.Host = req.URL.Host
+		if targetQuery == "" || req.URL.RawQuery == "" {
+			req.URL.RawQuery = targetQuery + req.URL.RawQuery
+		} else {
+			req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
+		}
+		if _, ok := req.Header["User-Agent"]; !ok {
+			// explicitly disable User-Agent so it's not set to default value
+			req.Header.Set("User-Agent", "")
+		}
+	}
+	return &httputil.ReverseProxy{Director: director}
+}
+
+func newHTTPProxy(u *url.URL) http.Handler {
+	u.Scheme = "http"
+	return NewSingleHostReverseProxyWithHostHeader(u)
+}
+
+func newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
 	u.Scheme = "https"
-	proxy := httputil.NewSingleHostReverseProxy(u)
-	config, err := createTLSConfiguration(endpointConfig.TLSCACertPath, endpointConfig.TLSCertPath, endpointConfig.TLSKeyPath)
+	proxy := NewSingleHostReverseProxyWithHostHeader(u)
+	config, err := createTLSConfiguration(endpoint.TLSCACertPath, endpoint.TLSCertPath, endpoint.TLSKeyPath)
 	if err != nil {
 		return nil, err
 	}

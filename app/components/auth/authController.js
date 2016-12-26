@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'Messages',
-function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, Messages) {
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'EndpointService', 'Messages',
+function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, EndpointService, Messages) {
 
   $scope.authData = {
     username: 'admin',
@@ -58,10 +58,17 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
     $scope.authenticationError = false;
     var username = $sanitize($scope.authData.username);
     var password = $sanitize($scope.authData.password);
-    Authentication.login(username, password)
-    .then(function() {
-      $state.go('dashboard');
-    }, function() {
+    Authentication.login(username, password).then(function success() {
+      EndpointService.getActive().then(function success(data) {
+        $state.go('dashboard');
+      }, function error(err) {
+        if (err.status === 404) {
+          $state.go('endpointInit');
+        } else {
+          Messages.error("Failure", err, 'Unable to verify Docker endpoint existence');
+        }
+      });
+    }, function error() {
       $scope.authData.error = 'Invalid credentials';
     });
   };

@@ -7,8 +7,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	"golang.org/x/net/websocket"
 	"io"
 	"log"
 	"net"
@@ -17,14 +15,17 @@ import (
 	"net/url"
 	"os"
 	"time"
+
+	"github.com/gorilla/mux"
+	"golang.org/x/net/websocket"
 )
 
 // WebSocketHandler represents an HTTP API handler for proxying requests to a web socket.
 type WebSocketHandler struct {
 	*mux.Router
-	Logger                *log.Logger
-	middleWareService     *middleWareService
-	endpointConfiguration *portainer.EndpointConfiguration
+	Logger            *log.Logger
+	middleWareService *middleWareService
+	endpoint          *portainer.Endpoint
 }
 
 // NewWebSocketHandler returns a new instance of WebSocketHandler.
@@ -42,7 +43,7 @@ func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
 	execID := qry.Get("id")
 
 	// Should not be managed here
-	endpoint, err := url.Parse(handler.endpointConfiguration.Endpoint)
+	endpoint, err := url.Parse(handler.endpoint.URL)
 	if err != nil {
 		log.Fatalf("Unable to parse endpoint URL: %s", err)
 		return
@@ -57,10 +58,10 @@ func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
 
 	// Should not be managed here
 	var tlsConfig *tls.Config
-	if handler.endpointConfiguration.TLS {
-		tlsConfig, err = createTLSConfiguration(handler.endpointConfiguration.TLSCACertPath,
-			handler.endpointConfiguration.TLSCertPath,
-			handler.endpointConfiguration.TLSKeyPath)
+	if handler.endpoint.TLS {
+		tlsConfig, err = createTLSConfiguration(handler.endpoint.TLSCACertPath,
+			handler.endpoint.TLSCertPath,
+			handler.endpoint.TLSKeyPath)
 		if err != nil {
 			log.Fatalf("Unable to create TLS configuration: %s", err)
 			return

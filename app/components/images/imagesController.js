@@ -38,7 +38,7 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
           Messages.error('Error', {}, detail.error);
         } else {
           $('#pullImageSpinner').hide();
-          $state.go('images', {}, {reload: true});
+          $state.reload();
         }
     }, function (e) {
       $('#pullImageSpinner').hide();

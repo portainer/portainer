@@ -14,7 +14,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Settin
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadServicesSpinner').hide();
       Messages.send("Service successfully scaled", "New replica count: " + service.Replicas);
-      $state.go('services', {}, {reload: true});
+      $state.reload();
     }, function (e) {
       $('#loadServicesSpinner').hide();
       service.Scale = false;

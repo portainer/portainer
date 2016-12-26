@@ -16,7 +16,7 @@ function ($scope, $state, $sanitize, Users, Messages) {
         var newPassword = $sanitize($scope.formValues.newPassword);
         Users.update({ username: $scope.username, password: newPassword }, function (d) {
           Messages.send("Success", "Password successfully updated");
-          $state.go('settings', {}, {reload: true});
+          $state.reload();
         }, function (e) {
           Messages.error("Failure", e, "Unable to update password");
         });
