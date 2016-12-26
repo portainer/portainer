@@ -32,7 +32,7 @@
             <div ng-if="formValues.endpointType === 'local'" style="margin-top: 25px;">
               <div class="form-group">
                 <div class="col-sm-12">
-                  <span class="small text-muted">Note: ensure that the Docker socket is bind mounted in the Portainer container at <code>/var/run/docker.sock</code></span>
+                  <span class="text-primary">Ensure that you have started Portainer container with the following Docker flag <code>-v "/var/run/docker.sock:/var/run/docker.sock"</code></span>
                 </div>
               </div>
               <!-- connect button -->
