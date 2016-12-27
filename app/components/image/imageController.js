@@ -48,6 +48,24 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
       Messages.error("Failure", e, "Unable to push image");
     });
   };
+  
+  $scope.pullImage = function(tag) {
+	var items = tag.split(":");
+	var id = items[0];
+	tag = items[1];
+    $('#loadingViewSpinner').show();
+    Image.pull({id: id, tag: tag}, function (d) {
+      if (d[d.length-1].error) {
+        Messages.error("Unable to pull image", {}, d[d.length-1].error);
+      } else {
+        Messages.send('Image successfully pulled');
+      }
+      $('#loadingViewSpinner').hide();
+    }, function (e) {
+      $('#loadingViewSpinner').hide();
+      Messages.error("Failure", e, "Unable to pull image");
+    });
+  };
 
   $scope.removeImage = function (id) {
     $('#loadingViewSpinner').show();
