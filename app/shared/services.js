@@ -123,10 +123,6 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
                 method: 'POST', params: {action: 'push', id: '@tag'},
                 isArray: true, transformResponse: jsonObjectsToArrayHandler
             },
-            pull: {
-                method: 'POST', params: {action: 'create', fromImage: '@id', tag: '@tag'},
-                isArray: true, transformResponse: jsonObjectsToArrayHandler
-            },
             create: {
                 method: 'POST', params: {action: 'create', fromImage: '@fromImage', tag: '@tag'},
                 isArray: true, transformResponse: jsonObjectsToArrayHandler
