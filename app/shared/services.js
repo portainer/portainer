@@ -115,7 +115,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
             query: {method: 'GET', params: {all: 0, action: 'json'}, isArray: true},
             get: {method: 'GET', params: {action: 'json'}},
             search: {method: 'GET', params: {action: 'search'}},
-            history: {method: 'GET', params: {action: 'history'}, isArray: true},
+            history: {method: 'GET', params: {id: "@id", action: 'history'}, isArray: true},
             insert: {method: 'POST', params: {id: '@id', action: 'insert'}},
             tag: {method: 'POST', params: {id: '@id', action: 'tag', force: 0, repo: '@repo', tag: '@tag'}},
             inspect: {method: 'GET', params: {id: '@id', action: 'json'}},

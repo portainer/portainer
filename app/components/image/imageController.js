@@ -2,6 +2,7 @@ angular.module('image', [])
 .controller('ImageController', ['$scope', '$stateParams', '$state', 'Image', 'ImageHelper', 'Messages',
 function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
   $scope.RepoTags = [];
+  $scope.Layers = [];
   $scope.config = {
     Image: '',
     Registry: ''
@@ -85,5 +86,22 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
     $scope.volumes = d.ContainerConfig.Volumes ? Object.keys(d.ContainerConfig.Volumes) : [];
   }, function (e) {
     Messages.error("Failure", e, "Unable to retrieve image info");
+  });
+
+  $('#loadingViewSpinner').show();
+  Image.history({id: $stateParams.id}, function (d) {
+    d.forEach(function(layer){
+      $scope.Layers.push({
+        id: layer.Id === "<missing>" ? "Missing" : layer.Id,
+        created : layer.Created,
+        createdBy : layer.CreatedBy,
+        size : layer.Size,
+        comment : layer.Comment
+      });
+    });
+    $('#loadingViewSpinner').hide();
+  }, function (e) {
+    $('#loadingViewSpinner').hide();
+    Messages.error("Failure", e, "Unable to retrieve image history");
   });
 }]);
