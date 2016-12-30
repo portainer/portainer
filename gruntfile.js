@@ -27,7 +27,7 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:res'
+    'clean:tmp'
   ]);
   grunt.registerTask('release', [
     'clean:app',
@@ -42,7 +42,7 @@ module.exports = function (grunt) {
     'copy:assets',
     'filerev',
     'usemin',
-    'clean:res'
+    'clean:tmp'
   ]);
   grunt.registerTask('release-win', [
     'clean:app',
@@ -56,7 +56,8 @@ module.exports = function (grunt) {
     'uglify',
     'copy',
     'filerev',
-    'usemin'
+    'usemin',
+    'clean:tmp'
   ]);
   grunt.registerTask('release-arm', [
     'clean:app',
@@ -70,7 +71,8 @@ module.exports = function (grunt) {
     'uglify',
     'copy',
     'filerev',
-    'usemin'
+    'usemin',
+    'clean:tmp'
   ]);
   grunt.registerTask('release-macos', [
     'clean:app',
@@ -84,7 +86,8 @@ module.exports = function (grunt) {
     'uglify',
     'copy',
     'filerev',
-    'usemin'
+    'usemin',
+    'clean:tmp'
   ]);
   grunt.registerTask('lint', ['jshint']);
   grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
@@ -133,7 +136,7 @@ module.exports = function (grunt) {
       all: ['<%= distdir %>/*'],
       app: ['<%= distdir %>/*', '!<%= distdir %>/portainer'],
       tmpl: ['<%= distdir %>/templates'],
-      res: ['<%= distdir %>/js/*', '!<%= distdir %>/js/app.*.js', '<%= distdir %>/css/*', '!<%= distdir %>/css/app.*.css']
+      tmp: ['<%= distdir %>/js/*', '!<%= distdir %>/js/app.*.js', '<%= distdir %>/css/*', '!<%= distdir %>/css/app.*.css']
     },
     useminPrepare: {
       dev: {
