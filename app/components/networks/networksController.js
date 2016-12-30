@@ -49,7 +49,7 @@ function ($scope, $state, Network, Config, Messages, Settings) {
 
   $scope.selectItems = function(allSelected) {
     angular.forEach($scope.state.filteredNetworks, function (network) {
-      if (network.Checked != allSelected) {
+      if (network.Checked !== allSelected) {
           network.Checked = allSelected;
           $scope.selectItem(network);
       }

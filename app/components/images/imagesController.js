@@ -19,7 +19,7 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
 
   $scope.selectItems = function (allSelected) {
     angular.forEach($scope.state.filteredImages, function (image) {
-      if (image.Checked != allSelected) {
+      if (image.Checked !== allSelected) {
         image.Checked = allSelected;
         $scope.selectItem(image);
       }

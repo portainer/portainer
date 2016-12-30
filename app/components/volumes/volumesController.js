@@ -17,7 +17,7 @@ function ($scope, $state, Volume, Messages, Settings) {
 
   $scope.selectItems = function (allSelected) {
     angular.forEach($scope.state.filteredVolumes, function (volume) {
-      if (volume.Checked != allSelected) {
+      if (volume.Checked !== allSelected) {
         volume.Checked = allSelected;
         $scope.selectItem(volume);
       }

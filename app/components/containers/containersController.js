@@ -96,7 +96,7 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
 
   $scope.selectItems = function (allSelected) {
     angular.forEach($scope.state.filteredContainers, function (container) {
-      if (container.Checked != allSelected) {
+      if (container.Checked !== allSelected) {
         container.Checked = allSelected;
         $scope.selectItem(container);
       }
