@@ -63,7 +63,7 @@ func (server *Server) Start() error {
 	endpointHandler.server = server
 	var uploadHandler = NewUploadHandler(middleWareService)
 	uploadHandler.FileService = server.FileService
-	var fileHandler = http.FileServer(http.Dir(server.AssetsPath))
+	var fileHandler = newFileHandler(server.AssetsPath)
 
 	server.Handler = &Handler{
 		AuthHandler:      authHandler,

@@ -10,7 +10,8 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-if');
-  grunt.loadNpmTasks('grunt-rev');
+  grunt.loadNpmTasks('grunt-filerev');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-usemin');
 
   // Default task.
@@ -19,56 +20,71 @@ module.exports = function (grunt) {
     'clean:app',
     'if:unixBinaryNotExist',
     'html2js',
+    'useminPrepare:dev',
+    'recess:build',
     'concat',
     'clean:tmpl',
-    'recess:build',
     'copy',
-    'rev',
-    'usemin'
+    'filerev',
+    'usemin',
+    'clean:res'
   ]);
   grunt.registerTask('release', [
-    'clean:all',
+    'clean:app',
     'if:unixBinaryNotExist',
     'html2js',
-    'uglify',
+    'useminPrepare:release',
+    'recess:build',
+    'concat',
     'clean:tmpl',
-    'jshint',
-    'concat:index',
-    'recess:min',
-    'copy'
+    'cssmin',
+    'uglify',
+    'copy:assets',
+    'filerev',
+    'usemin',
+    'clean:res'
   ]);
   grunt.registerTask('release-win', [
-    'clean:all',
+    'clean:app',
     'if:windowsBinaryNotExist',
     'html2js',
-    'uglify',
+    'useminPrepare',
+    'recess:build',
+    'concat',
     'clean:tmpl',
-    'jshint',
-    'concat:index',
-    'recess:min',
-    'copy'
+    'cssmin',
+    'uglify',
+    'copy',
+    'filerev',
+    'usemin'
   ]);
   grunt.registerTask('release-arm', [
-    'clean:all',
+    'clean:app',
     'if:unixArmBinaryNotExist',
     'html2js',
-    'uglify',
+    'useminPrepare',
+    'recess:build',
+    'concat',
     'clean:tmpl',
-    'jshint',
-    'concat:index',
-    'recess:min',
-    'copy'
+    'cssmin',
+    'uglify',
+    'copy',
+    'filerev',
+    'usemin'
   ]);
   grunt.registerTask('release-macos', [
-    'clean:all',
+    'clean:app',
     'if:darwinBinaryNotExist',
     'html2js',
-    'uglify',
+    'useminPrepare',
+    'recess:build',
+    'concat',
     'clean:tmpl',
-    'jshint',
-    'concat:index',
-    'recess:min',
-    'copy'
+    'cssmin',
+    'uglify',
+    'copy',
+    'filerev',
+    'usemin'
   ]);
   grunt.registerTask('lint', ['jshint']);
   grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
@@ -116,27 +132,54 @@ module.exports = function (grunt) {
     clean: {
       all: ['<%= distdir %>/*'],
       app: ['<%= distdir %>/*', '!<%= distdir %>/portainer'],
-      tmpl: ['<%= distdir %>/templates']
+      tmpl: ['<%= distdir %>/templates'],
+      res: ['<%= distdir %>/js/*', '!<%= distdir %>/js/app.*.js', '<%= distdir %>/css/*', '!<%= distdir %>/css/app.*.css']
     },
     useminPrepare: {
-      html: '<%= src.html %>',
-      options: {
-        dest: '<%= distdir %>/app'
+      dev: {
+        src: '<%= src.html %>',
+        options: {
+          root: '<%= distdir %>',
+          flow: {
+            steps: {
+              js: ['concat'],
+              css: ['concat']
+            }
+          }
+        }
+      },
+      release: {
+        src: '<%= src.html %>',
+        options: {
+          root: '<%= distdir %>',
+        }
       }
     },
-    rev: {
+    filerev: {
       files: {
         src: ['<%= distdir %>/js/*.js', '<%= distdir %>/css/*.css']
       }
     },
     usemin: {
       html: ['<%= distdir %>/index.html'],
-      // css: ['<%= distdir %>/css/*.css'],
-      options: {
-        assetsDirs: ['<%= distdir %>/js/*.js', '<%= distdir %>/css/*.css'],
-      }
     },
     copy: {
+      bundle: {
+        files: [
+          {
+            dest: '<%= distdir %>/js/',
+            src: ['app.js'],
+            expand: true,
+            cwd: '.tmp/concat/js/'
+          },
+          {
+            dest: '<%= distdir %>/css/',
+            src: ['app.css'],
+            expand: true,
+            cwd: '.tmp/concat/css/'
+          }
+        ]
+      },
       assets: {
         files: [
           {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
