@@ -17,6 +17,15 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
     $scope.sortType = sortType;
   };
 
+  $scope.selectItems = function (allSelected) {
+    angular.forEach($scope.state.filteredImages, function (image) {
+      if (image.Checked != allSelected) {
+        image.Checked = allSelected;
+        $scope.selectItem(image);
+      }
+    });
+  };
+
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
