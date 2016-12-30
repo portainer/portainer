@@ -3,3 +3,4 @@ bower_components
 dist
 portainer-checksum.txt
 api/cmd/portainer/portainer*
+.tmp
