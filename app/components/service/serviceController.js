@@ -25,7 +25,8 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     service.EditImage = false;
   };
   $scope.scaleService = function scaleService(service) {
-    updateServiceAttribute(service, 'Replicas', service.newServiceReplicas || service.Replicas);
+    var replicas = service.newServiceReplicas === null || isNaN(service.newServiceReplicas) ? service.Replicas : service.newServiceReplicas;
+    updateServiceAttribute(service, 'Replicas', replicas);
     service.EditReplicas = false;
   };
 
