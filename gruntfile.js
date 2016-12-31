@@ -154,7 +154,7 @@ module.exports = function (grunt) {
       release: {
         src: '<%= src.html %>',
         options: {
-          root: '<%= distdir %>',
+          root: '<%= distdir %>'
         }
       }
     },
@@ -164,7 +164,7 @@ module.exports = function (grunt) {
       }
     },
     usemin: {
-      html: ['<%= distdir %>/index.html'],
+      html: ['<%= distdir %>/index.html']
     },
     copy: {
       bundle: {
@@ -318,7 +318,7 @@ module.exports = function (grunt) {
       }
     },
     jshint: {
-      files: ['gruntFile.js', '<%= src.js %>', '<%= src.scenarios %>'],
+      files: ['gruntfile.js', '<%= src.js %>'],
       options: {
         curly: true,
         eqeqeq: true,
