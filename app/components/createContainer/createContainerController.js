@@ -141,7 +141,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   }
 
   function prepareImageConfig(config) {
-    var image = _.toLower(config.Image);
+    var image = config.Image;
     var registry = $scope.formValues.Registry;
     var imageConfig = ImageHelper.createImageConfigForContainer(image, registry);
     config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
