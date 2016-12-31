@@ -134,7 +134,7 @@ function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, C
   }
 
   function prepareImageConfig(config, template) {
-    var image = _.toLower(template.image);
+    var image = template.image;
     var registry = template.registry || '';
     var imageConfig = ImageHelper.createImageConfigForContainer(image, registry);
     config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
