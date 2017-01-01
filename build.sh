@@ -27,6 +27,13 @@ cd /tmp/portainer-build-arm
 tar cvpfz portainer-${VERSION}-linux-arm.tar.gz portainer
 cd -
 
+grunt release-arm64
+rm -rf /tmp/portainer-build-arm64 && mkdir -pv /tmp/portainer-build-arm64/portainer
+mv dist/* /tmp/portainer-build-arm64/portainer
+cd /tmp/portainer-build-arm64
+tar cvpfz portainer-${VERSION}-linux-arm64.tar.gz portainer
+cd -
+
 grunt release-macos
 rm -rf /tmp/portainer-build-darwin && mkdir -pv /tmp/portainer-build-darwin/portainer
 mv dist/* /tmp/portainer-build-darwin/portainer
