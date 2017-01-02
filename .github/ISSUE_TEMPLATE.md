@@ -37,6 +37,7 @@ Any other info e.g. Why do you consider this to be a bug? What did you expect to
 **Technical details:**
 
 * Portainer version:
+* Portainer Docker image tag (latest/arm/windows...):
 * Target Docker version (the host/cluster you manage):
 * Target Swarm version (if applicable):
 * Platform (windows/linux):
