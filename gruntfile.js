@@ -74,6 +74,21 @@ module.exports = function (grunt) {
     'usemin',
     'clean:tmp'
   ]);
+  grunt.registerTask('release-arm64', [
+    'clean:app',
+    'if:unixArm64BinaryNotExist',
+    'html2js',
+    'useminPrepare',
+    'recess:build',
+    'concat',
+    'clean:tmpl',
+    'cssmin',
+    'uglify',
+    'copy',
+    'filerev',
+    'usemin',
+    'clean:tmp'
+  ]);
   grunt.registerTask('release-macos', [
     'clean:app',
     'if:darwinBinaryNotExist',
@@ -355,6 +370,14 @@ module.exports = function (grunt) {
           'mv api/cmd/portainer/portainer-linux-arm dist/portainer'
         ].join(' && ')
       },
+        buildUnixArm64Binary: {
+            command: [
+                'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm64" portainer/golang-builder:cross-platform /src/cmd/portainer',
+                'shasum api/cmd/portainer/portainer-linux-arm64 > portainer-checksum.txt',
+                'mkdir -p dist',
+                'mv api/cmd/portainer/portainer-linux-arm64 dist/portainer'
+            ].join(' && ')
+        },
       buildDarwinBinary: {
         command: [
           'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="darwin" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform /src/cmd/portainer',
@@ -415,6 +438,12 @@ module.exports = function (grunt) {
           executable: 'dist/portainer'
         },
         ifFalse: ['shell:buildUnixArmBinary']
+      },
+      unixArm64BinaryNotExist: {
+        options: {
+          executable: 'dist/portainer'
+        },
+        ifFalse: ['shell:buildUnixArm64Binary']
       },
       darwinBinaryNotExist: {
         options: {
