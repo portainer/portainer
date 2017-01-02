@@ -27,8 +27,8 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
 
   $scope.pullImage = function() {
     $('#pullImageSpinner').show();
-    var image = _.toLower($scope.config.Image);
-    var registry = _.toLower($scope.config.Registry);
+    var image = $scope.config.Image;
+    var registry = $scope.config.Registry;
     var imageConfig = ImageHelper.createImageConfigForContainer(image, registry);
     Image.create(imageConfig, function (data) {
         var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
