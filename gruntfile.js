@@ -30,7 +30,7 @@ module.exports = function (grunt) {
     'clean:tmp'
   ]);
   grunt.registerTask('release', [
-    'clean:app',
+    'clean:all',
     'if:unixBinaryNotExist',
     'html2js',
     'useminPrepare:release',
@@ -45,7 +45,7 @@ module.exports = function (grunt) {
     'clean:tmp'
   ]);
   grunt.registerTask('release-win', [
-    'clean:app',
+    'clean:all',
     'if:windowsBinaryNotExist',
     'html2js',
     'useminPrepare',
@@ -60,7 +60,7 @@ module.exports = function (grunt) {
     'clean:tmp'
   ]);
   grunt.registerTask('release-arm', [
-    'clean:app',
+    'clean:all',
     'if:unixArmBinaryNotExist',
     'html2js',
     'useminPrepare',
@@ -75,7 +75,7 @@ module.exports = function (grunt) {
     'clean:tmp'
   ]);
   grunt.registerTask('release-arm64', [
-    'clean:app',
+    'clean:all',
     'if:unixArm64BinaryNotExist',
     'html2js',
     'useminPrepare',
@@ -90,7 +90,7 @@ module.exports = function (grunt) {
     'clean:tmp'
   ]);
   grunt.registerTask('release-macos', [
-    'clean:app',
+    'clean:all',
     'if:darwinBinaryNotExist',
     'html2js',
     'useminPrepare',
