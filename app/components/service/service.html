@@ -200,17 +200,14 @@
               <td>Update Failure Action</td>
               <td>
                 <div class="form-group">
-                  <div class="col-sm-3">
-                    <label class="radio-inline">
-                      <input type="radio" name="failure_action" ng-model="service.newServiceUpdateFailureAction" value="continue" ng-change="changeUpdateFailureAction(service)">
-                      Continue
-                    </label>
-                    <label class="radio-inline">
-                      <input type="radio" name="failure_action" ng-model="service.newServiceUpdateFailureAction" value="pause" ng-change="changeUpdateFailureAction(service)">
-                      Pause
-                    </label>
-                  </div>
-                  <div class="col-sm-8"></div>
+                  <label class="radio-inline">
+                    <input type="radio" name="failure_action" ng-model="service.newServiceUpdateFailureAction" value="continue" ng-change="changeUpdateFailureAction(service)">
+                    Continue
+                  </label>
+                  <label class="radio-inline">
+                    <input type="radio" name="failure_action" ng-model="service.newServiceUpdateFailureAction" value="pause" ng-change="changeUpdateFailureAction(service)">
+                    Pause
+                  </label>
                 </div>
               </td>
             </tr>
