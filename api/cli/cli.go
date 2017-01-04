@@ -25,14 +25,14 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		Endpoint:  kingpin.Flag("host", "Dockerd endpoint").Short('H').String(),
 		Logo:      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
 		Labels:    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
-		Addr:      kingpin.Flag("bind", "Address and port to serve Portainer").Default(":9000").Short('p').String(),
-		Assets:    kingpin.Flag("assets", "Path to the assets").Default(".").Short('a').String(),
-		Data:      kingpin.Flag("data", "Path to the folder where the data is stored").Default("/data").Short('d').String(),
-		Templates: kingpin.Flag("templates", "URL to the templates (apps) definitions").Default("https://raw.githubusercontent.com/portainer/templates/master/templates.json").Short('t').String(),
-		TLSVerify: kingpin.Flag("tlsverify", "TLS support").Default("false").Bool(),
-		TLSCacert: kingpin.Flag("tlscacert", "Path to the CA").Default("/certs/ca.pem").String(),
-		TLSCert:   kingpin.Flag("tlscert", "Path to the TLS certificate file").Default("/certs/cert.pem").String(),
-		TLSKey:    kingpin.Flag("tlskey", "Path to the TLS key").Default("/certs/key.pem").String(),
+		Addr:      kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
+		Assets:    kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
+		Data:      kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
+		Templates: kingpin.Flag("templates", "URL to the templates (apps) definitions").Default(defaultTemplatesURL).Short('t').String(),
+		TLSVerify: kingpin.Flag("tlsverify", "TLS support").Default(defaultTLSVerify).Bool(),
+		TLSCacert: kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String(),
+		TLSCert:   kingpin.Flag("tlscert", "Path to the TLS certificate file").Default(defaultTLSCertPath).String(),
+		TLSKey:    kingpin.Flag("tlskey", "Path to the TLS key").Default(defaultTLSKeyPath).String(),
 	}
 
 	kingpin.Parse()

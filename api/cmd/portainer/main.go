@@ -29,6 +29,11 @@ func main() {
 		Logo:         *flags.Logo,
 	}
 
+	fileService, err := file.NewService(*flags.Data, "")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var store = bolt.NewStore(*flags.Data)
 	err = store.Open()
 	if err != nil {
@@ -37,11 +42,6 @@ func main() {
 	defer store.Close()
 
 	jwtService, err := jwt.NewService()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fileService, err := file.NewService(*flags.Data)
 	if err != nil {
 		log.Fatal(err)
 	}

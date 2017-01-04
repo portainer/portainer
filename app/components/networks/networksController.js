@@ -47,6 +47,15 @@ function ($scope, $state, Network, Config, Messages, Settings) {
     $scope.sortType = sortType;
   };
 
+  $scope.selectItems = function(allSelected) {
+    angular.forEach($scope.state.filteredNetworks, function (network) {
+      if (network.Checked !== allSelected) {
+          network.Checked = allSelected;
+          $scope.selectItem(network);
+      }
+    });
+  };
+
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;

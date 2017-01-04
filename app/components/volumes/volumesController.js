@@ -15,6 +15,15 @@ function ($scope, $state, Volume, Messages, Settings) {
     $scope.sortType = sortType;
   };
 
+  $scope.selectItems = function (allSelected) {
+    angular.forEach($scope.state.filteredVolumes, function (volume) {
+      if (volume.Checked !== allSelected) {
+        volume.Checked = allSelected;
+        $scope.selectItem(volume);
+      }
+    });
+  };
+
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;

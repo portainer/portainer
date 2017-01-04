@@ -547,11 +547,11 @@ angular.module('portainer', [
   // This is your docker url that the api will use to make requests
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is required.  If you have a port, prefix it with a ':' i.e. :4243
-  .constant('DOCKER_ENDPOINT', '/api/docker')
-  .constant('CONFIG_ENDPOINT', '/api/settings')
-  .constant('AUTH_ENDPOINT', '/api/auth')
-  .constant('USERS_ENDPOINT', '/api/users')
-  .constant('ENDPOINTS_ENDPOINT', '/api/endpoints')
-  .constant('TEMPLATES_ENDPOINT', '/api/templates')
+  .constant('DOCKER_ENDPOINT', 'api/docker')
+  .constant('CONFIG_ENDPOINT', 'api/settings')
+  .constant('AUTH_ENDPOINT', 'api/auth')
+  .constant('USERS_ENDPOINT', 'api/users')
+  .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
+  .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('PAGINATION_MAX_ITEMS', 10)
-  .constant('UI_VERSION', 'v1.11.0');
+  .constant('UI_VERSION', 'v1.11.1');
