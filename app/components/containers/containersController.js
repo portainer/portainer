@@ -7,6 +7,7 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
   $scope.sortType = 'State';
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
+  $scope.state.checkedAll = false;
   $scope.pagination_count = Settings.pagination_count;
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
@@ -70,6 +71,8 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
             }
             else {
               Messages.send("Container " + msg, c.Id);
+              $scope.state.selectedItemCount--;
+              $scope.state.checkedAll = false;
             }
             complete();
           }, function (e) {
@@ -94,11 +97,33 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
     }
   };
 
+  $scope.selectAllItem = function () {
+    if($scope.state.selectedItemCount===$scope.containers.length){
+      angular.forEach($scope.containers, function (i) {
+        i.Checked = false;
+        $scope.state.selectedItemCount--;
+      });
+    } else {
+      angular.forEach($scope.containers, function (i) {
+        if (!i.Checked) {
+          i.Checked = true;
+          $scope.state.selectedItemCount++;
+        }
+      });
+    }
+  };
+
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
+      if($scope.state.selectedItemCount===$scope.containers.length){
+        $scope.state.checkedAll = true;
+      }
     } else {
       $scope.state.selectedItemCount--;
+      if($scope.state.checkedAll){
+        $scope.state.checkedAll = false;
+      }
     }
   };
 
