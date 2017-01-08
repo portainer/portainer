@@ -164,25 +164,41 @@
 <div class="row" ng-if="Layers.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-history" title="Image history"></rd-widget-header>
+      <rd-widget-header icon="fa-clone" title="Image layers"></rd-widget-header>
       <rd-widget-body classes="no-padding">
-        <table class="table">
+        <table id="image-layers" class="table">
           <thead>
             <tr>
               <td>Id</td>
               <td>Created</td>
               <td>Size</td>
+              <td></td>
               <td>Created by</td>
               <td>Comment</td>
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat="layer in Layers">
-              <td><div title="{{layer.id}}">{{layer.id|truncate:20}}</div></td>
-              <td style="white-space:nowrap;">{{layer.created|getisodatefromtimestamp}}</td>
-              <td style="white-space:nowrap;">{{layer.size|humansize}}</td>
-              <td>{{layer.createdBy}}</td>
-              <td>{{layer.comment}}</td>
+              <td class="col-md-1"><div title="{{layer.id}}">{{layer.id|truncate:20}}</div></td>
+              <td class="col-md-1" style="white-space:nowrap;">{{layer.created|getisodatefromtimestamp}}</td>
+              <td class="col-md-1" style="white-space:nowrap;">{{layer.size|humansize}}</td>
+              <td class="expand"><div ng-if="layer.createdBy.length > 100"><a id="layer-command-expander{{$index}}" class="btn" ng-click='toggleLayerCommand($index)'><span class="glyphicon glyphicon-plus-sign"></span></a></div></td>
+              <td class="col-md-6">
+                <div ng-if="layer.createdBy.length > 100">
+                  <span id="layer-command-{{$index}}-full" style="display: none">
+                    {{layer.createdBy}}
+                  </span>
+                  <span id="layer-command-{{$index}}-short">
+                    {{layer.createdBy|limitTo:100}}{{layer.createdBy.length > 100 ? '...' : ''}}
+                  </span>
+                </div>
+                <div ng-if="layer.createdBy.length <= 100">
+                  <span id="layer-command-{{$index}}-full">
+                    {{layer.createdBy}}
+                  </span>
+                </div>
+              </td>
+              <td class="col-md-1">{{layer.comment}}</td>
             </tr>
           </tbody>
         </table>

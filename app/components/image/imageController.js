@@ -20,6 +20,13 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
     });
   }
 
+  $scope.toggleLayerCommand = function(layerId) {
+    console.log("layerId: "+layerId);
+    jQuery("#layer-command-expander"+layerId+" span").toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
+    jQuery("#layer-command-"+layerId+"-short").toggle();
+    jQuery("#layer-command-"+layerId+"-full").toggle();
+  }
+
   $scope.tagImage = function() {
     $('#loadingViewSpinner').show();
     var image = $scope.config.Image;
@@ -91,10 +98,10 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
   $('#loadingViewSpinner').show();
   Image.history({id: $stateParams.id}, function (d) {
     d.forEach(function(layer){
-      $scope.Layers.push({
+      $scope.Layers.unshift({
         id: layer.Id === "<missing>" ? "Missing" : layer.Id,
         created : layer.Created,
-        createdBy : layer.CreatedBy,
+        createdBy : layer.CreatedBy.replace("/bin/sh -c #(nop) ","").replace("/bin/sh -c ", ""),
         size : layer.Size,
         comment : layer.Comment
       });

@@ -269,3 +269,12 @@ ul.sidebar .sidebar-list a.active {
   border-left: 3px solid #fff;
   background: #2d3e63;
 }
+
+#image-layers .btn{
+  padding: 0;
+}
+
+#image-layers .expand{
+  width: 1%;
+  padding-right: 0px;
+}
