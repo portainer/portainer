@@ -101,7 +101,7 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
       $scope.Layers.unshift({
         id: layer.Id === "<missing>" ? "Missing" : layer.Id,
         created : layer.Created,
-        createdBy : layer.CreatedBy.replace("/bin/sh -c #(nop) ","").replace("/bin/sh -c ", ""),
+        createdBy : layer.CreatedBy.replace("/bin/sh -c #(nop) ","").replace("/bin/sh -c ", "RUN "),
         size : layer.Size,
         comment : layer.Comment
       });
