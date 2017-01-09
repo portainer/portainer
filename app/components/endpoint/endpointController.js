@@ -19,8 +19,8 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Messages) {
     var TLSCACert = $scope.formValues.TLSCACert !== $scope.endpoint.TLSCACert ? $scope.formValues.TLSCACert : null;
     var TLSCert = $scope.formValues.TLSCert !== $scope.endpoint.TLSCert ? $scope.formValues.TLSCert : null;
     var TLSKey = $scope.formValues.TLSKey !== $scope.endpoint.TLSKey ? $scope.formValues.TLSKey : null;
-    var TYPE = $scope.endpointType;
-    EndpointService.updateEndpoint(ID, name, URL, TLS, TLSCACert, TLSCert, TLSKey, TYPE).then(function success(data) {
+    var type = $scope.endpointType;
+    EndpointService.updateEndpoint(ID, name, URL, TLS, TLSCACert, TLSCert, TLSKey, type).then(function success(data) {
       Messages.send("Endpoint updated", $scope.endpoint.Name);
       $state.go('endpoints');
     }, function error(err) {
