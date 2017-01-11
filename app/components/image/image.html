@@ -11,27 +11,36 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa fa-tags" title="Image tags"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <div style="margin: 5px 10px;">
-          <span ng-repeat="tag in RepoTags" class="label label-primary image-tag space-right">
-            <a data-toggle="tooltip" class="interactive" title="Push to registry" ng-click="pushImage(tag)">
-              <i class="fa fa-upload white-icon" aria-hidden="true"></i>
-            </a>
-            <a data-toggle="tooltip" class="interactive" title="Pull from registry" ng-click="pullImage(tag)">
-              <i class="fa fa-download white-icon" aria-hidden="true"></i>
-            </a>
-            {{ tag }}
-            <a data-toggle="tooltip" class="interactive" title="Remove tag" ng-click="removeImage(tag)">
-              <i class="fa fa-trash-o white-icon" aria-hidden="true"></i>
-            </a>
-          </span>
-        </div>
-        <div style="margin: 5px 10px;">
-          <span class="small text-muted">
-            Note: you can click on the upload icon to push an image
-            and on the trash icon to delete a tag
-          </span>
-        </div>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-2" ng-repeat="tag in RepoTags">
+              <div class="input-group">
+                <span class="input-group-addon">
+                  {{ tag|onlylabel }}
+                </span>
+                <span class="input-group-btn">
+                  <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushImage(tag)">
+                    <span class="fa fa-upload white-icon" aria-hidden="true"></span>
+                  </a>
+                  <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullImage(tag)">
+                    <span class="fa fa-download white-icon" aria-hidden="true"></span>
+                  </a>
+                  <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeImage(tag)">
+                    <span class="fa fa-trash-o white-icon" aria-hidden="true"></span>
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-12">
+              <span class="small text-muted">
+                Note: you can click on the upload icon to push an image and on the trash icon to delete a tag
+              </span>
+            </div>
+          </div>
+        </form>
       </rd-widget-body>
     </rd-widget>
   </div>
