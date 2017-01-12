@@ -374,11 +374,11 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         endpoints: function() {
           return Endpoints.query({}).$promise;
         },
-        updateEndpoint: function(ID, name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile) {
+        updateEndpoint: function(ID, name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, type) {
           var endpoint = {
             id: ID,
             Name: name,
-            URL: "tcp://" + URL,
+            URL: type === 'local' ? ("unix://" + URL) : ("tcp://" + URL),
             TLS: TLS
           };
           var deferred = $q.defer();
