@@ -2,7 +2,7 @@ FROM microsoft/windowsservercore
 
 COPY dist /
 
-VOLUME C:\\ProgramData
+VOLUME C:\\ProgramData\\Portainer
 
 WORKDIR /
 
