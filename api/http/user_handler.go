@@ -227,18 +227,28 @@ func (handler *UserHandler) handlePostAdminInit(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	user := &portainer.User{
-		Username: "admin",
-	}
-	user.Password, err = handler.CryptoService.Hash(req.Password)
-	if err != nil {
-		Error(w, portainer.ErrCryptoHashFailure, http.StatusBadRequest, handler.Logger)
+	user, err := handler.UserService.User("admin")
+	if err == portainer.ErrUserNotFound {
+		user := &portainer.User{
+			Username: "admin",
+		}
+		user.Password, err = handler.CryptoService.Hash(req.Password)
+		if err != nil {
+			Error(w, portainer.ErrCryptoHashFailure, http.StatusBadRequest, handler.Logger)
+			return
+		}
+
+		err = handler.UserService.UpdateUser(user)
+		if err != nil {
+			Error(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
+	} else if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-
-	err = handler.UserService.UpdateUser(user)
-	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+	if user != nil {
+		Error(w, portainer.ErrAdminAlreadyInitialized, http.StatusForbidden, handler.Logger)
 		return
 	}
 }
