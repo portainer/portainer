@@ -2,7 +2,7 @@ FROM microsoft/nanoserver
 
 COPY dist /
 
-VOLUME C:\\data
+VOLUME C:\\ProgramData
 
 WORKDIR /
 
