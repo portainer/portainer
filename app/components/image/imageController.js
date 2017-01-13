@@ -25,7 +25,7 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
     jQuery("#layer-command-expander"+layerId+" span").toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
     jQuery("#layer-command-"+layerId+"-short").toggle();
     jQuery("#layer-command-"+layerId+"-full").toggle();
-  }
+  };
 
   $scope.tagImage = function() {
     $('#loadingViewSpinner').show();
