@@ -2,7 +2,7 @@ angular.module('image', [])
 .filter('onlylabel', function(){
 	return function(tag){
 		return tag.substr(tag.indexOf(":")+1);
-	}
+	};
 })
 .controller('ImageController', ['$scope', '$stateParams', '$state', 'Image', 'ImageHelper', 'Messages',
 function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
