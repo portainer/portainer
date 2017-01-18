@@ -14,22 +14,22 @@
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
-            <div class="col-sm-2" ng-repeat="tag in RepoTags">
-              <div class="input-group">
-                <span class="input-group-addon">
-                  {{ tag|onlylabel }}
-                </span>
-                <span class="input-group-btn">
-                  <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushImage(tag)">
-                    <span class="fa fa-upload white-icon" aria-hidden="true"></span>
-                  </a>
-                  <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullImage(tag)">
-                    <span class="fa fa-download white-icon" aria-hidden="true"></span>
-                  </a>
-                  <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeImage(tag)">
-                    <span class="fa fa-trash-o white-icon" aria-hidden="true"></span>
-                  </a>
-                </span>
+            <div class="row">
+              <div class="pull-left" ng-repeat="tag in RepoTags">
+                <div class="input-group" style="padding:0 15px">
+                  <span class="input-group-addon">{{ tag }}</span>
+                  <span class="input-group-btn">
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushImage(tag)">
+                      <span class="fa fa-upload white-icon" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullImage(tag)">
+                      <span class="fa fa-download white-icon" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeImage(tag)">
+                      <span class="fa fa-trash-o white-icon" aria-hidden="true"></span>
+                    </a>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
