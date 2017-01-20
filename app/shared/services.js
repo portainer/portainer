@@ -359,6 +359,47 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         setActiveEndpoint: { method: 'POST', params: { id: '@id', action: 'active' } }
       });
     }])
+    .factory('State', ['$resource', 'STATE_ENDPOINT', function StateFactory($resource, STATE_ENDPOINT) {
+      'use strict';
+      return $resource(STATE_ENDPOINT, {}, {
+        get: { method: 'GET' }
+      });
+    }])
+    .factory('StateManager', ['State', 'localStorageService', function StateManagerFactory(State, localStorageService) {
+      'use strict';
+      var state;
+      var loading = true;
+      return {
+        isLoading: function() {
+          return loading;
+        },
+        setLoading: function(v) {
+          console.log('setLoading');
+          console.log(JSON.stringify(v, null, 4));
+          loading = v;
+        },
+        init: function() {
+          // Should use $q and deferred here
+          console.log(JSON.stringify('INIT', null, 4));
+          State.get().$promise.then(function success(data) {
+            console.log(JSON.stringify(data, null, 4));
+            state = {"key": "value"};
+            localStorageService.set('STATE', state);
+          }, function error(err) {
+            console.log(JSON.stringify(err, null, 4));
+          });
+        },
+        getState: function() {
+          console.log(JSON.stringify('GETSTATE', null, 4));
+          var self = this;
+          state = localStorageService.get('STATE');
+          if (!state) {
+            self.init();
+          }
+          return state;
+        }
+      };
+    }])
     .factory('EndpointService', ['$q', '$timeout', 'Endpoints', 'FileUploadService', function EndpointServiceFactory($q, $timeout, Endpoints, FileUploadService) {
       'use strict';
       return {

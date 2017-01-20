@@ -29,15 +29,36 @@
 </head>
 
 <body ng-controller="MainController">
-  <div id="page-wrapper" ng-class="{open: toggle && $state.current.name !== 'auth' && $state.current.name !== 'endpointInit', nopadding: $state.current.name === 'auth' || $state.current.name === 'endpointInit'}" ng-cloak>
+  <div id="page-wrapper" ng-class="{open: toggle && $state.current.name !== 'auth' && $state.current.name !== 'endpointInit' && $state.current.name !== 'init', nopadding: $state.current.name === 'auth' || $state.current.name === 'endpointInit' || $state.current.name === 'init'}" ng-cloak>
 
     <div id="sideview" ui-view="sidebar"></div>
 
     <div id="content-wrapper">
       <div class="page-content">
 
+        <div class="page-wrapper" ng-if="loading === true">
+          <!-- login box -->
+          <div class="container simple-box">
+            <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+              <!-- login box logo -->
+              <div class="row">
+                <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
+                <img ng-if="!logo" src="images/logo_alt.png" class="simple-box-logo" alt="Portainer">
+              </div>
+              <!-- !login box logo -->
+              <!-- panel -->
+              <div class="row" style="text-align: center">
+                <i class="fa fa-cog fa-3x fa-spin" style="margin-bottom: 5px"></i>
+                <p>Loading {{ loada }}</p>
+              </div>
+              <!-- !panel -->
+            </div>
+          </div>
+          <!-- !login box -->
+        </div>
+
         <!-- Main Content -->
-        <div id="view" ui-view="content"></div>
+        <div id="view" ui-view="content" ng-if="!loading"></div>
 
       </div><!-- End Page Content -->
     </div><!-- End Content Wrapper -->

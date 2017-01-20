@@ -24,6 +24,7 @@ angular.module('portainer', [
   'endpointInit',
   'endpoints',
   'events',
+  'initialization',
   'images',
   'image',
   'main',
@@ -58,9 +59,18 @@ angular.module('portainer', [
     });
     $httpProvider.interceptors.push('jwtInterceptor');
 
-    $urlRouterProvider.otherwise('/auth');
+    $urlRouterProvider.otherwise('/init');
 
     $stateProvider
+    .state('init', {
+      url: '/init',
+      views: {
+        "content": {
+          templateUrl: 'app/components/initialization/initialization.html',
+          controller: 'InitializationController'
+        }
+      }
+    })
     .state('auth', {
       url: '/auth',
       params: {
@@ -528,11 +538,25 @@ angular.module('portainer', [
       };
     });
   }])
-  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'EndpointMode', function ($rootScope, $state, Authentication, authManager, EndpointMode) {
+  .run(['$rootScope', '$state', '$timeout', 'Authentication', 'authManager', 'EndpointMode', 'StateManager', function ($rootScope, $state, $timeout, Authentication, authManager, EndpointMode, StateManager) {
     authManager.checkAuthOnRefresh();
     authManager.redirectWhenUnauthenticated();
     Authentication.init();
+
+    $rootScope.root_loading = true;
+    console.log('Loading...');
+    $rootScope.loada = true;
+    $timeout(function f(){
+      console.log('Loaded in the root.');
+      StateManager.setLoading(false);
+      $rootScope.loada = false;
+      // $rootScope.root_loading = false;
+    }, 3000);
+
+
     $rootScope.$state = $state;
+    var state = StateManager.getState();
+    console.log(JSON.stringify(state, null, 4));
 
     $rootScope.$on('tokenHasExpired', function($state) {
       $state.go('auth', {error: 'Your session has expired'});
@@ -550,6 +574,7 @@ angular.module('portainer', [
   .constant('DOCKER_ENDPOINT', 'api/docker')
   .constant('CONFIG_ENDPOINT', 'api/settings')
   .constant('AUTH_ENDPOINT', 'api/auth')
+  .constant('STATE_ENDPOINT', 'api/state')
   .constant('USERS_ENDPOINT', 'api/users')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')

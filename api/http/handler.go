@@ -12,6 +12,7 @@ import (
 // Handler is a collection of all the service handlers.
 type Handler struct {
 	AuthHandler      *AuthHandler
+	StateHandler     *StateHandler
 	UserHandler      *UserHandler
 	EndpointHandler  *EndpointHandler
 	SettingsHandler  *SettingsHandler
@@ -31,7 +32,9 @@ const (
 
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if strings.HasPrefix(r.URL.Path, "/api/auth") {
+	if strings.HasPrefix(r.URL.Path, "/api/state") {
+		http.StripPrefix("/api", h.StateHandler).ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/api/auth") {
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/users") {
 		http.StripPrefix("/api", h.UserHandler).ServeHTTP(w, r)
