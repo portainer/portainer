@@ -162,16 +162,18 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
         $scope.networkName = Object.keys(data.networks)[0];
         data.network = data.networks[$scope.networkName];
       }
-      var rxBytes = 0, txBytes = 0;
-      if (lastRxBytes !== 0 || lastTxBytes !== 0) {
-        // These will be zero on first call, ignore to prevent large graph spike
-        rxBytes = data.network.rx_bytes - lastRxBytes;
-        txBytes = data.network.tx_bytes - lastTxBytes;
+      if(data.network) {
+        var rxBytes = 0, txBytes = 0;
+        if (lastRxBytes !== 0 || lastTxBytes !== 0) {
+          // These will be zero on first call, ignore to prevent large graph spike
+          rxBytes = data.network.rx_bytes - lastRxBytes;
+          txBytes = data.network.tx_bytes - lastTxBytes;
+        }
+        lastRxBytes = data.network.rx_bytes;
+        lastTxBytes = data.network.tx_bytes;
+        networkChart.addData([rxBytes, txBytes], new Date(data.read).toLocaleTimeString());
+        networkChart.removeData();
       }
-      lastRxBytes = data.network.rx_bytes;
-      lastTxBytes = data.network.tx_bytes;
-      networkChart.addData([rxBytes, txBytes], new Date(data.read).toLocaleTimeString());
-      networkChart.removeData();
     }
 
     function calculateCPUPercent(stats) {
