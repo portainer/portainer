@@ -10,7 +10,7 @@ function ($scope, $cookieStore, StateManager) {
     return window.innerWidth;
   };
 
-  $scope.loading = StateManager.isLoading();
+  $scope.applicationState = StateManager.getState();
 
   $scope.$watch($scope.getWidth, function(newValue, oldValue) {
     if (newValue >= mobileView) {

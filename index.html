@@ -36,7 +36,7 @@
     <div id="content-wrapper">
       <div class="page-content">
 
-        <div class="page-wrapper" ng-if="loading === true">
+        <div class="page-wrapper" ng-if="applicationState.loading">
           <!-- login box -->
           <div class="container simple-box">
             <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
@@ -49,7 +49,7 @@
               <!-- panel -->
               <div class="row" style="text-align: center">
                 <i class="fa fa-cog fa-3x fa-spin" style="margin-bottom: 5px"></i>
-                <p>Loading {{ loada }}</p>
+                <p>Loading: {{ applicationState.loading }}</p>
               </div>
               <!-- !panel -->
             </div>
@@ -58,7 +58,7 @@
         </div>
 
         <!-- Main Content -->
-        <div id="view" ui-view="content" ng-if="!loading"></div>
+        <div id="view" ui-view="content" ng-if="!applicationState.loading"></div>
 
       </div><!-- End Page Content -->
     </div><!-- End Content Wrapper -->

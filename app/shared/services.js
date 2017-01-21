@@ -365,37 +365,53 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         get: { method: 'GET' }
       });
     }])
-    .factory('StateManager', ['State', 'localStorageService', function StateManagerFactory(State, localStorageService) {
+    .factory('StateManager', ['$q', 'Info', 'InfoHelper', 'Version', 'State', 'localStorageService', function StateManagerFactory($q, Info, InfoHelper, Version, State, localStorageService) {
       'use strict';
-      var state;
-      var loading = true;
+      var self = this;
+
+      var state = {
+        loading: true,
+        application: {},
+        endpoint: {
+          active: false
+        }
+      };
+
       return {
-        isLoading: function() {
-          return loading;
+        initState: function() {
+          console.log('Trigger the init, biotch.');
+          if (state.endpoint.active) {
+            self.setEndpointState().then(function success(){}, function error(err){
+              console.log('Some really bad shit happened');
+              console.log(JSON.stringify(err, null, 4));
+            });
+          } else {
+            state.loading = false;
+          }
         },
-        setLoading: function(v) {
-          console.log('setLoading');
-          console.log(JSON.stringify(v, null, 4));
-          loading = v;
+        setApplicationState: function() {
+
         },
-        init: function() {
-          // Should use $q and deferred here
-          console.log(JSON.stringify('INIT', null, 4));
-          State.get().$promise.then(function success(data) {
-            console.log(JSON.stringify(data, null, 4));
-            state = {"key": "value"};
-            localStorageService.set('STATE', state);
+        setEndpointState: function() {
+          var deferred = $q.defer();
+          state.loading = true;
+          $q.all([Info.get({}).$promise, Version.get({}).$promise])
+          .then(function success(data) {
+            var endpointMode = InfoHelper.determineEndpointMode(data[0]);
+            state.endpoint.mode = endpointMode;
+            state.loading = false;
+            deferred.resolve();
           }, function error(err) {
-            console.log(JSON.stringify(err, null, 4));
+            state.loading = false;
+            deferred.reject({msg: 'Endpoint state initialization failure', err: err});
           });
+          return deferred.promise;
+        },
+        setEndpointStateActive: function() {
+          state.endpoint.active = true;
+          return self.setEndpointState();
         },
         getState: function() {
-          console.log(JSON.stringify('GETSTATE', null, 4));
-          var self = this;
-          state = localStorageService.get('STATE');
-          if (!state) {
-            self.init();
-          }
           return state;
         }
       };

@@ -543,20 +543,17 @@ angular.module('portainer', [
     authManager.redirectWhenUnauthenticated();
     Authentication.init();
 
-    $rootScope.root_loading = true;
-    console.log('Loading...');
-    $rootScope.loada = true;
-    $timeout(function f(){
-      console.log('Loaded in the root.');
-      StateManager.setLoading(false);
-      $rootScope.loada = false;
-      // $rootScope.root_loading = false;
-    }, 3000);
+
+    StateManager.initState();
+    // $timeout(function f(){
+    //   console.log('Loaded via timeout.');
+    //   StateManager.setLoading(false);
+    // }, 3000);
 
 
-    $rootScope.$state = $state;
-    var state = StateManager.getState();
-    console.log(JSON.stringify(state, null, 4));
+    // $rootScope.$state = $state;
+    // var state = StateManager.getState();
+    // console.log(JSON.stringify(state, null, 4));
 
     $rootScope.$on('tokenHasExpired', function($state) {
       $state.go('auth', {error: 'Your session has expired'});

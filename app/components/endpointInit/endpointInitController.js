@@ -1,6 +1,6 @@
 angular.module('endpointInit', [])
-.controller('EndpointInitController', ['$scope', '$state', 'EndpointService', 'Messages',
-function ($scope, $state, EndpointService, Messages) {
+.controller('EndpointInitController', ['$scope', '$state', 'EndpointService', 'StateManager', 'Messages',
+function ($scope, $state, EndpointService, StateManager, Messages) {
   $scope.state = {
     error: '',
     uploadInProgress: false
@@ -29,7 +29,12 @@ function ($scope, $state, EndpointService, Messages) {
     var URL = "unix:///var/run/docker.sock";
     var TLS = false;
     EndpointService.createLocalEndpoint(name, URL, TLS, true).then(function success(data) {
-      $state.go('dashboard');
+      StateManager.setEndpointStateActive()
+      .then(function success() {
+        $state.go('dashboard');
+      }, function error(err) {
+        $scope.state.error = 'Unable to retrieve endpoint information';
+      });
     }, function error(err) {
       $scope.state.error = 'Unable to create endpoint';
     });
