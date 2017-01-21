@@ -26,7 +26,7 @@ func NewUploadHandler(middleWareService *middleWareService) *UploadHandler {
 		Logger:            log.New(os.Stderr, "", log.LstdFlags),
 		middleWareService: middleWareService,
 	}
-	h.Handle("/upload/tls/{endpointID}/{certificate:(ca|cert|key)}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	h.Handle("/upload/tls/{endpointID}/{certificate:(?:ca|cert|key)}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.handlePostUploadTLS(w, r)
 	})))
 	return h
