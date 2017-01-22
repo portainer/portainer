@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'EndpointService', 'Messages',
-function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, EndpointService, Messages) {
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'Messages',
+function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, EndpointService, StateManager, Messages) {
 
   $scope.authData = {
     username: 'admin',
@@ -60,7 +60,12 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
     var password = $sanitize($scope.authData.password);
     Authentication.login(username, password).then(function success() {
       EndpointService.getActive().then(function success(data) {
-        $state.go('dashboard');
+        StateManager.updateEndpointState(true)
+        .then(function success() {
+          $state.go('dashboard');
+        }, function error(err) {
+          Messages.error("Failure", err, 'Unable to connect to the Docker endpoint');
+        });
       }, function error(err) {
         if (err.status === 404) {
           $state.go('endpointInit');

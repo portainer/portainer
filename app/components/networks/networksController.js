@@ -13,7 +13,7 @@ function ($scope, $state, Network, Config, Messages, Settings) {
 
   function prepareNetworkConfiguration() {
     var config = angular.copy($scope.config);
-    if ($scope.endpointMode.provider === 'DOCKER_SWARM' || $scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
+    if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
       config.Driver = 'overlay';
       // Force IPAM Driver to 'default', should not be required.
       // See: https://github.com/docker/docker/issues/25735

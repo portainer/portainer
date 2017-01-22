@@ -43,7 +43,6 @@ func (server *Server) Start() error {
 		jwtService: server.JWTService,
 	}
 
-	var stateHandler = NewStateHandler()
 	var authHandler = NewAuthHandler()
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
@@ -67,7 +66,6 @@ func (server *Server) Start() error {
 	var fileHandler = newFileHandler(server.AssetsPath)
 
 	server.Handler = &Handler{
-		StateHandler:     stateHandler,
 		AuthHandler:      authHandler,
 		UserHandler:      userHandler,
 		EndpointHandler:  endpointHandler,

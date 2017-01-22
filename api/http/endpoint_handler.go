@@ -260,6 +260,7 @@ type putEndpointsRequest struct {
 }
 
 // handleDeleteEndpoint handles DELETE requests on /endpoints/:id
+// DELETE /endpoints/0 deletes the active endpoint
 func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -270,7 +271,14 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 		return
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	var endpoint *portainer.Endpoint
+	if id == "0" {
+		endpoint, err = handler.EndpointService.GetActive()
+		endpointID = int(endpoint.ID)
+	} else {
+		endpoint, err = handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	}
+
 	if err == portainer.ErrEndpointNotFound {
 		Error(w, err, http.StatusNotFound, handler.Logger)
 		return
@@ -283,6 +291,13 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
+	}
+	if id == "0" {
+		err = handler.EndpointService.DeleteActive()
+		if err != nil {
+			Error(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
 	}
 
 	if endpoint.TLS {

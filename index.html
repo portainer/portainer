@@ -29,9 +29,9 @@
 </head>
 
 <body ng-controller="MainController">
-  <div id="page-wrapper" ng-class="{open: toggle && $state.current.name !== 'auth' && $state.current.name !== 'endpointInit' && $state.current.name !== 'init', nopadding: $state.current.name === 'auth' || $state.current.name === 'endpointInit' || $state.current.name === 'init'}" ng-cloak>
+  <div id="page-wrapper" ng-class="{open: toggle && $state.current.name !== 'auth' && $state.current.name !== 'endpointInit' && $state.current.name !== 'init', nopadding: $state.current.name === 'auth' || $state.current.name === 'endpointInit' || $state.current.name === 'init' || applicationState.loading }" ng-cloak>
 
-    <div id="sideview" ui-view="sidebar"></div>
+    <div id="sideview" ui-view="sidebar" ng-if="!applicationState.loading"></div>
 
     <div id="content-wrapper">
       <div class="page-content">
@@ -48,8 +48,8 @@
               <!-- !login box logo -->
               <!-- panel -->
               <div class="row" style="text-align: center">
-                <i class="fa fa-cog fa-3x fa-spin" style="margin-bottom: 5px"></i>
-                <p>Loading: {{ applicationState.loading }}</p>
+                Portainer is loading...
+                <i class="fa fa-cog fa-spin" style="margin-left: 5px"></i>
               </div>
               <!-- !panel -->
             </div>

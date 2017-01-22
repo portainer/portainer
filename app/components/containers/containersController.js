@@ -28,7 +28,7 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
         if (model.IP) {
           $scope.state.displayIP = true;
         }
-        if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
+        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
           model.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
         }
         return model;
@@ -161,7 +161,7 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
 
   Config.$promise.then(function (c) {
     $scope.containersToHideLabels = c.hiddenLabels;
-    if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
+    if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
       Info.get({}, function (d) {
         $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
         update({all: Settings.displayAll ? 1 : 0});
