@@ -22,7 +22,7 @@ function ($scope, Info, Version, Node, Settings) {
 
   Info.get({}, function (d) {
     $scope.info = d;
-    if ($scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
+    if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
       Node.query({}, function(d) {
         $scope.nodes = d;
         var CPU = 0, memory = 0;

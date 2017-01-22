@@ -160,3 +160,15 @@ func (service *EndpointService) SetActive(endpoint *portainer.Endpoint) error {
 		return nil
 	})
 }
+
+// DeleteActive deletes the active endpoint.
+func (service *EndpointService) DeleteActive() error {
+	return service.store.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(activeEndpointBucketName))
+		err := bucket.Delete(internal.Itob(activeEndpointID))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}

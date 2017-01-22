@@ -72,7 +72,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
     Network.query({}, function (d) {
       var networks = d;
-      if ($scope.endpointMode.provider === 'DOCKER_SWARM' || $scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
+      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
         networks = d.filter(function (network) {
           if (network.Scope === 'global') {
             return network;
@@ -220,7 +220,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = $filter('trimcontainername')(container.Names[0]);
-      if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
+      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
         containerName = $filter('swarmcontainername')(container);
       }
     }

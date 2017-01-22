@@ -1,6 +1,6 @@
 angular.module('main', [])
-.controller('MainController', ['$scope', '$cookieStore',
-function ($scope, $cookieStore) {
+.controller('MainController', ['$scope', '$cookieStore', 'StateManager',
+function ($scope, $cookieStore, StateManager) {
 
   /**
   * Sidebar Toggle & Cookie Control
@@ -9,6 +9,8 @@ function ($scope, $cookieStore) {
   $scope.getWidth = function() {
     return window.innerWidth;
   };
+
+  $scope.applicationState = StateManager.getState();
 
   $scope.$watch($scope.getWidth, function(newValue, oldValue) {
     if (newValue >= mobileView) {

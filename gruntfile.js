@@ -398,14 +398,14 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer -d /data'
+          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer'
         ].join(';')
       },
       runSwarm: {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /tmp/portainer:/data --name portainer portainer -H tcp://10.0.7.10:2375 -d /data'
+          'docker run -d -p 9000:9000 -v /tmp/portainer:/data --name portainer portainer -H tcp://10.0.7.10:2375'
         ].join(';')
       },
       runSwarmLocal: {
@@ -419,7 +419,7 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /tmp/portainer:/data -v /tmp/docker-ssl:/certs --name portainer portainer -H tcp://10.0.7.10:2376 -d /data --tlsverify'
+          'docker run -d -p 9000:9000 -v /tmp/portainer:/data -v /tmp/docker-ssl:/certs --name portainer portainer -H tcp://10.0.7.10:2376 --tlsverify'
         ].join(';')
       },
       cleanImages: {

@@ -94,6 +94,7 @@ type (
 		DeleteEndpoint(ID EndpointID) error
 		GetActive() (*Endpoint, error)
 		SetActive(endpoint *Endpoint) error
+		DeleteActive() error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data.

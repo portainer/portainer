@@ -1,6 +1,6 @@
 angular.module('endpointInit', [])
-.controller('EndpointInitController', ['$scope', '$state', 'EndpointService', 'Messages',
-function ($scope, $state, EndpointService, Messages) {
+.controller('EndpointInitController', ['$scope', '$state', 'EndpointService', 'StateManager', 'Messages',
+function ($scope, $state, EndpointService, StateManager, Messages) {
   $scope.state = {
     error: '',
     uploadInProgress: false
@@ -15,27 +15,39 @@ function ($scope, $state, EndpointService, Messages) {
     TLSKey: null
   };
 
-  EndpointService.getActive().then(function success(data) {
+  if (!_.isEmpty($scope.applicationState.endpoint)) {
     $state.go('dashboard');
-  }, function error(err) {
-    if (err.status !== 404) {
-      Messages.error("Failure", err, 'Unable to verify Docker endpoint existence');
-    }
-  });
+  }
+
+  $scope.cleanError = function() {
+    $scope.state.error = '';
+  };
 
   $scope.createLocalEndpoint = function() {
+    $('#initEndpointSpinner').show();
     $scope.state.error = '';
     var name = "local";
     var URL = "unix:///var/run/docker.sock";
     var TLS = false;
     EndpointService.createLocalEndpoint(name, URL, TLS, true).then(function success(data) {
-      $state.go('dashboard');
+      StateManager.updateEndpointState(false)
+      .then(function success() {
+        $state.go('dashboard');
+      }, function error(err) {
+        EndpointService.deleteEndpoint(0)
+        .then(function success() {
+          $('#initEndpointSpinner').hide();
+          $scope.state.error = 'Unable to connect to the Docker endpoint';
+        });
+      });
     }, function error(err) {
+      $('#initEndpointSpinner').hide();
       $scope.state.error = 'Unable to create endpoint';
     });
   };
 
   $scope.createRemoteEndpoint = function() {
+    $('#initEndpointSpinner').show();
     $scope.state.error = '';
     var name = $scope.formValues.Name;
     var URL = $scope.formValues.URL;
@@ -43,9 +55,20 @@ function ($scope, $state, EndpointService, Messages) {
     var TLSCAFile = $scope.formValues.TLSCACert;
     var TLSCertFile = $scope.formValues.TLSCert;
     var TLSKeyFile = $scope.formValues.TLSKey;
-    EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, TLS ? false : true).then(function success(data) {
-      $state.go('dashboard');
+    EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, TLS ? false : true)
+    .then(function success(data) {
+      StateManager.updateEndpointState(false)
+      .then(function success() {
+        $state.go('dashboard');
+      }, function error(err) {
+        EndpointService.deleteEndpoint(0)
+        .then(function success() {
+          $('#initEndpointSpinner').hide();
+          $scope.state.error = 'Unable to connect to the Docker endpoint';
+        });
+      });
     }, function error(err) {
+      $('#initEndpointSpinner').hide();
       $scope.state.uploadInProgress = false;
       $scope.state.error = err.msg;
     }, function update(evt) {

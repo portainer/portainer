@@ -21,10 +21,10 @@
             <!-- endpoin-type radio -->
             <div class="form-group">
               <div class="radio">
-                <label><input type="radio" name="endpointType" value="local" ng-model="formValues.endpointType">Manage the Docker instance where Portainer is running</label>
+                <label><input type="radio" name="endpointType" value="local" ng-model="formValues.endpointType" ng-click="cleanError()">Manage the Docker instance where Portainer is running</label>
               </div>
               <div class="radio">
-                <label><input type="radio" name="endpointType" value="remote" ng-model="formValues.endpointType">Manage a remote Docker instance</label>
+                <label><input type="radio" name="endpointType" value="remote" ng-model="formValues.endpointType" ng-click="cleanError()">Manage a remote Docker instance</label>
               </div>
             </div>
             <!-- endpoint-type radio -->
@@ -41,7 +41,10 @@
                   <p class="pull-left text-danger" ng-if="state.error" style="margin: 5px;">
                     <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
                   </p>
-                  <button type="submit" class="btn btn-primary pull-right" ng-click="createLocalEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+                  <span class="pull-right">
+                    <i id="initEndpointSpinner" class="fa fa-cog fa-spin" style="margin-right: 5px; display: none;"></i>
+                    <button type="submit" class="btn btn-primary" ng-click="createLocalEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+                  </span>
                 </div>
               </div>
               <!-- !connect button -->
@@ -122,7 +125,10 @@
                   <p class="pull-left text-danger" ng-if="state.error" style="margin: 5px;">
                     <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
                   </p>
-                  <button type="submit" class="btn btn-primary pull-right" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && (!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey))" ng-click="createRemoteEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+                  <span class="pull-right">
+                    <i id="initEndpointSpinner" class="fa fa-cog fa-spin" style="margin-right: 5px; display: none;"></i>
+                    <button type="submit" class="btn btn-primary" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && (!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey))" ng-click="createRemoteEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+                  </span>
                 </div>
               </div>
               <!-- !connect button -->

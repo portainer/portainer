@@ -49,8 +49,8 @@ angular.module('portainer', [
     .setPrefix('portainer');
 
     jwtOptionsProvider.config({
-      tokenGetter: ['localStorageService', function(localStorageService) {
-        return localStorageService.get('JWT');
+      tokenGetter: ['LocalStorage', function(LocalStorage) {
+        return LocalStorage.getJWT();
       }],
       unauthenticatedRedirector: ['$state', function($state) {
         $state.go('auth', {error: 'Your session has expired'});
@@ -528,20 +528,17 @@ angular.module('portainer', [
       };
     });
   }])
-  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'EndpointMode', function ($rootScope, $state, Authentication, authManager, EndpointMode) {
+  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', function ($rootScope, $state, Authentication, authManager, StateManager) {
     authManager.checkAuthOnRefresh();
     authManager.redirectWhenUnauthenticated();
+
     Authentication.init();
+    StateManager.init();
+
     $rootScope.$state = $state;
 
     $rootScope.$on('tokenHasExpired', function($state) {
       $state.go('auth', {error: 'Your session has expired'});
-    });
-
-    $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams) {
-      if (toState.name !== 'endpointInit' && (fromState.name === 'auth' || fromState.name === '' || fromState.name === 'endpointInit') && Authentication.isAuthenticated()) {
-        EndpointMode.determineEndpointMode();
-      }
     });
   }])
   // This is your docker url that the api will use to make requests
