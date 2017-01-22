@@ -352,9 +352,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
       var state = {
         loading: true,
         application: {},
-        endpoint: {
-          active: false
-        }
+        endpoint: {}
       };
 
       return {

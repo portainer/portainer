@@ -15,13 +15,9 @@ function ($scope, $state, EndpointService, StateManager, Messages) {
     TLSKey: null
   };
 
-  EndpointService.getActive().then(function success(data) {
+  if (!_.isEmpty($scope.applicationState.endpoint)) {
     $state.go('dashboard');
-  }, function error(err) {
-    if (err.status !== 404) {
-      Messages.error("Failure", err, 'Unable to verify Docker endpoint existence');
-    }
-  });
+  }
 
   $scope.cleanError = function() {
     $scope.state.error = '';
