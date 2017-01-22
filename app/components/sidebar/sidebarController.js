@@ -14,7 +14,7 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Messa
       .then(function success() {
         $state.reload();
       }, function error(err) {
-        Messages.error("Failure", err, "Unable to retrieve endpoint information");
+        Messages.error("Failure", err, "Unable to connect to the Docker endpoint");
       });
     }, function error(err) {
       Messages.error("Failure", err, "Unable to switch to new endpoint");

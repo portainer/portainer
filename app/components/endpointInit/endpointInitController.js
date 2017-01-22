@@ -34,8 +34,11 @@ function ($scope, $state, EndpointService, StateManager, Messages) {
       .then(function success() {
         $state.go('dashboard');
       }, function error(err) {
-        $('#initEndpointSpinner').hide();
-        $scope.state.error = 'Unable to connect to the Docker endpoint';
+        EndpointService.deleteEndpoint(0)
+        .then(function success() {
+          $('#initEndpointSpinner').hide();
+          $scope.state.error = 'Unable to connect to the Docker endpoint';
+        });
       });
     }, function error(err) {
       $('#initEndpointSpinner').hide();
@@ -58,9 +61,9 @@ function ($scope, $state, EndpointService, StateManager, Messages) {
       .then(function success() {
         $state.go('dashboard');
       }, function error(err) {
-        $('#initEndpointSpinner').hide();
         EndpointService.deleteEndpoint(0)
         .then(function success() {
+          $('#initEndpointSpinner').hide();
           $scope.state.error = 'Unable to connect to the Docker endpoint';
         });
       });
