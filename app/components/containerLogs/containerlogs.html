@@ -31,7 +31,7 @@
       </rd-widget-taskbar>
       <rd-widget-body classes="no-padding">
         <div class="panel-body">
-          <pre id="stdoutLog" class="pre-scrollable pre-x-scrollable">{{stdout}}</pre>
+          <pre id="stdoutLog" class="pre-scrollable pre-x-scrollable" ng-bind-html="stdout"></pre>
         </div>
       </rd-widget-body>
     </rd-widget>
@@ -48,7 +48,7 @@
       </rd-widget-taskbar>
       <rd-widget-body classes="no-padding">
         <div class="panel-body">
-          <pre id="stderrLog" class="pre-scrollable pre-x-scrollable">{{stderr}}</pre>
+          <pre id="stderrLog" class="pre-scrollable pre-x-scrollable" ng-bind-html="stderr"></pre>
         </div>
       </rd-widget-body>
     </rd-widget>
