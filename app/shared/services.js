@@ -240,7 +240,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         initAdminUser: { method: 'POST', params: { username: 'admin', action: 'init' } }
       });
     }])
-    .factory('Authentication', ['$q', '$rootScope', 'Auth', 'jwtHelper', 'LocalStorage', function AuthenticationFactory($q, $rootScope, Auth, jwtHelper, LocalStorage) {
+    .factory('Authentication', ['$q', '$rootScope', 'Auth', 'jwtHelper', 'LocalStorage', 'StateManager', function AuthenticationFactory($q, $rootScope, Auth, jwtHelper, LocalStorage, StateManager) {
       'use strict';
       return {
         init: function() {
@@ -263,7 +263,8 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
           });
         },
         logout: function() {
-          LocalStorage.deleteJWT();
+          StateManager.clean();
+          LocalStorage.clean();
         },
         isAuthenticated: function() {
           var jwt = LocalStorage.getJWT();
@@ -343,6 +344,9 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         },
         deleteJWT: function() {
           localStorageService.remove('JWT');
+        },
+        clean: function() {
+          localStorageService.clearAll();
         }
       };
     }])
@@ -362,6 +366,9 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
             state.endpoint = endpointState;
           }
           state.loading = false;
+        },
+        clean: function() {
+          state.endpoint = {};
         },
         updateEndpointState: function(loading) {
           var deferred = $q.defer();
