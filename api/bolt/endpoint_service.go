@@ -44,7 +44,7 @@ func (service *EndpointService) Endpoint(ID portainer.EndpointID) (*portainer.En
 
 // Endpoints return an array containing all the endpoints.
 func (service *EndpointService) Endpoints() ([]portainer.Endpoint, error) {
-	var endpoints []portainer.Endpoint
+	var endpoints = make([]portainer.Endpoint, 0)
 	err := service.store.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(endpointBucketName))
 
