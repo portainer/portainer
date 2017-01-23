@@ -1,6 +1,6 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', '$state', '$stateParams', 'Network', 'Container', 'ContainerHelper', 'Messages',
-function ($scope, $state, $stateParams, Network, Container, ContainerHelper, Messages) {
+.controller('NetworkController', ['$scope', '$state', '$stateParams', 'Config', 'Network', 'Container', 'ContainerHelper', 'Messages',
+function ($scope, $state, $stateParams, Config, Network, Container, ContainerHelper, Messages) {
 
   $scope.removeNetwork = function removeNetwork(networkId) {
     $('#loadingViewSpinner').show();
@@ -38,34 +38,59 @@ function ($scope, $state, $stateParams, Network, Container, ContainerHelper, Mes
 
   function getNetwork() {
     $('#loadingViewSpinner').show();
-    Network.get({id: $stateParams.id}, function (d) {
-      $scope.network = d;
-      getContainersInNetwork(d);
+    Network.get({id: $stateParams.id}, function success(data) {
+      $scope.network = data;
+      getContainersInNetwork(data);
+    }, function error(err) {
       $('#loadingViewSpinner').hide();
-    }, function (e) {
-      $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to retrieve network info");
+      Messages.error("Failure", err, "Unable to retrieve network info");
     });
+  }
+
+  function filterContainersInNetwork(network, containers) {
+    if ($scope.containersToHideLabels) {
+      containers = ContainerHelper.hideContainers(containers, $scope.containersToHideLabels);
+    }
+    var containersInNetwork = [];
+    containers.forEach(function(container) {
+      var containerInNetwork = network.Containers[container.Id];
+      containerInNetwork.Id = container.Id;
+      containersInNetwork.push(containerInNetwork);
+    });
+    $scope.containersInNetwork = containersInNetwork;
   }
 
   function getContainersInNetwork(network) {
     if (network.Containers) {
-      Container.query({
-        filters: {network: [$stateParams.id]}
-      }, function (containersInNetworkResult) {
-        if ($scope.containersToHideLabels) {
-          containersInNetworkResult = ContainerHelper.hideContainers(containersInNetworkResult, $scope.containersToHideLabels);
-        }
-        var containersInNetwork = [];
-        containersInNetworkResult.forEach(function(container) {
-          var containerInNetwork = network.Containers[container.Id];
-          containerInNetwork.Id = container.Id;
-          containersInNetwork.push(containerInNetwork);
+      if ($scope.applicationState.endpoint.apiVersion < 1.24) {
+        Container.query({}, function success(data) {
+          var containersInNetwork = data.filter(function filter(container) {
+            if (container.NetworkSettings.Networks[network.Name]) {
+              return container;
+            }
+          });
+          filterContainersInNetwork(network, containersInNetwork);
+          $('#loadingViewSpinner').hide();
+        }, function error(err) {
+          $('#loadingViewSpinner').hide();
+          Messages.error("Failure", err, "Unable to retrieve containers in network");
         });
-        $scope.containersInNetwork = containersInNetwork;
-      });
+      } else {
+        Container.query({
+          filters: {network: [$stateParams.id]}
+        }, function success(data) {
+          filterContainersInNetwork(network, data);
+          $('#loadingViewSpinner').hide();
+        }, function error(err) {
+          $('#loadingViewSpinner').hide();
+          Messages.error("Failure", err, "Unable to retrieve containers in network");
+        });
+      }
     }
   }
 
-  getNetwork();
+  Config.$promise.then(function (c) {
+    $scope.containersToHideLabels = c.hiddenLabels;
+    getNetwork();
+  });
 }]);
