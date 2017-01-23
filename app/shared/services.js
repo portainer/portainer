@@ -345,6 +345,12 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         deleteJWT: function() {
           localStorageService.remove('JWT');
         },
+        storePaginationCount: function(key, count) {
+          localStorageService.cookie.set(key, count);
+        },
+        getPaginationCount: function(key) {
+          return localStorageService.cookie.get(key);
+        },
         clean: function() {
           localStorageService.clearAll();
         }
