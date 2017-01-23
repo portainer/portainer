@@ -1,14 +1,14 @@
 angular.module('endpoints', [])
-.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'Settings', 'Messages',
-function ($scope, $state, EndpointService, Settings, Messages) {
+.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'Settings', 'Messages', 'Pagination',
+function ($scope, $state, EndpointService, Settings, Messages, Pagination) {
   $scope.state = {
     error: '',
     uploadInProgress: false,
-    selectedItemCount: 0
+    selectedItemCount: 0,
+    pagination_count: Pagination.getPaginationCount('endpoints')
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
-  $scope.pagination_count = Settings.pagination_count;
 
   $scope.formValues = {
     Name: '',
@@ -22,6 +22,10 @@ function ($scope, $state, EndpointService, Settings, Messages) {
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('endpoints', $scope.state.pagination_count);
   };
 
   $scope.selectItem = function (item) {
