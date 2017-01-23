@@ -1,6 +1,6 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', '$state', '$stateParams', 'Config', 'Network', 'Container', 'ContainerHelper', 'Messages',
-function ($scope, $state, $stateParams, Config, Network, Container, ContainerHelper, Messages) {
+.controller('NetworkController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Network', 'Container', 'ContainerHelper', 'Messages',
+function ($scope, $state, $stateParams, $filter, Config, Network, Container, ContainerHelper, Messages) {
 
   $scope.removeNetwork = function removeNetwork(networkId) {
     $('#loadingViewSpinner').show();
@@ -55,6 +55,10 @@ function ($scope, $state, $stateParams, Config, Network, Container, ContainerHel
     containers.forEach(function(container) {
       var containerInNetwork = network.Containers[container.Id];
       containerInNetwork.Id = container.Id;
+      // Name is not available in Docker 1.9
+      if (!containerInNetwork.Name) {
+        containerInNetwork.Name = $filter('trimcontainername')(container.Names[0]);
+      }
       containersInNetwork.push(containerInNetwork);
     });
     $scope.containersInNetwork = containersInNetwork;
@@ -65,7 +69,7 @@ function ($scope, $state, $stateParams, Config, Network, Container, ContainerHel
       if ($scope.applicationState.endpoint.apiVersion < 1.24) {
         Container.query({}, function success(data) {
           var containersInNetwork = data.filter(function filter(container) {
-            if (container.NetworkSettings.Networks[network.Name]) {
+            if (container.HostConfig.NetworkMode === network.Name) {
               return container;
             }
           });
