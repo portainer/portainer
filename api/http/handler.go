@@ -20,6 +20,7 @@ type Handler struct {
 	WebSocketHandler *WebSocketHandler
 	UploadHandler    *UploadHandler
 	FileHandler      *FileHandler
+	MonitorHandler   *MonitorHandler
 }
 
 const (
@@ -47,6 +48,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.WebSocketHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/docker") {
 		http.StripPrefix("/api/docker", h.DockerHandler).ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/api/monitor") {
+		http.StripPrefix("/api/monitor", h.MonitorHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/") {
 		h.FileHandler.ServeHTTP(w, r)
 	}

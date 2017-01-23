@@ -64,6 +64,15 @@ func (server *Server) Start() error {
 	var uploadHandler = NewUploadHandler(middleWareService)
 	uploadHandler.FileService = server.FileService
 	var fileHandler = newFileHandler(server.AssetsPath)
+	var monitorHandler = NewMonitorHandler(middleWareService, MonitorOpts{
+		ES: EsOpts{
+			// FIXME: connect elasticsearch as a link. (How could I do this with grunt run-dev?)
+			endpoint: "http://172.17.0.4:9200/_search",
+		},
+		Influx: InfluxOpts{
+			endpoint: "http://172.17.0.3:8086/query",
+		},
+	})
 
 	server.Handler = &Handler{
 		AuthHandler:      authHandler,
@@ -75,6 +84,7 @@ func (server *Server) Start() error {
 		WebSocketHandler: websocketHandler,
 		FileHandler:      fileHandler,
 		UploadHandler:    uploadHandler,
+		MonitorHandler:   monitorHandler,
 	}
 	err := server.updateActiveEndpoint(server.ActiveEndpoint)
 	if err != nil {

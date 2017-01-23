@@ -40,6 +40,8 @@ angular.module('portainer', [
   'task',
   'templates',
   'volumes',
+  'monitor',
+  'monitorList',
   'createVolume'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider) {
     'use strict';
@@ -494,6 +496,38 @@ angular.module('portainer', [
         requiresLogin: true
       }
     })
+        .state('monitor', {
+            url: "^/monitor/:id",
+            views: {
+                "content": {
+                    templateUrl: 'app/components/monitor/monitor.html',
+                    controller: 'MonitorController'
+                },
+                "sidebar": {
+                    templateUrl: 'app/components/sidebar/sidebar.html',
+                    controller: 'SidebarController'
+                }
+            },
+            data: {
+                requiresLogin: true
+            }
+        })
+        .state('monitorList', {
+            url: "^/monitorList",
+            views: {
+                "content": {
+                    templateUrl: 'app/components/monitor/monitorList.html',
+                    controller: 'MonitorListController'
+                },
+                "sidebar": {
+                    templateUrl: 'app/components/sidebar/sidebar.html',
+                    controller: 'SidebarController'
+                }
+            },
+            data: {
+                requiresLogin: true
+            }
+        })
     .state('swarm', {
       url: '/swarm/',
       views: {
