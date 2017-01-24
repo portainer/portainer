@@ -1,14 +1,18 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'Settings',
-function ($scope, $state, Volume, Messages, Settings) {
+.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'Pagination',
+function ($scope, $state, Volume, Messages, Pagination) {
   $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('volumes');
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
   $scope.config = {
     Name: ''
   };
-  $scope.pagination_count = Settings.pagination_count;
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('volumes', $scope.state.pagination_count);
+  };
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;

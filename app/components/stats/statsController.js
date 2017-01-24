@@ -1,16 +1,19 @@
 angular.module('stats', [])
-.controller('StatsController', ['Settings', '$scope', 'Messages', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
-function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateParams, humansizeFilter, $sce, $document) {
+.controller('StatsController', ['Pagination', '$scope', 'Messages', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
+function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stateParams, humansizeFilter, $sce, $document) {
   // TODO: Force scale to 0-100 for cpu, fix charts on dashboard,
   // TODO: Force memory scale to 0 - max memory
   $scope.ps_args = '';
   $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('stats_processes');
   $scope.sortType = 'CMD';
   $scope.sortReverse = false;
-  $scope.pagination_count = Settings.pagination_count;
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('stats_processes', $scope.state.pagination_count);
   };
   $scope.getTop = function () {
       ContainerTop.get($stateParams.id, {

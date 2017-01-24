@@ -3,6 +3,7 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="networks" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
+    <i id="loadNetworksSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Networks</rd-header-content>
 </rd-header>
@@ -52,7 +53,14 @@
     <rd-widget>
       <rd-widget-header icon="fa-sitemap" title="Networks">
         <div class="pull-right">
-          <i id="loadNetworksSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
         </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12">
@@ -123,7 +131,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+              <tr dir-paginate="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="network.Checked" ng-change="selectItem(network)"/></td>
                 <td><a ui-sref="network({id: network.Id})">{{ network.Name|truncate:40}}</a></td>
                 <td>{{ network.Id }}</td>

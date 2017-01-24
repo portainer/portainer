@@ -3,6 +3,7 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="endpoints" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
+    <i id="loadEndpointsSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Endpoint management</rd-header-content>
 </rd-header>
@@ -101,7 +102,14 @@
     <rd-widget>
       <rd-widget-header icon="fa-plug" title="Endpoints">
         <div class="pull-right">
-          <i id="loadEndpointsSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
         </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12">
@@ -143,7 +151,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="endpoint in (state.filteredEndpoints = (endpoints | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+              <tr dir-paginate="endpoint in (state.filteredEndpoints = (endpoints | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="endpoint.Checked" ng-change="selectItem(endpoint)" /></td>
                 <td><i class="fa fa-star" aria-hidden="true" ng-if="endpoint.Id === activeEndpoint.Id"></i> {{ endpoint.Name }}</td>
                 <td>{{ endpoint.URL | stripprotocol }}</td>

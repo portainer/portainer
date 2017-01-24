@@ -1,7 +1,8 @@
 angular.module('swarm', [])
-.controller('SwarmController', ['$scope', 'Info', 'Version', 'Node', 'Settings',
-function ($scope, Info, Version, Node, Settings) {
-
+.controller('SwarmController', ['$scope', 'Info', 'Version', 'Node', 'Pagination',
+function ($scope, Info, Version, Node, Pagination) {
+  $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('swarm_nodes');
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
   $scope.info = {};
@@ -9,11 +10,14 @@ function ($scope, Info, Version, Node, Settings) {
   $scope.swarm = {};
   $scope.totalCPU = 0;
   $scope.totalMemory = 0;
-  $scope.pagination_count = Settings.pagination_count;
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('swarm_nodes', $scope.state.pagination_count);
   };
 
   Version.get({}, function (d) {

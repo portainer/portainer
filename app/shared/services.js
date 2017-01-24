@@ -327,6 +327,22 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         setActiveEndpoint: { method: 'POST', params: { id: '@id', action: 'active' } }
       });
     }])
+    .factory('Pagination', ['LocalStorage', 'Settings', function PaginationFactory(LocalStorage, Settings) {
+      'use strict';
+      return {
+        getPaginationCount: function(key) {
+          var storedCount = LocalStorage.getPaginationCount(key);
+          var paginationCount = Settings.pagination_count;
+          if (storedCount !== null) {
+            paginationCount = storedCount;
+          }
+          return '' + paginationCount;
+        },
+        setPaginationCount: function(key, count) {
+          LocalStorage.storePaginationCount(key, count);
+        }
+      };
+    }])
     .factory('LocalStorage', ['localStorageService', function LocalStorageFactory(localStorageService) {
       'use strict';
       return {
@@ -344,6 +360,12 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         },
         deleteJWT: function() {
           localStorageService.remove('JWT');
+        },
+        storePaginationCount: function(key, count) {
+          localStorageService.cookie.set('pagination_' + key, count);
+        },
+        getPaginationCount: function(key) {
+          return localStorageService.cookie.get('pagination_' + key);
         },
         clean: function() {
           localStorageService.clearAll();

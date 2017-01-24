@@ -67,7 +67,18 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
     <rd-widget>
-      <rd-widget-header icon="fa-hdd-o" title="Node status"></rd-widget-header>
+      <rd-widget-header icon="fa-hdd-o" title="Node status">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table table-striped">
           <thead>
@@ -117,7 +128,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="node in (state.filteredNodes = (swarm.Status | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+            <tr dir-paginate="node in (state.filteredNodes = (swarm.Status | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td>{{ node.name }}</td>
               <td>{{ node.cpu }}</td>
               <td>{{ node.memory }}</td>
@@ -135,7 +146,18 @@
   </div>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
     <rd-widget>
-      <rd-widget-header icon="fa-hdd-o" title="Node status"></rd-widget-header>
+      <rd-widget-header icon="fa-hdd-o" title="Node status">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table table-striped">
           <thead>
@@ -185,7 +207,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="node in (state.filteredNodes = (nodes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+            <tr dir-paginate="node in (state.filteredNodes = (nodes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td>{{ node.Description.Hostname }}</td>
               <td>{{ node.Spec.Role }}</td>
               <td>{{ node.Description.Resources.NanoCPUs / 1000000000 }}</td>

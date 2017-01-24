@@ -405,7 +405,7 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /tmp/portainer:/data --name portainer portainer -H tcp://10.0.7.10:2375'
+          'docker run -d -p 9000:9000 --name portainer portainer -H tcp://10.0.7.10:2375'
         ].join(';')
       },
       runSwarmLocal: {
