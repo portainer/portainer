@@ -95,17 +95,6 @@ angular.module('monitor', [])
                             });
                         }
                     });
-
-                $http.get("api/monitor/stats?db=statspout&name=" + $scope.name + "&resource=blkio_write&from=" + ts)
-                    .then(function (res) {
-                        if (res.data.results[0]["series"] === undefined) {
-                            return;
-                        }
-
-                        angular.forEach(res.data.results[0].series[0].values, function (value) {
-                            updateBlkioChart(value);
-                        });
-                    });
             }
 
             function updateCpuChart(data) {
@@ -141,17 +130,6 @@ angular.module('monitor', [])
                 $scope.networkChart.addData([data.rx, data.tx], timestamp.toLocaleTimeString());
             }
 
-            function updateBlkioChart(data) {
-                var timestamp = new Date(data[0]);
-
-                if (timestamp > $scope.lastMetricsTimestamp) {
-                    $scope.lastMetricsTimestamp = timestamp;
-                }
-
-                $scope.blkioChart.removeData();
-                $scope.blkioChart.addData([data[2]], timestamp.toLocaleTimeString());
-            }
-
             $document.ready(function () {
                 var cpuLabels = [],
                     cpuData = [],
@@ -159,20 +137,19 @@ angular.module('monitor', [])
                     memoryData = [],
                     networkLabels = [],
                     networkRxData = [],
-                    networkTxData = []
-                blkioLabels = [],
-                    blkioWriteData = [];
+                    networkTxData = [];
 
-                for (var i = 0; i < 30; i++) {
+                for (var i = 0; i < 40; i++) {
                     cpuLabels.push('');
                     cpuData.push(0);
-                    memoryLabels.push('');
-                    memoryData.push(0);
                     networkLabels.push('');
                     networkRxData.push(0);
                     networkTxData.push(0);
-                    blkioLabels.push('');
-                    blkioWriteData.push(0);
+
+                    memoryLabels.push('');
+                    memoryData.push(0);
+                    memoryLabels.push('');
+                    memoryData.push(0);
                 }
 
                 var cpuDataset = {
@@ -215,14 +192,6 @@ angular.module('monitor', [])
                     title: 'Tx Data'
                 }];
 
-                var blkioWriteDataset = {
-                    fillColor: "rgba(151,187,205,0.5)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    data: blkioWriteData
-                };
-
                 legend($('#network-legend').get(0), networkLegendData);
 
                 Chart.defaults.global.animationSteps = 30; // Lower from 60 to ease CPU load.
@@ -245,14 +214,6 @@ angular.module('monitor', [])
                 $scope.networkChart = new Chart($('#network-chart').get(0).getContext("2d")).Line({
                     labels: networkLabels,
                     datasets: [networkRxDataset, networkTxDataset]
-                }, {
-                    responsive: true,
-                    animation: false
-                });
-
-                $scope.blkioChart = new Chart($('#blkio-chart').get(0).getContext("2d")).Line({
-                    labels: blkioLabels,
-                    datasets: [blkioWriteDataset]
                 }, {
                     responsive: true,
                     animation: false

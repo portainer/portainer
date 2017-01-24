@@ -7,21 +7,13 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row">
-  <div class="col-lg-6">
-    <rd-widget>
-      <rd-widget-header icon="fa-area-chart" title="CPU usage"></rd-widget-header>
-      <rd-widget-body>
-        <canvas id="cpu-stats-chart" width="770" height="230"></canvas>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
 
-  <div class="col-lg-6">
+<div class="row">
+  <div class="col-lg-12">
     <rd-widget>
       <rd-widget-header icon="fa-area-chart" title="Memory usage"></rd-widget-header>
       <rd-widget-body>
-        <canvas id="memory-stats-chart" width="770" height="230"></canvas>
+        <canvas id="memory-stats-chart" width="770" height="100"></canvas>
       </rd-widget-body>
     </rd-widget>
   </div>
@@ -30,21 +22,21 @@
 <div class="row">
   <div class="col-lg-6">
     <rd-widget>
-      <rd-widget-header icon="fa-area-chart" title="Network IO"></rd-widget-header>
+      <rd-widget-header icon="fa-area-chart" title="CPU usage"></rd-widget-header>
       <rd-widget-body>
-        <canvas id="network-chart" width="770" height="230"></canvas>
-		<div class="comment">
-          <div id="network-legend" style="margin-bottom: 20px;"></div>
-        </div>
+        <canvas id="cpu-stats-chart" width="770" height="200"></canvas>
       </rd-widget-body>
     </rd-widget>
   </div>
 
   <div class="col-lg-6">
     <rd-widget>
-      <rd-widget-header icon="fa-area-chart" title="Disk Write"></rd-widget-header>
+      <rd-widget-header icon="fa-area-chart" title="Network IO"></rd-widget-header>
       <rd-widget-body>
-        <canvas id="blkio-chart" width="770" height="230"></canvas>
+        <canvas id="network-chart" width="770" height="150"></canvas>
+		<div class="comment">
+          <div id="network-legend" style="margin-bottom: 20px;"></div>
+        </div>
       </rd-widget-body>
     </rd-widget>
   </div>
