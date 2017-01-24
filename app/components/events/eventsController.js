@@ -1,14 +1,18 @@
 angular.module('events', [])
-.controller('EventsController', ['$scope', 'Settings', 'Messages', 'Events',
-function ($scope, Settings, Messages, Events) {
+.controller('EventsController', ['$scope', 'Messages', 'Events', 'Pagination',
+function ($scope, Messages, Events, Pagination) {
   $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('events');
   $scope.sortType = 'Time';
   $scope.sortReverse = true;
-  $scope.pagination_count = Settings.pagination_count;
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('events', $scope.state.pagination_count);
   };
 
   var from = moment().subtract(24, 'hour').unix();

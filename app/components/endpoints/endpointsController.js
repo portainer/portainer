@@ -1,6 +1,6 @@
 angular.module('endpoints', [])
-.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'Settings', 'Messages', 'Pagination',
-function ($scope, $state, EndpointService, Settings, Messages, Pagination) {
+.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'Messages', 'Pagination',
+function ($scope, $state, EndpointService, Messages, Pagination) {
   $scope.state = {
     error: '',
     uploadInProgress: false,

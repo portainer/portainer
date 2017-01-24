@@ -1,11 +1,11 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'ImageHelper', 'Messages', 'Settings',
-function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
+.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'ImageHelper', 'Messages', 'Pagination',
+function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination) {
   $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('images');
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
   $scope.state.selectedItemCount = 0;
-  $scope.pagination_count = Settings.pagination_count;
 
   $scope.config = {
     Image: '',
@@ -15,6 +15,10 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('images', $scope.state.pagination_count);
   };
 
   $scope.selectItems = function (allSelected) {

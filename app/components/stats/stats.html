@@ -54,7 +54,18 @@
   </div>
   <div class="col-lg-6">
     <rd-widget>
-      <rd-widget-header icon="fa-tasks" title="Processes"></rd-widget-header>
+      <rd-widget-header icon="fa-tasks" title="Processes">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table table-striped">
           <thead>
@@ -69,7 +80,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="processInfos in state.filteredProcesses = (containerTop.Processes | orderBy:sortType:sortReverse |  itemsPerPage: pagination_count)">
+            <tr dir-paginate="processInfos in state.filteredProcesses = (containerTop.Processes | orderBy:sortType:sortReverse |  itemsPerPage: state.pagination_count)">
               <td ng-repeat="processInfo in processInfos track by $index">{{processInfo}}</td>
             </tr>
           </tbody>

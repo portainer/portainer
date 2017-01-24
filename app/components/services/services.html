@@ -3,6 +3,7 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="services" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
+    <i id="loadServicesSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Services</rd-header-content>
 </rd-header>
@@ -12,7 +13,14 @@
     <rd-widget>
       <rd-widget-header icon="fa-list-alt" title="Services">
         <div class="pull-right">
-          <i id="loadServicesSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
         </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12 col-md-12 col-xs-12">
@@ -52,7 +60,7 @@
               </th>
             </thead>
             <tbody>
-              <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+              <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="service.Checked" ng-change="selectItem(service)"/></td>
                 <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
                 <td>{{ service.Image }}</td>

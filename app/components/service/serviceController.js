@@ -1,9 +1,9 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'LocalStorage', 'Settings',
-function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Messages, LocalStorage, Settings) {
+.controller('ServiceController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Pagination',
+function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Messages, Pagination) {
 
   $scope.state = {};
-  $scope.state.pagination_count = '' + LocalStorage.getPaginationCount('service_tasks') || Settings.pagination_count;
+  $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
   $scope.service = {};
   $scope.tasks = [];
   $scope.displayNode = false;
@@ -18,7 +18,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
   };
 
   $scope.changePaginationCount = function() {
-    LocalStorage.storePaginationCount('service_tasks', $scope.state.pagination_count);
+    Pagination.setPaginationCount('service_tasks', $scope.state.pagination_count);
   };
 
   $scope.renameService = function renameService(service) {
