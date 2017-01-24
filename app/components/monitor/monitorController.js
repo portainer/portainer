@@ -3,9 +3,9 @@ angular.module('monitor', [])
         function ($scope, $http, $filter, $stateParams, $document, Container) {
             $scope.state = {};
             $scope.name = undefined;
-            $scope.log = "";
+            $scope.logs = "";
             $scope.range = {};
-            $scope.autoFrom = null;
+            $scope.auto = true;
 
             setToAuto();
 
@@ -29,8 +29,7 @@ angular.module('monitor', [])
                     return;
                 }
 
-                getLogs();
-                getMetrics();
+                $scope.update();
             }
 
             function setToAuto() {
@@ -39,20 +38,37 @@ angular.module('monitor', [])
                 var d = new Date();
                 d.setMinutes(d.getMinutes() - 3);
                 $scope.range.from = d;
-                $scope.autoFrom = d;
-
                 $scope.range.to = null;
             }
 
-            $scope.resetToAuto = function () {
-                setToAuto();
-                alert(1);
+            $scope.setAuto = function (auto) {
+                $scope.auto = auto;
+
+                if (auto) {
+                    setToAuto();
+                }
+            };
+
+            $scope.update = function () {
+                if (!$scope.auto) {
+                    destroyCharts();
+                    createCharts();
+                    $scope.logs = "";
+                }
+
+                $scope.range.from = new Date($scope.range.from);
+                if ($scope.range.to) {
+                    $scope.range.to = new Date($scope.range.to);
+                } else {
+                    $scope.range.to = null;
+                }
+
+                getLogs();
+                getMetrics();
             };
 
             function startLogStream() {
                 var source = new EventSource('/api/monitor/logstream?name=' + $scope.name);
-
-                $scope.logs = "";
 
                 source.onmessage = function (e) {
                     $scope.logs = $scope.logs + e.data + "\n";
@@ -61,56 +77,67 @@ angular.module('monitor', [])
             }
 
             function getLogs() {
-                var d = new Date();
-                d.setHours(d.getHours() - 1);
+                var params = {
+                    'name': $scope.name,
+                    'from': $scope.range.from.toISOString()
+                };
 
-                $http({
-                    method: 'GET',
-                    url: "/api/monitor/logs",
-                    params: {
-                        'name': $scope.name,
-                        'from': d.toISOString()
-                    }
-                }).success(function (data, status, headers, config) {
-                    $scope.logs = "";
+                if ($scope.range.to) {
+                    params['to'] = $scope.range.to.toISOString();
+                }
 
-                    angular.forEach(data.hits.hits, function (hit) {
-                        $scope.logs += hit._source.message + "\n";
+                $http({method: 'GET', url: "/api/monitor/logs", params: params})
+                    .success(function (data, status, headers, config) {
+                        angular.forEach(data.hits.hits, function (hit) {
+                            $scope.logs += hit._source.message + "\n";
+                        });
                     });
-                });
             }
 
             function getMetrics() {
-                var ts = $scope.autoFrom.toISOString();
-                $http.get("api/monitor/stats?db=statspout&name=" + $scope.name + "&resource=cpu_usage&from=" + ts)
-                    .then(function (res) {
-                        if (res.data.results[0]["series"] === undefined) {
+                var ts = $scope.range.from.toISOString();
+                var params = {
+                    'db': 'statspout',
+                    'name': $scope.name,
+                    'from': $scope.range.from.toISOString()
+                };
+
+                if ($scope.range.to) {
+                    params['to'] = $scope.range.to.toISOString();
+                }
+
+                params['resource'] = 'cpu_usage';
+                $http({method: 'GET', url: "/api/monitor/stats", params: jQuery.extend({}, params)})
+                    .success(function (data, status, headers, config) {
+                        if (data.results[0]["series"] === undefined) {
                             return;
                         }
 
-                        angular.forEach(res.data.results[0].series[0].values, function (value) {
+                        angular.forEach(data.results[0].series[0].values, function (value) {
                             updateCpuChart(value);
                         });
                     });
 
-                $http.get("api/monitor/stats?db=statspout&name=" + $scope.name + "&resource=mem_usage&from=" + ts)
-                    .then(function (res) {
-                        if (res.data.results[0]["series"] === undefined) {
+                params['resource'] = 'mem_usage';
+                $http({method: 'GET', url: "/api/monitor/stats", params: jQuery.extend({}, params)})
+                    .success(function (data, status, headers, config) {
+                        if (data.results[0]["series"] === undefined) {
                             return;
                         }
 
-                        angular.forEach(res.data.results[0].series[0].values, function (value) {
+                        angular.forEach(data.results[0].series[0].values, function (value) {
                             updateMemChart(value);
                         });
                     });
 
-                $http.get("api/monitor/stats?db=statspout&name=" + $scope.name + "&resource=rx_bytes,tx_bytes&from=" + ts)
-                    .then(function (res) {
-                        if (res.data.results[0]["series"] === undefined) {
+                params['resource'] = 'rx_bytes,tx_bytes';
+                $http({method: 'GET', url: "/api/monitor/stats", params: jQuery.extend({}, params)})
+                    .success(function (data, status, headers, config) {
+                        if (data.results[0]["series"] === undefined) {
                             return;
                         }
 
-                        var series = res.data.results[0].series;
+                        var series = data.results[0].series;
                         for (var i = 0; i < series[0].values.length; i++) {
                             updateNetworkChart({
                                 'rx': series[0].values[i][2],
@@ -124,8 +151,8 @@ angular.module('monitor', [])
             function updateCpuChart(data) {
                 var timestamp = new Date(data[0]);
 
-                if ($scope.auto && timestamp > $scope.autoFrom) {
-                    $scope.autoFrom = timestamp;
+                if ($scope.auto && timestamp > $scope.range.from) {
+                    $scope.range.from = timestamp;
                 }
 
                 $scope.cpuChart.removeData();
@@ -135,8 +162,8 @@ angular.module('monitor', [])
             function updateMemChart(data) {
                 var timestamp = new Date(data[0]);
 
-                if ($scope.auto && timestamp > $scope.autoFrom) {
-                    $scope.autoFrom = timestamp;
+                if ($scope.auto && timestamp > $scope.range.from) {
+                    $scope.range.from = timestamp;
                 }
 
                 $scope.memChart.removeData();
@@ -146,15 +173,21 @@ angular.module('monitor', [])
             function updateNetworkChart(data) {
                 var timestamp = new Date(data.timestamp);
 
-                if ($scope.auto && timestamp > $scope.autoFrom) {
-                    $scope.autoFrom = timestamp;
+                if ($scope.auto && timestamp > $scope.range.from) {
+                    $scope.range.from = timestamp;
                 }
 
                 $scope.networkChart.removeData();
                 $scope.networkChart.addData([data.rx, data.tx], timestamp.toLocaleTimeString());
             }
 
-            $document.ready(function () {
+            function destroyCharts() {
+                $scope.cpuChart.destroy();
+                $scope.memChart.destroy();
+                $scope.networkChart.destroy();
+            }
+
+            function createCharts() {
                 // Charts configurations.
                 var cpuLabels = [],
                     cpuData = [],
@@ -164,7 +197,7 @@ angular.module('monitor', [])
                     networkRxData = [],
                     networkTxData = [];
 
-                for (var i = 0; i < 40; i++) {
+                for (var i = 0; i < 30; i++) {
                     cpuLabels.push('');
                     cpuData.push(0);
                     networkLabels.push('');
@@ -216,7 +249,6 @@ angular.module('monitor', [])
 
                 legend($('#network-legend').get(0), networkLegendData);
 
-                Chart.defaults.global.animationSteps = 30; // Lower from 60 to ease CPU load.
                 $scope.cpuChart = new Chart($('#cpu-stats-chart').get(0).getContext("2d")).Line({
                     labels: cpuLabels,
                     datasets: [cpuDataset]
@@ -240,9 +272,14 @@ angular.module('monitor', [])
                     responsive: true,
                     animation: false
                 });
+            }
+
+            $document.ready(function () {
+                Chart.defaults.global.animationSteps = 30; // Lower from 60 to ease CPU load.
+                createCharts();
 
                 // Main interval to retrieve data.
-                var pullIntervalId = window.setInterval(pullInterval, 5000);
+                var pullIntervalId = window.setInterval(pullInterval, 10000);
 
                 $scope.$on("$destroy", function () {
                     // clearing interval when view changes

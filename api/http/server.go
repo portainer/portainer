@@ -67,10 +67,10 @@ func (server *Server) Start() error {
 	var monitorHandler = NewMonitorHandler(middleWareService, MonitorOpts{
 		ES: EsOpts{
 			// FIXME: connect elasticsearch as a link. (How could I do this with grunt run-dev?)
-			endpoint: "http://172.17.0.3:9200/_search",
+			endpoint: "http://0.0.0.0:9200/_search",
 		},
 		Influx: InfluxOpts{
-			endpoint: "http://172.17.0.2:8086/query",
+			endpoint: "http://0.0.0.0:8086/query",
 		},
 	})
 
