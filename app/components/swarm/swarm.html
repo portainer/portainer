@@ -84,10 +84,10 @@
           <thead>
             <tr>
               <th>
-                <a ui-sref="swarm" ng-click="order('Name')">
+                <a ui-sref="swarm" ng-click="order('name')">
                   Name
-                  <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
@@ -105,24 +105,24 @@
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('IP')">
+                <a ui-sref="swarm" ng-click="order('ip')">
                   IP
-                  <span ng-show="sortType == 'IP' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'IP' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'ip' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'ip' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('Engine')">
+                <a ui-sref="swarm" ng-click="order('version')">
                   Engine
-                  <span ng-show="sortType == 'Engine' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Engine' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'version' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'version' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('Status')">
+                <a ui-sref="swarm" ng-click="order('status')">
                   Status
-                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
@@ -163,45 +163,45 @@
           <thead>
             <tr>
               <th>
-                <a ui-sref="swarm" ng-click="order('Name')">
+                <a ui-sref="swarm" ng-click="order('Description.Hostname')">
                   Name
-                  <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Description.Hostname' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Description.Hostname' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('type')">
+                <a ui-sref="swarm" ng-click="order('Spec.Role')">
                   Role
-                  <span ng-show="sortType == 'type' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'type' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Spec.Role' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Spec.Role' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('cpu')">
+                <a ui-sref="swarm" ng-click="order('Description.Resources.NanoCPUs')">
                   CPU
-                  <span ng-show="sortType == 'cpu' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'cpu' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Description.Resources.NanoCPUs' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Description.Resources.NanoCPUs' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('memory')">
+                <a ui-sref="swarm" ng-click="order('Description.Resources.MemoryBytes')">
                   Memory
-                  <span ng-show="sortType == 'memory' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'memory' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Description.Resources.MemoryBytes' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Description.Resources.MemoryBytes' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('Engine')">
+                <a ui-sref="swarm" ng-click="order('Description.Engine.EngineVersion')">
                   Engine
-                  <span ng-show="sortType == 'Engine' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Engine' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Description.Engine.EngineVersion' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Description.Engine.EngineVersion' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('Status')">
+                <a ui-sref="swarm" ng-click="order('node.Status.State')">
                   Status
-                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'node.Status.State' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'node.Status.State' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
