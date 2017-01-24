@@ -2,10 +2,9 @@ package http
 
 import (
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/http/internal"
 
-	"io"
 	"log"
-	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -60,8 +59,8 @@ func (handler *DockerHandler) setupProxy(endpoint *portainer.Endpoint) error {
 			proxy = newHTTPProxy(endpointURL)
 		}
 	} else {
-		// Assume unix:// scheme
-		proxy = newSocketProxy(endpointURL.Path)
+		// Assume npipe:// or unix:// scheme
+		proxy = internal.NewFileProxy(endpointURL.Path)
 	}
 	handler.proxy = proxy
 	return nil
@@ -121,39 +120,4 @@ func newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, erro
 		TLSClientConfig: config,
 	}
 	return proxy, nil
-}
-
-func newSocketProxy(path string) http.Handler {
-	return &unixSocketHandler{path}
-}
-
-// unixSocketHandler represents a handler to proxy HTTP requests via a unix:// socket
-type unixSocketHandler struct {
-	path string
-}
-
-func (h *unixSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	conn, err := net.Dial("unix", h.path)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	c := httputil.NewClientConn(conn, nil)
-	defer c.Close()
-
-	res, err := c.Do(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer res.Body.Close()
-
-	for k, vv := range res.Header {
-		for _, v := range vv {
-			w.Header().Add(k, v)
-		}
-	}
-	if _, err := io.Copy(w, res.Body); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
