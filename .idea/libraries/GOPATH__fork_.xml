@@ -1,0 +1,23 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;fork&gt;">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Coding/Golang/src/pipeline" />
+      <root url="file://$USER_HOME$/Coding/Golang/src/github.com" />
+      <root url="file://$USER_HOME$/Coding/Golang/src/gopkg.in" />
+      <root url="file://$USER_HOME$/Coding/Golang/src/golang.org" />
+      <root url="file://$USER_HOME$/Coding/Golang/src/sourcegraph.com" />
+      <root url="file://$USER_HOME$/Coding/Golang/src/experiments" />
+    </CLASSES>
+    <SOURCES>
+      <root url="file://$USER_HOME$/Coding/Golang/src/pipeline" />
+      <root url="file://$USER_HOME$/Coding/Golang/src/github.com" />
+      <root url="file://$USER_HOME$/Coding/Golang/src/gopkg.in" />
+      <root url="file://$USER_HOME$/Coding/Golang/src/golang.org" />
+      <root url="file://$USER_HOME$/Coding/Golang/src/sourcegraph.com" />
+      <root url="file://$USER_HOME$/Coding/Golang/src/experiments" />
+    </SOURCES>
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>

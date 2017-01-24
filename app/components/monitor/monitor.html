@@ -1,56 +1,82 @@
 <rd-header>
-  <rd-header-title title="Container monitor">
-      <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="monitorList">Monitor</a> > {{ container.Name|trimcontainername }}
-  </rd-header-content>
+    <rd-header-title title="Container monitor">
+        <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+    </rd-header-title>
+    <rd-header-content>
+        <a ui-sref="monitorList">Monitor</a> > {{ container.Name|trimcontainername }}
+    </rd-header-content>
 </rd-header>
 
-
 <div class="row">
-  <div class="col-lg-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-area-chart" title="Memory usage"></rd-widget-header>
-      <rd-widget-body>
-        <canvas id="memory-stats-chart" width="770" height="100"></canvas>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
+    <div class="col-lg-12">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="Time Range"></rd-widget-header>
+            <rd-widget-body>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <input type="text" ng-model="range.from" class="form-control">
+                    </div>
+
+                    <div class="col-lg-4">
+
+                    </div>
+
+                    <div class="col-lg-3">
+                        <input type="text" ng-model="range.to" class="form-control">
+                    </div>
+
+                    <div class="col-lg-2">
+                        <button class="btn btn-primary btn-block" ng-click="resetToAuto()">Reset to Auto</button>
+                    </div>
+                </div>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
 </div>
 
 <div class="row">
-  <div class="col-lg-6">
-    <rd-widget>
-      <rd-widget-header icon="fa-area-chart" title="CPU usage"></rd-widget-header>
-      <rd-widget-body>
-        <canvas id="cpu-stats-chart" width="770" height="200"></canvas>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-
-  <div class="col-lg-6">
-    <rd-widget>
-      <rd-widget-header icon="fa-area-chart" title="Network IO"></rd-widget-header>
-      <rd-widget-body>
-        <canvas id="network-chart" width="770" height="150"></canvas>
-		<div class="comment">
-          <div id="network-legend" style="margin-bottom: 20px;"></div>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
+    <div class="col-lg-12">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="Memory usage"></rd-widget-header>
+            <rd-widget-body>
+                <canvas id="memory-stats-chart" width="770" height="100"></canvas>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
 </div>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-info-circle" title="Logs since past hour"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <div class="panel-body">
-          <pre id="stdoutLog" class="pre-scrollable pre-x-scrollable">{{logs}}</pre>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
+    <div class="col-lg-6">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="CPU usage"></rd-widget-header>
+            <rd-widget-body>
+                <canvas id="cpu-stats-chart" width="770" height="230"></canvas>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
+
+    <div class="col-lg-6">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="Network IO"></rd-widget-header>
+            <rd-widget-body>
+                <canvas id="network-chart" width="770" height="230"></canvas>
+                <div class="comment">
+                    <div id="network-legend" style="margin-bottom: 20px;"></div>
+                </div>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+        <rd-widget>
+            <rd-widget-header icon="fa-info-circle" title="Logs since past hour"></rd-widget-header>
+            <rd-widget-body classes="no-padding">
+                <div class="panel-body">
+                    <pre id="stdoutLog" class="pre-scrollable pre-x-scrollable">{{logs}}</pre>
+                </div>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
 </div>

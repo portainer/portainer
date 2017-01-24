@@ -4,10 +4,10 @@ angular.module('monitor', [])
             $scope.state = {};
             $scope.name = undefined;
             $scope.log = "";
+            $scope.range = {};
+            $scope.autoFrom = null;
 
-            var d = new Date();
-            d.setMinutes(d.getMinutes() - 3);
-            $scope.lastMetricsTimestamp = d;
+            setToAuto();
 
             $('#loadingViewSpinner').show();
             Container.get({id: $stateParams.id}, function (d) {
@@ -16,14 +16,38 @@ angular.module('monitor', [])
 
                 // initial call
                 // startLogStream();
-                getLogs();
-                getMetrics();
+                pullInterval();
 
                 $('#loadingViewSpinner').hide();
             }, function (e) {
                 $('#loadingViewSpinner').hide();
                 Messages.error("Failure", e, "Unable to retrieve container info");
             });
+
+            function pullInterval() {
+                if (!$scope.auto) {
+                    return;
+                }
+
+                getLogs();
+                getMetrics();
+            }
+
+            function setToAuto() {
+                $scope.auto = true;
+
+                var d = new Date();
+                d.setMinutes(d.getMinutes() - 3);
+                $scope.range.from = d;
+                $scope.autoFrom = d;
+
+                $scope.range.to = null;
+            }
+
+            $scope.resetToAuto = function () {
+                setToAuto();
+                alert(1);
+            };
 
             function startLogStream() {
                 var source = new EventSource('/api/monitor/logstream?name=' + $scope.name);
@@ -57,7 +81,7 @@ angular.module('monitor', [])
             }
 
             function getMetrics() {
-                var ts = $scope.lastMetricsTimestamp.toISOString();
+                var ts = $scope.autoFrom.toISOString();
                 $http.get("api/monitor/stats?db=statspout&name=" + $scope.name + "&resource=cpu_usage&from=" + ts)
                     .then(function (res) {
                         if (res.data.results[0]["series"] === undefined) {
@@ -100,8 +124,8 @@ angular.module('monitor', [])
             function updateCpuChart(data) {
                 var timestamp = new Date(data[0]);
 
-                if (timestamp > $scope.lastMetricsTimestamp) {
-                    $scope.lastMetricsTimestamp = timestamp;
+                if ($scope.auto && timestamp > $scope.autoFrom) {
+                    $scope.autoFrom = timestamp;
                 }
 
                 $scope.cpuChart.removeData();
@@ -111,8 +135,8 @@ angular.module('monitor', [])
             function updateMemChart(data) {
                 var timestamp = new Date(data[0]);
 
-                if (timestamp > $scope.lastMetricsTimestamp) {
-                    $scope.lastMetricsTimestamp = timestamp;
+                if ($scope.auto && timestamp > $scope.autoFrom) {
+                    $scope.autoFrom = timestamp;
                 }
 
                 $scope.memChart.removeData();
@@ -122,8 +146,8 @@ angular.module('monitor', [])
             function updateNetworkChart(data) {
                 var timestamp = new Date(data.timestamp);
 
-                if (timestamp > $scope.lastMetricsTimestamp) {
-                    $scope.lastMetricsTimestamp = timestamp;
+                if ($scope.auto && timestamp > $scope.autoFrom) {
+                    $scope.autoFrom = timestamp;
                 }
 
                 $scope.networkChart.removeData();
@@ -131,6 +155,7 @@ angular.module('monitor', [])
             }
 
             $document.ready(function () {
+                // Charts configurations.
                 var cpuLabels = [],
                     cpuData = [],
                     memoryLabels = [],
@@ -143,13 +168,10 @@ angular.module('monitor', [])
                     cpuLabels.push('');
                     cpuData.push(0);
                     networkLabels.push('');
+                    memoryLabels.push('');
+                    memoryData.push(0);
                     networkRxData.push(0);
                     networkTxData.push(0);
-
-                    memoryLabels.push('');
-                    memoryData.push(0);
-                    memoryLabels.push('');
-                    memoryData.push(0);
                 }
 
                 var cpuDataset = {
@@ -219,13 +241,12 @@ angular.module('monitor', [])
                     animation: false
                 });
 
-                var logIntervalId = window.setInterval(getLogs, 5000);
-                var metricIntervalId = window.setInterval(getMetrics, 5000);
+                // Main interval to retrieve data.
+                var pullIntervalId = window.setInterval(pullInterval, 5000);
 
                 $scope.$on("$destroy", function () {
                     // clearing interval when view changes
-                    clearInterval(logIntervalId);
-                    clearInterval(metricIntervalId);
+                    clearInterval(pullIntervalId);
                 });
             });
         }
