@@ -47,13 +47,13 @@ func (service *middleWareService) middleWareAuthenticate(next http.Handler) http
 		}
 
 		if token == "" {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			Error(w, portainer.ErrUnauthorized, http.StatusUnauthorized, nil)
 			return
 		}
 
 		err := service.jwtService.VerifyToken(token)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
+			Error(w, err, http.StatusUnauthorized, nil)
 			return
 		}
 

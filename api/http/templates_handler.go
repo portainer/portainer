@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -40,15 +39,13 @@ func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *ht
 
 	resp, err := http.Get(handler.templatesURL)
 	if err != nil {
-		log.Print(err)
-		http.Error(w, fmt.Sprintf("Error making request to %s: %s", handler.templatesURL, err.Error()), http.StatusInternalServerError)
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Print(err)
-		http.Error(w, "Error reading body from templates URL", http.StatusInternalServerError)
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
