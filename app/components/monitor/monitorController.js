@@ -1,11 +1,11 @@
 angular.module('monitor', [])
     .controller('MonitorController', ['$scope', '$http', '$filter', '$stateParams', '$document', 'Container',
         function ($scope, $http, $filter, $stateParams, $document, Container) {
-            $scope.state = {};
             $scope.name = undefined;
             $scope.logs = "";
             $scope.range = {};
             $scope.auto = true;
+            $scope.initialized = false;
 
             setToAuto();
 
@@ -48,10 +48,14 @@ angular.module('monitor', [])
                 $scope.auto = auto;
 
                 if (auto) {
-                    $scope.sl.disable();
+                    $scope.fromSlider.disable();
+                    $scope.toSlider.disable();
+
                     setToAuto();
                 } else {
-                    $scope.sl.enable();
+                    $scope.fromSlider.enable();
+                    $scope.toSlider.enable();
+
                     $scope.range.to = new Date();
                 }
             };
@@ -65,9 +69,10 @@ angular.module('monitor', [])
                     $scope.logs = "";
 
                     // reset the silder to 0 delta.
-                    $scope.prevMax = 0;
-                    $scope.prevMin = 0;
-                    $scope.sl.setValue([0, 0]);
+                    $scope.prevFrom = 0;
+                    $scope.prevTo = 0;
+                    $scope.fromSlider.setValue(0);
+                    $scope.toSlider.setValue(0);
                 }
 
                 // fix date ranges to objects for querying.
@@ -269,7 +274,9 @@ angular.module('monitor', [])
                     title: 'Tx Data'
                 }];
 
-                legend($('#network-legend').get(0), networkLegendData);
+                if (!$scope.initialized) {
+                    legend($('#network-legend').get(0), networkLegendData);
+                }
 
                 $scope.cpuChart = new Chart($('#cpu-stats-chart').get(0).getContext("2d")).Line({
                     labels: cpuLabels,
@@ -303,30 +310,43 @@ angular.module('monitor', [])
                 // Data fine tune slider. Works as a slider for relative adjustment of the from/to range
                 // modifying each one with a delta in minutes. Note that this is intended as a fine tuning
                 // search, as so, it only allows to adjust a restricted range.
-                $scope.prevMin = 0;
-                $scope.prevMax = 0;
+                $scope.prevFrom = 0;
+                $scope.prevTo = 0;
 
-                $scope.sl = $("#rangeSlider").slider({ min: -60, max: 60, value: [0, 0], focus: true }).data('slider');
-                $scope.sl.on('change', function (e) {
-                    // get new values from the slider.
-                    var min = $scope.sl.getValue()[0];
-                    var max = $scope.sl.getValue()[1];
+                $scope.fromSlider = $("#fromSlider").slider({ min: -30, max: 30, value: 0, focus: true, tooltip_position: 'bottom' }).data('slider');
+                $scope.fromSlider.on('change', function (e) {
+                    // get new value from the slider.
+                    var current = $scope.fromSlider.getValue();
 
                     // calculate the delta relative to the previous update.
-                    var deltaMin = min - $scope.prevMin;
-                    var deltaMax = max - $scope.prevMax;
+                    var deltaMin = current - $scope.prevFrom;
 
-                    // store the new slider range for future delta.
-                    $scope.prevMin = min;
-                    $scope.prevMax = max;
+                    // store the new slider value for future delta.
+                    $scope.prevFrom = current;
 
                     // move times and store them back to the range model.
                     var d = new Date($scope.range.from);
                     d.setMinutes(d.getMinutes() + deltaMin);
                     $scope.range.from = d;
 
+                    // force update the scope.
+                    $scope.$apply();
+                });
+
+                $scope.toSlider = $("#toSlider").slider({ min: -30, max: 30, value: 0, focus: true, tooltip_position: 'bottom' }).data('slider');
+                $scope.toSlider.on('change', function (e) {
+                    // get new value from the slider.
+                    var current = $scope.toSlider.getValue();
+
+                    // calculate the delta relative to the previous update.
+                    var deltaMin = current - $scope.prevTo;
+
+                    // store the new slider value for future delta.
+                    $scope.prevTo = current;
+
+                    // move times and store them back to the range model.
                     var d = new Date($scope.range.to);
-                    d.setMinutes(d.getMinutes() + deltaMax);
+                    d.setMinutes(d.getMinutes() + deltaMin);
                     $scope.range.to = d;
 
                     // force update the scope.
@@ -334,7 +354,8 @@ angular.module('monitor', [])
                 });
 
                 // the slider should be disabled on 'auto mode'.
-                $scope.sl.disable();
+                $scope.fromSlider.disable();
+                $scope.toSlider.disable();
 
                 // Main interval to retrieve data.
                 var pullIntervalId = window.setInterval(pullInterval, 10000);
@@ -343,6 +364,8 @@ angular.module('monitor', [])
                     // clearing interval when view changes
                     clearInterval(pullIntervalId);
                 });
+
+                $scope.initialized = true;
             });
         }
     ]);

@@ -14,31 +14,20 @@
                 <div class="pull-right">
                     <input type="checkbox" ng-model="auto" id="autoCheckbox" ng-click="setAuto(auto)">
                     <label for="autoCheckbox">Auto</label>
+                    <button class="btn btn-primary" ng-disabled="auto" ng-click="update()" style="margin-left: 8px">Search</button>
                 </div>
             </rd-widget-header>
 
             <rd-widget-body>
                 <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
                         <input type="text" ng-model="range.from" class="form-control" ng-disabled="auto">
+                        <input id="fromSlider" type="text" style="width: 100%" data-slider-step="1">
                     </div>
 
                     <div class="col-lg-6">
-                        <input id="rangeSlider" type="text" style="width: 100%" data-slider-step="1">
-                    </div>
-
-                    <div class="col-lg-3">
                         <input type="text" ng-model="range.to" class="form-control" ng-disabled="auto">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-3">
-                        <div class="form-inline">
-                            <div class="form-group">
-                                <button class="btn btn-primary" ng-disabled="auto" ng-click="update()">Search</button>
-                            </div>
-                        </div>
+                        <input id="toSlider" type="text" style="width: 100%" data-slider-step="1">
                     </div>
                 </div>
             </rd-widget-body>
