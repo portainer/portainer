@@ -357,6 +357,16 @@ angular.module('monitor', [])
                 $scope.fromSlider.disable();
                 $scope.toSlider.disable();
 
+                $('#range-from').datetimepicker({
+                    format: 'ddd MMM DD YYYY H:mm:ss',
+                    sideBySide: true,
+                });
+
+                $('#range-to').datetimepicker({
+                    format: 'ddd MMM DD YYYY H:mm:ss',
+                    sideBySide: true,
+                });
+
                 // Main interval to retrieve data.
                 var pullIntervalId = window.setInterval(pullInterval, 10000);
 
