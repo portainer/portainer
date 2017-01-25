@@ -262,6 +262,11 @@ input[type="radio"] {
   margin: 0 auto;
 }
 
+#stdoutLog, #stderrLog {
+  background: #333;
+  color: #fff;
+}
+
 ul.sidebar .sidebar-list a.active {
   color: #fff;
   text-indent: 22px;
