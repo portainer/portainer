@@ -1,13 +1,14 @@
 angular.module('node', [])
-.controller('NodeController', ['$scope', '$state', '$stateParams', 'LabelHelper', 'Node', 'NodeHelper', 'Task', 'Settings', 'Messages',
-function ($scope, $state, $stateParams, LabelHelper, Node, NodeHelper, Task, Settings, Messages) {
+.controller('NodeController', ['$scope', '$state', '$stateParams', 'LabelHelper', 'Node', 'NodeHelper', 'Task', 'Pagination', 'Messages',
+function ($scope, $state, $stateParams, LabelHelper, Node, NodeHelper, Task, Pagination, Messages) {
 
+  $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('node_tasks');
   $scope.loading = true;
   $scope.tasks = [];
   $scope.displayNode = false;
   $scope.sortType = 'Status';
   $scope.sortReverse = false;
-  $scope.pagination_count = Settings.pagination_count;
 
   var originalNode = {};
   var editedKeys = [];
@@ -15,6 +16,10 @@ function ($scope, $state, $stateParams, LabelHelper, Node, NodeHelper, Task, Set
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('node_tasks', $scope.state.pagination_count);
   };
 
   $scope.updateNodeAttribute = function updateNodeAttribute(node, key) {

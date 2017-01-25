@@ -12,7 +12,7 @@
 <div class="row" ng-if="!node">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <div ng-if="loading">
-      <i class="fa fa-cog fa-spin"></i> Loading..
+      <i class="fa fa-cog fa-spin"></i> Loading...
     </div>
 
     <rd-widget ng-if="!loading">
@@ -207,7 +207,18 @@
 <div class="row" ng-if="node && tasks.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tasks" title="Associated tasks"></rd-widget-header>
+      <rd-widget-header icon="fa-tasks" title="Associated tasks">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
@@ -244,7 +255,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+            <tr dir-paginate="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
               <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
               <td>{{ task.Slot }}</td>
