@@ -3,8 +3,8 @@ angular.module('swarm', [])
 function ($scope, Info, Version, Node, Pagination) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('swarm_nodes');
-  $scope.sortType = 'Name';
-  $scope.sortReverse = true;
+  $scope.sortType = 'Spec.Role';
+  $scope.sortReverse = false;
   $scope.info = {};
   $scope.docker = {};
   $scope.swarm = {};
