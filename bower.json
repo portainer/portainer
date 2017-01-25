@@ -39,6 +39,7 @@
     "filesize": "~3.3.0",
     "jquery": "1.11.1",
     "jquery.gritter": "1.7.4",
+	"seiyria-bootstrap-slider": "9.7.0",
     "lodash": "4.12.0",
     "rdash-ui": "1.0.*",
     "moment": "~2.14.1",

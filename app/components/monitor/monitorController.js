@@ -24,6 +24,9 @@ angular.module('monitor', [])
                 Messages.error("Failure", e, "Unable to retrieve container info");
             });
 
+            // Intervall called every x seconds to pull data from the backend.
+            // It should only act as a filter for the 'auto mode' (if auto mode is not
+            // enabled, then ignore the interval).
             function pullInterval() {
                 if (!$scope.auto) {
                     return;
@@ -45,17 +48,29 @@ angular.module('monitor', [])
                 $scope.auto = auto;
 
                 if (auto) {
+                    $scope.sl.disable();
                     setToAuto();
+                } else {
+                    $scope.sl.enable();
+                    $scope.range.to = new Date();
                 }
             };
 
             $scope.update = function () {
                 if (!$scope.auto) {
+                    // if the display is not on auto mode, destroy all previous displayed data
+                    // in order to replace with the newly retrieved data.
                     destroyCharts();
                     createCharts();
                     $scope.logs = "";
+
+                    // reset the silder to 0 delta.
+                    $scope.prevMax = 0;
+                    $scope.prevMin = 0;
+                    $scope.sl.setValue([0, 0]);
                 }
 
+                // fix date ranges to objects for querying.
                 $scope.range.from = new Date($scope.range.from);
                 if ($scope.range.to) {
                     $scope.range.to = new Date($scope.range.to);
@@ -63,10 +78,12 @@ angular.module('monitor', [])
                     $scope.range.to = null;
                 }
 
+                // update data.
                 getLogs();
                 getMetrics();
             };
 
+            // TODO: not used yet.
             function startLogStream() {
                 var source = new EventSource('/api/monitor/logstream?name=' + $scope.name);
 
@@ -76,26 +93,29 @@ angular.module('monitor', [])
                 };
             }
 
+            // Gets logs from the backend and updates them in the display.
             function getLogs() {
                 var params = {
                     'name': $scope.name,
                     'from': $scope.range.from.toISOString()
                 };
 
+                // if the user specified a 'to' time, set as parameter.
                 if ($scope.range.to) {
                     params['to'] = $scope.range.to.toISOString();
                 }
 
                 $http({method: 'GET', url: "/api/monitor/logs", params: params})
                     .success(function (data, status, headers, config) {
+                        // for each result, add it to the logs string.
                         angular.forEach(data.hits.hits, function (hit) {
                             $scope.logs += hit._source.message + "\n";
                         });
                     });
             }
 
+            // Gets metrics from the backend and updates them in the display.
             function getMetrics() {
-                var ts = $scope.range.from.toISOString();
                 var params = {
                     'db': 'statspout',
                     'name': $scope.name,
@@ -181,14 +201,16 @@ angular.module('monitor', [])
                 $scope.networkChart.addData([data.rx, data.tx], timestamp.toLocaleTimeString());
             }
 
+            // Destroy all charts without recreate.
             function destroyCharts() {
+                // we have to destroy the element in order to dispose the stored data.
                 $scope.cpuChart.destroy();
                 $scope.memChart.destroy();
                 $scope.networkChart.destroy();
             }
 
             function createCharts() {
-                // Charts configurations.
+                // charts configurations.
                 var cpuLabels = [],
                     cpuData = [],
                     memoryLabels = [],
@@ -277,6 +299,42 @@ angular.module('monitor', [])
             $document.ready(function () {
                 Chart.defaults.global.animationSteps = 30; // Lower from 60 to ease CPU load.
                 createCharts();
+
+                // Data fine tune slider. Works as a slider for relative adjustment of the from/to range
+                // modifying each one with a delta in minutes. Note that this is intended as a fine tuning
+                // search, as so, it only allows to adjust a restricted range.
+                $scope.prevMin = 0;
+                $scope.prevMax = 0;
+
+                $scope.sl = $("#rangeSlider").slider({ min: -60, max: 60, value: [0, 0], focus: true }).data('slider');
+                $scope.sl.on('change', function (e) {
+                    // get new values from the slider.
+                    var min = $scope.sl.getValue()[0];
+                    var max = $scope.sl.getValue()[1];
+
+                    // calculate the delta relative to the previous update.
+                    var deltaMin = min - $scope.prevMin;
+                    var deltaMax = max - $scope.prevMax;
+
+                    // store the new slider range for future delta.
+                    $scope.prevMin = min;
+                    $scope.prevMax = max;
+
+                    // move times and store them back to the range model.
+                    var d = new Date($scope.range.from);
+                    d.setMinutes(d.getMinutes() + deltaMin);
+                    $scope.range.from = d;
+
+                    var d = new Date($scope.range.to);
+                    d.setMinutes(d.getMinutes() + deltaMax);
+                    $scope.range.to = d;
+
+                    // force update the scope.
+                    $scope.$apply();
+                });
+
+                // the slider should be disabled on 'auto mode'.
+                $scope.sl.disable();
 
                 // Main interval to retrieve data.
                 var pullIntervalId = window.setInterval(pullInterval, 10000);
