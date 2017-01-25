@@ -67,7 +67,7 @@ angular.module('portainer.filters', [])
 .filter('nodestatusbadge', function () {
   'use strict';
   return function (text) {
-    if (text === 'Unhealthy') {
+    if (text === 'down' || text === 'Unhealthy') {
       return 'danger';
     }
     return 'success';
