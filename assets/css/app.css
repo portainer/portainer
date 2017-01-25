@@ -263,7 +263,7 @@ input[type="radio"] {
 }
 
 #stdoutLog, #stderrLog {
-  background: #333;
+  background: #000;
   color: #fff;
 }
 
