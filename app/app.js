@@ -36,6 +36,7 @@ angular.module('portainer', [
   'swarm',
   'network',
   'networks',
+  'node',
   'createNetwork',
   'task',
   'templates',
@@ -388,6 +389,22 @@ angular.module('portainer', [
         "content": {
           templateUrl: 'app/components/network/network.html',
           controller: 'NetworkController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
+    })
+    .state('node', {
+      url: '^/nodes/:id/',
+      views: {
+        "content": {
+          templateUrl: 'app/components/node/node.html',
+          controller: 'NodeController'
         },
         "sidebar": {
           templateUrl: 'app/components/sidebar/sidebar.html',

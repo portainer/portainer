@@ -29,6 +29,28 @@ angular.module('portainer.helpers', [])
       return mode;
     }
   };
+}])      
+.factory('LabelHelper', [function LabelHelperFactory() {
+  'use strict';
+  return {
+    fromLabelHashToKeyValue: function(labels) {
+      if (labels) {
+        return Object.keys(labels).map(function(key) {
+          return {key: key, value: labels[key], originalKey: key, originalValue: labels[key], added: true};
+        });
+      }
+      return [];
+    },
+    fromKeyValueToLabelHash: function(labelKV) {
+      var labels = {};
+      if (labelKV) {
+        labelKV.forEach(function(label) {
+          labels[label.key] = label.value;
+        });
+      }
+      return labels;
+    }
+  };
 }])
 .factory('ImageHelper', [function ImageHelperFactory() {
   'use strict';
@@ -90,6 +112,19 @@ angular.module('portainer.helpers', [])
         UpdateConfig: service.Spec.UpdateConfig,
         Networks: service.Spec.Networks,
         EndpointSpec: service.Spec.EndpointSpec
+      };
+    }
+  };
+}])
+.factory('NodeHelper', [function NodeHelperFactory() {
+  'use strict';
+  return {
+    nodeToConfig: function(node) {
+      return {
+        Name: node.Spec.Name,
+        Role: node.Spec.Role,
+        Labels: node.Spec.Labels,
+        Availability: node.Spec.Availability
       };
     }
   };

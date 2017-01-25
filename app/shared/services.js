@@ -153,10 +153,11 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
     .factory('Node', ['$resource', 'Settings', function NodeFactory($resource, Settings) {
         'use strict';
         // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-7-nodes
-        return $resource(Settings.url + '/nodes', {}, {
-          query: {
-            method: 'GET', isArray: true
-          }
+        return $resource(Settings.url + '/nodes/:id/:action', {}, {
+          query: {method: 'GET', isArray: true},
+          get: {method: 'GET', params: {id: '@id'}},
+          update: { method: 'POST', params: {id: '@id', action: 'update', version: '@version'} },
+          remove: { method: 'DELETE', params: {id: '@id'} }
         });
     }])
     .factory('Swarm', ['$resource', 'Settings', function SwarmFactory($resource, Settings) {
