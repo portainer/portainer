@@ -81,6 +81,19 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
             complete();
           });
         }
+        else if (action === Container.pause) {
+          action({id: c.Id}, function (d) {
+            if (d.message) {
+              Messages.send("Container is already paused", c.Id);
+            } else {
+              Messages.send("Container " + msg, c.Id);
+            }
+            complete();
+          }, function (e) {
+            Messages.error("Failure", e, 'Unable to pause container');
+            complete();
+          });
+        }
         else {
           action({id: c.Id}, function (d) {
             Messages.send("Container " + msg, c.Id);
