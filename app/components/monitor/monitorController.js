@@ -6,6 +6,7 @@ angular.module('monitor', [])
             $scope.range = {};
             $scope.auto = true;
             $scope.initialized = false;
+            $scope.points = 30;
 
             setToAuto();
 
@@ -39,9 +40,15 @@ angular.module('monitor', [])
                 $scope.auto = true;
 
                 var d = new Date();
-                d.setMinutes(d.getMinutes() - 3);
+                d.setMinutes(d.getMinutes() - 6);
                 $scope.range.from = d;
                 $scope.range.to = null;
+
+                $scope.points = 30;
+
+                if ($scope.initialized) {
+                    pullInterval();
+                }
             }
 
             $scope.setAuto = function (auto) {
@@ -51,7 +58,9 @@ angular.module('monitor', [])
                     $scope.fromSlider.disable();
                     $scope.toSlider.disable();
 
+                    destroyCharts();
                     setToAuto();
+                    createCharts();
                 } else {
                     $scope.fromSlider.enable();
                     $scope.toSlider.enable();
@@ -64,8 +73,6 @@ angular.module('monitor', [])
                 if (!$scope.auto) {
                     // if the display is not on auto mode, destroy all previous displayed data
                     // in order to replace with the newly retrieved data.
-                    destroyCharts();
-                    createCharts();
                     $scope.logs = "";
 
                     // reset the silder to 0 delta.
@@ -131,79 +138,38 @@ angular.module('monitor', [])
                     params['to'] = $scope.range.to.toISOString();
                 }
 
-                params['resource'] = 'cpu_usage';
+                if (!$scope.auto) {
+                    destroyCharts();
+                }
+
                 $http({method: 'GET', url: "/api/monitor/stats", params: jQuery.extend({}, params)})
                     .success(function (data, status, headers, config) {
-                        if (data.results[0]["series"] === undefined) {
-                            return;
+                        if (!$scope.auto) {
+                            $scope.points = data.length;
+                            createCharts();
                         }
 
-                        angular.forEach(data.results[0].series[0].values, function (value) {
-                            updateCpuChart(value);
+                        angular.forEach(data, function (value) {
+                            updateCharts(value);
                         });
-                    });
-
-                params['resource'] = 'mem_usage';
-                $http({method: 'GET', url: "/api/monitor/stats", params: jQuery.extend({}, params)})
-                    .success(function (data, status, headers, config) {
-                        if (data.results[0]["series"] === undefined) {
-                            return;
-                        }
-
-                        angular.forEach(data.results[0].series[0].values, function (value) {
-                            updateMemChart(value);
-                        });
-                    });
-
-                params['resource'] = 'rx_bytes,tx_bytes';
-                $http({method: 'GET', url: "/api/monitor/stats", params: jQuery.extend({}, params)})
-                    .success(function (data, status, headers, config) {
-                        if (data.results[0]["series"] === undefined) {
-                            return;
-                        }
-
-                        var series = data.results[0].series;
-                        for (var i = 0; i < series[0].values.length; i++) {
-                            updateNetworkChart({
-                                'rx': series[0].values[i][2],
-                                'tx': series[1].values[i][2],
-                                'timestamp': series[0].values[i][0]
-                            });
-                        }
                     });
             }
 
-            function updateCpuChart(data) {
-                var timestamp = new Date(data[0]);
+            function updateCharts(value) {
+                var timestamp = new Date(value.timestamp);
 
                 if ($scope.auto && timestamp > $scope.range.from) {
                     $scope.range.from = timestamp;
                 }
 
                 $scope.cpuChart.removeData();
-                $scope.cpuChart.addData([data[2]], timestamp.toLocaleTimeString());
-            }
-
-            function updateMemChart(data) {
-                var timestamp = new Date(data[0]);
-
-                if ($scope.auto && timestamp > $scope.range.from) {
-                    $scope.range.from = timestamp;
-                }
+                $scope.cpuChart.addData([value.cpu_usage], timestamp.toLocaleTimeString());
 
                 $scope.memChart.removeData();
-                $scope.memChart.addData([data[2]], timestamp.toLocaleTimeString());
-            }
-
-            function updateNetworkChart(data) {
-                var timestamp = new Date(data.timestamp);
-
-                if ($scope.auto && timestamp > $scope.range.from) {
-                    $scope.range.from = timestamp;
-                }
+                $scope.memChart.addData([value.mem_usage], timestamp.toLocaleTimeString());
 
                 $scope.networkChart.removeData();
-                $scope.networkChart.addData([data.rx, data.tx], timestamp.toLocaleTimeString());
+                $scope.networkChart.addData([value.rx_bytes, value.tx_bytes], timestamp.toLocaleTimeString());
             }
 
             // Destroy all charts without recreate.
@@ -224,7 +190,7 @@ angular.module('monitor', [])
                     networkRxData = [],
                     networkTxData = [];
 
-                for (var i = 0; i < 30; i++) {
+                for (var i = 0; i < $scope.points; i++) {
                     cpuLabels.push('');
                     cpuData.push(0);
                     networkLabels.push('');
@@ -237,32 +203,24 @@ angular.module('monitor', [])
                 var cpuDataset = {
                     fillColor: "rgba(151,187,205,0.5)",
                     strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
                     data: cpuData
                 };
 
                 var memoryDataset = {
                     fillColor: "rgba(151,187,205,0.5)",
                     strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
                     data: memoryData
                 };
 
                 var networkRxDataset = {
                     fillColor: "rgba(0, 0, 0, 0)",
                     strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
                     data: networkRxData
                 };
 
                 var networkTxDataset = {
                     fillColor: "rgba(0, 0, 0, 0)",
                     strokeColor: "rgba(51,87,05,1)",
-                    pointColor: "rgba(51,87,05,1)",
-                    pointStrokeColor: "#fff",
                     data: networkTxData
                 };
 
@@ -283,7 +241,8 @@ angular.module('monitor', [])
                     datasets: [cpuDataset]
                 }, {
                     responsive: true,
-                    animation: false
+                    animation: false,
+                    pointDot: false
                 });
 
                 $scope.memChart = new Chart($('#memory-stats-chart').get(0).getContext("2d")).Line({
@@ -291,7 +250,8 @@ angular.module('monitor', [])
                     datasets: [memoryDataset]
                 }, {
                     responsive: true,
-                    animation: false
+                    animation: false,
+                    pointDot: false
                 });
 
                 $scope.networkChart = new Chart($('#network-chart').get(0).getContext("2d")).Line({
@@ -299,7 +259,8 @@ angular.module('monitor', [])
                     datasets: [networkRxDataset, networkTxDataset]
                 }, {
                     responsive: true,
-                    animation: false
+                    animation: false,
+                    pointDot: false
                 });
             }
 

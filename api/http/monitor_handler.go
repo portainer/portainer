@@ -170,6 +170,10 @@ func (h *MonitorHandler) queryStats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// assume that the response will always contain at least one serie.
+	if len(result.Results) < 1 || len(result.Results[0].Series) < 1 {
+		Error(w, errors.New("backend result error"), http.StatusInternalServerError, h.logger)
+	}
+
 	stats := make([]Metric, len(result.Results[0].Series[0].Values))
 
 	// build the stats for metrics slice collecting each stat from each serie.
