@@ -41,7 +41,7 @@ angular.module('monitor', [])
 
                 var d = new Date();
                 d.setMinutes(d.getMinutes() - 6);
-                $scope.range.from = d;
+                $scope.range.from = d.toISOString();
                 $scope.range.to = null;
 
                 $scope.points = 30;
@@ -65,7 +65,7 @@ angular.module('monitor', [])
                     $scope.fromSlider.enable();
                     $scope.toSlider.enable();
 
-                    $scope.range.to = new Date();
+                    $scope.range.to = new Date().toISOString();
                 }
             };
 
@@ -83,9 +83,9 @@ angular.module('monitor', [])
                 }
 
                 // fix date ranges to objects for querying.
-                $scope.range.from = new Date($scope.range.from);
+                $scope.range.from = new Date($scope.range.from).toISOString();
                 if ($scope.range.to) {
-                    $scope.range.to = new Date($scope.range.to);
+                    $scope.range.to = new Date($scope.range.to).toISOString();
                 } else {
                     $scope.range.to = null;
                 }
@@ -109,12 +109,12 @@ angular.module('monitor', [])
             function getLogs() {
                 var params = {
                     'name': $scope.name,
-                    'from': $scope.range.from.toISOString()
+                    'from': $scope.range.from
                 };
 
                 // if the user specified a 'to' time, set as parameter.
                 if ($scope.range.to) {
-                    params['to'] = $scope.range.to.toISOString();
+                    params['to'] = new Date($scope.range.to).toISOString();
                 }
 
                 $http({method: 'GET', url: "/api/monitor/logs", params: params})
@@ -131,11 +131,11 @@ angular.module('monitor', [])
                 var params = {
                     'db': 'statspout',
                     'name': $scope.name,
-                    'from': $scope.range.from.toISOString()
+                    'from': $scope.range.from
                 };
 
                 if ($scope.range.to) {
-                    params['to'] = $scope.range.to.toISOString();
+                    params['to'] = new Date($scope.range.to).toISOString();
                 }
 
                 if (!$scope.auto) {
@@ -155,21 +155,40 @@ angular.module('monitor', [])
                     });
             }
 
-            function updateCharts(value) {
-                var timestamp = new Date(value.timestamp);
+            function getUTCTimeString(d) {
+                var seconds = d.getUTCSeconds();
+                var hours = d.getUTCHours();
+                var minutes = d.getUTCMinutes();
 
-                if ($scope.auto && timestamp > $scope.range.from) {
-                    $scope.range.from = timestamp;
+                if (seconds < 10) {
+                    seconds = "0" + seconds;
                 }
 
+                if (minutes < 10) {
+                    minutes = "0" + minutes;
+                }
+
+                return hours + ":" + minutes + ":" + seconds + "Z";
+            }
+
+            function updateCharts(value) {
+                var timeDate = new Date(value.timestamp);
+                var fromDate = new Date($scope.range.from);
+
+                if ($scope.auto && timeDate > fromDate) {
+                    $scope.range.from = timeDate.toISOString();
+                }
+
+                var timestamp = getUTCTimeString(timeDate);
+
                 $scope.cpuChart.removeData();
-                $scope.cpuChart.addData([value.cpu_usage], timestamp.toLocaleTimeString());
+                $scope.cpuChart.addData([value.cpu_usage], timestamp);
 
                 $scope.memChart.removeData();
-                $scope.memChart.addData([value.mem_usage], timestamp.toLocaleTimeString());
+                $scope.memChart.addData([value.mem_usage], timestamp);
 
                 $scope.networkChart.removeData();
-                $scope.networkChart.addData([value.rx_bytes, value.tx_bytes], timestamp.toLocaleTimeString());
+                $scope.networkChart.addData([value.rx_bytes, value.tx_bytes], timestamp);
             }
 
             // Destroy all charts without recreate.
@@ -288,7 +307,7 @@ angular.module('monitor', [])
                     // move times and store them back to the range model.
                     var d = new Date($scope.range.from);
                     d.setMinutes(d.getMinutes() + deltaMin);
-                    $scope.range.from = d;
+                    $scope.range.from = d.toISOString();
 
                     // force update the scope.
                     $scope.$apply();
@@ -308,7 +327,7 @@ angular.module('monitor', [])
                     // move times and store them back to the range model.
                     var d = new Date($scope.range.to);
                     d.setMinutes(d.getMinutes() + deltaMin);
-                    $scope.range.to = d;
+                    $scope.range.to = d.toISOString();
 
                     // force update the scope.
                     $scope.$apply();
@@ -317,16 +336,6 @@ angular.module('monitor', [])
                 // the slider should be disabled on 'auto mode'.
                 $scope.fromSlider.disable();
                 $scope.toSlider.disable();
-
-                $('#range-from').datetimepicker({
-                    format: 'ddd MMM DD YYYY H:mm:ss',
-                    sideBySide: true,
-                });
-
-                $('#range-to').datetimepicker({
-                    format: 'ddd MMM DD YYYY H:mm:ss',
-                    sideBySide: true,
-                });
 
                 // Main interval to retrieve data.
                 var pullIntervalId = window.setInterval(pullInterval, 10000);
