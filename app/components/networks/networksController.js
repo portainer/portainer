@@ -1,19 +1,23 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'Settings',
-function ($scope, $state, Network, Config, Messages, Settings) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'Pagination',
+function ($scope, $state, Network, Config, Messages, Pagination) {
   $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('networks');
   $scope.state.selectedItemCount = 0;
   $scope.state.advancedSettings = false;
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
-  $scope.pagination_count = Settings.pagination_count;
   $scope.config = {
     Name: ''
   };
 
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('networks', $scope.state.pagination_count);
+  };
+
   function prepareNetworkConfiguration() {
     var config = angular.copy($scope.config);
-    if ($scope.endpointMode.provider === 'DOCKER_SWARM' || $scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
+    if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
       config.Driver = 'overlay';
       // Force IPAM Driver to 'default', should not be required.
       // See: https://github.com/docker/docker/issues/25735

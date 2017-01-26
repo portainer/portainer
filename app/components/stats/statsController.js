@@ -1,16 +1,19 @@
 angular.module('stats', [])
-.controller('StatsController', ['Settings', '$scope', 'Messages', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
-function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateParams, humansizeFilter, $sce, $document) {
+.controller('StatsController', ['Pagination', '$scope', 'Messages', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
+function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stateParams, humansizeFilter, $sce, $document) {
   // TODO: Force scale to 0-100 for cpu, fix charts on dashboard,
   // TODO: Force memory scale to 0 - max memory
   $scope.ps_args = '';
   $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('stats_processes');
   $scope.sortType = 'CMD';
   $scope.sortReverse = false;
-  $scope.pagination_count = Settings.pagination_count;
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('stats_processes', $scope.state.pagination_count);
   };
   $scope.getTop = function () {
       ContainerTop.get($stateParams.id, {
@@ -114,6 +117,12 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
     });
     $scope.networkLegend = $sce.trustAsHtml(networkChart.generateLegend());
 
+    function setUpdateStatsTimeout() {
+      if(!destroyed) {
+        timeout = $timeout(updateStats, 5000);
+      }
+    }
+
     function updateStats() {
       Container.stats({id: $stateParams.id}, function (d) {
         var arr = Object.keys(d).map(function (key) {
@@ -129,15 +138,17 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
         updateCpuChart(d);
         updateMemoryChart(d);
         updateNetworkChart(d);
-        timeout = $timeout(updateStats, 5000);
+        setUpdateStatsTimeout();
       }, function () {
         Messages.error('Unable to retrieve stats', {}, 'Is this container running?');
-        timeout = $timeout(updateStats, 5000);
+        setUpdateStatsTimeout();
       });
     }
 
+    var destroyed = false;
     var timeout;
     $scope.$on('$destroy', function () {
+      destroyed = true;
       $timeout.cancel(timeout);
     });
 
@@ -162,16 +173,18 @@ function (Settings, $scope, Messages, $timeout, Container, ContainerTop, $stateP
         $scope.networkName = Object.keys(data.networks)[0];
         data.network = data.networks[$scope.networkName];
       }
-      var rxBytes = 0, txBytes = 0;
-      if (lastRxBytes !== 0 || lastTxBytes !== 0) {
-        // These will be zero on first call, ignore to prevent large graph spike
-        rxBytes = data.network.rx_bytes - lastRxBytes;
-        txBytes = data.network.tx_bytes - lastTxBytes;
+      if(data.network) {
+        var rxBytes = 0, txBytes = 0;
+        if (lastRxBytes !== 0 || lastTxBytes !== 0) {
+          // These will be zero on first call, ignore to prevent large graph spike
+          rxBytes = data.network.rx_bytes - lastRxBytes;
+          txBytes = data.network.tx_bytes - lastTxBytes;
+        }
+        lastRxBytes = data.network.rx_bytes;
+        lastTxBytes = data.network.tx_bytes;
+        networkChart.addData([rxBytes, txBytes], new Date(data.read).toLocaleTimeString());
+        networkChart.removeData();
       }
-      lastRxBytes = data.network.rx_bytes;
-      lastTxBytes = data.network.tx_bytes;
-      networkChart.addData([rxBytes, txBytes], new Date(data.read).toLocaleTimeString());
-      networkChart.removeData();
     }
 
     function calculateCPUPercent(stats) {

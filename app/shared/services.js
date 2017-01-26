@@ -153,10 +153,11 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
     .factory('Node', ['$resource', 'Settings', function NodeFactory($resource, Settings) {
         'use strict';
         // https://docs.docker.com/engine/reference/api/docker_remote_api_<%= remoteApiVersion %>/#/3-7-nodes
-        return $resource(Settings.url + '/nodes', {}, {
-          query: {
-            method: 'GET', isArray: true
-          }
+        return $resource(Settings.url + '/nodes/:id/:action', {}, {
+          query: {method: 'GET', isArray: true},
+          get: {method: 'GET', params: {id: '@id'}},
+          update: { method: 'POST', params: {id: '@id', action: 'update', version: '@version'} },
+          remove: { method: 'DELETE', params: {id: '@id'} }
         });
     }])
     .factory('Swarm', ['$resource', 'Settings', function SwarmFactory($resource, Settings) {
@@ -240,44 +241,11 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         initAdminUser: { method: 'POST', params: { username: 'admin', action: 'init' } }
       });
     }])
-    .factory('EndpointMode', ['$rootScope', 'Info', function EndpointMode($rootScope, Info) {
-      'use strict';
-      return {
-        determineEndpointMode: function() {
-          Info.get({}, function(d) {
-            var mode = {
-              provider: '',
-              role: ''
-            };
-            if (_.startsWith(d.ServerVersion, 'swarm')) {
-              mode.provider = "DOCKER_SWARM";
-              if (d.SystemStatus[0][1] === 'primary') {
-                mode.role = "PRIMARY";
-              } else {
-                mode.role = "REPLICA";
-              }
-            } else {
-              if (!d.Swarm || _.isEmpty(d.Swarm.NodeID)) {
-                mode.provider = "DOCKER_STANDALONE";
-              } else {
-                mode.provider = "DOCKER_SWARM_MODE";
-                if (d.Swarm.ControlAvailable) {
-                  mode.role = "MANAGER";
-                } else {
-                  mode.role = "WORKER";
-                }
-              }
-            }
-            $rootScope.endpointMode = mode;
-          });
-        }
-      };
-    }])
-    .factory('Authentication', ['$q', '$rootScope', 'Auth', 'jwtHelper', 'localStorageService', function AuthenticationFactory($q, $rootScope, Auth, jwtHelper, localStorageService) {
+    .factory('Authentication', ['$q', '$rootScope', 'Auth', 'jwtHelper', 'LocalStorage', 'StateManager', function AuthenticationFactory($q, $rootScope, Auth, jwtHelper, LocalStorage, StateManager) {
       'use strict';
       return {
         init: function() {
-          var jwt = localStorageService.get('JWT');
+          var jwt = LocalStorage.getJWT();
           if (jwt) {
             var tokenPayload = jwtHelper.decodeToken(jwt);
             $rootScope.username = tokenPayload.username;
@@ -287,7 +255,7 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
           return $q(function (resolve, reject) {
             Auth.login({username: username, password: password}).$promise
             .then(function(data) {
-              localStorageService.set('JWT', data.jwt);
+              LocalStorage.storeJWT(data.jwt);
               $rootScope.username = username;
               resolve();
             }, function() {
@@ -296,10 +264,11 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
           });
         },
         logout: function() {
-          localStorageService.remove('JWT');
+          StateManager.clean();
+          LocalStorage.clean();
         },
         isAuthenticated: function() {
-          var jwt = localStorageService.get('JWT');
+          var jwt = LocalStorage.getJWT();
           return jwt && !jwtHelper.isTokenExpired(jwt);
         }
       };
@@ -359,7 +328,97 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         setActiveEndpoint: { method: 'POST', params: { id: '@id', action: 'active' } }
       });
     }])
-    .factory('EndpointService', ['$q', '$timeout', 'Endpoints', 'FileUploadService', function EndpointServiceFactory($q, $timeout, Endpoints, FileUploadService) {
+    .factory('Pagination', ['LocalStorage', 'Settings', function PaginationFactory(LocalStorage, Settings) {
+      'use strict';
+      return {
+        getPaginationCount: function(key) {
+          var storedCount = LocalStorage.getPaginationCount(key);
+          var paginationCount = Settings.pagination_count;
+          if (storedCount !== null) {
+            paginationCount = storedCount;
+          }
+          return '' + paginationCount;
+        },
+        setPaginationCount: function(key, count) {
+          LocalStorage.storePaginationCount(key, count);
+        }
+      };
+    }])
+    .factory('LocalStorage', ['localStorageService', function LocalStorageFactory(localStorageService) {
+      'use strict';
+      return {
+        storeEndpointState: function(state) {
+          localStorageService.set('ENDPOINT_STATE', state);
+        },
+        getEndpointState: function() {
+          return localStorageService.get('ENDPOINT_STATE');
+        },
+        storeJWT: function(jwt) {
+          localStorageService.set('JWT', jwt);
+        },
+        getJWT: function() {
+          return localStorageService.get('JWT');
+        },
+        deleteJWT: function() {
+          localStorageService.remove('JWT');
+        },
+        storePaginationCount: function(key, count) {
+          localStorageService.cookie.set('pagination_' + key, count);
+        },
+        getPaginationCount: function(key) {
+          return localStorageService.cookie.get('pagination_' + key);
+        },
+        clean: function() {
+          localStorageService.clearAll();
+        }
+      };
+    }])
+    .factory('StateManager', ['$q', 'Info', 'InfoHelper', 'Version', 'LocalStorage', function StateManagerFactory($q, Info, InfoHelper, Version, LocalStorage) {
+      'use strict';
+
+      var state = {
+        loading: true,
+        application: {},
+        endpoint: {}
+      };
+
+      return {
+        init: function() {
+          var endpointState = LocalStorage.getEndpointState();
+          if (endpointState) {
+            state.endpoint = endpointState;
+          }
+          state.loading = false;
+        },
+        clean: function() {
+          state.endpoint = {};
+        },
+        updateEndpointState: function(loading) {
+          var deferred = $q.defer();
+          if (loading) {
+            state.loading = true;
+          }
+          $q.all([Info.get({}).$promise, Version.get({}).$promise])
+          .then(function success(data) {
+            var endpointMode = InfoHelper.determineEndpointMode(data[0]);
+            var endpointAPIVersion = parseFloat(data[1].ApiVersion);
+            state.endpoint.mode = endpointMode;
+            state.endpoint.apiVersion = endpointAPIVersion;
+            LocalStorage.storeEndpointState(state.endpoint);
+            state.loading = false;
+            deferred.resolve();
+          }, function error(err) {
+            state.loading = false;
+            deferred.reject({msg: 'Unable to connect to the Docker endpoint', err: err});
+          });
+          return deferred.promise;
+        },
+        getState: function() {
+          return state;
+        }
+      };
+    }])
+    .factory('EndpointService', ['$q', 'Endpoints', 'FileUploadService', function EndpointServiceFactory($q, Endpoints, FileUploadService) {
       'use strict';
       return {
         getActive: function() {
@@ -374,11 +433,11 @@ angular.module('portainer.services', ['ngResource', 'ngSanitize'])
         endpoints: function() {
           return Endpoints.query({}).$promise;
         },
-        updateEndpoint: function(ID, name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile) {
+        updateEndpoint: function(ID, name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, type) {
           var endpoint = {
             id: ID,
             Name: name,
-            URL: "tcp://" + URL,
+            URL: type === 'local' ? ("unix://" + URL) : ("tcp://" + URL),
             TLS: TLS
           };
           var deferred = $q.defer();

@@ -44,7 +44,7 @@ func (service *EndpointService) Endpoint(ID portainer.EndpointID) (*portainer.En
 
 // Endpoints return an array containing all the endpoints.
 func (service *EndpointService) Endpoints() ([]portainer.Endpoint, error) {
-	var endpoints []portainer.Endpoint
+	var endpoints = make([]portainer.Endpoint, 0)
 	err := service.store.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(endpointBucketName))
 
@@ -154,6 +154,18 @@ func (service *EndpointService) SetActive(endpoint *portainer.Endpoint) error {
 		}
 
 		err = bucket.Put(internal.Itob(activeEndpointID), data)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+// DeleteActive deletes the active endpoint.
+func (service *EndpointService) DeleteActive() error {
+	return service.store.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(activeEndpointBucketName))
+		err := bucket.Delete(internal.Itob(activeEndpointID))
 		if err != nil {
 			return err
 		}

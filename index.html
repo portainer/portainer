@@ -29,15 +29,36 @@
 </head>
 
 <body ng-controller="MainController">
-  <div id="page-wrapper" ng-class="{open: toggle && $state.current.name !== 'auth' && $state.current.name !== 'endpointInit', nopadding: $state.current.name === 'auth' || $state.current.name === 'endpointInit'}" ng-cloak>
+  <div id="page-wrapper" ng-class="{open: toggle && $state.current.name !== 'auth' && $state.current.name !== 'endpointInit' && $state.current.name !== 'init', nopadding: $state.current.name === 'auth' || $state.current.name === 'endpointInit' || $state.current.name === 'init' || applicationState.loading }" ng-cloak>
 
-    <div id="sideview" ui-view="sidebar"></div>
+    <div id="sideview" ui-view="sidebar" ng-if="!applicationState.loading"></div>
 
     <div id="content-wrapper">
       <div class="page-content">
 
+        <div class="page-wrapper" ng-if="applicationState.loading">
+          <!-- loading box -->
+          <div class="container simple-box">
+            <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+              <!-- loading box logo -->
+              <div class="row">
+                <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
+                <img ng-if="!logo" src="images/logo_alt.png" class="simple-box-logo" alt="Portainer">
+              </div>
+              <!-- !loading box logo -->
+              <!-- panel -->
+              <div class="row" style="text-align: center">
+                Connecting to the Docker enpoint...
+                <i class="fa fa-cog fa-spin" style="margin-left: 5px"></i>
+              </div>
+              <!-- !panel -->
+            </div>
+          </div>
+          <!-- !loading box -->
+        </div>
+
         <!-- Main Content -->
-        <div id="view" ui-view="content"></div>
+        <div id="view" ui-view="content" ng-if="!applicationState.loading"></div>
 
       </div><!-- End Page Content -->
     </div><!-- End Content Wrapper -->

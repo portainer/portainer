@@ -34,12 +34,14 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 		fileStorePath: path.Join(dataStorePath, fileStorePath),
 	}
 
-	err := createDirectoryIfNotExist(dataStorePath, 0755)
-	if err != nil {
-		return nil, err
-	}
+	// Checking if a mount directory exists is broken with Go on Windows.
+	// This will need to be reviewed after the issue has been fixed in Go.
+	// err := createDirectoryIfNotExist(dataStorePath, 0755)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	err = service.createDirectoryInStoreIfNotExist(TLSStorePath)
+	err := service.createDirectoryInStoreIfNotExist(TLSStorePath)
 	if err != nil {
 		return nil, err
 	}

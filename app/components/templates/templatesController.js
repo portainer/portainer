@@ -1,18 +1,22 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', '$anchorScroll', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'Templates', 'TemplateHelper', 'Messages', 'Settings',
-function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, Templates, TemplateHelper, Messages, Settings) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', '$anchorScroll', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'Templates', 'TemplateHelper', 'Messages', 'Pagination',
+function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, Templates, TemplateHelper, Messages, Pagination) {
   $scope.state = {
     selectedTemplate: null,
-    showAdvancedOptions: false
+    showAdvancedOptions: false,
+    pagination_count: Pagination.getPaginationCount('templates')
   };
   $scope.formValues = {
     network: "",
     name: "",
     ports: []
   };
-  $scope.pagination_count = Settings.pagination_count;
 
   var selectedItem = -1;
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('templates', $scope.state.pagination_count);
+  };
 
   $scope.addPortBinding = function() {
     $scope.formValues.ports.push({ hostPort: '', containerPort: '', protocol: 'tcp' });
@@ -115,7 +119,7 @@ function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, C
         if (v.value || v.set) {
           var val;
           if (v.type && v.type === 'container') {
-            if ($scope.endpointMode.provider === 'DOCKER_SWARM' && $scope.formValues.network.Scope === 'global') {
+            if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' && $scope.formValues.network.Scope === 'global') {
               val = $filter('swarmcontainername')(v.value);
             } else {
               var container = v.value;
@@ -206,7 +210,7 @@ function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, C
     var containersToHideLabels = c.hiddenLabels;
     Network.query({}, function (d) {
       var networks = d;
-      if ($scope.endpointMode.provider === 'DOCKER_SWARM' || $scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
+      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
         networks = d.filter(function (network) {
           if (network.Scope === 'global') {
             return network;

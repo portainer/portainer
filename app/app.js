@@ -36,6 +36,7 @@ angular.module('portainer', [
   'swarm',
   'network',
   'networks',
+  'node',
   'createNetwork',
   'task',
   'templates',
@@ -49,8 +50,8 @@ angular.module('portainer', [
     .setPrefix('portainer');
 
     jwtOptionsProvider.config({
-      tokenGetter: ['localStorageService', function(localStorageService) {
-        return localStorageService.get('JWT');
+      tokenGetter: ['LocalStorage', function(LocalStorage) {
+        return LocalStorage.getJWT();
       }],
       unauthenticatedRedirector: ['$state', function($state) {
         $state.go('auth', {error: 'Your session has expired'});
@@ -398,6 +399,22 @@ angular.module('portainer', [
         requiresLogin: true
       }
     })
+    .state('node', {
+      url: '^/nodes/:id/',
+      views: {
+        "content": {
+          templateUrl: 'app/components/node/node.html',
+          controller: 'NodeController'
+        },
+        "sidebar": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      },
+      data: {
+        requiresLogin: true
+      }
+    })
     .state('services', {
       url: '/services/',
       views: {
@@ -528,20 +545,17 @@ angular.module('portainer', [
       };
     });
   }])
-  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'EndpointMode', function ($rootScope, $state, Authentication, authManager, EndpointMode) {
+  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', function ($rootScope, $state, Authentication, authManager, StateManager) {
     authManager.checkAuthOnRefresh();
     authManager.redirectWhenUnauthenticated();
+
     Authentication.init();
+    StateManager.init();
+
     $rootScope.$state = $state;
 
     $rootScope.$on('tokenHasExpired', function($state) {
       $state.go('auth', {error: 'Your session has expired'});
-    });
-
-    $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams) {
-      if (toState.name !== 'endpointInit' && (fromState.name === 'auth' || fromState.name === '' || fromState.name === 'endpointInit') && Authentication.isAuthenticated()) {
-        EndpointMode.determineEndpointMode();
-      }
     });
   }])
   // This is your docker url that the api will use to make requests
@@ -554,4 +568,4 @@ angular.module('portainer', [
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('PAGINATION_MAX_ITEMS', 10)
-  .constant('UI_VERSION', 'v1.11.1');
+  .constant('UI_VERSION', 'v1.11.2');

@@ -7,7 +7,8 @@ const (
 
 // User errors.
 const (
-	ErrUserNotFound = Error("User not found")
+	ErrUserNotFound            = Error("User not found")
+	ErrAdminAlreadyInitialized = Error("Admin user already initialized")
 )
 
 // Endpoint errors.
