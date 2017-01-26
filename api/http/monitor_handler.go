@@ -17,7 +17,7 @@ import (
 // InfluxDB queries.
 const (
 	InfluxSelectFrom = "SELECT time,value FROM %s WHERE container='%s' and time > '%s'"
-	InfluxSelectTo   = "SELECT time,value FROM %s WHERE container='%s' and time >= '%s' and time < '%s'"
+	InfluxSelectTo   = "SELECT time,value FROM %s WHERE container='%s' and time >= '%s' and time <= '%s'"
 )
 
 // EsOpts ElasticSearch options.
