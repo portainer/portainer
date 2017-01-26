@@ -18,7 +18,7 @@ module.exports = function (grunt) {
   grunt.registerTask('default', ['jshint', 'build']);
   grunt.registerTask('build', [
     'clean:app',
-    'if:darwinBinaryNotExist',
+    'if:unixBinaryNotExist',
     'html2js',
     'useminPrepare:dev',
     'recess:build',
