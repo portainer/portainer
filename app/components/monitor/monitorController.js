@@ -1,11 +1,24 @@
 angular.module('monitor', [])
     .controller('MonitorController', ['$scope', '$http', '$filter', '$stateParams', '$document', 'Container',
         function ($scope, $http, $filter, $stateParams, $document, Container) {
+            // name of the container.
             $scope.name = undefined;
+
+            // stores displayed logs.
             $scope.logs = "";
+
+            // stores time ranges, local and UTC.
             $scope.range = {};
+            $scope.rangeUTC = {};
+
+            // set to true if the system is runing in automated mode, which will
+            // pull stats and logs automatically based on a fixed range.
             $scope.auto = true;
+
+            // set to true if the system is initialized.
             $scope.initialized = false;
+
+            // number of initial points to display.
             $scope.points = 30;
 
             setToAuto();
@@ -41,7 +54,7 @@ angular.module('monitor', [])
 
                 var d = new Date();
                 d.setMinutes(d.getMinutes() - 6);
-                $scope.range.from = d.toISOString();
+                $scope.range.from = d.toLocaleString();
                 $scope.range.to = null;
 
                 $scope.points = 30;
@@ -65,7 +78,7 @@ angular.module('monitor', [])
                     $scope.fromSlider.enable();
                     $scope.toSlider.enable();
 
-                    $scope.range.to = new Date().toISOString();
+                    $scope.range.to = new Date().toLocaleString();
                 }
             };
 
@@ -82,12 +95,12 @@ angular.module('monitor', [])
                     $scope.toSlider.setValue(0);
                 }
 
-                // fix date ranges to objects for querying.
-                $scope.range.from = new Date($scope.range.from).toISOString();
-                if ($scope.range.to) {
-                    $scope.range.to = new Date($scope.range.to).toISOString();
+                // fix date ranges to objects for querying in UTC.
+                $scope.rangeUTC.from = new Date($scope.range.from).toISOString();
+                if ($scope.rangeUTC.to) {
+                    $scope.rangeUTC.to = new Date($scope.range.to).toISOString();
                 } else {
-                    $scope.range.to = null;
+                    $scope.rangeUTC.to = null;
                 }
 
                 // update data.
@@ -109,12 +122,12 @@ angular.module('monitor', [])
             function getLogs() {
                 var params = {
                     'name': $scope.name,
-                    'from': $scope.range.from
+                    'from': $scope.rangeUTC.from
                 };
 
                 // if the user specified a 'to' time, set as parameter.
                 if ($scope.range.to) {
-                    params['to'] = new Date($scope.range.to).toISOString();
+                    params['to'] = $scope.rangeUTC.to;
                 }
 
                 $http({method: 'GET', url: "/api/monitor/logs", params: params})
@@ -131,11 +144,11 @@ angular.module('monitor', [])
                 var params = {
                     'db': 'statspout',
                     'name': $scope.name,
-                    'from': $scope.range.from
+                    'from': $scope.rangeUTC.from
                 };
 
                 if ($scope.range.to) {
-                    params['to'] = new Date($scope.range.to).toISOString();
+                    params['to'] = $scope.rangeUTC.to;
                 }
 
                 if (!$scope.auto) {
@@ -155,31 +168,15 @@ angular.module('monitor', [])
                     });
             }
 
-            function getUTCTimeString(d) {
-                var seconds = d.getUTCSeconds();
-                var hours = d.getUTCHours();
-                var minutes = d.getUTCMinutes();
-
-                if (seconds < 10) {
-                    seconds = "0" + seconds;
-                }
-
-                if (minutes < 10) {
-                    minutes = "0" + minutes;
-                }
-
-                return hours + ":" + minutes + ":" + seconds + "Z";
-            }
-
             function updateCharts(value) {
                 var timeDate = new Date(value.timestamp);
                 var fromDate = new Date($scope.range.from);
 
                 if ($scope.auto && timeDate > fromDate) {
-                    $scope.range.from = timeDate.toISOString();
+                    $scope.range.from = timeDate.toLocaleString();
                 }
 
-                var timestamp = getUTCTimeString(timeDate);
+                var timestamp = timeDate.toLocaleTimeString();
 
                 $scope.cpuChart.removeData();
                 $scope.cpuChart.addData([value.cpu_usage], timestamp);
@@ -307,7 +304,7 @@ angular.module('monitor', [])
                     // move times and store them back to the range model.
                     var d = new Date($scope.range.from);
                     d.setMinutes(d.getMinutes() + deltaMin);
-                    $scope.range.from = d.toISOString();
+                    $scope.range.from = d.toLocaleString();
 
                     // force update the scope.
                     $scope.$apply();
@@ -327,7 +324,7 @@ angular.module('monitor', [])
                     // move times and store them back to the range model.
                     var d = new Date($scope.range.to);
                     d.setMinutes(d.getMinutes() + deltaMin);
-                    $scope.range.to = d.toISOString();
+                    $scope.range.to = d.toLocaleString();
 
                     // force update the scope.
                     $scope.$apply();
