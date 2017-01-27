@@ -97,7 +97,7 @@ angular.module('monitor', [])
 
                 // fix date ranges to objects for querying in UTC.
                 $scope.rangeUTC.from = new Date($scope.range.from).toISOString();
-                if ($scope.rangeUTC.to) {
+                if ($scope.range.to) {
                     $scope.rangeUTC.to = new Date($scope.range.to).toISOString();
                 } else {
                     $scope.rangeUTC.to = null;
@@ -154,6 +154,8 @@ angular.module('monitor', [])
                 if (!$scope.auto) {
                     destroyCharts();
                 }
+
+                console.log(params['to']);
 
                 $http({method: 'GET', url: "/api/monitor/stats", params: jQuery.extend({}, params)})
                     .success(function (data, status, headers, config) {
