@@ -95,6 +95,10 @@ angular.module('monitor', [])
                     $scope.toSlider.setValue(0);
                 }
 
+                console.log(">> ");
+                console.log($scope.range.from);
+                console.log($scope.range.to);
+
                 // fix date ranges to objects for querying in UTC.
                 $scope.rangeUTC.from = new Date($scope.range.from).toISOString();
                 if ($scope.range.to) {
@@ -154,8 +158,6 @@ angular.module('monitor', [])
                 if (!$scope.auto) {
                     destroyCharts();
                 }
-
-                console.log(params['to']);
 
                 $http({method: 'GET', url: "/api/monitor/stats", params: jQuery.extend({}, params)})
                     .success(function (data, status, headers, config) {
@@ -339,12 +341,24 @@ angular.module('monitor', [])
                 $('#range-from').datetimepicker({
                     format: 'M/D/YYYY, h:mm:ss A',
                     sideBySide: true,
+                }).on('dp.change', function (e) {
+                    // little hack to update the scope.
+                    $scope.range.from = $('#range-from').val();
                 });
 
                 $('#range-to').datetimepicker({
                     format: 'M/D/YYYY, h:mm:ss A',
                     sideBySide: true,
+                }).on('dp.change', function (e) {
+                    // little hack to update the scope.
+                    $scope.range.to = $('#range-to').val();
                 });
+
+                $scope.$watch('range.from', function(newVal, oldVal, scope){
+                    if (newVal != oldVal) {
+                        scope.minDate = newVal;
+                    }
+                })
 
                 // Main interval to retrieve data.
                 var pullIntervalId = window.setInterval(pullInterval, 10000);
