@@ -1,3 +1,5 @@
+angular.module('portainer.filters', []);
+angular.module('portainer.helpers', []);
 angular.module('portainer', [
   'portainer.templates',
   'ui.bootstrap',
