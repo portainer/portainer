@@ -90,6 +90,13 @@
                   <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th>
+                <a ui-sref="containers" ng-click="order('Health')">
+                  Healthy
+                  <span ng-show="sortType == 'Health' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Health' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -106,6 +113,11 @@
                   <i class="fa fa-external-link" aria-hidden="true"></i> {{p.public}}:{{ p.private }}
                 </a>
                 <span ng-if="container.Ports.length == 0" >-</span>
+              </td>
+              <td>
+                <i ng-if="container.Health == 'healthy'" class="fa fa-check" aria-hidden="true"></i>
+                <i ng-if="container.Health == 'unhealthy'" class="fa fa-times" aria-hidden="true"></i>
+                <i ng-if="container.Health == 'starting'" class="fa fa-ellipsis-h" aria-hidden="true"></i>
               </td>
             </tr>
             <tr ng-if="!containers">

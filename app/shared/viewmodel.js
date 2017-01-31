@@ -106,6 +106,17 @@ function ContainerViewModel(data) {
   if (data.NetworkSettings && !_.isEmpty(data.NetworkSettings.Networks)) {
     this.IP = data.NetworkSettings.Networks[Object.keys(data.NetworkSettings.Networks)[0]].IPAddress;
   }
+
+  if (data.Status.includes('(healthy)')) {
+      this.Health = 'healthy';
+  } else if (data.Status.includes('(unhealthy)')) {
+      this.Health = 'unhealthy';
+  } else if (data.Status.includes('(health: starting)')) {
+      this.Health = 'starting';
+  } else {
+      this.Health = 'unknown';
+  }
+
   this.Image = data.Image;
   this.Command = data.Command;
   this.Checked = false;
