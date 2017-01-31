@@ -1,6 +1,6 @@
 angular.module('portainer.filters', []);
 angular.module('portainer.rest', ['ngResource']);
-angular.module('portainer.services', ['ngSanitize']);
+angular.module('portainer.services', []);
 angular.module('portainer.helpers', []);
 angular.module('portainer', [
   'ui.bootstrap',
