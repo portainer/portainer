@@ -1,7 +1,8 @@
 angular.module('portainer.filters', []);
+angular.module('portainer.rest', ['ngResource']);
+angular.module('portainer.services', ['ngSanitize']);
 angular.module('portainer.helpers', []);
 angular.module('portainer', [
-  'portainer.templates',
   'ui.bootstrap',
   'ui.router',
   'ui.select',
@@ -11,9 +12,11 @@ angular.module('portainer', [
   'angularUtils.directives.dirPagination',
   'LocalStorageModule',
   'angular-jwt',
-  'portainer.services',
-  'portainer.helpers',
+  'portainer.templates',
   'portainer.filters',
+  'portainer.rest',
+  'portainer.helpers',
+  'portainer.services',
   'auth',
   'dashboard',
   'container',
@@ -21,29 +24,29 @@ angular.module('portainer', [
   'containerLogs',
   'containers',
   'createContainer',
+  'createNetwork',
+  'createService',
+  'createVolume',
   'docker',
   'endpoint',
   'endpointInit',
   'endpoints',
   'events',
-  'images',
   'image',
+  'images',
   'main',
+  'network',
+  'networks',
+  'node',
   'service',
   'services',
   'settings',
   'sidebar',
-  'createService',
   'stats',
   'swarm',
-  'network',
-  'networks',
-  'node',
-  'createNetwork',
   'task',
   'templates',
-  'volumes',
-  'createVolume'])
+  'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider) {
     'use strict';
 
