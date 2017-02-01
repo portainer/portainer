@@ -13,6 +13,23 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
     error: false
   };
 
+  if (!$scope.applicationState.application.authentication) {
+    EndpointService.getActive().then(function success(data) {
+      StateManager.updateEndpointState(true)
+      .then(function success() {
+        $state.go('dashboard');
+      }, function error(err) {
+        Messages.error("Failure", err, 'Unable to connect to the Docker endpoint');
+      });
+    }, function error(err) {
+      if (err.status === 404) {
+        $state.go('endpointInit');
+      } else {
+        Messages.error("Failure", err, 'Unable to verify Docker endpoint existence');
+      }
+    });
+  }
+
   if ($stateParams.logout) {
     Authentication.logout();
   }

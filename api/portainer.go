@@ -20,6 +20,7 @@ type (
 		Labels    *[]Pair
 		Logo      *string
 		Templates *string
+		NoAuth    *bool
 		TLSVerify *bool
 		TLSCacert *string
 		TLSCert   *string
@@ -28,8 +29,9 @@ type (
 
 	// Settings represents Portainer settings.
 	Settings struct {
-		HiddenLabels []Pair `json:"hiddenLabels"`
-		Logo         string `json:"logo"`
+		HiddenLabels   []Pair `json:"hiddenLabels"`
+		Logo           string `json:"logo"`
+		Authentication bool   `json:"authentication"`
 	}
 
 	// User represent a user account.

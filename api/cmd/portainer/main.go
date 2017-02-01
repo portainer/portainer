@@ -25,8 +25,9 @@ func main() {
 	}
 
 	settings := &portainer.Settings{
-		HiddenLabels: *flags.Labels,
-		Logo:         *flags.Logo,
+		HiddenLabels:   *flags.Labels,
+		Logo:           *flags.Logo,
+		Authentication: !*flags.NoAuth,
 	}
 
 	fileService, err := file.NewService(*flags.Data, "")
@@ -41,9 +42,12 @@ func main() {
 	}
 	defer store.Close()
 
-	jwtService, err := jwt.NewService()
-	if err != nil {
-		log.Fatal(err)
+	var jwtService portainer.JWTService
+	if !*flags.NoAuth {
+		jwtService, err = jwt.NewService()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	var cryptoService portainer.CryptoService = &crypto.Service{}
@@ -76,6 +80,7 @@ func main() {
 		AssetsPath:      *flags.Assets,
 		Settings:        settings,
 		TemplatesURL:    *flags.Templates,
+		AuthDisabled:    *flags.NoAuth,
 		UserService:     store.UserService,
 		EndpointService: store.EndpointService,
 		CryptoService:   cryptoService,
