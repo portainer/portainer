@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -18,6 +19,11 @@ import (
 const (
 	InfluxSelectFrom = "SELECT time,value FROM %s WHERE container='%s' and time > '%s'"
 	InfluxSelectTo   = "SELECT time,value FROM %s WHERE container='%s' and time >= '%s' and time <= '%s'"
+)
+
+// ElasticSearch options.
+const (
+	PageSize = 200
 )
 
 // EsOpts ElasticSearch options.
@@ -100,12 +106,27 @@ func (h *MonitorHandler) queryLogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var page int
+	pageStr, err := GetValue(&values, "page")
+	if err != nil {
+		page = 0
+	} else {
+		page32, err := strconv.ParseInt(pageStr, 10, 32)
+		if err != nil {
+			Error(w, errors.New("error parsing page"), http.StatusBadRequest, h.logger)
+			return
+		}
+		page = int(page32)
+	}
+
 	timeRange := GetTimeRange(&values)
 
 	// create the query for ElasticSearch and buffer it.
-	esQuery := createLogQuery(name, timeRange)
+	esQuery := createLogQuery(name, timeRange, page)
 	buffer := &bytes.Buffer{}
 	json.NewEncoder(buffer).Encode(esQuery)
+
+	fmt.Println(buffer)
 
 	// create the request for ElasticSearch with the buffer (json data) as body.
 	req, err := http.NewRequest("GET", h.opts.ES.endpoint, buffer)
@@ -172,6 +193,7 @@ func (h *MonitorHandler) queryStats(w http.ResponseWriter, r *http.Request) {
 	// assume that the response will always contain at least one serie.
 	if len(result.Results) < 1 || len(result.Results[0].Series) < 1 {
 		Error(w, errors.New("backend result error"), http.StatusInternalServerError, h.logger)
+		return
 	}
 
 	stats := make([]Metric, len(result.Results[0].Series[0].Values))
@@ -270,6 +292,7 @@ type ElasticSearch struct {
 	Sort []interface{} `json:"sort"`
 
 	Size int `json:"size"`
+	From int `json:"from"`
 }
 
 type Sort struct {
@@ -295,9 +318,10 @@ type Range struct {
 // CreateLogQuery for ElasticSearch, using the name of the container and the timeRange.
 // The From field almost always should be given, if blank, it will query all the logs,
 // but this intended only for debugging, the To field can be "now" or a datetime.
-func createLogQuery(name string, timeRange TimeRange) ElasticSearch {
+func createLogQuery(name string, timeRange TimeRange, page int) ElasticSearch {
 	query := ElasticSearch{
-		Size: 200,
+		Size: PageSize,
+		From: page * PageSize,
 	}
 
 	// create the Must Term struct.

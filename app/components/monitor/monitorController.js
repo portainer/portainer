@@ -6,6 +6,9 @@ angular.module('monitor', [])
 
             // stores displayed logs.
             $scope.logs = "";
+            $scope.logList = [];
+            $scope.logPage = 0;
+            $scope.logMaxDisplay = 200;
 
             // stores time ranges, local and UTC.
             $scope.range = {};
@@ -88,16 +91,15 @@ angular.module('monitor', [])
                     // in order to replace with the newly retrieved data.
                     $scope.logs = "";
 
+                    $scope.logList = [];
+                    $scope.logPage = 0;
+
                     // reset the silder to 0 delta.
                     $scope.prevFrom = 0;
                     $scope.prevTo = 0;
                     $scope.fromSlider.setValue(0);
                     $scope.toSlider.setValue(0);
                 }
-
-                console.log(">> ");
-                console.log($scope.range.from);
-                console.log($scope.range.to);
 
                 // fix date ranges to objects for querying in UTC.
                 $scope.rangeUTC.from = new Date($scope.range.from).toISOString();
@@ -110,6 +112,12 @@ angular.module('monitor', [])
                 // update data.
                 getLogs();
                 getMetrics();
+            };
+
+            $scope.nextPage = function () {
+                $scope.logPage += 1;
+
+                getLogs();
             };
 
             // TODO: not used yet.
@@ -125,19 +133,40 @@ angular.module('monitor', [])
             // Gets logs from the backend and updates them in the display.
             function getLogs() {
                 var params = {
-                    'name': $scope.name,
-                    'from': $scope.rangeUTC.from
+                    name: $scope.name,
+                    from: $scope.rangeUTC.from,
+                    page: $scope.logPage
                 };
 
                 // if the user specified a 'to' time, set as parameter.
                 if ($scope.range.to) {
-                    params['to'] = $scope.rangeUTC.to;
+                    params.to = $scope.rangeUTC.to;
                 }
 
                 $http({method: 'GET', url: "/api/monitor/logs", params: params})
                     .success(function (data, status, headers, config) {
+                        var resultCount = data.hits.hits.length;
+
+                        $scope.logTotal = data.hits.total;
+                        $scope.logLast = $scope.logPage * 200 + resultCount;
+
+                        if ($scope.auto) {
+                            // remove first elements of the list to make space for new.
+                            if ($scope.logList.length + resultCount > $scope.logMaxDisplay) {
+                                var removeCount = $scope.logList.length + resultCount  - $scope.logMaxDisplay;
+                                $scope.logList.splice(0, removeCount);
+                            }
+                        } else {
+                            $scope.logList = [];
+                        }
+
                         // for each result, add it to the logs string.
                         angular.forEach(data.hits.hits, function (hit) {
+                            $scope.logList.push({
+                                timestamp: new Date(hit._source['@timestamp']).toLocaleString(),
+                                message: hit._source.message,
+                            });
+
                             $scope.logs += hit._source.message + "\n";
                         });
                     });
