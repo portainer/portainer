@@ -72,24 +72,28 @@
 <div class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
         <rd-widget>
-            <rd-widget-header icon="fa-info-circle" title="Logs since past hour"></rd-widget-header>
-            <rd-widget-body classes="no-padding">
-                <div class="panel-body">
-                    <table class="table">
-                        <tr ng-repeat="log in logList">
-                            <td style="white-space: nowrap">{{ log.timestamp }}</td>
-                            <td>{{ log.message }}</td>
-                        </tr>
-                    </table>
-
-                    <div ng-if="!auto">
-                        <div ng-if="logLast < logTotal">
-                            <button ng-click="nextPage()">Next</button>
-                        </div>
-                    </div>
-                    <!-- <pre id="stdoutLog">{{logs}}</pre> -->
+            <rd-widget-header icon="fa-info-circle" title="Logs since past hour">
+                <div ng-if="!auto" class="text-right">
+                    <button class="btn btn-default" ng-click="prevPage()" ng-if="logPage > 0">Prev</button>
+                    <button class="btn btn-default" ng-click="nextPage()" ng-if="logLast < logTotal">Next</button>
                 </div>
+            </rd-widget-header>
+
+            <rd-widget-body classes="no-padding">
+                <table class="table">
+                    <tr ng-repeat="log in logList">
+                        <td style="white-space: nowrap">{{ log.timestamp }}</td>
+                        <td>{{ log.message }}</td>
+                    </tr>
+                </table>
             </rd-widget-body>
+
+            <rd-widget-footer ng-if="!auto">
+                <div class="text-right">
+                    <button class="btn btn-default" ng-click="prevPage()" ng-if="logPage > 0">Prev</button>
+                    <button class="btn btn-default" ng-click="nextPage()" ng-if="logLast < logTotal">Next</button>
+                </div>
+            </rd-widget-footer>
         </rd-widget>
     </div>
 </div>

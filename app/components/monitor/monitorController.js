@@ -116,7 +116,11 @@ angular.module('monitor', [])
 
             $scope.nextPage = function () {
                 $scope.logPage += 1;
+                getLogs();
+            };
 
+            $scope.prevPage = function () {
+                $scope.logPage -= 1;
                 getLogs();
             };
 
