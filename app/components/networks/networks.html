@@ -68,7 +68,9 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th></th>
+                <th>
+                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+                </th>
                 <th>
                   <a ui-sref="networks" ng-click="order('Name')">
                     Name

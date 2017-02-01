@@ -19,7 +19,7 @@ type Handler struct {
 	DockerHandler    *DockerHandler
 	WebSocketHandler *WebSocketHandler
 	UploadHandler    *UploadHandler
-	FileHandler      http.Handler
+	FileHandler      *FileHandler
 }
 
 const (

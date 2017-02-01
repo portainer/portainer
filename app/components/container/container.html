@@ -174,6 +174,23 @@
                 </table>
               </td>
             </tr>
+            <tr ng-if="container.HostConfig.RestartPolicy.Name !== 'no'">
+              <td>Restart policies</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr>
+                    <td class="col-md-3">Name</td>
+                    <td>{{ container.HostConfig.RestartPolicy.Name }}</td>
+                  </tr>
+                  <tr>
+                    <td class="col-md-3">MaximumRetryCount</td>
+                    <td>
+                      {{ container.HostConfig.RestartPolicy.MaximumRetryCount }}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
