@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('StateManager', ['$q', 'Info', 'InfoHelper', 'Version', 'LocalStorage', function StateManagerFactory($q, Info, InfoHelper, Version, LocalStorage) {
+.factory('StateManager', ['$q', 'Config', 'Info', 'InfoHelper', 'Version', 'LocalStorage', function StateManagerFactory($q, Config, Info, InfoHelper, Version, LocalStorage) {
   'use strict';
 
   var state = {
@@ -9,12 +9,31 @@ angular.module('portainer.services')
   };
 
   return {
-    init: function() {
+    initialize: function() {
       var endpointState = LocalStorage.getEndpointState();
       if (endpointState) {
         state.endpoint = endpointState;
       }
-      state.loading = false;
+
+      var deferred = $q.defer();
+      var applicationState = LocalStorage.getApplicationState();
+      if (applicationState) {
+        state.application = applicationState;
+        state.loading = false;
+        deferred.resolve(state);
+      } else {
+        Config.$promise.then(function success(data) {
+          state.application.authentication = data.authentication;
+          state.application.logo = data.logo;
+          LocalStorage.storeApplicationState(state.application);
+          state.loading = false;
+          deferred.resolve(state);
+        }, function error(err) {
+          state.loading = false;
+          deferred.reject({msg: 'Unable to retrieve server configuration', err: err});
+        });
+      }
+      return deferred.promise;
     },
     clean: function() {
       state.endpoint = {};

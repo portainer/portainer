@@ -1,11 +1,14 @@
 angular
 .module('portainer')
-.directive('rdHeaderContent', function rdHeaderContent() {
+.directive('rdHeaderContent', ['Authentication', function rdHeaderContent(Authentication) {
   var directive = {
     requires: '^rdHeader',
     transclude: true,
-    template: '<div class="breadcrumb-links"><div class="pull-left" ng-transclude></div><div class="pull-right"><a ui-sref="auth({logout: true})" class="text-danger" style="margin-right: 25px;"><u>log out <i class="fa fa-sign-out" aria-hidden="true"></i></u></a></div></div>',
+    link: function (scope, iElement, iAttrs) {
+      scope.username = Authentication.getCredentials().username;
+    },
+    template: '<div class="breadcrumb-links"><div class="pull-left" ng-transclude></div><div class="pull-right" ng-if="username"><a ui-sref="auth({logout: true})" class="text-danger" style="margin-right: 25px;"><u>log out <i class="fa fa-sign-out" aria-hidden="true"></i></u></a></div></div>',
     restrict: 'E'
   };
   return directive;
-});
+}]);

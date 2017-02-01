@@ -8,6 +8,12 @@ angular.module('portainer.services')
     getEndpointState: function() {
       return localStorageService.get('ENDPOINT_STATE');
     },
+    storeApplicationState: function(state) {
+      localStorageService.set('APPLICATION_STATE', state);
+    },
+    getApplicationState: function() {
+      return localStorageService.get('APPLICATION_STATE');
+    },
     storeJWT: function(jwt) {
       localStorageService.set('JWT', jwt);
     },
