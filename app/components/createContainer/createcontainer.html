@@ -303,7 +303,31 @@
                   <input type="text" class="form-control" ng-model="config.Domainname" id="container_domainname" placeholder="e.g. example.com">
                 </div>
               </div>
-              <!-- !domainname -->
+              <!-- extra-hosts-variables -->
+              <div class="form-group">
+                <label for="container_extrahosts" class="col-sm-1 control-label text-left">Extra Hosts</label>
+                <div class="col-sm-11">
+                  <span class="label label-default interactive" ng-click="addExtraHost()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> extra host
+                  </span>
+                </div>
+                <!-- extra-hosts-input-list -->
+                <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="variable in config.HostConfig.ExtraHosts" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">name</span>
+                      <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP">
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="removeExtraHost($index)">
+                          <i class="fa fa-minus" aria-hidden="true"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <!-- !extra-hosts-input-list -->
+              </div>
+              <!-- !extra-hosts-variables -->
             </form>
           </div>
           <!-- !tab-network -->

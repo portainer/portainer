@@ -84,7 +84,8 @@ function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, C
         PortBindings: {},
         Binds: [],
         NetworkMode: $scope.formValues.network.Name,
-        Privileged: false
+        Privileged: false,
+        ExtraHosts: []
       },
       Volumes: {},
       name: $scope.formValues.name

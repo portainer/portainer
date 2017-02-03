@@ -24,7 +24,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       PortBindings: [],
       Binds: [],
       NetworkMode: 'bridge',
-      Privileged: false
+      Privileged: false,
+      ExtraHosts: []
     },
     Labels: {}
   };
@@ -60,6 +61,14 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   $scope.removeLabel = function(index) {
     $scope.formValues.Labels.splice(index, 1);
   };
+
+  $scope.addExtraHost = function() {
+    $scope.config.HostConfig.ExtraHosts.push({ value: '' });
+  };
+
+  $scope.removeExtraHost = function(index) {
+      $scope.config.HostConfig.ExtraHosts.splice(index, 1);
+    };
 
   Config.$promise.then(function (c) {
     var containersToHideLabels = c.hiddenLabels;
@@ -229,6 +238,13 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       networkMode += ':' + containerName;
     }
     config.HostConfig.NetworkMode = networkMode;
+    var extraHosts = [];
+    config.HostConfig.ExtraHosts.forEach(function (v) {
+      if (v.value) {
+        extraHosts.push(v.value);
+      }
+    });
+    config.HostConfig.ExtraHosts = extraHosts;
   }
 
   function prepareLabels(config) {
