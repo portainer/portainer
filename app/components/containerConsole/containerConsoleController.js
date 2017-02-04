@@ -22,7 +22,7 @@ function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, Mess
     } else {
       Image.get({id: d.Image}, function(imgData) {
         $scope.imageOS = imgData.Os;
-        $scope.state.command = imgData.Os === 'windows' ? 'powershell' : 'bash';
+        $scope.state.command = imgData.Os === 'windows' ? 'powershell' : '/bin/bash';
         $scope.state.loaded = true;
         $('#loadingViewSpinner').hide();
       }, function (e) {
