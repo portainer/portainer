@@ -119,17 +119,31 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
     angular.forEach($scope.state.filteredContainers, function (container) {
       if (container.Checked !== allSelected) {
         container.Checked = allSelected;
-        $scope.selectItem(container);
+        $scope.selectItem(null, container);
       }
     });
   };
 
-  $scope.selectItem = function (item) {
+  $scope.selectItem = function ($event, item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
     } else {
       $scope.state.selectedItemCount--;
     }
+
+    var list = $scope.state.filteredContainers;
+    if ($scope.state.lastSelectedItem && $event && $event.shiftKey){
+      var begin = list.indexOf($scope.state.lastSelectedItem);
+      var end = list.indexOf(item);
+      var selection = list.slice(begin, end);
+      angular.forEach(selection, function (selectedItem) {
+        if (selectedItem.Checked !== $scope.state.lastSelectedItem.Checked) {
+          selectedItem.Checked = $scope.state.lastSelectedItem.Checked;
+          $scope.selectItem(null, selectedItem);
+        }
+      });
+    }
+    $scope.state.lastSelectedItem = item;
   };
 
   $scope.toggleGetAll = function () {

@@ -94,7 +94,7 @@
           </thead>
           <tbody>
             <tr dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-              <td><input type="checkbox" ng-model="container.Checked" ng-change="selectItem(container)"/></td>
+              <td><input type="checkbox" ng-model="container.Checked" ng-click="selectItem($event, container)"/></td>
               <td><span class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span></td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
               <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
