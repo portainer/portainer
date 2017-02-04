@@ -18,7 +18,7 @@ angular.module('portainer.rest')
       isArray: true, transformResponse: jsonObjectsToArrayHandler
     },
     remove: {
-      method: 'DELETE', params: {id: '@id'},
+      method: 'DELETE', params: {id: '@id', force: '@force'},
       isArray: true, transformResponse: deleteImageHandler
     }
   });

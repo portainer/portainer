@@ -59,7 +59,8 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination) {
     });
   };
 
-  $scope.removeAction = function () {
+  $scope.removeAction = function (force) {
+    force = !!force;
     $('#loadImagesSpinner').show();
     var counter = 0;
     var complete = function () {
@@ -71,7 +72,7 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination) {
     angular.forEach($scope.images, function (i) {
       if (i.Checked) {
         counter = counter + 1;
-        Image.remove({id: i.Id}, function (d) {
+        Image.remove({id: i.Id, force: force}, function (d) {
           if (d[0].message) {
             $('#loadImagesSpinner').hide();
             Messages.error("Unable to remove image", {}, d[0].message);
