@@ -25,9 +25,19 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
       if ($scope.containersToHideLabels) {
         containers = ContainerHelper.hideContainers(d, $scope.containersToHideLabels);
       }
+      
+      var oldScopeContainers = $scope.containers;
       $scope.containers = containers.map(function (container) {
         var model = new ContainerViewModel(container);
         model.Status = $filter('containerstatus')(model.Status);
+
+        oldModel = _.find(oldScopeContainers, function(item){
+          return item.Id === model.Id;
+        });
+        if (oldModel && oldModel.Checked) {
+          model.Checked = true;
+          $scope.selectItem(model);
+        }
 
         if (model.IP) {
           $scope.state.displayIP = true;
