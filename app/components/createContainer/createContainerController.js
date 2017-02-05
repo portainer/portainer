@@ -37,14 +37,6 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     $scope.formValues.Volumes.splice(index, 1);
   };
 
-  $scope.addEnvironmentVariable = function() {
-    $scope.config.Env.push({ name: '', value: ''});
-  };
-
-  $scope.removeEnvironmentVariable = function(index) {
-    $scope.config.Env.splice(index, 1);
-  };
-
   $scope.addPortBinding = function() {
     $scope.config.HostConfig.PortBindings.push({ hostPort: '', containerPort: '', protocol: 'tcp' });
   };
@@ -184,16 +176,6 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     config.Tty = tty;
   }
 
-  function prepareEnvironmentVariables(config) {
-    var env = [];
-    config.Env.forEach(function (v) {
-      if (v.name && v.value) {
-        env.push(v.name + "=" + v.value);
-      }
-    });
-    config.Env = env;
-  }
-
   function prepareVolumes(config) {
     var binds = [];
     var volumes = {};
@@ -247,7 +229,6 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     prepareImageConfig(config);
     preparePortBindings(config);
     prepareConsole(config);
-    prepareEnvironmentVariables(config);
     prepareVolumes(config);
     prepareLabels(config);
     return config;
