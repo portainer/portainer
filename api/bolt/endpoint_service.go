@@ -67,6 +67,49 @@ func (service *EndpointService) Endpoints() ([]portainer.Endpoint, error) {
 	return endpoints, nil
 }
 
+// Synchronize creates, updates and deletes endpoints inside a single transaction.
+func (service *EndpointService) Synchronize(toCreate, toUpdate, toDelete []*portainer.Endpoint) error {
+	return service.store.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(endpointBucketName))
+
+		for _, endpoint := range toCreate {
+			id, _ := bucket.NextSequence()
+			endpoint.ID = portainer.EndpointID(id)
+
+			data, err := internal.MarshalEndpoint(endpoint)
+			if err != nil {
+				return err
+			}
+
+			err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
+			if err != nil {
+				return err
+			}
+		}
+
+		for _, endpoint := range toUpdate {
+			data, err := internal.MarshalEndpoint(endpoint)
+			if err != nil {
+				return err
+			}
+
+			err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
+			if err != nil {
+				return err
+			}
+		}
+
+		for _, endpoint := range toDelete {
+			err := bucket.Delete(internal.Itob(int(endpoint.ID)))
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
 // CreateEndpoint assign an ID to a new endpoint and saves it.
 func (service *EndpointService) CreateEndpoint(endpoint *portainer.Endpoint) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
