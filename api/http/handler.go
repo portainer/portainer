@@ -58,7 +58,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Error writes an API error message to the response and logger.
 func Error(w http.ResponseWriter, err error, code int, logger *log.Logger) {
 	// Log error.
-	logger.Printf("http error: %s (code=%d)", err, code)
+	if logger != nil {
+		logger.Printf("http error: %s (code=%d)", err, code)
+	}
 
 	// Write generic error response.
 	w.WriteHeader(code)

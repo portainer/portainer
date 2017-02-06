@@ -10,6 +10,7 @@ import (
 type Server struct {
 	BindAddress     string
 	AssetsPath      string
+	AuthDisabled    bool
 	UserService     portainer.UserService
 	EndpointService portainer.EndpointService
 	CryptoService   portainer.CryptoService
@@ -40,13 +41,15 @@ func (server *Server) updateActiveEndpoint(endpoint *portainer.Endpoint) error {
 // Start starts the HTTP server
 func (server *Server) Start() error {
 	middleWareService := &middleWareService{
-		jwtService: server.JWTService,
+		jwtService:   server.JWTService,
+		authDisabled: server.AuthDisabled,
 	}
 
 	var authHandler = NewAuthHandler()
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
+	authHandler.authDisabled = server.AuthDisabled
 	var userHandler = NewUserHandler(middleWareService)
 	userHandler.UserService = server.UserService
 	userHandler.CryptoService = server.CryptoService

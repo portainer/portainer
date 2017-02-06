@@ -135,7 +135,7 @@ type unixSocketHandler struct {
 func (h *unixSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	conn, err := net.Dial("unix", h.path)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		Error(w, err, http.StatusInternalServerError, nil)
 		return
 	}
 	c := httputil.NewClientConn(conn, nil)
@@ -143,7 +143,7 @@ func (h *unixSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	res, err := c.Do(r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		Error(w, err, http.StatusInternalServerError, nil)
 		return
 	}
 	defer res.Body.Close()
@@ -154,6 +154,6 @@ func (h *unixSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if _, err := io.Copy(w, res.Body); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		Error(w, err, http.StatusInternalServerError, nil)
 	}
 }

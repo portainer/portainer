@@ -20,6 +20,7 @@ type (
 		Labels    *[]Pair
 		Logo      *string
 		Templates *string
+		NoAuth    *bool
 		TLSVerify *bool
 		TLSCacert *string
 		TLSCert   *string
@@ -28,8 +29,9 @@ type (
 
 	// Settings represents Portainer settings.
 	Settings struct {
-		HiddenLabels []Pair `json:"hiddenLabels"`
-		Logo         string `json:"logo"`
+		HiddenLabels   []Pair `json:"hiddenLabels"`
+		Logo           string `json:"logo"`
+		Authentication bool   `json:"authentication"`
 	}
 
 	// User represent a user account.
@@ -119,7 +121,7 @@ type (
 
 const (
 	// APIVersion is the version number of portainer API.
-	APIVersion = "1.11.1"
+	APIVersion = "1.11.3"
 )
 
 const (

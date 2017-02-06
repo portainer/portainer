@@ -2,11 +2,12 @@ package cli
 
 const (
 	defaultBindAddress     = ":9000"
-	defaultDataDirectory   = "C:\\ProgramData\\Portainer"
+	defaultDataDirectory   = "C:\\data"
 	defaultAssetsDirectory = "."
 	defaultTemplatesURL    = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
+	defaultNoAuth          = "false"
 	defaultTLSVerify       = "false"
-	defaultTLSCACertPath   = "C:\\ProgramData\\Portainer\\certs\\ca.pem"
-	defaultTLSCertPath     = "C:\\ProgramData\\Portainer\\certs\\cert.pem"
-	defaultTLSKeyPath      = "C:\\ProgramData\\Portainer\\certs\\key.pem"
+	defaultTLSCACertPath   = "C:\\certs\\ca.pem"
+	defaultTLSCertPath     = "C:\\certs\\cert.pem"
+	defaultTLSKeyPath      = "C:\\certs\\key.pem"
 )

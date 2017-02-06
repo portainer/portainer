@@ -16,6 +16,7 @@ import (
 type AuthHandler struct {
 	*mux.Router
 	Logger        *log.Logger
+	authDisabled  bool
 	UserService   portainer.UserService
 	CryptoService portainer.CryptoService
 	JWTService    portainer.JWTService
@@ -26,6 +27,9 @@ const (
 	ErrInvalidCredentialsFormat = portainer.Error("Invalid credentials format")
 	// ErrInvalidCredentials is an error raised when credentials for a user are invalid
 	ErrInvalidCredentials = portainer.Error("Invalid credentials")
+	// ErrAuthDisabled is an error raised when trying to access the authentication endpoints
+	// when the server has been started with the --no-auth flag
+	ErrAuthDisabled = portainer.Error("Authentication is disabled")
 )
 
 // NewAuthHandler returns a new instance of AuthHandler.
@@ -41,6 +45,11 @@ func NewAuthHandler() *AuthHandler {
 func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		handleNotAllowed(w, []string{http.MethodPost})
+		return
+	}
+
+	if handler.authDisabled {
+		Error(w, ErrAuthDisabled, http.StatusServiceUnavailable, handler.Logger)
 		return
 	}
 

@@ -1,11 +1,28 @@
 angular.module('services', [])
-.controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Settings',
-function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Settings) {
+.controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination',
+function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
+  $scope.state.pagination_count = Pagination.getPaginationCount('services');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
-  $scope.pagination_count = Settings.pagination_count;
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('services', $scope.state.pagination_count);
+  };
+
+  $scope.order = function (sortType) {
+    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+    $scope.sortType = sortType;
+  };
+
+  $scope.selectItem = function (item) {
+    if (item.Checked) {
+      $scope.state.selectedItemCount++;
+    } else {
+      $scope.state.selectedItemCount--;
+    }
+  };
 
   $scope.scaleService = function scaleService(service) {
     $('#loadServicesSpinner').show();
@@ -21,19 +38,6 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Settin
       service.Replicas = service.ReplicaCount;
       Messages.error("Failure", e, "Unable to scale service");
     });
-  };
-
-  $scope.order = function (sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
   };
 
   $scope.removeAction = function () {

@@ -1,18 +1,22 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', '$anchorScroll', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'Templates', 'TemplateHelper', 'Messages', 'Settings',
-function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, Templates, TemplateHelper, Messages, Settings) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$filter', '$anchorScroll', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'Templates', 'TemplateHelper', 'Messages', 'Pagination',
+function ($scope, $q, $state, $filter, $anchorScroll, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, Templates, TemplateHelper, Messages, Pagination) {
   $scope.state = {
     selectedTemplate: null,
-    showAdvancedOptions: false
+    showAdvancedOptions: false,
+    pagination_count: Pagination.getPaginationCount('templates')
   };
   $scope.formValues = {
     network: "",
     name: "",
     ports: []
   };
-  $scope.pagination_count = Settings.pagination_count;
 
   var selectedItem = -1;
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('templates', $scope.state.pagination_count);
+  };
 
   $scope.addPortBinding = function() {
     $scope.formValues.ports.push({ hostPort: '', containerPort: '', protocol: 'tcp' });

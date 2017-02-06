@@ -1,14 +1,18 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'Settings',
-function ($scope, $state, Network, Config, Messages, Settings) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'Pagination',
+function ($scope, $state, Network, Config, Messages, Pagination) {
   $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('networks');
   $scope.state.selectedItemCount = 0;
   $scope.state.advancedSettings = false;
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
-  $scope.pagination_count = Settings.pagination_count;
   $scope.config = {
     Name: ''
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('networks', $scope.state.pagination_count);
   };
 
   function prepareNetworkConfiguration() {
