@@ -24,6 +24,12 @@ angular.module('monitor', [])
             // number of initial points to display.
             $scope.points = 30;
 
+            $scope.memCpuPoints = [];
+            $scope.netPoints = [];
+
+            var lastRx = 0,
+                lastTx = 0;
+
             setToAuto();
 
             $('#loadingViewSpinner').show();
@@ -218,6 +224,30 @@ angular.module('monitor', [])
                 $scope.cpuChart.removeData();
                 $scope.cpuChart.addData([value.cpu_usage], timestamp);
 
+                $scope.memCpuPoints.push([
+                    timeDate, 
+                    parseFloat(value.mem_usage), 
+                    parseFloat(value.cpu_usage),
+                ]);
+
+                var rxBytes = 0, txBytes = 0;
+
+                if (lastRx !== 0 || lastTx !== 0) {
+                    rxBytes = value.rx_bytes - lastRx;
+                    txBytes = value.tx_bytes - lastTx;
+                }
+                lastRx = value.rx_bytes;
+                lastTx = value.tx_bytes;
+
+                $scope.netPoints.push([
+                    timeDate, 
+                    parseInt(rxBytes), 
+                    parseInt(txBytes)
+                ]);
+
+                $scope.memCpuChart.updateOptions({ file: $scope.memCpuPoints });
+                $scope.netChart.updateOptions({ file: $scope.netPoints });
+
                 $scope.memChart.removeData();
                 $scope.memChart.addData([value.mem_usage], timestamp);
 
@@ -231,6 +261,11 @@ angular.module('monitor', [])
                 $scope.cpuChart.destroy();
                 $scope.memChart.destroy();
                 $scope.networkChart.destroy();
+                $scope.memCpuPoints = [];
+                $scope.netPoints = [];
+
+                lastRx = 0;
+                lastTx = 0;
             }
 
             function createCharts() {
@@ -400,6 +435,30 @@ angular.module('monitor', [])
                     // clearing interval when view changes
                     clearInterval(pullIntervalId);
                 });
+
+                $scope.memCpuChart = new Dygraph(
+                    document.getElementById("memcpu-chart"),
+                    $scope.memCpuPoints,
+                    {
+                        labelsSeparateLines: true,
+                        legend: "always",
+                        labelsDiv: "memcpu-chart-legend",
+                        strokeWidth: 2,
+                        labels: ['Date', '%Mem', '%Cpu']
+                    }
+                );
+
+                $scope.netChart = new Dygraph(
+                    document.getElementById("net-chart"),
+                    $scope.netPoints,
+                    {
+                        labelsSeparateLines: true,
+                        legend: 'always',
+                        labelsDiv: "net-chart-legend",
+                        strokeWidth: 2,
+                        labels: ['Date', 'Rx', 'Tx']
+                    }
+                );
 
                 $scope.initialized = true;
             });

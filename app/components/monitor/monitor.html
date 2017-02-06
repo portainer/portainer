@@ -49,6 +49,28 @@
 <div class="row">
     <div class="col-lg-6">
         <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="Stats"></rd-widget-header>
+            <rd-widget-body>
+                <div id="memcpu-chart" style="width: 100%"></div>
+                <div id="memcpu-chart-legend"></div>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
+
+    <div class="col-lg-6">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="Stats"></rd-widget-header>
+            <rd-widget-body>
+                <div id="net-chart" style="width: 100%"></div>
+                <div id="net-chart-legend"></div>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <rd-widget>
             <rd-widget-header icon="fa-area-chart" title="CPU usage"></rd-widget-header>
             <rd-widget-body>
                 <canvas id="cpu-stats-chart" width="770" height="230"></canvas>
