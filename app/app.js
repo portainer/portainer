@@ -26,6 +26,7 @@ angular.module('portainer', [
   'containers',
   'createContainer',
   'createNetwork',
+  'createSecret',
   'createService',
   'createVolume',
   'docker',
@@ -40,6 +41,8 @@ angular.module('portainer', [
   'network',
   'networks',
   'node',
+  'secrets',
+  'secret',
   'service',
   'services',
   'settings',
@@ -239,6 +242,19 @@ angular.module('portainer', [
         }
       }
     })
+    .state('actions.create.secret', {
+      url: "/secret",
+      views: {
+        "content@": {
+          templateUrl: 'app/components/createSecret/createsecret.html',
+          controller: 'CreateSecretController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('actions.create.service', {
       url: "/service",
       views: {
@@ -397,6 +413,32 @@ angular.module('portainer', [
         "content@": {
           templateUrl: 'app/components/node/node.html',
           controller: 'NodeController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('secrets', {
+      url: '^/secrets/',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/secrets/secrets.html',
+          controller: 'SecretsController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('secret', {
+      url: '^/secret/:id/',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/secret/secret.html',
+          controller: 'SecretController'
         },
         "sidebar@": {
           templateUrl: 'app/components/sidebar/sidebar.html',

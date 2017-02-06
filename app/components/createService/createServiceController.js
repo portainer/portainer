@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$scope', '$state', 'Service', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications',
-function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication, ResourceControlService, Notifications) {
+.controller('CreateServiceController', ['$scope', '$state', 'SecretHelper', 'Secret', 'Service', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications',
+function ($scope, $state, SecretHelper, Secret, Service, Volume, Network, ImageHelper, Authentication, ResourceControlService, Notifications) {
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
@@ -24,7 +24,8 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
     Ports: [],
     Parallelism: 1,
     UpdateDelay: 0,
-    FailureAction: 'pause'
+    FailureAction: 'pause',
+    Secrets: []
   };
 
   $scope.addPortBinding = function() {
@@ -73,6 +74,14 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
 
   $scope.removeContainerLabel = function(index) {
     $scope.formValues.ContainerLabels.splice(index, 1);
+  };
+  $scope.addSecret = function(secret) {
+    if (secret && $scope.formValues.Secrets.filter(function(serviceSecret) { return serviceSecret.Id === secret.Id;}).length === 0) {
+      $scope.formValues.Secrets.push({ Id: secret.Id, Name: secret.Name, FileName: secret.Name, Uid: '0', Gid: '0', Mode: 444 });
+    }
+  };
+  $scope.removeSecret = function(index) {
+    $scope.formValues.Secrets.splice(index, 1);
   };
 
   function prepareImageConfig(config, input) {
@@ -189,6 +198,12 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
     };
   }
 
+  function prepareSecretConfig(config, input) {
+    if (input.Secrets) {
+      config.TaskTemplate.ContainerSpec.Secrets = input.Secrets.map(SecretHelper.secretConfig);
+    }
+  }
+
   function prepareConfiguration() {
     var input = $scope.formValues;
     var config = {
@@ -210,6 +225,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
     prepareVolumes(config, input);
     prepareNetworks(config, input);
     prepareUpdateConfig(config, input);
+    prepareSecretConfig(config, input);
     return config;
   }
 
@@ -258,4 +274,13 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
   }, function (e) {
     Notifications.error("Failure", e, "Unable to retrieve networks");
   });
+
+  Secret.query({}, function (d) {
+    $scope.secrets = d.map(function (secret) {
+      return new SecretViewModel(secret);
+    });
+  }, function(e) {
+    Messages.error("Failure", e, "Unable to retrieve secrets");
+  });
+
 }]);

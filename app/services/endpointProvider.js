@@ -25,10 +25,10 @@ angular.module('portainer.services')
   };
   service.endpointPublicURL = function() {
     return endpoint.PublicURL;
-  }
+  };
   service.setEndpointPublicURL = function(publicURL) {
     endpoint.PublicURL = publicURL;
     LocalStorage.storeEndpointPublicURL(publicURL);
-  }
+  };
   return service;
 }]);

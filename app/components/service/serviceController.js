@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Notifications', 'Pagination', 'ModalService',
-function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Secret', 'SecretHelper', 'Service', 'ServiceHelper', 'Task', 'Node', 'Notifications', 'Pagination', 'ModalService',
+function ($scope, $stateParams, $state, $location, $anchorScroll, Secret, SecretHelper, Service, ServiceHelper, Task, Node, Notifications, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -55,6 +55,18 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
   $scope.updateEnvironmentVariable = function updateEnvironmentVariable(service, variable) {
     if (variable.value !== variable.originalValue || variable.key !== variable.originalKey) {
       updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
+    }
+  };
+  $scope.addSecret = function addSecret(service, secret) {
+    if (secret && service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === secret.Id;}).length === 0) {
+      service.ServiceSecrets.push({ Id: secret.Id, Name: secret.Name, FileName: secret.Name, Uid: '0', Gid: '0', Mode: 444 });
+      updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
+    }
+  };
+  $scope.removeSecret = function removeSecret(service, index) {
+    var removedElement = service.ServiceSecrets.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
     }
   };
   $scope.addLabel = function addLabel(service) {
@@ -164,7 +176,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     config.TaskTemplate.ContainerSpec.Env = translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
     config.TaskTemplate.ContainerSpec.Labels = translateServiceLabelsToLabels(service.ServiceContainerLabels);
     config.TaskTemplate.ContainerSpec.Image = service.Image;
-    config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets;
+    config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
 
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
@@ -250,7 +262,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
   }
 
   function translateServiceArrays(service) {
-    service.ServiceSecrets = service.Secrets;
+    service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
     service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
     service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
     service.ServiceContainerLabels = translateLabelsToServiceLabels(service.ContainerLabels);
@@ -289,9 +301,26 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
         $('#loadingViewSpinner').hide();
         Notifications.error("Failure", e, "Unable to retrieve tasks associated to the service");
       });
+
+      fetchSecrets();
+
     }, function (e) {
       $('#loadingViewSpinner').hide();
       Notifications.error("Failure", e, "Unable to retrieve service details");
+    });
+  }
+
+  function fetchSecrets() {
+    $('#loadSecretsSpinner').show();
+    Secret.query({}, function (d) {
+      $scope.secrets = d.map(function (secret) {
+        return new SecretViewModel(secret);
+      });
+      $('#loadSecretsSpinner').hide();
+    }, function(e) {
+      $('#loadSecretsSpinner').hide();
+      Notifications.error("Failure", e, "Unable to retrieve secrets");
+      $scope.secrets = [];
     });
   }
 

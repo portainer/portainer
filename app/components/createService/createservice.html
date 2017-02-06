@@ -155,6 +155,7 @@
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
+          <li class="interactive"><a data-target="#secrets" data-toggle="tab" ng-if="applicationState.endpoint.apiVersion >= 1.25">Secrets</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -436,6 +437,54 @@
             </form>
           </div>
           <!-- !tab-update-config -->
+          <!-- tab-secrets -->
+          <div class="tab-pane" id="secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25">
+            <form class="form-horizontal" style="margin-top: 15px;">
+              <div class="form-group">
+                <div class="col-sm-3">
+                  <select ng-options="secret.Name for secret in secrets" ng-model="newSecret">
+                    <option selected disabled hidden value="">Select a secret</option>
+                  </select>
+                  <span class="label label-default interactive" ng-click="addSecret(newSecret)">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> secret
+                  </span>
+                </div>
+                <div class="col-sm-9">
+                  <p class="small text-muted" style="margin-top: 10px;">
+                    Select secrets that are available for this service. Secrets are available under <span>/run/secrets/$FILENAME</span> in the service taks
+                  </p>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <!-- secrets-input-list -->
+                <div class="col-sm-12" style="margin-top: 10px;">
+                  <table class="table" >
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>File name</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="secret in formValues.Secrets">
+                        <td>{{ secret.Name }}</td>
+                        <td>{{ secret.FileName }}</td>
+                        <td>
+                          <button class="btn btn-xs btn-danger pull-right" type="button" ng-click="removeSecret($index)">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!-- !secrets-input-list -->
+              </div>
+            </form>
+          </div>
+          <!-- !tab-secrets -->
         </div>
       </rd-widget-body>
     </rd-widget>
