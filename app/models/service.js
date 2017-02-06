@@ -2,6 +2,8 @@ function ServiceViewModel(data) {
   this.Model = data;
   this.Id = data.ID;
   this.Name = data.Spec.Name;
+  this.CreatedAt = data.CreatedAt;
+  this.UpdatedAt = data.UpdatedAt;
   this.Image = data.Spec.TaskTemplate.ContainerSpec.Image;
   this.Version = data.Version.Index;
   if (data.Spec.Mode.Replicated) {
@@ -10,16 +12,46 @@ function ServiceViewModel(data) {
   } else {
     this.Mode = 'global';
   }
+  if (data.Spec.TaskTemplate.Resources) {
+    if (data.Spec.TaskTemplate.Resources.Limits) {
+    this.LimitNanoCPUs = data.Spec.TaskTemplate.Resources.Limits.NanoCPUs;
+    this.LimitMemoryBytes = data.Spec.TaskTemplate.Resources.Limits.MemoryBytes;
+    }
+    if (data.Spec.TaskTemplate.Resources.Reservations) {
+    this.ReservationNanoCPUs = data.Spec.TaskTemplate.Resources.Reservations.NanoCPUs;
+    this.ReservationMemoryBytes = data.Spec.TaskTemplate.Resources.Reservations.MemoryBytes;
+    }
+  }
+
+  if (data.Spec.TaskTemplate.RestartPolicy) {
+    this.RestartCondition = data.Spec.TaskTemplate.RestartPolicy.Condition;
+    this.RestartDelay = data.Spec.TaskTemplate.RestartPolicy.Delay;
+    this.RestartMaxAttempts = data.Spec.TaskTemplate.RestartPolicy.MaxAttempts;
+    this.RestartWindow = data.Spec.TaskTemplate.RestartPolicy.Window;
+  } else {
+    this.RestartCondition = 'none';
+    this.RestartDelay = 0;
+    this.RestartMaxAttempts = 0;
+    this.RestartWindow = 0;
+  }
+  this.Constraints = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Constraints || [] : [];
   this.Labels = data.Spec.Labels;
-  if (data.Spec.TaskTemplate.ContainerSpec) {
-    this.ContainerLabels = data.Spec.TaskTemplate.ContainerSpec.Labels;
+
+  var containerSpec = data.Spec.TaskTemplate.ContainerSpec;
+  if (containerSpec) {
+    this.ContainerLabels = containerSpec.Labels;
+    this.Env = containerSpec.Env;
+    this.Mounts = containerSpec.Mounts || [];
+    this.User = containerSpec.User;
+    this.Dir = containerSpec.Dir;
+    this.Command = containerSpec.Command;
   }
-  if (data.Spec.TaskTemplate.ContainerSpec.Env) {
-    this.Env = data.Spec.TaskTemplate.ContainerSpec.Env;
+
+  if (data.Spec.EndpointSpec) {
+    this.Ports = data.Spec.EndpointSpec.Ports;
   }
-  if (data.Endpoint.Ports) {
-    this.Ports = data.Endpoint.Ports;
-  }
+  this.VirtualIPs = data.Endpoint ? data.Endpoint.VirtualIPs : [];
+
   if (data.Spec.UpdateConfig) {
     this.UpdateParallelism = (typeof data.Spec.UpdateConfig.Parallelism !== undefined) ? data.Spec.UpdateConfig.Parallelism || 0 : 1;
     this.UpdateDelay = data.Spec.UpdateConfig.Delay || 0;
@@ -32,5 +64,4 @@ function ServiceViewModel(data) {
 
   this.Checked = false;
   this.Scale = false;
-  this.EditName = false;
 }

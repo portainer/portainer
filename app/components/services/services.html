@@ -58,6 +58,13 @@
                   <span ng-show="sortType == 'Mode' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th>
+                <a ui-sref="services" ng-click="order('UpdatedAt')">
+                  Updated at
+                  <span ng-show="sortType == 'UpdatedAt' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'UpdatedAt' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
             </thead>
             <tbody>
               <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
@@ -75,6 +82,9 @@
                     <a class="interactive" ng-click="service.Scale = false;"><i class="fa fa-times"></i></a>
                     <a class="interactive" ng-click="scaleService(service)"><i class="fa fa-check-square-o"></i></a>
                   </span>
+                </td>
+                <td>
+                  {{ service.UpdatedAt|getisodate }}
                 </td>
               </tr>
               <tr ng-if="!services">

@@ -1,0 +1,66 @@
+<div ng-if="service.ServiceConstraints">
+  <rd-widget>
+    <rd-widget-header icon="fa-tasks" title="Placement constraints">
+      <div class="nopadding">
+        <a class="btn btn-default btn-sm pull-right" ng-click="addPlacementConstraint(service)">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> placement constraint
+        </a>
+      </div>
+    </rd-widget-header>
+    <rd-widget-body ng-if="service.ServiceConstraints.length === 0">
+      <p>There are no placement constraints for this service.</p>
+    </rd-widget-body>
+    <rd-widget-body ng-if="service.ServiceConstraints.length > 0" classes="no-padding">
+      <table class="table" >
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Operator</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="constraint in service.ServiceConstraints">
+            <td>
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control" ng-model="constraint.key" placeholder="e.g. node.role" ng-change="updatePlacementConstraint(service, constraint)">
+              </div>
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <select name="constraintOperator" class="form-control" ng-model="constraint.operator" ng-change="updatePlacementConstraint(service, constraint)">
+                  <option value="==">==</option>
+                  <option value="!=">!=</option>
+                </select>
+              </div>
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager" ng-change="updatePlacementConstraint(service, constraint)">
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="button" ng-click="removePlacementConstraint(service, $index)">
+                    <i class="fa fa-minus" aria-hidden="true"></i>
+                  </button>
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+    <rd-widget-footer>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServiceConstraints'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['ServiceConstraints'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
+  </rd-widget>
+</div>
