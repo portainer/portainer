@@ -19,7 +19,7 @@ const (
 	errSocketNotFound          = portainer.Error("Unable to locate Unix socket")
 	errEndpointsFileNotFound   = portainer.Error("Unable to locate external endpoints file")
 	errInvalidSyncInterval     = portainer.Error("Invalid synchronization interval")
-	errEndpointExcludeExternal = portainer.Error("Cannot use the -H mutually with --external-endpoints")
+	errEndpointExcludeExternal = portainer.Error("Cannot use the -H flag mutually with --external-endpoints")
 )
 
 // ParseFlags parse the CLI flags and return a portainer.Flags struct
