@@ -24,11 +24,17 @@ func NewWatcher(endpointService portainer.EndpointService, syncInterval string) 
 // WatchEndpointFile starts a cron job to synchronize the endpoints from a file
 func (watcher *Watcher) WatchEndpointFile(endpointFilePath string) error {
 	job := newEndpointSyncJob(endpointFilePath, watcher.EndpointService)
+
 	err := job.Sync()
 	if err != nil {
 		return err
 	}
-	watcher.Cron.AddJob("@every "+watcher.syncInterval, job)
+
+	err = watcher.Cron.AddJob("@every "+watcher.syncInterval, job)
+	if err != nil {
+		return err
+	}
+
 	watcher.Cron.Start()
 	return nil
 }

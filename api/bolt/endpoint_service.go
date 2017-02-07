@@ -73,27 +73,14 @@ func (service *EndpointService) Synchronize(toCreate, toUpdate, toDelete []*port
 		bucket := tx.Bucket([]byte(endpointBucketName))
 
 		for _, endpoint := range toCreate {
-			id, _ := bucket.NextSequence()
-			endpoint.ID = portainer.EndpointID(id)
-
-			data, err := internal.MarshalEndpoint(endpoint)
-			if err != nil {
-				return err
-			}
-
-			err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
+			err := storeNewEndpoint(endpoint, bucket)
 			if err != nil {
 				return err
 			}
 		}
 
 		for _, endpoint := range toUpdate {
-			data, err := internal.MarshalEndpoint(endpoint)
-			if err != nil {
-				return err
-			}
-
-			err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
+			err := marshalAndStoreEndpoint(endpoint, bucket)
 			if err != nil {
 				return err
 			}
@@ -114,16 +101,7 @@ func (service *EndpointService) Synchronize(toCreate, toUpdate, toDelete []*port
 func (service *EndpointService) CreateEndpoint(endpoint *portainer.Endpoint) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(endpointBucketName))
-
-		id, _ := bucket.NextSequence()
-		endpoint.ID = portainer.EndpointID(id)
-
-		data, err := internal.MarshalEndpoint(endpoint)
-		if err != nil {
-			return err
-		}
-
-		err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
+		err := storeNewEndpoint(endpoint, bucket)
 		if err != nil {
 			return err
 		}
@@ -214,4 +192,24 @@ func (service *EndpointService) DeleteActive() error {
 		}
 		return nil
 	})
+}
+
+func marshalAndStoreEndpoint(endpoint *portainer.Endpoint, bucket *bolt.Bucket) error {
+	data, err := internal.MarshalEndpoint(endpoint)
+	if err != nil {
+		return err
+	}
+
+	err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func storeNewEndpoint(endpoint *portainer.Endpoint, bucket *bolt.Bucket) error {
+	id, _ := bucket.NextSequence()
+	endpoint.ID = portainer.EndpointID(id)
+
+	return marshalAndStoreEndpoint(endpoint, bucket)
 }

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/portainer/portainer"
 )
@@ -46,6 +47,9 @@ func endpointSyncError(err error, logger *log.Logger) bool {
 
 func isValidEndpoint(endpoint *portainer.Endpoint) bool {
 	if endpoint.Name != "" && endpoint.URL != "" {
+		if !strings.HasPrefix(endpoint.URL, "unix://") && !strings.HasPrefix(endpoint.URL, "tcp://") {
+			return false
+		}
 		return true
 	}
 	return false
@@ -155,12 +159,13 @@ func (job endpointSyncJob) Sync() error {
 		if endpointSyncError(err, job.logger) {
 			return err
 		}
+		job.logger.Printf("Endpoint synchronization ended. [created: %v] [updated: %v] [deleted: %v]", len(sync.endpointsToCreate), len(sync.endpointsToUpdate), len(sync.endpointsToDelete))
 	}
 	return nil
 }
 
 func (job endpointSyncJob) Run() {
-	job.logger.Printf("Endpoint synchronization job started")
+	job.logger.Println("Endpoint synchronization job started.")
 	err := job.Sync()
 	endpointSyncError(err, job.logger)
 }

@@ -15,10 +15,11 @@ import (
 type Service struct{}
 
 const (
-	errInvalidEnpointProtocol = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
-	errSocketNotFound         = portainer.Error("Unable to locate Unix socket")
-	errEndpointsFileNotFound  = portainer.Error("Unable to locate external endpoints file")
-	errInvalidSyncInterval    = portainer.Error("Invalid synchronization interval")
+	errInvalidEnpointProtocol  = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
+	errSocketNotFound          = portainer.Error("Unable to locate Unix socket")
+	errEndpointsFileNotFound   = portainer.Error("Unable to locate external endpoints file")
+	errInvalidSyncInterval     = portainer.Error("Invalid synchronization interval")
+	errEndpointExcludeExternal = portainer.Error("Cannot use the -H mutually with --external-endpoints")
 )
 
 // ParseFlags parse the CLI flags and return a portainer.Flags struct
@@ -48,13 +49,37 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 
 // ValidateFlags validates the values of the flags.
 func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
-	if *flags.Endpoint != "" {
-		if !strings.HasPrefix(*flags.Endpoint, "unix://") && !strings.HasPrefix(*flags.Endpoint, "tcp://") {
+
+	if *flags.Endpoint != "" && *flags.ExternalEndpoints != "" {
+		return errEndpointExcludeExternal
+	}
+
+	err := validateEndpoint(*flags.Endpoint)
+	if err != nil {
+		return err
+	}
+
+	err = validateExternalEndpoints(*flags.ExternalEndpoints)
+	if err != nil {
+		return err
+	}
+
+	err = validateSyncInterval(*flags.SyncInterval)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validateEndpoint(endpoint string) error {
+	if endpoint != "" {
+		if !strings.HasPrefix(endpoint, "unix://") && !strings.HasPrefix(endpoint, "tcp://") {
 			return errInvalidEnpointProtocol
 		}
 
-		if strings.HasPrefix(*flags.Endpoint, "unix://") {
-			socketPath := strings.TrimPrefix(*flags.Endpoint, "unix://")
+		if strings.HasPrefix(endpoint, "unix://") {
+			socketPath := strings.TrimPrefix(endpoint, "unix://")
 			if _, err := os.Stat(socketPath); err != nil {
 				if os.IsNotExist(err) {
 					return errSocketNotFound
@@ -63,22 +88,27 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 			}
 		}
 	}
+	return nil
+}
 
-	if *flags.ExternalEndpoints != "" {
-		if _, err := os.Stat(*flags.ExternalEndpoints); err != nil {
+func validateExternalEndpoints(externalEndpoints string) error {
+	if externalEndpoints != "" {
+		if _, err := os.Stat(externalEndpoints); err != nil {
 			if os.IsNotExist(err) {
 				return errEndpointsFileNotFound
 			}
 			return err
 		}
 	}
+	return nil
+}
 
-	if *flags.SyncInterval != defaultSyncInterval {
-		_, err := time.ParseDuration(*flags.SyncInterval)
+func validateSyncInterval(syncInterval string) error {
+	if syncInterval != defaultSyncInterval {
+		_, err := time.ParseDuration(syncInterval)
 		if err != nil {
 			return errInvalidSyncInterval
 		}
 	}
-
 	return nil
 }
