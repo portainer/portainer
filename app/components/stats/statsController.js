@@ -117,12 +117,6 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
     });
     $scope.networkLegend = $sce.trustAsHtml(networkChart.generateLegend());
 
-    function setUpdateStatsTimeout() {
-      if(!destroyed) {
-        timeout = $timeout(updateStats, 5000);
-      }
-    }
-
     function updateStats() {
       Container.stats({id: $stateParams.id}, function (d) {
         var arr = Object.keys(d).map(function (key) {
@@ -205,6 +199,12 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
       return cpuPercent;
     }
   });
+
+  function setUpdateStatsTimeout() {
+    if(!destroyed) {
+      timeout = $timeout(updateStats, 5000);
+    }
+  }
 
   Container.get({id: $stateParams.id}, function (d) {
     $scope.container = d;
