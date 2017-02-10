@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('TemplateService', ['$q', 'Template', 'TemplateHelper', 'ImageHelper', function TemplateServiceFactory($q, Template, TemplateHelper, ImageHelper) {
+.factory('TemplateService', ['$q', 'Template', 'TemplateHelper', 'ImageHelper', 'ContainerHelper', function TemplateServiceFactory($q, Template, TemplateHelper, ImageHelper, ContainerHelper) {
   'use strict';
   var service = {};
 
@@ -39,9 +39,8 @@ angular.module('portainer.services')
     configuration.HostConfig.NetworkMode = network.Name;
     configuration.name = containerName;
     configuration.Image = template.Image;
-    if (template.Env) {
-      configuration.Env = TemplateHelper.EnvToStringArray(template.Env, containerMapping);
-    }
+    configuration.Env = TemplateHelper.EnvToStringArray(template.Env, containerMapping);
+    configuration.Cmd = ContainerHelper.commandStringToArray(template.Command);
     var portConfiguration = TemplateHelper.portArrayToPortConfiguration(template.Ports);
     configuration.HostConfig.PortBindings = portConfiguration.bindings;
     configuration.ExposedPorts = portConfiguration.exposedPorts;
