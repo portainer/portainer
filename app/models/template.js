@@ -4,6 +4,7 @@ function TemplateViewModel(data) {
   this.Logo = data.logo;
   this.Image = data.image;
   this.Registry = data.registry ? data.registry : '';
+  this.Network = data.network ? data.network : '';
   this.Env = data.env ? data.env : [];
   this.Volumes = data.volumes ? data.volumes : [];
   this.Ports = [];

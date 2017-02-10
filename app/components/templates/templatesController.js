@@ -68,6 +68,11 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, ImageServ
     selectedItem = idx;
     var selectedTemplate = $scope.templates[idx];
     $scope.state.selectedTemplate = selectedTemplate;
+    if (selectedTemplate.Network) {
+      $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === selectedTemplate.Network; });
+    } else {
+      $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === "bridge"; });
+    }
     $anchorScroll('selectedTemplate');
   }
 
@@ -94,8 +99,6 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, ImageServ
       networks = NetworkService.filterGlobalNetworks(networks);
       $scope.globalNetworkCount = networks.length;
       NetworkService.addPredefinedLocalNetworks(networks);
-    } else {
-      $scope.formValues.network = _.find(networks, function(o) { return o.Name === "bridge"; });
     }
     return networks;
   }
