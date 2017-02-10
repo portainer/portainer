@@ -1,40 +1,70 @@
 angular.module('portainer.helpers')
-.factory('TemplateHelper', [function TemplateHelperFactory() {
+.factory('TemplateHelper', ['$filter', function TemplateHelperFactory($filter) {
   'use strict';
-  return {
-    getPortBindings: function(ports) {
-      var bindings = [];
-      ports.forEach(function (port) {
-        var portAndProtocol = _.split(port, '/');
-        var binding = {
-          containerPort: portAndProtocol[0],
-          protocol: portAndProtocol[1]
-        };
-        bindings.push(binding);
-      });
-      return bindings;
-    },
-    //Not used atm, may prove useful later
-    getVolumeBindings: function(volumes) {
-      var bindings = [];
-      volumes.forEach(function (volume) {
-        bindings.push({ containerPath: volume });
-      });
-      return bindings;
-    },
-    //Not used atm, may prove useful later
-    getEnvBindings: function(env) {
-      var bindings = [];
-      env.forEach(function (envvar) {
-        var binding = {
-          name: envvar.name
-        };
-        if (envvar.set) {
-          binding.value = envvar.set;
-        }
-        bindings.push(binding);
-      });
-      return bindings;
-    }
+  var helper = {};
+
+  helper.getDefaultContainerConfiguration = function() {
+    return {
+      Env: [],
+      OpenStdin: false,
+      Tty: false,
+      ExposedPorts: {},
+      HostConfig: {
+        RestartPolicy: {
+          Name: 'no'
+        },
+        PortBindings: {},
+        Binds: [],
+        Privileged: false
+      },
+      Volumes: {}
+    };
   };
+
+  helper.portArrayToPortConfiguration = function(ports) {
+    var portConfiguration = {
+      bindings: {},
+      exposedPorts: {}
+    };
+    ports.forEach(function (p) {
+      if (p.containerPort) {
+        var key = p.containerPort + "/" + p.protocol;
+        var binding = {};
+        if (p.hostPort) {
+          binding.HostPort = p.hostPort;
+          if (p.hostPort.indexOf(':') > -1) {
+            var hostAndPort = p.hostPort.split(':');
+            binding.HostIp = hostAndPort[0];
+            binding.HostPort = hostAndPort[1];
+          }
+        }
+        portConfiguration.bindings[key] = [binding];
+        portConfiguration.exposedPorts[key] = {};
+      }
+    });
+    return portConfiguration;
+  };
+
+  helper.EnvToStringArray = function(templateEnvironment, containerMapping) {
+    var env = [];
+    templateEnvironment.forEach(function(envvar) {
+      if (envvar.value || envvar.set) {
+        var value = envvar.set ? envvar.set : envvar.value;
+        if (envvar.type && envvar.type === 'container') {
+          if (containerMapping === 'BY_CONTAINER_IP') {
+            var container = envvar.value;
+            value = container.NetworkSettings.Networks[Object.keys(container.NetworkSettings.Networks)[0]].IPAddress;
+          } else if (containerMapping === 'BY_CONTAINER_NAME') {
+            value = $filter('containername')(envvar.value);
+          } else if (containerMapping === 'BY_SWARM_CONTAINER_NAME') {
+            value = $filter('swarmcontainername')(envvar.value);
+          }
+        }
+        env.push(envvar.name + "=" + value);
+      }
+    });
+    return env;
+  };
+
+  return helper;
 }]);

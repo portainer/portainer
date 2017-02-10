@@ -10,7 +10,7 @@
 <div id="selectedTemplate" class="row" ng-if="state.selectedTemplate">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-custom-header icon="state.selectedTemplate.logo" title="state.selectedTemplate.image">
+      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Image">
       </rd-widget-custom-header>
       <rd-widget-body classes="padding">
         <form class="form-horizontal">
@@ -27,9 +27,9 @@
           </div>
           <!-- name-and-network-inputs -->
           <div class="form-group">
-            <label for="image_registry" class="col-sm-2 control-label text-left">Name</label>
+            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
             <div class="col-sm-4">
-              <input type="text" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)">
+              <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)">
             </div>
             <label for="container_network" class="col-sm-2 control-label text-right">Network</label>
             <div class="col-sm-4">
@@ -39,7 +39,7 @@
             </div>
           </div>
           <!-- !name-and-network-inputs -->
-          <div ng-repeat="var in state.selectedTemplate.env" ng-if="!var.set" class="form-group">
+          <div ng-repeat="var in state.selectedTemplate.Env" ng-if="!var.set" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
             <div class="col-sm-10">
               <select ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM' && var.type === 'container'" ng-options="container|containername for container in runningContainers" class="form-control" ng-model="var.value">
@@ -70,7 +70,7 @@
             </div>
             <!-- port-mapping-input-list -->
             <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="portBinding in formValues.ports" style="margin-top: 2px;">
+              <div ng-repeat="portBinding in state.selectedTemplate.Ports" style="margin-top: 2px;">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">host</span>
                   <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
@@ -125,9 +125,9 @@
       <rd-widget-body classes="padding">
         <div class="template-list">
           <div dir-paginate="tpl in templates | itemsPerPage: state.pagination_count" class="container-template hvr-underline-from-center" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index)">
-            <img class="logo" ng-src="{{ tpl.logo }}" />
-            <div class="title">{{ tpl.title }}</div>
-            <div class="description">{{ tpl.description }}</div>
+            <img class="logo" ng-src="{{ tpl.Logo }}" />
+            <div class="title">{{ tpl.Title }}</div>
+            <div class="description">{{ tpl.Description }}</div>
           </div>
           <div ng-if="!templates" class="text-center text-muted">
             Loading...
