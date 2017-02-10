@@ -129,6 +129,7 @@ module.exports = function (grunt) {
         'bower_components/bootstrap/dist/js/bootstrap.min.js',
         'bower_components/Chart.js/Chart.min.js',
         'bower_components/lodash/dist/lodash.min.js',
+        'bower_components/splitargs/src/splitargs.js',
         'bower_components/filesize/lib/filesize.min.js',
         'bower_components/moment/min/moment.min.js',
         'bower_components/xterm.js/dist/xterm.js',
@@ -399,7 +400,7 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer'
+          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --templates http://192.168.1.68:8080/templates.json'
         ].join(';')
       },
       runSwarm: {
