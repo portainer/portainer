@@ -16,6 +16,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   $scope.config = {
     Image: '',
     Env: [],
+    Cmd: '',
     ExposedPorts: {},
     HostConfig: {
       RestartPolicy: {
@@ -243,6 +244,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
+    config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
     prepareNetworkConfig(config);
     prepareImageConfig(config);
     preparePortBindings(config);
