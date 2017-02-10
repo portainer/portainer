@@ -1,0 +1,48 @@
+<rd-header>
+    <rd-header-title title="Container list">
+        <a data-toggle="tooltip" title="Refresh" ui-sref="containers" ui-sref-opts="{reload: true}">
+            <i class="fa fa-refresh" aria-hidden="true"></i>
+        </a>
+    </rd-header-title>
+    <rd-header-content>Monitor</rd-header-content>
+</rd-header>
+
+<div class="col-lg-12">
+    <rd-widget>
+        <rd-widget-header icon="fa-server" title="Containers">
+            <div class="pull-right">
+                <i id="loadContainersSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+            </div>
+        </rd-widget-header>
+        <rd-widget-taskbar classes="col-lg-12">
+            <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm"/>
+        </rd-widget-taskbar>
+
+        <rd-widget-body classes="no-padding">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th><a ui-sref="containers" ng-click="order('Names')">
+                            Name
+                            <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                            <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                        </a></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+                        <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="monitor({id: container.Id})">{{ container|containername}}</a></td>
+                        </td>
+                    </tr>
+                    <tr ng-if="!containers"><td colspan="8" class="text-center text-muted">Loading...</td></tr>
+                    <tr ng-if="containers.length == 0"><td colspan="8" class="text-center text-muted">No containers available.</td></tr>
+                    </tbody>
+                </table>
+                <div ng-if="containers" class="pull-left pagination-controls">
+                    <dir-pagination-controls></dir-pagination-controls>
+                </div>
+            </div>
+        </rd-widget-body>
+    </rd-widget>
+</div>

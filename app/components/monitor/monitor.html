@@ -1,0 +1,121 @@
+<rd-header>
+    <rd-header-title title="Container monitor">
+        <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+    </rd-header-title>
+    <rd-header-content>
+        <a ui-sref="monitorList">Monitor</a> > {{ container.Name|trimcontainername }}
+    </rd-header-content>
+</rd-header>
+
+<div class="row">
+    <div class="col-lg-12">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="Time Range">
+                <div class="pull-right">
+                    <input type="checkbox" ng-model="auto" id="autoCheckbox" ng-click="setAuto(auto)">
+                    <label for="autoCheckbox">Auto</label>
+                    <button class="btn btn-primary" ng-disabled="auto" ng-click="update()" style="margin-left: 8px">Search</button>
+                </div>
+            </rd-widget-header>
+
+            <rd-widget-body>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <input type="text" ng-model="range.from" id="range-from" class="form-control" ng-disabled="auto">
+                        <input id="fromSlider" type="text" style="width: 100%" data-slider-step="1">
+                    </div>
+
+                    <div class="col-lg-6">
+                        <input type="text" ng-model="range.to" id="range-to" class="form-control" ng-disabled="auto">
+                        <input id="toSlider" type="text" style="width: 100%" data-slider-step="1">
+                    </div>
+                </div>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="Memory usage"></rd-widget-header>
+            <rd-widget-body>
+                <canvas id="memory-stats-chart" width="770" height="100"></canvas>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="Stats"></rd-widget-header>
+            <rd-widget-body>
+                <div id="memcpu-chart" style="width: 100%"></div>
+                <div id="memcpu-chart-legend"></div>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
+
+    <div class="col-lg-6">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="Stats"></rd-widget-header>
+            <rd-widget-body>
+                <div id="net-chart" style="width: 100%"></div>
+                <div id="net-chart-legend"></div>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="CPU usage"></rd-widget-header>
+            <rd-widget-body>
+                <canvas id="cpu-stats-chart" width="770" height="230"></canvas>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
+
+    <div class="col-lg-6">
+        <rd-widget>
+            <rd-widget-header icon="fa-area-chart" title="Network IO"></rd-widget-header>
+            <rd-widget-body>
+                <canvas id="network-chart" width="770" height="230"></canvas>
+                <div class="comment">
+                    <div id="network-legend" style="margin-bottom: 20px;"></div>
+                </div>
+            </rd-widget-body>
+        </rd-widget>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+        <rd-widget>
+            <rd-widget-header icon="fa-info-circle" title="Logs since past hour">
+                <div ng-if="!auto" class="text-right">
+                    <button class="btn btn-default" ng-click="prevPage()" ng-if="logPage > 0">Prev</button>
+                    <button class="btn btn-default" ng-click="nextPage()" ng-if="logLast < logTotal">Next</button>
+                </div>
+            </rd-widget-header>
+
+            <rd-widget-body classes="no-padding">
+                <table class="table">
+                    <tr ng-repeat="log in logList">
+                        <td style="white-space: nowrap">{{ log.timestamp }}</td>
+                        <td>{{ log.message }}</td>
+                    </tr>
+                </table>
+            </rd-widget-body>
+
+            <rd-widget-footer ng-if="!auto">
+                <div class="text-right">
+                    <button class="btn btn-default" ng-click="prevPage()" ng-if="logPage > 0">Prev</button>
+                    <button class="btn btn-default" ng-click="nextPage()" ng-if="logLast < logTotal">Next</button>
+                </div>
+            </rd-widget-footer>
+        </rd-widget>
+    </div>
+</div>

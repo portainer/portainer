@@ -46,6 +46,8 @@ angular.module('portainer', [
   'swarm',
   'task',
   'templates',
+  'monitor',
+  'monitorList',
   'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider) {
     'use strict';
@@ -65,7 +67,6 @@ angular.module('portainer', [
     $httpProvider.interceptors.push('jwtInterceptor');
 
     $urlRouterProvider.otherwise('/auth');
-
     $stateProvider
     .state('root', {
       abstract: true,
@@ -465,7 +466,39 @@ angular.module('portainer', [
           controller: 'SidebarController'
         }
       }
-    });
+    })
+    .state('monitor', {
+            url: "^/monitor/:id",
+            views: {
+                "content": {
+                    templateUrl: 'app/components/monitor/monitor.html',
+                    controller: 'MonitorController'
+                },
+                "sidebar": {
+                    templateUrl: 'app/components/sidebar/sidebar.html',
+                    controller: 'SidebarController'
+                }
+            },
+            data: {
+                requiresLogin: true
+            }
+        })
+        .state('monitorList', {
+            url: "^/monitorList",
+            views: {
+                "content": {
+                    templateUrl: 'app/components/monitor/monitorList.html',
+                    controller: 'MonitorListController'
+                },
+                "sidebar": {
+                    templateUrl: 'app/components/sidebar/sidebar.html',
+                    controller: 'SidebarController'
+                }
+            },
+            data: {
+                requiresLogin: true
+            }
+        });
 
     // The Docker API likes to return plaintext errors, this catches them and disp
     $httpProvider.interceptors.push(function() {

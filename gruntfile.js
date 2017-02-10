@@ -133,7 +133,10 @@ module.exports = function (grunt) {
         'bower_components/moment/min/moment.min.js',
         'bower_components/xterm.js/dist/xterm.js',
         'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
-        'assets/js/legend.js' // Not a bower package
+        'assets/js/legend.js', // Not a bower package
+		'bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.js',
+		'bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
+		'assets/js/dygraph.min.js' // needs to use local version!
       ],
       html: ['index.html'],
       tpl: ['app/components/**/*.html'],
@@ -144,7 +147,10 @@ module.exports = function (grunt) {
         'bower_components/font-awesome/css/font-awesome.min.css',
         'bower_components/rdash-ui/dist/css/rdash.min.css',
         'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/xterm.js/dist/xterm.css'
+        'bower_components/xterm.js/dist/xterm.css',
+		'bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css',
+		'bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css',
+		'assets/js/dygraph.min.css' // needs to use local version!
       ]
     },
     clean: {

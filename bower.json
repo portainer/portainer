@@ -39,12 +39,15 @@
     "filesize": "~3.3.0",
     "jquery": "1.11.1",
     "jquery.gritter": "1.7.4",
+	"seiyria-bootstrap-slider": "9.7.0",
+	"eonasdan-bootstrap-datetimepicker": "4.17.45",
     "lodash": "4.12.0",
     "rdash-ui": "1.0.*",
     "moment": "~2.14.1",
     "xterm.js": "~2.0.1",
     "font-awesome": "~4.7.0",
-    "ng-file-upload": "~12.2.13"
+    "ng-file-upload": "~12.2.13",
+	"dygraphs": "2.0.0"
   },
   "resolutions": {
     "angular": "1.5.5"

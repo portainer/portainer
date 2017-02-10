@@ -46,6 +46,9 @@
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'">
       <a ui-sref="docker" ui-sref-active="active">Docker <span class="menu-icon fa fa-th"></span></a>
     </li>
+    <li class="sidebar-list">
+      <a ui-sref="monitorList">Monitor <span class="menu-icon fa fa-area-chart"></span></a>
+    </li>
     <li class="sidebar-title"><span>Portainer settings</span></li>
     <li class="sidebar-list" ng-if="applicationState.application.authentication">
       <a ui-sref="settings" ui-sref-active="active">Password <span class="menu-icon fa fa-lock"></span></a>
