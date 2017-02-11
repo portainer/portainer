@@ -66,5 +66,32 @@ angular.module('portainer.helpers')
     return env;
   };
 
+  helper.createVolumeBindings = function(volumes, generatedVolumesPile) {
+    volumes.forEach(function (volume) {
+      if (volume.containerPath) {
+        var binding;
+        if (volume.name) {
+          binding = volume.name + ':' + volume.containerPath;
+        } else {
+          binding = generatedVolumesPile.pop().Name + ':' + volume.containerPath;
+        }
+        if (volume.readOnly) {
+          binding += ':ro';
+        }
+        volume.binding = binding;
+      }
+    });
+  };
+
+  helper.determineRequiredGeneratedVolumeCount = function(volumes) {
+    var count = 0;
+    volumes.forEach(function (volume) {
+      if (volume.containerPath && !volume.name) {
+        ++count;
+      }
+    });
+    return count;
+  };
+
   return helper;
 }]);

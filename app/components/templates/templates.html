@@ -105,12 +105,12 @@
               <!-- volume-mapping -->
               <label class="col-sm-1 control-label text-left">Volume mapping</label>
               <div class="col-sm-11" style="margin-top: 5px;">
-                <span class="label label-default interactive" ng-click="addVolumeBinding()">
+                <span class="label label-default interactive" ng-click="addVolume()">
                   <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional volume
                 </span>
               </div>
               <div class="col-sm-12" style="margin-top: 10px">
-                <span class="small text-muted">Portainer will automatically create and map a local volume if you leave the volume empty.</span>
+                <span class="small text-muted">Portainer will automatically create and map a local volume if you do not select any volume or host path.</span>
               </div>
               <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
                 <div ng-repeat="volume in state.selectedTemplate.Volumes" style="margin-top: 2px;">

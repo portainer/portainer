@@ -47,10 +47,14 @@ angular.module('portainer.services')
     return configuration;
   };
 
-  service.updateContainerConfigurationWithVolumes = function(configuration, template, createdVolumes) {
-    createdVolumes.forEach(function (volume, idx) {
-      configuration.Volumes[template.Volumes[idx]] = {};
-      configuration.HostConfig.Binds.push(volume.Name + ':' + template.Volumes[idx]);
+  service.updateContainerConfigurationWithVolumes = function(configuration, template, generatedVolumesPile) {
+    var volumes = template.Volumes;
+    TemplateHelper.createVolumeBindings(volumes, generatedVolumesPile);
+    volumes.forEach(function (volume) {
+      if (volume.binding) {
+        configuration.Volumes[volume.containerPath] = {};
+        configuration.HostConfig.Binds.push(volume.binding);
+      }
     });
   };
 

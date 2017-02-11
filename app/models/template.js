@@ -7,7 +7,15 @@ function TemplateViewModel(data) {
   this.Command = data.command ? data.command : '';
   this.Network = data.network ? data.network : '';
   this.Env = data.env ? data.env : [];
-  this.Volumes = data.volumes ? data.volumes : [];
+  this.Volumes = [];
+  if (data.volumes) {
+    this.Volumes = data.volumes.map(function (v) {
+      return {
+        readOnly: false,
+        containerPath: v,
+      };
+    });
+  }
   this.Ports = [];
   if (data.ports) {
     this.Ports = data.ports.map(function (p) {
