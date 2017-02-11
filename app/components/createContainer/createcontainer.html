@@ -64,6 +64,11 @@
           <div class="form-group">
             <label for="container_ports" class="col-sm-1 control-label text-left">Port mapping</label>
             <div class="col-sm-11">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="config.HostConfig.PublishAllPorts"> Publish all exposed ports
+                </label>
+              </div>
               <span class="label label-default interactive" ng-click="addPortBinding()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> map port
               </span>

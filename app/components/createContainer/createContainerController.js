@@ -23,6 +23,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
         Name: 'no'
       },
       PortBindings: [],
+      PublishAllPorts: false,
       Binds: [],
       NetworkMode: 'bridge',
       Privileged: false
