@@ -13,6 +13,7 @@ function TemplateViewModel(data) {
       return {
         readOnly: false,
         containerPath: v,
+        type: 'managed'
       };
     });
   }

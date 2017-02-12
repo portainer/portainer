@@ -16,7 +16,7 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, Container
   };
 
   $scope.addVolume = function () {
-    $scope.state.selectedTemplate.Volumes.push({ containerPath: '', name: '', readOnly: false, isPath: false });
+    $scope.state.selectedTemplate.Volumes.push({ containerPath: '', name: '', readOnly: false, isPath: false, type: 'managed' });
   };
 
   $scope.removeVolume = function(index) {

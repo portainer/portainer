@@ -27,12 +27,12 @@
           </div>
           <!-- name-and-network-inputs -->
           <div class="form-group">
-            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
-            <div class="col-sm-4">
+            <label for="container_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-5">
               <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)">
             </div>
-            <label for="container_network" class="col-sm-2 control-label text-right">Network</label>
-            <div class="col-sm-4">
+            <label for="container_network" class="col-sm-1 control-label text-right">Network</label>
+            <div class="col-sm-5">
               <select class="form-control" ng-options="net.Name for net in availableNetworks" ng-model="formValues.network">
                 <option disabled hidden value="">Select a network</option>
               </select>
@@ -65,83 +65,112 @@
           <div ng-if="state.showAdvancedOptions">
             <!-- port-mapping -->
             <div class="form-group" >
-              <label class="col-sm-1 control-label text-left">Port mapping</label>
-              <div class="col-sm-11" style="margin-top: 5px;">
-                <span class="label label-default interactive" ng-click="addPortBinding()">
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Port mapping</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPortBinding()">
                   <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional port
                 </span>
               </div>
-              <div class="col-sm-12" style="margin-top: 10px">
+              <div class="col-sm-12" style="margin-top: 10px" ng-if="state.selectedTemplate.Ports.length > 0">
                 <span class="small text-muted">Portainer will automatically assign a port if you leave the host port empty.</span>
               </div>
               <!-- !port-mapping -->
               <!-- port-mapping-input-list -->
-              <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
-                <div ng-repeat="portBinding in state.selectedTemplate.Ports" style="margin-top: 2px;">
-                  <div class="input-group col-sm-5 input-group-sm">
-                    <span class="input-group-addon">host</span>
-                    <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
-                  </div>
-                  <div class="input-group col-sm-5 input-group-sm">
-                    <span class="input-group-addon">container</span>
-                    <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
-                  </div>
-                  <div class="input-group col-sm-1 input-group-sm">
-                    <select class="form-control" ng-model="portBinding.protocol">
-                      <option value="tcp">tcp</option>
-                      <option value="udp">udp</option>
-                    </select>
-                    <span class="input-group-btn">
-                      <button class="btn btn-default" type="button" ng-click="removePortBinding($index)">
-                        <i class="fa fa-minus" aria-hidden="true"></i>
-                      </button>
+              <div class="col-sm-12">
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="portBinding in state.selectedTemplate.Ports" style="margin-top: 2px;">
+                    <div class="input-group col-sm-4 input-group-sm">
+                      <span class="input-group-addon">container</span>
+                      <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
+                    </div>
+
+                    <span style="margin: 0 10px 0 10px;">
+                      <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                     </span>
+
+                    <div class="input-group col-sm-4 input-group-sm">
+                      <span class="input-group-addon">host</span>
+                      <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
+                    </div>
+
+                    <div class="input-group col-sm-3 input-group-sm">
+                      <div class="btn-group btn-group-sm">
+                        <label class="btn btn-default" ng-model="portBinding.protocol" uib-btn-radio="'tcp'" ng-click="volume.name = ''">TCP</label>
+                        <label class="btn btn-default" ng-model="portBinding.protocol" uib-btn-radio="'udp'" ng-click="volume.name = ''">UDP</label>
+                      </div>
+                      <button class="btn btn-sm btn-danger" type="button" ng-click="removePortBinding($index)">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
+
             </div>
             <!-- !port-mapping-input-list -->
+            <!-- volume-mapping -->
             <div class="form-group" >
-              <!-- volume-mapping -->
-              <label class="col-sm-1 control-label text-left">Volume mapping</label>
-              <div class="col-sm-11" style="margin-top: 5px;">
-                <span class="label label-default interactive" ng-click="addVolume()">
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Volume mapping</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addVolume()">
                   <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional volume
                 </span>
               </div>
-              <div class="col-sm-12" style="margin-top: 10px">
-                <span class="small text-muted">Portainer will automatically create and map a local volume if you do not select any volume or host path.</span>
+              <div class="col-sm-12" style="margin-top: 10px" ng-if="state.selectedTemplate.Volumes.length > 0">
+                <span class="small text-muted">Portainer will automatically create and map a local volume when using the <b>managed</b> option.</span>
               </div>
-              <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
-                <div ng-repeat="volume in state.selectedTemplate.Volumes" style="margin-top: 2px;">
-                  <div class="input-group col-sm-1 input-group-sm">
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox" ng-model="volume.readOnly"> Read-only
-                      </label>
+              <div ng-repeat="volume in state.selectedTemplate.Volumes">
+                <div class="col-sm-12" style="margin-top: 10px;">
+
+                  <div class="col-sm-12 form-inline">
+
+                    <div class="input-group input-group-sm col-sm-6">
+                      <span class="input-group-addon">container</span>
+                      <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container">
                     </div>
-                  </div>
-                  <div class="input-group col-sm-5 input-group-sm">
-                    <span class="input-group-addon"><input type="checkbox" ng-model="volume.isPath" ng-click="resetVolumePath($index)">Path</span>
-                    <select class="form-control" ng-model="volume.name" ng-if="!volume.isPath">
-                      <option selected disabled hidden value="">Select a volume</option>
-                      <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
-                    </select>
-                    <input ng-if="volume.isPath" type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host">
-                  </div>
-                  <div class="input-group col-sm-5 input-group-sm">
-                    <span class="input-group-addon">container</span>
-                    <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container">
-                    <span class="input-group-btn">
-                      <button class="btn btn-default" type="button" ng-click="removeVolume($index)">
-                        <i class="fa fa-minus" aria-hidden="true"></i>
+
+                    <div class="input-group col-sm-5" style="margin-left: 5px;">
+                      <div class="btn-group btn-group-sm">
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'managed'" ng-click="volume.name = ''">Managed</label>
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
+                      </div>
+                      <button class="btn btn-sm btn-danger" type="button" ng-click="removeVolume($index)">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
                       </button>
-                    </span>
+                    </div>
+
+                  </div>
+
+                  <div class="col-sm-12 form-inline" style="margin-top: 5px;" ng-if="volume.type !== 'managed'">
+
+                    <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+
+                    <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
+                      <span class="input-group-addon">volume</span>
+                      <select class="form-control" ng-model="volume.name">
+                        <option selected disabled hidden value="">Select a volume</option>
+                        <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
+                      </select>
+                    </div>
+
+                    <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
+                      <span class="input-group-addon">host</span>
+                      <input type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host">
+                    </div>
+
+                    <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
+                      <div class="btn-group btn-group-sm">
+                        <label class="btn btn-default" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
+                        <label class="btn btn-default" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>
-              <!-- !volume-mapping -->
             </div>
+            <!-- !volume-mapping -->
           </div>
           <!-- !advanced-options -->
           <div class="form-group">
