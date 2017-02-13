@@ -13,18 +13,19 @@ type (
 
 	// CLIFlags represents the available flags on the CLI.
 	CLIFlags struct {
-		Addr      *string
-		Assets    *string
-		Data      *string
-		Endpoint  *string
-		Labels    *[]Pair
-		Logo      *string
-		Templates *string
-		NoAuth    *bool
-		TLSVerify *bool
-		TLSCacert *string
-		TLSCert   *string
-		TLSKey    *string
+		Addr        *string
+		Assets      *string
+		Data        *string
+		Endpoint    *string
+		Labels      *[]Pair
+		Logo        *string
+		Templates   *string
+		NoAuth      *bool
+		NoAnalytics *bool
+		TLSVerify   *bool
+		TLSCacert   *string
+		TLSCert     *string
+		TLSKey      *string
 	}
 
 	// Settings represents Portainer settings.
@@ -32,6 +33,7 @@ type (
 		HiddenLabels   []Pair `json:"hiddenLabels"`
 		Logo           string `json:"logo"`
 		Authentication bool   `json:"authentication"`
+		Analytics      bool   `json:"analytics"`
 	}
 
 	// User represent a user account.

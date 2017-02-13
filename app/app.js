@@ -66,6 +66,7 @@ angular.module('portainer', [
     $httpProvider.interceptors.push('jwtInterceptor');
 
     AnalyticsProvider.setAccount('@@CONFIG_GA_ID');
+    AnalyticsProvider.startOffline(true);
 
     $urlRouterProvider.otherwise('/auth');
 
@@ -497,13 +498,17 @@ angular.module('portainer', [
           $state.go('auth', {error: 'Your session has expired'});
         });
       }
+      if (state.application.analytics) {
+        Analytics.offline(false);
+        Analytics.registerScriptTags();
+        Analytics.registerTrackers();
+        $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+          Analytics.trackPage(toState.url);
+          Analytics.pageView();
+        });
+      }
     }, function error(err) {
       Messages.error("Failure", err, 'Unable to retrieve application settings');
-    });
-
-    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-      Analytics.trackPage(toState.url);
-      Analytics.pageView();
     });
 
     $rootScope.$state = $state;

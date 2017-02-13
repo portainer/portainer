@@ -28,6 +28,7 @@ func main() {
 		HiddenLabels:   *flags.Labels,
 		Logo:           *flags.Logo,
 		Authentication: !*flags.NoAuth,
+		Analytics:      !*flags.NoAnalytics,
 	}
 
 	fileService, err := file.NewService(*flags.Data, "")
