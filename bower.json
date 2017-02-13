@@ -12,7 +12,8 @@
     "api",
     "portainer",
     "uifordocker",
-    "dockerui"
+    "dockerui",
+    "swarm"
   ],
   "license": "MIT",
   "ignore": [
@@ -35,6 +36,7 @@
     "angular-utils-pagination": "~0.11.1",
     "angular-local-storage": "~0.5.2",
     "angular-jwt": "~0.1.8",
+    "angular-google-analytics": "~1.1.9",
     "bootstrap": "~3.3.6",
     "filesize": "~3.3.0",
     "jquery": "1.11.1",

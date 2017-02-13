@@ -13,6 +13,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-filerev');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-usemin');
+  grunt.loadNpmTasks('grunt-replace');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'build']);
@@ -42,7 +43,8 @@ module.exports = function (grunt) {
     'copy:assets',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-win', [
     'clean:all',
@@ -57,7 +59,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-arm', [
     'clean:all',
@@ -72,7 +75,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-arm64', [
     'clean:all',
@@ -87,7 +91,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-macos', [
     'clean:all',
@@ -102,7 +107,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('lint', ['jshint']);
   grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
@@ -260,6 +266,7 @@ module.exports = function (grunt) {
         'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
         'bower_components/ng-file-upload/ng-file-upload.min.js',
         'bower_components/angular-utils-pagination/dirPagination.js',
+        'bower_components/angular-google-analytics/dist/angular-google-analytics.min.js',
         'bower_components/angular-ui-select/dist/select.min.js'],
         dest: '<%= distdir %>/js/angular.js'
       }
@@ -458,6 +465,26 @@ module.exports = function (grunt) {
           executable: 'dist/portainer.exe'
         },
         ifFalse: ['shell:buildWindowsBinary']
+      }
+    },
+    replace: {
+      dist: {
+        options: {
+          patterns: [
+            {
+              match: 'CONFIG_GA_ID',
+              replacement: '<%= pkg.config.GA_ID %>'
+            }
+          ]
+        },
+        files: [
+          {
+            expand: true,
+            flatten: true,
+            src: ['dist/js/**.js'],
+            dest: 'dist/js/'
+          }
+        ]
       }
     }
   });
