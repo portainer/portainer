@@ -22,18 +22,19 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 	kingpin.Version(version)
 
 	flags := &portainer.CLIFlags{
-		Endpoint:  kingpin.Flag("host", "Dockerd endpoint").Short('H').String(),
-		Logo:      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
-		Labels:    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
-		Addr:      kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
-		Assets:    kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
-		Data:      kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
-		Templates: kingpin.Flag("templates", "URL to the templates (apps) definitions").Default(defaultTemplatesURL).Short('t').String(),
-		NoAuth:    kingpin.Flag("no-auth", "Disable authentication").Default(defaultNoAuth).Bool(),
-		TLSVerify: kingpin.Flag("tlsverify", "TLS support").Default(defaultTLSVerify).Bool(),
-		TLSCacert: kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String(),
-		TLSCert:   kingpin.Flag("tlscert", "Path to the TLS certificate file").Default(defaultTLSCertPath).String(),
-		TLSKey:    kingpin.Flag("tlskey", "Path to the TLS key").Default(defaultTLSKeyPath).String(),
+		Endpoint:    kingpin.Flag("host", "Dockerd endpoint").Short('H').String(),
+		Logo:        kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
+		Labels:      pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
+		Addr:        kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
+		Assets:      kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
+		Data:        kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
+		Templates:   kingpin.Flag("templates", "URL to the templates (apps) definitions").Default(defaultTemplatesURL).Short('t').String(),
+		NoAuth:      kingpin.Flag("no-auth", "Disable authentication").Default(defaultNoAuth).Bool(),
+		NoAnalytics: kingpin.Flag("no-analytics", "Disable Analytics in app").Default(defaultNoAuth).Bool(),
+		TLSVerify:   kingpin.Flag("tlsverify", "TLS support").Default(defaultTLSVerify).Bool(),
+		TLSCacert:   kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String(),
+		TLSCert:     kingpin.Flag("tlscert", "Path to the TLS certificate file").Default(defaultTLSCertPath).String(),
+		TLSKey:      kingpin.Flag("tlskey", "Path to the TLS key").Default(defaultTLSKeyPath).String(),
 	}
 
 	kingpin.Parse()
