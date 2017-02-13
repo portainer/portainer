@@ -28,8 +28,6 @@ function ($scope, Info, Version, Node, Pagination) {
     $scope.info = d;
     if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
       Node.query({}, function(d) {
-        // $scope.nodes = d;
-        console.log(JSON.stringify(d, null, 4));
         $scope.nodes = d.map(function (node) {
           return new NodeViewModel(node);
         });
