@@ -139,7 +139,6 @@ module.exports = function (grunt) {
         'bower_components/filesize/lib/filesize.min.js',
         'bower_components/moment/min/moment.min.js',
         'bower_components/xterm.js/dist/xterm.js',
-        'bower_components/angular-google-analytics/dist/angular-google-analytics.min.js',
         'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
         'assets/js/legend.js' // Not a bower package
       ],
@@ -267,6 +266,7 @@ module.exports = function (grunt) {
         'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
         'bower_components/ng-file-upload/ng-file-upload.min.js',
         'bower_components/angular-utils-pagination/dirPagination.js',
+        'bower_components/angular-google-analytics/dist/angular-google-analytics.min.js',
         'bower_components/angular-ui-select/dist/select.min.js'],
         dest: '<%= distdir %>/js/angular.js'
       }
