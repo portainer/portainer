@@ -70,10 +70,10 @@ angular.module('portainer.helpers')
     volumes.forEach(function (volume) {
       if (volume.containerPath) {
         var binding;
-        if (volume.name) {
-          binding = volume.name + ':' + volume.containerPath;
-        } else {
+        if (volume.type === 'auto') {
           binding = generatedVolumesPile.pop().Name + ':' + volume.containerPath;
+        } else if (volume.type !== 'auto' && volume.name) {
+          binding = volume.name + ':' + volume.containerPath;
         }
         if (volume.readOnly) {
           binding += ':ro';
@@ -86,7 +86,7 @@ angular.module('portainer.helpers')
   helper.determineRequiredGeneratedVolumeCount = function(volumes) {
     var count = 0;
     volumes.forEach(function (volume) {
-      if (volume.containerPath && !volume.name) {
+      if (volume.type === 'auto') {
         ++count;
       }
     });

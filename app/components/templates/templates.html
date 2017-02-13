@@ -79,20 +79,22 @@
               <div class="col-sm-12">
                 <div class="col-sm-12 form-inline" style="margin-top: 10px;">
                   <div ng-repeat="portBinding in state.selectedTemplate.Ports" style="margin-top: 2px;">
-                    <div class="input-group col-sm-4 input-group-sm">
-                      <span class="input-group-addon">container</span>
-                      <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
-                    </div>
-
-                    <span style="margin: 0 10px 0 10px;">
-                      <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                    </span>
-
+                    <!-- host-port -->
                     <div class="input-group col-sm-4 input-group-sm">
                       <span class="input-group-addon">host</span>
                       <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
                     </div>
-
+                    <!-- !host-port -->
+                    <span style="margin: 0 10px 0 10px;">
+                      <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                    </span>
+                    <!-- container-port -->
+                    <div class="input-group col-sm-4 input-group-sm">
+                      <span class="input-group-addon">container</span>
+                      <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
+                    </div>
+                    <!-- !container-port -->
+                    <!-- protocol-actions -->
                     <div class="input-group col-sm-3 input-group-sm">
                       <div class="btn-group btn-group-sm">
                         <label class="btn btn-default" ng-model="portBinding.protocol" uib-btn-radio="'tcp'" ng-click="volume.name = ''">TCP</label>
@@ -102,6 +104,7 @@
                         <i class="fa fa-trash" aria-hidden="true"></i>
                       </button>
                     </div>
+                    <!-- !protocol-actions -->
                   </div>
                 </div>
               </div>
@@ -117,21 +120,22 @@
                 </span>
               </div>
               <div class="col-sm-12" style="margin-top: 10px" ng-if="state.selectedTemplate.Volumes.length > 0">
-                <span class="small text-muted">Portainer will automatically create and map a local volume when using the <b>managed</b> option.</span>
+                <span class="small text-muted">Portainer will automatically create and map a local volume when using the <b>auto</b> option.</span>
               </div>
               <div ng-repeat="volume in state.selectedTemplate.Volumes">
                 <div class="col-sm-12" style="margin-top: 10px;">
-
+                  <!-- volume-line1 -->
                   <div class="col-sm-12 form-inline">
-
+                    <!-- container-path -->
                     <div class="input-group input-group-sm col-sm-6">
                       <span class="input-group-addon">container</span>
                       <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container">
                     </div>
-
+                    <!-- !container-path -->
+                    <!-- volume-type -->
                     <div class="input-group col-sm-5" style="margin-left: 5px;">
                       <div class="btn-group btn-group-sm">
-                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'managed'" ng-click="volume.name = ''">Managed</label>
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'auto'" ng-click="volume.name = ''">Auto</label>
                         <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
                         <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
                       </div>
@@ -139,13 +143,13 @@
                         <i class="fa fa-trash" aria-hidden="true"></i>
                       </button>
                     </div>
-
+                    <!-- !volume-type -->
                   </div>
-
-                  <div class="col-sm-12 form-inline" style="margin-top: 5px;" ng-if="volume.type !== 'managed'">
-
+                  <!-- !volume-line1 -->
+                  <!-- volume-line2 -->
+                  <div class="col-sm-12 form-inline" style="margin-top: 5px;" ng-if="volume.type !== 'auto'">
                     <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-
+                    <!-- volume -->
                     <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
                       <span class="input-group-addon">volume</span>
                       <select class="form-control" ng-model="volume.name">
@@ -153,20 +157,23 @@
                         <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
                       </select>
                     </div>
-
+                    <!-- !volume -->
+                    <!-- bind -->
                     <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
                       <span class="input-group-addon">host</span>
                       <input type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host">
                     </div>
-
+                    <!-- !bind -->
+                    <!-- read-only -->
                     <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
                       <div class="btn-group btn-group-sm">
                         <label class="btn btn-default" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
                         <label class="btn btn-default" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
                       </div>
                     </div>
-
+                    <!-- !read-only -->
                   </div>
+                  <!-- !volume-line2 -->
                 </div>
               </div>
             </div>
