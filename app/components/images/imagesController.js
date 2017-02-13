@@ -66,7 +66,6 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination, Moda
       buttons: {
         confirm: {
           label: 'Remove the image',
-          className: 'btn-danger'
         },
         cancel: {
           label: 'Cancel'
