@@ -59,8 +59,28 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination) {
     });
   };
 
+  $scope.confirmRemovalAction = function (force) {
+    bootbox.confirm({
+      title: "Are you sure?",
+      message: "Forcing image removal will untag and remove all images matching the image ID",
+      buttons: {
+        confirm: {
+          label: 'Force',
+          className: 'btn-danger'
+        },
+        cancel: {
+          label: 'Cancel'
+        }
+      },
+      callback: function (confirmed) {
+        if(!confirmed) { return }
+        $scope.removeAction(force)
+      }
+    });
+  };
+
   $scope.removeAction = function (force) {
-    force = !!force;
+    force = !!force
     $('#loadImagesSpinner').show();
     var counter = 0;
     var complete = function () {
