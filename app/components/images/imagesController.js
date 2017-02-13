@@ -62,10 +62,10 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination) {
   $scope.confirmRemovalAction = function (force) {
     bootbox.confirm({
       title: "Are you sure?",
-      message: "Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers",
+      message: "Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.",
       buttons: {
         confirm: {
-          label: 'Force',
+          label: 'Remove the image',
           className: 'btn-danger'
         },
         cancel: {
@@ -73,14 +73,14 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination) {
         }
       },
       callback: function (confirmed) {
-        if(!confirmed) { return }
-        $scope.removeAction(force)
+        if(!confirmed) { return; }
+        $scope.removeAction(force);
       }
     });
   };
 
   $scope.removeAction = function (force) {
-    force = !!force
+    force = !!force;
     $('#loadImagesSpinner').show();
     var counter = 0;
     var complete = function () {
