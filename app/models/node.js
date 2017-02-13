@@ -27,6 +27,10 @@ function NodeViewModel(data) {
   this.Plugins = data.Description.Engine.Plugins;
   this.Status = data.Status.State;
 
+  if (data.Status.Addr) {
+    this.Addr = data.Status.Addr;
+  }
+
   if (data.ManagerStatus) {
     this.Leader = data.ManagerStatus.Leader;
     this.Reachability = data.ManagerStatus.Reachability;
