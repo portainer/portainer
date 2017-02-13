@@ -139,6 +139,23 @@ a[ng-click]{
     line-height: 1.42857143;
     border-radius: 4px;
   }
+
+  .modal:before {
+    display: inline-block;
+    vertical-align: middle;
+    content: " ";
+    height: 100%;
+  }
+}
+
+.modal {
+  text-align: center;
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
 }
 
 /* Underline From Center */
