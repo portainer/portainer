@@ -10,9 +10,12 @@
   "bugs": {
     "url": "https://github.com/portainer/portainer/issues"
   },
+  "config": {
+    "GA_ID": "UA-84944922-2"
+  },
   "licenses": [
     {
-      "type": "MIT",
+      "type": "Zlib",
       "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
     }
   ],
@@ -35,6 +38,7 @@
     "grunt-if": "^0.1.5",
     "grunt-karma": "~0.4.4",
     "grunt-recess": "~0.3",
+    "grunt-replace": "^1.0.1",
     "grunt-shell": "^1.1.2",
     "grunt-usemin": "^3.1.1"
   },

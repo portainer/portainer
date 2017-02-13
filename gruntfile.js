@@ -13,6 +13,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-filerev');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-usemin');
+  grunt.loadNpmTasks('grunt-replace');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'build']);
@@ -27,7 +28,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release', [
     'clean:all',
@@ -42,7 +44,8 @@ module.exports = function (grunt) {
     'copy:assets',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-win', [
     'clean:all',
@@ -57,7 +60,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-arm', [
     'clean:all',
@@ -72,7 +76,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-arm64', [
     'clean:all',
@@ -87,7 +92,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-macos', [
     'clean:all',
@@ -102,7 +108,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('lint', ['jshint']);
   grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
@@ -133,6 +140,7 @@ module.exports = function (grunt) {
         'bower_components/filesize/lib/filesize.min.js',
         'bower_components/moment/min/moment.min.js',
         'bower_components/xterm.js/dist/xterm.js',
+        'bower_components/angular-google-analytics/dist/angular-google-analytics.min.js',
         'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
         'assets/js/legend.js' // Not a bower package
       ],
@@ -458,6 +466,26 @@ module.exports = function (grunt) {
           executable: 'dist/portainer.exe'
         },
         ifFalse: ['shell:buildWindowsBinary']
+      }
+    },
+    replace: {
+      dist: {
+        options: {
+          patterns: [
+            {
+              match: 'CONFIG_GA_ID',
+              replacement: '<%= pkg.config.GA_ID %>'
+            }
+          ]
+        },
+        files: [
+          {
+            expand: true,
+            flatten: true,
+            src: ['dist/js/**.js'],
+            dest: 'dist/js/'
+          }
+        ]
       }
     }
   });

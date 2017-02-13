@@ -12,6 +12,7 @@ angular.module('portainer', [
   'angularUtils.directives.dirPagination',
   'LocalStorageModule',
   'angular-jwt',
+  'angular-google-analytics',
   'portainer.templates',
   'portainer.filters',
   'portainer.rest',
@@ -47,7 +48,7 @@ angular.module('portainer', [
   'task',
   'templates',
   'volumes'])
-  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider) {
+  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider) {
     'use strict';
 
     localStorageServiceProvider
@@ -63,6 +64,8 @@ angular.module('portainer', [
       }]
     });
     $httpProvider.interceptors.push('jwtInterceptor');
+
+    AnalyticsProvider.setAccount('@@CONFIG_GA_ID');
 
     $urlRouterProvider.otherwise('/auth');
 
@@ -484,7 +487,7 @@ angular.module('portainer', [
       };
     });
   }])
-  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'Messages', function ($rootScope, $state, Authentication, authManager, StateManager, Messages) {
+  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'Messages',  function ($rootScope, $state, Authentication, authManager, StateManager, Messages, Analytics) {
     StateManager.initialize().then(function success(state) {
       if (state.application.authentication) {
         authManager.checkAuthOnRefresh();
