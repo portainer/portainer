@@ -1,6 +1,6 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'ImageHelper', 'Messages', 'Pagination',
-function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination) {
+.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'ImageHelper', 'Messages', 'Pagination', 'ModalService',
+function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination, ModalService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('images');
   $scope.sortType = 'RepoTags';
@@ -60,7 +60,7 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination) {
   };
 
   $scope.confirmRemovalAction = function (force) {
-    bootbox.confirm({
+    ModalService.confirm({
       title: "Are you sure?",
       message: "Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.",
       buttons: {
