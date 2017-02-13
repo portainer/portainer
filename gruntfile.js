@@ -28,8 +28,7 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
   grunt.registerTask('release', [
     'clean:all',

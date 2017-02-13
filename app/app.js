@@ -487,7 +487,7 @@ angular.module('portainer', [
       };
     });
   }])
-  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'Messages',  function ($rootScope, $state, Authentication, authManager, StateManager, Messages, Analytics) {
+  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'Messages', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, Messages, Analytics) {
     StateManager.initialize().then(function success(state) {
       if (state.application.authentication) {
         authManager.checkAuthOnRefresh();
@@ -499,6 +499,11 @@ angular.module('portainer', [
       }
     }, function error(err) {
       Messages.error("Failure", err, 'Unable to retrieve application settings');
+    });
+
+    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+      Analytics.trackPage(toState.url);
+      Analytics.pageView();
     });
 
     $rootScope.$state = $state;
