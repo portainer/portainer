@@ -9,10 +9,11 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Messa
   $scope.uiVersion = Settings.uiVersion;
 
   $scope.switchEndpoint = function(endpoint) {
-    EndpointService.setActive(endpoint.Id).then(function success(data) {
+    EndpointService.setActive(endpoint.Id)
+    .then(function success(data) {
       StateManager.updateEndpointState(true)
       .then(function success() {
-        $state.reload();
+        $state.go('dashboard');
       }, function error(err) {
         Messages.error("Failure", err, "Unable to connect to the Docker endpoint");
       });
