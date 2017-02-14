@@ -272,3 +272,15 @@ ul.sidebar .sidebar-list a.active {
   border-left: 3px solid #fff;
   background: #2d3e63;
 }
+
+.sortable {
+  cursor: pointer;
+}
+
+.st-sort-ascent .glyphicon:before {
+  content: '\e113';
+}
+
+.st-sort-descent .glyphicon:before {
+  content: '\e114';
+}

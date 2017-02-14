@@ -8,13 +8,12 @@
   <rd-header-content>Containers</rd-header-content>
 </rd-header>
 
-<div class="col-lg-12">
+<div st-table="displayedContainers" st-safe-src="containers" class="col-lg-12">
   <rd-widget>
     <rd-widget-header icon="fa-server" title="Containers">
       <div class="pull-right">
         Items per page:
-        <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-          <option value="0">All</option>
+        <select rd-pagination="containers" ng-model="state.pagination_count">
           <option value="10">10</option>
           <option value="25">25</option>
           <option value="50">50</option>
@@ -37,7 +36,7 @@
       </div>
       <div class="pull-right">
         <input type="checkbox" ng-model="state.displayAll" id="displayAll" ng-change="toggleGetAll()" style="margin-top: -2px; margin-right: 5px;"/><label for="displayAll">Show all containers</label>
-        <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
+        <input type="search" id="filter" st-search placeholder="Filter..." class="form-control input-sm" />
       </div>
     </rd-widget-taskbar>
     <rd-widget-body classes="no-padding">
@@ -46,55 +45,37 @@
           <thead>
             <tr>
               <th>
-                <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+                <rd-select-all all="displayedContainers"></rd-select-all>
               </th>
-              <th>
-                <a ui-sref="containers" ng-click="order('Status')">
-                  State
-                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
+              <th st-sort="Status" class="sortable">
+                State
+                <span class="glyphicon"></span>
               </th>
-              <th>
-                <a ui-sref="containers" ng-click="order('Names')">
-                  Name
-                  <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
+              <th st-sort="Names" class="sortable">
+                Name
+                <span class="glyphicon"></span>
               </th>
-              <th>
-                <a ui-sref="containers" ng-click="order('Image')">
-                  Image
-                  <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
+              <th st-sort="Image" class="sortable">
+                Image
+                <span class="glyphicon"></span>
               </th>
-              <th ng-if="state.displayIP">
-                <a ui-sref="containers" ng-click="order('IP')">
-                  IP Address
-                  <span ng-show="sortType == 'IP' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'IP' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
+              <th st-sort="IP" class="sortable">
+                IP Address
+                <span class="glyphicon"></span>
               </th>
-              <th ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
-                <a ui-sref="containers" ng-click="order('Host')">
-                  Host IP
-                  <span ng-show="sortType == 'Host' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Host' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
+              <th ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'" st-sort="Host" class="sortable">
+                Host IP
+                <span class="glyphicon"></span>
               </th>
-              <th>
-                <a ui-sref="containers" ng-click="order('Ports')">
-                  Published Ports
-                  <span ng-show="sortType == 'Ports' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
+              <th st-sort="Ports" class="sortable">
+                Published Ports
+                <span class="glyphicon"></span>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-              <td><input type="checkbox" ng-model="container.Checked" ng-click="selectItem($event, container)"/></td>
+            <tr ng-repeat="container in displayedContainers" >
+              <td rd-select-row="container" rd-select-row-state="state"></td>
               <td><span class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span></td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
               <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
@@ -117,7 +98,7 @@
           </tbody>
         </table>
         <div ng-if="containers" class="pull-left pagination-controls">
-          <dir-pagination-controls></dir-pagination-controls>
+          <div st-pagination="" st-items-by-page="state.pagination_count"></div>
         </div>
       </div>
     </rd-widget-body>

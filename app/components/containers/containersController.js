@@ -2,24 +2,12 @@ angular.module('containers', [])
 .controller('ContainersController', ['$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination', 'EntityListService',
 function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination, EntityListService) {
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = Settings.displayAll;
   $scope.state.displayIP = false;
-  $scope.sortType = 'State';
-  $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
-  $scope.order = function (sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('containers', $scope.state.pagination_count);
-  };
 
   var update = function (data) {
     $('#loadContainersSpinner').show();
-    $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
       if ($scope.containersToHideLabels) {
@@ -60,7 +48,7 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
       }
     };
     angular.forEach(items, function (c) {
-      if (c.Checked) {
+      if (c.isSelected) {
         counter = counter + 1;
         if (action === Container.start) {
           action({id: c.Id}, {}, function (d) {
@@ -113,37 +101,6 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
     if (counter === 0) {
       $('#loadContainersSpinner').hide();
     }
-  };
-
-  $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredContainers, function (container) {
-      if (container.Checked !== allSelected) {
-        container.Checked = allSelected;
-        $scope.selectItem(null, container);
-      }
-    });
-  };
-
-  $scope.selectItem = function ($event, item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
-
-    var list = $scope.state.filteredContainers;
-    if ($scope.state.lastSelectedItem && $event && $event.shiftKey){
-      var begin = list.indexOf($scope.state.lastSelectedItem);
-      var end = list.indexOf(item);
-      var selection = list.slice(begin, end);
-      angular.forEach(selection, function (selectedItem) {
-        if (selectedItem.Checked !== $scope.state.lastSelectedItem.Checked) {
-          selectedItem.Checked = $scope.state.lastSelectedItem.Checked;
-          $scope.selectItem(null, selectedItem);
-        }
-      });
-    }
-    $scope.state.lastSelectedItem = item;
   };
 
   $scope.toggleGetAll = function () {

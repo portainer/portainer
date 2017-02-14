@@ -13,6 +13,7 @@ angular.module('portainer', [
   'LocalStorageModule',
   'angular-jwt',
   'angular-google-analytics',
+  'smart-table',
   'portainer.templates',
   'portainer.filters',
   'portainer.rest',
