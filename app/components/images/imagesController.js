@@ -62,7 +62,7 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination) {
   $scope.confirmRemovalAction = function (force) {
     bootbox.confirm({
       title: "Are you sure?",
-      message: "Forcing image removal will untag and remove all images matching the image ID",
+      message: "Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers",
       buttons: {
         confirm: {
           label: 'Force',
