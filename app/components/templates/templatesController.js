@@ -67,6 +67,27 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, Container
     }
   };
 
+  function getInitialConfiguration() {
+    return {
+      Env: [],
+      OpenStdin: false,
+      Tty: false,
+      ExposedPorts: {},
+      HostConfig: {
+        RestartPolicy: {
+          Name: 'no'
+        },
+        PortBindings: {},
+        Binds: [],
+        NetworkMode: $scope.formValues.network.Name,
+        Privileged: false,
+        ExtraHosts: []
+      },
+      Volumes: {},
+      name: $scope.formValues.name
+    };
+  }
+
   function unselectTemplate() {
     selectedItem = -1;
     $scope.state.selectedTemplate = null;
