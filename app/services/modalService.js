@@ -23,6 +23,6 @@ angular.module('portainer.services')
         return -(box.height() / 2);
       }
     });
-  }
+  };
   return service;
 }]);
