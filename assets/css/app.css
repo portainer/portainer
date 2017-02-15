@@ -72,6 +72,10 @@ input[type="radio"] {
   vertical-align: middle;
 }
 
+a[ng-click]{
+  cursor: pointer;
+}
+
 .space-right {
   margin-right: 5px;
 }
