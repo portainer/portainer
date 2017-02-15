@@ -9,7 +9,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Volumes: [],
     Registry: '',
     NetworkContainer: '',
-    Labels: []
+    Labels: [],
+    ExtraHosts: []
   };
 
   $scope.imageConfig = {};
@@ -27,7 +28,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       PublishAllPorts: false,
       Binds: [],
       NetworkMode: 'bridge',
-      Privileged: false
+      Privileged: false,
+      ExtraHosts: []
     },
     Labels: {}
   };
@@ -63,6 +65,15 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   $scope.removeLabel = function(index) {
     $scope.formValues.Labels.splice(index, 1);
   };
+
+  $scope.addExtraHost = function() {
+    $scope.formValues.ExtraHosts.push({ value: '' });
+  };
+
+  $scope.removeExtraHost = function(index) {
+    $scope.formValues.ExtraHosts.splice(index, 1);
+  };
+
 
   Config.$promise.then(function (c) {
     var containersToHideLabels = c.hiddenLabels;
@@ -232,6 +243,12 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       networkMode += ':' + containerName;
     }
     config.HostConfig.NetworkMode = networkMode;
+    
+    $scope.formValues.ExtraHosts.forEach(function (v) {
+    if (v.value) {
+        config.HostConfig.ExtraHosts.push(v.value);
+      }
+    });
   }
 
   function prepareLabels(config) {

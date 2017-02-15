@@ -1,6 +1,6 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination',
-function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination) {
+.controller('ContainersController', ['$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination', 'EntityListService',
+function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination, EntityListService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = Settings.displayAll;
@@ -28,6 +28,10 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
       $scope.containers = containers.map(function (container) {
         var model = new ContainerViewModel(container);
         model.Status = $filter('containerstatus')(model.Status);
+
+        EntityListService.rememberPreviousSelection($scope.containers, model, function onSelect(model){
+          $scope.selectItem(model);
+        });
 
         if (model.IP) {
           $scope.state.displayIP = true;
