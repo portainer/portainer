@@ -3,6 +3,7 @@ angular.module('createService', [])
 function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
 
   $scope.formValues = {
+    Ownership: 'private',
     Name: '',
     Image: '',
     Registry: '',

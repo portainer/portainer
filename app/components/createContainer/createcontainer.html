@@ -100,6 +100,17 @@
             <!-- !port-mapping-input-list -->
           </div>
           <!-- !port-mapping -->
+          <!-- ownership -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="ownership" class="control-label text-left">Ownership</label>
+              <div class="btn-group btn-group-sm" style="margin-left: 20px;">
+                <label class="btn btn-default" ng-model="formValues.Ownership" uib-btn-radio="'private'">Private</label>
+                <label class="btn btn-default" ng-model="formValues.Ownership" uib-btn-radio="'public'">Public</label>
+              </div>
+            </div>
+          </div>
+          <!-- !ownership -->
         </form>
       </rd-widget-body>
     </rd-widget>

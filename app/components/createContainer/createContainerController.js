@@ -3,6 +3,7 @@ angular.module('createContainer', [])
 function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, Messages) {
 
   $scope.formValues = {
+    Ownership: 'private',
     alwaysPull: true,
     Console: 'none',
     Volumes: [],

@@ -3,6 +3,7 @@ angular.module('createVolume', [])
 function ($scope, $state, Volume, Messages) {
 
   $scope.formValues = {
+    Ownership: 'private',
     DriverOptions: []
   };
 
