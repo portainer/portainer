@@ -8,7 +8,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Volumes: [],
     Registry: '',
     NetworkContainer: '',
-    Labels: []
+    Labels: [],
+    ExtraHosts: []
   };
 
   $scope.imageConfig = {};
@@ -65,11 +66,11 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   };
 
   $scope.addExtraHost = function() {
-    $scope.config.HostConfig.ExtraHosts.push({ value: '' });
+    $scope.formValues.ExtraHosts.push({ value: '' });
   };
 
   $scope.removeExtraHost = function(index) {
-    $scope.config.HostConfig.ExtraHosts.splice(index, 1);
+    $scope.formValues.ExtraHosts.splice(index, 1);
   };
 
 
@@ -241,13 +242,12 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       networkMode += ':' + containerName;
     }
     config.HostConfig.NetworkMode = networkMode;
-    var extraHosts = [];
-    config.HostConfig.ExtraHosts.forEach(function (v) {
+    
+    $scope.formValues.ExtraHosts.forEach(function (v) {
     if (v.value) {
-        extraHosts.push(v.value);
+        config.HostConfig.ExtraHosts.push(v.value);
       }
     });
-    config.HostConfig.ExtraHosts = extraHosts;
   }
 
   function prepareLabels(config) {

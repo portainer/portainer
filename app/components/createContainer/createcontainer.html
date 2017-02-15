@@ -319,7 +319,7 @@
                 </div>
                 <!-- extra-hosts-input-list -->
                 <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
-                  <div ng-repeat="variable in config.HostConfig.ExtraHosts" style="margin-top: 2px;">
+                  <div ng-repeat="variable in formValues.ExtraHosts" style="margin-top: 2px;">
                     <div class="input-group col-sm-5 input-group-sm">
                       <span class="input-group-addon">value</span>
                       <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP">
