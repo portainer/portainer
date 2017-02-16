@@ -28,6 +28,15 @@ function ($scope, $state, EndpointService, Messages, Pagination) {
     Pagination.setPaginationCount('endpoints', $scope.state.pagination_count);
   };
 
+  $scope.selectItems = function (allSelected) {
+    angular.forEach($scope.state.filteredEndpoints, function (endpoint) {
+      if (endpoint.Checked !== allSelected) {
+        endpoint.Checked = allSelected;
+        $scope.selectItem(endpoint);
+      }
+    });
+  };
+
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
