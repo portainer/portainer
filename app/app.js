@@ -294,6 +294,19 @@ angular.module('portainer', [
         }
       }
     })
+    .state('endpoint.access', {
+      url: '^/endpoints/:id/access',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/endpointAccess/endpointAccess.html',
+          controller: 'EndpointAccessController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('endpointInit', {
       url: '/init/endpoint',
       views: {

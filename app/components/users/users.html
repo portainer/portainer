@@ -19,7 +19,7 @@
           <div class="form-group">
             <label for="username" class="col-sm-2 control-label text-left">Username</label>
             <div class="col-sm-8">
-              <input type="text" class="form-control" id="username" ng-model="formValues.Name" placeholder="e.g. jdoe">
+              <input type="text" class="form-control" id="username" ng-model="formValues.Username" placeholder="e.g. jdoe">
             </div>
           </div>
           <!-- !name-input -->
@@ -48,18 +48,27 @@
           <!-- !confirm-password-input -->
           <!-- admin-checkbox -->
           <div class="form-group">
-            <div class="col-sm-12">
-              <label for="admin" class="control-label text-left">Administrator</label>
-              <input type="checkbox" name="admin" ng-model="formValues.isAdmin">
+            <label for="permissions" class="col-sm-2 control-label text-left">Permissions</label>
+            <div class="col-sm-8">
+              <div class="btn-group btn-group-sm">
+                <label class="btn btn-default" ng-model="formValues.Role" uib-btn-radio="'user'">
+                  <i class="fa fa-user" aria-hidden="true"></i>
+                  User
+                </label>
+                <label class="btn btn-default" ng-model="formValues.Role" uib-btn-radio="'administrator'">
+                  <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+                  Administrator
+                </label>
+              </div>
             </div>
           </div>
           <!-- !admin-checkbox -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="formValues.Name === '' || formValues.Password === '' || formValues.Password !== formValues.ConfirmPassword" ng-click="addUser()"><i class="fa fa-user-plus" aria-hidden="true"></i> Add user</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="formValues.Username === '' || formValues.Password === '' || formValues.Password !== formValues.ConfirmPassword" ng-click="addUser()"><i class="fa fa-user-plus" aria-hidden="true"></i> Add user</button>
               <i id="createUserSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
-              <span class="text-danger" ng-if="state.error" style="margin: 5px;">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
+              <span class="text-danger" ng-if="state.userCreationError" style="margin: 5px;">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.userCreationError }}
               </span>
             </div>
           </div>
@@ -97,7 +106,9 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th></th>
+                <th>
+                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+                </th>
                 <th>
                   <a ui-sref="users" ng-click="order('Username')">
                     Name
@@ -118,12 +129,14 @@
             <tbody>
               <tr dir-paginate="user in (state.filteredUsers = (users | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(user)" /></td>
-                <td><a ui-sref="user({id: user.Id})">{{ user.Username }}</a></td>
+                <td>{{ user.Username }}</td>
                 <td>
-                  <i class="fa" ng-class="user.Role === 'administrator' ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true"></i>
                   {{ user.Role }}
+                  <i class="fa" ng-class="user.Role === 'administrator' ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
                 </td>
-                <td>Actions</td>
+                <td>
+                  <a ui-sref="user({id: user.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
+                </td>
               </tr>
             <tr ng-if="!users">
               <td colspan="4" class="text-center text-muted">Loading...</td>

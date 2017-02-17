@@ -1,19 +1,19 @@
 angular.module('users', [])
-.controller('UsersController', ['$scope', '$state', 'UserService', 'Messages', 'Pagination',
-function ($scope, $state, UserService, Messages, Pagination) {
+.controller('UsersController', ['$scope', '$state', 'UserService', 'ModalService', 'Messages', 'Pagination',
+function ($scope, $state, UserService, ModalService, Messages, Pagination) {
   $scope.state = {
-    error: '',
+    userCreationError: '',
     selectedItemCount: 0,
-    pagination_count: Pagination.getPaginationCount('endpoints')
+    pagination_count: Pagination.getPaginationCount('users')
   };
   $scope.sortType = 'Username';
   $scope.sortReverse = true;
 
   $scope.formValues = {
-    Name: '',
+    Username: '',
     Password: '',
     ConfirmPassword: '',
-    isAdmin: false,
+    Role: 'user',
   };
 
   $scope.order = function(sortType) {
@@ -25,6 +25,15 @@ function ($scope, $state, UserService, Messages, Pagination) {
     Pagination.setPaginationCount('endpoints', $scope.state.pagination_count);
   };
 
+  $scope.selectItems = function (allSelected) {
+    angular.forEach($scope.state.filteredUsers, function (user) {
+      if (user.Checked !== allSelected) {
+        user.Checked = allSelected;
+        $scope.selectItem(user);
+      }
+    });
+  };
+
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
@@ -33,56 +42,61 @@ function ($scope, $state, UserService, Messages, Pagination) {
     }
   };
 
-  // $scope.addUser = function() {
-  //   $scope.state.error = '';
-  //   var name = $scope.formValues.Name;
-  //   var URL = $scope.formValues.URL;
-  //   var TLS = $scope.formValues.TLS;
-  //   var TLSCAFile = $scope.formValues.TLSCACert;
-  //   var TLSCertFile = $scope.formValues.TLSCert;
-  //   var TLSKeyFile = $scope.formValues.TLSKey;
-  //   UserService.createRemoteUser(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, false).then(function success(data) {
-  //     Messages.send("User created", name);
-  //     $state.reload();
-  //   }, function error(err) {
-  //     $scope.state.uploadInProgress = false;
-  //     $scope.state.error = err.msg;
-  //   }, function update(evt) {
-  //     if (evt.upload) {
-  //       $scope.state.uploadInProgress = evt.upload;
-  //     }
-  //   });
-  // };
-  //
-  // $scope.removeAction = function () {
-  //   $('#loadUsersSpinner').show();
-  //   var counter = 0;
-  //   var complete = function () {
-  //     counter = counter - 1;
-  //     if (counter === 0) {
-  //       $('#loadUsersSpinner').hide();
-  //     }
-  //   };
-  //   angular.forEach($scope.endpoints, function (endpoint) {
-  //     if (endpoint.Checked) {
-  //       counter = counter + 1;
-  //       UserService.deleteUser(endpoint.Id).then(function success(data) {
-  //         Messages.send("User deleted", endpoint.Name);
-  //         var index = $scope.endpoints.indexOf(endpoint);
-  //         $scope.endpoints.splice(index, 1);
-  //         complete();
-  //       }, function error(err) {
-  //         Messages.error("Failure", err, 'Unable to remove endpoint');
-  //         complete();
-  //       });
-  //     }
-  //   });
-  // };
-  //
+  $scope.addUser = function() {
+    $scope.state.userCreationError = '';
+    var username = $scope.formValues.Username;
+    Messages.send("User created", username);
+    $scope.state.userCreationError = 'An error occured';
+    // var URL = $scope.formValues.URL;
+    // var TLS = $scope.formValues.TLS;
+    // var TLSCAFile = $scope.formValues.TLSCACert;
+    // var TLSCertFile = $scope.formValues.TLSCert;
+    // var TLSKeyFile = $scope.formValues.TLSKey;
+    // UserService.createRemoteUser(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, false).then(function success(data) {
+    //   Messages.send("User created", name);
+    //   $state.reload();
+    // }, function error(err) {
+    //   $scope.state.uploadInProgress = false;
+    //   $scope.state.error = err.msg;
+    // }, function update(evt) {
+    //   if (evt.upload) {
+    //     $scope.state.uploadInProgress = evt.upload;
+    //   }
+    // });
+  };
+
+  function deleteSelectedUsers() {
+    $('#loadUsersSpinner').show();
+    var counter = 0;
+    var complete = function () {
+      counter = counter - 1;
+      if (counter === 0) {
+        $('#loadUsersSpinner').hide();
+      }
+    };
+    angular.forEach($scope.users, function (user) {
+      if (user.Checked) {
+        counter = counter + 1;
+        Messages.send('User successfully deleted', user.Username);
+      }
+    });
+  }
+
+  $scope.removeAction = function () {
+    ModalService.confirmDeletion(
+      'Do you want to delete the selected users? They will not be able to login into Portainer anymore.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        deleteSelectedUsers();
+      }
+    );
+  };
+
   function fetchUsers() {
     $scope.users = [
       {Id: 1, Username: "okenobi", Role: "administrator", Checked: false},
       {Id: 2, Username: "yabon", Role: "user", Checked: false},
+      {Id: 3, Username: "rbelmont", Role: "administrator", Checked: false}
     ];
     // $('#loadUsersSpinner').show();
     // UserService.endpoints().then(function success(data) {
