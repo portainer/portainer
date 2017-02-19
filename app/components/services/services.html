@@ -67,6 +67,8 @@
                 <td>
                   {{ service.Mode }}
                   <span ng-if="service.Mode === 'replicated' && !service.Scale">
+                    <code data-toggle="tooltip" title="Replicas">{{ service.Running }}</code>
+                    /
                     <code data-toggle="tooltip" title="Replicas">{{ service.Replicas }}</code>
                     <a class="interactive" ng-click="service.Scale = true; service.ReplicaCount = service.Replicas;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Scale</a>
                   </span>

@@ -1,6 +1,6 @@
 angular.module('services', [])
-.controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination',
-function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination) {
+.controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination', 'Task',
+function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination, Task) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');
@@ -72,16 +72,22 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagina
 
   function fetchServices() {
     $('#loadServicesSpinner').show();
-    Service.query({}, function (d) {
-      $scope.services = d.map(function (service) {
-        return new ServiceViewModel(service);
-      });
-      $('#loadServicesSpinner').hide();
-    }, function(e) {
+    var failure = function(e) {
       $('#loadServicesSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve services");
       $scope.services = [];
-    });
+    };
+    Service.query({}, function (d) {
+      Task.query({filters: {'desired-state': ['running']}}, function (tasks) {
+        $scope.services = d.map(function (service) {
+          var serviceTasks = tasks.filter(function (task) {
+            return task.ServiceID === service.ID;
+          });
+          return new ServiceViewModel(service, serviceTasks);
+        });
+        $('#loadServicesSpinner').hide();
+      }, failure);
+    }, failure);
   }
 
   fetchServices();
