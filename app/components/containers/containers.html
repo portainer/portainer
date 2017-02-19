@@ -98,7 +98,7 @@
               <td><span class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span></td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
               <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
-              <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
+              <td><a ui-sref="image({id: container.Image})">{{ container.Image | hideshasum }}</a></td>
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">{{ container.hostIP }}</td>
               <td>
