@@ -63,7 +63,7 @@
               <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="service.Checked" ng-change="selectItem(service)"/></td>
                 <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
-                <td>{{ service.Image }}</td>
+                <td>{{ service.Image | hideshasum }}</td>
                 <td>
                   {{ service.Mode }}
                   <span ng-if="service.Mode === 'replicated' && !service.Scale">
