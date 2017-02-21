@@ -1,4 +1,4 @@
-function ServiceViewModel(data, runningTasks) {
+function ServiceViewModel(data, runningTasks, nodes) {
   this.Model = data;
   this.Id = data.ID;
   this.Name = data.Spec.Name;
@@ -9,6 +9,7 @@ function ServiceViewModel(data, runningTasks) {
     this.Replicas = data.Spec.Mode.Replicated.Replicas;
   } else {
     this.Mode = 'global';
+    this.Replicas = nodes.length;
   }
   if (runningTasks) {
     this.Running = runningTasks.length;
