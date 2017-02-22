@@ -58,7 +58,29 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-	encodeJSON(w, endpoints, handler.Logger)
+
+	tokenData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
+	if tokenData == nil {
+		Error(w, portainer.ErrInvalidJWTToken, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	var allowedEndpoints []portainer.Endpoint
+	if tokenData.Role != portainer.AdministratorRole {
+		allowedEndpoints = make([]portainer.Endpoint, 0)
+		for _, endpoint := range endpoints {
+			for _, authorizedUserID := range endpoint.AuthorizedUsers {
+				if authorizedUserID == tokenData.ID {
+					allowedEndpoints = append(allowedEndpoints, endpoint)
+					break
+				}
+			}
+		}
+	} else {
+		allowedEndpoints = endpoints
+	}
+
+	encodeJSON(w, allowedEndpoints, handler.Logger)
 }
 
 // handlePostEndpoints handles POST requests on /endpoints

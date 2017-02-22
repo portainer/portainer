@@ -1,17 +1,26 @@
 package http
 
 import (
+	"context"
+
 	"github.com/portainer/portainer"
 
 	"net/http"
 	"strings"
 )
 
-// Service represents a service to manage HTTP middlewares
-type middleWareService struct {
-	jwtService   portainer.JWTService
-	authDisabled bool
-}
+type (
+	// middleWareService represents a service to manage HTTP middlewares
+	middleWareService struct {
+		jwtService   portainer.JWTService
+		authDisabled bool
+	}
+	contextKey int
+)
+
+const (
+	contextAuthenticationKey contextKey = iota
+)
 
 func addMiddleware(h http.Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
 	for _, mw := range middleware {
@@ -53,14 +62,17 @@ func (service *middleWareService) middleWareAuthenticate(next http.Handler) http
 				return
 			}
 
-			err := service.jwtService.VerifyToken(token)
+			tokenData, err := service.jwtService.VerifyToken(token)
 			if err != nil {
 				Error(w, err, http.StatusUnauthorized, nil)
 				return
 			}
+			ctx := context.WithValue(r.Context(), contextAuthenticationKey, tokenData)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		} else {
+			next.ServeHTTP(w, r)
 		}
 
-		next.ServeHTTP(w, r)
 		return
 	})
 }

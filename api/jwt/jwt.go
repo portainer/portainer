@@ -56,16 +56,24 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, error)
 }
 
 // VerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
-func (service *Service) VerifyToken(token string) error {
-	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+func (service *Service) VerifyToken(token string) (*portainer.TokenData, error) {
+	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			msg := fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			return nil, msg
 		}
 		return service.secret, nil
 	})
-	if err != nil || parsedToken == nil || !parsedToken.Valid {
-		return portainer.ErrInvalidJWTToken
+	if err == nil && parsedToken != nil {
+		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
+			tokenData := &portainer.TokenData{
+				ID:       portainer.UserID(cl.UserID),
+				Username: cl.Username,
+				Role:     portainer.UserRole(cl.Role),
+			}
+			return tokenData, nil
+		}
 	}
-	return nil
+
+	return nil, portainer.ErrInvalidJWTToken
 }

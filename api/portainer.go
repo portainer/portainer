@@ -90,7 +90,7 @@ type (
 		Close() error
 	}
 
-	// Server defines the interface to serve the data.
+	// Server defines the interface to serve the API.
 	Server interface {
 		Start() error
 	}
@@ -127,7 +127,7 @@ type (
 	// JWTService represents a service for managing JWT tokens.
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
-		VerifyToken(token string) error
+		VerifyToken(token string) (*TokenData, error)
 	}
 
 	// FileService represents a service for managing files.
