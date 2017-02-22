@@ -1,6 +1,6 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'Pagination',
-function ($scope, $state, Volume, Messages, Pagination) {
+.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'Pagination', 'ModalService',
+function ($scope, $state, Volume, Messages, Pagination, ModalService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('volumes');
   $scope.state.selectedItemCount = 0;
@@ -8,6 +8,21 @@ function ($scope, $state, Volume, Messages, Pagination) {
   $scope.sortReverse = true;
   $scope.config = {
     Name: ''
+  };
+
+  function changeVolumeOwnership(volume) {
+    // remove label and such
+    volume.Ownership = 'public';
+    $scope.$apply();
+    // should probably refresh the view instead of apply, check whats best online
+    Messages.send('Ownership changed to public', volume.Name);
+  }
+
+  $scope.switchOwnership = function(volume) {
+    ModalService.confirmOwnershipChange(function (confirmed) {
+      if(!confirmed) { return; }
+      changeVolumeOwnership(volume);
+    });
   };
 
   $scope.changePaginationCount = function() {
@@ -68,7 +83,10 @@ function ($scope, $state, Volume, Messages, Pagination) {
   function fetchVolumes() {
     $('#loadVolumesSpinner').show();
     Volume.query({}, function (d) {
-      $scope.volumes = d.Volumes || [];
+      var volumes = d.Volumes || [];
+      $scope.volumes = volumes.map(function (v) {
+        return new VolumeViewModel(v);
+      });
       $('#loadVolumesSpinner').hide();
     }, function (e) {
       $('#loadVolumesSpinner').hide();

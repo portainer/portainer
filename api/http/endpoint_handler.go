@@ -78,9 +78,10 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 	}
 
 	endpoint := &portainer.Endpoint{
-		Name: req.Name,
-		URL:  req.URL,
-		TLS:  req.TLS,
+		Name:            req.Name,
+		URL:             req.URL,
+		TLS:             req.TLS,
+		AuthorizedUsers: []portainer.UserID{},
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
@@ -224,14 +225,33 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		return
 	}
 
-	endpoint := &portainer.Endpoint{
-		ID:   portainer.EndpointID(endpointID),
-		Name: req.Name,
-		URL:  req.URL,
-		TLS:  req.TLS,
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrEndpointNotFound {
+		Error(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if req.Name != "" {
+		endpoint.Name = req.Name
+	}
+
+	if req.URL != "" {
+		endpoint.URL = req.URL
+	}
+
+	if req.AuthorizedUsers != nil {
+		authorizedUserIDs := []portainer.UserID{}
+		for _, value := range req.AuthorizedUsers {
+			authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
+		}
+		endpoint.AuthorizedUsers = authorizedUserIDs
 	}
 
 	if req.TLS {
+		endpoint.TLS = true
 		caCertPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCA)
 		endpoint.TLSCACertPath = caCertPath
 		certPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCert)
@@ -239,6 +259,10 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		keyPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileKey)
 		endpoint.TLSKeyPath = keyPath
 	} else {
+		endpoint.TLS = false
+		endpoint.TLSCACertPath = ""
+		endpoint.TLSCertPath = ""
+		endpoint.TLSKeyPath = ""
 		err = handler.FileService.DeleteTLSFiles(endpoint.ID)
 		if err != nil {
 			Error(w, err, http.StatusInternalServerError, handler.Logger)
@@ -254,9 +278,10 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 }
 
 type putEndpointsRequest struct {
-	Name string `valid:"required"`
-	URL  string `valid:"required"`
-	TLS  bool
+	Name            string `valid:"-"`
+	URL             string `valid:"-"`
+	TLS             bool   `valid:"-"`
+	AuthorizedUsers []int  `valid:"-"`
 }
 
 // handleDeleteEndpoint handles DELETE requests on /endpoints/:id

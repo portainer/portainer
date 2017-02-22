@@ -30,6 +30,7 @@ angular.module('portainer', [
   'createVolume',
   'docker',
   'endpoint',
+  'endpointAccess',
   'endpointInit',
   'endpoints',
   'events',
@@ -472,12 +473,12 @@ angular.module('portainer', [
         }
       }
     })
-    .state('user', {
-      url: '/user/',
+    .state('users', {
+      url: '/users/',
       views: {
         "content@": {
-          templateUrl: 'app/components/user/user.html',
-          controller: 'UserController'
+          templateUrl: 'app/components/users/users.html',
+          controller: 'UsersController'
         },
         "sidebar@": {
           templateUrl: 'app/components/sidebar/sidebar.html',
@@ -485,12 +486,12 @@ angular.module('portainer', [
         }
       }
     })
-    .state('users', {
-      url: '/users/',
+    .state('user', {
+      url: '^/users/:id',
       views: {
         "content@": {
-          templateUrl: 'app/components/users/users.html',
-          controller: 'UsersController'
+          templateUrl: 'app/components/user/user.html',
+          controller: 'UserController'
         },
         "sidebar@": {
           templateUrl: 'app/components/sidebar/sidebar.html',

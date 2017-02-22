@@ -3,7 +3,7 @@
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="users">Users</a> > <a ui-sref="users({id: user.Id})">{{ user.Username }}</a>
+    <a ui-sref="users">Users</a> > <a ui-sref="user({id: user.Id})">{{ user.Username }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -24,11 +24,11 @@
               <td>Permissions</td>
               <td>
                 <div class="btn-group btn-group-sm">
-                  <label class="btn btn-default" ng-model="user.Role" uib-btn-radio="'user'" ng-change="updatePermissions()">
+                  <label class="btn btn-default" ng-model="user.RoleId" uib-btn-radio="2" ng-change="updatePermissions()">
                     <i class="fa fa-user" aria-hidden="true"></i>
                     User
                   </label>
-                  <label class="btn btn-default" ng-model="user.Role" uib-btn-radio="'administrator'" ng-change="updatePermissions()">
+                  <label class="btn btn-default" ng-model="user.RoleId" uib-btn-radio="1" ng-change="updatePermissions()">
                     <i class="fa fa-user-circle-o" aria-hidden="true"></i>
                     Administrator
                   </label>

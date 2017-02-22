@@ -10,10 +10,10 @@ angular.module('portainer.services')
       buttons: {
         confirm: {
           label: options.buttons.confirm.label,
-          className: 'btn-danger'
+          className: options.buttons.confirm.className
         },
         cancel: {
-          label: options.buttons.cancel.label
+          label: options.buttons.cancel && options.buttons.cancel.label ? options.buttons.cancel.label : 'Cancel'
         }
       },
       callback: options.callback
@@ -26,6 +26,34 @@ angular.module('portainer.services')
     });
   };
 
+  service.confirmOwnershipChange = function(callback) {
+    service.confirm({
+      title: 'Are you sure ?',
+      message: 'You can change the ownership of an object one way only. You will not be able to make this object private again.',
+      buttons: {
+        confirm: {
+          label: 'Change ownership',
+          className: 'btn-primary'
+        }
+      },
+      callback: callback,
+    });
+  };
+
+  service.confirmImageForceRemoval = function(callback) {
+    service.confirm({
+      title: "Are you sure?",
+      message: "Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.",
+      buttons: {
+        confirm: {
+          label: 'Remove the image',
+          className: 'btn-danger'
+        }
+      },
+      callback: callback,
+    });
+  };
+
   service.confirmDeletion = function(message, callback) {
     service.confirm({
       title: 'Are you sure ?',
@@ -34,9 +62,6 @@ angular.module('portainer.services')
         confirm: {
           label: 'Delete',
           className: 'btn-danger'
-        },
-        cancel: {
-          label: 'Cancel'
         }
       },
       callback: callback,

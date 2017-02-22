@@ -38,13 +38,24 @@ type (
 
 	// User represent a user account.
 	User struct {
-		Username string `json:"Username"`
-		Password string `json:"Password,omitempty"`
+		ID       UserID   `json:"Id"`
+		Username string   `json:"Username"`
+		Password string   `json:"Password,omitempty"`
+		Role     UserRole `json:"Role"`
 	}
+
+	// UserID represents a user identifier
+	UserID int
+
+	// UserRole represents the role of a user. It can be either an administrator
+	// or a regular user.
+	UserRole int
 
 	// TokenData represents the data embedded in a JWT token.
 	TokenData struct {
+		ID       UserID
 		Username string
+		Role     UserRole
 	}
 
 	// EndpointID represents an endpoint identifier.
@@ -53,13 +64,14 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
-		ID            EndpointID `json:"Id"`
-		Name          string     `json:"Name"`
-		URL           string     `json:"URL"`
-		TLS           bool       `json:"TLS"`
-		TLSCACertPath string     `json:"TLSCACert,omitempty"`
-		TLSCertPath   string     `json:"TLSCert,omitempty"`
-		TLSKeyPath    string     `json:"TLSKey,omitempty"`
+		ID              EndpointID `json:"Id"`
+		Name            string     `json:"Name"`
+		URL             string     `json:"URL"`
+		TLS             bool       `json:"TLS"`
+		TLSCACertPath   string     `json:"TLSCACert,omitempty"`
+		TLSCertPath     string     `json:"TLSCert,omitempty"`
+		TLSKeyPath      string     `json:"TLSKey,omitempty"`
+		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
 	}
 
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
@@ -85,8 +97,13 @@ type (
 
 	// UserService represents a service for managing users.
 	UserService interface {
-		User(username string) (*User, error)
-		UpdateUser(user *User) error
+		User(ID UserID) (*User, error)
+		UserByUsername(username string) (*User, error)
+		Users() ([]User, error)
+		UsersByRole(role UserRole) ([]User, error)
+		CreateUser(user *User) error
+		UpdateUser(ID UserID, user *User) error
+		DeleteUser(ID UserID) error
 	}
 
 	// EndpointService represents a service for managing endpoints.
@@ -133,4 +150,12 @@ const (
 	TLSFileCert
 	// TLSFileKey represents a TLS key file.
 	TLSFileKey
+)
+
+const (
+	_ UserRole = iota
+	// AdministratorRole represents an administrator user role
+	AdministratorRole
+	// StandardUserRole represents a regular user role
+	StandardUserRole
 )

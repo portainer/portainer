@@ -4,9 +4,10 @@ import (
 	"github.com/portainer/portainer"
 
 	"fmt"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/securecookie"
-	"time"
 )
 
 // Service represents a service for managing JWT tokens.
@@ -15,7 +16,9 @@ type Service struct {
 }
 
 type claims struct {
+	UserID   int    `json:"id"`
 	Username string `json:"username"`
+	Role     int    `json:"role"`
 	jwt.StandardClaims
 }
 
@@ -35,7 +38,9 @@ func NewService() (*Service, error) {
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
 	expireToken := time.Now().Add(time.Hour * 8).Unix()
 	cl := claims{
+		int(data.ID),
 		data.Username,
+		int(data.Role),
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
 		},

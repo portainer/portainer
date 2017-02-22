@@ -89,8 +89,8 @@
               <tr ng-click="authorizeUser(user)" class="interactive" dir-paginate="user in (state.filteredUsers = (users | filter:state.filterUsers | orderBy:sortTypeUsers:sortReverseUsers | itemsPerPage: state.pagination_count_users))">
                 <td>{{ user.Username }}</td>
                 <td>
-                  {{ user.Role }}
-                  <i class="fa" ng-class="user.Role === 'administrator' ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
+                  {{ user.RoleName }}
+                  <i class="fa" ng-class="user.RoleId === 1 ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
                 </td>
               </tr>
               <tr ng-if="!users">
@@ -155,8 +155,8 @@
               <tr ng-click="unauthorizeUser(user)" class="interactive" dir-paginate="user in (state.filteredAuthorizedUsers = (authorizedUsers | filter:state.filterAuthorizedUsers | orderBy:sortTypeAuthorizedUsers:sortReverseAuthorizedUsers | itemsPerPage: state.pagination_count_authorizedUsers))">
                 <td>{{ user.Username }}</td>
                 <td>
-                  {{ user.Role }}
-                  <i class="fa" ng-class="user.Role === 'administrator' ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
+                  {{ user.RoleName }}
+                  <i class="fa" ng-class="user.RoleId === 1 ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
                 </td>
               </tr>
               <tr ng-if="!authorizedUsers">

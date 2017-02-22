@@ -8,6 +8,7 @@ const (
 // User errors.
 const (
 	ErrUserNotFound            = Error("User not found")
+	ErrUserAlreadyExists       = Error("User already exists")
 	ErrAdminAlreadyInitialized = Error("Admin user already initialized")
 )
 

@@ -9,6 +9,7 @@ angular.module('portainer.services')
       if (jwt) {
         var tokenPayload = jwtHelper.decodeToken(jwt);
         credentials.username = tokenPayload.username;
+        credentials.userID = tokenPayload.id;
       }
     },
     login: function(username, password) {
@@ -16,7 +17,9 @@ angular.module('portainer.services')
         Auth.login({username: username, password: password}).$promise
         .then(function(data) {
           LocalStorage.storeJWT(data.jwt);
+          var tokenPayload = jwtHelper.decodeToken(data.jwt);
           credentials.username = username;
+          credentials.userID = tokenPayload.id;
           resolve();
         }, function() {
           reject();

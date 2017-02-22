@@ -4,16 +4,17 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
   $scope.state = {
     userCreationError: '',
     selectedItemCount: 0,
+    validUsername: false,
     pagination_count: Pagination.getPaginationCount('users')
   };
-  $scope.sortType = 'Username';
-  $scope.sortReverse = true;
+  $scope.sortType = 'RoleName';
+  $scope.sortReverse = false;
 
   $scope.formValues = {
     Username: '',
     Password: '',
     ConfirmPassword: '',
-    Role: 'user',
+    Role: 2,
   };
 
   $scope.order = function(sortType) {
@@ -42,27 +43,35 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
     }
   };
 
+  $scope.checkUsernameValidity = function() {
+    var valid = true;
+    for (var i = 0; i < $scope.users.length; i++) {
+      if ($scope.formValues.Username === $scope.users[i].Username) {
+        valid = false;
+        break;
+      }
+    }
+    $scope.state.validUsername = valid;
+    $scope.state.userCreationError = valid ? '' : 'Username already taken';
+  };
+
   $scope.addUser = function() {
     $scope.state.userCreationError = '';
     var username = $scope.formValues.Username;
-    Messages.send("User created", username);
-    $scope.state.userCreationError = 'An error occured';
-    // var URL = $scope.formValues.URL;
-    // var TLS = $scope.formValues.TLS;
-    // var TLSCAFile = $scope.formValues.TLSCACert;
-    // var TLSCertFile = $scope.formValues.TLSCert;
-    // var TLSKeyFile = $scope.formValues.TLSKey;
-    // UserService.createRemoteUser(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, false).then(function success(data) {
-    //   Messages.send("User created", name);
-    //   $state.reload();
-    // }, function error(err) {
-    //   $scope.state.uploadInProgress = false;
-    //   $scope.state.error = err.msg;
-    // }, function update(evt) {
-    //   if (evt.upload) {
-    //     $scope.state.uploadInProgress = evt.upload;
-    //   }
-    // });
+    var password = $scope.formValues.Password;
+    var role = $scope.formValues.Role;
+    console.log(JSON.stringify(role, null, 4));
+    UserService.createUser(username, password, role)
+    .then(function success(data) {
+      Messages.send("User created", username);
+      $state.reload();
+    })
+    .catch(function error(err) {
+      $scope.state.userCreationError = err.msg;
+    })
+    .finally(function final() {
+
+    });
   };
 
   function deleteSelectedUsers() {
@@ -77,7 +86,18 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
     angular.forEach($scope.users, function (user) {
       if (user.Checked) {
         counter = counter + 1;
-        Messages.send('User successfully deleted', user.Username);
+        UserService.deleteUser(user.Id)
+        .then(function success(data) {
+          var index = $scope.users.indexOf(user);
+          $scope.users.splice(index, 1);
+          Messages.send('User successfully deleted', user.Username);
+        })
+        .catch(function error(err) {
+          Messages.error("Failure", err, 'Unable to remove user');
+        })
+        .finally(function final() {
+          complete();
+        });
       }
     });
   }
@@ -93,26 +113,20 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
   };
 
   function fetchUsers() {
-    $scope.users = [
-      {Id: 1, Username: "okenobi", Role: "administrator", Checked: false},
-      {Id: 2, Username: "yabon", Role: "user", Checked: false},
-      {Id: 3, Username: "rbelmont", Role: "administrator", Checked: false}
-    ];
-    // $('#loadUsersSpinner').show();
-    // UserService.endpoints().then(function success(data) {
-    //   $scope.endpoints = data;
-    //   UserService.getActive().then(function success(data) {
-    //     $scope.activeUser = data;
-    //     $('#loadUsersSpinner').hide();
-    //   }, function error(err) {
-    //     $('#loadUsersSpinner').hide();
-    //     Messages.error("Failure", err, "Unable to retrieve active endpoint");
-    //   });
-    // }, function error(err) {
-    //   $('#loadUsersSpinner').hide();
-    //   Messages.error("Failure", err, "Unable to retrieve endpoints");
-    //   $scope.endpoints = [];
-    // });
+    $('#loadUsersSpinner').show();
+    UserService.users()
+    .then(function success(data) {
+      $scope.users = data.map(function(user) {
+        return new UserViewModel(user);
+      });
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to retrieve users");
+      $scope.users = [];
+    })
+    .finally(function final() {
+      $('#loadUsersSpinner').hide();
+    });
   }
 
   fetchUsers();

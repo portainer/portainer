@@ -1,6 +1,6 @@
-angular.module('endpoint', [])
-.controller('EndpointAccessController', ['$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'Pagination', 'Messages',
-function ($scope, $state, $stateParams, $filter, EndpointService, Pagination, Messages) {
+angular.module('endpointAccess', [])
+.controller('EndpointAccessController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'UserService', 'Pagination', 'Messages',
+function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserService, Pagination, Messages) {
 
   $scope.state = {
     pagination_count_users: Pagination.getPaginationCount('endpoint_access_users'),
@@ -31,28 +31,109 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Pagination, Me
     Pagination.setPaginationCount('endpoint_access_authorizedUsers', $scope.state.pagination_count_authorizedUsers);
   };
 
-  function getEndpoint(endpointID) {
-    $('#loadingViewSpinner').show();
-    EndpointService.endpoint($stateParams.id)
+  $scope.authorizeAllUsers = function() {
+    var authorizedUserIDs = [];
+    angular.forEach($scope.authorizedUsers, function (user) {
+      authorizedUserIDs.push(user.Id);
+    });
+    angular.forEach($scope.users, function (user) {
+      authorizedUserIDs.push(user.Id);
+    });
+    EndpointService.updateEndpoint($stateParams.id, {authorizedUsers: authorizedUserIDs})
     .then(function success(data) {
-      $scope.endpoint = data;
+      $scope.authorizedUsers = $scope.authorizedUsers.concat($scope.users);
+      $scope.users = [];
+      Messages.send('Access granted for all users');
     })
     .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to update endpoint permissions");
+    });
+  };
+
+  $scope.unauthorizeAllUsers = function() {
+    EndpointService.updateEndpoint($stateParams.id, {authorizedUsers: []})
+    .then(function success(data) {
+      $scope.users = $scope.users.concat($scope.authorizedUsers);
+      $scope.authorizedUsers = [];
+      Messages.send('Access removed for all users');
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to update endpoint permissions");
+    });
+  };
+
+  $scope.authorizeUser = function(user) {
+    var authorizedUserIDs = [];
+    angular.forEach($scope.authorizedUsers, function (u) {
+      authorizedUserIDs.push(u.Id);
+    });
+    authorizedUserIDs.push(user.Id);
+    EndpointService.updateEndpoint($stateParams.id, {authorizedUsers: authorizedUserIDs})
+    .then(function success(data) {
+      removeUserFromArray(user.Id, $scope.users);
+      $scope.authorizedUsers.push(user);
+      Messages.send('Access granted for user', user.Username);
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to update endpoint permissions");
+    });
+  };
+
+  $scope.unauthorizeUser = function(user) {
+    var authorizedUserIDs = $scope.authorizedUsers.filter(function (u) {
+      if (u.Id !== user.Id) {
+        return u;
+      }
+    }).map(function (u) {
+      return u.Id;
+    });
+    EndpointService.updateEndpoint($stateParams.id, {authorizedUsers: authorizedUserIDs})
+    .then(function success(data) {
+      removeUserFromArray(user.Id, $scope.authorizedUsers);
+      $scope.users.push(user);
+      Messages.send('Access removed for user', user.Username);
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to update endpoint permissions");
+    });
+  };
+
+  function getEndpointAndUsers(endpointID) {
+    $('#loadingViewSpinner').show();
+    $q.all({
+      endpoint: EndpointService.endpoint($stateParams.id),
+      users: UserService.users(),
+    })
+    .then(function success(data) {
+      $scope.endpoint = data.endpoint;
+      $scope.users = data.users.filter(function (user) {
+        if (user.Role !== 1) {
+          return user;
+        }
+      }).map(function (user) {
+        return new UserViewModel(user);
+      });
+      $scope.authorizedUsers = [];
+      angular.forEach($scope.endpoint.AuthorizedUsers, function(userID) {
+        for (var i = 0, l = $scope.users.length; i < l; i++) {
+          if ($scope.users[i].Id === userID) {
+            $scope.authorizedUsers.push($scope.users[i]);
+            $scope.users.splice(i, 1);
+            return;
+          }
+        }
+      });
+    })
+    .catch(function error(err) {
+      $scope.templates = [];
+      $scope.users = [];
+      $scope.authorizedUsers = [];
       Messages.error("Failure", err, "Unable to retrieve endpoint details");
     })
-    .finally(function final() {
+    .finally(function final(){
       $('#loadingViewSpinner').hide();
     });
   }
-
-  $scope.users = [
-    {Id: 1, Username: "okenobi", Role: "administrator", Checked: false},
-    {Id: 2, Username: "yabon", Role: "user", Checked: false},
-  ];
-
-  $scope.authorizedUsers = [
-    {Id: 3, Username: "rbelmont", Role: "administrator", Checked: false},
-  ];
 
   function removeUserFromArray(id, users) {
     for (var i = 0, l = users.length; i < l; i++) {
@@ -63,33 +144,5 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Pagination, Me
     }
   }
 
-  $scope.authorizeAllUsers = function() {
-    angular.forEach($scope.users, function (user) {
-      $scope.authorizedUsers.push(user);
-    });
-    $scope.users = [];
-    Messages.send('Access granted for all users');
-  };
-
-  $scope.unauthorizeAllUsers = function() {
-    angular.forEach($scope.authorizedUsers, function (user) {
-      $scope.users.push(user);
-    });
-    $scope.authorizedUsers = [];
-    Messages.send('Access removed for all users');
-  };
-
-  $scope.authorizeUser = function(user) {
-    removeUserFromArray(user.Id, $scope.users);
-    $scope.authorizedUsers.push(user);
-    Messages.send('Access granted for user', user.Username);
-  };
-
-  $scope.unauthorizeUser = function(user) {
-    removeUserFromArray(user.Id, $scope.authorizedUsers);
-    $scope.users.push(user);
-    Messages.send('Access removed for user', user.Username);
-  };
-
-  getEndpoint($stateParams.id);
+  getEndpointAndUsers($stateParams.id);
 }]);

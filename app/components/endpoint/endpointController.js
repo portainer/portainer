@@ -13,14 +13,18 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Messages) {
 
   $scope.updateEndpoint = function() {
     var ID = $scope.endpoint.Id;
-    var name = $scope.endpoint.Name;
-    var URL = $scope.endpoint.URL;
-    var TLS = $scope.endpoint.TLS;
-    var TLSCACert = $scope.formValues.TLSCACert !== $scope.endpoint.TLSCACert ? $scope.formValues.TLSCACert : null;
-    var TLSCert = $scope.formValues.TLSCert !== $scope.endpoint.TLSCert ? $scope.formValues.TLSCert : null;
-    var TLSKey = $scope.formValues.TLSKey !== $scope.endpoint.TLSKey ? $scope.formValues.TLSKey : null;
-    var type = $scope.endpointType;
-    EndpointService.updateEndpoint(ID, name, URL, TLS, TLSCACert, TLSCert, TLSKey, type).then(function success(data) {
+    var endpointParams = {
+      name: $scope.endpoint.Name,
+      URL: $scope.endpoint.URL,
+      TLS: $scope.endpoint.TLS,
+      TLSCACert: $scope.formValues.TLSCACert !== $scope.endpoint.TLSCACert ? $scope.formValues.TLSCACert : null,
+      TLSCert: $scope.formValues.TLSCert !== $scope.endpoint.TLSCert ? $scope.formValues.TLSCert : null,
+      TLSKey: $scope.formValues.TLSKey !== $scope.endpoint.TLSKey ? $scope.formValues.TLSKey : null,
+      type: $scope.endpointType
+    };
+
+    EndpointService.updateEndpoint(ID, endpointParams)
+    .then(function success(data) {
       Messages.send("Endpoint updated", $scope.endpoint.Name);
       $state.go('endpoints');
     }, function error(err) {

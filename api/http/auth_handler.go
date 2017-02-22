@@ -68,7 +68,7 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	var username = req.Username
 	var password = req.Password
 
-	u, err := handler.UserService.User(username)
+	u, err := handler.UserService.UserByUsername(username)
 	if err == portainer.ErrUserNotFound {
 		Error(w, err, http.StatusNotFound, handler.Logger)
 		return
@@ -84,7 +84,9 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	}
 
 	tokenData := &portainer.TokenData{
-		username,
+		ID:       u.ID,
+		Username: u.Username,
+		Role:     u.Role,
 	}
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
