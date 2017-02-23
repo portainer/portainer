@@ -54,12 +54,15 @@ func main() {
 	var cryptoService portainer.CryptoService = &crypto.Service{}
 
 	// Initialize the active endpoint from the CLI only if there is no
-	// active endpoint defined yet.
-	var activeEndpoint *portainer.Endpoint
+	// endpoint defined yet.
 	if *flags.Endpoint != "" {
-		activeEndpoint, err = store.EndpointService.GetActive()
-		if err == portainer.ErrEndpointNotFound {
-			activeEndpoint = &portainer.Endpoint{
+		var endpoints []portainer.Endpoint
+		endpoints, err = store.EndpointService.Endpoints()
+		if err != nil {
+			log.Fatal(err)
+		}
+		if len(endpoints) == 0 {
+			endpoint := &portainer.Endpoint{
 				Name:          "primary",
 				URL:           *flags.Endpoint,
 				TLS:           *flags.TLSVerify,
@@ -67,14 +70,37 @@ func main() {
 				TLSCertPath:   *flags.TLSCert,
 				TLSKeyPath:    *flags.TLSKey,
 			}
-			err = store.EndpointService.CreateEndpoint(activeEndpoint)
+			err = store.EndpointService.CreateEndpoint(endpoint)
 			if err != nil {
 				log.Fatal(err)
 			}
-		} else if err != nil {
-			log.Fatal(err)
+		} else {
+			log.Println("Instance already has defined endpoints. Skipping the endpoint defined via CLI.")
 		}
 	}
+
+	// Initialize the active endpoint from the CLI only if there is no
+	// active endpoint defined yet.
+	// var activeEndpoint *portainer.Endpoint
+	// if *flags.Endpoint != "" {
+	// 	activeEndpoint, err = store.EndpointService.GetActive()
+	// 	if err == portainer.ErrEndpointNotFound {
+	// 		activeEndpoint = &portainer.Endpoint{
+	// 			Name:          "primary",
+	// 			URL:           *flags.Endpoint,
+	// 			TLS:           *flags.TLSVerify,
+	// 			TLSCACertPath: *flags.TLSCacert,
+	// 			TLSCertPath:   *flags.TLSCert,
+	// 			TLSKeyPath:    *flags.TLSKey,
+	// 		}
+	// 		err = store.EndpointService.CreateEndpoint(activeEndpoint)
+	// 		if err != nil {
+	// 			log.Fatal(err)
+	// 		}
+	// 	} else if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
 
 	var server portainer.Server = &http.Server{
 		BindAddress:     *flags.Addr,
@@ -87,7 +113,7 @@ func main() {
 		CryptoService:   cryptoService,
 		JWTService:      jwtService,
 		FileService:     fileService,
-		ActiveEndpoint:  activeEndpoint,
+		// ActiveEndpoint:  activeEndpoint,
 	}
 
 	log.Printf("Starting Portainer on %s", *flags.Addr)

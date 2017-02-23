@@ -1,9 +1,11 @@
 angular.module('portainer.rest')
-.factory('Container', ['$resource', 'Settings', function ContainerFactory($resource, Settings) {
+.factory('Container', ['$resource', 'Settings', 'EndpointProvider', function ContainerFactory($resource, Settings, EndpointProvider) {
   'use strict';
-  return $resource(Settings.url + '/containers/:id/:action', {
-    name: '@name'
-  }, {
+  return $resource(Settings.url + '/:endpointId/containers/:id/:action', {
+    name: '@name',
+    endpointId: EndpointProvider.endpointID
+  }, 
+  {
     query: {method: 'GET', params: {all: 0, action: 'json', filters: '@filters' }, isArray: true},
     get: {method: 'GET', params: {action: 'json'}},
     stop: {method: 'POST', params: {id: '@id', t: 5, action: 'stop'}},

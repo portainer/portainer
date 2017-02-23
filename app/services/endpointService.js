@@ -2,13 +2,6 @@ angular.module('portainer.services')
 .factory('EndpointService', ['$q', 'Endpoints', 'FileUploadService', function EndpointServiceFactory($q, Endpoints, FileUploadService) {
   'use strict';
   var service = {};
-  service.getActive = function() {
-    return Endpoints.getActiveEndpoint().$promise;
-  };
-
-  service.setActive = function(endpointID) {
-    return Endpoints.setActiveEndpoint({id: endpointID}).$promise;
-  };
 
   service.endpoint = function(endpointID) {
     return Endpoints.get({id: endpointID}).$promise;
@@ -57,7 +50,7 @@ angular.module('portainer.services')
       URL: "unix:///var/run/docker.sock",
       TLS: false
     };
-    return Endpoints.create({active: active}, endpoint).$promise;
+    return Endpoints.create({}, endpoint).$promise;
   };
 
   service.createRemoteEndpoint = function(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, active) {

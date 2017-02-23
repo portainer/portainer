@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'Messages',
-function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, EndpointService, StateManager, Messages) {
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Messages',
+function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, EndpointService, StateManager, EndpointProvider, Messages) {
 
   $scope.authData = {
     username: 'admin',
@@ -14,19 +14,26 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
   };
 
   if (!$scope.applicationState.application.authentication) {
-    EndpointService.getActive().then(function success(data) {
-      StateManager.updateEndpointState(true)
-      .then(function success() {
-        $state.go('dashboard');
-      }, function error(err) {
-        Messages.error("Failure", err, 'Unable to connect to the Docker endpoint');
-      });
-    }, function error(err) {
-      if (err.status === 404) {
-        $state.go('endpointInit');
-      } else {
-        Messages.error("Failure", err, 'Unable to verify Docker endpoint existence');
+    EndpointService.endpoints()
+    .then(function success(data) {
+      if (data.length > 0)  {
+        endpointID = EndpointProvider.endpointID();
+        if (!endpointID) {
+          endpointID = data[0].Id;
+          EndpointProvider.setEndpointID(endpointID);
+        }
+        StateManager.updateEndpointState(true)
+        .then(function success() {
+          $state.go('dashboard');
+        }, function error(err) {
+          Messages.error("Failure", err, 'Unable to connect to the Docker endpoint');
+        });
       }
+      else {
+        $state.go('endpointInit');
+      }
+    }, function error(err) {
+      Messages.error("Failure", err, 'Unable to retrieve endpoints');
     });
   }
 
@@ -75,23 +82,33 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
     $scope.authenticationError = false;
     var username = $sanitize($scope.authData.username);
     var password = $sanitize($scope.authData.password);
-    Authentication.login(username, password).then(function success() {
-      EndpointService.getActive().then(function success(data) {
+    Authentication.login(username, password)
+    .then(function success(data) {
+      return EndpointService.endpoints();
+    })
+    .then(function success(data) {
+      var userDetails = Authentication.getUserDetails();
+      if (data.length > 0)  {
+        endpointID = EndpointProvider.endpointID();
+        if (!endpointID) {
+          endpointID = data[0].Id;
+          EndpointProvider.setEndpointID(endpointID);
+        }
         StateManager.updateEndpointState(true)
         .then(function success() {
           $state.go('dashboard');
         }, function error(err) {
           Messages.error("Failure", err, 'Unable to connect to the Docker endpoint');
         });
-      }, function error(err) {
-        if (err.status === 404) {
-          $state.go('endpointInit');
-        } else {
-          Messages.error("Failure", err, 'Unable to verify Docker endpoint existence');
-        }
-      });
-    }, function error() {
-      $scope.authData.error = 'Invalid credentials';
+      }
+      else if (data.length === 0 && userDetails.role === 1) {
+        $state.go('endpointInit');
+      } else if (data.length === 0 && userDetails.role === 2) {
+        $scope.authData.error = 'User not allowed. Please contact your administrator.';
+      }
+    })
+    .catch(function error(err) {
+      $scope.authData.error = 'Authentication error';
     });
   };
 }]);

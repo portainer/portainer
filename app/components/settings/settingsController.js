@@ -9,7 +9,7 @@ function ($scope, $state, $sanitize, Authentication, UserService, Messages) {
 
   $scope.updatePassword = function() {
     $scope.invalidPassword = false;
-    var userID = Authentication.getCredentials().userID;
+    var userID = Authentication.getUserDetails().ID;
     var currentPassword = $sanitize($scope.formValues.currentPassword);
     var newPassword = $sanitize($scope.formValues.newPassword);
 
