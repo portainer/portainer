@@ -366,7 +366,7 @@ module.exports = function (grunt) {
       },
       buildBinary: {
         command: [
-          'docker run --rm -v $(pwd)/api:/src portainer/golang-builder /src/cmd/portainer',
+          'docker run --rm -e http_proxy=$http_proxy -e https_proxy=$https_proxy -v $(pwd)/api:/src portainer/golang-builder /src/cmd/portainer',
           'shasum api/cmd/portainer/portainer > portainer-checksum.txt',
           'mkdir -p dist',
           'mv api/cmd/portainer/portainer dist/'
