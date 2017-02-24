@@ -36,6 +36,34 @@ angular.module('portainer.filters', [])
     return 'success';
   };
 })
+.filter('containerhealthbadge', function () {
+  'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (status.indexOf('healthy') !== -1) {
+      return 'success';
+    } else if (status.indexOf('unhealthy') !== -1) {
+      return 'danger';
+    } else if (status.indexOf('starting') !== -1) {
+      return 'warning';
+    }
+    return 'info';
+  };
+})
+.filter('containerhealth', function () {
+  'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (status.indexOf('healthy') !== -1) {
+      return 'healthy';
+    } else if (status.indexOf('unhealthy') !== -1) {
+      return 'unhealthy';
+    } else if (status.indexOf('starting') !== -1) {
+      return 'starting';
+    }
+    return 'unknown';
+  };
+})
 .filter('containerstatusbadge', function () {
   'use strict';
   return function (text) {
