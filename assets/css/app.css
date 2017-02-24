@@ -277,10 +277,11 @@ ul.sidebar .sidebar-list a.active {
   cursor: pointer;
 }
 
-.st-sort-ascent .glyphicon:before {
-  content: '\e113';
+.st-sort-ascent:after {
+  font-family: FontAwesome;
+  content: "\f0de";
 }
-
-.st-sort-descent .glyphicon:before {
-  content: '\e114';
+.st-sort-descent:after {
+  font-family: FontAwesome;
+  content: "\f0dd";
 }
