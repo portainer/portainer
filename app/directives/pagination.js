@@ -3,6 +3,7 @@ angular
 .directive('rdPagination', ['Pagination', function(Pagination) {
   return {
     require: 'ngModel',
+    template: '<option value="10">10</option> <option value="25">25</option> <option value="50">50</option> <option value="100">100</option>',
     link: function(scope, element, attrs, ngModel) {
       var key = attrs['pagination'] || 'default';
       element.bind('change', function(){
