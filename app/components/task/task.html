@@ -28,7 +28,7 @@
             </tr>
             <tr>
               <td>Image</td>
-              <td>{{ task.Spec.ContainerSpec.Image }}</td>
+              <td><a ui-sref="image({id: task.Spec.ContainerSpec.Image})">{{ task.Spec.ContainerSpec.Image }}</a></td>
             </tr>
             <tr>
               <td>Slot</td>
@@ -40,7 +40,7 @@
             </tr>
             <tr ng-if="task.Status.ContainerStatus.ContainerID">
               <td>Container ID</td>
-              <td>{{ task.Status.ContainerStatus.ContainerID }}</td>
+              <td><a ui-sref="container({id: task.Status.ContainerStatus.ContainerID})">{{ task.Status.ContainerStatus.ContainerID }}</a></td>
             </tr>
           </tbody>
         </table>
