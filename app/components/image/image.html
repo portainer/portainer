@@ -15,8 +15,8 @@
         <form class="form-horizontal">
           <div class="form-group">
             <div class="row">
-              <div class="pull-left" ng-repeat="tag in RepoTags">
-                <div class="input-group" style="padding:0 15px">
+              <div class="pull-left" ng-repeat="tag in RepoTags" style="display:table">
+                <div class="input-group col-md-1" style="padding:0 15px">
                   <span class="input-group-addon">{{ tag }}</span>
                   <span class="input-group-btn">
                     <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushImage(tag)">
