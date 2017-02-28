@@ -9,7 +9,9 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.Replicas = data.Spec.Mode.Replicated.Replicas;
   } else {
     this.Mode = 'global';
-    this.Replicas = nodes.length;
+    if (nodes) {
+      this.Replicas = nodes.length;
+    }
   }
   if (runningTasks) {
     this.Running = runningTasks.length;
