@@ -75,7 +75,7 @@ function ($scope, $q, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     $q.all({
       services: Service.query({}).$promise,
       tasks: Task.query({filters: {'desired-state': ['running']}}).$promise,
-      nodes: Node.query({filters: {membership: ['accepted']}}).$promise,
+      nodes: Node.query({}).$promise,
     })
     .then(function success(data) {
       $scope.services = data.services.map(function (service) {
