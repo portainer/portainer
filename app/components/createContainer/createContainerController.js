@@ -243,7 +243,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       networkMode += ':' + containerName;
     }
     config.HostConfig.NetworkMode = networkMode;
-    
+
     $scope.formValues.ExtraHosts.forEach(function (v) {
     if (v.value) {
         config.HostConfig.ExtraHosts.push(v.value);

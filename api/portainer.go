@@ -74,6 +74,12 @@ type (
 		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
 	}
 
+	// ResourceControl represent a reference to a Docker resource with specific controls
+	ResourceControl struct {
+		OwnerID    UserID `json:"OwnerId"`
+		ResourceID string `json:"ResourceId"`
+	}
+
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file.
 	TLSFileType int
@@ -113,9 +119,14 @@ type (
 		CreateEndpoint(endpoint *Endpoint) error
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
-		GetActive() (*Endpoint, error)
-		SetActive(endpoint *Endpoint) error
-		DeleteActive() error
+	}
+
+	// ResourceControlService represents a service for managing resource controls.
+	ResourceControlService interface {
+		ResourceControl(resourceID string) (*ResourceControl, error)
+		ResourceControls() ([]ResourceControl, error)
+		CreateResourceControl(resourceID string, rc *ResourceControl) error
+		DeleteResourceControl(resourceID string) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data.

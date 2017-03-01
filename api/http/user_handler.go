@@ -17,10 +17,11 @@ import (
 // UserHandler represents an HTTP API handler for managing users.
 type UserHandler struct {
 	*mux.Router
-	Logger            *log.Logger
-	UserService       portainer.UserService
-	CryptoService     portainer.CryptoService
-	middleWareService *middleWareService
+	Logger                 *log.Logger
+	UserService            portainer.UserService
+	ResourceControlService portainer.ResourceControlService
+	CryptoService          portainer.CryptoService
+	middleWareService      *middleWareService
 }
 
 // NewUserHandler returns a new instance of UserHandler.
@@ -48,6 +49,12 @@ func NewUserHandler(middleWareService *middleWareService) *UserHandler {
 	h.Handle("/users/{id}/passwd", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.handlePostUserPasswd(w, r)
 	})))
+	h.Handle("/users/{id}/resources", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		h.handlePostUserResource(w, r)
+	}))).Methods(http.MethodPost)
+	h.Handle("/users/{id}/resources/{resourceId}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		h.handleDeleteUserResource(w, r)
+	}))).Methods(http.MethodDelete)
 	h.HandleFunc("/users/admin/check", h.handleGetAdminCheck)
 	h.HandleFunc("/users/admin/init", h.handlePostAdminInit)
 	return h
@@ -357,6 +364,57 @@ func (handler *UserHandler) handleDeleteUser(w http.ResponseWriter, r *http.Requ
 	}
 
 	err = handler.UserService.DeleteUser(portainer.UserID(userID))
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+}
+
+// handlePostUserResource handles POST requests on /users/:id/resources
+func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		Error(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	var req postUserResourceRequest
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = govalidator.ValidateStruct(req)
+	if err != nil {
+		Error(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	resource := portainer.ResourceControl{
+		OwnerID:    portainer.UserID(userID),
+		ResourceID: req.ResourceID,
+	}
+
+	err = handler.ResourceControlService.CreateResourceControl(req.ResourceID, &resource)
+	if err != nil {
+		Error(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+}
+
+type postUserResourceRequest struct {
+	ResourceID string `valid:"required"`
+}
+
+// handleDeleteUserResource handles DELETE requests on /users/:id/resources/:resourceId
+func (handler *UserHandler) handleDeleteUserResource(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	resourceID := vars["resourceId"]
+
+	err := handler.ResourceControlService.DeleteResourceControl(resourceID)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return

@@ -13,28 +13,33 @@ type Store struct {
 	Path string
 
 	// Services
-	UserService     *UserService
-	EndpointService *EndpointService
+	UserService            *UserService
+	EndpointService        *EndpointService
+	AllowedObjectService   *AllowedObjectService
+	ResourceControlService *ResourceControlService
 
 	db *bolt.DB
 }
 
 const (
-	databaseFileName         = "portainer.db"
-	userBucketName           = "users"
-	endpointBucketName       = "endpoints"
-	activeEndpointBucketName = "activeEndpoint"
+	databaseFileName          = "portainer.db"
+	userBucketName            = "users"
+	endpointBucketName        = "endpoints"
+	allowedObjectBucketName   = "allowedObjects"
+	resourceControlBucketName = "resourceControls"
 )
 
 // NewStore initializes a new Store and the associated services
 func NewStore(storePath string) *Store {
 	store := &Store{
-		Path:            storePath,
-		UserService:     &UserService{},
-		EndpointService: &EndpointService{},
+		Path:                   storePath,
+		UserService:            &UserService{},
+		EndpointService:        &EndpointService{},
+		ResourceControlService: &ResourceControlService{},
 	}
 	store.UserService.store = store
 	store.EndpointService.store = store
+	store.ResourceControlService.store = store
 	return store
 }
 
@@ -55,7 +60,7 @@ func (store *Store) Open() error {
 		if err != nil {
 			return err
 		}
-		_, err = tx.CreateBucketIfNotExists([]byte(activeEndpointBucketName))
+		_, err = tx.CreateBucketIfNotExists([]byte(resourceControlBucketName))
 		if err != nil {
 			return err
 		}

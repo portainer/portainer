@@ -8,16 +8,17 @@ import (
 
 // Server implements the portainer.Server interface
 type Server struct {
-	BindAddress     string
-	AssetsPath      string
-	AuthDisabled    bool
-	UserService     portainer.UserService
-	EndpointService portainer.EndpointService
-	CryptoService   portainer.CryptoService
-	JWTService      portainer.JWTService
-	FileService     portainer.FileService
-	Settings        *portainer.Settings
-	TemplatesURL    string
+	BindAddress            string
+	AssetsPath             string
+	AuthDisabled           bool
+	UserService            portainer.UserService
+	EndpointService        portainer.EndpointService
+	ResourceControlService portainer.ResourceControlService
+	CryptoService          portainer.CryptoService
+	JWTService             portainer.JWTService
+	FileService            portainer.FileService
+	Settings               *portainer.Settings
+	TemplatesURL           string
 	// ActiveEndpoint  *portainer.Endpoint
 	Handler *Handler
 }
@@ -54,11 +55,12 @@ func (server *Server) Start() error {
 	var userHandler = NewUserHandler(middleWareService)
 	userHandler.UserService = server.UserService
 	userHandler.CryptoService = server.CryptoService
+	userHandler.ResourceControlService = server.ResourceControlService
 	var settingsHandler = NewSettingsHandler(middleWareService)
 	settingsHandler.settings = server.Settings
 	var templatesHandler = NewTemplatesHandler(middleWareService)
 	templatesHandler.templatesURL = server.TemplatesURL
-	var dockerHandler = NewDockerHandler(middleWareService)
+	var dockerHandler = NewDockerHandler(middleWareService, server.ResourceControlService)
 	dockerHandler.EndpointService = server.EndpointService
 	var websocketHandler = NewWebSocketHandler()
 	websocketHandler.EndpointService = server.EndpointService

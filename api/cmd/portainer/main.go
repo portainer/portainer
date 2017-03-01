@@ -103,16 +103,18 @@ func main() {
 	// }
 
 	var server portainer.Server = &http.Server{
-		BindAddress:     *flags.Addr,
-		AssetsPath:      *flags.Assets,
-		Settings:        settings,
-		TemplatesURL:    *flags.Templates,
-		AuthDisabled:    *flags.NoAuth,
-		UserService:     store.UserService,
-		EndpointService: store.EndpointService,
-		CryptoService:   cryptoService,
-		JWTService:      jwtService,
-		FileService:     fileService,
+		BindAddress:            *flags.Addr,
+		AssetsPath:             *flags.Assets,
+		Settings:               settings,
+		TemplatesURL:           *flags.Templates,
+		AuthDisabled:           *flags.NoAuth,
+		UserService:            store.UserService,
+		EndpointService:        store.EndpointService,
+		AllowedObjectService:   store.AllowedObjectService,
+		ResourceControlService: store.ResourceControlService,
+		CryptoService:          cryptoService,
+		JWTService:             jwtService,
+		FileService:            fileService,
 		// ActiveEndpoint:  activeEndpoint,
 	}
 

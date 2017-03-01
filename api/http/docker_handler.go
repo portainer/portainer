@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/http/proxy"
 
 	"io"
 	"log"
@@ -12,7 +13,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -23,17 +23,20 @@ type DockerHandler struct {
 	Logger            *log.Logger
 	middleWareService *middleWareService
 	EndpointService   portainer.EndpointService
-	proxy             http.Handler
+	ProxyFactory      proxy.Factory
 	proxies           map[portainer.EndpointID]http.Handler
 }
 
 // NewDockerHandler returns a new instance of DockerHandler.
-func NewDockerHandler(middleWareService *middleWareService) *DockerHandler {
+func NewDockerHandler(middleWareService *middleWareService, resourceControlService portainer.ResourceControlService) *DockerHandler {
 	h := &DockerHandler{
 		Router:            mux.NewRouter(),
 		Logger:            log.New(os.Stderr, "", log.LstdFlags),
 		middleWareService: middleWareService,
-		proxies:           make(map[portainer.EndpointID]http.Handler),
+		ProxyFactory: proxy.Factory{
+			ResourceControlService: resourceControlService,
+		},
+		proxies: make(map[portainer.EndpointID]http.Handler),
 	}
 	h.PathPrefix("/{id}/").Handler(middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.proxyRequestsToDockerAPI(w, r)
@@ -60,7 +63,6 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 			return
 		}
 	}
-
 	http.StripPrefix("/"+id, proxy).ServeHTTP(w, r)
 }
 
@@ -79,12 +81,12 @@ func (handler *DockerHandler) createAndRegisterEndpointProxy(endpointID portaine
 
 	if endpointURL.Scheme == "tcp" {
 		if endpoint.TLS {
-			proxy, err = newHTTPSProxy(endpointURL, endpoint)
+			proxy, err = handler.newHTTPSProxy(endpointURL, endpoint)
 			if err != nil {
 				return nil, err
 			}
 		} else {
-			proxy = newHTTPProxy(endpointURL)
+			proxy = handler.newHTTPProxy(endpointURL)
 		}
 	} else {
 		// Assume unix:// scheme
@@ -95,83 +97,22 @@ func (handler *DockerHandler) createAndRegisterEndpointProxy(endpointID portaine
 	return proxy, nil
 }
 
-// Deprecated
-func (handler *DockerHandler) setupProxy(endpoint *portainer.Endpoint) error {
-	var proxy http.Handler
-	endpointURL, err := url.Parse(endpoint.URL)
-	if err != nil {
-		return err
-	}
-	if endpointURL.Scheme == "tcp" {
-		if endpoint.TLS {
-			proxy, err = newHTTPSProxy(endpointURL, endpoint)
-			if err != nil {
-				return err
-			}
-		} else {
-			proxy = newHTTPProxy(endpointURL)
-		}
-	} else {
-		// Assume unix:// scheme
-		proxy = newSocketProxy(endpointURL.Path)
-	}
-	handler.proxy = proxy
-	return nil
-}
-
-// singleJoiningSlash from golang.org/src/net/http/httputil/reverseproxy.go
-// included here for use in NewSingleHostReverseProxyWithHostHeader
-// because its used in NewSingleHostReverseProxy from golang.org/src/net/http/httputil/reverseproxy.go
-func singleJoiningSlash(a, b string) string {
-	aslash := strings.HasSuffix(a, "/")
-	bslash := strings.HasPrefix(b, "/")
-	switch {
-	case aslash && bslash:
-		return a + b[1:]
-	case !aslash && !bslash:
-		return a + "/" + b
-	}
-	return a + b
-}
-
-// NewSingleHostReverseProxyWithHostHeader is based on NewSingleHostReverseProxy
-// from golang.org/src/net/http/httputil/reverseproxy.go and merely sets the Host
-// HTTP header, which NewSingleHostReverseProxy deliberately preserves
-func NewSingleHostReverseProxyWithHostHeader(target *url.URL) *httputil.ReverseProxy {
-	targetQuery := target.RawQuery
-	director := func(req *http.Request) {
-		req.URL.Scheme = target.Scheme
-		req.URL.Host = target.Host
-		req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
-		req.Host = req.URL.Host
-		if targetQuery == "" || req.URL.RawQuery == "" {
-			req.URL.RawQuery = targetQuery + req.URL.RawQuery
-		} else {
-			req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
-		}
-		if _, ok := req.Header["User-Agent"]; !ok {
-			// explicitly disable User-Agent so it's not set to default value
-			req.Header.Set("User-Agent", "")
-		}
-	}
-	return &httputil.ReverseProxy{Director: director}
-}
-
-func newHTTPProxy(u *url.URL) http.Handler {
+func (handler *DockerHandler) newHTTPProxy(u *url.URL) http.Handler {
 	u.Scheme = "http"
-	return NewSingleHostReverseProxyWithHostHeader(u)
+	return handler.NewSingleHostReverseProxyWithHostHeader(u)
 }
 
-func newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
+func (handler *DockerHandler) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
 	u.Scheme = "https"
-	proxy := NewSingleHostReverseProxyWithHostHeader(u)
+	proxy := handler.NewSingleHostReverseProxyWithHostHeader(u)
 	config, err := createTLSConfiguration(endpoint.TLSCACertPath, endpoint.TLSCertPath, endpoint.TLSKeyPath)
 	if err != nil {
 		return nil, err
 	}
-	proxy.Transport = &http.Transport{
-		TLSClientConfig: config,
-	}
+	proxy.Transport.(*http.Transport).TLSClientConfig = config
+	// proxy.Transport = &http.Transport{
+	// 	TLSClientConfig: config,
+	// }
 	return proxy, nil
 }
 
@@ -192,6 +133,8 @@ func (h *unixSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	c := httputil.NewClientConn(conn, nil)
 	defer c.Close()
+
+	log.Printf("Unix query: %v", r.URL)
 
 	res, err := c.Do(r)
 	if err != nil {
