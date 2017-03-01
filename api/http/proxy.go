@@ -1,4 +1,4 @@
-package proxy
+package http
 
 import (
 	"net/http"
@@ -9,7 +9,8 @@ import (
 	"github.com/portainer/portainer"
 )
 
-type Factory struct {
+// ProxyFactory is a factory to create reverse proxies to Docker endpoints
+type ProxyFactory struct {
 	ResourceControlService portainer.ResourceControlService
 }
 
@@ -28,11 +29,11 @@ func singleJoiningSlash(a, b string) string {
 	return a + b
 }
 
-// newSingleHostReverseProxyWithHostHeader is based on NewSingleHostReverseProxy
+// NewSingleHostReverseProxyWithHostHeader is based on NewSingleHostReverseProxy
 // from golang.org/src/net/http/httputil/reverseproxy.go and merely sets the Host
 // HTTP header, which NewSingleHostReverseProxy deliberately preserves.
 // It also adds an extra Transport to the proxy to allow Portainer to rewrite the responses.
-func (factory *Factory) newSingleHostReverseProxyWithHostHeader(target *url.URL) *httputil.ReverseProxy {
+func (factory *ProxyFactory) NewSingleHostReverseProxyWithHostHeader(target *url.URL) *httputil.ReverseProxy {
 	targetQuery := target.RawQuery
 	director := func(req *http.Request) {
 		req.URL.Scheme = target.Scheme

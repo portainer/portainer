@@ -62,7 +62,7 @@ func (service *middleWareService) middleWareAuthenticate(next http.Handler) http
 				return
 			}
 
-			tokenData, err := service.jwtService.VerifyToken(token)
+			tokenData, err := service.jwtService.ParseAndVerifyToken(token)
 			if err != nil {
 				Error(w, err, http.StatusUnauthorized, nil)
 				return

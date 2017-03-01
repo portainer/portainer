@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/proxy"
 
 	"io"
 	"log"
@@ -23,7 +22,7 @@ type DockerHandler struct {
 	Logger            *log.Logger
 	middleWareService *middleWareService
 	EndpointService   portainer.EndpointService
-	ProxyFactory      proxy.Factory
+	ProxyFactory      ProxyFactory
 	proxies           map[portainer.EndpointID]http.Handler
 }
 
@@ -33,7 +32,7 @@ func NewDockerHandler(middleWareService *middleWareService, resourceControlServi
 		Router:            mux.NewRouter(),
 		Logger:            log.New(os.Stderr, "", log.LstdFlags),
 		middleWareService: middleWareService,
-		ProxyFactory: proxy.Factory{
+		ProxyFactory: ProxyFactory{
 			ResourceControlService: resourceControlService,
 		},
 		proxies: make(map[portainer.EndpointID]http.Handler),
@@ -99,12 +98,12 @@ func (handler *DockerHandler) createAndRegisterEndpointProxy(endpointID portaine
 
 func (handler *DockerHandler) newHTTPProxy(u *url.URL) http.Handler {
 	u.Scheme = "http"
-	return handler.NewSingleHostReverseProxyWithHostHeader(u)
+	return handler.ProxyFactory.NewSingleHostReverseProxyWithHostHeader(u)
 }
 
 func (handler *DockerHandler) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
 	u.Scheme = "https"
-	proxy := handler.NewSingleHostReverseProxyWithHostHeader(u)
+	proxy := handler.ProxyFactory.NewSingleHostReverseProxyWithHostHeader(u)
 	config, err := createTLSConfiguration(endpoint.TLSCACertPath, endpoint.TLSCertPath, endpoint.TLSKeyPath)
 	if err != nil {
 		return nil, err

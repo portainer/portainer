@@ -55,8 +55,8 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, error)
 	return signedToken, nil
 }
 
-// VerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
-func (service *Service) VerifyToken(token string) (*portainer.TokenData, error) {
+// ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
+func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData, error) {
 	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			msg := fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])

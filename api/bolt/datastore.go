@@ -15,7 +15,6 @@ type Store struct {
 	// Services
 	UserService            *UserService
 	EndpointService        *EndpointService
-	AllowedObjectService   *AllowedObjectService
 	ResourceControlService *ResourceControlService
 
 	db *bolt.DB
@@ -25,7 +24,6 @@ const (
 	databaseFileName          = "portainer.db"
 	userBucketName            = "users"
 	endpointBucketName        = "endpoints"
-	allowedObjectBucketName   = "allowedObjects"
 	resourceControlBucketName = "resourceControls"
 )
 

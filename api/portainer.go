@@ -138,7 +138,7 @@ type (
 	// JWTService represents a service for managing JWT tokens.
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
-		VerifyToken(token string) (*TokenData, error)
+		ParseAndVerifyToken(token string) (*TokenData, error)
 	}
 
 	// FileService represents a service for managing files.

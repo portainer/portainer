@@ -110,7 +110,6 @@ func main() {
 		AuthDisabled:           *flags.NoAuth,
 		UserService:            store.UserService,
 		EndpointService:        store.EndpointService,
-		AllowedObjectService:   store.AllowedObjectService,
 		ResourceControlService: store.ResourceControlService,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
