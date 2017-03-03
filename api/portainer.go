@@ -130,7 +130,7 @@ type (
 
 const (
 	// APIVersion is the version number of portainer API.
-	APIVersion = "1.11.3"
+	APIVersion = "1.11.4"
 )
 
 const (
