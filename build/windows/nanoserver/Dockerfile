@@ -2,7 +2,7 @@ FROM microsoft/nanoserver
 
 COPY dist /
 
-VOLUME C:\\ProgramData\\Portainer
+VOLUME C:\\data
 
 WORKDIR /
 
