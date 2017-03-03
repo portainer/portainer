@@ -8,18 +8,19 @@ import (
 
 // Server implements the portainer.Server interface
 type Server struct {
-	BindAddress     string
-	AssetsPath      string
-	AuthDisabled    bool
-	UserService     portainer.UserService
-	EndpointService portainer.EndpointService
-	CryptoService   portainer.CryptoService
-	JWTService      portainer.JWTService
-	FileService     portainer.FileService
-	Settings        *portainer.Settings
-	TemplatesURL    string
-	ActiveEndpoint  *portainer.Endpoint
-	Handler         *Handler
+	BindAddress        string
+	AssetsPath         string
+	AuthDisabled       bool
+	EndpointManagement bool
+	UserService        portainer.UserService
+	EndpointService    portainer.EndpointService
+	CryptoService      portainer.CryptoService
+	JWTService         portainer.JWTService
+	FileService        portainer.FileService
+	Settings           *portainer.Settings
+	TemplatesURL       string
+	ActiveEndpoint     *portainer.Endpoint
+	Handler            *Handler
 }
 
 func (server *Server) updateActiveEndpoint(endpoint *portainer.Endpoint) error {
@@ -61,6 +62,7 @@ func (server *Server) Start() error {
 	var websocketHandler = NewWebSocketHandler()
 	// EndpointHandler requires a reference to the server to be able to update the active endpoint.
 	var endpointHandler = NewEndpointHandler(middleWareService)
+	endpointHandler.authorizeEndpointManagement = server.EndpointManagement
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.server = server
