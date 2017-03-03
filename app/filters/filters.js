@@ -36,32 +36,18 @@ angular.module('portainer.filters', [])
     return 'success';
   };
 })
-.filter('containerhealthbadge', function () {
+.filter('containerhealthimage', function () {
   'use strict';
   return function (text) {
     var status = _.toLower(text);
     if (status.indexOf('healthy') !== -1) {
-      return 'success';
+      return 'fa-check';
     } else if (status.indexOf('unhealthy') !== -1) {
-      return 'danger';
+      return 'fa-times';
     } else if (status.indexOf('starting') !== -1) {
-      return 'warning';
+      return 'fa-ellipsis-h';
     }
-    return 'info';
-  };
-})
-.filter('containerhealth', function () {
-  'use strict';
-  return function (text) {
-    var status = _.toLower(text);
-    if (status.indexOf('healthy') !== -1) {
-      return 'healthy';
-    } else if (status.indexOf('unhealthy') !== -1) {
-      return 'unhealthy';
-    } else if (status.indexOf('starting') !== -1) {
-      return 'starting';
-    }
-    return 'unknown';
+    return 'fa-question';
   };
 })
 .filter('containerstatusbadge', function () {
