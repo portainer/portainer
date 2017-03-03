@@ -12,4 +12,5 @@ const (
 	defaultTLSCACertPath   = "/certs/ca.pem"
 	defaultTLSCertPath     = "/certs/cert.pem"
 	defaultTLSKeyPath      = "/certs/key.pem"
+	defaultSyncInterval    = "60s"
 )
