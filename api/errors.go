@@ -2,7 +2,8 @@ package portainer
 
 // General errors.
 const (
-	ErrUnauthorized = Error("Unauthorized")
+	ErrUnauthorized         = Error("Unauthorized")
+	ErrResourceAccessDenied = Error("Access denied to resource")
 )
 
 // User errors.

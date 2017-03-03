@@ -80,6 +80,10 @@ type (
 		ResourceID string `json:"ResourceId"`
 	}
 
+	// ResourceControlType represents a type of resource control.
+	// Can be one of: container, service or volume.
+	ResourceControlType int
+
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file.
 	TLSFileType int
@@ -123,10 +127,10 @@ type (
 
 	// ResourceControlService represents a service for managing resource controls.
 	ResourceControlService interface {
-		ResourceControl(resourceID string) (*ResourceControl, error)
-		ResourceControls() ([]ResourceControl, error)
-		CreateResourceControl(resourceID string, rc *ResourceControl) error
-		DeleteResourceControl(resourceID string) error
+		ResourceControl(resourceID string, rcType ResourceControlType) (*ResourceControl, error)
+		ResourceControls(rcType ResourceControlType) ([]ResourceControl, error)
+		CreateResourceControl(resourceID string, rc *ResourceControl, rcType ResourceControlType) error
+		DeleteResourceControl(resourceID string, rcType ResourceControlType) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data.
@@ -169,4 +173,14 @@ const (
 	AdministratorRole
 	// StandardUserRole represents a regular user role
 	StandardUserRole
+)
+
+const (
+	_ ResourceControlType = iota
+	// ContainerResourceControl represent a resource control for a container
+	ContainerResourceControl
+	// ServiceResourceControl represent a resource control for a service
+	ServiceResourceControl
+	// VolumeResourceControl represent a resource control for a volume
+	VolumeResourceControl
 )

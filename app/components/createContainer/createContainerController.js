@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Messages',
-function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Messages) {
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Messages',
+function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Messages) {
 
   $scope.formValues = {
     Ownership: 'private',
@@ -119,21 +119,21 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     });
   });
 
-function startContainer(containerID) {
-  Container.start({id: containerID}, {}, function (cd) {
-    if (cd.message) {
+  function startContainer(containerID) {
+    Container.start({id: containerID}, {}, function (cd) {
+      if (cd.message) {
+        $('#createContainerSpinner').hide();
+        Messages.error('Error', {}, cd.message);
+      } else {
+        $('#createContainerSpinner').hide();
+        Messages.send('Container Started', containerID);
+        $state.go('containers', {}, {reload: true});
+      }
+    }, function (e) {
       $('#createContainerSpinner').hide();
-      Messages.error('Error', {}, cd.message);
-    } else {
-      $('#createContainerSpinner').hide();
-      Messages.send('Container Started', d.Id);
-      $state.go('containers', {}, {reload: true});
-    }
-  }, function (e) {
-    $('#createContainerSpinner').hide();
-    Messages.error("Failure", e, 'Unable to start container');
-  });
-}
+      Messages.error("Failure", e, 'Unable to start container');
+    });
+  }
 
   function createContainer(config) {
     Container.create(config, function (d) {
@@ -142,7 +142,7 @@ function startContainer(containerID) {
         Messages.error('Error', {}, d.message);
       } else {
         if ($scope.formValues.Ownership === 'private') {
-          ResourceControlService.setResourceControl(1, d.Id)
+          ResourceControlService.setContainerResourceControl(Authentication.getUserDetails().ID, d.Id)
           .then(function success() {
             startContainer(d.Id);
           })

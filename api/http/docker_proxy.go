@@ -1,6 +1,8 @@
 package http
 
 import (
+	"io"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -33,7 +35,7 @@ func singleJoiningSlash(a, b string) string {
 // from golang.org/src/net/http/httputil/reverseproxy.go and merely sets the Host
 // HTTP header, which NewSingleHostReverseProxy deliberately preserves.
 // It also adds an extra Transport to the proxy to allow Portainer to rewrite the responses.
-func (factory *ProxyFactory) NewSingleHostReverseProxyWithHostHeader(target *url.URL) *httputil.ReverseProxy {
+func (factory *ProxyFactory) newSingleHostReverseProxyWithHostHeader(target *url.URL) *httputil.ReverseProxy {
 	targetQuery := target.RawQuery
 	director := func(req *http.Request) {
 		req.URL.Scheme = target.Scheme
@@ -54,4 +56,58 @@ func (factory *ProxyFactory) NewSingleHostReverseProxyWithHostHeader(target *url
 		ResourceControlService: factory.ResourceControlService,
 	}
 	return &httputil.ReverseProxy{Director: director, Transport: transport}
+}
+
+func (factory *ProxyFactory) newHTTPProxy(u *url.URL) http.Handler {
+	u.Scheme = "http"
+	return factory.newSingleHostReverseProxyWithHostHeader(u)
+}
+
+func (factory *ProxyFactory) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
+	u.Scheme = "https"
+	proxy := factory.newSingleHostReverseProxyWithHostHeader(u)
+	config, err := createTLSConfiguration(endpoint.TLSCACertPath, endpoint.TLSCertPath, endpoint.TLSKeyPath)
+	if err != nil {
+		return nil, err
+	}
+	proxy.Transport.(*http.Transport).TLSClientConfig = config
+	// proxy.Transport = &http.Transport{
+	// 	TLSClientConfig: config,
+	// }
+	return proxy, nil
+}
+
+func (factory *ProxyFactory) newSocketProxy(path string) http.Handler {
+	return &unixSocketHandler{path}
+}
+
+// unixSocketHandler represents a handler to proxy HTTP requests via a unix:// socket
+type unixSocketHandler struct {
+	path string
+}
+
+func (h *unixSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	conn, err := net.Dial("unix", h.path)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, nil)
+		return
+	}
+	c := httputil.NewClientConn(conn, nil)
+	defer c.Close()
+
+	res, err := c.Do(r)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, nil)
+		return
+	}
+	defer res.Body.Close()
+
+	for k, vv := range res.Header {
+		for _, v := range vv {
+			w.Header().Add(k, v)
+		}
+	}
+	if _, err := io.Copy(w, res.Body); err != nil {
+		Error(w, err, http.StatusInternalServerError, nil)
+	}
 }

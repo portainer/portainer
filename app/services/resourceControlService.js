@@ -3,12 +3,28 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.setResourceControl = function(userID, resourceID) {
-    return ResourceControl.create({ userId: userID }, { ResourceID: resourceID }).$promise;
+  service.setContainerResourceControl = function(userID, resourceID) {
+    return ResourceControl.create({ userId: userID, resourceType: 'container' }, { ResourceID: resourceID }).$promise;
   };
 
-  service.removeResourceControl = function(userID, resourceID) {
-    return ResourceControl.remove({ userId: userID, resourceID: resourceID }).$promise;
+  service.removeContainerResourceControl = function(userID, resourceID) {
+    return ResourceControl.remove({ userId: userID, resourceID: resourceID, resourceType: 'container' }).$promise;
+  };
+
+  service.setServiceResourceControl = function(userID, resourceID) {
+    return ResourceControl.create({ userId: userID, resourceType: 'service' }, { ResourceID: resourceID }).$promise;
+  };
+
+  service.removeServiceResourceControl = function(userID, resourceID) {
+    return ResourceControl.remove({ userId: userID, resourceID: resourceID, resourceType: 'service' }).$promise;
+  };
+
+  service.setVolumeResourceControl = function(userID, resourceID) {
+    return ResourceControl.create({ userId: userID, resourceType: 'volume' }, { ResourceID: resourceID }).$promise;
+  };
+
+  service.removeVolumeResourceControl = function(userID, resourceID) {
+    return ResourceControl.remove({ userId: userID, resourceID: resourceID, resourceType: 'volume' }).$promise;
   };
 
   return service;

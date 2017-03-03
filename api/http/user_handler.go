@@ -49,10 +49,10 @@ func NewUserHandler(middleWareService *middleWareService) *UserHandler {
 	h.Handle("/users/{id}/passwd", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.handlePostUserPasswd(w, r)
 	})))
-	h.Handle("/users/{id}/resources", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	h.Handle("/users/{userId}/resources/{resourceType}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.handlePostUserResource(w, r)
 	}))).Methods(http.MethodPost)
-	h.Handle("/users/{id}/resources/{resourceId}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	h.Handle("/users/{userId}/resources/{resourceType}/{resourceId}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h.handleDeleteUserResource(w, r)
 	}))).Methods(http.MethodDelete)
 	h.HandleFunc("/users/admin/check", h.handleGetAdminCheck)
@@ -370,14 +370,27 @@ func (handler *UserHandler) handleDeleteUser(w http.ResponseWriter, r *http.Requ
 	}
 }
 
-// handlePostUserResource handles POST requests on /users/:id/resources
+// handlePostUserResource handles POST requests on /users/:userId/resources/:resourceType
 func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["id"]
+	id := vars["userId"]
+	resourceType := vars["resourceType"]
 
 	userID, err := strconv.Atoi(id)
 	if err != nil {
 		Error(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	var rcType portainer.ResourceControlType
+	if resourceType == "container" {
+		rcType = portainer.ContainerResourceControl
+	} else if resourceType == "service" {
+		rcType = portainer.ServiceResourceControl
+	} else if resourceType == "volume" {
+		rcType = portainer.VolumeResourceControl
+	} else {
+		Error(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -398,7 +411,7 @@ func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *htt
 		ResourceID: req.ResourceID,
 	}
 
-	err = handler.ResourceControlService.CreateResourceControl(req.ResourceID, &resource)
+	err = handler.ResourceControlService.CreateResourceControl(req.ResourceID, &resource, rcType)
 	if err != nil {
 		Error(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
@@ -409,12 +422,38 @@ type postUserResourceRequest struct {
 	ResourceID string `valid:"required"`
 }
 
-// handleDeleteUserResource handles DELETE requests on /users/:id/resources/:resourceId
+// handleDeleteUserResource handles DELETE requests on /users/:userId/resources/:resourceType/:resourceId
 func (handler *UserHandler) handleDeleteUserResource(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	userID := vars["userId"]
 	resourceID := vars["resourceId"]
+	resourceType := vars["resourceType"]
 
-	err := handler.ResourceControlService.DeleteResourceControl(resourceID)
+	uid, err := strconv.Atoi(userID)
+	if err != nil {
+		Error(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	var rcType portainer.ResourceControlType
+	if resourceType == "container" {
+		rcType = portainer.ContainerResourceControl
+	} else if resourceType == "service" {
+		rcType = portainer.ServiceResourceControl
+	} else if resourceType == "volume" {
+		rcType = portainer.VolumeResourceControl
+	} else {
+		Error(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	userData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
+	if userData.ID != portainer.UserID(uid) {
+		Error(w, portainer.ErrResourceAccessDenied, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.ResourceControlService.DeleteResourceControl(resourceID, rcType)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return

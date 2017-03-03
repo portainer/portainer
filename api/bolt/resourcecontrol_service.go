@@ -12,11 +12,22 @@ type ResourceControlService struct {
 	store *Store
 }
 
+func getBucketNameByResourceControlType(rcType portainer.ResourceControlType) string {
+	bucketName := containerResourceControlBucketName
+	if rcType == portainer.ServiceResourceControl {
+		bucketName = serviceResourceControlBucketName
+	} else if rcType == portainer.VolumeResourceControl {
+		bucketName = volumeResourceControlBucketName
+	}
+	return bucketName
+}
+
 // ResourceControl returns a resource control object by resource ID
-func (service *ResourceControlService) ResourceControl(resourceID string) (*portainer.ResourceControl, error) {
+func (service *ResourceControlService) ResourceControl(resourceID string, rcType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	var data []byte
+	bucketName := getBucketNameByResourceControlType(rcType)
 	err := service.store.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(resourceControlBucketName))
+		bucket := tx.Bucket([]byte(bucketName))
 		value := bucket.Get([]byte(resourceID))
 		if value == nil {
 			return nil
@@ -42,10 +53,11 @@ func (service *ResourceControlService) ResourceControl(resourceID string) (*port
 }
 
 // ResourceControls returns all resource control objects
-func (service *ResourceControlService) ResourceControls() ([]portainer.ResourceControl, error) {
+func (service *ResourceControlService) ResourceControls(rcType portainer.ResourceControlType) ([]portainer.ResourceControl, error) {
 	var rcs = make([]portainer.ResourceControl, 0)
+	bucketName := getBucketNameByResourceControlType(rcType)
 	err := service.store.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(resourceControlBucketName))
+		bucket := tx.Bucket([]byte(bucketName))
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
@@ -67,9 +79,10 @@ func (service *ResourceControlService) ResourceControls() ([]portainer.ResourceC
 }
 
 // CreateResourceControl creates a new resource control
-func (service *ResourceControlService) CreateResourceControl(resourceID string, rc *portainer.ResourceControl) error {
+func (service *ResourceControlService) CreateResourceControl(resourceID string, rc *portainer.ResourceControl, rcType portainer.ResourceControlType) error {
+	bucketName := getBucketNameByResourceControlType(rcType)
 	return service.store.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(resourceControlBucketName))
+		bucket := tx.Bucket([]byte(bucketName))
 		data, err := internal.MarshalResourceControl(rc)
 		if err != nil {
 			return err
@@ -84,9 +97,10 @@ func (service *ResourceControlService) CreateResourceControl(resourceID string, 
 }
 
 // DeleteResourceControl deletes a resource control object by resource ID
-func (service *ResourceControlService) DeleteResourceControl(resourceID string) error {
+func (service *ResourceControlService) DeleteResourceControl(resourceID string, rcType portainer.ResourceControlType) error {
+	bucketName := getBucketNameByResourceControlType(rcType)
 	return service.store.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(resourceControlBucketName))
+		bucket := tx.Bucket([]byte(bucketName))
 		err := bucket.Delete([]byte(resourceID))
 		if err != nil {
 			return err

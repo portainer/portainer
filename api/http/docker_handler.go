@@ -5,11 +5,8 @@ import (
 
 	"github.com/portainer/portainer"
 
-	"io"
 	"log"
-	"net"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"os"
 
@@ -80,74 +77,18 @@ func (handler *DockerHandler) createAndRegisterEndpointProxy(endpointID portaine
 
 	if endpointURL.Scheme == "tcp" {
 		if endpoint.TLS {
-			proxy, err = handler.newHTTPSProxy(endpointURL, endpoint)
+			proxy, err = handler.ProxyFactory.newHTTPSProxy(endpointURL, endpoint)
 			if err != nil {
 				return nil, err
 			}
 		} else {
-			proxy = handler.newHTTPProxy(endpointURL)
+			proxy = handler.ProxyFactory.newHTTPProxy(endpointURL)
 		}
 	} else {
 		// Assume unix:// scheme
-		proxy = newSocketProxy(endpointURL.Path)
+		proxy = handler.ProxyFactory.newSocketProxy(endpointURL.Path)
 	}
 
 	handler.proxies[endpointID] = proxy
 	return proxy, nil
-}
-
-func (handler *DockerHandler) newHTTPProxy(u *url.URL) http.Handler {
-	u.Scheme = "http"
-	return handler.ProxyFactory.NewSingleHostReverseProxyWithHostHeader(u)
-}
-
-func (handler *DockerHandler) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
-	u.Scheme = "https"
-	proxy := handler.ProxyFactory.NewSingleHostReverseProxyWithHostHeader(u)
-	config, err := createTLSConfiguration(endpoint.TLSCACertPath, endpoint.TLSCertPath, endpoint.TLSKeyPath)
-	if err != nil {
-		return nil, err
-	}
-	proxy.Transport.(*http.Transport).TLSClientConfig = config
-	// proxy.Transport = &http.Transport{
-	// 	TLSClientConfig: config,
-	// }
-	return proxy, nil
-}
-
-func newSocketProxy(path string) http.Handler {
-	return &unixSocketHandler{path}
-}
-
-// unixSocketHandler represents a handler to proxy HTTP requests via a unix:// socket
-type unixSocketHandler struct {
-	path string
-}
-
-func (h *unixSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	conn, err := net.Dial("unix", h.path)
-	if err != nil {
-		Error(w, err, http.StatusInternalServerError, nil)
-		return
-	}
-	c := httputil.NewClientConn(conn, nil)
-	defer c.Close()
-
-	log.Printf("Unix query: %v", r.URL)
-
-	res, err := c.Do(r)
-	if err != nil {
-		Error(w, err, http.StatusInternalServerError, nil)
-		return
-	}
-	defer res.Body.Close()
-
-	for k, vv := range res.Header {
-		for _, v := range vv {
-			w.Header().Add(k, v)
-		}
-	}
-	if _, err := io.Copy(w, res.Body); err != nil {
-		Error(w, err, http.StatusInternalServerError, nil)
-	}
 }

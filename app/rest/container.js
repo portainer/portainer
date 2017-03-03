@@ -4,7 +4,7 @@ angular.module('portainer.rest')
   return $resource(Settings.url + '/:endpointId/containers/:id/:action', {
     name: '@name',
     endpointId: EndpointProvider.endpointID
-  }, 
+  },
   {
     query: {method: 'GET', params: {all: 0, action: 'json', filters: '@filters' }, isArray: true},
     get: {method: 'GET', params: {action: 'json'}},
@@ -13,7 +13,6 @@ angular.module('portainer.rest')
     kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
     pause: {method: 'POST', params: {id: '@id', action: 'pause'}},
     unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
-    changes: {method: 'GET', params: {action: 'changes'}, isArray: true},
     stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000},
     start: {
       method: 'POST', params: {id: '@id', action: 'start'},
