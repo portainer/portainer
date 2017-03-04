@@ -64,4 +64,5 @@ function ServiceViewModel(data) {
 
   this.Checked = false;
   this.Scale = false;
+  this.Secrets = containerSpec.Secrets;
 }

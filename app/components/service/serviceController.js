@@ -37,8 +37,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
   };
 
   $scope.goToItem = function(hash) {
-    $location.hash(hash);
-    $anchorScroll();
+    $anchorScroll(hash);
   };
 
   $scope.addEnvironmentVariable = function addEnvironmentVariable(service) {
@@ -47,7 +46,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
   };
   $scope.removeEnvironmentVariable = function removeEnvironmentVariable(service, index) {
     var removedElement = service.EnvironmentVariables.splice(index, 1);
-    if (removedElement != null) {
+    if (removedElement !== null) {
       updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
     }
   };
@@ -62,7 +61,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
   };
   $scope.removeLabel = function removeLabel(service, index) {
     var removedElement = service.ServiceLabels.splice(index, 1);
-    if (removedElement != null) {
+    if (removedElement !== null) {
       updateServiceArray(service, 'ServiceLabels', service.ServiceLabels);
     }
   };
@@ -77,7 +76,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
   };
   $scope.removeContainerLabel = function removeLabel(service, index) {
     var removedElement = service.ServiceContainerLabels.splice(index, 1);
-    if (removedElement != null) {
+    if (removedElement !== null) {
       updateServiceArray(service, 'ServiceContainerLabels', service.ServiceContainerLabels);
     }
   };
@@ -141,7 +140,6 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
       keys = Object.keys(service);
       previousServiceValues = [];
     }
-    console.log('cleaning out keys: ' + JSON.stringify(keys));
     keys.forEach(function(attribute) {
       service[attribute] = originalService[attribute]; // reset service values
     });
@@ -203,7 +201,8 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadServicesSpinner').hide();
       Messages.send("Service successfully updated", "Service updated");
-      $state.go('service', {id: service.Id}, {reload: true});
+      $scope.cancelChanges({});
+      fetchServiceDetails();
     }, function (e) {
       $('#loadServicesSpinner').hide();
       Messages.error("Failure", e, "Unable to update service");
