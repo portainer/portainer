@@ -2,7 +2,7 @@
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title="Service labels">
       <div class="nopadding">
-        <a class="btn btn-default btn-sm pull-right" ng-click="addLabel(service)">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating || addLabel(service)" ng-disabled="isUpdating">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> label
         </a>
       </div>
@@ -27,15 +27,15 @@
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">name</span>
-                <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="updateLabel(service, label)">
+                <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="updateLabel(service, label)" ng-disabled="isUpdating">
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">value</span>
-                <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateLabel(service, label)">
+                <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateLabel(service, label)" ng-disabled="isUpdating">
                 <span class="input-group-btn">
-                  <button class="btn btn-default" type="button" ng-click="removeLabel(service, $index)">
+                  <button class="btn btn-default" type="button" ng-click="removeLabel(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-minus" aria-hidden="true"></i>
                   </button>
                 </span>

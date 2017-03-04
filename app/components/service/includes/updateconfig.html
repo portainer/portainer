@@ -8,7 +8,7 @@
           <tr>
             <td>Update Parallelism</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.UpdateParallelism" ng-change="updateServiceAttribute(service, 'UpdateParallelism')"/>
+              <input class="input-sm" type="number" ng-model="service.UpdateParallelism" ng-change="updateServiceAttribute(service, 'UpdateParallelism')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -19,7 +19,7 @@
           <tr>
             <td>Update Delay</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.UpdateDelay" ng-change="updateServiceAttribute(service, 'UpdateDelay')"/>
+              <input class="input-sm" type="number" ng-model="service.UpdateDelay" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -32,11 +32,11 @@
             <td>
               <div class="form-group">
                 <label class="radio-inline">
-                  <input type="radio" name="failure_action" ng-model="service.UpdateFailureAction" value="continue" ng-change="updateServiceAttribute(service, 'UpdateFailureAction')">
+                  <input type="radio" name="failure_action" ng-model="service.UpdateFailureAction" value="continue" ng-change="updateServiceAttribute(service, 'UpdateFailureAction')" ng-disabled="isUpdating">
                   Continue
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" name="failure_action" ng-model="service.UpdateFailureAction" value="pause" ng-change="updateServiceAttribute(service, 'UpdateFailureAction')">
+                  <input type="radio" name="failure_action" ng-model="service.UpdateFailureAction" value="pause" ng-change="updateServiceAttribute(service, 'UpdateFailureAction')" ng-disabled="isUpdating">
                   Pause
                 </label>
               </div>

@@ -2,7 +2,7 @@
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title="Environment variables">
       <div class="nopadding">
-        <a class="btn btn-default btn-sm pull-right" ng-click="addEnvironmentVariable(service)">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addEnvironmentVariable(service)" ng-disabled="isUpdating">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> environment variable
         </a>
       </div>
@@ -23,15 +23,15 @@
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">name</span>
-                <input type="text" class="form-control" ng-model="var.key" ng-disabled="var.added" placeholder="e.g. FOO">
+                <input type="text" class="form-control" ng-model="var.key" ng-disabled="var.added || isUpdating" placeholder="e.g. FOO">
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">value</span>
-                <input type="text" class="form-control" ng-model="var.value" ng-change="updateEnvironmentVariable(service, var)" placeholder="e.g. bar">
+                <input type="text" class="form-control" ng-model="var.value" ng-change="updateEnvironmentVariable(service, var)" placeholder="e.g. bar" ng-disabled="isUpdating">
                 <span class="input-group-btn">
-                  <button class="btn btn-default" type="button" ng-click="removeEnvironmentVariable(service, $index)">
+                  <button class="btn btn-default" type="button" ng-click="removeEnvironmentVariable(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-minus" aria-hidden="true"></i>
                   </button>
                 </span>

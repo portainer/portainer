@@ -2,7 +2,7 @@
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title="Mounts">
       <div class="nopadding">
-        <a class="btn btn-default btn-sm pull-right" ng-click="addMount(service)">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addMount(service)" ng-disabled="isUpdating">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> mount
         </a>
       </div>
@@ -24,23 +24,23 @@
         <tbody>
           <tr ng-repeat="mount in service.ServiceMounts">
             <td>
-              <select name="mountType" class="form-control" ng-model="mount.Type" >
+              <select name="mountType" class="form-control" ng-model="mount.Type" ng-disabled="isUpdating">
                 <option value="volume">Volume</option>
                 <option value="bind">Bind</option>
               </select>
             </td>
             <td>
-              <input type="text" class="form-control" ng-model="mount.Source" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)">
+              <input type="text" class="form-control" ng-model="mount.Source" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)" ng-disabled="isUpdating">
             </td>
             <td>
-              <input type="text" class="form-control" ng-model="mount.Target" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)">
+              <input type="text" class="form-control" ng-model="mount.Target" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)" ng-disabled="isUpdating">
             </td>
             <td>
-              <input type="checkbox" class="form-control" ng-model="mount.ReadOnly" ng-change="updateMount(service, mount)">
+              <input type="checkbox" class="form-control" ng-model="mount.ReadOnly" ng-change="updateMount(service, mount)" ng-disabled="isUpdating">
             </td>
             <td>
               <span class="input-group-btn">
-                <button class="btn btn-default" type="button" ng-click="removeMount(service, $index)">
+                <button class="btn btn-default" type="button" ng-click="removeMount(service, $index)" ng-disabled="isUpdating">
                   <i class="fa fa-minus" aria-hidden="true"></i>
                 </button>
               </span>

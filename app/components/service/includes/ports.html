@@ -2,7 +2,7 @@
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title="Published ports">
       <div class="nopadding">
-        <a class="btn btn-default btn-sm pull-right" ng-click="addPublishedPort(service)">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addPublishedPort(service)" ng-disabled="isUpdating">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> port mapping
         </a>
       </div>
@@ -25,18 +25,18 @@
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon">host</span>
-                <input type="number" class="form-control" ng-model="portBinding.PublishedPort" placeholder="e.g. 8080" ng-change="updatePublishedPort(service, mapping)">
+                <input type="number" class="form-control" ng-model="portBinding.PublishedPort" placeholder="e.g. 8080" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon">container</span>
-                <input type="number" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80" ng-change="updatePublishedPort(service, mapping)">
+                <input type="number" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
-                <select class="selectpicker form-control" ng-model="portBinding.Protocol" ng-change="updatePublishedPort(service, mapping)">
+                <select class="selectpicker form-control" ng-model="portBinding.Protocol" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
                   <option value="tcp">tcp</option>
                   <option value="udp">udp</option>
                 </select>
@@ -44,7 +44,7 @@
             </td>
             <td>
               <span class="input-group-btn">
-                <button class="btn btn-default" type="button" ng-click="removePortPublishedBinding(service, $index)">
+                <button class="btn btn-default" type="button" ng-click="removePortPublishedBinding(service, $index)" ng-disabled="isUpdating">
                   <i class="fa fa-minus" aria-hidden="true"></i>
                 </button>
               </span>

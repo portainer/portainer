@@ -6,9 +6,18 @@
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="services" id="top">Services</a> > <a ui-sref="service({id: service.Id})">{{ service.Name }}</a>
+    <a ui-sref="services" id="top">Services</a> > <a ui-sref="service({id: service.Id}, {reload: true})">{{ service.Name }}</a>
   </rd-header-content>
 </rd-header>
+
+<div class="row">
+  <div ng-if="isUpdating" class="col-lg-12 col-md-12 col-xs-12">
+    <div class="alert alert-info" role="alert" id="service-update-alert">
+      <p>This service is being updated. Editing this service is currently disabled.</p>
+      <a ui-sref="service({id: service.Id}, {reload: true})">Refresh to see if this service has finished updated.</a>
+    </div>
+  </div>
+</div>
 
 <div class="row">
   <div class="col-lg-9 col-md-9 col-xs-9">
@@ -20,7 +29,7 @@
             <tr>
               <td>Name</td>
               <td ng-if="applicationState.endpoint.apiVersion <= 1.24">
-                <input type="text" class="form-control" ng-model="service.Name" ng-change="updateServiceAttribute(service, 'Name')">
+                <input type="text" class="form-control" ng-model="service.Name" ng-change="updateServiceAttribute(service, 'Name')" ng-disabled="isUpdating">
               </td>
               <td ng-if="applicationState.endpoint.apiVersion >= 1.25">
                 {{ service.Name }}
@@ -30,7 +39,7 @@
               <td>ID</td>
               <td>
                 {{ service.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeService()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this service</button>
+                <button class="btn btn-xs btn-danger" ng-click="removeService()"><i class="fa fa-trash space-right" aria-hidden="true" ng-disabled="isUpdating"></i>Delete this service</button>
               </td>
             </tr>
             <tr ng-if="service.CreatedAt">
@@ -53,14 +62,14 @@
               <td>Replicas</td>
               <td>
                 <span ng-if="service.Mode === 'replicated'">
-                  <input class="input-sm" type="number" ng-model="service.Replicas" ng-change="updateServiceAttribute(service, 'Replicas')" />
+                  <input class="input-sm" type="number" ng-model="service.Replicas" ng-change="updateServiceAttribute(service, 'Replicas')" ng-disabled="isUpdating" />
                 </span>
               </td>
             </tr>
             <tr>
               <td>Image</td>
               <td>
-                <input type="text" class="form-control" ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')">
+                <input type="text" class="form-control" ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" ng-disabled="isUpdating" />
               </td>
             </tr>
           </tbody>

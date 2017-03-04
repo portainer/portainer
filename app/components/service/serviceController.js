@@ -10,6 +10,8 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
   $scope.sortType = 'Status';
   $scope.sortReverse = false;
 
+  $scope.lastVersion = 0;
+
   var originalService = {};
   var previousServiceValues = [];
 
@@ -163,7 +165,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     config.TaskTemplate.ContainerSpec.Labels = translateServiceLabelsToLabels(service.ServiceContainerLabels);
     config.TaskTemplate.ContainerSpec.Image = service.Image;
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : undefined;
-    
+
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
     }
@@ -242,6 +244,10 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     $('#loadingViewSpinner').show();
     Service.get({id: $stateParams.id}, function (d) {
       var service = new ServiceViewModel(d);
+      $scope.isUpdating = $scope.lastVersion >= service.Version;
+      if (!$scope.isUpdating) {
+        $scope.lastVersion = service.Version;
+      }
 
       translateServiceArrays(service);
       $scope.service = service;
