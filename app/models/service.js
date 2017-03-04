@@ -45,6 +45,7 @@ function ServiceViewModel(data) {
     this.User = containerSpec.User;
     this.Dir = containerSpec.Dir;
     this.Command = containerSpec.Command;
+    this.Secrets = containerSpec.Secrets;
   }
 
   if (data.Spec.EndpointSpec) {
@@ -64,5 +65,4 @@ function ServiceViewModel(data) {
 
   this.Checked = false;
   this.Scale = false;
-  this.Secrets = containerSpec.Secrets;
 }
