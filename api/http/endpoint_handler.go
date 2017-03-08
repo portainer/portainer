@@ -20,34 +20,25 @@ type EndpointHandler struct {
 	EndpointService portainer.EndpointService
 	FileService     portainer.FileService
 	// server            *Server
-	middleWareService *middleWareService
 }
 
 // NewEndpointHandler returns a new instance of EndpointHandler.
-func NewEndpointHandler(middleWareService *middleWareService) *EndpointHandler {
+func NewEndpointHandler(mw *middleWareService) *EndpointHandler {
 	h := &EndpointHandler{
-		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
-		middleWareService: middleWareService,
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.Handle("/endpoints", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handlePostEndpoints(w, r)
-	}))).Methods(http.MethodPost)
-	h.Handle("/endpoints", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleGetEndpoints(w, r)
-	}))).Methods(http.MethodGet)
-	h.Handle("/endpoints/{id}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleGetEndpoint(w, r)
-	}))).Methods(http.MethodGet)
-	h.Handle("/endpoints/{id}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handlePutEndpoint(w, r)
-	}))).Methods(http.MethodPut)
-	h.Handle("/endpoints/{id}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleDeleteEndpoint(w, r)
-	}))).Methods(http.MethodDelete)
-	// h.Handle("/endpoints/{id}/active", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 	h.handlePostEndpoint(w, r)
-	// }))).Methods(http.MethodPost)
+	h.Handle("/endpoints",
+		mw.administrator(http.HandlerFunc(h.handlePostEndpoints))).Methods(http.MethodPost)
+	h.Handle("/endpoints",
+		mw.authenticated(http.HandlerFunc(h.handleGetEndpoints))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}",
+		mw.administrator(http.HandlerFunc(h.handleGetEndpoint))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}",
+		mw.administrator(http.HandlerFunc(h.handlePutEndpoint))).Methods(http.MethodPut)
+	h.Handle("/endpoints/{id}",
+		mw.administrator(http.HandlerFunc(h.handleDeleteEndpoint))).Methods(http.MethodDelete)
+
 	return h
 }
 
@@ -123,22 +114,6 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 			return
 		}
 	}
-
-	// activeEndpointParameter := r.FormValue("active")
-	// if activeEndpointParameter != "" {
-	// 	active, err := strconv.ParseBool(activeEndpointParameter)
-	// 	if err != nil {
-	// 		Error(w, err, http.StatusBadRequest, handler.Logger)
-	// 		return
-	// 	}
-	// 	if active == true {
-	// 		err = handler.server.updateActiveEndpoint(endpoint)
-	// 		if err != nil {
-	// 			Error(w, err, http.StatusInternalServerError, handler.Logger)
-	// 			return
-	// 		}
-	// 	}
-	// }
 
 	encodeJSON(w, &postEndpointsResponse{ID: int(endpoint.ID)}, handler.Logger)
 }

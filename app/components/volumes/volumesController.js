@@ -1,6 +1,6 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'Pagination', 'ModalService',
-function ($scope, $state, Volume, Messages, Pagination, ModalService) {
+.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'Pagination', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
+function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentication, ResourceControlService, UserService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('volumes');
   $scope.state.selectedItemCount = 0;
@@ -10,18 +10,21 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService) {
     Name: ''
   };
 
-  function changeVolumeOwnership(volume) {
-    // remove label and such
-    volume.Ownership = 'public';
-    $scope.$apply();
-    // should probably refresh the view instead of apply, check whats best online
-    Messages.send('Ownership changed to public', volume.Name);
+  function removeVolumeResourceControl(volume) {
+    ResourceControlService.removeVolumeResourceControl($scope.user.ID, volume.Name)
+    .then(function success() {
+      delete volume.Metadata.ResourceControl;
+      Messages.send('Ownership changed to public', volume.Name);
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to change volume ownership");
+    });
   }
 
   $scope.switchOwnership = function(volume) {
     ModalService.confirmOwnershipChange(function (confirmed) {
       if(!confirmed) { return; }
-      changeVolumeOwnership(volume);
+      removeVolumeResourceControl(volume);
     });
   };
 
@@ -67,9 +70,15 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService) {
           if (d.message) {
             Messages.error("Unable to remove volume", {}, d.message);
           } else {
-            Messages.send("Volume deleted", volume.Name);
-            var index = $scope.volumes.indexOf(volume);
-            $scope.volumes.splice(index, 1);
+            ResourceControlService.removeVolumeResourceControl($scope.user.ID, volume.Name)
+            .then(function success() {
+              Messages.send("Volume deleted", volume.Name);
+              var index = $scope.volumes.indexOf(volume);
+              $scope.volumes.splice(index, 1);
+            })
+            .catch(function error(err) {
+              Messages.error("Failure", err, "Unable to remove volume ownership");
+            });
           }
           complete();
         }, function (e) {
@@ -80,14 +89,45 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService) {
     });
   };
 
+  function mapUsersToVolumes(users) {
+    angular.forEach($scope.volumes, function (volume) {
+      if (volume.Metadata) {
+        var volumeRC = volume.Metadata.ResourceControl;
+        if (volumeRC && volumeRC.OwnerId != $scope.user.ID) {
+          angular.forEach(users, function (user) {
+            if (volumeRC.OwnerId === user.Id) {
+              volume.Owner = user.Username;
+            }
+          });
+        }
+      }
+    });
+  }
+
   function fetchVolumes() {
     $('#loadVolumesSpinner').show();
+    var userDetails = Authentication.getUserDetails();
+    $scope.user = userDetails;
+
     Volume.query({}, function (d) {
       var volumes = d.Volumes || [];
       $scope.volumes = volumes.map(function (v) {
         return new VolumeViewModel(v);
       });
-      $('#loadVolumesSpinner').hide();
+      if (userDetails.role === 1) {
+        UserService.users()
+        .then(function success(data) {
+          mapUsersToVolumes(data);
+        })
+        .catch(function error(err) {
+          Messages.error("Failure", err, "Unable to retrieve users");
+        })
+        .finally(function final() {
+          $('#loadVolumesSpinner').hide();
+        });
+      } else {
+        $('#loadVolumesSpinner').hide();
+      }
     }, function (e) {
       $('#loadVolumesSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve volumes");

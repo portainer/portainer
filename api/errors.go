@@ -15,8 +15,8 @@ const (
 
 // Endpoint errors.
 const (
-	ErrEndpointNotFound = Error("Endpoint not found")
-	ErrNoActiveEndpoint = Error("Undefined Docker endpoint")
+	ErrEndpointNotFound     = Error("Endpoint not found")
+	ErrEndpointAccessDenied = Error("Access denied to endpoint")
 )
 
 // Crypto errors.

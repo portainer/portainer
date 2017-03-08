@@ -3,5 +3,12 @@ function VolumeViewModel(data) {
   this.Name = data.Name;
   this.Driver = data.Driver;
   this.Mountpoint = data.Mountpoint;
-  this.Ownership = 'private';
+  if (data.Portainer) {
+    this.Metadata = {};
+    if (data.Portainer.ResourceControl) {
+      this.Metadata.ResourceControl = {
+        OwnerId: data.Portainer.ResourceControl.OwnerId
+      };
+    }
+  }
 }

@@ -33,12 +33,14 @@ const (
 )
 
 // NewAuthHandler returns a new instance of AuthHandler.
-func NewAuthHandler() *AuthHandler {
+func NewAuthHandler(mw *middleWareService) *AuthHandler {
 	h := &AuthHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.HandleFunc("/auth", h.handlePostAuth)
+	h.Handle("/auth",
+		mw.public(http.HandlerFunc(h.handlePostAuth)))
+
 	return h
 }
 

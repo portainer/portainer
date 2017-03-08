@@ -7,7 +7,5 @@ angular.module('portainer.rest')
     get: { method: 'GET', params: { id: '@id' } },
     update: { method: 'PUT', params: { id: '@id' } },
     remove: { method: 'DELETE', params: { id: '@id'} },
-    getActiveEndpoint: { method: 'GET', params: { id: '0' } },
-    setActiveEndpoint: { method: 'POST', params: { id: '@id', action: 'active' } }
   });
 }]);

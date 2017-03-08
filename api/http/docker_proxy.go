@@ -78,12 +78,15 @@ func (factory *ProxyFactory) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpo
 }
 
 func (factory *ProxyFactory) newSocketProxy(path string) http.Handler {
-	return &unixSocketHandler{path}
+	return &unixSocketHandler{path, &proxyTransport{
+		ResourceControlService: factory.ResourceControlService,
+	}}
 }
 
 // unixSocketHandler represents a handler to proxy HTTP requests via a unix:// socket
 type unixSocketHandler struct {
-	path string
+	path      string
+	transport *proxyTransport
 }
 
 func (h *unixSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -101,6 +104,12 @@ func (h *unixSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer res.Body.Close()
+
+	err = h.transport.proxyDockerRequests(r, res)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, nil)
+		return
+	}
 
 	for k, vv := range res.Header {
 		for _, v := range vv {

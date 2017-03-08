@@ -8,7 +8,7 @@ angular.module('portainer.services')
   };
 
   service.removeContainerResourceControl = function(userID, resourceID) {
-    return ResourceControl.remove({ userId: userID, resourceID: resourceID, resourceType: 'container' }).$promise;
+    return ResourceControl.remove({ userId: userID, resourceId: resourceID, resourceType: 'container' }).$promise;
   };
 
   service.setServiceResourceControl = function(userID, resourceID) {
@@ -16,7 +16,7 @@ angular.module('portainer.services')
   };
 
   service.removeServiceResourceControl = function(userID, resourceID) {
-    return ResourceControl.remove({ userId: userID, resourceID: resourceID, resourceType: 'service' }).$promise;
+    return ResourceControl.remove({ userId: userID, resourceId: resourceID, resourceType: 'service' }).$promise;
   };
 
   service.setVolumeResourceControl = function(userID, resourceID) {
@@ -24,7 +24,7 @@ angular.module('portainer.services')
   };
 
   service.removeVolumeResourceControl = function(userID, resourceID) {
-    return ResourceControl.remove({ userId: userID, resourceID: resourceID, resourceType: 'volume' }).$promise;
+    return ResourceControl.remove({ userId: userID, resourceId: resourceID, resourceType: 'volume' }).$promise;
   };
 
   return service;

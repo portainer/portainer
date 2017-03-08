@@ -23,9 +23,8 @@ import (
 // WebSocketHandler represents an HTTP API handler for proxying requests to a web socket.
 type WebSocketHandler struct {
 	*mux.Router
-	Logger            *log.Logger
-	middleWareService *middleWareService
-	EndpointService   portainer.EndpointService
+	Logger          *log.Logger
+	EndpointService portainer.EndpointService
 }
 
 // NewWebSocketHandler returns a new instance of WebSocketHandler.

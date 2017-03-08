@@ -12,90 +12,129 @@ import (
 	"github.com/portainer/portainer"
 )
 
-type proxyTransport struct {
-	ResourceControlService portainer.ResourceControlService
-}
+type (
+	proxyTransport struct {
+		ResourceControlService portainer.ResourceControlService
+	}
+	resourceControlMetadata struct {
+		OwnerID portainer.UserID `json:"OwnerId"`
+	}
+)
 
 func (p *proxyTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	response, err := http.DefaultTransport.RoundTrip(req)
-
-	userData := req.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
-	if userData.Role != portainer.AdministratorRole {
-		err = p.proxyDockerRequests(req, response, userData.ID)
+	if err != nil {
+		return response, err
 	}
+
+	err = p.proxyDockerRequests(req, response)
 	return response, err
 }
 
-func (p *proxyTransport) proxyDockerRequests(request *http.Request, response *http.Response, userID portainer.UserID) error {
+func (p *proxyTransport) proxyDockerRequests(request *http.Request, response *http.Response) error {
 	path := request.URL.Path
 
 	if strings.HasPrefix(path, "/containers") {
-		return p.handleContainerRequests(request, response, userID)
+		return p.handleContainerRequests(request, response)
 	} else if strings.HasPrefix(path, "/services") {
-		return p.handleServiceRequests(request, response, userID)
+		return p.handleServiceRequests(request, response)
 	} else if strings.HasPrefix(path, "/volumes") {
-		return p.handleVolumeRequests(request, response, userID)
+		return p.handleVolumeRequests(request, response)
 	}
 
 	return nil
 }
 
-func (p *proxyTransport) handleContainerRequests(request *http.Request, response *http.Response, userID portainer.UserID) error {
+func (p *proxyTransport) handleContainerRequests(request *http.Request, response *http.Response) error {
 	requestPath := request.URL.Path
+	userData := request.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
 
-	if requestPath == "/containers/prune" {
+	if requestPath == "/containers/prune" && userData.Role != portainer.AdministratorRole {
 		return writeAccessDeniedResponse(response)
 	}
 	if requestPath == "/containers/json" {
-		return p.proxyContainerResponseWithResourceControl(response, userID)
+		if userData.Role == portainer.AdministratorRole {
+			return p.decorateContainerResponse(response)
+		}
+		return p.proxyContainerResponseWithResourceControl(response, userData.ID)
 	}
 	// /containers/{id}/action
 	if match, _ := path.Match("/containers/*/*", requestPath); match {
-		resourceID := path.Base(path.Dir(requestPath))
-		return p.proxyContainerResponseWithAccessControl(response, userID, resourceID)
+		if userData.Role != portainer.AdministratorRole {
+			resourceID := path.Base(path.Dir(requestPath))
+			return p.proxyContainerResponseWithAccessControl(response, userData.ID, resourceID)
+		}
 	}
 
 	return nil
 }
 
-func (p *proxyTransport) handleServiceRequests(request *http.Request, response *http.Response, userID portainer.UserID) error {
+func (p *proxyTransport) handleServiceRequests(request *http.Request, response *http.Response) error {
 	requestPath := request.URL.Path
+	userData := request.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
 
 	if requestPath == "/services" {
-		return p.proxyServiceResponseWithResourceControl(response, userID)
+		if userData.Role == portainer.AdministratorRole {
+			return p.decorateServiceResponse(response)
+		}
+		return p.proxyServiceResponseWithResourceControl(response, userData.ID)
 	}
 	// /services/{id}
 	if match, _ := path.Match("/services/*", requestPath); match {
-		resourceID := path.Base(requestPath)
-		return p.proxyServiceResponseWithAccessControl(response, userID, resourceID)
+		if userData.Role != portainer.AdministratorRole {
+			resourceID := path.Base(requestPath)
+			return p.proxyServiceResponseWithAccessControl(response, userData.ID, resourceID)
+		}
 	}
 	// /services/{id}/action
 	if match, _ := path.Match("/services/*/*", requestPath); match {
-		resourceID := path.Base(path.Dir(requestPath))
-		return p.proxyServiceResponseWithAccessControl(response, userID, resourceID)
+		if userData.Role != portainer.AdministratorRole {
+			resourceID := path.Base(path.Dir(requestPath))
+			return p.proxyServiceResponseWithAccessControl(response, userData.ID, resourceID)
+		}
 	}
 
 	return nil
 }
 
-func (p *proxyTransport) handleVolumeRequests(request *http.Request, response *http.Response, userID portainer.UserID) error {
+func (p *proxyTransport) handleVolumeRequests(request *http.Request, response *http.Response) error {
 	requestPath := request.URL.Path
+	userData := request.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
 
 	if requestPath == "/volumes" {
-		return p.proxyVolumeResponseWithResourceControl(response, userID)
+		if userData.Role == portainer.AdministratorRole {
+			return p.decorateVolumeResponse(response)
+		}
+		return p.proxyVolumeResponseWithResourceControl(response, userData.ID)
 	}
-	if requestPath == "/volumes/prune" {
+	if requestPath == "/volumes/prune" && userData.Role != portainer.AdministratorRole {
 		return writeAccessDeniedResponse(response)
 	}
 	// /volumes/{name}
 	if match, _ := path.Match("/volumes/*", requestPath); match {
-		resourceID := path.Base(requestPath)
-		return p.proxyVolumeResponseWithAccessControl(response, userID, resourceID)
+		if userData.Role != portainer.AdministratorRole {
+			resourceID := path.Base(requestPath)
+			return p.proxyVolumeResponseWithAccessControl(response, userData.ID, resourceID)
+		}
 	}
 	return nil
 }
 
 func (p *proxyTransport) proxyContainerResponseWithAccessControl(response *http.Response, userID portainer.UserID, resourceID string) error {
+	rcs, err := p.ResourceControlService.ResourceControls(portainer.ContainerResourceControl)
+	if err != nil {
+		return err
+	}
+
+	userOwnedResources, err := getResourceIDsOwnedByUser(userID, rcs)
+	if err != nil {
+		return err
+	}
+
+	if !isStringInArray(resourceID, userOwnedResources) && isResourceIDInRCs(resourceID, rcs) {
+		return writeAccessDeniedResponse(response)
+	}
+
 	return nil
 }
 
@@ -133,7 +172,60 @@ func (p *proxyTransport) proxyVolumeResponseWithAccessControl(response *http.Res
 	return nil
 }
 
+func (p *proxyTransport) decorateContainerResponse(response *http.Response) error {
+	responseData, err := getResponseData(response)
+	if err != nil {
+		return err
+	}
+
+	containers, err := p.decorateContainers(responseData)
+	if err != nil {
+		return err
+	}
+
+	err = rewriteContainerResponse(response, containers)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (p *proxyTransport) proxyContainerResponseWithResourceControl(response *http.Response, userID portainer.UserID) error {
+	responseData, err := getResponseData(response)
+	if err != nil {
+		return err
+	}
+
+	containers, err := p.filterContainers(userID, responseData)
+	if err != nil {
+		return err
+	}
+
+	err = rewriteContainerResponse(response, containers)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *proxyTransport) decorateServiceResponse(response *http.Response) error {
+	responseData, err := getResponseData(response)
+	if err != nil {
+		return err
+	}
+
+	services, err := p.decorateServices(responseData)
+	if err != nil {
+		return err
+	}
+
+	err = rewriteServiceResponse(response, services)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -144,6 +236,25 @@ func (p *proxyTransport) proxyServiceResponseWithResourceControl(response *http.
 	}
 
 	volumes, err := p.filterServices(userID, responseData)
+	if err != nil {
+		return err
+	}
+
+	err = rewriteServiceResponse(response, volumes)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *proxyTransport) decorateVolumeResponse(response *http.Response) error {
+	responseData, err := getResponseData(response)
+	if err != nil {
+		return err
+	}
+
+	volumes, err := p.decorateVolumes(responseData)
 	if err != nil {
 		return err
 	}
@@ -175,43 +286,133 @@ func (p *proxyTransport) proxyVolumeResponseWithResourceControl(response *http.R
 	return nil
 }
 
+func (p *proxyTransport) decorateContainers(responseData interface{}) ([]interface{}, error) {
+	responseDataArray := responseData.([]interface{})
+
+	containerRCs, err := p.ResourceControlService.ResourceControls(portainer.ContainerResourceControl)
+	if err != nil {
+		return nil, err
+	}
+
+	serviceRCs, err := p.ResourceControlService.ResourceControls(portainer.ServiceResourceControl)
+	if err != nil {
+		return nil, err
+	}
+
+	decoratedResources := make([]interface{}, 0)
+
+	for _, container := range responseDataArray {
+		jsonObject := container.(map[string]interface{})
+		containerID := jsonObject["Id"].(string)
+		containerRC := getRCByResourceID(containerID, containerRCs)
+		if containerRC != nil {
+			decoratedObject := decorateWithResourceControlMetadata(jsonObject, containerRC.OwnerID)
+			decoratedResources = append(decoratedResources, decoratedObject)
+			continue
+		}
+
+		containerLabels := jsonObject["Labels"]
+		if containerLabels != nil {
+			jsonLabels := containerLabels.(map[string]interface{})
+			serviceID := jsonLabels["com.docker.swarm.service.id"]
+			if serviceID != nil {
+				serviceRC := getRCByResourceID(serviceID.(string), serviceRCs)
+				if serviceRC != nil {
+					decoratedObject := decorateWithResourceControlMetadata(jsonObject, serviceRC.OwnerID)
+					decoratedResources = append(decoratedResources, decoratedObject)
+					continue
+				}
+			}
+		}
+		decoratedResources = append(decoratedResources, container)
+	}
+
+	return decoratedResources, nil
+}
+
 func (p *proxyTransport) filterContainers(userID portainer.UserID, responseData interface{}) ([]interface{}, error) {
 	responseDataArray := responseData.([]interface{})
 
-	// containerRCs, err := p.ResourceControlService.ResourceControls(portainer.ContainerResourceControl)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
-	// serviceRCs, err := p.ResourceControlService.ResourceControls(portainer.ServiceResourceControl)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
-	// userOwnedContainerIDs, err := getResourceIDsOwnedByUser(userID, containerRCs)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
-	// userOwnedServiceContainers, err := getOwnedServiceContainers(responseDataArray, serviceRCs)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
-	// publicContainers := getPublicResources(responseDataArray, containerRCs, "Id")
-	//
-	// filteredResources := make([]interface{}, 0)
-	//
-	// for _, res := range responseDataArray {
-	// 	jsonResource := res.(map[string]interface{})
-	// 	resourceID := jsonResource["Id"].(string)
-	// 	if isStringInArray(resourceID, userOwnedVolumeIDs) {
-	// 		filteredResources = append(filteredResources, res)
-	// 	}
-	// }
-	//
-	// filteredResources = append(filteredResources, publicContainers...)
-	return responseDataArray, nil
+	containerRCs, err := p.ResourceControlService.ResourceControls(portainer.ContainerResourceControl)
+	if err != nil {
+		return nil, err
+	}
+
+	serviceRCs, err := p.ResourceControlService.ResourceControls(portainer.ServiceResourceControl)
+	if err != nil {
+		return nil, err
+	}
+
+	userOwnedContainerIDs, err := getResourceIDsOwnedByUser(userID, containerRCs)
+	if err != nil {
+		return nil, err
+	}
+
+	userOwnedServiceIDs, err := getResourceIDsOwnedByUser(userID, serviceRCs)
+	if err != nil {
+		return nil, err
+	}
+
+	publicContainers := getPublicContainers(responseDataArray, containerRCs, serviceRCs)
+
+	filteredResources := make([]interface{}, 0)
+
+	for _, container := range responseDataArray {
+		jsonObject := container.(map[string]interface{})
+		containerID := jsonObject["Id"].(string)
+		if isStringInArray(containerID, userOwnedContainerIDs) {
+			decoratedObject := decorateWithResourceControlMetadata(jsonObject, userID)
+			filteredResources = append(filteredResources, decoratedObject)
+			continue
+		}
+
+		containerLabels := jsonObject["Labels"]
+		if containerLabels != nil {
+			jsonLabels := containerLabels.(map[string]interface{})
+			serviceID := jsonLabels["com.docker.swarm.service.id"]
+			if serviceID != nil && isStringInArray(serviceID.(string), userOwnedServiceIDs) {
+				decoratedObject := decorateWithResourceControlMetadata(jsonObject, userID)
+				filteredResources = append(filteredResources, decoratedObject)
+			}
+		}
+	}
+
+	filteredResources = append(filteredResources, publicContainers...)
+	return filteredResources, nil
+}
+
+func decorateWithResourceControlMetadata(object map[string]interface{}, userID portainer.UserID) map[string]interface{} {
+	metadata := make(map[string]interface{})
+	metadata["ResourceControl"] = resourceControlMetadata{
+		OwnerID: userID,
+	}
+	object["Portainer"] = metadata
+	return object
+}
+
+func (p *proxyTransport) decorateServices(responseData interface{}) ([]interface{}, error) {
+	responseDataArray := responseData.([]interface{})
+
+	rcs, err := p.ResourceControlService.ResourceControls(portainer.ServiceResourceControl)
+	if err != nil {
+		return nil, err
+	}
+
+	decoratedResources := make([]interface{}, 0)
+
+	for _, service := range responseDataArray {
+		jsonResource := service.(map[string]interface{})
+		resourceID := jsonResource["ID"].(string)
+		serviceRC := getRCByResourceID(resourceID, rcs)
+		if serviceRC != nil {
+			decoratedObject := decorateWithResourceControlMetadata(jsonResource, serviceRC.OwnerID)
+			decoratedResources = append(decoratedResources, decoratedObject)
+			continue
+		}
+		decoratedResources = append(decoratedResources, service)
+	}
+
+	return decoratedResources, nil
 }
 
 func (p *proxyTransport) filterServices(userID portainer.UserID, responseData interface{}) ([]interface{}, error) {
@@ -235,12 +436,42 @@ func (p *proxyTransport) filterServices(userID portainer.UserID, responseData in
 		jsonResource := res.(map[string]interface{})
 		resourceID := jsonResource["ID"].(string)
 		if isStringInArray(resourceID, userOwnedServiceIDs) {
-			filteredResources = append(filteredResources, res)
+			decoratedObject := decorateWithResourceControlMetadata(jsonResource, userID)
+			filteredResources = append(filteredResources, decoratedObject)
 		}
 	}
 
 	filteredResources = append(filteredResources, publicServices...)
 	return filteredResources, nil
+}
+
+func (p *proxyTransport) decorateVolumes(responseData interface{}) ([]interface{}, error) {
+	var responseDataArray []interface{}
+	jsonObject := responseData.(map[string]interface{})
+	if jsonObject["Volumes"] != nil {
+		responseDataArray = jsonObject["Volumes"].([]interface{})
+	}
+
+	rcs, err := p.ResourceControlService.ResourceControls(portainer.VolumeResourceControl)
+	if err != nil {
+		return nil, err
+	}
+
+	decoratedResources := make([]interface{}, 0)
+
+	for _, volume := range responseDataArray {
+		jsonResource := volume.(map[string]interface{})
+		resourceID := jsonResource["Name"].(string)
+		volumeRC := getRCByResourceID(resourceID, rcs)
+		if volumeRC != nil {
+			decoratedObject := decorateWithResourceControlMetadata(jsonResource, volumeRC.OwnerID)
+			decoratedResources = append(decoratedResources, decoratedObject)
+			continue
+		}
+		decoratedResources = append(decoratedResources, volume)
+	}
+
+	return decoratedResources, nil
 }
 
 func (p *proxyTransport) filterVolumes(userID portainer.UserID, responseData interface{}) ([]interface{}, error) {
@@ -268,7 +499,8 @@ func (p *proxyTransport) filterVolumes(userID portainer.UserID, responseData int
 		jsonResource := res.(map[string]interface{})
 		resourceID := jsonResource["Name"].(string)
 		if isStringInArray(resourceID, userOwnedVolumeIDs) {
-			filteredResources = append(filteredResources, res)
+			decoratedObject := decorateWithResourceControlMetadata(jsonResource, userID)
+			filteredResources = append(filteredResources, decoratedObject)
 		}
 	}
 
@@ -301,23 +533,29 @@ func getOwnedServiceContainers(responseData []interface{}, serviceRCs []portaine
 	return ownedContainers
 }
 
-// func getPublicContainers(responseData []interface{}, containerRCs []portainer.ResourceControl, serviceRCs []portainer.ResourceControl) []interface{} {
-// 	publicContainers := make([]interface{}, 0)
-// 	for _, res := range responseData {
-// 		jsonResource := res.(map[string]interface{})
-// 		resourceID := jsonResource["Id"].(string)
-// 		containerLabels := jsonResource["Labels"].(map[string]interface{})
-//
-// 		// if containerLabels != nil && containerLabels["com.docker.swarm.service.id"] != nil {
-// 		//
-// 		// }
-// 		// if !isResourceIDInRCs(resourceID, rcs) {
-// 		// 	publicResources = append(publicResources, res)
-// 		// }
-//
-// 	}
-// 	return publicContainers
-// }
+func getPublicContainers(responseData []interface{}, containerRCs []portainer.ResourceControl, serviceRCs []portainer.ResourceControl) []interface{} {
+	publicContainers := make([]interface{}, 0)
+	for _, container := range responseData {
+		jsonObject := container.(map[string]interface{})
+		containerID := jsonObject["Id"].(string)
+		if !isResourceIDInRCs(containerID, containerRCs) {
+			containerLabels := jsonObject["Labels"]
+			if containerLabels != nil {
+				jsonLabels := containerLabels.(map[string]interface{})
+				serviceID := jsonLabels["com.docker.swarm.service.id"]
+				if serviceID == nil {
+					publicContainers = append(publicContainers, container)
+				} else if serviceID != nil && !isResourceIDInRCs(serviceID.(string), serviceRCs) {
+					publicContainers = append(publicContainers, container)
+				}
+			} else {
+				publicContainers = append(publicContainers, container)
+			}
+		}
+	}
+
+	return publicContainers
+}
 
 func getPublicResources(responseData []interface{}, rcs []portainer.ResourceControl, resourceIDKey string) []interface{} {
 	publicResources := make([]interface{}, 0)
@@ -349,6 +587,15 @@ func isResourceIDInRCs(resourceID string, rcs []portainer.ResourceControl) bool 
 	return false
 }
 
+func getRCByResourceID(resourceID string, rcs []portainer.ResourceControl) *portainer.ResourceControl {
+	for _, rc := range rcs {
+		if resourceID == rc.ResourceID {
+			return &rc
+		}
+	}
+	return nil
+}
+
 func getResponseData(response *http.Response) (interface{}, error) {
 	var data interface{}
 	if response.Body != nil {
@@ -374,6 +621,14 @@ func getResponseData(response *http.Response) (interface{}, error) {
 
 func writeAccessDeniedResponse(response *http.Response) error {
 	return rewriteResponse(response, portainer.ErrResourceAccessDenied, 403)
+}
+
+func rewriteContainerResponse(response *http.Response, responseData interface{}) error {
+	return rewriteResponse(response, responseData, 200)
+}
+
+func rewriteServiceResponse(response *http.Response, responseData interface{}) error {
+	return rewriteResponse(response, responseData, 200)
 }
 
 func rewriteVolumeResponse(response *http.Response, responseData interface{}) error {

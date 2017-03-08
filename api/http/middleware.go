@@ -22,21 +22,30 @@ const (
 	contextAuthenticationKey contextKey = iota
 )
 
-func addMiddleware(h http.Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
-	for _, mw := range middleware {
-		h = mw(h)
-	}
+// public defines a chain of middleware for public endpoints (no authentication required)
+func (service *middleWareService) public(h http.Handler) http.Handler {
+	h = mwSecureHeaders(h)
 	return h
 }
 
-func (service *middleWareService) addMiddleWares(h http.Handler) http.Handler {
-	h = service.middleWareSecureHeaders(h)
-	h = service.middleWareAuthenticate(h)
+// authenticated defines a chain of middleware for private endpoints (authentication required)
+func (service *middleWareService) authenticated(h http.Handler) http.Handler {
+	h = service.mwCheckAuthentication(h)
+	h = mwSecureHeaders(h)
 	return h
 }
 
-// middleWareAuthenticate provides secure headers middleware for handlers
-func (*middleWareService) middleWareSecureHeaders(next http.Handler) http.Handler {
+// administrator defines a chain of middleware for private administrator restricted endpoints
+// (authentication and role admin required)
+func (service *middleWareService) administrator(h http.Handler) http.Handler {
+	h = mwCheckAdministratorRole(h)
+	h = service.mwCheckAuthentication(h)
+	h = mwSecureHeaders(h)
+	return h
+}
+
+// mwSecureHeaders provides secure headers middleware for handlers
+func mwSecureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("X-Content-Type-Options", "nosniff")
 		w.Header().Add("X-Frame-Options", "DENY")
@@ -44,8 +53,27 @@ func (*middleWareService) middleWareSecureHeaders(next http.Handler) http.Handle
 	})
 }
 
-// middleWareAuthenticate provides Authentication middleware for handlers
-func (service *middleWareService) middleWareAuthenticate(next http.Handler) http.Handler {
+// mwCheckAdministratorRole check the role of the user associated to the request
+func mwCheckAdministratorRole(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userData := r.Context().Value(contextAuthenticationKey)
+		if userData == nil {
+			Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+			return
+		}
+
+		token := userData.(*portainer.TokenData)
+		if token.Role != portainer.AdministratorRole {
+			Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+// mwCheckAuthentication provides Authentication middleware for handlers
+func (service *middleWareService) mwCheckAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !service.authDisabled {
 			var token string

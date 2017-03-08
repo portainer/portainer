@@ -33,4 +33,13 @@ function ServiceViewModel(data) {
   this.Checked = false;
   this.Scale = false;
   this.EditName = false;
+
+  if (data.Portainer) {
+    this.Metadata = {};
+    if (data.Portainer.ResourceControl) {
+      this.Metadata.ResourceControl = {
+        OwnerId: data.Portainer.ResourceControl.OwnerId
+      };
+    }
+  }
 }

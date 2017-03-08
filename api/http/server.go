@@ -47,7 +47,7 @@ func (server *Server) Start() error {
 		authDisabled: server.AuthDisabled,
 	}
 
-	var authHandler = NewAuthHandler()
+	var authHandler = NewAuthHandler(middleWareService)
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService

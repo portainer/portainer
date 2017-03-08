@@ -21,42 +21,35 @@ type UserHandler struct {
 	UserService            portainer.UserService
 	ResourceControlService portainer.ResourceControlService
 	CryptoService          portainer.CryptoService
-	middleWareService      *middleWareService
 }
 
 // NewUserHandler returns a new instance of UserHandler.
-func NewUserHandler(middleWareService *middleWareService) *UserHandler {
+func NewUserHandler(mw *middleWareService) *UserHandler {
 	h := &UserHandler{
-		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
-		middleWareService: middleWareService,
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.Handle("/users", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handlePostUsers(w, r)
-	}))).Methods(http.MethodPost)
-	h.Handle("/users", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleGetUsers(w, r)
-	}))).Methods(http.MethodGet)
-	h.Handle("/users/{id}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleGetUser(w, r)
-	}))).Methods(http.MethodGet)
-	h.Handle("/users/{id}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handlePutUser(w, r)
-	}))).Methods(http.MethodPut)
-	h.Handle("/users/{id}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleDeleteUser(w, r)
-	}))).Methods(http.MethodDelete)
-	h.Handle("/users/{id}/passwd", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handlePostUserPasswd(w, r)
-	})))
-	h.Handle("/users/{userId}/resources/{resourceType}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handlePostUserResource(w, r)
-	}))).Methods(http.MethodPost)
-	h.Handle("/users/{userId}/resources/{resourceType}/{resourceId}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleDeleteUserResource(w, r)
-	}))).Methods(http.MethodDelete)
-	h.HandleFunc("/users/admin/check", h.handleGetAdminCheck)
-	h.HandleFunc("/users/admin/init", h.handlePostAdminInit)
+	h.Handle("/users",
+		mw.administrator(http.HandlerFunc(h.handlePostUsers))).Methods(http.MethodPost)
+	h.Handle("/users",
+		mw.administrator(http.HandlerFunc(h.handleGetUsers))).Methods(http.MethodGet)
+	h.Handle("/users/{id}",
+		mw.administrator(http.HandlerFunc(h.handleGetUser))).Methods(http.MethodGet)
+	h.Handle("/users/{id}",
+		mw.authenticated(http.HandlerFunc(h.handlePutUser))).Methods(http.MethodPut)
+	h.Handle("/users/{id}",
+		mw.administrator(http.HandlerFunc(h.handleDeleteUser))).Methods(http.MethodDelete)
+	h.Handle("/users/{id}/passwd",
+		mw.authenticated(http.HandlerFunc(h.handlePostUserPasswd)))
+	h.Handle("/users/{userId}/resources/{resourceType}",
+		mw.authenticated(http.HandlerFunc(h.handlePostUserResource))).Methods(http.MethodPost)
+	h.Handle("/users/{userId}/resources/{resourceType}/{resourceId}",
+		mw.authenticated(http.HandlerFunc(h.handleDeleteUserResource))).Methods(http.MethodDelete)
+	h.Handle("/users/admin/check",
+		mw.public(http.HandlerFunc(h.handleGetAdminCheck)))
+	h.Handle("/users/admin/init",
+		mw.public(http.HandlerFunc(h.handlePostAdminInit)))
+
 	return h
 }
 
@@ -219,6 +212,12 @@ func (handler *UserHandler) handlePutUser(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	userData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
+	if userData.Role != portainer.AdministratorRole && userData.ID != portainer.UserID(userID) {
+		Error(w, portainer.ErrUnauthorized, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	var req putUserRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
@@ -254,6 +253,10 @@ func (handler *UserHandler) handlePutUser(w http.ResponseWriter, r *http.Request
 	}
 
 	if req.Role != 0 {
+		if userData.Role != portainer.AdministratorRole {
+			Error(w, portainer.ErrUnauthorized, http.StatusForbidden, handler.Logger)
+			return
+		}
 		if req.Role == 1 {
 			user.Role = portainer.AdministratorRole
 		} else {
@@ -373,10 +376,10 @@ func (handler *UserHandler) handleDeleteUser(w http.ResponseWriter, r *http.Requ
 // handlePostUserResource handles POST requests on /users/:userId/resources/:resourceType
 func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["userId"]
+	userID := vars["userId"]
 	resourceType := vars["resourceType"]
 
-	userID, err := strconv.Atoi(id)
+	uid, err := strconv.Atoi(userID)
 	if err != nil {
 		Error(w, err, http.StatusBadRequest, handler.Logger)
 		return
@@ -394,6 +397,12 @@ func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *htt
 		return
 	}
 
+	userData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
+	if userData.ID != portainer.UserID(uid) {
+		Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	var req postUserResourceRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
@@ -407,7 +416,7 @@ func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *htt
 	}
 
 	resource := portainer.ResourceControl{
-		OwnerID:    portainer.UserID(userID),
+		OwnerID:    portainer.UserID(uid),
 		ResourceID: req.ResourceID,
 	}
 
@@ -449,7 +458,7 @@ func (handler *UserHandler) handleDeleteUserResource(w http.ResponseWriter, r *h
 
 	userData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
 	if userData.ID != portainer.UserID(uid) {
-		Error(w, portainer.ErrResourceAccessDenied, http.StatusInternalServerError, handler.Logger)
+		Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}
 

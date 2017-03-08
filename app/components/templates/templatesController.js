@@ -1,6 +1,6 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$anchorScroll', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Messages', 'Pagination',
-function ($scope, $q, $state, $anchorScroll, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Messages, Pagination) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$anchorScroll', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Messages', 'Pagination', 'ResourceControlService', 'Authentication',
+function ($scope, $q, $state, $anchorScroll, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Messages, Pagination, ResourceControlService, Authentication) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
@@ -48,7 +48,14 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, Container
     })
     .then(function success(data) {
       Messages.send('Container Started', data.Id);
-      $state.go('containers', {}, {reload: true});
+      if ($scope.formValues.Ownership === 'private') {
+        ResourceControlService.setContainerResourceControl(Authentication.getUserDetails().ID, data.Id)
+        .then(function success(data) {
+          $state.go('containers', {}, {reload: true});
+        });
+      } else {
+        $state.go('containers', {}, {reload: true});
+      }
     })
     .catch(function error(err) {
       Messages.error('Failure', err, err.msg);

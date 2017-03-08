@@ -1,6 +1,6 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination', 'EntityListService',
-function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination, EntityListService) {
+  .controller('ContainersController', ['$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
+  function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = Settings.displayAll;
@@ -17,8 +17,43 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
     Pagination.setPaginationCount('containers', $scope.state.pagination_count);
   };
 
+  function removeContainerResourceControl(container) {
+    ResourceControlService.removeContainerResourceControl($scope.userId, container.Id)
+    .then(function success() {
+      delete container.Metadata.ResourceControl;
+      Messages.send('Ownership changed to public', container.Id);
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to change container ownership");
+    });
+  }
+
+  $scope.switchOwnership = function(container) {
+    ModalService.confirmOwnershipChange(function (confirmed) {
+      if(!confirmed) { return; }
+      removeContainerResourceControl(container);
+    });
+  };
+
+  function mapUsersToContainers(users) {
+    angular.forEach($scope.containers, function (container) {
+      if (container.Metadata) {
+        var containerRC = container.Metadata.ResourceControl;
+        if (containerRC && containerRC.OwnerId != $scope.user.ID) {
+          angular.forEach(users, function (user) {
+            if (containerRC.OwnerId === user.Id) {
+              container.Owner = user.Username;
+            }
+          });
+        }
+      }
+    });
+  }
+
   var update = function (data) {
     $('#loadContainersSpinner').show();
+    var userDetails = Authentication.getUserDetails();
+    $scope.user = userDetails;
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
@@ -41,7 +76,20 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
         }
         return model;
       });
-      $('#loadContainersSpinner').hide();
+      if (userDetails.role === 1) {
+        UserService.users()
+        .then(function success(data) {
+          mapUsersToContainers(data);
+        })
+        .catch(function error(err) {
+          Messages.error("Failure", err, "Unable to retrieve users");
+        })
+        .finally(function final() {
+          $('#loadContainersSpinner').hide();
+        });
+      } else {
+        $('#loadContainersSpinner').hide();
+      }
     }, function (e) {
       $('#loadContainersSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve containers");

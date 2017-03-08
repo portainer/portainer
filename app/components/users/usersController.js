@@ -60,7 +60,6 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
     var role = $scope.formValues.Role;
-    console.log(JSON.stringify(role, null, 4));
     UserService.createUser(username, password, role)
     .then(function success(data) {
       Messages.send("User created", username);

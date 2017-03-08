@@ -56,7 +56,10 @@
           <!-- ownership -->
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="ownership" class="control-label text-left">Ownership</label>
+              <label for="ownership" class="control-label text-left">
+                Ownership
+                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing public, everybody will be able to access it."></portainer-tooltip>
+              </label>
               <div class="btn-group btn-group-sm" style="margin-left: 20px;">
                 <label class="btn btn-default" ng-model="formValues.Ownership" uib-btn-radio="'private'">Private</label>
                 <label class="btn btn-default" ng-model="formValues.Ownership" uib-btn-radio="'public'">Public</label>

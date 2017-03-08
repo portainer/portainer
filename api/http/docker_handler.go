@@ -16,28 +16,34 @@ import (
 // DockerHandler represents an HTTP API handler for proxying requests to the Docker API.
 type DockerHandler struct {
 	*mux.Router
-	Logger            *log.Logger
-	middleWareService *middleWareService
-	EndpointService   portainer.EndpointService
-	ProxyFactory      ProxyFactory
-	proxies           map[portainer.EndpointID]http.Handler
+	Logger          *log.Logger
+	EndpointService portainer.EndpointService
+	ProxyFactory    ProxyFactory
+	proxies         map[portainer.EndpointID]http.Handler
 }
 
 // NewDockerHandler returns a new instance of DockerHandler.
-func NewDockerHandler(middleWareService *middleWareService, resourceControlService portainer.ResourceControlService) *DockerHandler {
+func NewDockerHandler(mw *middleWareService, resourceControlService portainer.ResourceControlService) *DockerHandler {
 	h := &DockerHandler{
-		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
-		middleWareService: middleWareService,
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 		ProxyFactory: ProxyFactory{
 			ResourceControlService: resourceControlService,
 		},
 		proxies: make(map[portainer.EndpointID]http.Handler),
 	}
-	h.PathPrefix("/{id}/").Handler(middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.proxyRequestsToDockerAPI(w, r)
-	})))
+	h.PathPrefix("/{id}/").Handler(
+		mw.authenticated(http.HandlerFunc(h.proxyRequestsToDockerAPI)))
 	return h
+}
+
+func checkEndpointAccessControl(endpoint *portainer.Endpoint, userID portainer.UserID) bool {
+	for _, authorizedUserID := range endpoint.AuthorizedUsers {
+		if authorizedUserID == userID {
+			return true
+		}
+	}
+	return false
 }
 
 func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.Request) {
@@ -51,9 +57,21 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 	}
 
 	endpointID := portainer.EndpointID(parsedID)
+	endpoint, err := handler.EndpointService.Endpoint(endpointID)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	userData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
+	if userData.Role != portainer.AdministratorRole && !checkEndpointAccessControl(endpoint, userData.ID) {
+		Error(w, portainer.ErrEndpointAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	proxy := handler.proxies[endpointID]
 	if proxy == nil {
-		proxy, err = handler.createAndRegisterEndpointProxy(endpointID)
+		proxy, err = handler.createAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			Error(w, err, http.StatusBadRequest, handler.Logger)
 			return
@@ -62,13 +80,8 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 	http.StripPrefix("/"+id, proxy).ServeHTTP(w, r)
 }
 
-func (handler *DockerHandler) createAndRegisterEndpointProxy(endpointID portainer.EndpointID) (http.Handler, error) {
+func (handler *DockerHandler) createAndRegisterEndpointProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	var proxy http.Handler
-
-	endpoint, err := handler.EndpointService.Endpoint(endpointID)
-	if err != nil {
-		return nil, err
-	}
 
 	endpointURL, err := url.Parse(endpoint.URL)
 	if err != nil {
@@ -89,6 +102,6 @@ func (handler *DockerHandler) createAndRegisterEndpointProxy(endpointID portaine
 		proxy = handler.ProxyFactory.newSocketProxy(endpointURL.Path)
 	}
 
-	handler.proxies[endpointID] = proxy
+	handler.proxies[endpoint.ID] = proxy
 	return proxy, nil
 }
