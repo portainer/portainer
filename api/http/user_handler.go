@@ -457,7 +457,7 @@ func (handler *UserHandler) handleDeleteUserResource(w http.ResponseWriter, r *h
 	}
 
 	userData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
-	if userData.ID != portainer.UserID(uid) {
+	if userData.Role != portainer.AdministratorRole && userData.ID != portainer.UserID(uid) {
 		Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}

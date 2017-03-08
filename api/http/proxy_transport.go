@@ -14,6 +14,7 @@ import (
 
 type (
 	proxyTransport struct {
+		transport              *http.Transport
 		ResourceControlService portainer.ResourceControlService
 	}
 	resourceControlMetadata struct {
@@ -22,7 +23,7 @@ type (
 )
 
 func (p *proxyTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	response, err := http.DefaultTransport.RoundTrip(req)
+	response, err := p.transport.RoundTrip(req)
 	if err != nil {
 		return response, err
 	}
@@ -648,135 +649,4 @@ func rewriteResponse(response *http.Response, newContent interface{}, statusCode
 	response.ContentLength = int64(len(jsonData))
 	response.Header.Set("Content-Length", strconv.Itoa(len(jsonData)))
 	return nil
-}
-
-////////// DEPRECATE ///////
-
-func rewriteResponseWithNewContent(response *http.Response, responseData interface{}, resourceLocationKey string) error {
-	if resourceLocationKey != "" {
-		tmpData := map[string]interface{}{}
-		tmpData[resourceLocationKey] = responseData
-		responseData = tmpData
-	}
-	return rewriteResponse(response, responseData, 200)
-}
-
-func (p *proxyTransport) proxyResponseWithAccessControl(response *http.Response, userID portainer.UserID, resourceID string, rcType portainer.ResourceControlType) error {
-	rcs, err := p.ResourceControlService.ResourceControls(rcType)
-	if err != nil {
-		return err
-	}
-
-	userOwnedResources, err := getResourceIDsOwnedByUser(userID, rcs)
-	if err != nil {
-		return err
-	}
-
-	if !isStringInArray(resourceID, userOwnedResources) && isResourceIDInRCs(resourceID, rcs) {
-		return writeAccessDeniedResponse(response)
-	}
-	return nil
-}
-
-func (p *proxyTransport) proxyResponseWithResourceControl(response *http.Response, userID portainer.UserID, resourceLocationKey, resourceIDKey string, rcType portainer.ResourceControlType) error {
-	err := p.rewriteResponseWithFilteredResources(response, userID, resourceLocationKey, resourceIDKey, rcType)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (p *proxyTransport) getFilteredResources(userID portainer.UserID, responseDataArray []interface{}, resourceIDKey string, rcType portainer.ResourceControlType) ([]interface{}, error) {
-	rcs, err := p.ResourceControlService.ResourceControls(rcType)
-	if err != nil {
-		return nil, err
-	}
-
-	userOwnedResources, err := getResourceIDsOwnedByUser(userID, rcs)
-	if err != nil {
-		return nil, err
-	}
-
-	publicResourceData := getPublicResources(responseDataArray, rcs, resourceIDKey)
-	filteredResourceData := filterResources(responseDataArray, userOwnedResources, resourceIDKey)
-	filteredResourceData = append(filteredResourceData, publicResourceData...)
-
-	// Also check for containers related to a service
-	if rcType == portainer.ContainerResourceControl {
-		serviceRCs, err := p.ResourceControlService.ResourceControls(portainer.ServiceResourceControl)
-		if err != nil {
-			return nil, err
-		}
-
-		userOwnedServiceResources, err := getResourceIDsOwnedByUser(userID, serviceRCs)
-		if err != nil {
-			return nil, err
-		}
-
-		// publicServiceResourcesData := getPublicServiceResources(filteredResourceData, serviceRCs)
-		// filteredResourceData = append(filteredResourceData, filteredServiceResourceData...)
-
-		// publicServiceResourceData := getPublicResources(filteredResourceData, serviceRCs, "ID")
-		filteredServiceResourceData := filterContainersByServiceResource(filteredResourceData, userOwnedServiceResources)
-		filteredResourceData = append(filteredResourceData, filteredServiceResourceData...)
-	}
-
-	return filteredResourceData, nil
-}
-
-func (p *proxyTransport) rewriteResponseWithFilteredResources(response *http.Response, userID portainer.UserID, resourceLocationKey, resourceIDKey string, rcType portainer.ResourceControlType) error {
-	responseData, err := getResponseData(response)
-	if err != nil {
-		return err
-	}
-
-	var responseDataArray []interface{}
-	if resourceLocationKey != "" {
-		temporaryData := responseData.(map[string]interface{})
-		if temporaryData[resourceLocationKey] != nil {
-			responseDataArray = temporaryData[resourceLocationKey].([]interface{})
-		}
-	} else {
-		responseDataArray = responseData.([]interface{})
-	}
-
-	filteredResourceData, err := p.getFilteredResources(userID, responseDataArray, resourceIDKey, rcType)
-	if err != nil {
-		return err
-	}
-
-	err = rewriteResponseWithNewContent(response, filteredResourceData, resourceLocationKey)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func filterContainersByServiceResource(resources []interface{}, serviceResourceIDs []string) []interface{} {
-	filteredResources := make([]interface{}, 0)
-	for _, res := range resources {
-		jsonResource := res.(map[string]map[string]interface{})
-		swarmServiceID := jsonResource["Labels"]["com.docker.swarm.service.id"]
-		if swarmServiceID != nil {
-			resourceID := swarmServiceID.(string)
-			if isStringInArray(resourceID, serviceResourceIDs) {
-				filteredResources = append(filteredResources, res)
-			}
-		}
-	}
-	return filteredResources
-}
-
-func filterResources(resources []interface{}, filteredResourceIDs []string, resourceIDKey string) []interface{} {
-	filteredResources := make([]interface{}, 0)
-	for _, res := range resources {
-		jsonResource := res.(map[string]interface{})
-		resourceID := jsonResource[resourceIDKey].(string)
-		if isStringInArray(resourceID, filteredResourceIDs) {
-			filteredResources = append(filteredResources, res)
-		}
-	}
-	return filteredResources
 }

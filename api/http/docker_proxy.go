@@ -54,6 +54,7 @@ func (factory *ProxyFactory) newSingleHostReverseProxyWithHostHeader(target *url
 	}
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,
+		transport:              &http.Transport{},
 	}
 	return &httputil.ReverseProxy{Director: director, Transport: transport}
 }
@@ -70,10 +71,8 @@ func (factory *ProxyFactory) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpo
 	if err != nil {
 		return nil, err
 	}
-	proxy.Transport.(*http.Transport).TLSClientConfig = config
-	// proxy.Transport = &http.Transport{
-	// 	TLSClientConfig: config,
-	// }
+
+	proxy.Transport.(*proxyTransport).transport.TLSClientConfig = config
 	return proxy, nil
 }
 

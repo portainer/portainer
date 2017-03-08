@@ -18,7 +18,7 @@ angular.module('containers', [])
   };
 
   function removeContainerResourceControl(container) {
-    ResourceControlService.removeContainerResourceControl($scope.userId, container.Id)
+    ResourceControlService.removeContainerResourceControl(container.Metadata.ResourceControl.OwnerId, container.Id)
     .then(function success() {
       delete container.Metadata.ResourceControl;
       Messages.send('Ownership changed to public', container.Id);
@@ -125,7 +125,17 @@ angular.module('containers', [])
               Messages.send("Error", d.message);
             }
             else {
-              Messages.send("Container " + msg, c.Id);
+              if (c.Metadata && c.Metadata.ResourceControl) {
+                ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, c.Id)
+                .then(function success() {
+                  Messages.send("Container " + msg, c.Id);
+                })
+                .catch(function error(err) {
+                  Messages.error("Failure", err, "Unable to remove container ownership");
+                });
+              } else {
+                Messages.send("Container " + msg, c.Id);
+              }
             }
             complete();
           }, function (e) {

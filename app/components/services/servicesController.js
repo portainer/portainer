@@ -8,7 +8,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagina
   $scope.sortReverse = false;
 
   function removeServiceResourceControl(service) {
-    ResourceControlService.removeServiceResourceControl($scope.user.ID, service.Id)
+    ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id)
     .then(function success() {
       delete service.Metadata.ResourceControl;
       Messages.send('Ownership changed to public', service.Id);
@@ -75,9 +75,21 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagina
             $('#loadServicesSpinner').hide();
             Messages.error("Unable to remove service", {}, d[0].message);
           } else {
-            Messages.send("Service deleted", service.Id);
-            var index = $scope.services.indexOf(service);
-            $scope.services.splice(index, 1);
+            if (service.Metadata && service.Metadata.ResourceControl) {
+              ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id)
+              .then(function success() {
+                Messages.send("Service deleted", service.Id);
+                var index = $scope.services.indexOf(service);
+                $scope.services.splice(index, 1);
+              })
+              .catch(function error(err) {
+                Messages.error("Failure", err, "Unable to remove service ownership");
+              });
+            } else {
+              Messages.send("Service deleted", service.Id);
+              var index = $scope.services.indexOf(service);
+              $scope.services.splice(index, 1);
+            }
           }
           complete();
         }, function (e) {
