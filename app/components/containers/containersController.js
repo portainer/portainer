@@ -1,6 +1,6 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
-  function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
+  function ($q, $scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = Settings.displayAll;
@@ -18,7 +18,15 @@ angular.module('containers', [])
   };
 
   function removeContainerResourceControl(container) {
-    ResourceControlService.removeContainerResourceControl(container.Metadata.ResourceControl.OwnerId, container.Id)
+    volumeResourceControlQueries = [];
+    angular.forEach(container.Mounts, function (volume) {
+      volumeResourceControlQueries.push(ResourceControlService.removeVolumeResourceControl(container.Metadata.ResourceControl.OwnerId, volume.Name));
+    });
+
+    $q.all(volumeResourceControlQueries)
+    .then(function success() {
+      return ResourceControlService.removeContainerResourceControl(container.Metadata.ResourceControl.OwnerId, container.Id);
+    })
     .then(function success() {
       delete container.Metadata.ResourceControl;
       Messages.send('Ownership changed to public', container.Id);
@@ -29,7 +37,7 @@ angular.module('containers', [])
   }
 
   $scope.switchOwnership = function(container) {
-    ModalService.confirmOwnershipChange(function (confirmed) {
+    ModalService.confirmContainerOwnershipChange(function (confirmed) {
       if(!confirmed) { return; }
       removeContainerResourceControl(container);
     });

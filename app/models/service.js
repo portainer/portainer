@@ -17,6 +17,10 @@ function ServiceViewModel(data) {
   if (data.Spec.TaskTemplate.ContainerSpec.Env) {
     this.Env = data.Spec.TaskTemplate.ContainerSpec.Env;
   }
+  this.Mounts = [];
+  if (data.Spec.TaskTemplate.ContainerSpec.Mounts) {
+    this.Mounts = data.Spec.TaskTemplate.ContainerSpec.Mounts;
+  }
   if (data.Endpoint.Ports) {
     this.Ports = data.Endpoint.Ports;
   }

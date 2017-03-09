@@ -22,7 +22,7 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentica
   }
 
   $scope.switchOwnership = function(volume) {
-    ModalService.confirmOwnershipChange(function (confirmed) {
+    ModalService.confirmVolumeOwnershipChange(function (confirmed) {
       if(!confirmed) { return; }
       removeVolumeResourceControl(volume);
     });

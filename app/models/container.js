@@ -12,6 +12,7 @@ function ContainerViewModel(data) {
   this.Checked = false;
   this.Labels = data.Labels;
   this.Ports = [];
+  this.Mounts = data.Mounts;
   for (var i = 0; i < data.Ports.length; ++i) {
     var p = data.Ports[i];
     if (p.PublicPort) {

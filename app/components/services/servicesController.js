@@ -1,6 +1,6 @@
 angular.module('services', [])
-.controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
-function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination, Authentication, UserService, ModalService, ResourceControlService) {
+.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination, Authentication, UserService, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');
@@ -8,7 +8,17 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagina
   $scope.sortReverse = false;
 
   function removeServiceResourceControl(service) {
-    ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id)
+    volumeResourceControlQueries = [];
+    angular.forEach(service.Mounts, function (mount) {
+      if (mount.Type === 'volume') {
+        volumeResourceControlQueries.push(ResourceControlService.removeVolumeResourceControl(service.Metadata.ResourceControl.OwnerId, mount.Source));
+      }
+    });
+
+    $q.all(volumeResourceControlQueries)
+    .then(function success() {
+      return ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id);
+    })
     .then(function success() {
       delete service.Metadata.ResourceControl;
       Messages.send('Ownership changed to public', service.Id);
@@ -19,7 +29,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagina
   }
 
   $scope.switchOwnership = function(volume) {
-    ModalService.confirmOwnershipChange(function (confirmed) {
+    ModalService.confirmServiceOwnershipChange(function (confirmed) {
       if(!confirmed) { return; }
       removeServiceResourceControl(volume);
     });
