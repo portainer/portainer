@@ -89,7 +89,7 @@
                     Private
                   </span>
                   <span ng-if="service.Metadata.ResourceControl.OwnerId !== user.ID">
-                    Private (owner: {{ service.Owner }})
+                    Private <span ng-if="service.Owner">(owner: {{ service.Owner }})</span>
                   </span>
                   <a ng-click="switchOwnership(service)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
                 </td>
