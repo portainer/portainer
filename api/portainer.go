@@ -76,13 +76,18 @@ type (
 
 	// ResourceControl represent a reference to a Docker resource with specific controls
 	ResourceControl struct {
-		OwnerID    UserID `json:"OwnerId"`
-		ResourceID string `json:"ResourceId"`
+		OwnerID     UserID              `json:"OwnerId"`
+		ResourceID  string              `json:"ResourceId"`
+		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
 	// ResourceControlType represents a type of resource control.
 	// Can be one of: container, service or volume.
 	ResourceControlType int
+
+	// ResourceAccessLevel represents the level of control associated to a resource for a specific owner.
+	// Can be one of: full, restricted, limited.
+	ResourceAccessLevel int
 
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file.
@@ -177,10 +182,16 @@ const (
 
 const (
 	_ ResourceControlType = iota
-	// ContainerResourceControl represent a resource control for a container
+	// ContainerResourceControl represents a resource control for a container
 	ContainerResourceControl
-	// ServiceResourceControl represent a resource control for a service
+	// ServiceResourceControl represents a resource control for a service
 	ServiceResourceControl
-	// VolumeResourceControl represent a resource control for a volume
+	// VolumeResourceControl represents a resource control for a volume
 	VolumeResourceControl
+)
+
+const (
+	_ ResourceAccessLevel = iota
+	// RestrictedResourceAccessLevel represents a restricted access level on a resource (private ownership)
+	RestrictedResourceAccessLevel
 )

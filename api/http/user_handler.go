@@ -416,8 +416,9 @@ func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *htt
 	}
 
 	resource := portainer.ResourceControl{
-		OwnerID:    portainer.UserID(uid),
-		ResourceID: req.ResourceID,
+		OwnerID:     portainer.UserID(uid),
+		ResourceID:  req.ResourceID,
+		AccessLevel: portainer.RestrictedResourceAccessLevel,
 	}
 
 	err = handler.ResourceControlService.CreateResourceControl(req.ResourceID, &resource, rcType)
