@@ -105,7 +105,8 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, Container
   function filterNetworksBasedOnProvider(networks) {
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     if (endpointProvider === 'DOCKER_SWARM' || endpointProvider === 'DOCKER_SWARM_MODE') {
-      networks = NetworkService.filterGlobalNetworks(networks);
+      if (endpointProvider === 'DOCKER_SWARM') networks = NetworkService.filterGlobalNetworks(networks);
+      else networks = NetworkService.filterSwarmModeAttachableNetworks(networks);
       $scope.globalNetworkCount = networks.length;
       NetworkService.addPredefinedLocalNetworks(networks);
     }
