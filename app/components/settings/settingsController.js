@@ -1,6 +1,6 @@
 angular.module('settings', [])
-.controller('SettingsController', ['$scope', '$state', '$sanitize', 'Users', 'Messages',
-function ($scope, $state, $sanitize, Users, Messages) {
+.controller('SettingsController', ['$scope', '$state', '$sanitize', 'Authentication', 'UserService', 'Messages',
+function ($scope, $state, $sanitize, Authentication, UserService, Messages) {
   $scope.formValues = {
     currentPassword: '',
     newPassword: '',
@@ -9,22 +9,21 @@ function ($scope, $state, $sanitize, Users, Messages) {
 
   $scope.updatePassword = function() {
     $scope.invalidPassword = false;
-    $scope.error = false;
+    var userID = Authentication.getUserDetails().ID;
     var currentPassword = $sanitize($scope.formValues.currentPassword);
-    Users.checkPassword({ username: $scope.username, password: currentPassword }, function (d) {
-      if (d.valid) {
-        var newPassword = $sanitize($scope.formValues.newPassword);
-        Users.update({ username: $scope.username, password: newPassword }, function (d) {
-          Messages.send("Success", "Password successfully updated");
-          $state.reload();
-        }, function (e) {
-          Messages.error("Failure", e, "Unable to update password");
-        });
-      } else {
+    var newPassword = $sanitize($scope.formValues.newPassword);
+
+    UserService.updateUserPassword(userID, currentPassword, newPassword)
+    .then(function success() {
+      Messages.send("Success", "Password successfully updated");
+      $state.reload();
+    })
+    .catch(function error(err) {
+      if (err.invalidPassword) {
         $scope.invalidPassword = true;
+      } else {
+        Messages.error("Failure", err, err.msg);
       }
-    }, function (e) {
-      Messages.error("Failure", e, "Unable to check password validity");
     });
   };
 }]);

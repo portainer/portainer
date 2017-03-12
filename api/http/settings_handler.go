@@ -13,19 +13,19 @@ import (
 // SettingsHandler represents an HTTP API handler for managing settings.
 type SettingsHandler struct {
 	*mux.Router
-	Logger            *log.Logger
-	middleWareService *middleWareService
-	settings          *portainer.Settings
+	Logger   *log.Logger
+	settings *portainer.Settings
 }
 
 // NewSettingsHandler returns a new instance of SettingsHandler.
-func NewSettingsHandler(middleWareService *middleWareService) *SettingsHandler {
+func NewSettingsHandler(mw *middleWareService) *SettingsHandler {
 	h := &SettingsHandler{
-		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
-		middleWareService: middleWareService,
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.HandleFunc("/settings", h.handleGetSettings)
+	h.Handle("/settings",
+		mw.public(http.HandlerFunc(h.handleGetSettings)))
+
 	return h
 }
 

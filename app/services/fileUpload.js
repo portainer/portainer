@@ -19,15 +19,15 @@ angular.module('portainer.services')
       var deferred = $q.defer();
       var queue = [];
 
-      if (TLSCAFile !== null) {
+      if (TLSCAFile) {
         var uploadTLSCA = uploadFile('api/upload/tls/' + endpointID + '/ca', TLSCAFile);
         queue.push(uploadTLSCA);
       }
-      if (TLSCertFile !== null) {
+      if (TLSCertFile) {
         var uploadTLSCert = uploadFile('api/upload/tls/' + endpointID + '/cert', TLSCertFile);
         queue.push(uploadTLSCert);
       }
-      if (TLSKeyFile !== null) {
+      if (TLSKeyFile) {
         var uploadTLSKey = uploadFile('api/upload/tls/' + endpointID + '/key', TLSKeyFile);
         queue.push(uploadTLSKey);
       }

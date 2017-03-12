@@ -1,11 +1,39 @@
 angular.module('services', [])
-.controller('ServicesController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination',
-function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination) {
+.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination, Authentication, UserService, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
+
+  function removeServiceResourceControl(service) {
+    volumeResourceControlQueries = [];
+    angular.forEach(service.Mounts, function (mount) {
+      if (mount.Type === 'volume') {
+        volumeResourceControlQueries.push(ResourceControlService.removeVolumeResourceControl(service.Metadata.ResourceControl.OwnerId, mount.Source));
+      }
+    });
+
+    $q.all(volumeResourceControlQueries)
+    .then(function success() {
+      return ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id);
+    })
+    .then(function success() {
+      delete service.Metadata.ResourceControl;
+      Messages.send('Ownership changed to public', service.Id);
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to change service ownership");
+    });
+  }
+
+  $scope.switchOwnership = function(volume) {
+    ModalService.confirmServiceOwnershipChange(function (confirmed) {
+      if(!confirmed) { return; }
+      removeServiceResourceControl(volume);
+    });
+  };
 
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('services', $scope.state.pagination_count);
@@ -57,9 +85,21 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagina
             $('#loadServicesSpinner').hide();
             Messages.error("Unable to remove service", {}, d[0].message);
           } else {
-            Messages.send("Service deleted", service.Id);
-            var index = $scope.services.indexOf(service);
-            $scope.services.splice(index, 1);
+            if (service.Metadata && service.Metadata.ResourceControl) {
+              ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id)
+              .then(function success() {
+                Messages.send("Service deleted", service.Id);
+                var index = $scope.services.indexOf(service);
+                $scope.services.splice(index, 1);
+              })
+              .catch(function error(err) {
+                Messages.error("Failure", err, "Unable to remove service ownership");
+              });
+            } else {
+              Messages.send("Service deleted", service.Id);
+              var index = $scope.services.indexOf(service);
+              $scope.services.splice(index, 1);
+            }
           }
           complete();
         }, function (e) {
@@ -70,12 +110,42 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagina
     });
   };
 
+  function mapUsersToServices(users) {
+    angular.forEach($scope.services, function (service) {
+      if (service.Metadata) {
+        var serviceRC = service.Metadata.ResourceControl;
+        if (serviceRC && serviceRC.OwnerId != $scope.user.ID) {
+          angular.forEach(users, function (user) {
+            if (serviceRC.OwnerId === user.Id) {
+              service.Owner = user.Username;
+            }
+          });
+        }
+      }
+    });
+  }
+
   function fetchServices() {
     $('#loadServicesSpinner').show();
+    var userDetails = Authentication.getUserDetails();
+    $scope.user = userDetails;
+
     Service.query({}, function (d) {
       $scope.services = d.map(function (service) {
         return new ServiceViewModel(service);
       });
+      if (userDetails.role === 1) {
+        UserService.users()
+        .then(function success(data) {
+          mapUsersToServices(data);
+        })
+        .catch(function error(err) {
+          Messages.error("Failure", err, "Unable to retrieve users");
+        })
+        .finally(function final() {
+          $('#loadServicesSpinner').hide();
+        });
+      }
       $('#loadServicesSpinner').hide();
     }, function(e) {
       $('#loadServicesSpinner').hide();

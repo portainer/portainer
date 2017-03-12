@@ -84,6 +84,26 @@ a[ng-click]{
   color: #23ae89;
 }
 
+.tooltip.portainer-tooltip .tooltip-inner {
+  font-family: Montserrat;
+  background-color: #ffffff;
+  padding: .833em 1em;
+  color: #333333;
+  border: 1px solid #d4d4d5;
+  border-radius: .14285714rem;
+  box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.15);
+}
+
+.tooltip.portainer-tooltip .tooltip-arrow {
+  display: none;
+}
+
+.fa.tooltip-icon {
+  margin-left: 5px;
+  font-size: 1.3em;
+  color: #337ab7;
+}
+
 .fa.red-icon {
   color: #ae2323;
 }
@@ -271,4 +291,41 @@ ul.sidebar .sidebar-list a.active {
   text-indent: 22px;
   border-left: 3px solid #fff;
   background: #2d3e63;
+}
+
+@media (min-width: 768px) {
+    .pull-sm-left {
+        float: left !important;
+    }
+    .pull-sm-right {
+        float: right !important;
+    }
+    .pull-sm-none {
+        float: none !important;
+    }
+}
+@media (min-width: 992px) {
+    .pull-md-left {
+        float: left !important;
+    }
+    .pull-md-right {
+        float: right !important;
+    }
+    .pull-md-none {
+        float: none !important;
+    }
+}
+@media (min-width: 1200px) {
+    .pull-lg-left {
+        float: left !important;
+    }
+    .pull-lg-right {
+        float: right !important;
+    }
+    .pull-lg-none {
+        float: none !important;
+    }
+}
+.pull-none {
+    float: none !important;
 }
