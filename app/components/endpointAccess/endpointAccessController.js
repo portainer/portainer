@@ -39,7 +39,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     angular.forEach($scope.users, function (user) {
       authorizedUserIDs.push(user.Id);
     });
-    EndpointService.updateEndpoint($stateParams.id, {authorizedUsers: authorizedUserIDs})
+    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedUserIDs)
     .then(function success(data) {
       $scope.authorizedUsers = $scope.authorizedUsers.concat($scope.users);
       $scope.users = [];
@@ -51,7 +51,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
   };
 
   $scope.unauthorizeAllUsers = function() {
-    EndpointService.updateEndpoint($stateParams.id, {authorizedUsers: []})
+    EndpointService.updateAuthorizedUsers($stateParams.id, [])
     .then(function success(data) {
       $scope.users = $scope.users.concat($scope.authorizedUsers);
       $scope.authorizedUsers = [];
@@ -68,7 +68,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
       authorizedUserIDs.push(u.Id);
     });
     authorizedUserIDs.push(user.Id);
-    EndpointService.updateEndpoint($stateParams.id, {authorizedUsers: authorizedUserIDs})
+    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedUserIDs)
     .then(function success(data) {
       removeUserFromArray(user.Id, $scope.users);
       $scope.authorizedUsers.push(user);
@@ -87,7 +87,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     }).map(function (u) {
       return u.Id;
     });
-    EndpointService.updateEndpoint($stateParams.id, {authorizedUsers: authorizedUserIDs})
+    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedUserIDs)
     .then(function success(data) {
       removeUserFromArray(user.Id, $scope.authorizedUsers);
       $scope.users.push(user);

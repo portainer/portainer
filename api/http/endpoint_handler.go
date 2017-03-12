@@ -43,6 +43,8 @@ func NewEndpointHandler(mw *middleWareService) *EndpointHandler {
 		mw.administrator(http.HandlerFunc(h.handleGetEndpoint))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
 		mw.administrator(http.HandlerFunc(h.handlePutEndpoint))).Methods(http.MethodPut)
+	h.Handle("/endpoints/{id}/access",
+		mw.administrator(http.HandlerFunc(h.handlePutEndpointAccess))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}",
 		mw.administrator(http.HandlerFunc(h.handleDeleteEndpoint))).Methods(http.MethodDelete)
 
@@ -219,6 +221,55 @@ func (handler *EndpointHandler) handleGetEndpoint(w http.ResponseWriter, r *http
 // 	}
 // }
 
+// handlePutEndpointAccess handles PUT requests on /endpoints/:id/access
+func (handler *EndpointHandler) handlePutEndpointAccess(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	endpointID, err := strconv.Atoi(id)
+	if err != nil {
+		Error(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	var req putEndpointAccessRequest
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = govalidator.ValidateStruct(req)
+	if err != nil {
+		Error(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrEndpointNotFound {
+		Error(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	authorizedUserIDs := []portainer.UserID{}
+	for _, value := range req.AuthorizedUsers {
+		authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
+	}
+	endpoint.AuthorizedUsers = authorizedUserIDs
+
+	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+}
+
+type putEndpointAccessRequest struct {
+	AuthorizedUsers []int `valid:"required"`
+}
+
 // handlePutEndpoint handles PUT requests on /endpoints/:id
 func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http.Request) {
 	if !handler.authorizeEndpointManagement {
@@ -264,13 +315,13 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		endpoint.URL = req.URL
 	}
 
-	if req.AuthorizedUsers != nil {
-		authorizedUserIDs := []portainer.UserID{}
-		for _, value := range req.AuthorizedUsers {
-			authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
-		}
-		endpoint.AuthorizedUsers = authorizedUserIDs
-	}
+	// if req.AuthorizedUsers != nil {
+	// 	authorizedUserIDs := []portainer.UserID{}
+	// 	for _, value := range req.AuthorizedUsers {
+	// 		authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
+	// 	}
+	// 	endpoint.AuthorizedUsers = authorizedUserIDs
+	// }
 
 	if req.TLS {
 		endpoint.TLS = true
@@ -300,10 +351,9 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 }
 
 type putEndpointsRequest struct {
-	Name            string `valid:"-"`
-	URL             string `valid:"-"`
-	TLS             bool   `valid:"-"`
-	AuthorizedUsers []int  `valid:"-"`
+	Name string `valid:"-"`
+	URL  string `valid:"-"`
+	TLS  bool   `valid:"-"`
 }
 
 // handleDeleteEndpoint handles DELETE requests on /endpoints/:id

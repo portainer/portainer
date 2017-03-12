@@ -12,7 +12,7 @@ angular.module('portainer.services')
   };
 
   service.updateAuthorizedUsers = function(id, authorizedUserIDs) {
-    return Endpoints.update({id: id}, {authorizedUsers: authorizedUserIDs}).$promise;
+    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs}).$promise;
   };
 
   service.updateEndpoint = function(id, endpointParams) {
