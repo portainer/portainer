@@ -1,6 +1,6 @@
 angular.module('services', [])
-.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination, Authentication, UserService, ModalService, ResourceControlService) {
+.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination', 'Task', 'Node', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination, Task, Node, Authentication, UserService, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');
@@ -127,30 +127,41 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
 
   function fetchServices() {
     $('#loadServicesSpinner').show();
+
     var userDetails = Authentication.getUserDetails();
     $scope.user = userDetails;
 
-    Service.query({}, function (d) {
-      $scope.services = d.map(function (service) {
-        return new ServiceViewModel(service);
+    $q.all({
+      services: Service.query({}).$promise,
+      tasks: Task.query({filters: {'desired-state': ['running']}}).$promise,
+      nodes: Node.query({}).$promise,
+    })
+    .then(function success(data) {
+      $scope.services = data.services.map(function (service) {
+        var serviceTasks = data.tasks.filter(function (task) {
+          return task.ServiceID === service.ID;
+        });
+        var taskNodes = data.nodes.filter(function (node) {
+          return node.Spec.Availability === 'active' && node.Status.State === 'ready';
+        });
+        return new ServiceViewModel(service, serviceTasks, taskNodes);
       });
       if (userDetails.role === 1) {
         UserService.users()
         .then(function success(data) {
           mapUsersToServices(data);
         })
-        .catch(function error(err) {
-          Messages.error("Failure", err, "Unable to retrieve users");
-        })
         .finally(function final() {
           $('#loadServicesSpinner').hide();
         });
       }
-      $('#loadServicesSpinner').hide();
-    }, function(e) {
-      $('#loadServicesSpinner').hide();
-      Messages.error("Failure", e, "Unable to retrieve services");
+    })
+    .catch(function error(err) {
       $scope.services = [];
+      Messages.error("Failure", err, "Unable to retrieve services");
+    })
+    .finally(function final() {
+      $('#loadServicesSpinner').hide();
     });
   }
 
