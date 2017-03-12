@@ -37,6 +37,7 @@ angular.module('portainer.services')
   service.createContainerConfiguration = function(template, containerName, network, containerMapping) {
     var configuration = TemplateHelper.getDefaultContainerConfiguration();
     configuration.HostConfig.NetworkMode = network.Name;
+    configuration.HostConfig.Privileged = template.Privileged;
     configuration.name = containerName;
     configuration.Image = template.Image;
     configuration.Env = TemplateHelper.EnvToStringArray(template.Env, containerMapping);

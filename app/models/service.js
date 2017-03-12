@@ -23,6 +23,10 @@ function ServiceViewModel(data, runningTasks, nodes) {
   if (data.Spec.TaskTemplate.ContainerSpec.Env) {
     this.Env = data.Spec.TaskTemplate.ContainerSpec.Env;
   }
+  this.Mounts = [];
+  if (data.Spec.TaskTemplate.ContainerSpec.Mounts) {
+    this.Mounts = data.Spec.TaskTemplate.ContainerSpec.Mounts;
+  }
   if (data.Endpoint.Ports) {
     this.Ports = data.Endpoint.Ports;
   }
@@ -39,4 +43,13 @@ function ServiceViewModel(data, runningTasks, nodes) {
   this.Checked = false;
   this.Scale = false;
   this.EditName = false;
+
+  if (data.Portainer) {
+    this.Metadata = {};
+    if (data.Portainer.ResourceControl) {
+      this.Metadata.ResourceControl = {
+        OwnerId: data.Portainer.ResourceControl.OwnerId
+      };
+    }
+  }
 }

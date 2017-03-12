@@ -27,6 +27,16 @@ func UnmarshalEndpoint(data []byte, endpoint *portainer.Endpoint) error {
 	return json.Unmarshal(data, endpoint)
 }
 
+// MarshalResourceControl encodes a resource control object to binary format.
+func MarshalResourceControl(rc *portainer.ResourceControl) ([]byte, error) {
+	return json.Marshal(rc)
+}
+
+// UnmarshalResourceControl decodes a resource control object from a binary data.
+func UnmarshalResourceControl(data []byte, rc *portainer.ResourceControl) error {
+	return json.Unmarshal(data, rc)
+}
+
 // Itob returns an 8-byte big endian representation of v.
 // This function is typically used for encoding integer IDs to byte slices
 // so that they can be used as BoltDB keys.
