@@ -12,10 +12,6 @@ type EndpointService struct {
 	store *Store
 }
 
-const (
-	activeEndpointID = 0
-)
-
 // Endpoint returns an endpoint by ID.
 func (service *EndpointService) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	var data []byte
@@ -138,62 +134,6 @@ func (service *EndpointService) DeleteEndpoint(ID portainer.EndpointID) error {
 	})
 }
 
-// GetActive returns the active endpoint.
-func (service *EndpointService) GetActive() (*portainer.Endpoint, error) {
-	var data []byte
-	err := service.store.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(activeEndpointBucketName))
-		value := bucket.Get(internal.Itob(activeEndpointID))
-		if value == nil {
-			return portainer.ErrEndpointNotFound
-		}
-
-		data = make([]byte, len(value))
-		copy(data, value)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var endpoint portainer.Endpoint
-	err = internal.UnmarshalEndpoint(data, &endpoint)
-	if err != nil {
-		return nil, err
-	}
-	return &endpoint, nil
-}
-
-// SetActive saves an endpoint as active.
-func (service *EndpointService) SetActive(endpoint *portainer.Endpoint) error {
-	return service.store.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(activeEndpointBucketName))
-
-		data, err := internal.MarshalEndpoint(endpoint)
-		if err != nil {
-			return err
-		}
-
-		err = bucket.Put(internal.Itob(activeEndpointID), data)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-}
-
-// DeleteActive deletes the active endpoint.
-func (service *EndpointService) DeleteActive() error {
-	return service.store.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(activeEndpointBucketName))
-		err := bucket.Delete(internal.Itob(activeEndpointID))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-}
-
 func marshalAndStoreEndpoint(endpoint *portainer.Endpoint, bucket *bolt.Bucket) error {
 	data, err := internal.MarshalEndpoint(endpoint)
 	if err != nil {
@@ -210,6 +150,5 @@ func marshalAndStoreEndpoint(endpoint *portainer.Endpoint, bucket *bolt.Bucket) 
 func storeNewEndpoint(endpoint *portainer.Endpoint, bucket *bolt.Bucket) error {
 	id, _ := bucket.NextSequence()
 	endpoint.ID = portainer.EndpointID(id)
-
 	return marshalAndStoreEndpoint(endpoint, bucket)
 }

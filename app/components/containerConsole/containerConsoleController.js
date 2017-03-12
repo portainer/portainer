@@ -1,6 +1,6 @@
 angular.module('containerConsole', [])
-.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Settings', 'Container', 'Image', 'Exec', '$timeout', 'Messages',
-function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, Messages) {
+.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Settings', 'Container', 'Image', 'Exec', '$timeout', 'EndpointProvider', 'Messages',
+function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, EndpointProvider, Messages) {
   $scope.state = {};
   $scope.state.loaded = false;
   $scope.state.connected = false;
@@ -55,7 +55,7 @@ function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, Mess
       } else {
         var execId = d.Id;
         resizeTTY(execId, termHeight, termWidth);
-        var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId;
+        var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
         if (url.indexOf('https') > -1) {
           url = url.replace('https://', 'wss://');
         } else {

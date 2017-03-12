@@ -66,7 +66,10 @@ func endpointExists(endpoint *portainer.Endpoint, endpoints []portainer.Endpoint
 
 func mergeEndpointIfRequired(original, updated *portainer.Endpoint) *portainer.Endpoint {
 	var endpoint *portainer.Endpoint
-	if original.URL != updated.URL || original.TLS != updated.TLS {
+	if original.URL != updated.URL || original.TLS != updated.TLS ||
+		(updated.TLS && original.TLSCACertPath != updated.TLSCACertPath) ||
+		(updated.TLS && original.TLSCertPath != updated.TLSCertPath) ||
+		(updated.TLS && original.TLSKeyPath != updated.TLSKeyPath) {
 		endpoint = original
 		endpoint.URL = updated.URL
 		if updated.TLS {

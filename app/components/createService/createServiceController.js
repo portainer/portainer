@@ -1,8 +1,11 @@
+// @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
+// See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$scope', '$state', 'Service', 'Volume', 'Network', 'ImageHelper', 'Messages',
-function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
+.controller('CreateServiceController', ['$scope', '$state', 'Service', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Messages',
+function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication, ResourceControlService, Messages) {
 
   $scope.formValues = {
+    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     Name: '',
     Image: '',
     Registry: '',
@@ -205,9 +208,22 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Messages) {
 
   function createNewService(config) {
     Service.create(config, function (d) {
-      $('#createServiceSpinner').hide();
-      Messages.send('Service created', d.ID);
-      $state.go('services', {}, {reload: true});
+      if ($scope.formValues.Ownership === 'private') {
+        ResourceControlService.setServiceResourceControl(Authentication.getUserDetails().ID, d.ID)
+        .then(function success() {
+          $('#createServiceSpinner').hide();
+          Messages.send('Service created', d.ID);
+          $state.go('services', {}, {reload: true});
+        })
+        .catch(function error(err) {
+          $('#createContainerSpinner').hide();
+          Messages.error("Failure", err, 'Unable to apply resource control on service');
+        });
+      } else {
+        $('#createServiceSpinner').hide();
+        Messages.send('Service created', d.ID);
+        $state.go('services', {}, {reload: true});
+      }
     }, function (e) {
       $('#createServiceSpinner').hide();
       Messages.error("Failure", e, 'Unable to create service');

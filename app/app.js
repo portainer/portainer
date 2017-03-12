@@ -30,6 +30,7 @@ angular.module('portainer', [
   'createVolume',
   'docker',
   'endpoint',
+  'endpointAccess',
   'endpointInit',
   'endpoints',
   'events',
@@ -47,6 +48,8 @@ angular.module('portainer', [
   'swarm',
   'task',
   'templates',
+  'user',
+  'users',
   'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider) {
     'use strict';
@@ -292,6 +295,19 @@ angular.module('portainer', [
         }
       }
     })
+    .state('endpoint.access', {
+      url: '^/endpoints/:id/access',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/endpointAccess/endpointAccess.html',
+          controller: 'EndpointAccessController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('endpointInit', {
       url: '/init/endpoint',
       views: {
@@ -457,6 +473,32 @@ angular.module('portainer', [
         }
       }
     })
+    .state('users', {
+      url: '/users/',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/users/users.html',
+          controller: 'UsersController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('user', {
+      url: '^/users/:id',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/user/user.html',
+          controller: 'UserController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('swarm', {
       url: '/swarm/',
       views: {
@@ -488,7 +530,8 @@ angular.module('portainer', [
       };
     });
   }])
-  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'Messages', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, Messages, Analytics) {
+  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Messages', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Messages, Analytics) {
+    EndpointProvider.initialize();
     StateManager.initialize().then(function success(state) {
       if (state.application.authentication) {
         authManager.checkAuthOnRefresh();

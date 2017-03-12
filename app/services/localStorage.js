@@ -2,6 +2,12 @@ angular.module('portainer.services')
 .factory('LocalStorage', ['localStorageService', function LocalStorageFactory(localStorageService) {
   'use strict';
   return {
+    storeEndpointID: function(id) {
+      localStorageService.set('ENDPOINT_ID', id);
+    },
+    getEndpointID: function() {
+      return localStorageService.get('ENDPOINT_ID');
+    },
     storeEndpointState: function(state) {
       localStorageService.set('ENDPOINT_STATE', state);
     },
