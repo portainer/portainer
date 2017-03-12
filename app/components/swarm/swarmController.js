@@ -75,7 +75,7 @@ function ($scope, Info, Version, Node, Pagination) {
     var node = {};
     node.name = info[offset][0];
     node.ip = info[offset][1];
-    node.id = info[offset + 1][1];
+    node.Id = info[offset + 1][1];
     node.status = info[offset + 2][1];
     node.containers = info[offset + 3][1];
     node.cpu = info[offset + 4][1].split('/')[1];
