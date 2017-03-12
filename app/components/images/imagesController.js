@@ -1,11 +1,11 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'ImageHelper', 'Messages', 'Settings',
-function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
+.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'ImageHelper', 'Messages', 'Pagination', 'ModalService',
+function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination, ModalService) {
   $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('images');
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
   $scope.state.selectedItemCount = 0;
-  $scope.pagination_count = Settings.pagination_count;
 
   $scope.config = {
     Image: '',
@@ -15,6 +15,19 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('images', $scope.state.pagination_count);
+  };
+
+  $scope.selectItems = function (allSelected) {
+    angular.forEach($scope.state.filteredImages, function (image) {
+      if (image.Checked !== allSelected) {
+        image.Checked = allSelected;
+        $scope.selectItem(image);
+      }
+    });
   };
 
   $scope.selectItem = function (item) {
@@ -46,7 +59,15 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
     });
   };
 
-  $scope.removeAction = function () {
+  $scope.confirmRemovalAction = function (force) {
+    ModalService.confirmImageForceRemoval(function (confirmed) {
+      if(!confirmed) { return; }
+      $scope.removeAction(force);
+    });
+  };
+
+  $scope.removeAction = function (force) {
+    force = !!force;
     $('#loadImagesSpinner').show();
     var counter = 0;
     var complete = function () {
@@ -58,7 +79,7 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
     angular.forEach($scope.images, function (i) {
       if (i.Checked) {
         counter = counter + 1;
-        Image.remove({id: i.Id}, function (d) {
+        Image.remove({id: i.Id, force: force}, function (d) {
           if (d[0].message) {
             $('#loadImagesSpinner').hide();
             Messages.error("Unable to remove image", {}, d[0].message);

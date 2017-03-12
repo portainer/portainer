@@ -3,6 +3,7 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="containers" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
+    <i id="loadContainersSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Containers</rd-header-content>
 </rd-header>
@@ -11,7 +12,14 @@
   <rd-widget>
     <rd-widget-header icon="fa-server" title="Containers">
       <div class="pull-right">
-        <i id="loadContainersSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+        Items per page:
+        <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+          <option value="0">All</option>
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
       </div>
     </rd-widget-header>
     <rd-widget-taskbar classes="col-lg-12">
@@ -37,7 +45,9 @@
         <table class="table table-hover">
           <thead>
             <tr>
-              <th></th>
+              <th>
+                <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+              </th>
               <th>
                 <a ui-sref="containers" ng-click="order('Status')">
                   State
@@ -66,7 +76,7 @@
                   <span ng-show="sortType == 'IP' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
-              <th ng-if="endpointMode.provider === 'DOCKER_SWARM'">
+              <th ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
                 <a ui-sref="containers" ng-click="order('Host')">
                   Host IP
                   <span ng-show="sortType == 'Host' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -75,34 +85,72 @@
               </th>
               <th>
                 <a ui-sref="containers" ng-click="order('Ports')">
-                  Exposed Ports
+                  Published Ports
                   <span ng-show="sortType == 'Ports' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th ng-if="applicationState.application.authentication">
+                <a ui-sref="containers" ng-click="order('Metadata.ResourceControl.OwnerId')">
+                  Ownership
+                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+            <tr dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><input type="checkbox" ng-model="container.Checked" ng-change="selectItem(container)"/></td>
               <td><span class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span></td>
-              <td ng-if="endpointMode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
-              <td ng-if="endpointMode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
+              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
+              <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
               <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
-              <td ng-if="endpointMode.provider === 'DOCKER_SWARM'">{{ container.hostIP }}</td>
+              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">{{ container.hostIP }}</td>
               <td>
                 <a ng-if="container.Ports.length > 0" ng-repeat="p in container.Ports" class="image-tag" ng-href="http://{{p.host}}:{{p.public}}" target="_blank">
                   <i class="fa fa-external-link" aria-hidden="true"></i> {{p.public}}:{{ p.private }}
                 </a>
                 <span ng-if="container.Ports.length == 0" >-</span>
               </td>
+              <td ng-if="applicationState.application.authentication">
+                <span ng-if="!container.Metadata.ResourceControl">
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                  <span ng-if="container.Labels['com.docker.swarm.service.id']">
+                    Public service
+                  </span>
+                  <span ng-if="!container.Labels['com.docker.swarm.service.id']">
+                    Public
+                  </span>
+                </span>
+                <span ng-if="container.Metadata.ResourceControl.OwnerId === user.ID">
+                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                  <span ng-if="container.Labels['com.docker.swarm.service.id']">
+                    Private service
+                  </span>
+                  <span ng-if="!container.Labels['com.docker.swarm.service.id']">
+                    Private
+                    <a ng-click="switchOwnership(container)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
+                  </span>
+                </span>
+                <span ng-if="container.Metadata.ResourceControl && container.Metadata.ResourceControl.OwnerId !== user.ID">
+                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                  <span ng-if="container.Labels['com.docker.swarm.service.id']">
+                    Private service <span ng-if="container.Owner">(owner: {{ container.Owner }})</span>
+                  </span>
+                  <span ng-if="!container.Labels['com.docker.swarm.service.id']">
+                    Private <span ng-if="container.Owner">(owner: {{ container.Owner }})</span>
+                    <a ng-click="switchOwnership(container)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
+                  </span>
+                </span>
+              </td>
             </tr>
             <tr ng-if="!containers">
-              <td colspan="8" class="text-center text-muted">Loading...</td>
+              <td colspan="9" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="containers.length == 0">
-              <td colspan="8" class="text-center text-muted">No containers available.</td>
+              <td colspan="9" class="text-center text-muted">No containers available.</td>
             </tr>
           </tbody>
         </table>

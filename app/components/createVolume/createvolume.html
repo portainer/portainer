@@ -55,6 +55,26 @@
             <!-- !driver-options-input-list -->
           </div>
           <!-- !driver-options -->
+          <!-- ownership -->
+          <div class="form-group" ng-if="applicationState.application.authentication">
+            <div class="col-sm-12">
+              <label for="ownership" class="control-label text-left">
+                Ownership
+                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing public, everybody will be able to access it."></portainer-tooltip>
+              </label>
+              <div class="btn-group btn-group-sm" style="margin-left: 20px;">
+                <label class="btn btn-default" ng-model="formValues.Ownership" uib-btn-radio="'private'">
+                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                  Private
+                </label>
+                <label class="btn btn-default" ng-model="formValues.Ownership" uib-btn-radio="'public'">
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                  Public
+                </label>
+              </div>
+            </div>
+          </div>
+          <!-- !ownership -->
         </form>
       </rd-widget-body>
     </rd-widget>

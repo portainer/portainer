@@ -1,20 +1,67 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config',
-function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
+  function ($q, $scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService) {
   $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = Settings.displayAll;
   $scope.state.displayIP = false;
   $scope.sortType = 'State';
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
-  $scope.pagination_count = Settings.pagination_count;
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
   };
 
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('containers', $scope.state.pagination_count);
+  };
+
+  function removeContainerResourceControl(container) {
+    volumeResourceControlQueries = [];
+    angular.forEach(container.Mounts, function (volume) {
+      volumeResourceControlQueries.push(ResourceControlService.removeVolumeResourceControl(container.Metadata.ResourceControl.OwnerId, volume.Name));
+    });
+
+    $q.all(volumeResourceControlQueries)
+    .then(function success() {
+      return ResourceControlService.removeContainerResourceControl(container.Metadata.ResourceControl.OwnerId, container.Id);
+    })
+    .then(function success() {
+      delete container.Metadata.ResourceControl;
+      Messages.send('Ownership changed to public', container.Id);
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to change container ownership");
+    });
+  }
+
+  $scope.switchOwnership = function(container) {
+    ModalService.confirmContainerOwnershipChange(function (confirmed) {
+      if(!confirmed) { return; }
+      removeContainerResourceControl(container);
+    });
+  };
+
+  function mapUsersToContainers(users) {
+    angular.forEach($scope.containers, function (container) {
+      if (container.Metadata) {
+        var containerRC = container.Metadata.ResourceControl;
+        if (containerRC && containerRC.OwnerId != $scope.user.ID) {
+          angular.forEach(users, function (user) {
+            if (containerRC.OwnerId === user.Id) {
+              container.Owner = user.Username;
+            }
+          });
+        }
+      }
+    });
+  }
+
   var update = function (data) {
     $('#loadContainersSpinner').show();
+    var userDetails = Authentication.getUserDetails();
+    $scope.user = userDetails;
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
@@ -25,15 +72,32 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
         var model = new ContainerViewModel(container);
         model.Status = $filter('containerstatus')(model.Status);
 
+        EntityListService.rememberPreviousSelection($scope.containers, model, function onSelect(model){
+          $scope.selectItem(model);
+        });
+
         if (model.IP) {
           $scope.state.displayIP = true;
         }
-        if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
+        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
           model.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
         }
         return model;
       });
-      $('#loadContainersSpinner').hide();
+      if (userDetails.role === 1) {
+        UserService.users()
+        .then(function success(data) {
+          mapUsersToContainers(data);
+        })
+        .catch(function error(err) {
+          Messages.error("Failure", err, "Unable to retrieve users");
+        })
+        .finally(function final() {
+          $('#loadContainersSpinner').hide();
+        });
+      } else {
+        $('#loadContainersSpinner').hide();
+      }
     }, function (e) {
       $('#loadContainersSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve containers");
@@ -69,11 +133,34 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
               Messages.send("Error", d.message);
             }
             else {
-              Messages.send("Container " + msg, c.Id);
+              if (c.Metadata && c.Metadata.ResourceControl) {
+                ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, c.Id)
+                .then(function success() {
+                  Messages.send("Container " + msg, c.Id);
+                })
+                .catch(function error(err) {
+                  Messages.error("Failure", err, "Unable to remove container ownership");
+                });
+              } else {
+                Messages.send("Container " + msg, c.Id);
+              }
             }
             complete();
           }, function (e) {
             Messages.error("Failure", e, 'Unable to remove container');
+            complete();
+          });
+        }
+        else if (action === Container.pause) {
+          action({id: c.Id}, function (d) {
+            if (d.message) {
+              Messages.send("Container is already paused", c.Id);
+            } else {
+              Messages.send("Container " + msg, c.Id);
+            }
+            complete();
+          }, function (e) {
+            Messages.error("Failure", e, 'Unable to pause container');
             complete();
           });
         }
@@ -92,6 +179,15 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
     if (counter === 0) {
       $('#loadContainersSpinner').hide();
     }
+  };
+
+  $scope.selectItems = function (allSelected) {
+    angular.forEach($scope.state.filteredContainers, function (container) {
+      if (container.Checked !== allSelected) {
+        container.Checked = allSelected;
+        $scope.selectItem(container);
+      }
+    });
   };
 
   $scope.selectItem = function (item) {
@@ -152,7 +248,7 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
 
   Config.$promise.then(function (c) {
     $scope.containersToHideLabels = c.hiddenLabels;
-    if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
+    if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
       Info.get({}, function (d) {
         $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
         update({all: Settings.displayAll ? 1 : 0});

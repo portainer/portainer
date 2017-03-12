@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,21 +12,18 @@ import (
 // TemplatesHandler represents an HTTP API handler for managing templates.
 type TemplatesHandler struct {
 	*mux.Router
-	Logger            *log.Logger
-	middleWareService *middleWareService
-	templatesURL      string
+	Logger       *log.Logger
+	templatesURL string
 }
 
 // NewTemplatesHandler returns a new instance of TemplatesHandler.
-func NewTemplatesHandler(middleWareService *middleWareService) *TemplatesHandler {
+func NewTemplatesHandler(mw *middleWareService) *TemplatesHandler {
 	h := &TemplatesHandler{
-		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
-		middleWareService: middleWareService,
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.Handle("/templates", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleGetTemplates(w, r)
-	})))
+	h.Handle("/templates",
+		mw.authenticated(http.HandlerFunc(h.handleGetTemplates)))
 	return h
 }
 
@@ -40,15 +36,13 @@ func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *ht
 
 	resp, err := http.Get(handler.templatesURL)
 	if err != nil {
-		log.Print(err)
-		http.Error(w, fmt.Sprintf("Error making request to %s: %s", handler.templatesURL, err.Error()), http.StatusInternalServerError)
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Print(err)
-		http.Error(w, "Error reading body from templates URL", http.StatusInternalServerError)
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

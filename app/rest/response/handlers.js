@@ -56,7 +56,7 @@ function deleteImageHandler(data) {
     response.push({message: data});
   }
   // A JSON object is returned on failure (Docker = 1.12)
-  else if (!isJSONArray) {
+  else if (!isJSONArray(data)) {
     var json = angular.fromJson(data);
     response.push(json);
   }

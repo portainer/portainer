@@ -1,8 +1,6 @@
 package http
 
 import (
-	"github.com/portainer/portainer"
-
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
@@ -14,18 +12,19 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/portainer/portainer"
 	"golang.org/x/net/websocket"
 )
 
 // WebSocketHandler represents an HTTP API handler for proxying requests to a web socket.
 type WebSocketHandler struct {
 	*mux.Router
-	Logger            *log.Logger
-	middleWareService *middleWareService
-	endpoint          *portainer.Endpoint
+	Logger          *log.Logger
+	EndpointService portainer.EndpointService
 }
 
 // NewWebSocketHandler returns a new instance of WebSocketHandler.
@@ -41,34 +40,47 @@ func NewWebSocketHandler() *WebSocketHandler {
 func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
 	qry := ws.Request().URL.Query()
 	execID := qry.Get("id")
+	edpID := qry.Get("endpointId")
 
-	// Should not be managed here
-	endpoint, err := url.Parse(handler.endpoint.URL)
+	parsedID, err := strconv.Atoi(edpID)
 	if err != nil {
-		log.Fatalf("Unable to parse endpoint URL: %s", err)
+		log.Printf("Unable to parse endpoint ID: %s", err)
+		return
+	}
+
+	endpointID := portainer.EndpointID(parsedID)
+	endpoint, err := handler.EndpointService.Endpoint(endpointID)
+	if err != nil {
+		log.Printf("Unable to retrieve endpoint: %s", err)
+		return
+	}
+
+	endpointURL, err := url.Parse(endpoint.URL)
+	if err != nil {
+		log.Printf("Unable to parse endpoint URL: %s", err)
 		return
 	}
 
 	var host string
-	if endpoint.Scheme == "tcp" {
-		host = endpoint.Host
-	} else if endpoint.Scheme == "unix" {
-		host = endpoint.Path
+	if endpointURL.Scheme == "tcp" {
+		host = endpointURL.Host
+	} else if endpointURL.Scheme == "unix" {
+		host = endpointURL.Path
 	}
 
 	// Should not be managed here
 	var tlsConfig *tls.Config
-	if handler.endpoint.TLS {
-		tlsConfig, err = createTLSConfiguration(handler.endpoint.TLSCACertPath,
-			handler.endpoint.TLSCertPath,
-			handler.endpoint.TLSKeyPath)
+	if endpoint.TLS {
+		tlsConfig, err = createTLSConfiguration(endpoint.TLSCACertPath,
+			endpoint.TLSCertPath,
+			endpoint.TLSKeyPath)
 		if err != nil {
 			log.Fatalf("Unable to create TLS configuration: %s", err)
 			return
 		}
 	}
 
-	if err := hijack(host, endpoint.Scheme, "POST", "/exec/"+execID+"/start", tlsConfig, true, ws, ws, ws, nil, nil); err != nil {
+	if err := hijack(host, endpointURL.Scheme, "POST", "/exec/"+execID+"/start", tlsConfig, true, ws, ws, ws, nil, nil); err != nil {
 		log.Fatalf("error during hijack: %s", err)
 		return
 	}

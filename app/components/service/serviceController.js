@@ -1,19 +1,24 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Settings',
-function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Messages, Settings) {
+.controller('ServiceController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Pagination',
+function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Messages, Pagination) {
 
+  $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
   $scope.service = {};
   $scope.tasks = [];
   $scope.displayNode = false;
   $scope.sortType = 'Status';
   $scope.sortReverse = false;
-  $scope.pagination_count = Settings.pagination_count;
 
   var previousServiceValues = {};
 
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('service_tasks', $scope.state.pagination_count);
   };
 
   $scope.renameService = function renameService(service) {

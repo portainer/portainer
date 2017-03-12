@@ -3,6 +3,7 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="volumes" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
+    <i id="loadVolumesSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Volumes</rd-header-content>
 </rd-header>
@@ -11,7 +12,14 @@
   <rd-widget>
     <rd-widget-header icon="fa-cubes" title="Volumes">
       <div class="pull-right">
-        <i id="loadVolumesSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+        Items per page:
+        <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+          <option value="0">All</option>
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
       </div>
     </rd-widget-header>
     <rd-widget-taskbar classes="col-lg-12">
@@ -28,7 +36,9 @@
         <table class="table table-hover">
           <thead>
             <tr>
-              <th></th>
+              <th>
+                <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+              </th>
               <th>
                 <a ui-sref="volumes" ng-click="order('Name')">
                   Name
@@ -50,20 +60,48 @@
                   <span ng-show="sortType == 'Mountpoint' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th ng-if="applicationState.application.authentication">
+                <a ui-sref="volumes" ng-click="order('Metadata.ResourceControl.OwnerId')">
+                  Ownership
+                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+            <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
               <td>{{ volume.Name|truncate:50 }}</td>
               <td>{{ volume.Driver }}</td>
               <td>{{ volume.Mountpoint }}</td>
+              <td ng-if="applicationState.application.authentication">
+                <span ng-if="user.role === 1 && volume.Metadata.ResourceControl">
+                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                 <span ng-if="volume.Metadata.ResourceControl.OwnerId === user.ID">
+                   Private
+                 </span>
+                 <span ng-if="volume.Metadata.ResourceControl.OwnerId !== user.ID">
+                   Private <span ng-if="volume.Owner">(owner: {{ volume.Owner }})</span>
+                 </span>
+                 <a ng-click="switchOwnership(volume)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
+                </span>
+                <span ng-if="user.role !== 1 && volume.Metadata.ResourceControl.OwnerId === user.ID">
+                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                  Private
+                  <a ng-click="switchOwnership(volume)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
+                </span>
+                <span ng-if="!volume.Metadata.ResourceControl">
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                  Public
+                </span>
+              </td>
             </tr>
             <tr ng-if="!volumes">
-              <td colspan="4" class="text-center text-muted">Loading...</td>
+              <td colspan="6" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="volumes.length == 0">
-              <td colspan="4" class="text-center text-muted">No volumes available.</td>
+              <td colspan="6" class="text-center text-muted">No volumes available.</td>
             </tr>
           </tbody>
         </table>

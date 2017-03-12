@@ -1,14 +1,18 @@
+// @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
+// See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'Messages',
-function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, Messages) {
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Messages',
+function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Messages) {
 
   $scope.formValues = {
+    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     alwaysPull: true,
     Console: 'none',
     Volumes: [],
     Registry: '',
     NetworkContainer: '',
-    Labels: []
+    Labels: [],
+    ExtraHosts: []
   };
 
   $scope.imageConfig = {};
@@ -16,15 +20,18 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   $scope.config = {
     Image: '',
     Env: [],
+    Cmd: '',
     ExposedPorts: {},
     HostConfig: {
       RestartPolicy: {
         Name: 'no'
       },
       PortBindings: [],
+      PublishAllPorts: false,
       Binds: [],
       NetworkMode: 'bridge',
-      Privileged: false
+      Privileged: false,
+      ExtraHosts: []
     },
     Labels: {}
   };
@@ -61,6 +68,15 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     $scope.formValues.Labels.splice(index, 1);
   };
 
+  $scope.addExtraHost = function() {
+    $scope.formValues.ExtraHosts.push({ value: '' });
+  };
+
+  $scope.removeExtraHost = function(index) {
+    $scope.formValues.ExtraHosts.splice(index, 1);
+  };
+
+
   Config.$promise.then(function (c) {
     var containersToHideLabels = c.hiddenLabels;
 
@@ -72,7 +88,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
     Network.query({}, function (d) {
       var networks = d;
-      if ($scope.endpointMode.provider === 'DOCKER_SWARM' || $scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
+      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
         networks = d.filter(function (network) {
           if (network.Scope === 'global') {
             return network;
@@ -103,26 +119,40 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     });
   });
 
-  // TODO: centralize, already present in templatesController
+  function startContainer(containerID) {
+    Container.start({id: containerID}, {}, function (cd) {
+      if (cd.message) {
+        $('#createContainerSpinner').hide();
+        Messages.error('Error', {}, cd.message);
+      } else {
+        $('#createContainerSpinner').hide();
+        Messages.send('Container Started', containerID);
+        $state.go('containers', {}, {reload: true});
+      }
+    }, function (e) {
+      $('#createContainerSpinner').hide();
+      Messages.error("Failure", e, 'Unable to start container');
+    });
+  }
+
   function createContainer(config) {
     Container.create(config, function (d) {
       if (d.message) {
         $('#createContainerSpinner').hide();
         Messages.error('Error', {}, d.message);
       } else {
-        Container.start({id: d.Id}, {}, function (cd) {
-          if (cd.message) {
+        if ($scope.formValues.Ownership === 'private') {
+          ResourceControlService.setContainerResourceControl(Authentication.getUserDetails().ID, d.Id)
+          .then(function success() {
+            startContainer(d.Id);
+          })
+          .catch(function error(err) {
             $('#createContainerSpinner').hide();
-            Messages.error('Error', {}, cd.message);
-          } else {
-            $('#createContainerSpinner').hide();
-            Messages.send('Container Started', d.Id);
-            $state.go('containers', {}, {reload: true});
-          }
-        }, function (e) {
-          $('#createContainerSpinner').hide();
-          Messages.error("Failure", e, 'Unable to start container');
-        });
+            Messages.error("Failure", err, 'Unable to apply resource control on container');
+          });
+        } else {
+          startContainer(d.Id);
+        }
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
@@ -130,7 +160,6 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     });
   }
 
-  // TODO: centralize, already present in templatesController
   function pullImageAndCreateContainer(config) {
     Image.create($scope.imageConfig, function (data) {
       createContainer(config);
@@ -220,7 +249,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = $filter('trimcontainername')(container.Names[0]);
-      if ($scope.endpointMode.provider === 'DOCKER_SWARM') {
+      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
         containerName = $filter('swarmcontainername')(container);
       }
     }
@@ -229,6 +258,12 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       networkMode += ':' + containerName;
     }
     config.HostConfig.NetworkMode = networkMode;
+
+    $scope.formValues.ExtraHosts.forEach(function (v) {
+    if (v.value) {
+        config.HostConfig.ExtraHosts.push(v.value);
+      }
+    });
   }
 
   function prepareLabels(config) {
@@ -243,6 +278,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
+    config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
     prepareNetworkConfig(config);
     prepareImageConfig(config);
     preparePortBindings(config);

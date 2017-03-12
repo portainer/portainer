@@ -174,6 +174,23 @@
                 </table>
               </td>
             </tr>
+            <tr ng-if="container.HostConfig.RestartPolicy.Name !== 'no'">
+              <td>Restart policies</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr>
+                    <td class="col-md-3">Name</td>
+                    <td>{{ container.HostConfig.RestartPolicy.Name }}</td>
+                  </tr>
+                  <tr>
+                    <td class="col-md-3">MaximumRetryCount</td>
+                    <td>
+                      {{ container.HostConfig.RestartPolicy.MaximumRetryCount }}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
@@ -208,7 +225,18 @@
 <div class="row" ng-if="!(container.NetworkSettings.Networks | emptyobject)">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-sitemap" title="Connected networks"></rd-widget-header>
+      <rd-widget-header icon="fa-sitemap" title="Connected networks">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
@@ -219,7 +247,7 @@
             <th>Actions</th>
           </thead>
           <tbody>
-            <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: pagination_count">
+            <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: state.pagination_count">
               <td><a ui-sref="network({id: value.NetworkID})">{{ key }}</a></td>
               <td>{{ value.IPAddress || '-' }}</td>
               <td>{{ value.Gateway || '-' }}</td>

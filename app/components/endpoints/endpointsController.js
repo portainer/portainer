@@ -1,14 +1,14 @@
 angular.module('endpoints', [])
-.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'Settings', 'Messages',
-function ($scope, $state, EndpointService, Settings, Messages) {
+.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Messages', 'Pagination',
+function ($scope, $state, EndpointService, EndpointProvider, Messages, Pagination) {
   $scope.state = {
     error: '',
     uploadInProgress: false,
-    selectedItemCount: 0
+    selectedItemCount: 0,
+    pagination_count: Pagination.getPaginationCount('endpoints')
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
-  $scope.pagination_count = Settings.pagination_count;
 
   $scope.formValues = {
     Name: '',
@@ -22,6 +22,19 @@ function ($scope, $state, EndpointService, Settings, Messages) {
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('endpoints', $scope.state.pagination_count);
+  };
+
+  $scope.selectItems = function (allSelected) {
+    angular.forEach($scope.state.filteredEndpoints, function (endpoint) {
+      if (endpoint.Checked !== allSelected) {
+        endpoint.Checked = allSelected;
+        $scope.selectItem(endpoint);
+      }
+    });
   };
 
   $scope.selectItem = function (item) {
@@ -80,19 +93,17 @@ function ($scope, $state, EndpointService, Settings, Messages) {
 
   function fetchEndpoints() {
     $('#loadEndpointsSpinner').show();
-    EndpointService.endpoints().then(function success(data) {
+    EndpointService.endpoints()
+    .then(function success(data) {
       $scope.endpoints = data;
-      EndpointService.getActive().then(function success(data) {
-        $scope.activeEndpoint = data;
-        $('#loadEndpointsSpinner').hide();
-      }, function error(err) {
-        $('#loadEndpointsSpinner').hide();
-        Messages.error("Failure", err, "Unable to retrieve active endpoint");
-      });
-    }, function error(err) {
-      $('#loadEndpointsSpinner').hide();
+      $scope.activeEndpointID = EndpointProvider.endpointID();
+    })
+    .catch(function error(err) {
       Messages.error("Failure", err, "Unable to retrieve endpoints");
       $scope.endpoints = [];
+    })
+    .finally(function final() {
+      $('#loadEndpointsSpinner').hide();
     });
   }
 

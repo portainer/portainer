@@ -1,8 +1,9 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$scope', '$state', 'Volume', 'Messages',
-function ($scope, $state, Volume, Messages) {
+.controller('CreateVolumeController', ['$scope', '$state', 'Volume', 'ResourceControlService', 'Authentication', 'Messages',
+function ($scope, $state, Volume, ResourceControlService, Authentication, Messages) {
 
   $scope.formValues = {
+    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     DriverOptions: []
   };
 
@@ -25,9 +26,22 @@ function ($scope, $state, Volume, Messages) {
         $('#createVolumeSpinner').hide();
         Messages.error('Unable to create volume', {}, d.message);
       } else {
-        Messages.send("Volume created", d.Name);
-        $('#createVolumeSpinner').hide();
-        $state.go('volumes', {}, {reload: true});
+        if ($scope.formValues.Ownership === 'private') {
+          ResourceControlService.setVolumeResourceControl(Authentication.getUserDetails().ID, d.Name)
+          .then(function success() {
+            Messages.send("Volume created", d.Name);
+            $('#createVolumeSpinner').hide();
+            $state.go('volumes', {}, {reload: true});
+          })
+          .catch(function error(err) {
+            $('#createVolumeSpinner').hide();
+            Messages.error("Failure", err, 'Unable to apply resource control on volume');
+          });
+        } else {
+          Messages.send("Volume created", d.Name);
+          $('#createVolumeSpinner').hide();
+          $state.go('volumes', {}, {reload: true});
+        }
       }
     }, function (e) {
       $('#createVolumeSpinner').hide();

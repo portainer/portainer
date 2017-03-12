@@ -1,9 +1,12 @@
 package bolt
 
 import (
+	"log"
+	"os"
 	"time"
 
 	"github.com/boltdb/bolt"
+	"github.com/portainer/portainer"
 )
 
 // Store defines the implementation of portainer.DataStore using
@@ -13,29 +16,49 @@ type Store struct {
 	Path string
 
 	// Services
-	UserService     *UserService
-	EndpointService *EndpointService
+	UserService            *UserService
+	EndpointService        *EndpointService
+	ResourceControlService *ResourceControlService
+	VersionService         *VersionService
 
-	db *bolt.DB
+	db                    *bolt.DB
+	checkForDataMigration bool
 }
 
 const (
-	databaseFileName         = "portainer.db"
-	userBucketName           = "users"
-	endpointBucketName       = "endpoints"
-	activeEndpointBucketName = "activeEndpoint"
+	databaseFileName                   = "portainer.db"
+	versionBucketName                  = "version"
+	userBucketName                     = "users"
+	endpointBucketName                 = "endpoints"
+	containerResourceControlBucketName = "containerResourceControl"
+	serviceResourceControlBucketName   = "serviceResourceControl"
+	volumeResourceControlBucketName    = "volumeResourceControl"
 )
 
 // NewStore initializes a new Store and the associated services
-func NewStore(storePath string) *Store {
+func NewStore(storePath string) (*Store, error) {
 	store := &Store{
-		Path:            storePath,
-		UserService:     &UserService{},
-		EndpointService: &EndpointService{},
+		Path:                   storePath,
+		UserService:            &UserService{},
+		EndpointService:        &EndpointService{},
+		ResourceControlService: &ResourceControlService{},
+		VersionService:         &VersionService{},
 	}
 	store.UserService.store = store
 	store.EndpointService.store = store
-	return store
+	store.ResourceControlService.store = store
+	store.VersionService.store = store
+
+	_, err := os.Stat(storePath)
+	if err != nil && os.IsNotExist(err) {
+		store.checkForDataMigration = false
+	} else if err != nil {
+		return nil, err
+	} else {
+		store.checkForDataMigration = true
+	}
+
+	return store, nil
 }
 
 // Open opens and initializes the BoltDB database.
@@ -47,7 +70,11 @@ func (store *Store) Open() error {
 	}
 	store.db = db
 	return db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(userBucketName))
+		_, err := tx.CreateBucketIfNotExists([]byte(versionBucketName))
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(userBucketName))
 		if err != nil {
 			return err
 		}
@@ -55,7 +82,15 @@ func (store *Store) Open() error {
 		if err != nil {
 			return err
 		}
-		_, err = tx.CreateBucketIfNotExists([]byte(activeEndpointBucketName))
+		_, err = tx.CreateBucketIfNotExists([]byte(containerResourceControlBucketName))
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(serviceResourceControlBucketName))
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(volumeResourceControlBucketName))
 		if err != nil {
 			return err
 		}
@@ -68,5 +103,34 @@ func (store *Store) Close() error {
 	if store.db != nil {
 		return store.db.Close()
 	}
+	return nil
+}
+
+// MigrateData automatically migrate the data based on the DBVersion.
+func (store *Store) MigrateData() error {
+	if !store.checkForDataMigration {
+		err := store.VersionService.StoreDBVersion(portainer.DBVersion)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	version, err := store.VersionService.DBVersion()
+	if err == portainer.ErrDBVersionNotFound {
+		version = 0
+	} else if err != nil {
+		return err
+	}
+
+	if version < portainer.DBVersion {
+		log.Printf("Migrating database from version %v to %v.\n", version, portainer.DBVersion)
+		migrator := NewMigrator(store, version)
+		err = migrator.Migrate()
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
