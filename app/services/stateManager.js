@@ -24,6 +24,7 @@ angular.module('portainer.services')
       } else {
         Config.$promise.then(function success(data) {
           state.application.authentication = data.authentication;
+          state.application.analytics = data.analytics;
           state.application.endpointManagement = data.endpointManagement;
           state.application.logo = data.logo;
           LocalStorage.storeApplicationState(state.application);

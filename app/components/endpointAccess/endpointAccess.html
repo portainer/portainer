@@ -1,0 +1,177 @@
+<rd-header>
+  <rd-header-title title="Endpoint access">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="endpoints">Endpoints</a> > <a ui-sref="endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a> > Access management
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="endpoint">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plug" title="Endpoint"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>
+                {{ endpoint.Name }}
+              </td>
+            </tr>
+            <tr>
+              <td>URL</td>
+              <td>
+                {{ endpoint.URL | stripprotocol }}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <span class="small text-muted">
+                  You can select which user can access this endpoint by moving them to the authorized users table. Simply click
+                  on a user entry to move it from one table to the other.
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="endpoint">
+  <div class="col-sm-6">
+    <rd-widget>
+      <rd-widget-header classes="col-sm-12 col-md-6 nopadding" icon="fa-users" title="Users">
+        <div class="pull-md-right pull-lg-right">
+          Items per page:
+          <select ng-model="state.pagination_count_users" ng-change="changePaginationCountUsers()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-sm-12 nopadding">
+        <div class="col-sm-12 col-md-6 nopadding">
+          <button class="btn btn-primary btn-sm" ng-click="authorizeAllUsers()" ng-disabled="users.length ===  0 || filteredUsers.length === 0"><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Authorize all users</button>
+        </div>
+        <div class="col-sm-12 col-md-6 nopadding">
+          <input type="text" id="filter" ng-model="state.filterUsers" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderUsers('Username')">
+                    Name
+                    <span ng-show="sortTypeUsers == 'Username' && !sortReverseUsers" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeUsers == 'Username' && sortReverseUsers" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderUsers('Role')">
+                    Role
+                    <span ng-show="sortTypeUsers == 'Role' && !sortReverseUsers" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeUsers == 'Role' && sortReverseUsers" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-click="authorizeUser(user)" class="interactive" dir-paginate="user in (state.filteredUsers = (users | filter:state.filterUsers | orderBy:sortTypeUsers:sortReverseUsers | itemsPerPage: state.pagination_count_users))">
+                <td>{{ user.Username }}</td>
+                <td>
+                  {{ user.RoleName }}
+                  <i class="fa" ng-class="user.RoleId === 1 ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
+                </td>
+              </tr>
+              <tr ng-if="!users">
+                <td colspan="2" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="users.length === 0 || state.filteredUsers.length === 0">
+                <td colspan="2" class="text-center text-muted">No users.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="users" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-sm-6">
+    <rd-widget>
+      <rd-widget-header classes="col-sm-12 col-md-6 nopadding" icon="fa-users" title="Authorized users">
+        <div class="pull-md-right pull-lg-right">
+          Items per page:
+          <select ng-model="state.pagination_count_authorizedUsers" ng-change="changePaginationCountAuthorizedUsers()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-sm-12 nopadding">
+        <div class="col-sm-12 col-md-6 nopadding">
+          <button class="btn btn-primary btn-sm" ng-click="unauthorizeAllUsers()" ng-disabled="authorizedUsers.length ===  0 || filteredAuthorizedUsers.length === 0"><i class="fa fa-user-times space-right" aria-hidden="true"></i>Deny all users</button>
+        </div>
+        <div class="col-sm-12 col-md-6 nopadding">
+          <input type="text" id="filter" ng-model="state.filterAuthorizedUsers" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderAuthorizedUsers('Username')">
+                    Name
+                    <span ng-show="sortTypeAuthorizedUsers == 'Username' && !sortReverseAuthorizedUsers" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeAuthorizedUsers == 'Username' && sortReverseAuthorizedUsers" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderAuthorizedUsers('Role')">
+                    Role
+                    <span ng-show="sortTypeAuthorizedUsers == 'Role' && !sortReverseAuthorizedUsers" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeAuthorizedUsers == 'Role' && sortReverseAuthorizedUsers" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-click="unauthorizeUser(user)" class="interactive" dir-paginate="user in (state.filteredAuthorizedUsers = (authorizedUsers | filter:state.filterAuthorizedUsers | orderBy:sortTypeAuthorizedUsers:sortReverseAuthorizedUsers | itemsPerPage: state.pagination_count_authorizedUsers))">
+                <td>{{ user.Username }}</td>
+                <td>
+                  {{ user.RoleName }}
+                  <i class="fa" ng-class="user.RoleId === 1 ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
+                </td>
+              </tr>
+              <tr ng-if="!authorizedUsers">
+                <td colspan="2" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="authorizedUsers.length === 0 || state.filteredAuthorizedUsers.length === 0">
+                <td colspan="2" class="text-center text-muted">No authorized users.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="authorizedUsers" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

@@ -22,6 +22,8 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
           $scope.containerTop = data;
       });
   };
+  var destroyed = false;
+  var timeout;
   $document.ready(function(){
     var cpuLabels = [];
     var cpuData = [];
@@ -117,11 +119,6 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
     });
     $scope.networkLegend = $sce.trustAsHtml(networkChart.generateLegend());
 
-    function setUpdateStatsTimeout() {
-      if(!destroyed) {
-        timeout = $timeout(updateStats, 5000);
-      }
-    }
 
     function updateStats() {
       Container.stats({id: $stateParams.id}, function (d) {
@@ -145,8 +142,7 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
       });
     }
 
-    var destroyed = false;
-    var timeout;
+
     $scope.$on('$destroy', function () {
       destroyed = true;
       $timeout.cancel(timeout);
@@ -203,6 +199,12 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
         cpuPercent = (cpuDelta / systemDelta) * curCpu.cpu_usage.percpu_usage.length * 100.0;
       }
       return cpuPercent;
+    }
+
+    function setUpdateStatsTimeout() {
+      if(!destroyed) {
+        timeout = $timeout(updateStats, 5000);
+      }
     }
   });
 

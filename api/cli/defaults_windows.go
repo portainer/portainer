@@ -6,6 +6,7 @@ const (
 	defaultAssetsDirectory = "."
 	defaultTemplatesURL    = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	defaultNoAuth          = "false"
+	defaultNoAnalytics     = "false"
 	defaultTLSVerify       = "false"
 	defaultTLSCACertPath   = "C:\\certs\\ca.pem"
 	defaultTLSCertPath     = "C:\\certs\\cert.pem"

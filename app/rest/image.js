@@ -1,7 +1,10 @@
 angular.module('portainer.rest')
-.factory('Image', ['$resource', 'Settings', function ImageFactory($resource, Settings) {
+.factory('Image', ['$resource', 'Settings', 'EndpointProvider', function ImageFactory($resource, Settings, EndpointProvider) {
   'use strict';
-  return $resource(Settings.url + '/images/:id/:action', {}, {
+  return $resource(Settings.url + '/:endpointId/images/:id/:action', {
+    endpointId: EndpointProvider.endpointID
+  },
+  {
     query: {method: 'GET', params: {all: 0, action: 'json'}, isArray: true},
     get: {method: 'GET', params: {action: 'json'}},
     search: {method: 'GET', params: {action: 'search'}},
@@ -18,7 +21,7 @@ angular.module('portainer.rest')
       isArray: true, transformResponse: jsonObjectsToArrayHandler
     },
     remove: {
-      method: 'DELETE', params: {id: '@id'},
+      method: 'DELETE', params: {id: '@id', force: '@force'},
       isArray: true, transformResponse: deleteImageHandler
     }
   });

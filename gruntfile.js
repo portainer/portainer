@@ -13,6 +13,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-filerev');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-usemin');
+  grunt.loadNpmTasks('grunt-replace');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'build']);
@@ -42,7 +43,8 @@ module.exports = function (grunt) {
     'copy:assets',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-win', [
     'clean:all',
@@ -57,7 +59,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-arm', [
     'clean:all',
@@ -72,7 +75,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-arm64', [
     'clean:all',
@@ -87,7 +91,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('release-macos', [
     'clean:all',
@@ -102,7 +107,8 @@ module.exports = function (grunt) {
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp',
+    'replace'
   ]);
   grunt.registerTask('lint', ['jshint']);
   grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
@@ -129,9 +135,11 @@ module.exports = function (grunt) {
         'bower_components/bootstrap/dist/js/bootstrap.min.js',
         'bower_components/Chart.js/Chart.min.js',
         'bower_components/lodash/dist/lodash.min.js',
+        'bower_components/splitargs/src/splitargs.js',
         'bower_components/filesize/lib/filesize.min.js',
         'bower_components/moment/min/moment.min.js',
         'bower_components/xterm.js/dist/xterm.js',
+        'bower_components/bootbox.js/bootbox.js',
         'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
         'assets/js/legend.js' // Not a bower package
       ],
@@ -259,6 +267,7 @@ module.exports = function (grunt) {
         'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
         'bower_components/ng-file-upload/ng-file-upload.min.js',
         'bower_components/angular-utils-pagination/dirPagination.js',
+        'bower_components/angular-google-analytics/dist/angular-google-analytics.min.js',
         'bower_components/angular-ui-select/dist/select.min.js'],
         dest: '<%= distdir %>/js/angular.js'
       }
@@ -338,7 +347,8 @@ module.exports = function (grunt) {
         curly: true,
         eqeqeq: true,
         immed: true,
-        latedef: true,
+        indent: 2,
+        latedef: 'nofunc',
         newcap: true,
         noarg: true,
         sub: true,
@@ -398,28 +408,28 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer'
+          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
         ].join(';')
       },
       runSwarm: {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run -d -p 9000:9000 --name portainer portainer -H tcp://10.0.7.10:2375'
+          'docker run -d -p 9000:9000 --name portainer portainer -H tcp://10.0.7.10:2375 --no-analytics'
         ].join(';')
       },
       runSwarmLocal: {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer'
+          'docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
         ].join(';')
       },
       runSsl: {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /tmp/portainer:/data -v /tmp/docker-ssl:/certs --name portainer portainer -H tcp://10.0.7.10:2376 --tlsverify'
+          'docker run -d -p 9000:9000 -v /tmp/portainer:/data -v /tmp/docker-ssl:/certs --name portainer portainer -H tcp://10.0.7.10:2376 --tlsverify --no-analytics'
         ].join(';')
       },
       cleanImages: {
@@ -456,6 +466,26 @@ module.exports = function (grunt) {
           executable: 'dist/portainer.exe'
         },
         ifFalse: ['shell:buildWindowsBinary']
+      }
+    },
+    replace: {
+      dist: {
+        options: {
+          patterns: [
+            {
+              match: 'CONFIG_GA_ID',
+              replacement: '<%= pkg.config.GA_ID %>'
+            }
+          ]
+        },
+        files: [
+          {
+            expand: true,
+            flatten: true,
+            src: ['dist/js/**.js'],
+            dest: 'dist/js/'
+          }
+        ]
       }
     }
   });

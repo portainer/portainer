@@ -28,7 +28,9 @@ function ($scope, Info, Version, Node, Pagination) {
     $scope.info = d;
     if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
       Node.query({}, function(d) {
-        $scope.nodes = d;
+        $scope.nodes = d.map(function (node) {
+          return new NodeViewModel(node);
+        });
         var CPU = 0, memory = 0;
         angular.forEach(d, function(node) {
           CPU += node.Description.Resources.NanoCPUs;
@@ -73,7 +75,7 @@ function ($scope, Info, Version, Node, Pagination) {
     var node = {};
     node.name = info[offset][0];
     node.ip = info[offset][1];
-    node.id = info[offset + 1][1];
+    node.Id = info[offset + 1][1];
     node.status = info[offset + 2][1];
     node.containers = info[offset + 3][1];
     node.cpu = info[offset + 4][1].split('/')[1];

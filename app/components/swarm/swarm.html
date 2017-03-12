@@ -163,57 +163,65 @@
           <thead>
             <tr>
               <th>
-                <a ui-sref="swarm" ng-click="order('Description.Hostname')">
+                <a ui-sref="swarm" ng-click="order('Hostname')">
                   Name
-                  <span ng-show="sortType == 'Description.Hostname' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Description.Hostname' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Hostname' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Hostname' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('Spec.Role')">
+                <a ui-sref="swarm" ng-click="order('Role')">
                   Role
-                  <span ng-show="sortType == 'Spec.Role' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Spec.Role' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Role' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Role' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('Description.Resources.NanoCPUs')">
+                <a ui-sref="swarm" ng-click="order('CPUs')">
                   CPU
-                  <span ng-show="sortType == 'Description.Resources.NanoCPUs' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Description.Resources.NanoCPUs' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'CPUs' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'CPUs' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('Description.Resources.MemoryBytes')">
+                <a ui-sref="swarm" ng-click="order('Memory')">
                   Memory
-                  <span ng-show="sortType == 'Description.Resources.MemoryBytes' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Description.Resources.MemoryBytes' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Memory' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Memory' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('Description.Engine.EngineVersion')">
+                <a ui-sref="swarm" ng-click="order('EngineVersion')">
                   Engine
-                  <span ng-show="sortType == 'Description.Engine.EngineVersion' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Description.Engine.EngineVersion' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'EngineVersion' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'EngineVersion' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th ng-if="applicationState.endpoint.apiVersion >= 1.25">
+                <a ui-sref="swarm" ng-click="order('Addr')">
+                  IP Address
+                  <span ng-show="sortType == 'Addr' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Addr' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="swarm" ng-click="order('node.Status.State')">
+                <a ui-sref="swarm" ng-click="order('Status')">
                   Status
-                  <span ng-show="sortType == 'node.Status.State' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'node.Status.State' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
           </thead>
           <tbody>
             <tr dir-paginate="node in (state.filteredNodes = (nodes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-              <td><a ui-sref="node({id: node.ID})">{{ node.Description.Hostname }}</a></td>
-              <td>{{ node.Spec.Role }}</td>
-              <td>{{ node.Description.Resources.NanoCPUs / 1000000000 }}</td>
-              <td>{{ node.Description.Resources.MemoryBytes|humansize }}</td>
-              <td>{{ node.Description.Engine.EngineVersion }}</td>
-              <td><span class="label label-{{ node.Status.State|nodestatusbadge }}">{{ node.Status.State }}</span></td>
+              <td><a ui-sref="node({id: node.Id})">{{ node.Hostname }}</a></td>
+              <td>{{ node.Role }}</td>
+              <td>{{ node.CPUs / 1000000000 }}</td>
+              <td>{{ node.Memory|humansize }}</td>
+              <td>{{ node.EngineVersion }}</td>
+              <td ng-if="applicationState.endpoint.apiVersion >= 1.25">{{ node.Addr }}</td>
+              <td><span class="label label-{{ node.Status|nodestatusbadge }}">{{ node.Status }}</span></td>
             </tr>
           </tbody>
         </table>
