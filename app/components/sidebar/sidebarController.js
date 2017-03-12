@@ -10,6 +10,7 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
   $scope.userRole = Authentication.getUserDetails().role;
 
   $scope.switchEndpoint = function(endpoint) {
+    var activeEndpointID = EndpointProvider.endpointID();
     EndpointProvider.setEndpointID(endpoint.Id);
     StateManager.updateEndpointState(true)
     .then(function success() {
@@ -17,6 +18,9 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to connect to the Docker endpoint");
+      EndpointProvider.setEndpointID(activeEndpointID);
+      StateManager.updateEndpointState(true)
+      .then(function success() {});
     });
   };
 
