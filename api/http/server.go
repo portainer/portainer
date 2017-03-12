@@ -20,26 +20,8 @@ type Server struct {
 	FileService            portainer.FileService
 	Settings               *portainer.Settings
 	TemplatesURL           string
-	// ActiveEndpoint  *portainer.Endpoint
-	Handler *Handler
+	Handler                *Handler
 }
-
-// Deprecated
-// func (server *Server) updateActiveEndpoint(endpoint *portainer.Endpoint) error {
-// 	if endpoint != nil {
-// 		server.ActiveEndpoint = endpoint
-// 		server.Handler.WebSocketHandler.endpoint = endpoint
-// 		err := server.Handler.DockerHandler.setupProxy(endpoint)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		err = server.EndpointService.SetActive(endpoint)
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-// 	return nil
-// }
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
@@ -65,12 +47,10 @@ func (server *Server) Start() error {
 	dockerHandler.EndpointService = server.EndpointService
 	var websocketHandler = NewWebSocketHandler()
 	websocketHandler.EndpointService = server.EndpointService
-	// EndpointHandler requires a reference to the server to be able to update the active endpoint.
 	var endpointHandler = NewEndpointHandler(middleWareService)
 	endpointHandler.authorizeEndpointManagement = server.EndpointManagement
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.FileService = server.FileService
-	// endpointHandler.server = server
 	var uploadHandler = NewUploadHandler(middleWareService)
 	uploadHandler.FileService = server.FileService
 	var fileHandler = newFileHandler(server.AssetsPath)
@@ -86,11 +66,6 @@ func (server *Server) Start() error {
 		FileHandler:      fileHandler,
 		UploadHandler:    uploadHandler,
 	}
-
-	// err := server.updateActiveEndpoint(server.ActiveEndpoint)
-	// if err != nil {
-	// 	return err
-	// }
 
 	return http.ListenAndServe(server.BindAddress, server.Handler)
 }

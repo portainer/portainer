@@ -156,33 +156,6 @@ func (handler *EndpointHandler) handleGetEndpoint(w http.ResponseWriter, r *http
 		return
 	}
 
-	// var endpoint *portainer.Endpoint
-	// if id == "0" {
-	// 	endpoint, err = handler.EndpointService.GetActive()
-	// 	if err == portainer.ErrEndpointNotFound {
-	// 		Error(w, err, http.StatusNotFound, handler.Logger)
-	// 		return
-	// 	} else if err != nil {
-	// 		Error(w, err, http.StatusInternalServerError, handler.Logger)
-	// 		return
-	// 	}
-	// 	if handler.server.ActiveEndpoint == nil {
-	// 		err = handler.server.updateActiveEndpoint(endpoint)
-	// 		if err != nil {
-	// 			Error(w, err, http.StatusInternalServerError, handler.Logger)
-	// 			return
-	// 		}
-	// 	}
-	// } else {
-	// 	endpoint, err = handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	// 	if err == portainer.ErrEndpointNotFound {
-	// 		Error(w, err, http.StatusNotFound, handler.Logger)
-	// 		return
-	// 	} else if err != nil {
-	// 		Error(w, err, http.StatusInternalServerError, handler.Logger)
-	// 		return
-	// 	}
-	// }
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrEndpointNotFound {
 		Error(w, err, http.StatusNotFound, handler.Logger)
@@ -194,32 +167,6 @@ func (handler *EndpointHandler) handleGetEndpoint(w http.ResponseWriter, r *http
 
 	encodeJSON(w, endpoint, handler.Logger)
 }
-
-// handlePostEndpoint handles POST requests on /endpoints/:id/active
-// func (handler *EndpointHandler) handlePostEndpoint(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	id := vars["id"]
-//
-// 	endpointID, err := strconv.Atoi(id)
-// 	if err != nil {
-// 		Error(w, err, http.StatusBadRequest, handler.Logger)
-// 		return
-// 	}
-//
-// 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-// 	if err == portainer.ErrEndpointNotFound {
-// 		Error(w, err, http.StatusNotFound, handler.Logger)
-// 		return
-// 	} else if err != nil {
-// 		Error(w, err, http.StatusInternalServerError, handler.Logger)
-// 		return
-// 	}
-//
-// 	err = handler.server.updateActiveEndpoint(endpoint)
-// 	if err != nil {
-// 		Error(w, err, http.StatusInternalServerError, handler.Logger)
-// 	}
-// }
 
 // handlePutEndpointAccess handles PUT requests on /endpoints/:id/access
 func (handler *EndpointHandler) handlePutEndpointAccess(w http.ResponseWriter, r *http.Request) {
@@ -314,14 +261,6 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 	if req.URL != "" {
 		endpoint.URL = req.URL
 	}
-
-	// if req.AuthorizedUsers != nil {
-	// 	authorizedUserIDs := []portainer.UserID{}
-	// 	for _, value := range req.AuthorizedUsers {
-	// 		authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
-	// 	}
-	// 	endpoint.AuthorizedUsers = authorizedUserIDs
-	// }
 
 	if req.TLS {
 		endpoint.TLS = true
