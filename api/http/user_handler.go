@@ -296,7 +296,6 @@ func (handler *UserHandler) handleGetAdminCheck(w http.ResponseWriter, r *http.R
 		Error(w, portainer.ErrUserNotFound, http.StatusNotFound, handler.Logger)
 		return
 	}
-	encodeJSON(w, users, handler.Logger)
 }
 
 // handlePostAdminInit handles POST requests on /users/admin/init

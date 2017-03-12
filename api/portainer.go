@@ -106,6 +106,7 @@ type (
 	DataStore interface {
 		Open() error
 		Close() error
+		MigrateData() error
 	}
 
 	// Server defines the interface to serve the API.
@@ -113,7 +114,7 @@ type (
 		Start() error
 	}
 
-	// UserService represents a service for managing users.
+	// UserService represents a service for managing user data.
 	UserService interface {
 		User(ID UserID) (*User, error)
 		UserByUsername(username string) (*User, error)
@@ -124,7 +125,7 @@ type (
 		DeleteUser(ID UserID) error
 	}
 
-	// EndpointService represents a service for managing endpoints.
+	// EndpointService represents a service for managing endpoint data.
 	EndpointService interface {
 		Endpoint(ID EndpointID) (*Endpoint, error)
 		Endpoints() ([]Endpoint, error)
@@ -134,7 +135,13 @@ type (
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
 	}
 
-	// ResourceControlService represents a service for managing resource controls.
+	// VersionService represents a service for managing version data.
+	VersionService interface {
+		DBVersion() (int, error)
+		StoreDBVersion(version int) error
+	}
+
+	// ResourceControlService represents a service for managing resource control data.
 	ResourceControlService interface {
 		ResourceControl(resourceID string, rcType ResourceControlType) (*ResourceControl, error)
 		ResourceControls(rcType ResourceControlType) ([]ResourceControl, error)
@@ -168,8 +175,10 @@ type (
 )
 
 const (
-	// APIVersion is the version number of portainer API.
+	// APIVersion is the version number of Portainer API.
 	APIVersion = "1.11.4"
+	// DBVersion is the version number of Portainer database.
+	DBVersion = 1
 )
 
 const (

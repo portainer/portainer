@@ -19,6 +19,11 @@ const (
 	ErrEndpointAccessDenied = Error("Access denied to endpoint")
 )
 
+// Version errors.
+const (
+	ErrDBVersionNotFound = Error("DB version not found")
+)
+
 // Crypto errors.
 const (
 	ErrCryptoHashFailure = Error("Unable to hash data")

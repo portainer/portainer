@@ -12,10 +12,6 @@ type EndpointService struct {
 	store *Store
 }
 
-const (
-	activeEndpointID = 0
-)
-
 // Endpoint returns an endpoint by ID.
 func (service *EndpointService) Endpoint(ID portainer.EndpointID) (*portainer.Endpoint, error) {
 	var data []byte

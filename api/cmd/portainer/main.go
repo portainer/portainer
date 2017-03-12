@@ -36,8 +36,17 @@ func initFileService(dataStorePath string) portainer.FileService {
 }
 
 func initStore(dataStorePath string) *bolt.Store {
-	var store = bolt.NewStore(dataStorePath)
-	err := store.Open()
+	store, err := bolt.NewStore(dataStorePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = store.Open()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = store.MigrateData()
 	if err != nil {
 		log.Fatal(err)
 	}

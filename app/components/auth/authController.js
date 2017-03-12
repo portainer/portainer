@@ -36,7 +36,7 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
       Messages.error("Failure", err, 'Unable to retrieve endpoints');
     });
   } else {
-    Users.checkAdminUser({}, function (d) {},
+    Users.checkAdminUser({}, function () {},
     function (e) {
       if (e.status === 404) {
         $scope.initPassword = true;
