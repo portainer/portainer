@@ -137,7 +137,9 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th ng-if="applicationState.application.endpointManagement"></th>
+                <th ng-if="applicationState.application.endpointManagement">
+                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+                </th>
                 <th>
                   <a ui-sref="endpoints" ng-click="order('Name')">
                     Name
