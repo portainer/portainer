@@ -13,27 +13,30 @@ type (
 
 	// CLIFlags represents the available flags on the CLI.
 	CLIFlags struct {
-		Addr        *string
-		Assets      *string
-		Data        *string
-		Endpoint    *string
-		Labels      *[]Pair
-		Logo        *string
-		Templates   *string
-		NoAuth      *bool
-		NoAnalytics *bool
-		TLSVerify   *bool
-		TLSCacert   *string
-		TLSCert     *string
-		TLSKey      *string
+		Addr              *string
+		Assets            *string
+		Data              *string
+		ExternalEndpoints *string
+		SyncInterval      *string
+		Endpoint          *string
+		Labels            *[]Pair
+		Logo              *string
+		Templates         *string
+		NoAuth            *bool
+		NoAnalytics       *bool
+		TLSVerify         *bool
+		TLSCacert         *string
+		TLSCert           *string
+		TLSKey            *string
 	}
 
 	// Settings represents Portainer settings.
 	Settings struct {
-		HiddenLabels   []Pair `json:"hiddenLabels"`
-		Logo           string `json:"logo"`
-		Authentication bool   `json:"authentication"`
-		Analytics      bool   `json:"analytics"`
+		HiddenLabels       []Pair `json:"hiddenLabels"`
+		Logo               string `json:"logo"`
+		Authentication     bool   `json:"authentication"`
+		Analytics          bool   `json:"analytics"`
+		EndpointManagement bool   `json:"endpointManagement"`
 	}
 
 	// User represent a user account.
@@ -128,6 +131,7 @@ type (
 		CreateEndpoint(endpoint *Endpoint) error
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
+		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
 	}
 
 	// ResourceControlService represents a service for managing resource controls.
@@ -156,11 +160,16 @@ type (
 		GetPathForTLSFile(endpointID EndpointID, fileType TLSFileType) (string, error)
 		DeleteTLSFiles(endpointID EndpointID) error
 	}
+
+	// EndpointWatcher represents a service to synchronize the endpoints via an external source.
+	EndpointWatcher interface {
+		WatchEndpointFile(endpointFilePath string) error
+	}
 )
 
 const (
 	// APIVersion is the version number of portainer API.
-	APIVersion = "1.11.3"
+	APIVersion = "1.11.4"
 )
 
 const (

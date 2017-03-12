@@ -3,7 +3,7 @@ angular.module('createVolume', [])
 function ($scope, $state, Volume, ResourceControlService, Authentication, Messages) {
 
   $scope.formValues = {
-    Ownership: 'private',
+    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     DriverOptions: []
   };
 
@@ -35,7 +35,7 @@ function ($scope, $state, Volume, ResourceControlService, Authentication, Messag
           })
           .catch(function error(err) {
             $('#createVolumeSpinner').hide();
-            Messages.error("Failure", e, 'Unable to apply resource control on volume');
+            Messages.error("Failure", err, 'Unable to apply resource control on volume');
           });
         } else {
           Messages.send("Volume created", d.Name);

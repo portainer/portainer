@@ -5,7 +5,7 @@ angular.module('createContainer', [])
 function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Messages) {
 
   $scope.formValues = {
-    Ownership: 'private',
+    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     alwaysPull: true,
     Console: 'none',
     Volumes: [],
@@ -148,7 +148,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
           })
           .catch(function error(err) {
             $('#createContainerSpinner').hide();
-            Messages.error("Failure", e, 'Unable to apply resource control on container');
+            Messages.error("Failure", err, 'Unable to apply resource control on container');
           });
         } else {
           startContainer(d.Id);

@@ -67,20 +67,41 @@ func (service *EndpointService) Endpoints() ([]portainer.Endpoint, error) {
 	return endpoints, nil
 }
 
+// Synchronize creates, updates and deletes endpoints inside a single transaction.
+func (service *EndpointService) Synchronize(toCreate, toUpdate, toDelete []*portainer.Endpoint) error {
+	return service.store.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(endpointBucketName))
+
+		for _, endpoint := range toCreate {
+			err := storeNewEndpoint(endpoint, bucket)
+			if err != nil {
+				return err
+			}
+		}
+
+		for _, endpoint := range toUpdate {
+			err := marshalAndStoreEndpoint(endpoint, bucket)
+			if err != nil {
+				return err
+			}
+		}
+
+		for _, endpoint := range toDelete {
+			err := bucket.Delete(internal.Itob(int(endpoint.ID)))
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
 // CreateEndpoint assign an ID to a new endpoint and saves it.
 func (service *EndpointService) CreateEndpoint(endpoint *portainer.Endpoint) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(endpointBucketName))
-
-		id, _ := bucket.NextSequence()
-		endpoint.ID = portainer.EndpointID(id)
-
-		data, err := internal.MarshalEndpoint(endpoint)
-		if err != nil {
-			return err
-		}
-
-		err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
+		err := storeNewEndpoint(endpoint, bucket)
 		if err != nil {
 			return err
 		}
@@ -115,4 +136,23 @@ func (service *EndpointService) DeleteEndpoint(ID portainer.EndpointID) error {
 		}
 		return nil
 	})
+}
+
+func marshalAndStoreEndpoint(endpoint *portainer.Endpoint, bucket *bolt.Bucket) error {
+	data, err := internal.MarshalEndpoint(endpoint)
+	if err != nil {
+		return err
+	}
+
+	err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func storeNewEndpoint(endpoint *portainer.Endpoint, bucket *bolt.Bucket) error {
+	id, _ := bucket.NextSequence()
+	endpoint.ID = portainer.EndpointID(id)
+	return marshalAndStoreEndpoint(endpoint, bucket)
 }

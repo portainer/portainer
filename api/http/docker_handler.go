@@ -63,8 +63,11 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 		return
 	}
 
-	userData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
-	if userData.Role != portainer.AdministratorRole && !checkEndpointAccessControl(endpoint, userData.ID) {
+	tokenData, err := extractTokenDataFromRequestContext(r)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+	}
+	if tokenData.Role != portainer.AdministratorRole && !checkEndpointAccessControl(endpoint, tokenData.ID) {
 		Error(w, portainer.ErrEndpointAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}

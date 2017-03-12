@@ -26,8 +26,9 @@ const (
 
 // JWT errors.
 const (
-	ErrSecretGeneration = Error("Unable to generate secret key")
-	ErrInvalidJWTToken  = Error("Invalid JWT token")
+	ErrSecretGeneration   = Error("Unable to generate secret key")
+	ErrInvalidJWTToken    = Error("Invalid JWT token")
+	ErrMissingContextData = Error("Unable to find JWT data in request context")
 )
 
 // File errors.

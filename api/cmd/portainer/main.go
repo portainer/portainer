@@ -4,6 +4,7 @@ import (
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/bolt"
 	"github.com/portainer/portainer/cli"
+	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/crypto"
 	"github.com/portainer/portainer/file"
 	"github.com/portainer/portainer/http"
@@ -12,7 +13,7 @@ import (
 	"log"
 )
 
-func main() {
+func initCLI() *portainer.CLIFlags {
 	var cli portainer.CLIService = &cli.Service{}
 	flags, err := cli.ParseFlags(portainer.APIVersion)
 	if err != nil {
@@ -23,41 +24,92 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return flags
+}
 
-	settings := &portainer.Settings{
-		HiddenLabels:   *flags.Labels,
-		Logo:           *flags.Logo,
-		Authentication: !*flags.NoAuth,
-		Analytics:      !*flags.NoAnalytics,
-	}
-
-	fileService, err := file.NewService(*flags.Data, "")
+func initFileService(dataStorePath string) portainer.FileService {
+	fileService, err := file.NewService(dataStorePath, "")
 	if err != nil {
 		log.Fatal(err)
 	}
+	return fileService
+}
 
-	var store = bolt.NewStore(*flags.Data)
-	err = store.Open()
+func initStore(dataStorePath string) *bolt.Store {
+	var store = bolt.NewStore(dataStorePath)
+	err := store.Open()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer store.Close()
+	return store
+}
 
-	var jwtService portainer.JWTService
-	if !*flags.NoAuth {
-		jwtService, err = jwt.NewService()
+func initJWTService(authenticationEnabled bool) portainer.JWTService {
+	if authenticationEnabled {
+		jwtService, err := jwt.NewService()
+		if err != nil {
+			log.Fatal(err)
+		}
+		return jwtService
+	}
+	return nil
+}
+
+func initCryptoService() portainer.CryptoService {
+	return &crypto.Service{}
+}
+
+func initEndpointWatcher(endpointService portainer.EndpointService, externalEnpointFile string, syncInterval string) bool {
+	authorizeEndpointMgmt := true
+	if externalEnpointFile != "" {
+		authorizeEndpointMgmt = false
+		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
+		endpointWatcher := cron.NewWatcher(endpointService, syncInterval)
+		err := endpointWatcher.WatchEndpointFile(externalEnpointFile)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
+	return authorizeEndpointMgmt
+}
 
-	var cryptoService portainer.CryptoService = &crypto.Service{}
+func initSettings(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portainer.Settings {
+	return &portainer.Settings{
+		HiddenLabels:       *flags.Labels,
+		Logo:               *flags.Logo,
+		Analytics:          !*flags.NoAnalytics,
+		Authentication:     !*flags.NoAuth,
+		EndpointManagement: authorizeEndpointMgmt,
+	}
+}
 
-	// Initialize the active endpoint from the CLI only if there is no
-	// endpoint defined yet.
+func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService) *portainer.Endpoint {
+	endpoints, err := endpointService.Endpoints()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &endpoints[0]
+}
+
+func main() {
+	flags := initCLI()
+
+	fileService := initFileService(*flags.Data)
+
+	store := initStore(*flags.Data)
+	defer store.Close()
+
+	jwtService := initJWTService(!*flags.NoAuth)
+
+	cryptoService := initCryptoService()
+
+	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
+
+	settings := initSettings(authorizeEndpointMgmt, flags)
+
 	if *flags.Endpoint != "" {
 		var endpoints []portainer.Endpoint
-		endpoints, err = store.EndpointService.Endpoints()
+		endpoints, err := store.EndpointService.Endpoints()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -78,6 +130,8 @@ func main() {
 			log.Println("Instance already has defined endpoints. Skipping the endpoint defined via CLI.")
 		}
 	}
+
+	// activeEndpoint := initActiveEndpoint(store.EndpointService, flags)
 
 	// Initialize the active endpoint from the CLI only if there is no
 	// active endpoint defined yet.
@@ -108,6 +162,7 @@ func main() {
 		Settings:               settings,
 		TemplatesURL:           *flags.Templates,
 		AuthDisabled:           *flags.NoAuth,
+		EndpointManagement:     authorizeEndpointMgmt,
 		UserService:            store.UserService,
 		EndpointService:        store.EndpointService,
 		ResourceControlService: store.ResourceControlService,
@@ -118,7 +173,7 @@ func main() {
 	}
 
 	log.Printf("Starting Portainer on %s", *flags.Addr)
-	err = server.Start()
+	err := server.Start()
 	if err != nil {
 		log.Fatal(err)
 	}

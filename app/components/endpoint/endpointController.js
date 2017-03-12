@@ -1,6 +1,11 @@
 angular.module('endpoint', [])
 .controller('EndpointController', ['$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'Messages',
 function ($scope, $state, $stateParams, $filter, EndpointService, Messages) {
+
+  if (!$scope.applicationState.application.endpointManagement) {
+    $state.go('endpoints');
+  }
+
   $scope.state = {
     error: '',
     uploadInProgress: false

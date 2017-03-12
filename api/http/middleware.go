@@ -22,6 +22,16 @@ const (
 	contextAuthenticationKey contextKey = iota
 )
 
+func extractTokenDataFromRequestContext(request *http.Request) (*portainer.TokenData, error) {
+	contextData := request.Context().Value(contextAuthenticationKey)
+	if contextData == nil {
+		return nil, portainer.ErrMissingContextData
+	}
+
+	tokenData := contextData.(*portainer.TokenData)
+	return tokenData, nil
+}
+
 // public defines a chain of middleware for public endpoints (no authentication required)
 func (service *middleWareService) public(h http.Handler) http.Handler {
 	h = mwSecureHeaders(h)
@@ -56,14 +66,13 @@ func mwSecureHeaders(next http.Handler) http.Handler {
 // mwCheckAdministratorRole check the role of the user associated to the request
 func mwCheckAdministratorRole(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userData := r.Context().Value(contextAuthenticationKey)
-		if userData == nil {
+		tokenData, err := extractTokenDataFromRequestContext(r)
+		if err != nil {
 			Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
 			return
 		}
 
-		token := userData.(*portainer.TokenData)
-		if token.Role != portainer.AdministratorRole {
+		if tokenData.Role != portainer.AdministratorRole {
 			Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
 			return
 		}
@@ -75,6 +84,7 @@ func mwCheckAdministratorRole(next http.Handler) http.Handler {
 // mwCheckAuthentication provides Authentication middleware for handlers
 func (service *middleWareService) mwCheckAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var tokenData *portainer.TokenData
 		if !service.authDisabled {
 			var token string
 
@@ -90,17 +100,20 @@ func (service *middleWareService) mwCheckAuthentication(next http.Handler) http.
 				return
 			}
 
-			tokenData, err := service.jwtService.ParseAndVerifyToken(token)
+			var err error
+			tokenData, err = service.jwtService.ParseAndVerifyToken(token)
 			if err != nil {
 				Error(w, err, http.StatusUnauthorized, nil)
 				return
 			}
-			ctx := context.WithValue(r.Context(), contextAuthenticationKey, tokenData)
-			next.ServeHTTP(w, r.WithContext(ctx))
 		} else {
-			next.ServeHTTP(w, r)
+			tokenData = &portainer.TokenData{
+				Role: portainer.AdministratorRole,
+			}
 		}
 
+		ctx := context.WithValue(r.Context(), contextAuthenticationKey, tokenData)
+		next.ServeHTTP(w, r.WithContext(ctx))
 		return
 	})
 }

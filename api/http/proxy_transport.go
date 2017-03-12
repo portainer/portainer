@@ -48,22 +48,26 @@ func (p *proxyTransport) proxyDockerRequests(request *http.Request, response *ht
 
 func (p *proxyTransport) handleContainerRequests(request *http.Request, response *http.Response) error {
 	requestPath := request.URL.Path
-	userData := request.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
 
-	if requestPath == "/containers/prune" && userData.Role != portainer.AdministratorRole {
+	tokenData, err := extractTokenDataFromRequestContext(request)
+	if err != nil {
+		return err
+	}
+
+	if requestPath == "/containers/prune" && tokenData.Role != portainer.AdministratorRole {
 		return writeAccessDeniedResponse(response)
 	}
 	if requestPath == "/containers/json" {
-		if userData.Role == portainer.AdministratorRole {
+		if tokenData.Role == portainer.AdministratorRole {
 			return p.decorateContainerResponse(response)
 		}
-		return p.proxyContainerResponseWithResourceControl(response, userData.ID)
+		return p.proxyContainerResponseWithResourceControl(response, tokenData.ID)
 	}
 	// /containers/{id}/action
 	if match, _ := path.Match("/containers/*/*", requestPath); match {
-		if userData.Role != portainer.AdministratorRole {
+		if tokenData.Role != portainer.AdministratorRole {
 			resourceID := path.Base(path.Dir(requestPath))
-			return p.proxyContainerResponseWithAccessControl(response, userData.ID, resourceID)
+			return p.proxyContainerResponseWithAccessControl(response, tokenData.ID, resourceID)
 		}
 	}
 
@@ -72,26 +76,30 @@ func (p *proxyTransport) handleContainerRequests(request *http.Request, response
 
 func (p *proxyTransport) handleServiceRequests(request *http.Request, response *http.Response) error {
 	requestPath := request.URL.Path
-	userData := request.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
+
+	tokenData, err := extractTokenDataFromRequestContext(request)
+	if err != nil {
+		return err
+	}
 
 	if requestPath == "/services" {
-		if userData.Role == portainer.AdministratorRole {
+		if tokenData.Role == portainer.AdministratorRole {
 			return p.decorateServiceResponse(response)
 		}
-		return p.proxyServiceResponseWithResourceControl(response, userData.ID)
+		return p.proxyServiceResponseWithResourceControl(response, tokenData.ID)
 	}
 	// /services/{id}
 	if match, _ := path.Match("/services/*", requestPath); match {
-		if userData.Role != portainer.AdministratorRole {
+		if tokenData.Role != portainer.AdministratorRole {
 			resourceID := path.Base(requestPath)
-			return p.proxyServiceResponseWithAccessControl(response, userData.ID, resourceID)
+			return p.proxyServiceResponseWithAccessControl(response, tokenData.ID, resourceID)
 		}
 	}
 	// /services/{id}/action
 	if match, _ := path.Match("/services/*/*", requestPath); match {
-		if userData.Role != portainer.AdministratorRole {
+		if tokenData.Role != portainer.AdministratorRole {
 			resourceID := path.Base(path.Dir(requestPath))
-			return p.proxyServiceResponseWithAccessControl(response, userData.ID, resourceID)
+			return p.proxyServiceResponseWithAccessControl(response, tokenData.ID, resourceID)
 		}
 	}
 
@@ -100,22 +108,26 @@ func (p *proxyTransport) handleServiceRequests(request *http.Request, response *
 
 func (p *proxyTransport) handleVolumeRequests(request *http.Request, response *http.Response) error {
 	requestPath := request.URL.Path
-	userData := request.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
+
+	tokenData, err := extractTokenDataFromRequestContext(request)
+	if err != nil {
+		return err
+	}
 
 	if requestPath == "/volumes" {
-		if userData.Role == portainer.AdministratorRole {
+		if tokenData.Role == portainer.AdministratorRole {
 			return p.decorateVolumeResponse(response)
 		}
-		return p.proxyVolumeResponseWithResourceControl(response, userData.ID)
+		return p.proxyVolumeResponseWithResourceControl(response, tokenData.ID)
 	}
-	if requestPath == "/volumes/prune" && userData.Role != portainer.AdministratorRole {
+	if requestPath == "/volumes/prune" && tokenData.Role != portainer.AdministratorRole {
 		return writeAccessDeniedResponse(response)
 	}
 	// /volumes/{name}
 	if match, _ := path.Match("/volumes/*", requestPath); match {
-		if userData.Role != portainer.AdministratorRole {
+		if tokenData.Role != portainer.AdministratorRole {
 			resourceID := path.Base(requestPath)
-			return p.proxyVolumeResponseWithAccessControl(response, userData.ID, resourceID)
+			return p.proxyVolumeResponseWithAccessControl(response, tokenData.ID, resourceID)
 		}
 	}
 	return nil

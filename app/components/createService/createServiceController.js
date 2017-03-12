@@ -5,7 +5,7 @@ angular.module('createService', [])
 function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication, ResourceControlService, Messages) {
 
   $scope.formValues = {
-    Ownership: 'private',
+    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     Name: '',
     Image: '',
     Registry: '',
@@ -217,7 +217,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
         })
         .catch(function error(err) {
           $('#createContainerSpinner').hide();
-          Messages.error("Failure", e, 'Unable to apply resource control on service');
+          Messages.error("Failure", err, 'Unable to apply resource control on service');
         });
       } else {
         $('#createServiceSpinner').hide();

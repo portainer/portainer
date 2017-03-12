@@ -53,7 +53,7 @@
     <li class="sidebar-list" ng-if="applicationState.application.authentication && userRole === 1">
       <a ui-sref="users" ui-sref-active="active">Users <span class="menu-icon fa fa-user"></span></a>
     </li>
-    <li class="sidebar-list" ng-if="userRole === 1">
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || userRole === 1">
       <a ui-sref="endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug"></span></a>
     </li>
   </ul>

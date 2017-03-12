@@ -90,7 +90,7 @@
                   <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
-              <th>
+              <th ng-if="applicationState.application.authentication">
                 <a ui-sref="containers" ng-click="order('Metadata.ResourceControl.OwnerId')">
                   Ownership
                   <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -114,7 +114,7 @@
                 </a>
                 <span ng-if="container.Ports.length == 0" >-</span>
               </td>
-              <td>
+              <td ng-if="applicationState.application.authentication">
                 <span ng-if="!container.Metadata.ResourceControl">
                   <i class="fa fa-eye" aria-hidden="true"></i>
                   <span ng-if="container.Labels['com.docker.swarm.service.id']">

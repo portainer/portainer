@@ -35,6 +35,15 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
     }, function error(err) {
       Messages.error("Failure", err, 'Unable to retrieve endpoints');
     });
+  } else {
+    Users.checkAdminUser({}, function (d) {},
+    function (e) {
+      if (e.status === 404) {
+        $scope.initPassword = true;
+      } else {
+        Messages.error("Failure", e, 'Unable to verify administrator account existence');
+      }
+    });
   }
 
   if ($stateParams.logout) {
@@ -52,15 +61,6 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
 
   Config.$promise.then(function (c) {
     $scope.logo = c.logo;
-  });
-
-  Users.checkAdminUser({}, function (d) {},
-  function (e) {
-    if (e.status === 404) {
-      $scope.initPassword = true;
-    } else {
-      Messages.error("Failure", e, 'Unable to verify administrator account existence');
-    }
   });
 
   $scope.createAdminUser = function() {

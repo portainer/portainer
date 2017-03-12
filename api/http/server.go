@@ -11,6 +11,7 @@ type Server struct {
 	BindAddress            string
 	AssetsPath             string
 	AuthDisabled           bool
+	EndpointManagement     bool
 	UserService            portainer.UserService
 	EndpointService        portainer.EndpointService
 	ResourceControlService portainer.ResourceControlService
@@ -66,6 +67,7 @@ func (server *Server) Start() error {
 	websocketHandler.EndpointService = server.EndpointService
 	// EndpointHandler requires a reference to the server to be able to update the active endpoint.
 	var endpointHandler = NewEndpointHandler(middleWareService)
+	endpointHandler.authorizeEndpointManagement = server.EndpointManagement
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.FileService = server.FileService
 	// endpointHandler.server = server

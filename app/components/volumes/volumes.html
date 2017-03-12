@@ -60,7 +60,7 @@
                   <span ng-show="sortType == 'Mountpoint' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
-              <th>
+              <th ng-if="applicationState.application.authentication">
                 <a ui-sref="volumes" ng-click="order('Metadata.ResourceControl.OwnerId')">
                   Ownership
                   <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -75,24 +75,26 @@
               <td>{{ volume.Name|truncate:50 }}</td>
               <td>{{ volume.Driver }}</td>
               <td>{{ volume.Mountpoint }}</td>
-              <td ng-if="user.role === 1 && volume.Metadata.ResourceControl">
-                <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                <span ng-if="volume.Metadata.ResourceControl.OwnerId === user.ID">
+              <td ng-if="applicationState.application.authentication">
+                <span ng-if="user.role === 1 && volume.Metadata.ResourceControl">
+                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                 <span ng-if="volume.Metadata.ResourceControl.OwnerId === user.ID">
+                   Private
+                 </span>
+                 <span ng-if="volume.Metadata.ResourceControl.OwnerId !== user.ID">
+                   Private <span ng-if="volume.Owner">(owner: {{ volume.Owner }})</span>
+                 </span>
+                 <a ng-click="switchOwnership(volume)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
+                </span>
+                <span ng-if="user.role !== 1 && volume.Metadata.ResourceControl.OwnerId === user.ID">
+                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
                   Private
+                  <a ng-click="switchOwnership(volume)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
                 </span>
-                <span ng-if="volume.Metadata.ResourceControl.OwnerId !== user.ID">
-                  Private <span ng-if="volume.Owner">(owner: {{ volume.Owner }})</span>
+                <span ng-if="!volume.Metadata.ResourceControl">
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                  Public
                 </span>
-                <a ng-click="switchOwnership(volume)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
-              </td>
-              <td ng-if="user.role !== 1 && volume.Metadata.ResourceControl.OwnerId === user.ID">
-                <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                Private
-                <a ng-click="switchOwnership(volume)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
-              </td>
-              <td ng-if="!volume.Metadata.ResourceControl">
-                <i class="fa fa-eye" aria-hidden="true"></i>
-                Public
               </td>
             </tr>
             <tr ng-if="!volumes">

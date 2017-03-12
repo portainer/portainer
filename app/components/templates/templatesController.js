@@ -7,7 +7,7 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, Container
     pagination_count: Pagination.getPaginationCount('templates')
   };
   $scope.formValues = {
-    Ownership: 'private',
+    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     network: "",
     name: "",
   };

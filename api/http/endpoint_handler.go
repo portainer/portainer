@@ -16,11 +16,18 @@ import (
 // EndpointHandler represents an HTTP API handler for managing Docker endpoints.
 type EndpointHandler struct {
 	*mux.Router
-	Logger          *log.Logger
-	EndpointService portainer.EndpointService
-	FileService     portainer.FileService
+	Logger                      *log.Logger
+	authorizeEndpointManagement bool
+	EndpointService             portainer.EndpointService
+	FileService                 portainer.FileService
 	// server            *Server
 }
+
+const (
+	// ErrEndpointManagementDisabled is an error raised when trying to access the endpoints management endpoints
+	// when the server has been started with the --external-endpoints flag
+	ErrEndpointManagementDisabled = portainer.Error("Endpoint management is disabled")
+)
 
 // NewEndpointHandler returns a new instance of EndpointHandler.
 func NewEndpointHandler(mw *middleWareService) *EndpointHandler {
@@ -50,7 +57,10 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 		return
 	}
 
-	tokenData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
+	tokenData, err := extractTokenDataFromRequestContext(r)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+	}
 	if tokenData == nil {
 		Error(w, portainer.ErrInvalidJWTToken, http.StatusBadRequest, handler.Logger)
 		return
@@ -76,6 +86,11 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 
 // handlePostEndpoints handles POST requests on /endpoints
 func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *http.Request) {
+	if !handler.authorizeEndpointManagement {
+		Error(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
+		return
+	}
+
 	var req postEndpointsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
@@ -206,6 +221,11 @@ func (handler *EndpointHandler) handleGetEndpoint(w http.ResponseWriter, r *http
 
 // handlePutEndpoint handles PUT requests on /endpoints/:id
 func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http.Request) {
+	if !handler.authorizeEndpointManagement {
+		Error(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
+		return
+	}
+
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -288,6 +308,11 @@ type putEndpointsRequest struct {
 
 // handleDeleteEndpoint handles DELETE requests on /endpoints/:id
 func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *http.Request) {
+	if !handler.authorizeEndpointManagement {
+		Error(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
+		return
+	}
+
 	vars := mux.Vars(r)
 	id := vars["id"]
 

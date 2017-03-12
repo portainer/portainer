@@ -212,8 +212,12 @@ func (handler *UserHandler) handlePutUser(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	userData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
-	if userData.Role != portainer.AdministratorRole && userData.ID != portainer.UserID(userID) {
+	tokenData, err := extractTokenDataFromRequestContext(r)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+	}
+
+	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
 		Error(w, portainer.ErrUnauthorized, http.StatusForbidden, handler.Logger)
 		return
 	}
@@ -253,7 +257,7 @@ func (handler *UserHandler) handlePutUser(w http.ResponseWriter, r *http.Request
 	}
 
 	if req.Role != 0 {
-		if userData.Role != portainer.AdministratorRole {
+		if tokenData.Role != portainer.AdministratorRole {
 			Error(w, portainer.ErrUnauthorized, http.StatusForbidden, handler.Logger)
 			return
 		}
@@ -397,8 +401,11 @@ func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *htt
 		return
 	}
 
-	userData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
-	if userData.ID != portainer.UserID(uid) {
+	tokenData, err := extractTokenDataFromRequestContext(r)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+	}
+	if tokenData.ID != portainer.UserID(uid) {
 		Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}
@@ -457,8 +464,11 @@ func (handler *UserHandler) handleDeleteUserResource(w http.ResponseWriter, r *h
 		return
 	}
 
-	userData := r.Context().Value(contextAuthenticationKey).(*portainer.TokenData)
-	if userData.Role != portainer.AdministratorRole && userData.ID != portainer.UserID(uid) {
+	tokenData, err := extractTokenDataFromRequestContext(r)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+	}
+	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(uid) {
 		Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}
