@@ -518,7 +518,7 @@ angular.module('portainer', [
       return {
         'response': function(response) {
           if (typeof(response.data) === 'string' &&
-          (response.data.startsWith('Conflict.') || response.data.startsWith('conflict:'))) {
+          (_.startsWith(response.data, 'Conflict.') || _.startsWith(response.data, 'conflict:'))) {
             $.gritter.add({
               title: 'Error',
               text: $('<div>').text(response.data).html(),
