@@ -228,7 +228,7 @@
           <div dir-paginate="tpl in templates | itemsPerPage: state.pagination_count" class="container-template hvr-underline-from-center" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index)">
             <img class="logo" ng-src="{{ tpl.Logo }}" />
             <div class="title">{{ tpl.Title }}</div>
-            <div class="description">{{ tpl.Description }}</div>
+            <div class="description" ng-if="tpl.Description">{{ tpl.Description | truncate:50 }}</div>
           </div>
           <div ng-if="!templates" class="text-center text-muted">
             Loading...
