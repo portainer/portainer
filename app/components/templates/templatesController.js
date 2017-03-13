@@ -46,7 +46,10 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, Container
         });
       }
       TemplateService.updateContainerConfigurationWithVolumes(templateConfiguration.container, template, data);
-      return $q.all(volumeResourceControlQueries).then(ImageService.pullImage(templateConfiguration.image));
+      return $q.all(volumeResourceControlQueries)
+      .then(function success() {
+        return ImageService.pullImage(templateConfiguration.image);
+      });
     })
     .then(function success(data) {
       return ContainerService.createAndStartContainer(templateConfiguration.container);
