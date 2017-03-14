@@ -42,6 +42,8 @@ angular.module('portainer', [
   'node',
   'service',
   'services',
+  'stack',
+  'stacks',
   'settings',
   'sidebar',
   'stats',
@@ -414,6 +416,32 @@ angular.module('portainer', [
         "content@": {
           templateUrl: 'app/components/service/service.html',
           controller: 'ServiceController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('stacks', {
+      url: '/stacks/',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/stacks/stacks.html',
+          controller: 'StacksController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('stack', {
+      url: '^/stack/:name/',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/stack/stack.html',
+          controller: 'StackController'
         },
         "sidebar@": {
           templateUrl: 'app/components/sidebar/sidebar.html',

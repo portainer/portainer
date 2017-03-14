@@ -1,0 +1,177 @@
+<rd-header>
+  <rd-header-title title="Stack details">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="stack({name: stack.Name})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="stacks">Stacks</a> > <a ui-sref="stack({name: stack.Name})">{{ stack.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-list-alt" title="Stack details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <!--<td ng-if="!service.EditName">-->
+              <td>
+                {{ stack.Name }}
+                <!--<button class="btn btn-xs btn-danger" ng-click="removeStack()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this stack</button>-->
+                <!--<a href="" data-toggle="tooltip" title="Edit service name" ng-click="service.EditName = true;"><i class="fa fa-edit"></i></a>-->
+              </td>
+              <!--<td ng-if="service.EditName">
+                <input type="text" class="containerNameInput" ng-model="service.newServiceName">
+                <a class="interactive" ng-click="service.EditName = false;"><i class="fa fa-times"></i></a>
+                <a class="interactive" ng-click="renameService(service)"><i class="fa fa-check-square-o"></i></a>
+              </td>-->
+            </tr>
+            <tr>
+              <td>Services</td>
+              <td>{{ stack.Services }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+      <rd-widget-footer ng-if="service.hasChanges">
+        <div>
+            <button type="button" class="btn btn-primary" ng-click="updateService(service)">Save changes</button>
+            <button type="button" class="btn btn-default" ng-click="cancelChanges(service)">Reset</button>
+        </div>
+      </rd-widget-footer>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="services.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title="Associated services">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>
+                <a ui-sref="stack" ng-click="order('Name')">
+                  Name
+                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="stack" ng-click="order('Image')">
+                  Image
+                  <span ng-show="sortType == 'Slot' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Slot' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="stack" ng-click="order('Scheduling Mode')">
+                  Scheduling Mode
+                  <span ng-show="sortType == 'Node' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Node' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="service in (filteredServices = ( services | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <td><a ui-sref="service({ id: service.Id })">{{ service.Id }}</a></td>
+              <td>{{ service.Name }}</td>
+              <td>{{ service.Image }}</td>
+              <td>{{ service.Mode }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div ng-if="services" class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="tasks.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title="Associated tasks">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>
+                <a ui-sref="service" ng-click="order(Status)">
+                  Status
+                  <span ng-show="sortType == Status && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == Status && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="service" ng-click="order(Slot)">
+                  Slot
+                  <span ng-show="sortType == Slot && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == Slot && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th ng-if="displayNode">
+                <a ui-sref="service" ng-click="order(Node)">
+                  Node
+                  <span ng-show="sortType == Node && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == Node && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="service" ng-click="order(Updated)">
+                  Last update
+                  <span ng-show="sortType == Updated && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == Updated && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
+              <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
+              <td>{{ task.Slot }}</td>
+              <td ng-if="displayNode">{{ task.Node }}</td>
+              <td>{{ task.Updated|getisodate }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div ng-if="tasks" class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
