@@ -54,7 +54,7 @@
       <rd-widget-header icon="fa-tasks" title="Associated services">
         <div class="pull-right">
           Items per page:
-          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+          <select ng-model="state.pagination_count_services" ng-change="changePaginationCountServices()">
             <option value="0">All</option>
             <option value="10">10</option>
             <option value="25">25</option>
@@ -70,28 +70,28 @@
               <th>
                 <a ui-sref="stack" ng-click="order('Name')">
                   Name
-                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortServicesType == 'Status' && !sortServicesReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortServicesType == 'Name' && sortServicesReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
                 <a ui-sref="stack" ng-click="order('Image')">
                   Image
-                  <span ng-show="sortType == 'Slot' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Slot' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortServicesType == 'Image' && !sortServicesReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortServicesType == 'Image' && sortServicesReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
                 <a ui-sref="stack" ng-click="order('Mode')">
                   Mode
-                  <span ng-show="sortType == 'Node' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Node' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortServicesType == 'Mode' && !sortServicesReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortServicesType == 'Mode' && sortServicesReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="service in (filteredServices = ( services | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+            <tr dir-paginate="service in (filteredServices = ( services | orderBy:sortServicesType:sortServicesReverse | itemsPerPage: state.pagination_count_services))">
               <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
               <td>{{ service.Image | hideshasum }}</td>
               <td>
@@ -125,7 +125,7 @@
       <rd-widget-header icon="fa-tasks" title="Associated tasks">
         <div class="pull-right">
           Items per page:
-          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+          <select ng-model="state.pagination_count_tasks" ng-change="changePaginationCountTasks()">
             <option value="0">All</option>
             <option value="10">10</option>
             <option value="25">25</option>
@@ -142,42 +142,42 @@
               <th>
                 <a ui-sref="stack" ng-click="order(Status)">
                   Status
-                  <span ng-show="sortType == Status && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == Status && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortTasksType == Status && !sortTasksReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortTasksType == Status && sortTasksReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
                 <a ui-sref="stack" ng-click="order(Image)">
                   Image
-                  <span ng-show="sortType == Status && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == Status && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortTasksType == Image && !sortTasksReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortTasksType == Image && sortTasksReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
                 <a ui-sref="stack" ng-click="order(Slot)">
                   Slot
-                  <span ng-show="sortType == Slot && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == Slot && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortTasksType == Slot && !sortTasksReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortTasksType == Slot && sortTasksReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th ng-if="displayNode">
                 <a ui-sref="stack" ng-click="order(Node)">
                   Node
-                  <span ng-show="sortType == Node && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == Node && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortTasksType == Node && !sortTasksReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortTasksType == Node && sortTasksReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
                 <a ui-sref="stack" ng-click="order(Updated)">
                   Last update
-                  <span ng-show="sortType == Updated && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == Updated && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortTasksType == Updated && !sortTasksReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortTasksType == Updated && sortTasksReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+            <tr dir-paginate="task in (filteredTasks = ( tasks | orderBy:sortTasksType:sortTasksReverse | itemsPerPage: state.pagination_count_tasks))">
               <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
               <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
               <td>{{ task.Image | hideshasum }}</td>

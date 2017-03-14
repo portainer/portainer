@@ -3,20 +3,32 @@ angular.module('stack', [])
 function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Messages, Pagination) {
 
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
+  $scope.state.pagination_count_service = Pagination.getPaginationCount('stack_services');
+  $scope.state.pagination_count_tasks = Pagination.getPaginationCount('stack_tasks');
   $scope.service = {};
   $scope.tasks = [];
   $scope.displayNode = false;
-  $scope.sortType = 'Status';
-  $scope.sortReverse = false;
+  $scope.sortServicesType = 'Name';
+  $scope.sortServicesReverse = false;
+  $scope.sortTasksType = 'Status';
+  $scope.sortTasksReverse = false;
 
-  $scope.order = function (sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
+  $scope.orderServices = function (sortServicesType) {
+    $scope.sortServicesReverse = ($scope.sortServicesType === sortServicesType) ? !$scope.sortServicesReverse : false;
+    $scope.sortServicesType = sortServicesType;
   };
 
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('service_tasks', $scope.state.pagination_count);
+  $scope.orderTasks = function (sortTasksType) {
+    $scope.sortTasksReverse = ($scope.sortTasksType === sortTasksType) ? !$scope.sortTasksReverse : false;
+    $scope.sortTasksType = sortTasksType;
+  };
+
+  $scope.changePaginationCountServices = function() {
+    Pagination.setPaginationCount('stack_services', $scope.state.pagination_count);
+  };
+
+  $scope.changePaginationCountTasks = function() {
+    Pagination.setPaginationCount('stack_tasks', $scope.state.pagination_count);
   };
 
   function fetchStackDetails() {
