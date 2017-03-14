@@ -28,10 +28,17 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
         "Name": $stateParams.name,
         "Services": services.length
       });
-      $scope.services = services.map(function (service) {
+
+      /*$scope.services = services.map(function (service) {
         return new ServiceViewModel(service);
-      });
+      });*/
       Task.query({filters: {label: label_filter}}, function (tasks) {
+        $scope.services = services.map(function (service) {
+          var serviceTasks = tasks.filter(function (task) {
+            return task.ServiceID === service.ID && task.DesiredState === 'running';
+          });
+          return new ServiceViewModel(service, serviceTasks);
+        });
         Node.query({}, function (nodes) {
           $scope.displayNode = true;
           $scope.tasks = tasks.map(function (task) {
