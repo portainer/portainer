@@ -7,6 +7,8 @@ function ($scope, $state, $sanitize, Authentication, UserService, Messages) {
     confirmPassword: ''
   };
 
+  $scope.UserId = Authentication.getUserDetails().ID;
+
   $scope.updatePassword = function() {
     $scope.invalidPassword = false;
     var userID = Authentication.getUserDetails().ID;

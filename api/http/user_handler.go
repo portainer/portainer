@@ -212,6 +212,11 @@ func (handler *UserHandler) handlePutUser(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	if userID == 1 {
+		Error(w, portainer.ErrNotAvailableInDemo, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	tokenData, err := extractTokenDataFromRequestContext(r)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
@@ -356,6 +361,11 @@ func (handler *UserHandler) handleDeleteUser(w http.ResponseWriter, r *http.Requ
 	userID, err := strconv.Atoi(id)
 	if err != nil {
 		Error(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	if userID == 1 {
+		Error(w, portainer.ErrNotAvailableInDemo, http.StatusForbidden, handler.Logger)
 		return
 	}
 

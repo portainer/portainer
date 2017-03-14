@@ -137,8 +137,11 @@
                   {{ user.RoleName }}
                   <i class="fa" ng-class="user.RoleId === 1 ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
                 </td>
-                <td>
+                <td ng-if="user.Id !== 1">
                   <a ui-sref="user({id: user.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
+                </td>
+                <td ng-if="user.Id === 1">
+                  <i class="fa fa-lock" aria-hidden="true"></i> You cannot edit this user in the demo version
                 </td>
               </tr>
             <tr ng-if="!users">

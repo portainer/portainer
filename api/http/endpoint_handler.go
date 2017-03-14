@@ -233,6 +233,11 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		return
 	}
 
+	if endpointID == 1 {
+		Error(w, portainer.ErrNotAvailableInDemo, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	var req putEndpointsRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
@@ -308,6 +313,11 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 	endpointID, err := strconv.Atoi(id)
 	if err != nil {
 		Error(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	if endpointID == 1 {
+		Error(w, portainer.ErrNotAvailableInDemo, http.StatusForbidden, handler.Logger)
 		return
 	}
 

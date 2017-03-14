@@ -53,6 +53,36 @@ func initStore(dataStorePath string) *bolt.Store {
 	return store
 }
 
+func initDemoData(store *bolt.Store, cryptoService portainer.CryptoService) error {
+	password, err := cryptoService.Hash("tryportainer")
+	if err != nil {
+		return err
+	}
+
+	admin := &portainer.User{
+		Username: "admin",
+		Password: password,
+		Role:     portainer.AdministratorRole,
+	}
+
+	err = store.UserService.CreateUser(admin)
+	if err != nil {
+		return err
+	}
+
+	localEndpoint := &portainer.Endpoint{
+		Name: "local",
+		URL:  "unix:///var/run/docker.sock",
+	}
+
+	err = store.EndpointService.CreateEndpoint(localEndpoint)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
 	if authenticationEnabled {
 		jwtService, err := jwt.NewService()
@@ -111,6 +141,8 @@ func main() {
 	jwtService := initJWTService(!*flags.NoAuth)
 
 	cryptoService := initCryptoService()
+
+	initDemoData(store, cryptoService)
 
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 

@@ -41,6 +41,11 @@ const (
 	ErrUndefinedTLSFileType = Error("Undefined TLS file type")
 )
 
+// Demo errors.
+const (
+	ErrNotAvailableInDemo = Error("This feature is not available in the demo version of Portainer")
+)
+
 // Error represents an application error.
 type Error string
 
