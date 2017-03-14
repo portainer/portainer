@@ -68,21 +68,21 @@
           <thead>
             <tr>
               <th>
-                <a ui-sref="stack" ng-click="order('Name')">
+                <a ui-sref="stack" ng-click="orderServices('Name')">
                   Name
-                  <span ng-show="sortServicesType == 'Status' && !sortServicesReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortServicesType == 'Name' && !sortServicesReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortServicesType == 'Name' && sortServicesReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="stack" ng-click="order('Image')">
+                <a ui-sref="stack" ng-click="orderServices('Image')">
                   Image
                   <span ng-show="sortServicesType == 'Image' && !sortServicesReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortServicesType == 'Image' && sortServicesReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="stack" ng-click="order('Mode')">
+                <a ui-sref="stack" ng-click="orderServices('Mode')">
                   Mode
                   <span ng-show="sortServicesType == 'Mode' && !sortServicesReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortServicesType == 'Mode' && sortServicesReverse" class="glyphicon glyphicon-chevron-up"></span>
@@ -140,35 +140,35 @@
             <tr>
               <th>Id</th>
               <th>
-                <a ui-sref="stack" ng-click="order(Status)">
+                <a ui-sref="stack" ng-click="orderTasks(Status)">
                   Status
                   <span ng-show="sortTasksType == Status && !sortTasksReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortTasksType == Status && sortTasksReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="stack" ng-click="order(Image)">
+                <a ui-sref="stack" ng-click="orderTasks(Image)">
                   Image
                   <span ng-show="sortTasksType == Image && !sortTasksReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortTasksType == Image && sortTasksReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="stack" ng-click="order(Slot)">
+                <a ui-sref="stack" ng-click="orderTasks(Slot)">
                   Slot
                   <span ng-show="sortTasksType == Slot && !sortTasksReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortTasksType == Slot && sortTasksReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th ng-if="displayNode">
-                <a ui-sref="stack" ng-click="order(Node)">
+                <a ui-sref="stack" ng-click="orderTasks(Node)">
                   Node
                   <span ng-show="sortTasksType == Node && !sortTasksReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortTasksType == Node && sortTasksReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="stack" ng-click="order(Updated)">
+                <a ui-sref="stack" ng-click="orderTasks(Updated)">
                   Last update
                   <span ng-show="sortTasksType == Updated && !sortTasksReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortTasksType == Updated && sortTasksReverse" class="glyphicon glyphicon-chevron-up"></span>
