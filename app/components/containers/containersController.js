@@ -47,7 +47,7 @@ angular.module('containers', [])
     angular.forEach($scope.containers, function (container) {
       if (container.Metadata) {
         var containerRC = container.Metadata.ResourceControl;
-        if (containerRC && containerRC.OwnerId != $scope.user.ID) {
+        if (containerRC && containerRC.OwnerId !== $scope.user.ID) {
           angular.forEach(users, function (user) {
             if (containerRC.OwnerId === user.Id) {
               container.Owner = user.Username;
