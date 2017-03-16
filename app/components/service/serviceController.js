@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'SecretHelper', 'Task', 'Node', 'Messages', 'Pagination',
-function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, SecretHelper, Task, Node, Messages, Pagination) {
+.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Pagination',
+function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Messages, Pagination) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -164,7 +164,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     config.TaskTemplate.ContainerSpec.Env = translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
     config.TaskTemplate.ContainerSpec.Labels = translateServiceLabelsToLabels(service.ServiceContainerLabels);
     config.TaskTemplate.ContainerSpec.Image = service.Image;
-    config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : undefined;
+    config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets;
 
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
@@ -232,7 +232,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
   };
 
   function translateServiceArrays(service) {
-    service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : undefined;
+    service.ServiceSecrets = service.Secrets;
     service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
     service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
     service.ServiceContainerLabels = translateLabelsToServiceLabels(service.ContainerLabels);
