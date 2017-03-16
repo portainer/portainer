@@ -21,13 +21,17 @@ function ServiceViewModel(data, runningTasks, nodes) {
       if (globalStatus[runningTasks[t].Status.State]) globalStatus[runningTasks[t].Status.State]++;
       else globalStatus[runningTasks[t].Status.State] = 1;
     }
+    // If runningTasks.length === 0, service is down
+    // If runningTasks.length != Replicas, we are preparing or in a loop of start/fail
     // If all running => running
     // If some running but not all => Partially running
     // If some starting and no running => starting
-    // If no running, no starting, bu some preparing => preparing
-    // Else unknownA
+    // If no running, no starting, but some preparing => preparing
+    // Else unknown
     this.Status = "unknown";
-    if (globalStatus["running"] && globalStatus["running"] === runningTasks.length) this.Status = "running";
+    if (runningTasks.length === 0) this.Status = "down";
+    else if (runningTasks.length != this.Replicas) this.Status = "preparing";
+    else if (globalStatus["running"] && globalStatus["running"] === runningTasks.length) this.Status = "running";
     else if (globalStatus["running"]) this.Status = "partially running";
     else if (!globalStatus["running"] && globalStatus["starting"]) this.Status = "starting";
     else if (!globalStatus["running"] && !globalStatus["starting"] && globalStatus["preparing"]) this.Status = "preparing";

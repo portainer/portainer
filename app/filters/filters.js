@@ -46,6 +46,8 @@ angular.module('portainer.filters', [])
       return 'info';
     } else if (status.indexOf('running') !== -1) {
       return 'success';
+    } else if (status.indexOf('down') !== -1) {
+      return 'danger';
     }
     return 'primary';
   };
