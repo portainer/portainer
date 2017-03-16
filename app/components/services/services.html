@@ -45,6 +45,12 @@
                 </a>
               </th>
               <th>
+                <a ui-sref="services" ng-click="order('Status')">
+                  Status
+                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+              </th>
+              <th>
                 <a ui-sref="services" ng-click="order('Image')">
                   Image
                   <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -70,6 +76,7 @@
               <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="service.Checked" ng-change="selectItem(service)"/></td>
                 <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
+                <td><span class="label label-{{ service.Status|servicestatusbadge }}">{{ service.Status }}</span></td>
                 <td>{{ service.Image | hideshasum }}</td>
                 <td>
                   {{ service.Mode }}
