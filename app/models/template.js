@@ -7,6 +7,7 @@ function TemplateViewModel(data) {
   this.Command = data.command ? data.command : '';
   this.Network = data.network ? data.network : '';
   this.Env = data.env ? data.env : [];
+  this.Privileged = data.privileged ? data.privileged : false;
   this.Volumes = [];
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {

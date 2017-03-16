@@ -1,14 +1,16 @@
 angular.module('portainer.services')
-.factory('Authentication', ['$q', 'Auth', 'jwtHelper', 'LocalStorage', 'StateManager', function AuthenticationFactory($q, Auth, jwtHelper, LocalStorage, StateManager) {
+.factory('Authentication', ['$q', 'Auth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', function AuthenticationFactory($q, Auth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
   'use strict';
 
-  var credentials = {};
+  var user = {};
   return {
     init: function() {
       var jwt = LocalStorage.getJWT();
       if (jwt) {
         var tokenPayload = jwtHelper.decodeToken(jwt);
-        credentials.username = tokenPayload.username;
+        user.username = tokenPayload.username;
+        user.ID = tokenPayload.id;
+        user.role = tokenPayload.role;
       }
     },
     login: function(username, password) {
@@ -16,7 +18,10 @@ angular.module('portainer.services')
         Auth.login({username: username, password: password}).$promise
         .then(function(data) {
           LocalStorage.storeJWT(data.jwt);
-          credentials.username = username;
+          var tokenPayload = jwtHelper.decodeToken(data.jwt);
+          user.username = username;
+          user.ID = tokenPayload.id;
+          user.role = tokenPayload.role;
           resolve();
         }, function() {
           reject();
@@ -25,14 +30,15 @@ angular.module('portainer.services')
     },
     logout: function() {
       StateManager.clean();
+      EndpointProvider.clean();
       LocalStorage.clean();
     },
     isAuthenticated: function() {
       var jwt = LocalStorage.getJWT();
       return jwt && !jwtHelper.isTokenExpired(jwt);
     },
-    getCredentials: function() {
-      return credentials;
+    getUserDetails: function() {
+      return user;
     }
   };
 }]);

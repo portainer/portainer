@@ -1,6 +1,6 @@
 angular.module('endpointInit', [])
-.controller('EndpointInitController', ['$scope', '$state', 'EndpointService', 'StateManager', 'Messages',
-function ($scope, $state, EndpointService, StateManager, Messages) {
+.controller('EndpointInitController', ['$scope', '$state', 'EndpointService', 'StateManager', 'EndpointProvider', 'Messages',
+function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messages) {
   $scope.state = {
     error: '',
     uploadInProgress: false
@@ -29,20 +29,28 @@ function ($scope, $state, EndpointService, StateManager, Messages) {
     var name = "local";
     var URL = "unix:///var/run/docker.sock";
     var TLS = false;
-    EndpointService.createLocalEndpoint(name, URL, TLS, true).then(function success(data) {
-      StateManager.updateEndpointState(false)
-      .then(function success() {
+
+    EndpointService.createLocalEndpoint(name, URL, TLS, true)
+    .then(
+    function success(data) {
+      var endpointID = data.Id;
+      EndpointProvider.setEndpointID(endpointID);
+      StateManager.updateEndpointState(false).then(
+      function success() {
         $state.go('dashboard');
-      }, function error(err) {
-        EndpointService.deleteEndpoint(0)
+      },
+      function error(err) {
+        EndpointService.deleteEndpoint(endpointID)
         .then(function success() {
-          $('#initEndpointSpinner').hide();
           $scope.state.error = 'Unable to connect to the Docker endpoint';
         });
       });
-    }, function error(err) {
-      $('#initEndpointSpinner').hide();
+    },
+    function error() {
       $scope.state.error = 'Unable to create endpoint';
+    })
+    .finally(function final() {
+      $('#initEndpointSpinner').hide();
     });
   };
 
@@ -57,11 +65,13 @@ function ($scope, $state, EndpointService, StateManager, Messages) {
     var TLSKeyFile = $scope.formValues.TLSKey;
     EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, TLS ? false : true)
     .then(function success(data) {
+      var endpointID = data.Id;
+      EndpointProvider.setEndpointID(endpointID);
       StateManager.updateEndpointState(false)
       .then(function success() {
         $state.go('dashboard');
       }, function error(err) {
-        EndpointService.deleteEndpoint(0)
+        EndpointService.deleteEndpoint(endpointID)
         .then(function success() {
           $('#initEndpointSpinner').hide();
           $scope.state.error = 'Unable to connect to the Docker endpoint';

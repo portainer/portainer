@@ -1,4 +1,4 @@
-function ServiceViewModel(data) {
+function ServiceViewModel(data, runningTasks, nodes) {
   this.Model = data;
   this.Id = data.ID;
   this.Name = data.Spec.Name;
@@ -11,6 +11,12 @@ function ServiceViewModel(data) {
     this.Replicas = data.Spec.Mode.Replicated.Replicas;
   } else {
     this.Mode = 'global';
+    if (nodes) {
+      this.Replicas = nodes.length;
+    }
+  }
+  if (runningTasks) {
+    this.Running = runningTasks.length;
   }
   if (data.Spec.TaskTemplate.Resources) {
     if (data.Spec.TaskTemplate.Resources.Limits) {
@@ -47,10 +53,15 @@ function ServiceViewModel(data) {
     this.Command = containerSpec.Command;
     this.Secrets = containerSpec.Secrets;
   }
-
   if (data.Spec.EndpointSpec) {
     this.Ports = data.Spec.EndpointSpec.Ports;
   }
+
+  this.Mounts = [];
+  if (data.Spec.TaskTemplate.ContainerSpec.Mounts) {
+    this.Mounts = data.Spec.TaskTemplate.ContainerSpec.Mounts;
+  }
+
   this.VirtualIPs = data.Endpoint ? data.Endpoint.VirtualIPs : [];
 
   if (data.Spec.UpdateConfig) {
@@ -65,4 +76,14 @@ function ServiceViewModel(data) {
 
   this.Checked = false;
   this.Scale = false;
+  this.EditName = false;
+
+  if (data.Portainer) {
+    this.Metadata = {};
+    if (data.Portainer.ResourceControl) {
+      this.Metadata.ResourceControl = {
+        OwnerId: data.Portainer.ResourceControl.OwnerId
+      };
+    }
+  }
 }

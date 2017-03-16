@@ -36,8 +36,17 @@ func initFileService(dataStorePath string) portainer.FileService {
 }
 
 func initStore(dataStorePath string) *bolt.Store {
-	var store = bolt.NewStore(dataStorePath)
-	err := store.Open()
+	store, err := bolt.NewStore(dataStorePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = store.Open()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = store.MigrateData()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -91,31 +100,6 @@ func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService
 	return &endpoints[0]
 }
 
-func initActiveEndpoint(endpointService portainer.EndpointService, flags *portainer.CLIFlags) *portainer.Endpoint {
-	activeEndpoint, err := endpointService.GetActive()
-	if err == portainer.ErrEndpointNotFound {
-		if *flags.Endpoint != "" {
-			activeEndpoint = &portainer.Endpoint{
-				Name:          "primary",
-				URL:           *flags.Endpoint,
-				TLS:           *flags.TLSVerify,
-				TLSCACertPath: *flags.TLSCacert,
-				TLSCertPath:   *flags.TLSCert,
-				TLSKeyPath:    *flags.TLSKey,
-			}
-			err = endpointService.CreateEndpoint(activeEndpoint)
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else if *flags.ExternalEndpoints != "" {
-			activeEndpoint = retrieveFirstEndpointFromDatabase(endpointService)
-		}
-	} else if err != nil {
-		log.Fatal(err)
-	}
-	return activeEndpoint
-}
-
 func main() {
 	flags := initCLI()
 
@@ -132,21 +116,43 @@ func main() {
 
 	settings := initSettings(authorizeEndpointMgmt, flags)
 
-	activeEndpoint := initActiveEndpoint(store.EndpointService, flags)
+	if *flags.Endpoint != "" {
+		var endpoints []portainer.Endpoint
+		endpoints, err := store.EndpointService.Endpoints()
+		if err != nil {
+			log.Fatal(err)
+		}
+		if len(endpoints) == 0 {
+			endpoint := &portainer.Endpoint{
+				Name:          "primary",
+				URL:           *flags.Endpoint,
+				TLS:           *flags.TLSVerify,
+				TLSCACertPath: *flags.TLSCacert,
+				TLSCertPath:   *flags.TLSCert,
+				TLSKeyPath:    *flags.TLSKey,
+			}
+			err = store.EndpointService.CreateEndpoint(endpoint)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			log.Println("Instance already has defined endpoints. Skipping the endpoint defined via CLI.")
+		}
+	}
 
 	var server portainer.Server = &http.Server{
-		BindAddress:        *flags.Addr,
-		AssetsPath:         *flags.Assets,
-		Settings:           settings,
-		TemplatesURL:       *flags.Templates,
-		AuthDisabled:       *flags.NoAuth,
-		EndpointManagement: authorizeEndpointMgmt,
-		UserService:        store.UserService,
-		EndpointService:    store.EndpointService,
-		CryptoService:      cryptoService,
-		JWTService:         jwtService,
-		FileService:        fileService,
-		ActiveEndpoint:     activeEndpoint,
+		BindAddress:            *flags.Addr,
+		AssetsPath:             *flags.Assets,
+		Settings:               settings,
+		TemplatesURL:           *flags.Templates,
+		AuthDisabled:           *flags.NoAuth,
+		EndpointManagement:     authorizeEndpointMgmt,
+		UserService:            store.UserService,
+		EndpointService:        store.EndpointService,
+		ResourceControlService: store.ResourceControlService,
+		CryptoService:          cryptoService,
+		JWTService:             jwtService,
+		FileService:            fileService,
 	}
 
 	log.Printf("Starting Portainer on %s", *flags.Addr)

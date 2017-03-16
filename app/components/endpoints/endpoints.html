@@ -14,7 +14,7 @@
       <rd-widget-header icon="fa-exclamation-triangle" title="Endpoint management is not available">
       </rd-widget-header>
       <rd-widget-body>
-        <span class="small text-muted">Portainer has been started using the <code>--external-endpoints</code> flag. Endpoint management via the UI is disabled.</span>
+        <span class="small text-muted">Portainer has been started using the <code>--external-endpoints</code> flag. Endpoint management via the UI is disabled. You can still manage endpoint access.</span>
       </rd-wigdet-body>
     </rd-widget>
   </div>
@@ -137,7 +137,9 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th ng-if="applicationState.application.endpointManagement"></th>
+                <th ng-if="applicationState.application.endpointManagement">
+                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+                </th>
                 <th>
                   <a ui-sref="endpoints" ng-click="order('Name')">
                     Name
@@ -152,14 +154,7 @@
                     <span ng-show="sortType == 'URL' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
-                <th>
-                  <a ui-sref="endpoints" ng-click="order('TLS')">
-                    TLS
-                    <span ng-show="sortType == 'TLS' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'TLS' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
-                </th>
-                <th ng-if="applicationState.application.endpointManagement"></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -167,13 +162,17 @@
                 <td ng-if="applicationState.application.endpointManagement"><input type="checkbox" ng-model="endpoint.Checked" ng-change="selectItem(endpoint)" /></td>
                 <td><i class="fa fa-star" aria-hidden="true" ng-if="endpoint.Id === activeEndpoint.Id"></i> {{ endpoint.Name }}</td>
                 <td>{{ endpoint.URL | stripprotocol }}</td>
-                <td><i class="fa fa-shield" aria-hidden="true" ng-if="endpoint.TLS"></i></td>
-                <td ng-if="applicationState.application.endpointManagement">
-                  <span ng-if="endpoint.Id !== activeEndpoint.Id">
-                    <a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
+                <td>
+                  <span ng-if="applicationState.application.endpointManagement">
+                    <span ng-if="endpoint.Id !== activeEndpointID">
+                      <a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
+                    </span>
+                    <span class="small text-muted" ng-if="endpoint.Id === activeEndpointID">
+                      <i class="fa fa-lock" aria-hidden="true"></i> You cannot edit the active endpoint
+                    </span>
                   </span>
-                  <span class="small text-muted" ng-if="endpoint.Id === activeEndpoint.Id">
-                    <i class="fa fa-lock" aria-hidden="true"></i> You cannot edit the active endpoint
+                  <span ng-if="applicationState.application.authentication">
+                    <a ui-sref="endpoint.access({id: endpoint.Id})"><i class="fa fa-users" aria-hidden="true" style="margin-left: 7px;"></i> Manage access</a>
                   </span>
               </td>
               </tr>
