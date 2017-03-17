@@ -141,7 +141,8 @@ module.exports = function (grunt) {
         'bower_components/xterm.js/dist/xterm.js',
         'bower_components/bootbox.js/bootbox.js',
         'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
-        'assets/js/legend.js' // Not a bower package
+        'assets/js/legend.js', // Not a bower package
+        'assets/js/ansi2html.js' // https://github.com/jorgeecardona/ansi-to-html
       ],
       html: ['index.html'],
       tpl: ['app/components/**/*.html'],
