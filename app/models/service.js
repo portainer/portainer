@@ -23,6 +23,22 @@ function ServiceViewModel(data, runningTasks, nodes) {
   if (data.Spec.TaskTemplate.ContainerSpec.Env) {
     this.Env = data.Spec.TaskTemplate.ContainerSpec.Env;
   }
+  // Find first manager IP
+  if (nodes) {
+    for (var n in nodes) {
+      if (undefined === nodes[n].ManagerStatus) continue;
+      if (nodes[n].ManagerStatus.Reachability !== "reachable") continue;
+      var manager_ip = nodes[n].ManagerStatus.Addr.split(":")[0];
+      // Get service exposed port
+      this.PublishedPorts = [];
+      if (undefined === data.Endpoint.Ports) break;
+      for (var i = 0; i < data.Endpoint.Ports.length; ++i) {
+        var p = data.Endpoint.Ports[i];
+        this.PublishedPorts.push({ host: manager_ip, private: p.TargetPort, public: p.PublishedPort });
+      }
+      break;
+    }
+  }
   this.Mounts = [];
   if (data.Spec.TaskTemplate.ContainerSpec.Mounts) {
     this.Mounts = data.Spec.TaskTemplate.ContainerSpec.Mounts;
