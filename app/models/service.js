@@ -18,8 +18,11 @@ function ServiceViewModel(data, runningTasks, nodes) {
     // Find service status
     var globalStatus = {};
     for (var t in runningTasks) {
-      if (globalStatus[runningTasks[t].Status.State]) globalStatus[runningTasks[t].Status.State]++;
-      else globalStatus[runningTasks[t].Status.State] = 1;
+      if (globalStatus[runningTasks[t].Status.State]) {
+        globalStatus[runningTasks[t].Status.State]++;
+      } else {
+        globalStatus[runningTasks[t].Status.State] = 1;
+      }
     }
     // If runningTasks.length === 0, service is down
     // If runningTasks.length != Replicas, we are preparing or in a loop of start/fail
@@ -29,12 +32,19 @@ function ServiceViewModel(data, runningTasks, nodes) {
     // If no running, no starting, but some preparing => preparing
     // Else unknown
     this.Status = "unknown";
-    if (runningTasks.length === 0) this.Status = "down";
-    else if (runningTasks.length != this.Replicas) this.Status = "preparing";
-    else if (globalStatus["running"] && globalStatus["running"] === runningTasks.length) this.Status = "running";
-    else if (globalStatus["running"]) this.Status = "partially running";
-    else if (!globalStatus["running"] && globalStatus["starting"]) this.Status = "starting";
-    else if (!globalStatus["running"] && !globalStatus["starting"] && globalStatus["preparing"]) this.Status = "preparing";
+    if (runningTasks.length === 0) {
+      this.Status = "down";
+    } else if (runningTasks.length !== this.Replicas) {
+      this.Status = "preparing";
+    } else if (globalStatus["running"] && globalStatus["running"] === runningTasks.length) {
+      this.Status = "running";
+    } else if (globalStatus["running"]) {
+      this.Status = "partially running";
+    } else if (!globalStatus["running"] && globalStatus["starting"]) {
+      this.Status = "starting";
+    } else if (!globalStatus["running"] && !globalStatus["starting"] && globalStatus["preparing"]) {
+      this.Status = "preparing";
+    }
   }
   this.Labels = data.Spec.Labels;
   if (data.Spec.TaskTemplate.ContainerSpec) {
