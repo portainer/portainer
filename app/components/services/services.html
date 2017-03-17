@@ -58,16 +58,25 @@
                   <span ng-show="sortType == 'Mode' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th ng-if="applicationState.application.authentication">
+                <a ui-sref="services" ng-click="order('Metadata.ResourceControl.OwnerId')">
+                  Ownership
+                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
             </thead>
             <tbody>
               <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="service.Checked" ng-change="selectItem(service)"/></td>
                 <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
-                <td>{{ service.Image }}</td>
+                <td>{{ service.Image | hideshasum }}</td>
                 <td>
                   {{ service.Mode }}
+                  <code data-toggle="tooltip" title="Replicas">{{ service.Running }}</code>
+                  /
+                  <code data-toggle="tooltip" title="Replicas">{{ service.Replicas }}</code>
                   <span ng-if="service.Mode === 'replicated' && !service.Scale">
-                    <code data-toggle="tooltip" title="Replicas">{{ service.Replicas }}</code>
                     <a class="interactive" ng-click="service.Scale = true; service.ReplicaCount = service.Replicas;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Scale</a>
                   </span>
                   <span ng-if="service.Mode === 'replicated' && service.Scale">
@@ -76,12 +85,33 @@
                     <a class="interactive" ng-click="scaleService(service)"><i class="fa fa-check-square-o"></i></a>
                   </span>
                 </td>
+                <td ng-if="applicationState.application.authentication">
+                  <span ng-if="user.role === 1 && service.Metadata.ResourceControl">
+                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                    <span ng-if="service.Metadata.ResourceControl.OwnerId === user.ID">
+                      Private
+                    </span>
+                    <span ng-if="service.Metadata.ResourceControl.OwnerId !== user.ID">
+                      Private <span ng-if="service.Owner">(owner: {{ service.Owner }})</span>
+                    </span>
+                    <a ng-click="switchOwnership(service)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
+                  </span>
+                  <span ng-if="user.role !== 1 && service.Metadata.ResourceControl.OwnerId === user.ID">
+                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                    Private
+                    <a ng-click="switchOwnership(service)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
+                  </span>
+                  <span ng-if="!service.Metadata.ResourceControl">
+                    <i class="fa fa-eye" aria-hidden="true"></i>
+                    Public
+                  </span>
+                </td>
               </tr>
               <tr ng-if="!services">
-                <td colspan="4" class="text-center text-muted">Loading...</td>
+                <td colspan="5" class="text-center text-muted">Loading...</td>
               </tr>
               <tr ng-if="services.length == 0">
-                <td colspan="4" class="text-center text-muted">No services available.</td>
+                <td colspan="5" class="text-center text-muted">No services available.</td>
               </tr>
             </tbody>
           </table>

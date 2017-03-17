@@ -16,38 +16,37 @@ import (
 // EndpointHandler represents an HTTP API handler for managing Docker endpoints.
 type EndpointHandler struct {
 	*mux.Router
-	Logger            *log.Logger
-	EndpointService   portainer.EndpointService
-	FileService       portainer.FileService
-	server            *Server
-	middleWareService *middleWareService
+	Logger                      *log.Logger
+	authorizeEndpointManagement bool
+	EndpointService             portainer.EndpointService
+	FileService                 portainer.FileService
 }
 
+const (
+	// ErrEndpointManagementDisabled is an error raised when trying to access the endpoints management endpoints
+	// when the server has been started with the --external-endpoints flag
+	ErrEndpointManagementDisabled = portainer.Error("Endpoint management is disabled")
+)
+
 // NewEndpointHandler returns a new instance of EndpointHandler.
-func NewEndpointHandler(middleWareService *middleWareService) *EndpointHandler {
+func NewEndpointHandler(mw *middleWareService) *EndpointHandler {
 	h := &EndpointHandler{
-		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
-		middleWareService: middleWareService,
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.Handle("/endpoints", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handlePostEndpoints(w, r)
-	}))).Methods(http.MethodPost)
-	h.Handle("/endpoints", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleGetEndpoints(w, r)
-	}))).Methods(http.MethodGet)
-	h.Handle("/endpoints/{id}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleGetEndpoint(w, r)
-	}))).Methods(http.MethodGet)
-	h.Handle("/endpoints/{id}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handlePutEndpoint(w, r)
-	}))).Methods(http.MethodPut)
-	h.Handle("/endpoints/{id}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handleDeleteEndpoint(w, r)
-	}))).Methods(http.MethodDelete)
-	h.Handle("/endpoints/{id}/active", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handlePostEndpoint(w, r)
-	}))).Methods(http.MethodPost)
+	h.Handle("/endpoints",
+		mw.administrator(http.HandlerFunc(h.handlePostEndpoints))).Methods(http.MethodPost)
+	h.Handle("/endpoints",
+		mw.authenticated(http.HandlerFunc(h.handleGetEndpoints))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}",
+		mw.administrator(http.HandlerFunc(h.handleGetEndpoint))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}",
+		mw.administrator(http.HandlerFunc(h.handlePutEndpoint))).Methods(http.MethodPut)
+	h.Handle("/endpoints/{id}/access",
+		mw.administrator(http.HandlerFunc(h.handlePutEndpointAccess))).Methods(http.MethodPut)
+	h.Handle("/endpoints/{id}",
+		mw.administrator(http.HandlerFunc(h.handleDeleteEndpoint))).Methods(http.MethodDelete)
+
 	return h
 }
 
@@ -58,13 +57,41 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-	encodeJSON(w, endpoints, handler.Logger)
+
+	tokenData, err := extractTokenDataFromRequestContext(r)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+	}
+	if tokenData == nil {
+		Error(w, portainer.ErrInvalidJWTToken, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	var allowedEndpoints []portainer.Endpoint
+	if tokenData.Role != portainer.AdministratorRole {
+		allowedEndpoints = make([]portainer.Endpoint, 0)
+		for _, endpoint := range endpoints {
+			for _, authorizedUserID := range endpoint.AuthorizedUsers {
+				if authorizedUserID == tokenData.ID {
+					allowedEndpoints = append(allowedEndpoints, endpoint)
+					break
+				}
+			}
+		}
+	} else {
+		allowedEndpoints = endpoints
+	}
+
+	encodeJSON(w, allowedEndpoints, handler.Logger)
 }
 
 // handlePostEndpoints handles POST requests on /endpoints
-// if the active URL parameter is specified, will also define the new endpoint as the active endpoint.
-// /endpoints(?active=true|false)
 func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *http.Request) {
+	if !handler.authorizeEndpointManagement {
+		Error(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
+		return
+	}
+
 	var req postEndpointsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
@@ -78,9 +105,10 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 	}
 
 	endpoint := &portainer.Endpoint{
-		Name: req.Name,
-		URL:  req.URL,
-		TLS:  req.TLS,
+		Name:            req.Name,
+		URL:             req.URL,
+		TLS:             req.TLS,
+		AuthorizedUsers: []portainer.UserID{},
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
@@ -103,22 +131,6 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		}
 	}
 
-	activeEndpointParameter := r.FormValue("active")
-	if activeEndpointParameter != "" {
-		active, err := strconv.ParseBool(activeEndpointParameter)
-		if err != nil {
-			Error(w, err, http.StatusBadRequest, handler.Logger)
-			return
-		}
-		if active == true {
-			err = handler.server.updateActiveEndpoint(endpoint)
-			if err != nil {
-				Error(w, err, http.StatusInternalServerError, handler.Logger)
-				return
-			}
-		}
-	}
-
 	encodeJSON(w, &postEndpointsResponse{ID: int(endpoint.ID)}, handler.Logger)
 }
 
@@ -133,50 +145,7 @@ type postEndpointsResponse struct {
 }
 
 // handleGetEndpoint handles GET requests on /endpoints/:id
-// GET /endpoints/0 returns active endpoint
 func (handler *EndpointHandler) handleGetEndpoint(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	endpointID, err := strconv.Atoi(id)
-	if err != nil {
-		Error(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	var endpoint *portainer.Endpoint
-	if id == "0" {
-		endpoint, err = handler.EndpointService.GetActive()
-		if err == portainer.ErrEndpointNotFound {
-			Error(w, err, http.StatusNotFound, handler.Logger)
-			return
-		} else if err != nil {
-			Error(w, err, http.StatusInternalServerError, handler.Logger)
-			return
-		}
-		if handler.server.ActiveEndpoint == nil {
-			err = handler.server.updateActiveEndpoint(endpoint)
-			if err != nil {
-				Error(w, err, http.StatusInternalServerError, handler.Logger)
-				return
-			}
-		}
-	} else {
-		endpoint, err = handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-		if err == portainer.ErrEndpointNotFound {
-			Error(w, err, http.StatusNotFound, handler.Logger)
-			return
-		} else if err != nil {
-			Error(w, err, http.StatusInternalServerError, handler.Logger)
-			return
-		}
-	}
-
-	encodeJSON(w, endpoint, handler.Logger)
-}
-
-// handlePostEndpoint handles POST requests on /endpoints/:id/active
-func (handler *EndpointHandler) handlePostEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -195,14 +164,65 @@ func (handler *EndpointHandler) handlePostEndpoint(w http.ResponseWriter, r *htt
 		return
 	}
 
-	err = handler.server.updateActiveEndpoint(endpoint)
+	encodeJSON(w, endpoint, handler.Logger)
+}
+
+// handlePutEndpointAccess handles PUT requests on /endpoints/:id/access
+func (handler *EndpointHandler) handlePutEndpointAccess(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	endpointID, err := strconv.Atoi(id)
+	if err != nil {
+		Error(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	var req putEndpointAccessRequest
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = govalidator.ValidateStruct(req)
+	if err != nil {
+		Error(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrEndpointNotFound {
+		Error(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	authorizedUserIDs := []portainer.UserID{}
+	for _, value := range req.AuthorizedUsers {
+		authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
+	}
+	endpoint.AuthorizedUsers = authorizedUserIDs
+
+	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		return
 	}
+}
+
+type putEndpointAccessRequest struct {
+	AuthorizedUsers []int `valid:"-"`
 }
 
 // handlePutEndpoint handles PUT requests on /endpoints/:id
 func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http.Request) {
+	if !handler.authorizeEndpointManagement {
+		Error(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
+		return
+	}
+
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -224,14 +244,25 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		return
 	}
 
-	endpoint := &portainer.Endpoint{
-		ID:   portainer.EndpointID(endpointID),
-		Name: req.Name,
-		URL:  req.URL,
-		TLS:  req.TLS,
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrEndpointNotFound {
+		Error(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if req.Name != "" {
+		endpoint.Name = req.Name
+	}
+
+	if req.URL != "" {
+		endpoint.URL = req.URL
 	}
 
 	if req.TLS {
+		endpoint.TLS = true
 		caCertPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCA)
 		endpoint.TLSCACertPath = caCertPath
 		certPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCert)
@@ -239,6 +270,10 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		keyPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileKey)
 		endpoint.TLSKeyPath = keyPath
 	} else {
+		endpoint.TLS = false
+		endpoint.TLSCACertPath = ""
+		endpoint.TLSCertPath = ""
+		endpoint.TLSKeyPath = ""
 		err = handler.FileService.DeleteTLSFiles(endpoint.ID)
 		if err != nil {
 			Error(w, err, http.StatusInternalServerError, handler.Logger)
@@ -254,14 +289,18 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 }
 
 type putEndpointsRequest struct {
-	Name string `valid:"required"`
-	URL  string `valid:"required"`
-	TLS  bool
+	Name string `valid:"-"`
+	URL  string `valid:"-"`
+	TLS  bool   `valid:"-"`
 }
 
 // handleDeleteEndpoint handles DELETE requests on /endpoints/:id
-// DELETE /endpoints/0 deletes the active endpoint
 func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *http.Request) {
+	if !handler.authorizeEndpointManagement {
+		Error(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
+		return
+	}
+
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -271,13 +310,7 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 		return
 	}
 
-	var endpoint *portainer.Endpoint
-	if id == "0" {
-		endpoint, err = handler.EndpointService.GetActive()
-		endpointID = int(endpoint.ID)
-	} else {
-		endpoint, err = handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	}
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 
 	if err == portainer.ErrEndpointNotFound {
 		Error(w, err, http.StatusNotFound, handler.Logger)
@@ -291,13 +324,6 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
-	}
-	if id == "0" {
-		err = handler.EndpointService.DeleteActive()
-		if err != nil {
-			Error(w, err, http.StatusInternalServerError, handler.Logger)
-			return
-		}
 	}
 
 	if endpoint.TLS {

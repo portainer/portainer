@@ -60,21 +60,9 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Pagination, Moda
   };
 
   $scope.confirmRemovalAction = function (force) {
-    ModalService.confirm({
-      title: "Are you sure?",
-      message: "Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.",
-      buttons: {
-        confirm: {
-          label: 'Remove the image',
-        },
-        cancel: {
-          label: 'Cancel'
-        }
-      },
-      callback: function (confirmed) {
-        if(!confirmed) { return; }
-        $scope.removeAction(force);
-      }
+    ModalService.confirmImageForceRemoval(function (confirmed) {
+      if(!confirmed) { return; }
+      $scope.removeAction(force);
     });
   };
 

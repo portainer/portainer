@@ -1,13 +1,59 @@
 angular.module('containers', [])
-.controller('ContainersController', ['$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination', 'EntityListService',
-function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination, EntityListService) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
+  function ($q, $scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService) {
   $scope.state = {};
   $scope.state.displayAll = Settings.displayAll;
   $scope.state.displayIP = false;
   $scope.state.selectedItemCount = 0;
 
+  function removeContainerResourceControl(container) {
+    volumeResourceControlQueries = [];
+    angular.forEach(container.Mounts, function (volume) {
+      volumeResourceControlQueries.push(ResourceControlService.removeVolumeResourceControl(container.Metadata.ResourceControl.OwnerId, volume.Name));
+    });
+
+    $q.all(volumeResourceControlQueries)
+    .then(function success() {
+      return ResourceControlService.removeContainerResourceControl(container.Metadata.ResourceControl.OwnerId, container.Id);
+    })
+    .then(function success() {
+      delete container.Metadata.ResourceControl;
+      Messages.send('Ownership changed to public', container.Id);
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to change container ownership");
+    });
+  }
+
+  $scope.switchOwnership = function(container) {
+    ModalService.confirmContainerOwnershipChange(function (confirmed) {
+      if(!confirmed) { return; }
+      removeContainerResourceControl(container);
+    });
+  };
+
+  function mapUsersToContainers(users) {
+    angular.forEach($scope.containers, function (container) {
+      if (container.Metadata) {
+        var containerRC = container.Metadata.ResourceControl;
+        if (containerRC && containerRC.OwnerId !== $scope.user.ID) {
+          angular.forEach(users, function (user) {
+            if (containerRC.OwnerId === user.Id) {
+              container.Owner = user.Username;
+            }
+          });
+        }
+      }
+    });
+  }
+
   var update = function (data) {
     $('#loadContainersSpinner').show();
+
+    var userDetails = Authentication.getUserDetails();
+    $scope.state.selectedItemCount = 0;
+    $scope.user = userDetails;
+
     Container.query(data, function (d) {
       var containers = d;
       if ($scope.containersToHideLabels) {
@@ -29,7 +75,20 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
         }
         return model;
       });
-      $('#loadContainersSpinner').hide();
+      if (userDetails.role === 1) {
+        UserService.users()
+        .then(function success(data) {
+          mapUsersToContainers(data);
+        })
+        .catch(function error(err) {
+          Messages.error("Failure", err, "Unable to retrieve users");
+        })
+        .finally(function final() {
+          $('#loadContainersSpinner').hide();
+        });
+      } else {
+        $('#loadContainersSpinner').hide();
+      }
     }, function (e) {
       $('#loadContainersSpinner').hide();
       Messages.error("Failure", e, "Unable to retrieve containers");
@@ -65,7 +124,17 @@ function ($scope, $filter, Container, ContainerHelper, Info, Settings, Messages,
               Messages.send("Error", d.message);
             }
             else {
-              Messages.send("Container " + msg, c.Id);
+              if (c.Metadata && c.Metadata.ResourceControl) {
+                ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, c.Id)
+                .then(function success() {
+                  Messages.send("Container " + msg, c.Id);
+                })
+                .catch(function error(err) {
+                  Messages.error("Failure", err, "Unable to remove container ownership");
+                });
+              } else {
+                Messages.send("Container " + msg, c.Id);
+              }
             }
             complete();
           }, function (e) {
