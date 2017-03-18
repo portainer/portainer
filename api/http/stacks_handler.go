@@ -12,6 +12,7 @@ import (
   "fmt"
   "bytes"
   "os/exec"
+  "io/ioutil"
 
 	"github.com/gorilla/mux"
 )
@@ -29,16 +30,17 @@ func NewStacksHandler(mw *middleWareService, resourceControlService portainer.Re
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.PathPrefix("/{id}/{stack}/{command}").Handler(
-		mw.authenticated(http.HandlerFunc(h.executeDockerStackCommand)))
+	h.PathPrefix("/{id}/{stack}/deploy").Handler(
+		mw.authenticated(http.HandlerFunc(h.executeDockerStackDeploy)))
+	h.PathPrefix("/{id}/{stack}/rm").Handler(
+		mw.authenticated(http.HandlerFunc(h.executeDockerStackRm)))
 	return h
 }
 
-func (handler *StacksHandler) executeDockerStackCommand(w http.ResponseWriter, r *http.Request) {
+func (handler *StacksHandler) executeDockerStackRm(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	stack := vars["stack"]
-  command := vars["command"]
 
 	parsedID, err := strconv.Atoi(id)
 	if err != nil {
@@ -49,7 +51,7 @@ func (handler *StacksHandler) executeDockerStackCommand(w http.ResponseWriter, r
 	endpointID := portainer.EndpointID(parsedID)
 	endpoint, _ := handler.EndpointService.Endpoint(endpointID)
 
-  cmd := exec.Command("/docker", "-H", endpoint.URL, "stack", command, stack)
+  cmd := exec.Command("/docker", "-H", endpoint.URL, "stack", "rm", stack)
 
   var out bytes.Buffer
   cmd.Stdout = &out
@@ -60,3 +62,37 @@ func (handler *StacksHandler) executeDockerStackCommand(w http.ResponseWriter, r
   fmt.Fprintln(w, "err: ", err)
 }
 
+func (handler *StacksHandler) executeDockerStackDeploy(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	stack := vars["stack"]
+
+  // Get Body (compose-file)
+  body, _ := ioutil.ReadAll(r.Body)
+
+  // Place body in tempfile
+  tmpfile, err := ioutil.TempFile("/", "portainer_compose_file_")
+  defer os.Remove(tmpfile.Name())
+  tmpfile.Write(body)
+
+	parsedID, err := strconv.Atoi(id)
+	if err != nil {
+		Error(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	endpointID := portainer.EndpointID(parsedID)
+	endpoint, _ := handler.EndpointService.Endpoint(endpointID)
+
+  cmd := exec.Command("/docker", "-H", endpoint.URL, "stack", "deploy", "--compose-file", tmpfile.Name(), stack)
+
+  var out bytes.Buffer
+  cmd.Stdout = &out
+  cmd.Stderr = &out
+  err = cmd.Run()
+
+  fmt.Fprintln(w, out.String())
+  fmt.Fprintln(w, "err: ", err)
+
+  tmpfile.Close()
+}
