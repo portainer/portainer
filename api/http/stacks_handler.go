@@ -7,7 +7,7 @@ import (
 
 	"log"
 	"net/http"
-	//"net/url"
+	"net/url"
 	"os"
   "fmt"
   "bytes"
@@ -77,6 +77,8 @@ func (handler *StacksHandler) executeDockerStackDeploy(w http.ResponseWriter, r 
 	vars := mux.Vars(r)
 	id := vars["id"]
 	stack := vars["stack"]
+  u, _ := url.Parse(r.URL.String())
+  queryParams := u.Query()
 
   // Get Body (compose-file)
   body, _ := ioutil.ReadAll(r.Body)
@@ -96,6 +98,11 @@ func (handler *StacksHandler) executeDockerStackDeploy(w http.ResponseWriter, r 
 	endpoint, _ := handler.EndpointService.Endpoint(endpointID)
 
   cmd := exec.Command("/docker", "-H", endpoint.URL, "stack", "deploy", "--compose-file", tmpfile.Name(), stack)
+  // Add env from queryParams
+  cmd.Env = []string{}
+  for k, v := range queryParams { 
+    cmd.Env = append(cmd.Env, k + "=" + v[0])
+  }
 
   var stdout bytes.Buffer
   var stderr bytes.Buffer
