@@ -13,6 +13,7 @@ import (
   "bytes"
   "os/exec"
   "io/ioutil"
+  "encoding/json"
 
 	"github.com/gorilla/mux"
 )
@@ -22,6 +23,12 @@ type StacksHandler struct {
 	*mux.Router
 	Logger          *log.Logger
 	EndpointService portainer.EndpointService
+}
+
+type StackCommandResult struct {
+  Error       error
+  Stdout      string
+  Stderr      string
 }
 
 // NewStacksHandler returns a new instance of StacksHandler.
@@ -53,13 +60,17 @@ func (handler *StacksHandler) executeDockerStackRm(w http.ResponseWriter, r *htt
 
   cmd := exec.Command("/docker", "-H", endpoint.URL, "stack", "rm", stack)
 
-  var out bytes.Buffer
-  cmd.Stdout = &out
-  cmd.Stderr = &out
+  var stdout bytes.Buffer
+  var stderr bytes.Buffer
+  cmd.Stdout = &stdout
+  cmd.Stderr = &stderr
   err = cmd.Run()
 
-  fmt.Fprintln(w, out.String())
-  fmt.Fprintln(w, "err: ", err)
+  result := StackCommandResult{Error: err, Stdout: stdout.String(), Stderr: stderr.String()}
+  jsonResult, err := json.Marshal(result)
+  /*fmt.Fprintln(w, out.String())
+  fmt.Fprintln(w, "err: ", err)*/
+  fmt.Fprintln(w, string(jsonResult))
 }
 
 func (handler *StacksHandler) executeDockerStackDeploy(w http.ResponseWriter, r *http.Request) {
@@ -86,13 +97,17 @@ func (handler *StacksHandler) executeDockerStackDeploy(w http.ResponseWriter, r 
 
   cmd := exec.Command("/docker", "-H", endpoint.URL, "stack", "deploy", "--compose-file", tmpfile.Name(), stack)
 
-  var out bytes.Buffer
-  cmd.Stdout = &out
-  cmd.Stderr = &out
+  var stdout bytes.Buffer
+  var stderr bytes.Buffer
+  cmd.Stdout = &stdout
+  cmd.Stderr = &stderr
   err = cmd.Run()
 
-  fmt.Fprintln(w, out.String())
-  fmt.Fprintln(w, "err: ", err)
+  result := StackCommandResult{Error: err, Stdout: stdout.String(), Stderr: stderr.String()}
+  jsonResult, err := json.Marshal(result)
+  /*fmt.Fprintln(w, out.String())
+  fmt.Fprintln(w, "err: ", err)*/
+  fmt.Fprintln(w, string(jsonResult))
 
   tmpfile.Close()
 }
