@@ -45,6 +45,8 @@ func (server *Server) Start() error {
 	templatesHandler.templatesURL = server.TemplatesURL
 	var dockerHandler = NewDockerHandler(middleWareService, server.ResourceControlService)
 	dockerHandler.EndpointService = server.EndpointService
+	var stacksHandler = NewStacksHandler(middleWareService, server.ResourceControlService)
+	stacksHandler.EndpointService = server.EndpointService
 	var websocketHandler = NewWebSocketHandler()
 	websocketHandler.EndpointService = server.EndpointService
 	var endpointHandler = NewEndpointHandler(middleWareService)
@@ -62,6 +64,7 @@ func (server *Server) Start() error {
 		SettingsHandler:  settingsHandler,
 		TemplatesHandler: templatesHandler,
 		DockerHandler:    dockerHandler,
+		StacksHandler:    stacksHandler,
 		WebSocketHandler: websocketHandler,
 		FileHandler:      fileHandler,
 		UploadHandler:    uploadHandler,
