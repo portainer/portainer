@@ -286,6 +286,10 @@ a[ng-click]{
   margin: 0 auto;
 }
 
+ul.sidebar {
+  bottom: 40px;
+}
+
 ul.sidebar .sidebar-list a.active {
   color: #fff;
   text-indent: 22px;
