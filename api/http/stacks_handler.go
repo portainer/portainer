@@ -30,9 +30,9 @@ func NewStacksHandler(mw *middleWareService, resourceControlService portainer.Re
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.PathPrefix("/{id}/{stack}/deploy").Handler(
+	h.PathPrefix("/{id}/{stack}").Methods("POST").Handler(
 		mw.authenticated(http.HandlerFunc(h.executeDockerStackDeploy)))
-	h.PathPrefix("/{id}/{stack}/rm").Handler(
+	h.PathPrefix("/{id}/{stack}").Methods("DELETE").Handler(
 		mw.authenticated(http.HandlerFunc(h.executeDockerStackRm)))
 	return h
 }
