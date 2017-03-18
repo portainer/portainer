@@ -17,7 +17,7 @@ type Handler struct {
 	SettingsHandler  *SettingsHandler
 	TemplatesHandler *TemplatesHandler
 	DockerHandler    *DockerHandler
-  StacksHandler    *StacksHandler
+	StacksHandler    *StacksHandler
 	WebSocketHandler *WebSocketHandler
 	UploadHandler    *UploadHandler
 	FileHandler      *FileHandler
