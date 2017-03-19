@@ -116,6 +116,7 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, Container
     } else if (network.Name !== "bridge") {
       containerMapping = 'BY_CONTAINER_NAME';
     }
+    return containerMapping;
   }
 
   function filterNetworksBasedOnProvider(networks) {
