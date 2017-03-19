@@ -4,8 +4,8 @@ angular.module('image', [])
 		return tag.substr(tag.indexOf(":")+1);
 	};
 })
-.controller('ImageController', ['$scope', '$stateParams', '$state', 'Image', 'ImageHelper', 'Messages',
-function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
+.controller('ImageController', ['$scope', '$stateParams', '$state', 'Image', 'ImageService', 'ImageHelper', 'Messages',
+function ($scope, $stateParams, $state, Image, ImageService, ImageHelper, Messages) {
   $scope.RepoTags = [];
   $scope.config = {
     Image: '',
@@ -59,16 +59,15 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
     var image = items[0];
     tag = items[1];
     $('#loadingViewSpinner').show();
-    Image.create({fromImage: image, tag: tag}, function (d) {
-      if (d[d.length-1].error) {
-        Messages.error("Unable to pull image", {}, d[d.length-1].error);
-      } else {
+    ImageService.pullImage({fromImage: image, tag: tag})
+    .then(function success(data) {
         Messages.send('Image successfully pulled');
-      }
-      $('#loadingViewSpinner').hide();
-    }, function (e) {
-      $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to pull image");
+    })
+    .catch(function error(error){
+        Messages.error("Failure", error, "Unable to pull image");
+    })
+    .finally(function final() {
+        $('#loadingViewSpinner').hide();
     });
   };
 
