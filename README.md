@@ -18,7 +18,7 @@
 
 <img src="http://portainer.io/images/screenshots/portainer.gif" width="77%"/>
 
-You can try out the public demo instance: http://demo.portainer.io/ (login with the username **demo** and the password **tryportainer**).
+You can try out the public demo instance: http://demo.portainer.io/ (login with the username **adimn** and the password **tryportainer**).
 
 Please note that the public demo cluster is **reset every 15min**.
 
