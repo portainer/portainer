@@ -96,7 +96,7 @@
                   <a ng-if="service.PublishedPorts.length > 0" ng-repeat="p in service.PublishedPorts" class="image-tag" ng-href="http://{{p.host}}:{{p.public}}" target="_blank">
                     <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.public }}:{{ p.private }}
                   </a>
-                  <span ng-if="service.Ports.length == 0" >-</span>
+                  <span ng-if="service.PublishedPorts.length == 0" >-</span>
                 </td>
                 <td ng-if="applicationState.application.authentication">
                   <span ng-if="user.role === 1 && service.Metadata.ResourceControl">
