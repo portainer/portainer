@@ -7,7 +7,7 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="RepoTags.length > 0">
+<div class="row" ng-if="image.RepoTags.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa fa-tags" title="Image tags"></rd-widget-header>
@@ -15,7 +15,7 @@
         <form class="form-horizontal">
           <div class="form-group">
             <div class="row">
-              <div class="pull-left" ng-repeat="tag in RepoTags" style="display:table">
+              <div class="pull-left" ng-repeat="tag in image.RepoTags" style="display:table">
                 <div class="input-group col-md-1" style="padding:0 15px">
                   <span class="input-group-addon">{{ tag }}</span>
                   <span class="input-group-btn">
@@ -25,7 +25,7 @@
                     <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullImage(tag)">
                       <span class="fa fa-download white-icon" aria-hidden="true"></span>
                     </a>
-                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeImage(tag)">
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)">
                       <span class="fa fa-trash-o white-icon" aria-hidden="true"></span>
                     </a>
                   </span>
@@ -36,7 +36,9 @@
           <div class="form-group">
             <div class="col-sm-12">
               <span class="small text-muted">
-                Note: you can click on the upload icon to push or on the download icon to pull an image and on the trash icon to delete a tag
+                Note: you can click on the upload icon <span class="fa fa-upload" aria-hidden="true"></span> to push an image
+                or on the download icon <span class="fa fa-download" aria-hidden="true"></span> to pull an image
+                or on the trash icon <span class="fa fa-trash-o" aria-hidden="true"></span> to delete a tag.
               </span>
             </div>
           </div>
@@ -133,33 +135,33 @@
           <tbody>
             <tr>
               <td>CMD</td>
-              <td><code>{{ image.ContainerConfig.Cmd|command }}</code></td>
+              <td><code>{{ image.Command|command }}</code></td>
             </tr>
-            <tr ng-if="image.ContainerConfig.Entrypoint">
+            <tr ng-if="image.Entrypoint">
               <td>ENTRYPOINT</td>
-              <td><code>{{ image.ContainerConfig.Entrypoint|command }}</code></td>
+              <td><code>{{ image.Entrypoint|command }}</code></td>
             </tr>
-            <tr ng-if="image.ContainerConfig.ExposedPorts">
+            <tr ng-if="image.ExposedPorts.length > 0">
               <td>EXPOSE</td>
               <td>
-                <span class="label label-default space-right" ng-repeat="port in exposedPorts">
+                <span class="label label-default space-right" ng-repeat="port in image.ExposedPorts">
                   {{ port }}
                 </span>
               </td>
             </tr>
-            <tr ng-if="image.ContainerConfig.Volumes">
+            <tr ng-if="image.Volumes.length > 0">
               <td>VOLUME</td>
               <td>
-                <span class="label label-default space-right" ng-repeat="volume in volumes">
+                <span class="label label-default space-right" ng-repeat="volume in image.Volumes">
                   {{ volume }}
                 </span>
               </td>
             </tr>
-            <tr>
+            <tr ng-if="image.Env.length > 0">
               <td>ENV</td>
               <td>
                 <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="var in image.ContainerConfig.Env">
+                  <tr ng-repeat="var in image.Env">
                     <td>{{ var|key: '=' }}</td>
                     <td>{{ var|value: '=' }}</td>
                   </tr>
