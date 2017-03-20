@@ -1,6 +1,11 @@
 angular.module('image', [])
-.controller('ImageController', ['$scope', '$stateParams', '$state', 'Image', 'ImageHelper', 'Messages',
-function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
+.filter('onlylabel', function(){
+	return function(tag){
+		return tag.substr(tag.indexOf(":")+1);
+	};
+})
+.controller('ImageController', ['$scope', '$stateParams', '$state', 'Image', 'ImageService', 'ImageHelper', 'Messages',
+function ($scope, $stateParams, $state, Image, ImageService, ImageHelper, Messages) {
   $scope.RepoTags = [];
   $scope.config = {
     Image: '',
@@ -46,6 +51,23 @@ function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
     }, function (e) {
       $('#loadingViewSpinner').hide();
       Messages.error("Failure", e, "Unable to push image");
+    });
+  };
+
+  $scope.pullImage = function(tag) {
+    var items = tag.split(":");
+    var image = items[0];
+    tag = items[1];
+    $('#loadingViewSpinner').show();
+    ImageService.pullImage({fromImage: image, tag: tag})
+    .then(function success(data) {
+        Messages.send('Image successfully pulled');
+    })
+    .catch(function error(error){
+        Messages.error("Failure", error, "Unable to pull image");
+    })
+    .finally(function final() {
+        $('#loadingViewSpinner').hide();
     });
   };
 
