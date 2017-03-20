@@ -40,7 +40,7 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 
   $scope.removeTag = function(id) {
     $('#loadingViewSpinner').show();
-    ImageService.deleteImage(id)
+    ImageService.deleteImage(id, false)
     .then(function success() {
       Messages.send('Tag successfully deleted', id);
       $state.go('image', {id: $stateParams.id}, {reload: true});
@@ -55,7 +55,7 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 
   $scope.removeImage = function (id) {
     $('#loadingViewSpinner').show();
-    ImageService.deleteImage(id)
+    ImageService.deleteImage(id, false)
     .then(function success() {
       Messages.send('Image successfully deleted');
       $state.go('images', {}, {reload: true});

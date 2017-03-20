@@ -45,14 +45,14 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, Container
           volumeResourceControlQueries.push(ResourceControlService.setVolumeResourceControl(Authentication.getUserDetails().ID, volume.Name));
         });
       }
-      TemplateService.updateContainerConfigurationWithVolumes(templateConfiguration.container, template, data);
+      TemplateService.updateContainerConfigurationWithVolumes(templateConfiguration, template, data);
       return $q.all(volumeResourceControlQueries)
       .then(function success() {
-        return ImageService.pullImage(templateConfiguration.image);
+        return ImageService.pullImage(template.Image, template.Registry);
       });
     })
     .then(function success(data) {
-      return ContainerService.createAndStartContainer(templateConfiguration.container);
+      return ContainerService.createAndStartContainer(templateConfiguration);
     })
     .then(function success(data) {
       Messages.send('Container Started', data.Id);

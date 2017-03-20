@@ -20,8 +20,24 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.pullImage = function(imageConfiguration) {
+  service.images = function() {
     var deferred = $q.defer();
+    Image.query({}).$promise
+    .then(function success(data) {
+      var images = data.map(function (item) {
+        return new ImageViewModel(item);
+      });
+      deferred.resolve(images);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve images', err: err });
+    });
+    return deferred.promise;
+  };
+
+  service.pullImage = function(image, registry) {
+    var deferred = $q.defer();
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(image, registry);
     Image.create(imageConfiguration).$promise
     .then(function success(data) {
       var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
@@ -43,9 +59,9 @@ angular.module('portainer.services')
     return Image.tag({id: id, tag: imageConfig.tag, repo: imageConfig.repo}).$promise;
   };
 
-  service.deleteImage = function(id) {
+  service.deleteImage = function(id, forceRemoval) {
     var deferred = $q.defer();
-    Image.remove({id: id}).$promise
+    Image.remove({id: id, force: forceRemoval}).$promise
     .then(function success(data) {
       if (data[0].message) {
         deferred.reject({ msg: data[0].message });
