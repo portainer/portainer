@@ -38,12 +38,34 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
     });
   };
 
-  $scope.removeTag = function(id) {
+  $scope.pullImage = function(tag) {
+		$('#loadingViewSpinner').show();
+		var image = $scope.config.Image;
+		var registry = $scope.config.Registry;
+
+    ImageService.pullImage(image, registry)
+    .then(function success(data) {
+        Messages.send('Image successfully pulled', image);
+    })
+    .catch(function error(err){
+        Messages.error("Failure", err, "Unable to pull image");
+    })
+    .finally(function final() {
+        $('#loadingViewSpinner').hide();
+    });
+  };
+
+	$scope.removeTag = function(id) {
     $('#loadingViewSpinner').show();
     ImageService.deleteImage(id, false)
     .then(function success() {
-      Messages.send('Tag successfully deleted', id);
-      $state.go('image', {id: $stateParams.id}, {reload: true});
+			if ($scope.image.RepoTags.length === 1) {
+				Messages.send('Image successfully deleted', id);
+				$state.go('images', {}, {reload: true});
+			} else {
+				Messages.send('Tag successfully deleted', id);
+	      $state.go('image', {id: $stateParams.id}, {reload: true});
+			}
     })
     .catch(function error(err) {
       Messages.error("Failure", err, 'Unable to remove image');
@@ -57,8 +79,8 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
     $('#loadingViewSpinner').show();
     ImageService.deleteImage(id, false)
     .then(function success() {
-      Messages.send('Image successfully deleted');
-      $state.go('images', {}, {reload: true});
+			Messages.send('Image successfully deleted', id);
+			$state.go('images', {}, {reload: true});
     })
     .catch(function error(err) {
       Messages.error("Failure", err, 'Unable to remove image');
