@@ -125,6 +125,10 @@ a[ng-click]{
   padding: 0 !important;
 }
 
+.padding-top {
+  padding-top: 15px !important;
+}
+
 .terminal-container {
   width: 100%;
   padding: 10px 5px;
