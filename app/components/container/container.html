@@ -13,12 +13,12 @@
       <rd-widget-header icon="fa-cogs" title="Actions"></rd-widget-header>
       <rd-widget-body classes="padding">
         <div class="btn-group" role="group" aria-label="...">
-          <button class="btn btn-primary" ng-click="start()" ng-if="!container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
-          <button class="btn btn-danger" ng-click="stop()" ng-if="container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
-          <button class="btn btn-danger" ng-click="kill()" ng-if="container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
-          <button class="btn btn-primary" ng-click="restart()" ng-if="container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
-          <button class="btn btn-primary" ng-click="pause()" ng-if="container.State.Running && !container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
-          <button class="btn btn-primary" ng-click="unpause()" ng-if="container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
+          <button class="btn btn-success" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
+          <button class="btn btn-danger" ng-click="stop()" ng-disabled="!container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
+          <button class="btn btn-danger" ng-click="kill()" ng-disabled="!container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
+          <button class="btn btn-primary" ng-click="restart()" ng-disabled="!container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
+          <button class="btn btn-primary" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
+          <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
           <button class="btn btn-danger" ng-click="remove()" ng-disabled="container.State.Running"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
         </div>
       </rd-widget-body>
