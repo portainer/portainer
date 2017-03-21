@@ -8,7 +8,6 @@ angular.module('containers', [])
   $scope.sortType = 'State';
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
-  $scope.state.maxStrLen = 24;
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
