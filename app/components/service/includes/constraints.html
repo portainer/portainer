@@ -38,8 +38,8 @@
               <div class="input-group input-group-sm">
                 <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager" ng-change="updatePlacementConstraint(service, constraint)" ng-disabled="isUpdating">
                 <span class="input-group-btn">
-                  <button class="btn btn-default" type="button" ng-click="removePlacementConstraint(service, $index)" ng-disabled="isUpdating">
-                    <i class="fa fa-minus" aria-hidden="true"></i>
+                  <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementConstraint(service, $index)" ng-disabled="isUpdating">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
                   </button>
                 </span>
               </div>

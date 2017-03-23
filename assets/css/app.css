@@ -1,3 +1,10 @@
+.form-section-title {
+  border-bottom: 1px solid #777;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  color: #777;
+}
+
 html, body, #content-wrapper, .page-content, #view {
   height: 100%;
   width: 100%;
@@ -301,6 +308,11 @@ ul.sidebar .sidebar-list a.active {
   background: #2d3e63;
 }
 
+@media(min-width: 768px) and (max-width: 992px) {
+  .margin-sm-top {
+    margin-top: 5px;
+  }
+}
 @media (min-width: 768px) {
     .pull-sm-left {
         float: left !important;

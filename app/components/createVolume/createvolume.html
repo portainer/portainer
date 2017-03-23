@@ -28,14 +28,14 @@
           <!-- !driver-input -->
           <!-- driver-options -->
           <div class="form-group">
-            <label for="volume_driveropts" class="col-sm-1 control-label text-left">Driver options</label>
-            <div class="col-sm-11">
-              <span class="label label-default interactive" ng-click="addDriverOption()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> driver option
+            <div class="col-sm-12" style="margin-top: 5px;">
+              <label class="control-label text-left">Driver options</label>
+              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addDriverOption()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> add driver option
               </span>
             </div>
             <!-- driver-options-input-list -->
-            <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
               <div ng-repeat="option in formValues.DriverOptions" style="margin-top: 2px;">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
@@ -44,12 +44,10 @@
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. /path/on/host">
-                  <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click="removeDriverOption($index)">
-                      <i class="fa fa-minus" aria-hidden="true"></i>
-                    </button>
-                  </span>
                 </div>
+                <button class="btn btn-sm btn-danger" type="button" ng-click="removeDriverOption($index)">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
               </div>
             </div>
             <!-- !driver-options-input-list -->
