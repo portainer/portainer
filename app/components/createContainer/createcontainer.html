@@ -295,7 +295,7 @@
                 <div class="col-sm-9">
                   <select class="form-control" ng-model="config.HostConfig.NetworkMode" id="container_network">
                     <option selected disabled hidden value="">Select a network</option>
-                    <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
+                    <option ng-repeat="net in availableNetworks" ng-value="net.Id">{{ net.Name }}</option>
                   </select>
                 </div>
               </div>
