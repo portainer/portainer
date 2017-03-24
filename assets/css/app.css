@@ -1,10 +1,3 @@
-.form-section-title {
-  border-bottom: 1px solid #777;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  color: #777;
-}
-
 html, body, #content-wrapper, .page-content, #view {
   height: 100%;
   width: 100%;
@@ -64,9 +57,16 @@ html, body, #content-wrapper, .page-content, #view {
   margin-left: 5px;
 }
 
+.form-section-title {
+  border-bottom: 1px solid #777;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  color: #777;
+}
+
 .form-horizontal .control-label.text-left{
-    text-align: left;
-    font-size: 0.9em;
+  text-align: left;
+  font-size: 0.9em;
 }
 
 input[type="checkbox"] {
@@ -314,38 +314,70 @@ ul.sidebar .sidebar-list a.active {
   }
 }
 @media (min-width: 768px) {
-    .pull-sm-left {
-        float: left !important;
-    }
-    .pull-sm-right {
-        float: right !important;
-    }
-    .pull-sm-none {
-        float: none !important;
-    }
+  .pull-sm-left {
+    float: left !important;
+  }
+  .pull-sm-right {
+    float: right !important;
+  }
+  .pull-sm-none {
+    float: none !important;
+  }
 }
 @media (min-width: 992px) {
-    .pull-md-left {
-        float: left !important;
-    }
-    .pull-md-right {
-        float: right !important;
-    }
-    .pull-md-none {
-        float: none !important;
-    }
+  .pull-md-left {
+    float: left !important;
+  }
+  .pull-md-right {
+    float: right !important;
+  }
+  .pull-md-none {
+    float: none !important;
+  }
 }
 @media (min-width: 1200px) {
-    .pull-lg-left {
-        float: left !important;
-    }
-    .pull-lg-right {
-        float: right !important;
-    }
-    .pull-lg-none {
-        float: none !important;
-    }
+  .pull-lg-left {
+    float: left !important;
+  }
+  .pull-lg-right {
+    float: right !important;
+  }
+  .pull-lg-none {
+    float: none !important;
+  }
 }
 .pull-none {
-    float: none !important;
+  float: none !important;
+}
+
+.switch input {
+  display: none;
+}
+
+.switch i {
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  padding-right: 24px;
+  transition: all ease 0.2s;
+  -webkit-transition: all ease 0.2s;
+  border-radius: 24px;
+  box-shadow: inset 0 0 1px rgba(0,0,0,.5);
+}
+
+.switch i:before {
+  display: block;
+  content: '';
+  width: 24px;
+  height: 24px;
+  border-radius: 24px;
+  background: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,.5);
+}
+
+.switch :checked + i {
+  padding-right: 0;
+  padding-left: 24px;
+  box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
+  -webkit-box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
 }

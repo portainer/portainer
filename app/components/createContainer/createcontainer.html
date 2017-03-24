@@ -43,14 +43,9 @@
                 Always pull the image
                 <portainer-tooltip position="bottom" message="When enabled, Portainer will automatically try to pull the specified image before creating the container."></portainer-tooltip>
               </label>
-              <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                <label class="btn btn-default" ng-model="formValues.alwaysPull" uib-btn-radio="true">
-                  On
-                </label>
-                <label class="btn btn-default" ng-model="formValues.alwaysPull" uib-btn-radio="false">
-                  Off
-                </label>
-              </div>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.alwaysPull"><i></i>
+              </label>
             </div>
           </div>
           <!-- !always-pull -->
@@ -64,14 +59,9 @@
                 Publish all exposed ports
                 <portainer-tooltip position="bottom" message="When enabled, Portainer will let Docker automatically map a random port on the host to each one defined in the image Dockerfile."></portainer-tooltip>
               </label>
-              <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                <label class="btn btn-default" ng-model="config.HostConfig.PublishAllPorts" uib-btn-radio="true">
-                  On
-                </label>
-                <label class="btn btn-default" ng-model="config.HostConfig.PublishAllPorts" uib-btn-radio="false">
-                  Off
-                </label>
-              </div>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="config.HostConfig.PublishAllPorts"><i></i>
+              </label>
             </div>
           </div>
           <!-- !publish-exposed-ports -->
@@ -104,8 +94,8 @@
                 <!-- protocol-actions -->
                 <div class="input-group col-sm-3 input-group-sm">
                   <div class="btn-group btn-group-sm">
-                    <label class="btn btn-default" ng-model="portBinding.protocol" uib-btn-radio="'tcp'">TCP</label>
-                    <label class="btn btn-default" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
+                    <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'tcp'">TCP</label>
+                    <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
                   </div>
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removePortBinding($index)">
                     <i class="fa fa-trash" aria-hidden="true"></i>
@@ -128,11 +118,11 @@
                 <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing public, everybody will be able to access it."></portainer-tooltip>
               </label>
               <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                <label class="btn btn-default" ng-model="formValues.Ownership" uib-btn-radio="'private'">
+                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'private'">
                   <i class="fa fa-eye-slash" aria-hidden="true"></i>
                   Private
                 </label>
-                <label class="btn btn-default" ng-model="formValues.Ownership" uib-btn-radio="'public'">
+                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'public'">
                   <i class="fa fa-eye" aria-hidden="true"></i>
                   Public
                 </label>
@@ -294,8 +284,8 @@
                         <!-- read-only -->
                         <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
                           <div class="btn-group btn-group-sm">
-                            <label class="btn btn-default" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
-                            <label class="btn btn-default" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
+                            <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
+                            <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
                           </div>
                         </div>
                         <!-- !read-only -->
@@ -361,9 +351,9 @@
               <!-- extra-hosts-variables -->
               <div class="form-group">
                 <div class="col-sm-12" style="margin-top: 5px;">
-                  <label class="control-label text-left">Extra hosts</label>
+                  <label class="control-label text-left">Hosts file entries</label>
                   <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addExtraHost()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add extra host
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add additional entry
                   </span>
                 </div>
                 <!-- extra-hosts-input-list -->
@@ -459,16 +449,16 @@
                     Restart policy
                   </label>
                   <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                    <label class="btn btn-default" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'no'">
+                    <label class="btn btn-primary" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'no'">
                       Never
                     </label>
-                    <label class="btn btn-default" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'always'">
+                    <label class="btn btn-primary" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'always'">
                       Always
                     </label>
-                    <label class="btn btn-default" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'on-failure'">
+                    <label class="btn btn-primary" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'on-failure'">
                       On failure
                     </label>
-                    <label class="btn btn-default" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'unless-stopped'">
+                    <label class="btn btn-primary" ng-model="config.HostConfig.RestartPolicy.Name" uib-btn-radio="'unless-stopped'">
                       Unless stopped
                     </label>
                   </div>
@@ -486,14 +476,9 @@
                   <label for="ownership" class="control-label text-left">
                     Privileged mode
                   </label>
-                  <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                    <label class="btn btn-default" ng-model="config.HostConfig.Privileged" uib-btn-radio="true">
-                      On
-                    </label>
-                    <label class="btn btn-default" ng-model="config.HostConfig.Privileged" uib-btn-radio="false">
-                      Off
-                    </label>
-                  </div>
+                  <label class="switch" style="margin-left: 20px;">
+                    <input type="checkbox" ng-model="config.HostConfig.Privileged"><i></i>
+                  </label>
                 </div>
               </div>
               <!-- !privileged-mode -->
