@@ -288,7 +288,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var path = [];
     config.HostConfig.Devices.forEach(function (p) {
       if (p.pathOnHost) {
-        if(p.pathInContainer == '') {
+        if(p.pathInContainer === '') {
           p.pathInContainer = p.pathOnHost;
         }
         path.push({PathOnHost:p.pathOnHost,PathInContainer:p.pathInContainer,CgroupPermissions:'rwm'});  
