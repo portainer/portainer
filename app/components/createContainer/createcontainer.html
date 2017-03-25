@@ -136,6 +136,7 @@
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#security" data-toggle="tab">Security/Host</a></li>
+          <li class="interactive"><a data-target="#devices" data-toggle="tab">Devices</a></li>  
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -409,6 +410,41 @@
             </form>
           </div>
           <!-- !tab-security -->
+          <!-- tab-devices -->
+          <div class="tab-pane" id="devices">
+            <form class="form-horizontal" style="margin-top: 15px;">
+              <!-- devices -->
+              <div class="form-group">
+                <label for="container_devices" class="col-sm-1 control-label text-left">Devices</label>
+                <div class="col-sm-11">
+                  <span class="label label-default interactive" ng-click="addDevice()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> device
+                  </span>
+                </div>
+                <!-- devices-input-list -->
+                <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="device in config.HostConfig.Devices" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">Host path</span>
+                      <input type="text" class="form-control" ng-model="device.pathOnHost" placeholder="e.g. /dev/tty0">
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">Container path</span>
+                      <input type="text" class="form-control" ng-model="device.pathInContainer" placeholder="e.g. /dev/tty0">
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="removeDevice($index)">
+                          <i class="fa fa-minus" aria-hidden="true"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <!-- !devices-input-list -->
+              </div>
+              <!-- !devices-->
+            </form>
+          </div>
+          <!-- !tab-devices -->
         </div>
       </rd-widget-body>
     </rd-widget>
