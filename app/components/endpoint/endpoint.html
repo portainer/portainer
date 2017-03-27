@@ -14,25 +14,33 @@
         <form class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
-            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
-            <div class="col-sm-10">
+            <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="container_name" ng-model="endpoint.Name" placeholder="e.g. docker-prod01">
             </div>
           </div>
           <!-- !name-input -->
           <!-- endpoint-url-input -->
           <div class="form-group">
-            <label for="endpoint_url" class="col-sm-2 control-label text-left">Endpoint URL</label>
-            <div class="col-sm-10">
+            <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Endpoint URL
+              <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
               <input ng-disabled="endpointType === 'local'" type="text" class="form-control" id="endpoint_url" ng-model="endpoint.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
             </div>
           </div>
           <!-- !endpoint-url-input -->
           <!-- tls-checkbox -->
           <div class="form-group" ng-if="endpointType === 'remote'">
-            <label for="tls" class="col-sm-2 control-label text-left">TLS</label>
-            <div class="col-sm-10">
-              <input type="checkbox" name="tls" ng-model="endpoint.TLS">
+            <div class="col-sm-12">
+              <label for="tls" class="control-label text-left">
+                TLS
+                <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the Docker endpoint."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="endpoint.TLS"><i></i>
+              </label>
             </div>
           </div>
           <!-- !tls-checkbox -->

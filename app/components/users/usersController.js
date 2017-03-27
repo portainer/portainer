@@ -14,7 +14,7 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
     Username: '',
     Password: '',
     ConfirmPassword: '',
-    Role: 2,
+    Administrator: false,
   };
 
   $scope.order = function(sortType) {
@@ -59,7 +59,7 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
     $scope.state.userCreationError = '';
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
-    var role = $scope.formValues.Role;
+    var role = $scope.formValues.Administrator ? 1 : 2;
     UserService.createUser(username, password, role)
     .then(function success(data) {
       Messages.send("User created", username);

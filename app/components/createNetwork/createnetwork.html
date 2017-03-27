@@ -18,22 +18,28 @@
             </div>
           </div>
           <!-- !name-input -->
+          <div class="col-sm-12 form-section-title">
+            Network configuration
+          </div>
           <!-- subnet-gateway-inputs -->
           <div class="form-group">
-            <label for="network_subnet" class="col-sm-1 control-label text-left">Subnet</label>
-            <div class="col-sm-5">
+            <label for="network_subnet" class="col-sm-2 col-lg-1 control-label text-left">Subnet</label>
+            <div class="col-sm-4 col-lg-5">
               <input type="text" class="form-control" ng-model="formValues.Subnet" id="network_subnet" placeholder="e.g. 172.20.0.0/16">
             </div>
-            <label for="network_gateway" class="col-sm-1 control-label text-left">Gateway</label>
-            <div class="col-sm-5">
+            <label for="network_gateway" class="col-sm-2 col-lg-1 control-label text-left">Gateway</label>
+            <div class="col-sm-4 col-lg-5">
               <input type="text" class="form-control" ng-model="formValues.Gateway" id="network_gateway" placeholder="e.g. 172.20.10.11">
             </div>
           </div>
           <!-- !subnet-gateway-inputs -->
+          <div class="col-sm-12 form-section-title">
+            Driver configuration
+          </div>
           <!-- driver-input -->
           <div class="form-group">
-            <label for="network_driver" class="col-sm-1 control-label text-left">Driver</label>
-            <div class="col-sm-11">
+            <label for="network_driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
+            <div class="col-sm-10">
               <input type="text" class="form-control" ng-model="config.Driver" id="network_driver" placeholder="e.g. driverName">
             </div>
           </div>
@@ -41,7 +47,10 @@
           <!-- driver-options -->
           <div class="form-group">
             <div class="col-sm-12" style="margin-top: 5px;">
-              <label class="control-label text-left">Driver options</label>
+              <label class="control-label text-left">
+                Driver options
+                <portainer-tooltip position="bottom" message="Driver options are specific to the selected driver. Please refer to the selected driver documentation."></portainer-tooltip>
+              </label>
               <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addDriverOption()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> add driver option
               </span>
@@ -65,6 +74,9 @@
             <!-- !driver-options-input-list -->
           </div>
           <!-- !driver-options -->
+          <div class="col-sm-12 form-section-title">
+            Advanced configuration
+          </div>
           <!-- labels -->
           <div class="form-group">
             <div class="col-sm-12" style="margin-top: 5px;">
@@ -95,26 +107,29 @@
           <!-- internal -->
           <div class="form-group">
             <div class="col-sm-12">
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" ng-model="config.Internal"> Restrict external access to the network
-                </label>
-              </div>
+              <label for="ownership" class="control-label text-left">
+                Restrict external access to the network
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.alwaysPull"><i></i>
+              </label>
             </div>
           </div>
           <!-- !internal -->
+          <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Name" ng-click="create()">Create network</button>
+              <a type="button" class="btn btn-default btn-sm" ui-sref="networks">Cancel</a>
+              <i id="createNetworkSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+            </div>
+          </div>
+          <!-- !actions -->
         </form>
       </rd-widget-body>
     </rd-widget>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12" style="text-align: center;">
-    <div>
-      <i id="createNetworkSpinner" class="fa fa-cog fa-3x fa-spin" style="margin-bottom: 5px; display: none;"></i>
-    </div>
-    <button type="button" class="btn btn-default btn-lg" ng-disabled="!config.Name" ng-click="create()">Create</button>
-    <a type="button" class="btn btn-default btn-lg" ui-sref="networks">Cancel</a>
   </div>
 </div>
