@@ -114,7 +114,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     angular.forEach($scope.services, function (service) {
       if (service.Metadata) {
         var serviceRC = service.Metadata.ResourceControl;
-        if (serviceRC && serviceRC.OwnerId != $scope.user.ID) {
+        if (serviceRC && serviceRC.OwnerId !== $scope.user.ID) {
           angular.forEach(users, function (user) {
             if (serviceRC.OwnerId === user.Id) {
               service.Owner = user.Username;

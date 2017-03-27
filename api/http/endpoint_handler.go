@@ -20,7 +20,6 @@ type EndpointHandler struct {
 	authorizeEndpointManagement bool
 	EndpointService             portainer.EndpointService
 	FileService                 portainer.FileService
-	// server            *Server
 }
 
 const (
@@ -214,7 +213,7 @@ func (handler *EndpointHandler) handlePutEndpointAccess(w http.ResponseWriter, r
 }
 
 type putEndpointAccessRequest struct {
-	AuthorizedUsers []int `valid:"required"`
+	AuthorizedUsers []int `valid:"-"`
 }
 
 // handlePutEndpoint handles PUT requests on /endpoints/:id

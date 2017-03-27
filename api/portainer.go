@@ -176,7 +176,7 @@ type (
 
 const (
 	// APIVersion is the version number of Portainer API.
-	APIVersion = "1.11.4"
+	APIVersion = "1.12.1"
 	// DBVersion is the version number of Portainer database.
 	DBVersion = 1
 )

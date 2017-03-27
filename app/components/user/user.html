@@ -21,18 +21,14 @@
                 <button class="btn btn-xs btn-danger" ng-click="deleteUser()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this user</button>
               </td>
             </tr>
-              <td>Permissions</td>
-              <td>
-                <div class="btn-group btn-group-sm">
-                  <label class="btn btn-default" ng-model="user.RoleId" uib-btn-radio="2" ng-change="updatePermissions()">
-                    <i class="fa fa-user" aria-hidden="true"></i>
-                    User
-                  </label>
-                  <label class="btn btn-default" ng-model="user.RoleId" uib-btn-radio="1" ng-change="updatePermissions()">
-                    <i class="fa fa-user-circle-o" aria-hidden="true"></i>
-                    Administrator
-                  </label>
-                </div>
+              <td colspan="2">
+                <label for="permissions" class="control-label text-left">
+                  Administrator
+                  <portainer-tooltip position="bottom" message="Administrators have access to Portainer settings management as well as full control over all defined endpoints and their resources."></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="formValues.Administrator" ng-change="updatePermissions()"><i></i>
+                </label>
               </td>
             </tr>
           </tbody>

@@ -21,17 +21,10 @@ angular.module('portainer.services')
   };
 
   service.createTemplateConfiguration = function(template, containerName, network, containerMapping) {
-    var imageConfiguration = service.createImageConfiguration(template);
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(template.Image, template.Registry);
     var containerConfiguration = service.createContainerConfiguration(template, containerName, network, containerMapping);
     containerConfiguration.Image = imageConfiguration.fromImage + ':' + imageConfiguration.tag;
-    return {
-      container: containerConfiguration,
-      image: imageConfiguration
-    };
-  };
-
-  service.createImageConfiguration = function(template) {
-    return ImageHelper.createImageConfigForContainer(template.Image, template.Registry);
+    return containerConfiguration;
   };
 
   service.createContainerConfiguration = function(template, containerName, network, containerMapping) {

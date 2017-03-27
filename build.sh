@@ -49,7 +49,7 @@ cd -
 
 grunt release-win
 rm -rf /tmp/portainer-builds/win && mkdir -pv /tmp/portainer-builds/win/portainer
-mv dist/* /tmp/portainer-builds/win/portainer
+cp -r dist/* /tmp/portainer-builds/win/portainer
 cd /tmp/portainer-builds/win
 tar cvpfz portainer-${VERSION}-windows-amd64.tar.gz portainer
 mv portainer-${VERSION}-windows-amd64.tar.gz /tmp/portainer-builds/

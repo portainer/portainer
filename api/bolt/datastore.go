@@ -49,7 +49,7 @@ func NewStore(storePath string) (*Store, error) {
 	store.ResourceControlService.store = store
 	store.VersionService.store = store
 
-	_, err := os.Stat(storePath)
+	_, err := os.Stat(storePath + "/" + databaseFileName)
 	if err != nil && os.IsNotExist(err) {
 		store.checkForDataMigration = false
 	} else if err != nil {
