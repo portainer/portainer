@@ -20,8 +20,7 @@ type DockerHandler struct {
 	Logger          *log.Logger
 	EndpointService portainer.EndpointService
 	ProxyFactory    ProxyFactory
-	// proxies         map[portainer.EndpointID]http.Handler
-	proxies cmap.ConcurrentMap
+	proxies         cmap.ConcurrentMap
 }
 
 // NewDockerHandler returns a new instance of DockerHandler.
@@ -32,7 +31,6 @@ func NewDockerHandler(mw *middleWareService, resourceControlService portainer.Re
 		ProxyFactory: ProxyFactory{
 			ResourceControlService: resourceControlService,
 		},
-		// proxies: make(map[portainer.EndpointID]http.Handler),
 		proxies: cmap.New(),
 	}
 	h.PathPrefix("/{id}/").Handler(
@@ -75,7 +73,6 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 		return
 	}
 
-	// proxy := handler.proxies[endpointID]
 	var proxy http.Handler
 	item, ok := handler.proxies.Get(string(endpointID))
 	if !ok {
@@ -112,7 +109,6 @@ func (handler *DockerHandler) createAndRegisterEndpointProxy(endpoint *portainer
 		proxy = handler.ProxyFactory.newSocketProxy(endpointURL.Path)
 	}
 
-	// handler.proxies[endpoint.ID] = proxy
 	handler.proxies.Set(string(endpoint.ID), proxy)
 	return proxy, nil
 }
