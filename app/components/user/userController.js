@@ -8,7 +8,8 @@ function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
 
   $scope.formValues = {
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    Administrator: false,
   };
 
   $scope.deleteUser = function() {
@@ -23,9 +24,10 @@ function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
 
   $scope.updatePermissions = function() {
     $('#loadingViewSpinner').show();
-    UserService.updateUser($scope.user.Id, undefined, $scope.user.RoleId)
+    var role = $scope.formValues.Administrator ? 1 : 2;
+    UserService.updateUser($scope.user.Id, undefined, role)
     .then(function success(data) {
-      var newRole = $scope.user.RoleId === 1 ? 'administrator' : 'user';
+      var newRole = role === 1 ? 'administrator' : 'user';
       Messages.send('Permissions successfully updated', $scope.user.Username + ' is now ' + newRole);
       $state.reload();
     })
@@ -71,7 +73,9 @@ function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
     $('#loadingViewSpinner').show();
     UserService.user($stateParams.id)
     .then(function success(data) {
-      $scope.user = new UserViewModel(data);
+      var user = new UserViewModel(data);
+      $scope.user = user;
+      $scope.formValues.Administrator = user.RoleId === 1 ? true : false;
     })
     .catch(function error(err) {
       Messages.error("Failure", err, 'Unable to retrieve user information');

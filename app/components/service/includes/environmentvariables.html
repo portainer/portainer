@@ -31,8 +31,8 @@
                 <span class="input-group-addon fit-text-size">value</span>
                 <input type="text" class="form-control" ng-model="var.value" ng-change="updateEnvironmentVariable(service, var)" placeholder="e.g. bar" ng-disabled="isUpdating">
                 <span class="input-group-btn">
-                  <button class="btn btn-default" type="button" ng-click="removeEnvironmentVariable(service, $index)" ng-disabled="isUpdating">
-                    <i class="fa fa-minus" aria-hidden="true"></i>
+                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable(service, $index)" ng-disabled="isUpdating">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
                   </button>
                 </span>
               </div>

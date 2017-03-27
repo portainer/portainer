@@ -51,7 +51,7 @@ angular.module('portainer', [
   'user',
   'users',
   'volumes'])
-  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider) {
+  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider) {
     'use strict';
 
     localStorageServiceProvider
@@ -72,6 +72,13 @@ angular.module('portainer', [
     AnalyticsProvider.startOffline(true);
 
     $urlRouterProvider.otherwise('/auth');
+
+    $uibTooltipProvider.setTriggers({
+      'mouseenter': 'mouseleave',
+      'click': 'click',
+      'focus': 'blur',
+      'outsideClick': 'outsideClick'
+    });
 
     $stateProvider
     .state('root', {

@@ -44,7 +44,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
   };
 
   $scope.addVolume = function() {
-    $scope.formValues.Volumes.push({ name: '', containerPath: '' });
+    $scope.formValues.Volumes.push({ Source: '', Target: '', ReadOnly: false, Type: 'volume' });
   };
 
   $scope.removeVolume = function(index) {
