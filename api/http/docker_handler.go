@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/orcaman/concurrent-map"
 )
 
 // DockerHandler represents an HTTP API handler for proxying requests to the Docker API.
@@ -19,7 +20,8 @@ type DockerHandler struct {
 	Logger          *log.Logger
 	EndpointService portainer.EndpointService
 	ProxyFactory    ProxyFactory
-	proxies         map[portainer.EndpointID]http.Handler
+	// proxies         map[portainer.EndpointID]http.Handler
+	proxies cmap.ConcurrentMap
 }
 
 // NewDockerHandler returns a new instance of DockerHandler.
@@ -30,7 +32,8 @@ func NewDockerHandler(mw *middleWareService, resourceControlService portainer.Re
 		ProxyFactory: ProxyFactory{
 			ResourceControlService: resourceControlService,
 		},
-		proxies: make(map[portainer.EndpointID]http.Handler),
+		// proxies: make(map[portainer.EndpointID]http.Handler),
+		proxies: cmap.New(),
 	}
 	h.PathPrefix("/{id}/").Handler(
 		mw.authenticated(http.HandlerFunc(h.proxyRequestsToDockerAPI)))
@@ -72,13 +75,17 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 		return
 	}
 
-	proxy := handler.proxies[endpointID]
-	if proxy == nil {
+	// proxy := handler.proxies[endpointID]
+	var proxy http.Handler
+	item, ok := handler.proxies.Get(string(endpointID))
+	if !ok {
 		proxy, err = handler.createAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			Error(w, err, http.StatusBadRequest, handler.Logger)
 			return
 		}
+	} else {
+		proxy = item.(http.Handler)
 	}
 	http.StripPrefix("/"+id, proxy).ServeHTTP(w, r)
 }
@@ -105,6 +112,7 @@ func (handler *DockerHandler) createAndRegisterEndpointProxy(endpoint *portainer
 		proxy = handler.ProxyFactory.newSocketProxy(endpointURL.Path)
 	}
 
-	handler.proxies[endpoint.ID] = proxy
+	// handler.proxies[endpoint.ID] = proxy
+	handler.proxies.Set(string(endpoint.ID), proxy)
 	return proxy, nil
 }
