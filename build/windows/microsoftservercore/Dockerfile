@@ -2,7 +2,7 @@ FROM microsoft/windowsservercore
 
 COPY dist /
 
-RUN mkdir C:\\data
+VOLUME C:\\data
 
 WORKDIR /
 
