@@ -10,7 +10,9 @@ function ContainerViewModel(data) {
   this.Image = data.Image;
   this.Command = data.Command;
   this.Checked = false;
+  this.Labels = data.Labels;
   this.Ports = [];
+  this.Mounts = data.Mounts;
   for (var i = 0; i < data.Ports.length; ++i) {
     var p = data.Ports[i];
     if (p.PublicPort) {
@@ -25,5 +27,13 @@ function ContainerViewModel(data) {
     this.Health = 'starting';
   } else {
     this.Health = 'unknown';
+  }
+  if (data.Portainer) {
+    this.Metadata = {};
+    if (data.Portainer.ResourceControl) {
+      this.Metadata.ResourceControl = {
+        OwnerId: data.Portainer.ResourceControl.OwnerId
+      };
+    }
   }
 }

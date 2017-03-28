@@ -2,7 +2,7 @@ FROM microsoft/nanoserver
 
 COPY dist /
 
-VOLUME C:\\data
+RUN mkdir C:\\data
 
 WORKDIR /
 

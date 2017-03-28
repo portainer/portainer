@@ -242,4 +242,13 @@ angular.module('portainer.filters', [])
     }
     return '';
   };
+})
+.filter('hideshasum', function () {
+  'use strict';
+  return function (imageName) {
+    if (imageName) {
+      return imageName.split('@sha')[0];
+    }
+    return '';
+  };
 });
