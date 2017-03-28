@@ -11,7 +11,9 @@ mkdir -pv /tmp/portainer-builds
 
 grunt release
 docker build -t portainer/portainer:linux-amd64-${VERSION} -f build/linux/Dockerfile .
+docker push portainer/portainer:linux-amd64-${VERSION}
 docker build -t portainer/portainer:linux-amd64 -f build/linux/Dockerfile .
+docker push portainer/portainer:linux-amd64
 rm -rf /tmp/portainer-builds/unix && mkdir -pv /tmp/portainer-builds/unix/portainer
 mv dist/* /tmp/portainer-builds/unix/portainer
 cd /tmp/portainer-builds/unix
@@ -21,7 +23,9 @@ cd -
 
 grunt release-arm
 docker build -t portainer/portainer:linux-arm-${VERSION} -f build/linux/Dockerfile .
+docker push portainer/portainer:linux-arm-${VERSION}
 docker build -t portainer/portainer:linux-arm -f build/linux/Dockerfile .
+docker push portainer/portainer:linux-arm
 rm -rf /tmp/portainer-builds/arm && mkdir -pv /tmp/portainer-builds/arm/portainer
 mv dist/* /tmp/portainer-builds/arm/portainer
 cd /tmp/portainer-builds/arm
@@ -31,7 +35,9 @@ cd -
 
 grunt release-arm64
 docker build -t portainer/portainer:linux-arm64-${VERSION} -f build/linux/Dockerfile .
+docker push portainer/portainer:linux-arm64-${VERSION}
 docker build -t portainer/portainer:linux-arm64 -f build/linux/Dockerfile .
+docker push portainer/portainer:linux-arm64
 rm -rf /tmp/portainer-builds/arm64 && mkdir -pv /tmp/portainer-builds/arm64/portainer
 mv dist/* /tmp/portainer-builds/arm64/portainer
 cd /tmp/portainer-builds/arm64
