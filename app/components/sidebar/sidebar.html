@@ -21,7 +21,7 @@
     </li>
     <li class="sidebar-list">
       <a ui-sref="templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket"></span></a>
-      <div class="sidebar-sublist">
+      <div class="sidebar-sublist" ng-if="$state.current.name === 'templates'">
         <a ui-sref="templates" ui-sref-active="active">LinuxServer.io</a>
       </div>
     </li>
