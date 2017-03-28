@@ -59,6 +59,13 @@
                 </a>
               </th>
               <th>
+                <a ui-sref="services" ng-click="order('Ports')">
+                  Published Ports
+                  <span ng-show="sortType == 'Ports' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
                 <a ui-sref="services" ng-click="order('UpdatedAt')">
                   Updated at
                   <span ng-show="sortType == 'UpdatedAt' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -91,6 +98,12 @@
                     <a class="interactive" ng-click="service.Scale = false;"><i class="fa fa-times"></i></a>
                     <a class="interactive" ng-click="scaleService(service)"><i class="fa fa-check-square-o"></i></a>
                   </span>
+                </td>
+                <td>
+                  <a ng-if="service.Ports && service.Ports.length > 0 && swarmManagerIP" ng-repeat="p in service.Ports" class="image-tag" ng-href="http://{{swarmManagerIP}}:{{p.PublishedPort}}" target="_blank">
+                    <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
+                  </a>
+                  <span ng-if="!service.Ports || service.Ports.length === 0 || !swarmManagerIP" >-</span>
                 </td>
                 <td>
                   {{ service.UpdatedAt|getisodate }}
