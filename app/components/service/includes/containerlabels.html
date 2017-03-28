@@ -1,0 +1,59 @@
+<div>
+  <rd-widget>
+    <rd-widget-header icon="fa-tasks" title="Container labels">
+      <div class="nopadding">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addContainerLabel(service)" ng-disabled="isUpdating">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> container label
+        </a>
+      </div>
+    </rd-widget-header>
+    <rd-widget-body ng-if="service.ServiceContainerLabels.length === 0">
+      <p>There are no container labels for this service.</p>
+    </rd-widget-body>
+    <rd-widget-body ng-if="service.ServiceContainerLabels.length > 0" classes="no-padding">
+      <table class="table" >
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="label in service.ServiceContainerLabels">
+            <td>
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon fit-text-size">name</span>
+                <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="updateContainerLabel(service, label)" ng-disabled="isUpdating">
+              </div>
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon fit-text-size">value</span>
+                <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateContainerLabel(service, label)" ng-disabled="isUpdating">
+                <span class="input-group-btn">
+                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeContainerLabel(service, $index)" ng-disabled="isUpdating">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+    <rd-widget-footer>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServiceContainerLabels'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['ServiceContainerLabels'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
+  </rd-widget>
+</div>

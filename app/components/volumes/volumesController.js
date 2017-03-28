@@ -99,7 +99,7 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentica
     angular.forEach($scope.volumes, function (volume) {
       if (volume.Metadata) {
         var volumeRC = volume.Metadata.ResourceControl;
-        if (volumeRC && volumeRC.OwnerId != $scope.user.ID) {
+        if (volumeRC && volumeRC.OwnerId !== $scope.user.ID) {
           angular.forEach(users, function (user) {
             if (volumeRC.OwnerId === user.Id) {
               volume.Owner = user.Username;
