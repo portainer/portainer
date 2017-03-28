@@ -31,8 +31,8 @@
             <div class="col-sm-5">
               <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)">
             </div>
-            <label for="container_network" class="col-sm-1 control-label text-right">Network</label>
-            <div class="col-sm-5">
+            <label for="container_network" class="col-sm-2 col-lg-1 control-label text-right">Network</label>
+            <div class="col-sm-4 col-lg-5">
               <select class="form-control" ng-options="net.Name for net in availableNetworks" ng-model="formValues.network">
                 <option disabled hidden value="">Select a network</option>
               </select>
@@ -113,8 +113,8 @@
                     <!-- protocol-actions -->
                     <div class="input-group col-sm-3 input-group-sm">
                       <div class="btn-group btn-group-sm">
-                        <label class="btn btn-default" ng-model="portBinding.protocol" uib-btn-radio="'tcp'" ng-click="volume.name = ''">TCP</label>
-                        <label class="btn btn-default" ng-model="portBinding.protocol" uib-btn-radio="'udp'" ng-click="volume.name = ''">UDP</label>
+                        <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'tcp'">TCP</label>
+                        <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
                       </div>
                       <button class="btn btn-sm btn-danger" type="button" ng-click="removePortBinding($index)">
                         <i class="fa fa-trash" aria-hidden="true"></i>
@@ -183,8 +183,8 @@
                     <!-- read-only -->
                     <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
                       <div class="btn-group btn-group-sm">
-                        <label class="btn btn-default" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
-                        <label class="btn btn-default" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
+                        <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
+                        <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
                       </div>
                     </div>
                     <!-- !read-only -->
@@ -198,7 +198,7 @@
           <!-- !advanced-options -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-default btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
               <i id="createContainerSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>

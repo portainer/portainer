@@ -37,7 +37,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   };
 
   $scope.addVolume = function() {
-    $scope.formValues.Volumes.push({ name: '', containerPath: '' });
+    $scope.formValues.Volumes.push({ name: '', containerPath: '', readOnly: false, type: 'volume' });
   };
 
   $scope.removeVolume = function(index) {

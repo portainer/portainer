@@ -1,0 +1,67 @@
+<div ng-if="service.ServiceMounts">
+  <rd-widget>
+    <rd-widget-header icon="fa-tasks" title="Mounts">
+      <div class="nopadding">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addMount(service)" ng-disabled="isUpdating">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> mount
+        </a>
+      </div>
+    </rd-widget-header>
+    <rd-widget-body ng-if="service.ServiceMounts.length === 0">
+      <p>There are no mounts for this service.</p>
+    </rd-widget-body>
+    <rd-widget-body ng-if="service.ServiceMounts.length > 0" classes="no-padding">
+      <table class="table" >
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Source</th>
+            <th>Target</th>
+            <th>Read only</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="mount in service.ServiceMounts">
+            <td>
+              <select name="mountType" class="form-control" ng-model="mount.Type" ng-disabled="isUpdating">
+                <option value="volume">Volume</option>
+                <option value="bind">Bind</option>
+              </select>
+            </td>
+            <td>
+              <input type="text" class="form-control" ng-model="mount.Source" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)" ng-disabled="isUpdating">
+            </td>
+            <td>
+              <input type="text" class="form-control" ng-model="mount.Target" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)" ng-disabled="isUpdating">
+            </td>
+            <td>
+              <input type="checkbox" class="form-control" ng-model="mount.ReadOnly" ng-change="updateMount(service, mount)" ng-disabled="isUpdating">
+            </td>
+            <td>
+              <span class="input-group-btn">
+                <button class="btn btn-sm btn-danger" type="button" ng-click="removeMount(service, $index)" ng-disabled="isUpdating">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+    <rd-widget-footer>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServiceMounts'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['ServiceMounts'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
+  </rd-widget>
+</div>
