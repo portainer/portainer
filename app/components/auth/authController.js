@@ -104,6 +104,7 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
       else if (data.length === 0 && userDetails.role === 1) {
         $state.go('endpointInit');
       } else if (data.length === 0 && userDetails.role === 2) {
+        Authentication.logout();
         $scope.authData.error = 'User not allowed. Please contact your administrator.';
       }
     })
