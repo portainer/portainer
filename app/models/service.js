@@ -53,8 +53,8 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.Command = containerSpec.Command;
     this.Secrets = containerSpec.Secrets;
   }
-  if (data.Spec.EndpointSpec) {
-    this.Ports = data.Spec.EndpointSpec.Ports;
+  if (data.Endpoint) {
+    this.Ports = data.Endpoint.Ports;
   }
 
   this.Mounts = [];
