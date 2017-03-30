@@ -68,7 +68,17 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     });
   };
 
-  $scope.removeAction = function () {
+  $scope.removeAction = function() {
+    ModalService.confirmDeletion(
+      'Do you want to delete the selected service(s)? All the containers associated to the selected service(s) will be removed too.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        removeServices();
+      }
+    );
+  };
+
+  function removeServices() {
     $('#loadServicesSpinner').show();
     var counter = 0;
     var complete = function () {
@@ -108,7 +118,11 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
         });
       }
     });
-  };
+  }
+
+  // $scope.removeAction = function () {
+  //
+  // };
 
   function mapUsersToServices(users) {
     angular.forEach($scope.services, function (service) {
