@@ -3,9 +3,9 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.getTemplates = function() {
+  service.getTemplates = function(key) {
     var deferred = $q.defer();
-    Template.get().$promise
+    Template.get({key: key}).$promise
     .then(function success(data) {
       var templates = data.map(function (tpl, idx) {
         var template = new TemplateViewModel(tpl);
@@ -18,6 +18,13 @@ angular.module('portainer.services')
       deferred.reject({ msg: 'Unable to retrieve templates', err: err });
     });
     return deferred.promise;
+  };
+
+  service.filterLinuxServerTemplates = function(templates) {
+    console.log(JSON.stringify(templates, null, 4));
+    return templates.filter(function f(template) {
+      return template;
+    });
   };
 
   service.createTemplateConfiguration = function(template, containerName, network, containerMapping) {

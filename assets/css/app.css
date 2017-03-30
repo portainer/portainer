@@ -321,7 +321,8 @@ ul.sidebar .sidebar-list .sidebar-sublist a {
 
 ul.sidebar .sidebar-list .sidebar-sublist a.active {
   color: #fff;
-  border: 0;
+  border-left: 3px solid #fff;
+  background: #2d3e63;
 }
 
 @media(min-width: 768px) and (max-width: 992px) {
