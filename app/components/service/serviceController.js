@@ -197,6 +197,13 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
       MaxAttempts: service.RestartMaxAttempts,
       Window: service.RestartWindow
     };
+
+    service.Ports.forEach(function (binding) {
+      if (binding.PublishedPort === null || binding.PublishedPort === '') {
+        delete binding.PublishedPort;
+      }
+    });
+
     config.EndpointSpec = {
       Mode: config.EndpointSpec.Mode || 'vip',
       Ports: service.Ports
