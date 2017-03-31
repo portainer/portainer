@@ -39,7 +39,7 @@ type (
 		EndpointManagement bool   `json:"endpointManagement"`
 	}
 
-	// User represent a user account.
+	// User represents a user account.
 	User struct {
 		ID       UserID   `json:"Id"`
 		Username string   `json:"Username"`
@@ -49,6 +49,16 @@ type (
 
 	// UserID represents a user identifier
 	UserID int
+
+	// UserGroup represents a list of user accounts.
+	UserGroup struct {
+		ID    UserGroupID `json:"Id"`
+		Name  string      `json:"Name"`
+		Users []UserID    `json:"Users"`
+	}
+
+	// UserGroupID represents a user group identifier
+	UserGroupID int
 
 	// UserRole represents the role of a user. It can be either an administrator
 	// or a regular user.
@@ -67,14 +77,15 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
-		ID              EndpointID `json:"Id"`
-		Name            string     `json:"Name"`
-		URL             string     `json:"URL"`
-		TLS             bool       `json:"TLS"`
-		TLSCACertPath   string     `json:"TLSCACert,omitempty"`
-		TLSCertPath     string     `json:"TLSCert,omitempty"`
-		TLSKeyPath      string     `json:"TLSKey,omitempty"`
-		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
+		ID                   EndpointID    `json:"Id"`
+		Name                 string        `json:"Name"`
+		URL                  string        `json:"URL"`
+		TLS                  bool          `json:"TLS"`
+		TLSCACertPath        string        `json:"TLSCACert,omitempty"`
+		TLSCertPath          string        `json:"TLSCert,omitempty"`
+		TLSKeyPath           string        `json:"TLSKey,omitempty"`
+		AuthorizedUsers      []UserID      `json:"AuthorizedUsers"`
+		AuthorizedUserGroups []UserGroupID `json:"AuthorizedGroups"`
 	}
 
 	// ResourceControl represent a reference to a Docker resource with specific controls

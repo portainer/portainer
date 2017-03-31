@@ -50,6 +50,7 @@ angular.module('portainer', [
   'templates',
   'user',
   'users',
+  'usergroups',
   'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider) {
     'use strict';
@@ -499,6 +500,19 @@ angular.module('portainer', [
         "content@": {
           templateUrl: 'app/components/user/user.html',
           controller: 'UserController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('usergroups', {
+      url: '/usergroups/',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/usergroups/usergroups.html',
+          controller: 'UserGroupsController'
         },
         "sidebar@": {
           templateUrl: 'app/components/sidebar/sidebar.html',
