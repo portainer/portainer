@@ -1,5 +1,7 @@
 <rd-header>
-  <rd-header-title title="Create volume"></rd-header-title>
+  <rd-header-title title="Create volume">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
   <rd-header-content>
     <a ui-sref="volumes">Volumes</a> > Add volume
   </rd-header-content>
@@ -14,7 +16,7 @@
           <div class="form-group">
             <label for="volume_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="config.Name" id="volume_name" placeholder="e.g. myVolume">
+              <input type="text" class="form-control" ng-model="formValues.Name" id="volume_name" placeholder="e.g. myVolume">
             </div>
           </div>
           <!-- !name-input -->
@@ -25,7 +27,10 @@
           <div class="form-group">
             <label for="volume_driver" class="col-sm-1 control-label text-left">Driver</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="config.Driver" id="volume_driver" placeholder="e.g. driverName">
+              <select class="form-control" ng-options="driver for driver in availableVolumeDrivers" ng-model="formValues.Driver" ng-if="availableVolumeDrivers.length > 0">
+                <option disabled hidden value="">Select a driver</option>
+              </select>
+              <input type="text" class="form-control" ng-model="formValues.Driver" id="volume_driver" placeholder="e.g. driverName" ng-if="availableVolumeDrivers.length === 0">
             </div>
           </div>
           <!-- !driver-input -->
