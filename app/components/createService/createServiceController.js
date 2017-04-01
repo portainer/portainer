@@ -83,8 +83,15 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
   function preparePortsConfig(config, input) {
     var ports = [];
     input.Ports.forEach(function (binding) {
-      if (binding.PublishedPort && binding.TargetPort) {
-        ports.push({ PublishedPort: +binding.PublishedPort, TargetPort: +binding.TargetPort, Protocol: binding.Protocol });
+      var port = {
+        Protocol: binding.Protocol
+      };
+      if (binding.TargetPort) {
+        port.TargetPort = +binding.TargetPort;
+        if (binding.PublishedPort) {
+          port.PublishedPort = +binding.PublishedPort;
+        }
+        ports.push(port);
       }
     });
     config.EndpointSpec.Ports = ports;
