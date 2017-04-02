@@ -28,6 +28,7 @@ type (
 		TLSCacert         *string
 		TLSCert           *string
 		TLSKey            *string
+		AdminPassword     *string
 	}
 
 	// Settings represents Portainer settings.
