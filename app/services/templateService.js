@@ -20,11 +20,8 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.filterLinuxServerTemplates = function(templates) {
-    console.log(JSON.stringify(templates, null, 4));
-    return templates.filter(function f(template) {
-      return template;
-    });
+  service.filterLinuxServerIOTemplates = function(templates) {
+    return TemplateHelper.filterLinuxServerIOTemplates(templates);
   };
 
   service.createTemplateConfiguration = function(template, containerName, network, containerMapping) {

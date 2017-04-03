@@ -458,6 +458,7 @@ angular.module('portainer', [
       url: '/templates/',
       params: {
         key: 'containers',
+        hide_descriptions: false
       },
       views: {
         "content@": {
@@ -474,6 +475,7 @@ angular.module('portainer', [
       url: '^/templates/linuxserver.io',
       params: {
         key: 'linuxserver.io',
+        hide_descriptions: true
       },
       views: {
         "content@": {

@@ -4,6 +4,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
+    hideDescriptions: $stateParams.hide_descriptions,
     pagination_count: Pagination.getPaginationCount('templates')
   };
   $scope.formValues = {
@@ -124,7 +125,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
     if (endpointProvider === 'DOCKER_SWARM' || endpointProvider === 'DOCKER_SWARM_MODE') {
       if (endpointProvider === 'DOCKER_SWARM') {
         networks = NetworkService.filterGlobalNetworks(networks);
-      } else { 
+      } else {
         networks = NetworkService.filterSwarmModeAttachableNetworks(networks);
       }
       $scope.globalNetworkCount = networks.length;
@@ -145,7 +146,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
       .then(function success(data) {
         var templates = data.templates;
         if (templatesKey == 'linuxserver.io') {
-          templates = TemplateService.filterLinuxServerTemplates(templates);
+          templates = TemplateService.filterLinuxServerIOTemplates(templates);
         }
         $scope.templates = templates;
         $scope.runningContainers = data.containers;
