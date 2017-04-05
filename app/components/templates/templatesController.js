@@ -145,7 +145,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
       })
       .then(function success(data) {
         var templates = data.templates;
-        if (templatesKey == 'linuxserver.io') {
+        if (templatesKey === 'linuxserver.io') {
           templates = TemplateService.filterLinuxServerIOTemplates(templates);
         }
         $scope.templates = templates;
