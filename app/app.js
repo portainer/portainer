@@ -44,6 +44,7 @@ angular.module('portainer', [
   'services',
   'stack',
   'stacks',
+  'composeStack',
   'settings',
   'sidebar',
   'stats',
@@ -442,6 +443,19 @@ angular.module('portainer', [
         "content@": {
           templateUrl: 'app/components/stack/stack.html',
           controller: 'StackController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('composeStack', {
+      url: '^/composestack/:name/',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/composeStack/composeStack.html',
+          controller: 'ComposeStackController'
         },
         "sidebar@": {
           templateUrl: 'app/components/sidebar/sidebar.html',

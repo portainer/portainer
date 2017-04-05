@@ -45,19 +45,27 @@
                 </a>
               </th>
               <th>
-                <a ui-sref="stacks" ng-click="order('Services')">
-                  Services
+                <a ui-sref="stacks" ng-click="order('Items')">
+                  Items
                   <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th>
+                <a ui-sref="stacks" ng-click="order('Type')">
+                  Type
+                  <span ng-show="sortType == 'Type' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Type' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
             </thead>
             <tbody>
-              <!--<tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">-->
               <tr dir-paginate="stack in (state.filteredStack = ( stacks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="stack.Checked" ng-change="selectItem(stack)"/></td>
-                <td><a ui-sref="stack({name: stack.Name})">{{ stack.Name }}</a></td>
-                <td>{{ stack.Services }}</td>
+                <td ng-if="stack.Type === 'Compose'"><a ui-sref="composeStack({name: stack.Name})">{{ stack.Name }}</a></td>
+                <td ng-if="stack.Type === 'SwarmMode'"><a ui-sref="stack({name: stack.Name})">{{ stack.Name }}</a></td>
+                <td>{{ stack.Items }}<span ng-if="stack.Type === 'Compose'"> container(s)</span><span ng-if="stack.Type === 'SwarmMode'"> service(s)</span></td>
+                <td>{{ stack.Type }}</td>
               </tr>
               <tr ng-if="!stacks">
                 <td colspan="5" class="text-center text-muted">Loading...</td>

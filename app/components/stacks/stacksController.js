@@ -1,6 +1,6 @@
 angular.module('stacks', [])
-.controller('StacksController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination', 'Task', 'Node', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination, Task, Node, Authentication, UserService, ModalService, ResourceControlService) {
+.controller('StacksController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Container', 'Messages', 'Pagination', 'Task', 'Node', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Container, Messages, Pagination, Task, Node, Authentication, UserService, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('stacks');
@@ -38,8 +38,10 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     $scope.user = userDetails;
 
     var stacks = {};
+    var composeStacks = {};
 
     $q.all({
+      containers: Container.query({all: 1}).$promise,
       services: Service.query({}).$promise,
       tasks: Task.query({filters: {'desired-state': ['running']}}).$promise,
       nodes: Node.query({}).$promise,
@@ -47,26 +49,36 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     .then(function success(data) {
       for (var k in data.services) {
         var service = data.services[k];
-        if (!service.Spec || !service.Spec.Labels) continue;
+        if (!service.Spec || !service.Spec.Labels || !service.Spec.Labels["com.docker.stack.namespace"]) continue;
         var stackLabel = service.Spec.Labels["com.docker.stack.namespace"];
 
         if (stacks[stackLabel]) stacks[stackLabel]++;
         else stacks[stackLabel] = 1;
       }
+      for (var k in data.containers) {
+        var container = data.containers[k];
+        if (!container.Labels || !container.Labels["com.docker.compose.project"]) continue;
+        var stackLabel = container.Labels["com.docker.compose.project"];
+        if (composeStacks[stackLabel]) composeStacks[stackLabel]++;
+        else composeStacks[stackLabel] = 1;
+      }
       var arr = [];
       for (var k in stacks) {
-        arr.push(new StackViewModel({"Name": k, "Services": stacks[k]}));
+        arr.push(new StackViewModel({"Name": k, "Items": stacks[k], "Type": "SwarmMode"}));
+      }
+      for (var k in composeStacks) {
+        arr.push(new StackViewModel({"Name": k, "Items": composeStacks[k], "Type": "Compose"}));
       }
       $scope.stacks = arr;
 
-      $('#loadSStacksSpinner').hide();
+      $('#loadStacksSpinner').hide();
     })
     .catch(function error(err) {
       $scope.services = [];
       Messages.error("Failure", err, "Unable to retrieve services");
     })
     .finally(function final() {
-      $('#loadServicesSpinner').hide();
+      $('#loadStacksSpinner').hide();
     });
   }
 

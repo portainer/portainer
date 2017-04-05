@@ -1,7 +1,8 @@
 function StackViewModel(data) {
   this.Model = data;
   this.Name = data.Name;
-  this.Services = data.Services;
+  this.Items = data.Items;
+  this.Type = data.Type;
   this.Checked = false;
 
   if (data.Portainer) {

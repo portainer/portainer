@@ -3,7 +3,7 @@ angular.module('stack', [])
 function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Messages, Pagination) {
 
   $scope.state = {};
-  $scope.state.pagination_count_service = Pagination.getPaginationCount('stack_services');
+  $scope.state.pagination_count_services = Pagination.getPaginationCount('stack_services');
   $scope.state.pagination_count_tasks = Pagination.getPaginationCount('stack_tasks');
   $scope.service = {};
   $scope.tasks = [];
@@ -24,11 +24,11 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
   };
 
   $scope.changePaginationCountServices = function() {
-    Pagination.setPaginationCount('stack_services', $scope.state.pagination_count);
+    Pagination.setPaginationCount('stack_services', $scope.state.pagination_count_services);
   };
 
   $scope.changePaginationCountTasks = function() {
-    Pagination.setPaginationCount('stack_tasks', $scope.state.pagination_count);
+    Pagination.setPaginationCount('stack_tasks', $scope.state.pagination_count_tasks);
   };
 
   function fetchStackDetails() {
@@ -38,7 +38,8 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
     Service.query({filters: {label: label_filter}}, function (services) {
       $scope.stack = new StackViewModel({
         "Name": $stateParams.name,
-        "Services": services.length
+        "Items": services.length,
+        "Type": "SwarmMode"
       });
 
       /*$scope.services = services.map(function (service) {
