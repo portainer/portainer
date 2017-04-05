@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Pagination',
-function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Messages, Pagination) {
+.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Pagination', 'ModalService',
+function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Messages, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -197,6 +197,13 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
       MaxAttempts: service.RestartMaxAttempts,
       Window: service.RestartWindow
     };
+
+    service.Ports.forEach(function (binding) {
+      if (binding.PublishedPort === null || binding.PublishedPort === '') {
+        delete binding.PublishedPort;
+      }
+    });
+
     config.EndpointSpec = {
       Mode: config.EndpointSpec.Mode || 'vip',
       Ports: service.Ports
@@ -213,8 +220,17 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     });
   };
 
+  $scope.removeService = function() {
+    ModalService.confirmDeletion(
+      'Do you want to delete this service? All the containers associated to this service will be removed too.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        removeService();
+      }
+    );
+  };
 
-  $scope.removeService = function removeService() {
+  function removeService() {
     $('#loadingViewSpinner').show();
     Service.remove({id: $stateParams.id}, function (d) {
       if (d.message) {
@@ -229,7 +245,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
       $('#loadingViewSpinner').hide();
       Messages.error("Failure", e, "Unable to remove service");
     });
-  };
+  }
 
   function translateServiceArrays(service) {
     service.ServiceSecrets = service.Secrets;

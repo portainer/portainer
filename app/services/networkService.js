@@ -15,6 +15,14 @@ angular.module('portainer.services')
     });
   };
 
+  service.filterSwarmModeAttachableNetworks = function(networks) {
+    return networks.filter(function (network) {
+      if (network.Scope === 'swarm' && network.Attachable === true) {
+        return network;
+      }
+    });
+  };
+
   service.addPredefinedLocalNetworks = function(networks) {
     networks.push({Scope: "local", Name: "bridge"});
     networks.push({Scope: "local", Name: "host"});

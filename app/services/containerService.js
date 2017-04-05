@@ -9,7 +9,7 @@ angular.module('portainer.services')
     .then(function success(data) {
       var containers = data;
       if (hiddenLabels) {
-        containers = ContainerHelper.hideContainers(d, hiddenLabels);
+        containers = ContainerHelper.hideContainers(data, hiddenLabels);
       }
       deferred.resolve(data);
     })
