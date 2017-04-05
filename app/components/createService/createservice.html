@@ -239,7 +239,7 @@
                         <!-- container-path -->
                         <div class="input-group input-group-sm col-sm-6">
                           <span class="input-group-addon">container</span>
-                          <input type="text" class="form-control" ng-model="volume.Source" placeholder="e.g. /path/in/container">
+                          <input type="text" class="form-control" ng-model="volume.Target" placeholder="e.g. /path/in/container">
                         </div>
                         <!-- !container-path -->
                         <!-- volume-type -->
@@ -261,7 +261,7 @@
                         <!-- volume -->
                         <div class="input-group input-group-sm col-sm-6" ng-if="volume.Type === 'volume'">
                           <span class="input-group-addon">volume</span>
-                          <select class="form-control" ng-model="volume.Target">
+                          <select class="form-control" ng-model="volume.Source">
                             <option selected disabled hidden value="">Select a volume</option>
                             <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
                           </select>
@@ -270,7 +270,7 @@
                         <!-- bind -->
                         <div class="input-group input-group-sm col-sm-6" ng-if="volume.Type === 'bind'">
                           <span class="input-group-addon">host</span>
-                          <input type="text" class="form-control" ng-model="volume.Target" placeholder="e.g. /path/on/host">
+                          <input type="text" class="form-control" ng-model="volume.Source" placeholder="e.g. /path/on/host">
                         </div>
                         <!-- !bind -->
                         <!-- read-only -->
