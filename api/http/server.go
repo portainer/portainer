@@ -42,7 +42,7 @@ func (server *Server) Start() error {
 	var settingsHandler = NewSettingsHandler(middleWareService)
 	settingsHandler.settings = server.Settings
 	var templatesHandler = NewTemplatesHandler(middleWareService)
-	templatesHandler.templatesURL = server.TemplatesURL
+	templatesHandler.containerTemplatesURL = server.TemplatesURL
 	var dockerHandler = NewDockerHandler(middleWareService, server.ResourceControlService)
 	dockerHandler.EndpointService = server.EndpointService
 	var websocketHandler = NewWebSocketHandler()

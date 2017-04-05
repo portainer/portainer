@@ -12,9 +12,13 @@ import (
 // TemplatesHandler represents an HTTP API handler for managing templates.
 type TemplatesHandler struct {
 	*mux.Router
-	Logger       *log.Logger
-	templatesURL string
+	Logger                *log.Logger
+	containerTemplatesURL string
 }
+
+const (
+	containerTemplatesURLLinuxServerIo = "http://tools.linuxserver.io/portainer.json"
+)
 
 // NewTemplatesHandler returns a new instance of TemplatesHandler.
 func NewTemplatesHandler(mw *middleWareService) *TemplatesHandler {
@@ -27,14 +31,30 @@ func NewTemplatesHandler(mw *middleWareService) *TemplatesHandler {
 	return h
 }
 
-// handleGetTemplates handles GET requests on /templates
+// handleGetTemplates handles GET requests on /templates?key=<key>
 func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		handleNotAllowed(w, []string{http.MethodGet})
 		return
 	}
 
-	resp, err := http.Get(handler.templatesURL)
+	key := r.FormValue("key")
+	if key == "" {
+		Error(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	var templatesURL string
+	if key == "containers" {
+		templatesURL = handler.containerTemplatesURL
+	} else if key == "linuxserver.io" {
+		templatesURL = containerTemplatesURLLinuxServerIo
+	} else {
+		Error(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	resp, err := http.Get(templatesURL)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return

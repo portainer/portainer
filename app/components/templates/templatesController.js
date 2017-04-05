@@ -1,9 +1,10 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$anchorScroll', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Messages', 'Pagination', 'ResourceControlService', 'Authentication',
-function ($scope, $q, $state, $anchorScroll, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Messages, Pagination, ResourceControlService, Authentication) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Messages', 'Pagination', 'ResourceControlService', 'Authentication',
+function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Messages, Pagination, ResourceControlService, Authentication) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
+    hideDescriptions: $stateParams.hide_descriptions,
     pagination_count: Pagination.getPaginationCount('templates')
   };
   $scope.formValues = {
@@ -124,7 +125,7 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, Container
     if (endpointProvider === 'DOCKER_SWARM' || endpointProvider === 'DOCKER_SWARM_MODE') {
       if (endpointProvider === 'DOCKER_SWARM') {
         networks = NetworkService.filterGlobalNetworks(networks);
-      } else { 
+      } else {
         networks = NetworkService.filterSwarmModeAttachableNetworks(networks);
       }
       $scope.globalNetworkCount = networks.length;
@@ -134,15 +135,20 @@ function ($scope, $q, $state, $anchorScroll, Config, ContainerService, Container
   }
 
   function initTemplates() {
+    var templatesKey = $stateParams.key;
     Config.$promise.then(function (c) {
       $q.all({
-        templates: TemplateService.getTemplates(),
+        templates: TemplateService.getTemplates(templatesKey),
         containers: ContainerService.getContainers(0, c.hiddenLabels),
         networks: NetworkService.getNetworks(),
         volumes: VolumeService.getVolumes()
       })
       .then(function success(data) {
-        $scope.templates = data.templates;
+        var templates = data.templates;
+        if (templatesKey === 'linuxserver.io') {
+          templates = TemplateService.filterLinuxServerIOTemplates(templates);
+        }
+        $scope.templates = templates;
         $scope.runningContainers = data.containers;
         $scope.availableNetworks = filterNetworksBasedOnProvider(data.networks);
         $scope.availableVolumes = data.volumes.Volumes;
