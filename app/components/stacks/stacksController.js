@@ -44,7 +44,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Container, M
       containers: Container.query({all: 1}).$promise,
       services: Service.query({}).$promise,
       tasks: Task.query({filters: {'desired-state': ['running']}}).$promise,
-      nodes: Node.query({}).$promise,
+      nodes: Node.query({}).$promise
     })
     .then(function success(data) {
       for (var k in data.services) {
