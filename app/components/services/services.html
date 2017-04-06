@@ -59,6 +59,13 @@
                 </a>
               </th>
               <th>
+                <a ui-sref="services" ng-click="order('Ports')">
+                  Published Ports
+                  <span ng-show="sortType == 'Ports' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
                 <a ui-sref="services" ng-click="order('UpdatedAt')">
                   Updated at
                   <span ng-show="sortType == 'UpdatedAt' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -93,6 +100,12 @@
                   </span>
                 </td>
                 <td>
+                  <a ng-if="service.Ports && service.Ports.length > 0 && swarmManagerIP" ng-repeat="p in service.Ports" class="image-tag" ng-href="http://{{swarmManagerIP}}:{{p.PublishedPort}}" target="_blank">
+                    <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
+                  </a>
+                  <span ng-if="!service.Ports || service.Ports.length === 0 || !swarmManagerIP" >-</span>
+                </td>
+                <td>
                   {{ service.UpdatedAt|getisodate }}
                 </td>
                 <td ng-if="applicationState.application.authentication">
@@ -118,10 +131,10 @@
                 </td>
               </tr>
               <tr ng-if="!services">
-                <td colspan="5" class="text-center text-muted">Loading...</td>
+                <td colspan="7" class="text-center text-muted">Loading...</td>
               </tr>
               <tr ng-if="services.length == 0">
-                <td colspan="5" class="text-center text-muted">No services available.</td>
+                <td colspan="7" class="text-center text-muted">No services available.</td>
               </tr>
             </tbody>
           </table>

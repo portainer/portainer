@@ -43,7 +43,7 @@ Please note that the public demo cluster is **reset every 15min**.
 
 **_Portainer_** has full support for the following Docker versions:
 
-* Docker 1.10 to Docker 1.12 (including `swarm-mode`)
+* Docker 1.10 to Docker 17.03 (including `swarm-mode`)
 * Docker Swarm >= 1.2.3
 
 Partial support for the following Docker versions (some features may not be available):

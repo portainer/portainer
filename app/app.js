@@ -456,6 +456,27 @@ angular.module('portainer', [
     })
     .state('templates', {
       url: '/templates/',
+      params: {
+        key: 'containers',
+        hide_descriptions: false
+      },
+      views: {
+        "content@": {
+          templateUrl: 'app/components/templates/templates.html',
+          controller: 'TemplatesController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('templates_linuxserver', {
+      url: '^/templates/linuxserver.io',
+      params: {
+        key: 'linuxserver.io',
+        hide_descriptions: true
+      },
       views: {
         "content@": {
           templateUrl: 'app/components/templates/templates.html',
@@ -573,4 +594,4 @@ angular.module('portainer', [
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('PAGINATION_MAX_ITEMS', 10)
-  .constant('UI_VERSION', 'v1.12.1');
+  .constant('UI_VERSION', 'v1.12.4');

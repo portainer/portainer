@@ -1,6 +1,6 @@
 angular.module('services', [])
-.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination', 'Task', 'Node', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination, Task, Node, Authentication, UserService, ModalService, ResourceControlService) {
+.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination', 'Task', 'Node', 'NodeHelper', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination, Task, Node, NodeHelper, Authentication, UserService, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');
@@ -68,7 +68,17 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     });
   };
 
-  $scope.removeAction = function () {
+  $scope.removeAction = function() {
+    ModalService.confirmDeletion(
+      'Do you want to delete the selected service(s)? All the containers associated to the selected service(s) will be removed too.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        removeServices();
+      }
+    );
+  };
+
+  function removeServices() {
     $('#loadServicesSpinner').show();
     var counter = 0;
     var complete = function () {
@@ -108,7 +118,11 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
         });
       }
     });
-  };
+  }
+
+  // $scope.removeAction = function () {
+  //
+  // };
 
   function mapUsersToServices(users) {
     angular.forEach($scope.services, function (service) {
@@ -137,6 +151,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
       nodes: Node.query({}).$promise,
     })
     .then(function success(data) {
+      $scope.swarmManagerIP = NodeHelper.getManagerIP(data.nodes);
       $scope.services = data.services.map(function (service) {
         var serviceTasks = data.tasks.filter(function (task) {
           return task.ServiceID === service.ID;

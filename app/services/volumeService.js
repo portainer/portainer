@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('VolumeService', ['$q', 'Volume', function VolumeServiceFactory($q, Volume) {
+.factory('VolumeService', ['$q', 'Volume', 'VolumeHelper', function VolumeServiceFactory($q, Volume, VolumeHelper) {
   'use strict';
   var service = {};
 
@@ -7,27 +7,14 @@ angular.module('portainer.services')
     return Volume.query({}).$promise;
   };
 
-  function prepareVolumeQueries(template, containerConfig) {
-    var volumeQueries = [];
-    if (template.volumes) {
-      template.volumes.forEach(function (vol) {
-        volumeQueries.push(
-          Volume.create({}, function (d) {
-            if (d.message) {
-              Messages.error("Unable to create volume", {}, d.message);
-            } else {
-              Messages.send("Volume created", d.Name);
-              containerConfig.Volumes[vol] = {};
-              containerConfig.HostConfig.Binds.push(d.Name + ':' + vol);
-            }
-          }, function (e) {
-            Messages.error("Failure", e, "Unable to create volume");
-          }).$promise
-        );
-      });
-    }
-    return volumeQueries;
-  }
+  service.createVolumeConfiguration = function(name, driver, driverOptions) {
+    var volumeConfiguration = {
+      Name: name,
+      Driver: driver,
+      DriverOpts: VolumeHelper.createDriverOptions(driverOptions)
+    };
+    return volumeConfiguration;
+  };
 
   service.createVolume = function(volumeConfiguration) {
     var deferred = $q.defer();
@@ -45,9 +32,9 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.createVolumes = function(volumes) {
-    var createVolumeQueries = volumes.map(function(volume) {
-      return service.createVolume(volume);
+  service.createVolumes = function(volumeConfigurations) {
+    var createVolumeQueries = volumeConfigurations.map(function(volumeConfiguration) {
+      return service.createVolume(volumeConfiguration);
     });
     return $q.all(createVolumeQueries);
   };
