@@ -19,7 +19,7 @@ function ContainerViewModel(data) {
       this.Ports.push({ host: p.IP, private: p.PrivatePort, public: p.PublicPort });
     }
   }
-  if (data.Status.includes('(healthy)')) {
+  /*if (data.Status.includes('(healthy)')) {
     this.Health = 'healthy';
   } else if (data.Status.includes('(unhealthy)')) {
     this.Health = 'unhealthy';
@@ -27,7 +27,7 @@ function ContainerViewModel(data) {
     this.Health = 'starting';
   } else {
     this.Health = 'unknown';
-  }
+  }*/
   if (data.Portainer) {
     this.Metadata = {};
     if (data.Portainer.ResourceControl) {

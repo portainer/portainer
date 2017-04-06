@@ -54,11 +54,11 @@ angular.module('portainer.filters', [])
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (status.indexOf('paused') !== -1) {
+    if (status.indexOf('paused') !== -1 || status.indexOf('starting') !== -1) {
       return 'warning';
     } else if (status.indexOf('created') !== -1) {
       return 'info';
-    } else if (status.indexOf('stopped') !== -1) {
+    } else if (status.indexOf('stopped') !== -1 || status.indexOf('unhealthy') !== -1) {
       return 'danger';
     }
     return 'success';
@@ -74,7 +74,13 @@ angular.module('portainer.filters', [])
       return 'created';
     } else if (status.indexOf('exited') !== -1) {
       return 'stopped';
-    }
+    } else if (status.indexOf('(healthy)') !== -1) {
+			return 'healthy';
+		} else if (status.indexOf('(unhealthy)') !== -1) {
+			return 'unhealthy';
+    } else if (status.indexOf('(health: starting)') !== -1) {
+      return 'starting';
+		}
     return 'running';
   };
 })
