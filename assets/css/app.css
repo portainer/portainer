@@ -301,9 +301,26 @@ ul.sidebar {
   bottom: 40px;
 }
 
+ul.sidebar .sidebar-title {
+  height: auto;
+}
+
 ul.sidebar .sidebar-list a.active {
   color: #fff;
   text-indent: 22px;
+  border-left: 3px solid #fff;
+  background: #2d3e63;
+}
+
+ul.sidebar .sidebar-list .sidebar-sublist a {
+  text-indent: 35px;
+  font-size: 12px;
+  color: #b2bfdc;
+  line-height: 40px;
+}
+
+ul.sidebar .sidebar-list .sidebar-sublist a.active {
+  color: #fff;
   border-left: 3px solid #fff;
   background: #2d3e63;
 }

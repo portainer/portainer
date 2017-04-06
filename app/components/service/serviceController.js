@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Pagination',
-function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Messages, Pagination) {
+.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Pagination', 'ModalService',
+function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Messages, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -157,7 +157,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
   };
 
   $scope.updateService = function updateService(service) {
-    $('#loadServicesSpinner').show();
+    $('#loadingViewSpinner').show();
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Name = service.Name;
     config.Labels = translateServiceLabelsToLabels(service.ServiceLabels);
@@ -197,24 +197,42 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
       MaxAttempts: service.RestartMaxAttempts,
       Window: service.RestartWindow
     };
+
+    if (service.Ports) {
+      service.Ports.forEach(function (binding) {
+        if (binding.PublishedPort === null || binding.PublishedPort === '') {
+          delete binding.PublishedPort;
+        }
+      });
+    }
+
     config.EndpointSpec = {
       Mode: config.EndpointSpec.Mode || 'vip',
       Ports: service.Ports
     };
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
-      $('#loadServicesSpinner').hide();
+      $('#loadingViewSpinner').hide();
       Messages.send("Service successfully updated", "Service updated");
       $scope.cancelChanges({});
       fetchServiceDetails();
     }, function (e) {
-      $('#loadServicesSpinner').hide();
+      $('#loadingViewSpinner').hide();
       Messages.error("Failure", e, "Unable to update service");
     });
   };
 
+  $scope.removeService = function() {
+    ModalService.confirmDeletion(
+      'Do you want to delete this service? All the containers associated to this service will be removed too.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        removeService();
+      }
+    );
+  };
 
-  $scope.removeService = function removeService() {
+  function removeService() {
     $('#loadingViewSpinner').show();
     Service.remove({id: $stateParams.id}, function (d) {
       if (d.message) {
@@ -229,7 +247,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
       $('#loadingViewSpinner').hide();
       Messages.error("Failure", e, "Unable to remove service");
     });
-  };
+  }
 
   function translateServiceArrays(service) {
     service.ServiceSecrets = service.Secrets;
