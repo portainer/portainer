@@ -198,11 +198,13 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
       Window: service.RestartWindow
     };
 
-    service.Ports.forEach(function (binding) {
-      if (binding.PublishedPort === null || binding.PublishedPort === '') {
-        delete binding.PublishedPort;
-      }
-    });
+    if (service.Ports) {
+      service.Ports.forEach(function (binding) {
+        if (binding.PublishedPort === null || binding.PublishedPort === '') {
+          delete binding.PublishedPort;
+        }
+      });
+    }
 
     config.EndpointSpec = {
       Mode: config.EndpointSpec.Mode || 'vip',
