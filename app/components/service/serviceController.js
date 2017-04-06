@@ -157,7 +157,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
   };
 
   $scope.updateService = function updateService(service) {
-    $('#loadServicesSpinner').show();
+    $('#loadingViewSpinner').show();
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Name = service.Name;
     config.Labels = translateServiceLabelsToLabels(service.ServiceLabels);
@@ -210,12 +210,12 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     };
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
-      $('#loadServicesSpinner').hide();
+      $('#loadingViewSpinner').hide();
       Messages.send("Service successfully updated", "Service updated");
       $scope.cancelChanges({});
       fetchServiceDetails();
     }, function (e) {
-      $('#loadServicesSpinner').hide();
+      $('#loadingViewSpinner').hide();
       Messages.error("Failure", e, "Unable to update service");
     });
   };
