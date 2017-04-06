@@ -36,20 +36,6 @@ angular.module('portainer.filters', [])
     return 'success';
   };
 })
-.filter('containerhealthimage', function () {
-  'use strict';
-  return function (text) {
-    var status = _.toLower(text);
-    if (status.indexOf('healthy') !== -1) {
-      return 'fa-check';
-    } else if (status.indexOf('unhealthy') !== -1) {
-      return 'fa-times';
-    } else if (status.indexOf('starting') !== -1) {
-      return 'fa-ellipsis-h';
-    }
-    return 'fa-question';
-  };
-})
 .filter('containerstatusbadge', function () {
   'use strict';
   return function (text) {
