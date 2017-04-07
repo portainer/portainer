@@ -498,11 +498,11 @@
                 <div class="col-sm-12 form-inline" style="margin-top: 10px;">
                   <div ng-repeat="device in config.HostConfig.Devices" style="margin-top: 2px;">
                     <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">Host path</span>
+                      <span class="input-group-addon">host</span>
                       <input type="text" class="form-control" ng-model="device.pathOnHost" placeholder="e.g. /dev/tty0">
                     </div>
                     <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">Container path</span>
+                      <span class="input-group-addon">container</span>
                       <input type="text" class="form-control" ng-model="device.pathInContainer" placeholder="e.g. /dev/tty0">
                     </div>
                     <button class="btn btn-sm btn-danger" type="button" ng-click="removeDevice($index)">
