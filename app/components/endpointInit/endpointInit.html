@@ -21,10 +21,10 @@
             <!-- endpoin-type radio -->
             <div class="form-group">
               <div class="radio">
-                <label><input type="radio" name="endpointType" value="local" ng-model="formValues.endpointType" ng-click="cleanError()">Manage the Docker instance where Portainer is running</label>
+                <label><input type="radio" name="endpointType" value="local" ng-model="formValues.endpointType" ng-click="resetErrorMessage()">Manage the Docker instance where Portainer is running</label>
               </div>
               <div class="radio">
-                <label><input type="radio" name="endpointType" value="remote" ng-model="formValues.endpointType" ng-click="cleanError()">Manage a remote Docker instance</label>
+                <label><input type="radio" name="endpointType" value="remote" ng-model="formValues.endpointType" ng-click="resetErrorMessage()">Manage a remote Docker instance</label>
               </div>
             </div>
             <!-- endpoint-type radio -->
