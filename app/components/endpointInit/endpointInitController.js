@@ -38,7 +38,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     .catch(function error(err) {
       EndpointService.deleteEndpoint(endpointID)
       .then(function success() {
-        $scope.state.error = 'Unable to connect to the Docker endpoint';
+        showErrorMessage('Unable to connect to the Docker endpoint');
       });
     });
   }
