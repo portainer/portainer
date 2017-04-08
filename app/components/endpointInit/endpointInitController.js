@@ -62,7 +62,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     var TLSCAFile = $scope.formValues.TLSCACert;
     var TLSCertFile = $scope.formValues.TLSCert;
     var TLSKeyFile = $scope.formValues.TLSKey;
-    EndpointService.createRemote(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       var endpointID = data.Id;
       EndpointProvider.setEndpointID(endpointID);
