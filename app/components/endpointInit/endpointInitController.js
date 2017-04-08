@@ -24,6 +24,25 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     $scope.state.error = '';
   };
 
+  function showErrorMessage(message) {
+    $scope.state.uploadInProgress = false;
+    $scope.state.error = message;
+  }
+
+  function updateEndpointState(endpointID) {
+    EndpointProvider.setEndpointID(endpointID);
+    StateManager.updateEndpointState(false)
+    .then(function success(data) {
+      $state.go('dashboard');
+    })
+    .catch(function error(err) {
+      EndpointService.deleteEndpoint(endpointID)
+      .then(function success() {
+        $scope.state.error = 'Unable to connect to the Docker endpoint';
+      });
+    });
+  }
+
   $scope.createLocalEndpoint = function() {
     $('#initEndpointSpinner').show();
     $scope.state.error = '';
@@ -34,17 +53,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     EndpointService.createLocalEndpoint(name, URL, TLS, true)
     .then(function success(data) {
       var endpointID = data.Id;
-      EndpointProvider.setEndpointID(endpointID);
-      StateManager.updateEndpointState(false)
-      .then(function success(data) {
-        $state.go('dashboard');
-      })
-      .catch(function error(err) {
-        EndpointService.deleteEndpoint(endpointID)
-        .then(function success() {
-          $scope.state.error = 'Unable to connect to the Docker endpoint';
-        });
-      });
+      updateEndpointState(data.Id);
     }, function error() {
       $scope.state.error = 'Unable to create endpoint';
     })
@@ -62,23 +71,13 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     var TLSCAFile = $scope.formValues.TLSCACert;
     var TLSCertFile = $scope.formValues.TLSCert;
     var TLSKeyFile = $scope.formValues.TLSKey;
+
     EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       var endpointID = data.Id;
-      EndpointProvider.setEndpointID(endpointID);
-      StateManager.updateEndpointState(false)
-      .then(function success(data) {
-        $state.go('dashboard');
-      })
-      .catch(function error(err) {
-        EndpointService.deleteEndpoint(endpointID)
-        .then(function success() {
-          $scope.state.error = 'Unable to connect to the Docker endpoint';
-        });
-      });
+      updateEndpointState(endpointID);
     }, function error(err) {
-      $scope.state.uploadInProgress = false;
-      $scope.state.error = err.msg;
+      showErrorMessage(err.msg);
     }, function update(evt) {
       if (evt.upload) {
         $scope.state.uploadInProgress = evt.upload;
