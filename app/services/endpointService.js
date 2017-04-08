@@ -53,6 +53,34 @@ angular.module('portainer.services')
     return Endpoints.create({}, endpoint).$promise;
   };
 
+  service.createRemote = function(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    var endpoint = {
+      Name: name,
+      URL: 'tcp://' + URL,
+      TLS: TLS
+    };
+    var deferred = $q.defer();
+    Endpoints.create({}, endpoint).$promise
+    .then(function success(data) {
+      var endpointID = data.Id;
+      if (TLS) {
+        deferred.notify({upload: true});
+        FileUploadService.uploadTLSFilesForEndpoint(endpointID, TLSCAFile, TLSCertFile, TLSKeyFile)
+        .then(function success() {
+          deferred.notify({upload: false});
+          deferred.resolve(data);
+        });
+      } else {
+        deferred.resolve(data);
+      }
+    })
+    .catch(function error(err) {
+      deferred.notify({upload: false});
+      deferred.reject({msg: 'Unable to upload TLS certs', err: err});
+    });
+    return deferred.promise;
+  };
+
   service.createRemoteEndpoint = function(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, active) {
     var endpoint = {
       Name: name,
@@ -60,7 +88,7 @@ angular.module('portainer.services')
       TLS: TLS
     };
     var deferred = $q.defer();
-    Endpoints.create({active: active}, endpoint, function success(data) {
+    Endpoints.create({}, endpoint, function success(data) {
       var endpointID = data.Id;
       if (TLS) {
         deferred.notify({upload: true});
