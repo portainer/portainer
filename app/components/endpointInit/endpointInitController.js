@@ -5,6 +5,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     error: '',
     uploadInProgress: false
   };
+
   $scope.formValues = {
     endpointType: "remote",
     Name: '',
@@ -19,7 +20,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     $state.go('dashboard');
   }
 
-  $scope.cleanError = function() {
+  $scope.resetErrorMessage = function() {
     $scope.state.error = '';
   };
 
@@ -31,22 +32,20 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     var TLS = false;
 
     EndpointService.createLocalEndpoint(name, URL, TLS, true)
-    .then(
-    function success(data) {
+    .then(function success(data) {
       var endpointID = data.Id;
       EndpointProvider.setEndpointID(endpointID);
-      StateManager.updateEndpointState(false).then(
-      function success() {
+      StateManager.updateEndpointState(false)
+      .then(function success(data) {
         $state.go('dashboard');
-      },
-      function error(err) {
+      })
+      .catch(function error(err) {
         EndpointService.deleteEndpoint(endpointID)
         .then(function success() {
           $scope.state.error = 'Unable to connect to the Docker endpoint';
         });
       });
-    },
-    function error() {
+    }, function error() {
       $scope.state.error = 'Unable to create endpoint';
     })
     .finally(function final() {
@@ -63,28 +62,31 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     var TLSCAFile = $scope.formValues.TLSCACert;
     var TLSCertFile = $scope.formValues.TLSCert;
     var TLSKeyFile = $scope.formValues.TLSKey;
-    EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, TLS ? false : true)
+
+    EndpointService.createRemote(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       var endpointID = data.Id;
       EndpointProvider.setEndpointID(endpointID);
       StateManager.updateEndpointState(false)
-      .then(function success() {
+      .then(function success(data) {
         $state.go('dashboard');
-      }, function error(err) {
+      })
+      .catch(function error(err) {
         EndpointService.deleteEndpoint(endpointID)
         .then(function success() {
-          $('#initEndpointSpinner').hide();
           $scope.state.error = 'Unable to connect to the Docker endpoint';
         });
       });
     }, function error(err) {
-      $('#initEndpointSpinner').hide();
       $scope.state.uploadInProgress = false;
       $scope.state.error = err.msg;
     }, function update(evt) {
       if (evt.upload) {
         $scope.state.uploadInProgress = evt.upload;
       }
+    })
+    .finally(function final() {
+      $('#initEndpointSpinner').hide();
     });
   };
 }]);
