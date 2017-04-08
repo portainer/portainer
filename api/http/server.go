@@ -29,6 +29,7 @@ func (server *Server) Start() error {
 		jwtService:   server.JWTService,
 		authDisabled: server.AuthDisabled,
 	}
+	proxyService := NewProxyService(server.ResourceControlService)
 
 	var authHandler = NewAuthHandler(middleWareService)
 	authHandler.UserService = server.UserService
@@ -45,12 +46,14 @@ func (server *Server) Start() error {
 	templatesHandler.containerTemplatesURL = server.TemplatesURL
 	var dockerHandler = NewDockerHandler(middleWareService, server.ResourceControlService)
 	dockerHandler.EndpointService = server.EndpointService
+	dockerHandler.ProxyService = proxyService
 	var websocketHandler = NewWebSocketHandler()
 	websocketHandler.EndpointService = server.EndpointService
 	var endpointHandler = NewEndpointHandler(middleWareService)
 	endpointHandler.authorizeEndpointManagement = server.EndpointManagement
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.FileService = server.FileService
+	endpointHandler.ProxyService = proxyService
 	var uploadHandler = NewUploadHandler(middleWareService)
 	uploadHandler.FileService = server.FileService
 	var fileHandler = newFileHandler(server.AssetsPath)

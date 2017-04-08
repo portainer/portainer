@@ -10,6 +10,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Messages) {
     error: '',
     uploadInProgress: false
   };
+
   $scope.formValues = {
     TLSCACert: null,
     TLSCert: null,
@@ -28,6 +29,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Messages) {
       type: $scope.endpointType
     };
 
+    console.log(JSON.stringify(endpointParams, null, 4));
     EndpointService.updateEndpoint(ID, endpointParams)
     .then(function success(data) {
       Messages.send("Endpoint updated", $scope.endpoint.Name);

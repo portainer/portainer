@@ -20,14 +20,17 @@ angular.module('portainer.services')
       var queue = [];
 
       if (TLSCAFile) {
+        console.log('HDD');
         var uploadTLSCA = uploadFile('api/upload/tls/' + endpointID + '/ca', TLSCAFile);
         queue.push(uploadTLSCA);
       }
       if (TLSCertFile) {
+        console.log('HDZ');
         var uploadTLSCert = uploadFile('api/upload/tls/' + endpointID + '/cert', TLSCertFile);
         queue.push(uploadTLSCert);
       }
       if (TLSKeyFile) {
+        console.log('HDDS');
         var uploadTLSKey = uploadFile('api/upload/tls/' + endpointID + '/key', TLSKeyFile);
         queue.push(uploadTLSKey);
       }

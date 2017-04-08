@@ -1,8 +1,6 @@
 package portainer
 
-import (
-	"io"
-)
+import "io"
 
 type (
 	// Pair defines a key/value string pair
