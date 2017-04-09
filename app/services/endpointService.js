@@ -24,13 +24,14 @@ angular.module('portainer.services')
     if (endpointParams.type && endpointParams.URL) {
       query.URL = endpointParams.type === 'local' ? ("unix://" + endpointParams.URL) : ("tcp://" + endpointParams.URL);
     }
+
     var deferred = $q.defer();
-    Endpoints.update({id: id}, query).$promise
+    FileUploadService.uploadTLSFilesForEndpoint(id, endpointParams.TLSCACert, endpointParams.TLSCert, endpointParams.TLSKey)
     .then(function success() {
-      return FileUploadService.uploadTLSFilesForEndpoint(id, endpointParams.TLSCAFile, endpointParams.TLSCertFile, endpointParams.TLSKeyFile);
+      deferred.notify({upload: false});
+      return Endpoints.update({id: id}, query).$promise;
     })
     .then(function success(data) {
-      deferred.notify({upload: false});
       deferred.resolve(data);
     })
     .catch(function error(err) {

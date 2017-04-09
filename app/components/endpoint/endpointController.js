@@ -10,6 +10,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Messages) {
     error: '',
     uploadInProgress: false
   };
+
   $scope.formValues = {
     TLSCACert: null,
     TLSCert: null,
