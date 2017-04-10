@@ -115,6 +115,10 @@ a[ng-click]{
   color: #ae2323;
 }
 
+.fa.orange-icon {
+  color: #f0ad4e;
+}
+
 .fa.white-icon {
   color: white;
 }
