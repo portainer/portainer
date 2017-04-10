@@ -1,6 +1,6 @@
 angular.module('settings', [])
-.controller('SettingsController', ['$scope', '$state', '$sanitize', 'Authentication', 'UserService', 'Messages',
-function ($scope, $state, $sanitize, Authentication, UserService, Messages) {
+.controller('SettingsController', ['$scope', '$state', '$sanitize', 'Authentication', 'UserService', 'Notifications',
+function ($scope, $state, $sanitize, Authentication, UserService, Notifications) {
   $scope.formValues = {
     currentPassword: '',
     newPassword: '',
@@ -15,14 +15,14 @@ function ($scope, $state, $sanitize, Authentication, UserService, Messages) {
 
     UserService.updateUserPassword(userID, currentPassword, newPassword)
     .then(function success() {
-      Messages.success("Success", "Password successfully updated");
+      Notifications.success("Success", "Password successfully updated");
       $state.reload();
     })
     .catch(function error(err) {
       if (err.invalidPassword) {
         $scope.invalidPassword = true;
       } else {
-        Messages.error("Failure", err, err.msg);
+        Notifications.error("Failure", err, err.msg);
       }
     });
   };

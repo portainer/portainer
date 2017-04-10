@@ -1,6 +1,6 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$scope', '$state', 'Volume', 'Messages', 'Pagination', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
-function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentication, ResourceControlService, UserService) {
+.controller('VolumesController', ['$scope', '$state', 'Volume', 'Notifications', 'Pagination', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
+function ($scope, $state, Volume, Notifications, Pagination, ModalService, Authentication, ResourceControlService, UserService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('volumes');
   $scope.state.selectedItemCount = 0;
@@ -14,10 +14,10 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentica
     ResourceControlService.removeVolumeResourceControl(volume.Metadata.ResourceControl.OwnerId, volume.Name)
     .then(function success() {
       delete volume.Metadata.ResourceControl;
-      Messages.success('Ownership changed to public', volume.Name);
+      Notifications.success('Ownership changed to public', volume.Name);
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, "Unable to change volume ownership");
+      Notifications.error("Failure", err, "Unable to change volume ownership");
     });
   }
 
@@ -68,27 +68,27 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentica
         counter = counter + 1;
         Volume.remove({name: volume.Name}, function (d) {
           if (d.message) {
-            Messages.error("Unable to remove volume", {}, d.message);
+            Notifications.error("Unable to remove volume", {}, d.message);
           } else {
             if (volume.Metadata && volume.Metadata.ResourceControl) {
               ResourceControlService.removeVolumeResourceControl(volume.Metadata.ResourceControl.OwnerId, volume.Name)
               .then(function success() {
-                Messages.success("Volume deleted", volume.Name);
+                Notifications.success("Volume deleted", volume.Name);
                 var index = $scope.volumes.indexOf(volume);
                 $scope.volumes.splice(index, 1);
               })
               .catch(function error(err) {
-                Messages.error("Failure", err, "Unable to remove volume ownership");
+                Notifications.error("Failure", err, "Unable to remove volume ownership");
               });
             } else {
-              Messages.success("Volume deleted", volume.Name);
+              Notifications.success("Volume deleted", volume.Name);
               var index = $scope.volumes.indexOf(volume);
               $scope.volumes.splice(index, 1);
             }
           }
           complete();
         }, function (e) {
-          Messages.error("Failure", e, "Unable to remove volume");
+          Notifications.error("Failure", e, "Unable to remove volume");
           complete();
         });
       }
@@ -126,7 +126,7 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentica
           mapUsersToVolumes(data);
         })
         .catch(function error(err) {
-          Messages.error("Failure", err, "Unable to retrieve users");
+          Notifications.error("Failure", err, "Unable to retrieve users");
         })
         .finally(function final() {
           $('#loadVolumesSpinner').hide();
@@ -136,7 +136,7 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentica
       }
     }, function (e) {
       $('#loadVolumesSpinner').hide();
-      Messages.error("Failure", e, "Unable to retrieve volumes");
+      Notifications.error("Failure", e, "Unable to retrieve volumes");
       $scope.volumes = [];
     });
   }

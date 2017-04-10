@@ -1,6 +1,6 @@
 angular.module('createNetwork', [])
-.controller('CreateNetworkController', ['$scope', '$state', 'Messages', 'Network',
-function ($scope, $state, Messages, Network) {
+.controller('CreateNetworkController', ['$scope', '$state', 'Notifications', 'Network',
+function ($scope, $state, Notifications, Network) {
   $scope.formValues = {
     DriverOptions: [],
     Subnet: '',
@@ -42,15 +42,15 @@ function ($scope, $state, Messages, Network) {
     Network.create(config, function (d) {
       if (d.message) {
         $('#createNetworkSpinner').hide();
-        Messages.error('Unable to create network', {}, d.message);
+        Notifications.error('Unable to create network', {}, d.message);
       } else {
-        Messages.success("Network created", d.Id);
+        Notifications.success("Network created", d.Id);
         $('#createNetworkSpinner').hide();
         $state.go('networks', {}, {reload: true});
       }
     }, function (e) {
       $('#createNetworkSpinner').hide();
-      Messages.error("Failure", e, 'Unable to create network');
+      Notifications.error("Failure", e, 'Unable to create network');
     });
   }
 

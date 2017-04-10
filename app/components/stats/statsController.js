@@ -1,6 +1,6 @@
 angular.module('stats', [])
-.controller('StatsController', ['Pagination', '$scope', 'Messages', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
-function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stateParams, humansizeFilter, $sce, $document) {
+.controller('StatsController', ['Pagination', '$scope', 'Notifications', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
+function (Pagination, $scope, Notifications, $timeout, Container, ContainerTop, $stateParams, humansizeFilter, $sce, $document) {
   // TODO: Force scale to 0-100 for cpu, fix charts on dashboard,
   // TODO: Force memory scale to 0 - max memory
   $scope.ps_args = '';
@@ -126,7 +126,7 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
           return d[key];
         });
         if (arr.join('').indexOf('no such id') !== -1) {
-          Messages.error('Unable to retrieve stats', {}, 'Is this container running?');
+          Notifications.error('Unable to retrieve stats', {}, 'Is this container running?');
           return;
         }
 
@@ -137,7 +137,7 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
         updateNetworkChart(d);
         setUpdateStatsTimeout();
       }, function () {
-        Messages.error('Unable to retrieve stats', {}, 'Is this container running?');
+        Notifications.error('Unable to retrieve stats', {}, 'Is this container running?');
         setUpdateStatsTimeout();
       });
     }
@@ -211,7 +211,7 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
   Container.get({id: $stateParams.id}, function (d) {
     $scope.container = d;
   }, function (e) {
-    Messages.error("Failure", e, "Unable to retrieve container info");
+    Notifications.error("Failure", e, "Unable to retrieve container info");
   });
   $scope.getTop();
 }]);

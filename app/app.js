@@ -543,7 +543,7 @@ angular.module('portainer', [
       }
     });
   }])
-  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Messages', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Messages, Analytics) {
+  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics) {
     EndpointProvider.initialize();
     StateManager.initialize().then(function success(state) {
       if (state.application.authentication) {
@@ -564,7 +564,7 @@ angular.module('portainer', [
         });
       }
     }, function error(err) {
-      Messages.error("Failure", err, 'Unable to retrieve application settings');
+      Notifications.error("Failure", err, 'Unable to retrieve application settings');
     });
 
     $rootScope.$state = $state;

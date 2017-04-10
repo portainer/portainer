@@ -1,6 +1,6 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Messages', 'Pagination', 'ResourceControlService', 'Authentication',
-function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Messages, Pagination, ResourceControlService, Authentication) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication',
+function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
@@ -56,7 +56,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
       return ContainerService.createAndStartContainer(templateConfiguration);
     })
     .then(function success(data) {
-      Messages.success('Container started', data.Id);
+      Notifications.success('Container started', data.Id);
       if ($scope.formValues.Ownership === 'private') {
         ResourceControlService.setContainerResourceControl(Authentication.getUserDetails().ID, data.Id)
         .then(function success(data) {
@@ -67,7 +67,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
       }
     })
     .catch(function error(err) {
-      Messages.error('Failure', err, err.msg);
+      Notifications.error('Failure', err, err.msg);
     })
     .finally(function final() {
       $('#createContainerSpinner').hide();
@@ -155,7 +155,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
       })
       .catch(function error(err) {
         $scope.templates = [];
-        Messages.error("Failure", err, "An error occured during apps initialization.");
+        Notifications.error("Failure", err, "An error occured during apps initialization.");
       })
       .finally(function final(){
         $('#loadTemplatesSpinner').hide();

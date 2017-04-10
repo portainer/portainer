@@ -1,6 +1,6 @@
 angular.module('services', [])
-.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Messages', 'Pagination', 'Task', 'Node', 'NodeHelper', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pagination, Task, Node, NodeHelper, Authentication, UserService, ModalService, ResourceControlService) {
+.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, Authentication, UserService, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');
@@ -21,10 +21,10 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     })
     .then(function success() {
       delete service.Metadata.ResourceControl;
-      Messages.success('Ownership changed to public', service.Id);
+      Notifications.success('Ownership changed to public', service.Id);
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, "Unable to change service ownership");
+      Notifications.error("Failure", err, "Unable to change service ownership");
     });
   }
 
@@ -58,13 +58,13 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     config.Mode.Replicated.Replicas = service.Replicas;
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadServicesSpinner').hide();
-      Messages.success("Service successfully scaled", "New replica count: " + service.Replicas);
+      Notifications.success("Service successfully scaled", "New replica count: " + service.Replicas);
       $state.reload();
     }, function (e) {
       $('#loadServicesSpinner').hide();
       service.Scale = false;
       service.Replicas = service.ReplicaCount;
-      Messages.error("Failure", e, "Unable to scale service");
+      Notifications.error("Failure", e, "Unable to scale service");
     });
   };
 
@@ -93,27 +93,27 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
         Service.remove({id: service.Id}, function (d) {
           if (d.message) {
             $('#loadServicesSpinner').hide();
-            Messages.error("Unable to remove service", {}, d[0].message);
+            Notifications.error("Unable to remove service", {}, d[0].message);
           } else {
             if (service.Metadata && service.Metadata.ResourceControl) {
               ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id)
               .then(function success() {
-                Messages.success("Service deleted", service.Id);
+                Notifications.success("Service deleted", service.Id);
                 var index = $scope.services.indexOf(service);
                 $scope.services.splice(index, 1);
               })
               .catch(function error(err) {
-                Messages.error("Failure", err, "Unable to remove service ownership");
+                Notifications.error("Failure", err, "Unable to remove service ownership");
               });
             } else {
-              Messages.success("Service deleted", service.Id);
+              Notifications.success("Service deleted", service.Id);
               var index = $scope.services.indexOf(service);
               $scope.services.splice(index, 1);
             }
           }
           complete();
         }, function (e) {
-          Messages.error("Failure", e, 'Unable to remove service');
+          Notifications.error("Failure", e, 'Unable to remove service');
           complete();
         });
       }
@@ -173,7 +173,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     })
     .catch(function error(err) {
       $scope.services = [];
-      Messages.error("Failure", err, "Unable to retrieve services");
+      Notifications.error("Failure", err, "Unable to retrieve services");
     })
     .finally(function final() {
       $('#loadServicesSpinner').hide();

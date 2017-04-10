@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Pagination', 'ModalService',
-function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Messages, Pagination, ModalService) {
+.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Notifications', 'Pagination', 'ModalService',
+function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Notifications, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -213,12 +213,12 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadingViewSpinner').hide();
-      Messages.success("Service successfully updated", "Service updated");
+      Notifications.success("Service successfully updated", "Service updated");
       $scope.cancelChanges({});
       fetchServiceDetails();
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to update service");
+      Notifications.error("Failure", e, "Unable to update service");
     });
   };
 
@@ -237,15 +237,15 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     Service.remove({id: $stateParams.id}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Messages.error("Error", d, "Unable to remove service");
+        Notifications.error("Error", d, "Unable to remove service");
       } else {
         $('#loadingViewSpinner').hide();
-        Messages.success("Service removed", $stateParams.id);
+        Notifications.success("Service removed", $stateParams.id);
         $state.go('services', {});
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to remove service");
+      Notifications.error("Failure", e, "Unable to remove service");
     });
   }
 
@@ -283,15 +283,15 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
           $scope.tasks = tasks.map(function (task) {
             return new TaskViewModel(task, null);
           });
-          Messages.error("Failure", e, "Unable to retrieve node information");
+          Notifications.error("Failure", e, "Unable to retrieve node information");
         });
       }, function (e) {
         $('#loadingViewSpinner').hide();
-        Messages.error("Failure", e, "Unable to retrieve tasks associated to the service");
+        Notifications.error("Failure", e, "Unable to retrieve tasks associated to the service");
       });
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to retrieve service details");
+      Notifications.error("Failure", e, "Unable to retrieve service details");
     });
   }
 

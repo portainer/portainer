@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('Messages', ['$sanitize', function MessagesFactory($sanitize) {
+.factory('Notifications', ['$sanitize', function NotificationsFactory($sanitize) {
   'use strict';
   var service = {};
 
