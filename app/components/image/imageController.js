@@ -1,12 +1,47 @@
 angular.module('image', [])
-.controller('ImageController', ['$scope', '$stateParams', '$state', 'Image', 'ImageHelper', 'Messages',
-function ($scope, $stateParams, $state, Image, ImageHelper, Messages) {
-  $scope.RepoTags = [];
-  $scope.Layers = [];
-  $scope.config = {
-    Image: '',
-    Registry: ''
-  };
+.controller('ImageController', ['$scope', '$stateParams', '$state', 'ImageService', 'Messages',
+function ($scope, $stateParams, $state, ImageService, Messages) {
+	$scope.config = {
+		Image: '',
+		Registry: ''
+	};
+
+	$scope.tagImage = function() {
+		$('#loadingViewSpinner').show();
+		var image = $scope.config.Image;
+		var registry = $scope.config.Registry;
+
+		ImageService.tagImage($stateParams.id, image, registry)
+		.then(function success(data) {
+			Messages.send('Image successfully tagged');
+			$state.go('image', {id: $stateParams.id}, {reload: true});
+		})
+		.catch(function error(err) {
+			Messages.error("Failure", err, "Unable to tag image");
+		})
+		.finally(function final() {
+			$('#loadingViewSpinner').hide();
+		});
+	};
+
+	$scope.pushImage = function(tag) {
+		$('#loadingViewSpinner').show();
+		ImageService.pushImage(tag)
+		.then(function success() {
+			Messages.send('Image successfully pushed');
+		})
+		.catch(function error(err) {
+			Messages.error("Failure", err, "Unable to push image tag");
+		})
+		.finally(function final() {
+			$('#loadingViewSpinner').hide();
+		});
+	};
+
+	$scope.pullImage = function(tag) {
+		$('#loadingViewSpinner').show();
+		var image = $scope.config.Image;
+		var registry = $scope.config.Registry;
 
   // Get RepoTags from the /images/query endpoint instead of /image/json,
   // for backwards compatibility with Docker API versions older than 1.21

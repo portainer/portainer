@@ -16,6 +16,7 @@ import (
 type AuthHandler struct {
 	*mux.Router
 	Logger        *log.Logger
+	authDisabled  bool
 	UserService   portainer.UserService
 	CryptoService portainer.CryptoService
 	JWTService    portainer.JWTService
@@ -26,21 +27,31 @@ const (
 	ErrInvalidCredentialsFormat = portainer.Error("Invalid credentials format")
 	// ErrInvalidCredentials is an error raised when credentials for a user are invalid
 	ErrInvalidCredentials = portainer.Error("Invalid credentials")
+	// ErrAuthDisabled is an error raised when trying to access the authentication endpoints
+	// when the server has been started with the --no-auth flag
+	ErrAuthDisabled = portainer.Error("Authentication is disabled")
 )
 
 // NewAuthHandler returns a new instance of AuthHandler.
-func NewAuthHandler() *AuthHandler {
+func NewAuthHandler(mw *middleWareService) *AuthHandler {
 	h := &AuthHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.HandleFunc("/auth", h.handlePostAuth)
+	h.Handle("/auth",
+		mw.public(http.HandlerFunc(h.handlePostAuth)))
+
 	return h
 }
 
 func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		handleNotAllowed(w, []string{http.MethodPost})
+		return
+	}
+
+	if handler.authDisabled {
+		Error(w, ErrAuthDisabled, http.StatusServiceUnavailable, handler.Logger)
 		return
 	}
 
@@ -59,7 +70,7 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	var username = req.Username
 	var password = req.Password
 
-	u, err := handler.UserService.User(username)
+	u, err := handler.UserService.UserByUsername(username)
 	if err == portainer.ErrUserNotFound {
 		Error(w, err, http.StatusNotFound, handler.Logger)
 		return
@@ -75,7 +86,9 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	}
 
 	tokenData := &portainer.TokenData{
-		username,
+		ID:       u.ID,
+		Username: u.Username,
+		Role:     u.Role,
 	}
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {

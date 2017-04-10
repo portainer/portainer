@@ -21,8 +21,11 @@
     </li>
     <li class="sidebar-list">
       <a ui-sref="templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket"></span></a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'templates' || $state.current.name === 'templates_linuxserver')">
+        <a ui-sref="templates_linuxserver" ui-sref-active="active">LinuxServer.io</a>
+      </div>
     </li>
-    <li class="sidebar-list" ng-if="endpointMode.provider === 'DOCKER_SWARM_MODE'">
+    <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
       <a ui-sref="services" ui-sref-active="active">Services <span class="menu-icon fa fa-list-alt"></span></a>
     </li>
     <li class="sidebar-list">
@@ -37,20 +40,23 @@
     <li class="sidebar-list">
       <a ui-sref="volumes" ui-sref-active="active">Volumes <span class="menu-icon fa fa-cubes"></span></a>
     </li>
-    <li class="sidebar-list" ng-if="endpointMode.provider === 'DOCKER_STANDALONE'">
+    <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'">
       <a ui-sref="events" ui-sref-active="active">Events <span class="menu-icon fa fa-history"></span></a>
     </li>
-    <li class="sidebar-list" ng-if="endpointMode.provider === 'DOCKER_SWARM' || (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER')">
+    <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || (applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER')">
       <a ui-sref="swarm" ui-sref-active="active">Swarm <span class="menu-icon fa fa-object-group"></span></a>
     </li>
-    <li class="sidebar-list" ng-if="endpointMode.provider === 'DOCKER_STANDALONE'">
-      <a ui-sref="docker">Docker <span class="menu-icon fa fa-th"></span></a>
+    <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'">
+      <a ui-sref="docker" ui-sref-active="active">Docker <span class="menu-icon fa fa-th"></span></a>
     </li>
     <li class="sidebar-title"><span>Portainer settings</span></li>
-    <li class="sidebar-list">
+    <li class="sidebar-list" ng-if="applicationState.application.authentication">
       <a ui-sref="settings" ui-sref-active="active">Password <span class="menu-icon fa fa-lock"></span></a>
     </li>
-    <li class="sidebar-list">
+    <li class="sidebar-list" ng-if="applicationState.application.authentication && userRole === 1">
+      <a ui-sref="users" ui-sref-active="active">Users <span class="menu-icon fa fa-user"></span></a>
+    </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || userRole === 1">
       <a ui-sref="endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug"></span></a>
     </li>
   </ul>

@@ -27,6 +27,10 @@ const (
 	ErrInvalidJSON = portainer.Error("Invalid JSON")
 	// ErrInvalidRequestFormat defines an error raised when the format of the data sent in a request is not valid
 	ErrInvalidRequestFormat = portainer.Error("Invalid request data format")
+	// ErrInvalidQueryFormat defines an error raised when the data sent in the query or the URL is invalid
+	ErrInvalidQueryFormat = portainer.Error("Invalid query format")
+	// ErrEmptyResponseBody defines an error raised when portainer excepts to parse the body of a HTTP response and there is nothing to parse
+	ErrEmptyResponseBody = portainer.Error("Empty response body")
 )
 
 // ServeHTTP delegates a request to the appropriate subhandler.
@@ -55,7 +59,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Error writes an API error message to the response and logger.
 func Error(w http.ResponseWriter, err error, code int, logger *log.Logger) {
 	// Log error.
-	logger.Printf("http error: %s (code=%d)", err, code)
+	if logger != nil {
+		logger.Printf("http error: %s (code=%d)", err, code)
+	}
 
 	// Write generic error response.
 	w.WriteHeader(code)

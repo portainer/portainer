@@ -3,6 +3,7 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="images" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
+    <i id="loadImagesSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Images</rd-header-content>
 </rd-header>
@@ -17,12 +18,15 @@
           <!-- name-and-registry-inputs -->
           <div class="form-group">
             <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-7">
+            <div class="col-sm-11 col-md-6">
               <input type="text" class="form-control" ng-model="config.Image" id="image_name" placeholder="e.g. ubuntu:trusty">
             </div>
-            <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
-            <div class="col-sm-3">
-              <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="leave empty to use DockerHub">
+            <label for="image_registry" class="col-sm-2 margin-sm-top control-label text-left">
+              Registry
+              <portainer-tooltip position="bottom" message="A registry to pull the image from. Leave empty to use the official Docker registry."></portainer-tooltip>
+            </label>
+            <div class="col-sm-10 col-md-3 margin-sm-top">
+              <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="e.g. myregistry.mydomain">
             </div>
           </div>
           <!-- !name-and-registry-inputs -->
@@ -35,7 +39,7 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-default btn-sm" ng-disabled="!config.Image" ng-click="pullImage()">Pull</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="pullImage()">Pull</button>
               <i id="pullImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
@@ -50,12 +54,28 @@
     <rd-widget>
       <rd-widget-header icon="fa-clone" title="Images">
         <div class="pull-right">
-          <i id="loadImagesSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
         </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12">
         <div class="pull-left">
-          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+          <div class="btn-group">
+            <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-disabled="!state.selectedItemCount" >
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a ng-click="confirmRemovalAction(true)" ng-disabled="!state.selectedItemCount" >Force Remove</a></li>
+            </ul>
+          </div>
         </div>
         <div class="pull-right">
           <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
@@ -66,7 +86,9 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th></th>
+                <th>
+                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+                </th>
                 <th>
                   <a ui-sref="images" ng-click="order('Id')">
                     Id
@@ -98,7 +120,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="image in (state.filteredImages = (images | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+              <tr dir-paginate="image in (state.filteredImages = (images | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
                 <td><a ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a></td>
                 <td>

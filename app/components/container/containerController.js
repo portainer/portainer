@@ -1,13 +1,18 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Network', 'Messages', 'Settings',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Network, Messages, Settings) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Network', 'Messages', 'Pagination',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Network, Messages, Pagination) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
     Image: '',
     Registry: ''
   };
-  $scope.pagination_count = Settings.pagination_count;
+  $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('container_networks');
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('container_networks', $scope.state.pagination_count);
+  };
 
   var update = function () {
     $('#loadingViewSpinner').show();

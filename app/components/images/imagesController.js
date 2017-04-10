@@ -1,11 +1,11 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Config', 'Image', 'ImageHelper', 'Messages', 'Settings',
-function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
+.controller('ImagesController', ['$scope', '$state', 'Config', 'ImageService', 'Messages', 'Pagination', 'ModalService',
+function ($scope, $state, Config, ImageService, Messages, Pagination, ModalService) {
   $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('images');
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
   $scope.state.selectedItemCount = 0;
-  $scope.pagination_count = Settings.pagination_count;
 
   $scope.config = {
     Image: '',
@@ -15,6 +15,19 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('images', $scope.state.pagination_count);
+  };
+
+  $scope.selectItems = function (allSelected) {
+    angular.forEach($scope.state.filteredImages, function (image) {
+      if (image.Checked !== allSelected) {
+        image.Checked = allSelected;
+        $scope.selectItem(image);
+      }
+    });
   };
 
   $scope.selectItem = function (item) {
@@ -29,24 +42,27 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
     $('#pullImageSpinner').show();
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;
-    var imageConfig = ImageHelper.createImageConfigForContainer(image, registry);
-    Image.create(imageConfig, function (data) {
-        var err = data.length > 0 && data[data.length - 1].hasOwnProperty('error');
-        if (err) {
-          var detail = data[data.length - 1];
-          $('#pullImageSpinner').hide();
-          Messages.error('Error', {}, detail.error);
-        } else {
-          $('#pullImageSpinner').hide();
-          $state.reload();
-        }
-    }, function (e) {
+    ImageService.pullImage(image, registry)
+    .then(function success(data) {
+      $state.reload();
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to pull image");
+    })
+    .finally(function final() {
       $('#pullImageSpinner').hide();
-      Messages.error("Failure", e, "Unable to pull image");
     });
   };
 
-  $scope.removeAction = function () {
+  $scope.confirmRemovalAction = function (force) {
+    ModalService.confirmImageForceRemoval(function (confirmed) {
+      if(!confirmed) { return; }
+      $scope.removeAction(force);
+    });
+  };
+
+  $scope.removeAction = function (force) {
+    force = !!force;
     $('#loadImagesSpinner').show();
     var counter = 0;
     var complete = function () {
@@ -58,18 +74,16 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
     angular.forEach($scope.images, function (i) {
       if (i.Checked) {
         counter = counter + 1;
-        Image.remove({id: i.Id}, function (d) {
-          if (d[0].message) {
-            $('#loadImagesSpinner').hide();
-            Messages.error("Unable to remove image", {}, d[0].message);
-          } else {
-            Messages.send("Image deleted", i.Id);
-            var index = $scope.images.indexOf(i);
-            $scope.images.splice(index, 1);
-          }
-          complete();
-        }, function (e) {
-          Messages.error("Failure", e, 'Unable to remove image');
+        ImageService.deleteImage(i.Id, force)
+        .then(function success(data) {
+          Messages.send("Image deleted", i.Id);
+          var index = $scope.images.indexOf(i);
+          $scope.images.splice(index, 1);
+        })
+        .catch(function error(err) {
+          Messages.error("Failure", err, 'Unable to remove image');
+        })
+        .finally(function final() {
           complete();
         });
       }
@@ -77,19 +91,19 @@ function ($scope, $state, Config, Image, ImageHelper, Messages, Settings) {
   };
 
   function fetchImages() {
-    Image.query({}, function (d) {
-      $scope.images = d.map(function (item) {
-        return new ImageViewModel(item);
-      });
-      $('#loadImagesSpinner').hide();
-    }, function (e) {
-      $('#loadImagesSpinner').hide();
-      Messages.error("Failure", e, "Unable to retrieve images");
+    $('#loadImagesSpinner').show();
+    ImageService.images()
+    .then(function success(data) {
+      $scope.images = data;
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, "Unable to retrieve images");
       $scope.images = [];
+    })
+    .finally(function final() {
+      $('#loadImagesSpinner').hide();
     });
   }
 
-  Config.$promise.then(function (c) {
-    fetchImages();
-  });
+  fetchImages();
 }]);

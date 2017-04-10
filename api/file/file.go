@@ -1,13 +1,12 @@
 package file
 
 import (
-	"strconv"
-
 	"github.com/portainer/portainer"
 
 	"io"
 	"os"
 	"path"
+	"strconv"
 )
 
 const (
@@ -21,18 +20,29 @@ const (
 	TLSKeyFile = "key.pem"
 )
 
-// Service represents a service for managing files.
+// Service represents a service for managing files and directories.
 type Service struct {
+	dataStorePath string
 	fileStorePath string
 }
 
-// NewService initializes a new service.
-func NewService(fileStorePath string) (*Service, error) {
+// NewService initializes a new service. It creates a data directory and a directory to store files
+// inside this directory if they don't exist.
+func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 	service := &Service{
-		fileStorePath: fileStorePath,
+		dataStorePath: dataStorePath,
+		fileStorePath: path.Join(dataStorePath, fileStorePath),
 	}
 
-	err := service.createFolderInStoreIfNotExist(TLSStorePath)
+	// Checking if a mount directory exists is broken with Go on Windows.
+	// This will need to be reviewed after the issue has been fixed in Go.
+	// See: https://github.com/portainer/portainer/issues/474
+	// err := createDirectoryIfNotExist(dataStorePath, 0755)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	err := service.createDirectoryInStoreIfNotExist(TLSStorePath)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +54,7 @@ func NewService(fileStorePath string) (*Service, error) {
 func (service *Service) StoreTLSFile(endpointID portainer.EndpointID, fileType portainer.TLSFileType, r io.Reader) error {
 	ID := strconv.Itoa(int(endpointID))
 	endpointStorePath := path.Join(TLSStorePath, ID)
-	err := service.createFolderInStoreIfNotExist(endpointStorePath)
+	err := service.createDirectoryInStoreIfNotExist(endpointStorePath)
 	if err != nil {
 		return err
 	}
@@ -97,12 +107,20 @@ func (service *Service) DeleteTLSFiles(endpointID portainer.EndpointID) error {
 	return nil
 }
 
-// createFolderInStoreIfNotExist creates a new folder in the file store if it doesn't exists on the file system.
-func (service *Service) createFolderInStoreIfNotExist(name string) error {
+// createDirectoryInStoreIfNotExist creates a new directory in the file store if it doesn't exists on the file system.
+func (service *Service) createDirectoryInStoreIfNotExist(name string) error {
 	path := path.Join(service.fileStorePath, name)
+	return createDirectoryIfNotExist(path, 0700)
+}
+
+// createDirectoryIfNotExist creates a directory if it doesn't exists on the file system.
+func createDirectoryIfNotExist(path string, mode uint32) error {
 	_, err := os.Stat(path)
 	if os.IsNotExist(err) {
-		os.Mkdir(path, 0600)
+		err = os.Mkdir(path, os.FileMode(mode))
+		if err != nil {
+			return err
+		}
 	} else if err != nil {
 		return err
 	}

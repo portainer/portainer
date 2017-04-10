@@ -1,19 +1,23 @@
 angular.module('swarm', [])
-.controller('SwarmController', ['$scope', 'Info', 'Version', 'Node', 'Settings',
-function ($scope, Info, Version, Node, Settings) {
-
-  $scope.sortType = 'Name';
-  $scope.sortReverse = true;
+.controller('SwarmController', ['$scope', 'Info', 'Version', 'Node', 'Pagination',
+function ($scope, Info, Version, Node, Pagination) {
+  $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('swarm_nodes');
+  $scope.sortType = 'Spec.Role';
+  $scope.sortReverse = false;
   $scope.info = {};
   $scope.docker = {};
   $scope.swarm = {};
   $scope.totalCPU = 0;
   $scope.totalMemory = 0;
-  $scope.pagination_count = Settings.pagination_count;
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('swarm_nodes', $scope.state.pagination_count);
   };
 
   Version.get({}, function (d) {
@@ -22,9 +26,11 @@ function ($scope, Info, Version, Node, Settings) {
 
   Info.get({}, function (d) {
     $scope.info = d;
-    if ($scope.endpointMode.provider === 'DOCKER_SWARM_MODE') {
+    if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
       Node.query({}, function(d) {
-        $scope.nodes = d;
+        $scope.nodes = d.map(function (node) {
+          return new NodeViewModel(node);
+        });
         var CPU = 0, memory = 0;
         angular.forEach(d, function(node) {
           CPU += node.Description.Resources.NanoCPUs;
@@ -69,7 +75,7 @@ function ($scope, Info, Version, Node, Settings) {
     var node = {};
     node.name = info[offset][0];
     node.ip = info[offset][1];
-    node.id = info[offset + 1][1];
+    node.Id = info[offset + 1][1];
     node.status = info[offset + 2][1];
     node.containers = info[offset + 3][1];
     node.cpu = info[offset + 4][1].split('/')[1];

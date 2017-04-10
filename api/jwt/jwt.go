@@ -4,9 +4,10 @@ import (
 	"github.com/portainer/portainer"
 
 	"fmt"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/securecookie"
-	"time"
 )
 
 // Service represents a service for managing JWT tokens.
@@ -15,7 +16,9 @@ type Service struct {
 }
 
 type claims struct {
+	UserID   int    `json:"id"`
 	Username string `json:"username"`
+	Role     int    `json:"role"`
 	jwt.StandardClaims
 }
 
@@ -35,7 +38,9 @@ func NewService() (*Service, error) {
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
 	expireToken := time.Now().Add(time.Hour * 8).Unix()
 	cl := claims{
+		int(data.ID),
 		data.Username,
+		int(data.Role),
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
 		},
@@ -50,17 +55,25 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, error)
 	return signedToken, nil
 }
 
-// VerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
-func (service *Service) VerifyToken(token string) error {
-	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+// ParseAndVerifyToken parses a JWT token and verify its validity. It returns an error if token is invalid.
+func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData, error) {
+	parsedToken, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			msg := fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			return nil, msg
 		}
 		return service.secret, nil
 	})
-	if err != nil || parsedToken == nil || !parsedToken.Valid {
-		return portainer.ErrInvalidJWTToken
+	if err == nil && parsedToken != nil {
+		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
+			tokenData := &portainer.TokenData{
+				ID:       portainer.UserID(cl.UserID),
+				Username: cl.Username,
+				Role:     portainer.UserRole(cl.Role),
+			}
+			return tokenData, nil
+		}
 	}
-	return nil
+
+	return nil, portainer.ErrInvalidJWTToken
 }

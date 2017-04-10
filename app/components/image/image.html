@@ -7,28 +7,42 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="RepoTags.length > 0">
+<div class="row" ng-if="image.RepoTags.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa fa-tags" title="Image tags"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <div style="margin: 5px 10px;">
-          <span ng-repeat="tag in RepoTags" class="label label-primary image-tag space-right">
-            <a data-toggle="tooltip" class="interactive" title="Push to registry" ng-click="pushImage(tag)">
-              <i class="fa fa-upload white-icon" aria-hidden="true"></i>
-            </a>
-            {{ tag }}
-            <a data-toggle="tooltip" class="interactive" title="Remove tag" ng-click="removeImage(tag)">
-              <i class="fa fa-trash-o white-icon" aria-hidden="true"></i>
-            </a>
-          </span>
-        </div>
-        <div style="margin: 5px 10px;">
-          <span class="small text-muted">
-            Note: you can click on the upload icon to push an image
-            and on the trash icon to delete a tag
-          </span>
-        </div>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="row">
+              <div class="pull-left" ng-repeat="tag in image.RepoTags" style="display:table">
+                <div class="input-group col-md-1" style="padding:0 15px">
+                  <span class="input-group-addon">{{ tag }}</span>
+                  <span class="input-group-btn">
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushImage(tag)">
+                      <span class="fa fa-upload white-icon" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullImage(tag)">
+                      <span class="fa fa-download white-icon" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)">
+                      <span class="fa fa-trash-o white-icon" aria-hidden="true"></span>
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">
+                Note: you can click on the upload icon <span class="fa fa-upload" aria-hidden="true"></span> to push an image
+                or on the download icon <span class="fa fa-download" aria-hidden="true"></span> to pull an image
+                or on the trash icon <span class="fa fa-trash-o" aria-hidden="true"></span> to delete a tag.
+              </span>
+            </div>
+          </div>
+        </form>
       </rd-widget-body>
     </rd-widget>
   </div>
@@ -43,12 +57,15 @@
           <!-- name-and-registry-inputs -->
           <div class="form-group">
             <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-7">
+            <div class="col-sm-11 col-md-6">
               <input type="text" class="form-control" ng-model="config.Image" id="image_name" placeholder="e.g. myImage:myTag">
             </div>
-            <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
-            <div class="col-sm-3">
-              <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="optional">
+            <label for="image_registry" class="col-sm-2 margin-sm-top control-label text-left">
+              Registry
+              <portainer-tooltip position="bottom" message="A registry to pull the image from. Leave empty to use the official Docker registry."></portainer-tooltip>
+            </label>
+            <div class="col-sm-10 col-md-3 margin-sm-top">
+              <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="e.g. myregistry.mydomain">
             </div>
           </div>
           <!-- !name-and-registry-inputs -->
@@ -61,7 +78,7 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-default btn-sm" ng-disabled="!config.Image" ng-click="tagImage()">Tag</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="tagImage()">Tag</button>
               <i id="pullImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
@@ -121,33 +138,33 @@
           <tbody>
             <tr>
               <td>CMD</td>
-              <td><code>{{ image.ContainerConfig.Cmd|command }}</code></td>
+              <td><code>{{ image.Command|command }}</code></td>
             </tr>
-            <tr ng-if="image.ContainerConfig.Entrypoint">
+            <tr ng-if="image.Entrypoint">
               <td>ENTRYPOINT</td>
-              <td><code>{{ image.ContainerConfig.Entrypoint|command }}</code></td>
+              <td><code>{{ image.Entrypoint|command }}</code></td>
             </tr>
-            <tr ng-if="image.ContainerConfig.ExposedPorts">
+            <tr ng-if="image.ExposedPorts.length > 0">
               <td>EXPOSE</td>
               <td>
-                <span class="label label-default space-right" ng-repeat="port in exposedPorts">
+                <span class="label label-default space-right" ng-repeat="port in image.ExposedPorts">
                   {{ port }}
                 </span>
               </td>
             </tr>
-            <tr ng-if="image.ContainerConfig.Volumes">
+            <tr ng-if="image.Volumes.length > 0">
               <td>VOLUME</td>
               <td>
-                <span class="label label-default space-right" ng-repeat="volume in volumes">
+                <span class="label label-default space-right" ng-repeat="volume in image.Volumes">
                   {{ volume }}
                 </span>
               </td>
             </tr>
-            <tr>
+            <tr ng-if="image.Env.length > 0">
               <td>ENV</td>
               <td>
                 <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="var in image.ContainerConfig.Env">
+                  <tr ng-repeat="var in image.Env">
                     <td>{{ var|key: '=' }}</td>
                     <td>{{ var|value: '=' }}</td>
                   </tr>

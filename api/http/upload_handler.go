@@ -14,21 +14,18 @@ import (
 // UploadHandler represents an HTTP API handler for managing file uploads.
 type UploadHandler struct {
 	*mux.Router
-	Logger            *log.Logger
-	FileService       portainer.FileService
-	middleWareService *middleWareService
+	Logger      *log.Logger
+	FileService portainer.FileService
 }
 
 // NewUploadHandler returns a new instance of UploadHandler.
-func NewUploadHandler(middleWareService *middleWareService) *UploadHandler {
+func NewUploadHandler(mw *middleWareService) *UploadHandler {
 	h := &UploadHandler{
-		Router:            mux.NewRouter(),
-		Logger:            log.New(os.Stderr, "", log.LstdFlags),
-		middleWareService: middleWareService,
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.Handle("/upload/tls/{endpointID}/{certificate:(ca|cert|key)}", middleWareService.addMiddleWares(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.handlePostUploadTLS(w, r)
-	})))
+	h.Handle("/upload/tls/{endpointID}/{certificate:(?:ca|cert|key)}",
+		mw.authenticated(http.HandlerFunc(h.handlePostUploadTLS)))
 	return h
 }
 

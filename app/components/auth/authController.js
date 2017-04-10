@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'EndpointService', 'Messages',
-function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, EndpointService, Messages) {
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Messages',
+function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, EndpointService, StateManager, EndpointProvider, Messages) {
 
   $scope.authData = {
     username: 'admin',
@@ -12,6 +12,39 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
     password_confirmation: '',
     error: false
   };
+
+  if (!$scope.applicationState.application.authentication) {
+    EndpointService.endpoints()
+    .then(function success(data) {
+      if (data.length > 0)  {
+        endpointID = EndpointProvider.endpointID();
+        if (!endpointID) {
+          endpointID = data[0].Id;
+          EndpointProvider.setEndpointID(endpointID);
+        }
+        StateManager.updateEndpointState(true)
+        .then(function success() {
+          $state.go('dashboard');
+        }, function error(err) {
+          Messages.error("Failure", err, 'Unable to connect to the Docker endpoint');
+        });
+      }
+      else {
+        $state.go('endpointInit');
+      }
+    }, function error(err) {
+      Messages.error("Failure", err, 'Unable to retrieve endpoints');
+    });
+  } else {
+    Users.checkAdminUser({}, function () {},
+    function (e) {
+      if (e.status === 404) {
+        $scope.initPassword = true;
+      } else {
+        Messages.error("Failure", e, 'Unable to verify administrator account existence');
+      }
+    });
+  }
 
   if ($stateParams.logout) {
     Authentication.logout();
@@ -28,15 +61,6 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
 
   Config.$promise.then(function (c) {
     $scope.logo = c.logo;
-  });
-
-  Users.checkAdminUser({}, function (d) {},
-  function (e) {
-    if (e.status === 404) {
-      $scope.initPassword = true;
-    } else {
-      Messages.error("Failure", e, 'Unable to verify administrator account existence');
-    }
   });
 
   $scope.createAdminUser = function() {
@@ -58,18 +82,34 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
     $scope.authenticationError = false;
     var username = $sanitize($scope.authData.username);
     var password = $sanitize($scope.authData.password);
-    Authentication.login(username, password).then(function success() {
-      EndpointService.getActive().then(function success(data) {
-        $state.go('dashboard');
-      }, function error(err) {
-        if (err.status === 404) {
-          $state.go('endpointInit');
-        } else {
-          Messages.error("Failure", err, 'Unable to verify Docker endpoint existence');
+    Authentication.login(username, password)
+    .then(function success(data) {
+      return EndpointService.endpoints();
+    })
+    .then(function success(data) {
+      var userDetails = Authentication.getUserDetails();
+      if (data.length > 0)  {
+        endpointID = EndpointProvider.endpointID();
+        if (!endpointID) {
+          endpointID = data[0].Id;
+          EndpointProvider.setEndpointID(endpointID);
         }
-      });
-    }, function error() {
-      $scope.authData.error = 'Invalid credentials';
+        StateManager.updateEndpointState(true)
+        .then(function success() {
+          $state.go('dashboard');
+        }, function error(err) {
+          Messages.error("Failure", err, 'Unable to connect to the Docker endpoint');
+        });
+      }
+      else if (data.length === 0 && userDetails.role === 1) {
+        $state.go('endpointInit');
+      } else if (data.length === 0 && userDetails.role === 2) {
+        Authentication.logout();
+        $scope.authData.error = 'User not allowed. Please contact your administrator.';
+      }
+    })
+    .catch(function error(err) {
+      $scope.authData.error = 'Authentication error';
     });
   };
 }]);

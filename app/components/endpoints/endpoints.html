@@ -3,11 +3,24 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="endpoints" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
+    <i id="loadEndpointsSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Endpoint management</rd-header-content>
 </rd-header>
 
-<div class="row">
+<div class="row" ng-if="!applicationState.application.endpointManagement">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-exclamation-triangle" title="Endpoint management is not available">
+      </rd-widget-header>
+      <rd-widget-body>
+        <span class="small text-muted">Portainer has been started using the <code>--external-endpoints</code> flag. Endpoint management via the UI is disabled. You can still manage endpoint access.</span>
+      </rd-wigdet-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="applicationState.application.endpointManagement">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-plus" title="Add a new endpoint">
@@ -16,25 +29,33 @@
         <form class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
-            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
-            <div class="col-sm-10">
+            <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="container_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01">
             </div>
           </div>
           <!-- !name-input -->
           <!-- endpoint-url-input -->
           <div class="form-group">
-            <label for="endpoint_url" class="col-sm-2 control-label text-left">Endpoint URL</label>
-            <div class="col-sm-10">
+            <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Endpoint URL
+              <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
             </div>
           </div>
           <!-- !endpoint-url-input -->
           <!-- tls-checkbox -->
           <div class="form-group">
-            <label for="tls" class="col-sm-2 control-label text-left">TLS</label>
-            <div class="col-sm-10">
-              <input type="checkbox" name="tls" ng-model="formValues.TLS">
+            <div class="col-sm-12">
+              <label for="tls" class="control-label text-left">
+                TLS
+                <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the Docker endpoint."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.TLS"><i></i>
+              </label>
             </div>
           </div>
           <!-- !tls-checkbox -->
@@ -101,11 +122,18 @@
     <rd-widget>
       <rd-widget-header icon="fa-plug" title="Endpoints">
         <div class="pull-right">
-          <i id="loadEndpointsSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
         </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12">
-        <div class="pull-left">
+        <div class="pull-left" ng-if="applicationState.application.endpointManagement">
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
         </div>
         <div class="pull-right">
@@ -117,7 +145,9 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th></th>
+                <th ng-if="applicationState.application.endpointManagement">
+                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+                </th>
                 <th>
                   <a ui-sref="endpoints" ng-click="order('Name')">
                     Name
@@ -132,28 +162,25 @@
                     <span ng-show="sortType == 'URL' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
-                <th>
-                  <a ui-sref="endpoints" ng-click="order('TLS')">
-                    TLS
-                    <span ng-show="sortType == 'TLS' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'TLS' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
-                </th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="endpoint in (state.filteredEndpoints = (endpoints | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
-                <td><input type="checkbox" ng-model="endpoint.Checked" ng-change="selectItem(endpoint)" /></td>
+              <tr dir-paginate="endpoint in (state.filteredEndpoints = (endpoints | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+                <td ng-if="applicationState.application.endpointManagement"><input type="checkbox" ng-model="endpoint.Checked" ng-change="selectItem(endpoint)" /></td>
                 <td><i class="fa fa-star" aria-hidden="true" ng-if="endpoint.Id === activeEndpoint.Id"></i> {{ endpoint.Name }}</td>
                 <td>{{ endpoint.URL | stripprotocol }}</td>
-                <td><i class="fa fa-shield" aria-hidden="true" ng-if="endpoint.TLS"></i></td>
                 <td>
-                  <span ng-if="endpoint.Id !== activeEndpoint.Id">
-                    <a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
+                  <span ng-if="applicationState.application.endpointManagement">
+                    <span ng-if="endpoint.Id !== activeEndpointID">
+                      <a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
+                    </span>
+                    <span class="small text-muted" ng-if="endpoint.Id === activeEndpointID">
+                      <i class="fa fa-lock" aria-hidden="true"></i> You cannot edit the active endpoint
+                    </span>
                   </span>
-                  <span class="small text-muted" ng-if="endpoint.Id === activeEndpoint.Id">
-                    <i class="fa fa-lock" aria-hidden="true"></i> You cannot edit the active endpoint
+                  <span ng-if="applicationState.application.authentication">
+                    <a ui-sref="endpoint.access({id: endpoint.Id})"><i class="fa fa-users" aria-hidden="true" style="margin-left: 7px;"></i> Manage access</a>
                   </span>
               </td>
               </tr>

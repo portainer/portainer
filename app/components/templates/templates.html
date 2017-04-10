@@ -3,53 +3,66 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="templates" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
+    <i id="loadTemplatesSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Templates</rd-header-content>
 </rd-header>
 <div id="selectedTemplate" class="row" ng-if="state.selectedTemplate">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-custom-header icon="state.selectedTemplate.logo" title="state.selectedTemplate.image">
+      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Image">
       </rd-widget-custom-header>
       <rd-widget-body classes="padding">
         <form class="form-horizontal">
-          <div class="form-group" ng-if="globalNetworkCount === 0 && endpointMode.provider === 'DOCKER_SWARM'">
+          <!-- description -->
+          <div class="form-group" ng-if="state.selectedTemplate.Description">
             <div class="col-sm-12">
-              <span class="small text-muted">When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref="networks">networks view</a> to create one.</span>
+              <span class="small" style="margin-left: 5px;">{{ state.selectedTemplate.Description }}</span>
             </div>
           </div>
-          <div class="form-group" ng-if="endpointMode.provider === 'DOCKER_SWARM_MODE'">
-            <div class="col-sm-12">
-              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-              <span class="small text-muted">App templates cannot be used with swarm-mode at the moment. You can still use them to quickly deploy containers to the Docker host.</span>
-            </div>
-          </div>
+          <!-- !description -->
           <!-- name-and-network-inputs -->
           <div class="form-group">
-            <label for="image_registry" class="col-sm-2 control-label text-left">Name</label>
-            <div class="col-sm-4">
-              <input type="text" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)">
+            <label for="container_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-5">
+              <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)">
             </div>
-            <label for="container_network" class="col-sm-2 control-label text-right">Network</label>
-            <div class="col-sm-4">
+            <label for="container_network" class="col-sm-2 col-lg-1 control-label text-right">Network</label>
+            <div class="col-sm-4 col-lg-5">
               <select class="form-control" ng-options="net.Name for net in availableNetworks" ng-model="formValues.network">
                 <option disabled hidden value="">Select a network</option>
               </select>
             </div>
           </div>
           <!-- !name-and-network-inputs -->
-          <div ng-repeat="var in state.selectedTemplate.env" ng-if="!var.set" class="form-group">
+          <!-- env -->
+          <div ng-repeat="var in state.selectedTemplate.Env" ng-if="!var.set" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
             <div class="col-sm-10">
-              <select ng-if="endpointMode.provider !== 'DOCKER_SWARM' && var.type === 'container'" ng-options="container|containername for container in runningContainers" class="form-control" ng-model="var.value">
+              <select ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM' && var.type === 'container'" ng-options="container|containername for container in runningContainers" class="form-control" ng-model="var.value">
                 <option selected disabled hidden value="">Select a container</option>
               </select>
-              <select ng-if="endpointMode.provider === 'DOCKER_SWARM' && var.type === 'container'" ng-options="container|swarmcontainername for container in runningContainers" class="form-control" ng-model="var.value">
+              <select ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM' && var.type === 'container'" ng-options="container|swarmcontainername for container in runningContainers" class="form-control" ng-model="var.value">
                 <option selected disabled hidden value="">Select a container</option>
               </select>
               <input ng-if="!var.type || !var.type === 'container'" type="text" class="form-control" ng-model="var.value" id="field_{{ $index }}">
             </div>
           </div>
+          <!-- !env -->
+          <!-- ownership -->
+          <div class="form-group" ng-if="applicationState.application.authentication">
+            <div class="col-sm-12">
+              <label for="ownership" class="control-label text-left">
+                Ownership
+                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing public, everybody will be able to access it."></portainer-tooltip>
+              </label>
+              <div class="btn-group btn-group-sm" style="margin-left: 20px;">
+                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'private'">Private</label>
+                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'public'">Public</label>
+              </div>
+            </div>
+          </div>
+          <!-- !ownership -->
           <div class="form-group">
             <div class="col-sm-12">
               <a class="small interactive" ng-if="!state.showAdvancedOptions" ng-click="state.showAdvancedOptions = true;">
@@ -60,44 +73,136 @@
               </a>
             </div>
           </div>
-          <div class="form-group" ng-if="state.showAdvancedOptions">
-            <label for="container_ports" class="col-sm-1 control-label text-left">Port mapping</label>
-            <div class="col-sm-11" style="margin-top: 5px;">
-              <span class="label label-default interactive" ng-click="addPortBinding()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional port
-              </span>
+          <!-- advanced-options -->
+          <div ng-if="state.showAdvancedOptions">
+            <!-- port-mapping -->
+            <div class="form-group" >
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Port mapping</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPortBinding()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional port
+                </span>
+              </div>
+              <div class="col-sm-12" style="margin-top: 10px" ng-if="state.selectedTemplate.Ports.length > 0">
+                <span class="small text-muted">Portainer will automatically assign a port if you leave the host port empty.</span>
+              </div>
+              <!-- !port-mapping -->
+              <!-- port-mapping-input-list -->
+              <div class="col-sm-12">
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="portBinding in state.selectedTemplate.Ports" style="margin-top: 2px;">
+                    <!-- host-port -->
+                    <div class="input-group col-sm-4 input-group-sm">
+                      <span class="input-group-addon">host</span>
+                      <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
+                    </div>
+                    <!-- !host-port -->
+                    <span style="margin: 0 10px 0 10px;">
+                      <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                    </span>
+                    <!-- container-port -->
+                    <div class="input-group col-sm-4 input-group-sm">
+                      <span class="input-group-addon">container</span>
+                      <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
+                    </div>
+                    <!-- !container-port -->
+                    <!-- protocol-actions -->
+                    <div class="input-group col-sm-3 input-group-sm">
+                      <div class="btn-group btn-group-sm">
+                        <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'tcp'">TCP</label>
+                        <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
+                      </div>
+                      <button class="btn btn-sm btn-danger" type="button" ng-click="removePortBinding($index)">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <!-- !protocol-actions -->
+                  </div>
+                </div>
+              </div>
+
             </div>
-            <!-- port-mapping-input-list -->
-            <div class="col-sm-offset-1 col-sm-11 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="portBinding in formValues.ports" style="margin-top: 2px;">
-                <div class="input-group col-sm-5 input-group-sm">
-                  <span class="input-group-addon">host</span>
-                  <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
-                </div>
-                <div class="input-group col-sm-5 input-group-sm">
-                  <span class="input-group-addon">container</span>
-                  <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
-                </div>
-                <div class="input-group col-sm-1 input-group-sm">
-                  <select class="form-control" ng-model="portBinding.protocol">
-                    <option value="tcp">tcp</option>
-                    <option value="udp">udp</option>
-                  </select>
-                  <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click="removePortBinding($index)">
-                      <i class="fa fa-minus" aria-hidden="true"></i>
-                    </button>
-                  </span>
+            <!-- !port-mapping-input-list -->
+            <!-- volume-mapping -->
+            <div class="form-group" >
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Volume mapping</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addVolume()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional volume
+                </span>
+              </div>
+              <div class="col-sm-12" style="margin-top: 10px" ng-if="state.selectedTemplate.Volumes.length > 0">
+                <span class="small text-muted">Portainer will automatically create and map a local volume when using the <b>auto</b> option.</span>
+              </div>
+              <div ng-repeat="volume in state.selectedTemplate.Volumes">
+                <div class="col-sm-12" style="margin-top: 10px;">
+                  <!-- volume-line1 -->
+                  <div class="col-sm-12 form-inline">
+                    <!-- container-path -->
+                    <div class="input-group input-group-sm col-sm-6">
+                      <span class="input-group-addon">container</span>
+                      <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container">
+                    </div>
+                    <!-- !container-path -->
+                    <!-- volume-type -->
+                    <div class="input-group col-sm-5" style="margin-left: 5px;">
+                      <div class="btn-group btn-group-sm">
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'auto'" ng-click="volume.name = ''">Auto</label>
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
+                      </div>
+                      <button class="btn btn-sm btn-danger" type="button" ng-click="removeVolume($index)">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <!-- !volume-type -->
+                  </div>
+                  <!-- !volume-line1 -->
+                  <!-- volume-line2 -->
+                  <div class="col-sm-12 form-inline" style="margin-top: 5px;" ng-if="volume.type !== 'auto'">
+                    <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                    <!-- volume -->
+                    <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
+                      <span class="input-group-addon">volume</span>
+                      <select class="form-control" ng-model="volume.name">
+                        <option selected disabled hidden value="">Select a volume</option>
+                        <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
+                      </select>
+                    </div>
+                    <!-- !volume -->
+                    <!-- bind -->
+                    <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
+                      <span class="input-group-addon">host</span>
+                      <input type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host">
+                    </div>
+                    <!-- !bind -->
+                    <!-- read-only -->
+                    <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
+                      <div class="btn-group btn-group-sm">
+                        <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
+                        <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
+                      </div>
+                    </div>
+                    <!-- !read-only -->
+                  </div>
+                  <!-- !volume-line2 -->
                 </div>
               </div>
             </div>
-            <!-- !port-mapping-input-list -->
+            <!-- !volume-mapping -->
           </div>
-          <!-- !port-mapping -->
+          <!-- !advanced-options -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-default btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
               <i id="createContainerSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <span class="small text-muted" style="margin-left: 10px" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
+                When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref="networks">networks view</a> to create one.
+              </span>
+              <span ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'" style="margin-left: 10px">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span class="small text-muted" style="margin-left: 5px;">App templates cannot be deployed as Swarm Mode services for the moment. You can still use them to quickly deploy containers on the Docker host.</span>
+              </span>
             </div>
           </div>
         </form>
@@ -106,24 +211,27 @@
   </div>
 </div>
 
-<div class="row" ng-if="state.selectedTemplate">
-
-</div>
-
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-rocket" title="Available templates">
         <div class="pull-right">
-          <i id="loadTemplatesSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px;"></i>
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
         </div>
       </rd-widget-header>
       <rd-widget-body classes="padding">
         <div class="template-list">
-          <div dir-paginate="tpl in templates | itemsPerPage: pagination_count" class="container-template hvr-underline-from-center" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index)">
-            <img class="logo" ng-src="{{ tpl.logo }}" />
-            <div class="title">{{ tpl.title }}</div>
-            <div class="description">{{ tpl.description }}</div>
+          <div dir-paginate="tpl in templates | itemsPerPage: state.pagination_count" class="container-template hvr-underline-from-center" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index)">
+            <img class="logo" ng-src="{{ tpl.Logo }}" />
+            <div class="title">{{ tpl.Title }}</div>
+            <div class="description" ng-if="tpl.Description && !state.hideDescriptions">{{ tpl.Description }}</div>
           </div>
           <div ng-if="!templates" class="text-center text-muted">
             Loading...

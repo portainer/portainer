@@ -11,7 +11,16 @@
 </rd-header>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
+  <div ng-if="isUpdating" class="col-lg-12 col-md-12 col-xs-12">
+    <div class="alert alert-info" role="alert" id="service-update-alert">
+      <p>This service is being updated. Editing this service is currently disabled.</p>
+      <a ui-sref="service({id: service.Id}, {reload: true})">Refresh to see if this service has finished updated.</a>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-9 col-md-9 col-xs-9">
     <rd-widget>
       <rd-widget-header icon="fa-list-alt" title="Service details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
@@ -19,22 +28,31 @@
           <tbody>
             <tr>
               <td>Name</td>
-              <td ng-if="!service.EditName">
-                {{ service.Name }}
-                <a href="" data-toggle="tooltip" title="Edit service name" ng-click="service.EditName = true;"><i class="fa fa-edit"></i></a>
+              <td ng-if="applicationState.endpoint.apiVersion <= 1.24">
+                <input type="text" class="form-control" ng-model="service.Name" ng-change="updateServiceAttribute(service, 'Name')" ng-disabled="isUpdating">
               </td>
-              <td ng-if="service.EditName">
-                <input type="text" class="containerNameInput" ng-model="service.newServiceName">
-                <a class="interactive" ng-click="service.EditName = false;"><i class="fa fa-times"></i></a>
-                <a class="interactive" ng-click="renameService(service)"><i class="fa fa-check-square-o"></i></a>
+              <td ng-if="applicationState.endpoint.apiVersion >= 1.25">
+                {{ service.Name }}
               </td>
             </tr>
             <tr>
               <td>ID</td>
               <td>
                 {{ service.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeService()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this service</button>
+                <button class="btn btn-xs btn-danger" ng-click="removeService()"><i class="fa fa-trash space-right" aria-hidden="true" ng-disabled="isUpdating"></i>Delete this service</button>
               </td>
+            </tr>
+            <tr ng-if="service.CreatedAt">
+              <td>Created at</td>
+              <td>{{ service.CreatedAt|getisodate}}</td>
+            </tr>
+            <tr ng-if="service.UpdatedAt">
+              <td>Last updated at</td>
+              <td>{{ service.UpdatedAt|getisodate }}</td>
+            </tr>
+            <tr ng-if="service.Version">
+              <td>Version</td>
+              <td>{{ service.Version }}</td>
             </tr>
             <tr>
               <td>Scheduling mode</td>
@@ -43,240 +61,90 @@
             <tr ng-if="service.Mode === 'replicated'">
               <td>Replicas</td>
               <td>
-                <span ng-if="service.Mode === 'replicated' && !service.EditReplicas">
-                  {{ service.Replicas }}
-                  <a class="interactive" ng-click="service.EditReplicas = true;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Scale</a>
-                </span>
-                <span ng-if="service.Mode === 'replicated' && service.EditReplicas">
-                  <input class="input-sm" type="number" ng-model="service.newServiceReplicas" />
-                  <a class="interactive" ng-click="service.EditReplicas = false;"><i class="fa fa-times"></i></a>
-                  <a class="interactive" ng-click="scaleService(service)"><i class="fa fa-check-square-o"></i></a>
+                <span ng-if="service.Mode === 'replicated'">
+                  <input class="input-sm" type="number" ng-model="service.Replicas" ng-change="updateServiceAttribute(service, 'Replicas')" ng-disabled="isUpdating" />
                 </span>
               </td>
             </tr>
             <tr>
               <td>Image</td>
-              <td ng-if="!service.EditImage">
-                {{ service.Image }}
-                <a href="" data-toggle="tooltip" title="Edit service image" ng-click="service.EditImage = true;"><i class="fa fa-edit"></i></a>
-              </td>
-
-              <td ng-if="service.EditImage">
-                <input type="text" class="containerNameInput" ng-model="service.newServiceImage">
-                <a class="interactive" ng-click="service.EditImage = false;"><i class="fa fa-times"></i></a>
-                <a class="interactive" ng-click="changeServiceImage(service)"><i class="fa fa-check-square-o"></i></a>
-              </td>
-            </tr>
-            <tr ng-if="service.Ports">
-              <td>Published ports</td>
               <td>
-                <div ng-repeat="mapping in service.Ports">
-                  {{ mapping.TargetPort }} <i class="fa fa-long-arrow-right"></i> {{ mapping.PublishedPort }}
-                </div>
-              </td>
-            </tr>
-            <tr ng-if="service.EnvironmentVariables">
-              <td>Environment variables</td>
-              <td>
-                <div class="form-group">
-                  <div class="col-sm-11 nopadding">
-                    <span class="label label-default interactive fit-text-size" ng-click="addEnvironmentVariable(service)">
-                      <i class="fa fa-plus-circle" aria-hidden="true"></i> environment variable
-                    </span>
-                  </div>
-                  <!-- environment-variable-input-list -->
-                  <div class="col-sm-11 form-inline nopadding" style="margin-top: 10px;">
-                    <div ng-repeat="var in service.EnvironmentVariables" style="margin-top: 2px;">
-                      <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon fit-text-size">name</span>
-                        <input type="text" class="form-control" ng-model="var.key" ng-disabled="var.added" placeholder="e.g. FOO">
-                      </div>
-                      <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon fit-text-size">value</span>
-                        <input type="text" class="form-control" ng-model="var.value" ng-change="updateEnvironmentVariable(service, var)" placeholder="e.g. bar">
-                        <span class="input-group-btn">
-                          <button class="btn btn-default" type="button" ng-click="removeEnvironmentVariable(service, $index)">
-                            <i class="fa fa-minus" aria-hidden="true"></i>
-                          </button>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- !environment-variable-input-list -->
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Labels</td>
-              <td>
-                <div class="form-group">
-                  <div class="col-sm-11 nopadding">
-                    <span class="label label-default interactive fit-text-size" ng-click="addLabel(service)">
-                      <i class="fa fa-plus-circle" aria-hidden="true"></i> label
-                    </span>
-                  </div>
-                  <!-- labels-input-list -->
-                  <div class="col-sm-11 form-inline nopadding" style="margin-top: 10px;">
-                    <div ng-repeat="label in service.ServiceLabels" style="margin-top: 2px;">
-                      <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon fit-text-size">name</span>
-                        <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="updateLabel(service, label)">
-                      </div>
-                      <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon fit-text-size">value</span>
-                        <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateLabel(service, label)">
-                        <span class="input-group-btn">
-                          <button class="btn btn-default" type="button" ng-click="removeLabel(service, $index)">
-                            <i class="fa fa-minus" aria-hidden="true"></i>
-                          </button>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- !labels-input-list -->
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Container labels</td>
-              <td>
-                <div class="form-group">
-                  <div class="col-sm-11 nopadding">
-                    <span class="label label-default interactive fit-text-size" ng-click="addContainerLabel(service)">
-                      <i class="fa fa-plus-circle" aria-hidden="true"></i> container label
-                    </span>
-                  </div>
-                  <!-- labels-input-list -->
-                  <div class="col-sm-11 form-inline nopadding" style="margin-top: 10px;">
-                    <div ng-repeat="label in service.ServiceContainerLabels" style="margin-top: 2px;">
-                      <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon fit-text-size">name</span>
-                        <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="updateLabel(service, label)">
-                      </div>
-                      <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon fit-text-size">value</span>
-                        <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateLabel(service, label)">
-                        <span class="input-group-btn">
-                          <button class="btn btn-default" type="button" ng-click="removeContainerLabel(service, $index)">
-                            <i class="fa fa-minus" aria-hidden="true"></i>
-                          </button>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- !labels-input-list -->
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Update Parallelism</td>
-              <td>
-                <span ng-if="!service.EditParallelism">
-                  {{ service.UpdateParallelism }}
-                  <a class="interactive" ng-click="service.EditParallelism = true;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Change</a>
-                </span>
-                <span ng-if="service.EditParallelism">
-                  <input class="input-sm" type="number" ng-model="service.newServiceUpdateParallelism" />
-                  <a class="interactive" ng-click="service.EditParallelism = false;"><i class="fa fa-times"></i></a>
-                  <a class="interactive" ng-click="changeParallelism(service)"><i class="fa fa-check-square-o"></i></a>
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <td>Update Delay</td>
-              <td>
-                <span ng-if="!service.EditDelay">
-                  {{ service.UpdateDelay }}
-                  <a class="interactive" ng-click="service.EditDelay = true;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Change</a>
-                </span>
-                <span ng-if="service.EditDelay">
-                  <input class="input-sm" type="number" ng-model="service.newServiceUpdateDelay" />
-                  <a class="interactive" ng-click="service.EditDelay = false;"><i class="fa fa-times"></i></a>
-                  <a class="interactive" ng-click="changeUpdateDelay(service)"><i class="fa fa-check-square-o"></i></a>
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <td>Update Failure Action</td>
-              <td>
-                <div class="form-group">
-                  <label class="radio-inline">
-                    <input type="radio" name="failure_action" ng-model="service.newServiceUpdateFailureAction" value="continue" ng-change="changeUpdateFailureAction(service)">
-                    Continue
-                  </label>
-                  <label class="radio-inline">
-                    <input type="radio" name="failure_action" ng-model="service.newServiceUpdateFailureAction" value="pause" ng-change="changeUpdateFailureAction(service)">
-                    Pause
-                  </label>
-                </div>
+                <input type="text" class="form-control" ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" ng-disabled="isUpdating" />
               </td>
             </tr>
           </tbody>
         </table>
       </rd-widget-body>
-      <rd-widget-footer ng-if="service.hasChanges">
-        <div>
-            <button type="button" class="btn btn-primary" ng-click="updateService(service)">Save changes</button>
-            <button type="button" class="btn btn-default" ng-click="cancelChanges(service)">Reset</button>
+      <rd-widget-footer>
+        <p class="small text-muted">
+          Do you need help? View the Docker Service documentation <a href="https://docs.docker.com/engine/reference/commandline/service_update/" target="self">here</a>.
+        </p>
+        <div class="btn-toolbar" role="toolbar">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary" ng-disabled="!hasChanges(service, ['Mode', 'Replicas', 'Image', 'Name'])" ng-click="updateService(service)">Apply changes</button>
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a ng-click="cancelChanges(service, ['Mode', 'Replicas', 'Image', 'Name'])">Reset changes</a></li>
+              <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+            </ul>
+          </div>
         </div>
       </rd-widget-footer>
     </rd-widget>
   </div>
-</div>
 
-<div class="row" ng-if="tasks.length > 0">
-  <div class="col-lg-12 col-md-12 col-xs-12">
+  <div class="col-lg-3 col-md-3 col-xs-3">
     <rd-widget>
-      <rd-widget-header icon="fa-tasks" title="Associated tasks"></rd-widget-header>
+      <rd-widget-header icon="fa-bars" title="Quick navigation"></rd-widget-header>
       <rd-widget-body classes="no-padding">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>
-                <a ui-sref="service" ng-click="order('Status')">
-                  Status
-                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="service" ng-click="order('Slot')">
-                  Slot
-                  <span ng-show="sortType == 'Slot' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Slot' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th ng-if="displayNode">
-                <a ui-sref="service" ng-click="order('Node')">
-                  Node
-                  <span ng-show="sortType == 'Node' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Node' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="service" ng-click="order('Updated')">
-                  Last update
-                  <span ng-show="sortType == 'Updated' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Updated' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr dir-paginate="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
-              <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
-              <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
-              <td>{{ task.Slot }}</td>
-              <td ng-if="displayNode">{{ task.Node }}</td>
-              <td>{{ task.Updated|getisodate }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div ng-if="tasks" class="pagination-controls">
-          <dir-pagination-controls></dir-pagination-controls>
-        </div>
+        <ul class="nav nav-pills nav-stacked">
+          <li><a href ng-click="goToItem('service-env-variables')">Environment variables</a></li>
+          <li><a href ng-click="goToItem('service-container-labels')">Container labels</a></li>
+          <li><a href ng-click="goToItem('service-mounts')">Mounts</a></li>
+          <li><a href ng-click="goToItem('service-network-specs')">Network &amp; published ports</a></li>
+          <li><a href ng-click="goToItem('service-resources')">Resource limits &amp; reservations</a></li>
+          <li><a href ng-click="goToItem('service-placement-constraints')">Placement constraints</a></li>
+          <li><a href ng-click="goToItem('service-restart-policy')">Restart policy</a></li>
+          <li><a href ng-click="goToItem('service-update-config')">Update configuration</a></li>
+          <li><a href ng-click="goToItem('service-labels')">Service labels</a></li>
+          <li><a href ng-click="goToItem('service-tasks')">Tasks</a></li>
+        <ul>
       </rd-widget-body>
     </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <hr>
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <h3 id="container-specs">Container specification</h3>
+    <div id="service-container-spec" class="padding-top" ng-include="'app/components/service/includes/container-specs.html'"></div>
+    <div id="service-env-variables" class="padding-top" ng-include="'app/components/service/includes/environmentvariables.html'"></div>
+    <div id="service-container-labels" class="padding-top" ng-include="'app/components/service/includes/containerlabels.html'"></div>
+    <div id="service-mounts" class="padding-top" ng-include="'app/components/service/includes/mounts.html'"></div>
+  </div>
+</div>
+
+<div class="row">
+  <hr>
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <h3 id="service-network-specs">Networks &amp; ports</h3>
+    <div id="service-networks" class="padding-top" ng-include="'app/components/service/includes/networks.html'"></div>
+    <div id="service-published-ports" class="padding-top" ng-include="'app/components/service/includes/ports.html'"></div>
+  </div>
+</div>
+
+<div class="row">
+  <hr>
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <h3 id="service-specs">Service specification</h3>
+    <div id="service-resources" class="padding-top" ng-include="'app/components/service/includes/resources.html'"></div>
+    <div id="service-placement-constraints" class="padding-top" ng-include="'app/components/service/includes/constraints.html'"></div>
+    <div id="service-restart-policy" class="padding-top" ng-include="'app/components/service/includes/restart.html'"></div>
+    <div id="service-update-config" class="padding-top" ng-include="'app/components/service/includes/updateconfig.html'"></div>
+    <div id="service-labels" class="padding-top" ng-include="'app/components/service/includes/servicelabels.html'"></div>
+    <div id="service-tasks" class="padding-top" ng-include="'app/components/service/includes/tasks.html'"></div>
   </div>
 </div>

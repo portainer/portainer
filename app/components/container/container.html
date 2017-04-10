@@ -13,12 +13,12 @@
       <rd-widget-header icon="fa-cogs" title="Actions"></rd-widget-header>
       <rd-widget-body classes="padding">
         <div class="btn-group" role="group" aria-label="...">
-          <button class="btn btn-primary" ng-click="start()" ng-if="!container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
-          <button class="btn btn-danger" ng-click="stop()" ng-if="container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
-          <button class="btn btn-danger" ng-click="kill()" ng-if="container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
-          <button class="btn btn-primary" ng-click="restart()" ng-if="container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
-          <button class="btn btn-primary" ng-click="pause()" ng-if="container.State.Running && !container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
-          <button class="btn btn-primary" ng-click="unpause()" ng-if="container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
+          <button class="btn btn-success" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
+          <button class="btn btn-danger" ng-click="stop()" ng-disabled="!container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
+          <button class="btn btn-danger" ng-click="kill()" ng-disabled="!container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
+          <button class="btn btn-primary" ng-click="restart()" ng-disabled="!container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
+          <button class="btn btn-primary" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
+          <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
           <button class="btn btn-danger" ng-click="remove()" ng-disabled="container.State.Running"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
         </div>
       </rd-widget-body>
@@ -101,11 +101,14 @@
           <!-- name-and-registry-inputs -->
           <div class="form-group">
             <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-7">
+            <div class="col-sm-11 col-md-6">
               <input type="text" class="form-control" ng-model="config.Image" id="image_name" placeholder="e.g. myImage:myTag">
             </div>
-            <label for="image_registry" class="col-sm-1 control-label text-left">Registry</label>
-            <div class="col-sm-3">
+            <label for="image_registry" class="col-sm-2 margin-sm-top control-label text-left">
+              Registry
+              <portainer-tooltip position="bottom" message="A registry to pull the image from. Leave empty to use the official Docker registry."></portainer-tooltip>
+            </label>
+            <div class="col-sm-10 col-md-3 margin-sm-top">
               <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="optional">
             </div>
           </div>
@@ -119,7 +122,7 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-default btn-sm" ng-disabled="!config.Image" ng-click="commit()">Create</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="commit()">Create</button>
               <i id="createImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
@@ -174,6 +177,23 @@
                 </table>
               </td>
             </tr>
+            <tr ng-if="container.HostConfig.RestartPolicy.Name !== 'no'">
+              <td>Restart policies</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr>
+                    <td class="col-md-3">Name</td>
+                    <td>{{ container.HostConfig.RestartPolicy.Name }}</td>
+                  </tr>
+                  <tr>
+                    <td class="col-md-3">MaximumRetryCount</td>
+                    <td>
+                      {{ container.HostConfig.RestartPolicy.MaximumRetryCount }}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
@@ -208,7 +228,18 @@
 <div class="row" ng-if="!(container.NetworkSettings.Networks | emptyobject)">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-sitemap" title="Connected networks"></rd-widget-header>
+      <rd-widget-header icon="fa-sitemap" title="Connected networks">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
@@ -219,7 +250,7 @@
             <th>Actions</th>
           </thead>
           <tbody>
-            <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: pagination_count">
+            <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: state.pagination_count">
               <td><a ui-sref="network({id: value.NetworkID})">{{ key }}</a></td>
               <td>{{ value.IPAddress || '-' }}</td>
               <td>{{ value.Gateway || '-' }}</td>
