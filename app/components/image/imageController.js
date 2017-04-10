@@ -13,7 +13,7 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 
 		ImageService.tagImage($stateParams.id, image, registry)
 		.then(function success(data) {
-			Messages.send('Image successfully tagged');
+			Messages.success('Image successfully tagged');
 			$state.go('image', {id: $stateParams.id}, {reload: true});
 		})
 		.catch(function error(err) {
@@ -28,7 +28,7 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 		$('#loadingViewSpinner').show();
 		ImageService.pushImage(tag)
 		.then(function success() {
-			Messages.send('Image successfully pushed');
+			Messages.success('Image successfully pushed');
 		})
 		.catch(function error(err) {
 			Messages.error("Failure", err, "Unable to push image tag");
@@ -45,7 +45,7 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 
 		ImageService.pullImage(image, registry)
 		.then(function success(data) {
-			Messages.send('Image successfully pulled', image);
+			Messages.success('Image successfully pulled', image);
 		})
 		.catch(function error(err){
 			Messages.error("Failure", err, "Unable to pull image");
@@ -60,10 +60,10 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 		ImageService.deleteImage(id, false)
 		.then(function success() {
 			if ($scope.image.RepoTags.length === 1) {
-				Messages.send('Image successfully deleted', id);
+				Messages.success('Image successfully deleted', id);
 				$state.go('images', {}, {reload: true});
 			} else {
-				Messages.send('Tag successfully deleted', id);
+				Messages.success('Tag successfully deleted', id);
 				$state.go('image', {id: $stateParams.id}, {reload: true});
 			}
 		})
@@ -79,7 +79,7 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 		$('#loadingViewSpinner').show();
 		ImageService.deleteImage(id, false)
 		.then(function success() {
-			Messages.send('Image successfully deleted', id);
+			Messages.success('Image successfully deleted', id);
 			$state.go('images', {}, {reload: true});
 		})
 		.catch(function error(err) {

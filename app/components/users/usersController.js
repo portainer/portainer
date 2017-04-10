@@ -62,7 +62,7 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
     var role = $scope.formValues.Administrator ? 1 : 2;
     UserService.createUser(username, password, role)
     .then(function success(data) {
-      Messages.send("User created", username);
+      Messages.success("User created", username);
       $state.reload();
     })
     .catch(function error(err) {
@@ -89,7 +89,7 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
         .then(function success(data) {
           var index = $scope.users.indexOf(user);
           $scope.users.splice(index, 1);
-          Messages.send('User successfully deleted', user.Username);
+          Messages.success('User successfully deleted', user.Username);
         })
         .catch(function error(err) {
           Messages.error("Failure", err, 'Unable to remove user');

@@ -56,7 +56,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
       return ContainerService.createAndStartContainer(templateConfiguration);
     })
     .then(function success(data) {
-      Messages.send('Container Started', data.Id);
+      Messages.success('Container started', data.Id);
       if ($scope.formValues.Ownership === 'private') {
         ResourceControlService.setContainerResourceControl(Authentication.getUserDetails().ID, data.Id)
         .then(function success(data) {

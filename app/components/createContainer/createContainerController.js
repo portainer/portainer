@@ -126,7 +126,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
         Messages.error('Error', {}, cd.message);
       } else {
         $('#createContainerSpinner').hide();
-        Messages.send('Container Started', containerID);
+        Messages.success('Container Started', containerID);
         $state.go('containers', {}, {reload: true});
       }
     }, function (e) {

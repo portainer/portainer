@@ -21,7 +21,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     })
     .then(function success() {
       delete service.Metadata.ResourceControl;
-      Messages.send('Ownership changed to public', service.Id);
+      Messages.success('Ownership changed to public', service.Id);
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to change service ownership");
@@ -58,7 +58,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
     config.Mode.Replicated.Replicas = service.Replicas;
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadServicesSpinner').hide();
-      Messages.send("Service successfully scaled", "New replica count: " + service.Replicas);
+      Messages.success("Service successfully scaled", "New replica count: " + service.Replicas);
       $state.reload();
     }, function (e) {
       $('#loadServicesSpinner').hide();
@@ -98,7 +98,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
             if (service.Metadata && service.Metadata.ResourceControl) {
               ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id)
               .then(function success() {
-                Messages.send("Service deleted", service.Id);
+                Messages.success("Service deleted", service.Id);
                 var index = $scope.services.indexOf(service);
                 $scope.services.splice(index, 1);
               })
@@ -106,7 +106,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Messages, Pa
                 Messages.error("Failure", err, "Unable to remove service ownership");
               });
             } else {
-              Messages.send("Service deleted", service.Id);
+              Messages.success("Service deleted", service.Id);
               var index = $scope.services.indexOf(service);
               $scope.services.splice(index, 1);
             }

@@ -44,7 +44,7 @@ function ($scope, $state, Messages, Network) {
         $('#createNetworkSpinner').hide();
         Messages.error('Unable to create network', {}, d.message);
       } else {
-        Messages.send("Network created", d.Id);
+        Messages.success("Network created", d.Id);
         $('#createNetworkSpinner').hide();
         $state.go('networks', {}, {reload: true});
       }

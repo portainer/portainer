@@ -7,10 +7,10 @@ function ($scope, $state, $stateParams, $filter, Config, Network, Container, Con
     Network.remove({id: $stateParams.id}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Messages.send("Error", {}, d.message);
+        Messages.error("Error", d, "Unable to remove network");
       } else {
         $('#loadingViewSpinner').hide();
-        Messages.send("Network removed", $stateParams.id);
+        Messages.success("Network removed", $stateParams.id);
         $state.go('networks', {});
       }
     }, function (e) {
@@ -24,10 +24,10 @@ function ($scope, $state, $stateParams, $filter, Config, Network, Container, Con
     Network.disconnect({id: $stateParams.id}, { Container: containerId, Force: false }, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Messages.send("Error", {}, d.message);
+        Messages.error("Error", d, "Unable to disconnect container from network");
       } else {
         $('#loadingViewSpinner').hide();
-        Messages.send("Container left network", $stateParams.id);
+        Messages.success("Container left network", $stateParams.id);
         $state.go('network', {id: network.Id}, {reload: true});
       }
     }, function (e) {

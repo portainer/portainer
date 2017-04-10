@@ -54,7 +54,7 @@ function ($scope, $state, EndpointService, EndpointProvider, Messages, Paginatio
     var TLSCertFile = $scope.formValues.TLSCert;
     var TLSKeyFile = $scope.formValues.TLSKey;
     EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, false).then(function success(data) {
-      Messages.send("Endpoint created", name);
+      Messages.success("Endpoint created", name);
       $state.reload();
     }, function error(err) {
       $scope.state.uploadInProgress = false;
@@ -79,7 +79,7 @@ function ($scope, $state, EndpointService, EndpointProvider, Messages, Paginatio
       if (endpoint.Checked) {
         counter = counter + 1;
         EndpointService.deleteEndpoint(endpoint.Id).then(function success(data) {
-          Messages.send("Endpoint deleted", endpoint.Name);
+          Messages.success("Endpoint deleted", endpoint.Name);
           var index = $scope.endpoints.indexOf(endpoint);
           $scope.endpoints.splice(index, 1);
           complete();

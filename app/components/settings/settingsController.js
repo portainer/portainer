@@ -15,7 +15,7 @@ function ($scope, $state, $sanitize, Authentication, UserService, Messages) {
 
     UserService.updateUserPassword(userID, currentPassword, newPassword)
     .then(function success() {
-      Messages.send("Success", "Password successfully updated");
+      Messages.success("Success", "Password successfully updated");
       $state.reload();
     })
     .catch(function error(err) {

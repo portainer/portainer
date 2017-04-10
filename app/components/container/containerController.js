@@ -49,7 +49,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.start({id: $scope.container.Id}, {}, function (d) {
       update();
-      Messages.send("Container started", $stateParams.id);
+      Messages.success("Container started", $stateParams.id);
     }, function (e) {
       update();
       Messages.error("Failure", e, "Unable to start container");
@@ -60,7 +60,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.stop({id: $stateParams.id}, function (d) {
       update();
-      Messages.send("Container stopped", $stateParams.id);
+      Messages.success("Container stopped", $stateParams.id);
     }, function (e) {
       update();
       Messages.error("Failure", e, "Unable to stop container");
@@ -71,7 +71,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.kill({id: $stateParams.id}, function (d) {
       update();
-      Messages.send("Container killed", $stateParams.id);
+      Messages.success("Container killed", $stateParams.id);
     }, function (e) {
       update();
       Messages.error("Failure", e, "Unable to kill container");
@@ -86,7 +86,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     ContainerCommit.commit({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
       $('#createImageSpinner').hide();
       update();
-      Messages.send("Container commited", $stateParams.id);
+      Messages.success("Container commited", $stateParams.id);
     }, function (e) {
       $('#createImageSpinner').hide();
       update();
@@ -98,7 +98,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.pause({id: $stateParams.id}, function (d) {
       update();
-      Messages.send("Container paused", $stateParams.id);
+      Messages.success("Container paused", $stateParams.id);
     }, function (e) {
       update();
       Messages.error("Failure", e, "Unable to pause container");
@@ -109,7 +109,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.unpause({id: $stateParams.id}, function (d) {
       update();
-      Messages.send("Container unpaused", $stateParams.id);
+      Messages.success("Container unpaused", $stateParams.id);
     }, function (e) {
       update();
       Messages.error("Failure", e, "Unable to unpause container");
@@ -121,11 +121,11 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     Container.remove({id: $stateParams.id}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Messages.send("Error", d.message);
+        Messages.error("Failure", d, "Unable to remove container");
       }
       else {
         $state.go('containers', {}, {reload: true});
-        Messages.send("Container removed", $stateParams.id);
+        Messages.success("Container removed", $stateParams.id);
       }
     }, function (e) {
       update();
@@ -137,7 +137,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.restart({id: $stateParams.id}, function (d) {
       update();
-      Messages.send("Container restarted", $stateParams.id);
+      Messages.success("Container restarted", $stateParams.id);
     }, function (e) {
       update();
       Messages.error("Failure", e, "Unable to restart container");
@@ -151,7 +151,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
         Messages.error("Unable to rename container", {}, d.message);
       } else {
         $scope.container.Name = $scope.container.newContainerName;
-        Messages.send("Container successfully renamed", d.name);
+        Messages.success("Container successfully renamed", d.name);
       }
     }, function (e) {
       Messages.error("Failure", e, 'Unable to rename container');
@@ -164,10 +164,10 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     Network.disconnect({id: networkId}, { Container: $stateParams.id, Force: false }, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Messages.send("Error", {}, d.message);
+        Messages.error("Error", d, "Unable to disconnect container from network");
       } else {
         $('#loadingViewSpinner').hide();
-        Messages.send("Container left network", $stateParams.id);
+        Messages.success("Container left network", $stateParams.id);
         $state.go('container', {id: $stateParams.id}, {reload: true});
       }
     }, function (e) {

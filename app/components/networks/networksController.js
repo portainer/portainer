@@ -36,7 +36,7 @@ function ($scope, $state, Network, Config, Messages, Pagination) {
         $('#createNetworkSpinner').hide();
         Messages.error('Unable to create network', {}, d.message);
       } else {
-        Messages.send("Network created", d.Id);
+        Messages.success("Network created", d.Id);
         $('#createNetworkSpinner').hide();
         $state.reload();
       }
@@ -82,9 +82,9 @@ function ($scope, $state, Network, Config, Messages, Pagination) {
         counter = counter + 1;
         Network.remove({id: network.Id}, function (d) {
           if (d.message) {
-            Messages.send("Error", d.message);
+            Messages.error("Error", d, "Unable to remove network");
           } else {
-            Messages.send("Network removed", network.Id);
+            Messages.success("Network removed", network.Id);
             var index = $scope.networks.indexOf(network);
             $scope.networks.splice(index, 1);
           }

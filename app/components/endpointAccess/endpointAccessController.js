@@ -43,7 +43,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       $scope.authorizedUsers = $scope.authorizedUsers.concat($scope.users);
       $scope.users = [];
-      Messages.send('Access granted for all users');
+      Messages.success('Access granted for all users');
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to update endpoint permissions");
@@ -55,7 +55,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       $scope.users = $scope.users.concat($scope.authorizedUsers);
       $scope.authorizedUsers = [];
-      Messages.send('Access removed for all users');
+      Messages.success('Access removed for all users');
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to update endpoint permissions");
@@ -72,7 +72,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       removeUserFromArray(user.Id, $scope.users);
       $scope.authorizedUsers.push(user);
-      Messages.send('Access granted for user', user.Username);
+      Messages.success('Access granted for user', user.Username);
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to update endpoint permissions");
@@ -91,7 +91,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       removeUserFromArray(user.Id, $scope.authorizedUsers);
       $scope.users.push(user);
-      Messages.send('Access removed for user', user.Username);
+      Messages.success('Access removed for user', user.Username);
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to update endpoint permissions");

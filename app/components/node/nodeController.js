@@ -68,7 +68,7 @@ function ($scope, $state, $stateParams, LabelHelper, Node, NodeHelper, Task, Pag
 
     Node.update({ id: node.Id, version: node.Version }, config, function (data) {
       $('#loadServicesSpinner').hide();
-      Messages.send("Node successfully updated", "Node updated");
+      Messages.success("Node successfully updated", "Node updated");
       $state.go('node', {id: node.Id}, {reload: true});
     }, function (e) {
       $('#loadServicesSpinner').hide();

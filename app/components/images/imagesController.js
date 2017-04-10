@@ -76,7 +76,7 @@ function ($scope, $state, Config, ImageService, Messages, Pagination, ModalServi
         counter = counter + 1;
         ImageService.deleteImage(i.Id, force)
         .then(function success(data) {
-          Messages.send("Image deleted", i.Id);
+          Messages.success("Image deleted", i.Id);
           var index = $scope.images.indexOf(i);
           $scope.images.splice(index, 1);
         })

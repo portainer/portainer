@@ -14,7 +14,7 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentica
     ResourceControlService.removeVolumeResourceControl(volume.Metadata.ResourceControl.OwnerId, volume.Name)
     .then(function success() {
       delete volume.Metadata.ResourceControl;
-      Messages.send('Ownership changed to public', volume.Name);
+      Messages.success('Ownership changed to public', volume.Name);
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to change volume ownership");
@@ -73,7 +73,7 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentica
             if (volume.Metadata && volume.Metadata.ResourceControl) {
               ResourceControlService.removeVolumeResourceControl(volume.Metadata.ResourceControl.OwnerId, volume.Name)
               .then(function success() {
-                Messages.send("Volume deleted", volume.Name);
+                Messages.success("Volume deleted", volume.Name);
                 var index = $scope.volumes.indexOf(volume);
                 $scope.volumes.splice(index, 1);
               })
@@ -81,7 +81,7 @@ function ($scope, $state, Volume, Messages, Pagination, ModalService, Authentica
                 Messages.error("Failure", err, "Unable to remove volume ownership");
               });
             } else {
-              Messages.send("Volume deleted", volume.Name);
+              Messages.success("Volume deleted", volume.Name);
               var index = $scope.volumes.indexOf(volume);
               $scope.volumes.splice(index, 1);
             }

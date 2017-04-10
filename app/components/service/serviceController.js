@@ -213,7 +213,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadingViewSpinner').hide();
-      Messages.send("Service successfully updated", "Service updated");
+      Messages.success("Service successfully updated", "Service updated");
       $scope.cancelChanges({});
       fetchServiceDetails();
     }, function (e) {
@@ -237,10 +237,10 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     Service.remove({id: $stateParams.id}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Messages.send("Error", {}, d.message);
+        Messages.error("Error", d, "Unable to remove service");
       } else {
         $('#loadingViewSpinner').hide();
-        Messages.send("Service removed", $stateParams.id);
+        Messages.success("Service removed", $stateParams.id);
         $state.go('services', {});
       }
     }, function (e) {

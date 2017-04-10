@@ -29,7 +29,7 @@ angular.module('containers', [])
     })
     .then(function success() {
       delete container.Metadata.ResourceControl;
-      Messages.send('Ownership changed to public', container.Id);
+      Messages.success('Ownership changed to public', container.Id);
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to change container ownership");
@@ -120,7 +120,7 @@ angular.module('containers', [])
         counter = counter + 1;
         if (action === Container.start) {
           action({id: c.Id}, {}, function (d) {
-            Messages.send("Container " + msg, c.Id);
+            Messages.success("Container " + msg, c.Id);
             complete();
           }, function (e) {
             Messages.error("Failure", e, "Unable to start container");
@@ -130,19 +130,19 @@ angular.module('containers', [])
         else if (action === Container.remove) {
           action({id: c.Id}, function (d) {
             if (d.message) {
-              Messages.send("Error", d.message);
+              Messages.error("Error", d, "Unable to remove container");
             }
             else {
               if (c.Metadata && c.Metadata.ResourceControl) {
                 ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, c.Id)
                 .then(function success() {
-                  Messages.send("Container " + msg, c.Id);
+                  Messages.success("Container " + msg, c.Id);
                 })
                 .catch(function error(err) {
                   Messages.error("Failure", err, "Unable to remove container ownership");
                 });
               } else {
-                Messages.send("Container " + msg, c.Id);
+                Messages.success("Container " + msg, c.Id);
               }
             }
             complete();
@@ -154,9 +154,9 @@ angular.module('containers', [])
         else if (action === Container.pause) {
           action({id: c.Id}, function (d) {
             if (d.message) {
-              Messages.send("Container is already paused", c.Id);
+              Messages.success("Container is already paused", c.Id);
             } else {
-              Messages.send("Container " + msg, c.Id);
+              Messages.success("Container " + msg, c.Id);
             }
             complete();
           }, function (e) {
@@ -166,7 +166,7 @@ angular.module('containers', [])
         }
         else {
           action({id: c.Id}, function (d) {
-            Messages.send("Container " + msg, c.Id);
+            Messages.success("Container " + msg, c.Id);
             complete();
           }, function (e) {
             Messages.error("Failure", e, 'An error occured');

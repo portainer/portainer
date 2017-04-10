@@ -219,7 +219,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
         ResourceControlService.setServiceResourceControl(Authentication.getUserDetails().ID, d.ID)
         .then(function success() {
           $('#createServiceSpinner').hide();
-          Messages.send('Service created', d.ID);
+          Messages.success('Service created', d.ID);
           $state.go('services', {}, {reload: true});
         })
         .catch(function error(err) {
@@ -228,7 +228,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
         });
       } else {
         $('#createServiceSpinner').hide();
-        Messages.send('Service created', d.ID);
+        Messages.success('Service created', d.ID);
         $state.go('services', {}, {reload: true});
       }
     }, function (e) {

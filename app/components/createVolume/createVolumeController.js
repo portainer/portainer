@@ -30,14 +30,14 @@ function ($scope, $state, VolumeService, InfoService, ResourceControlService, Au
       if ($scope.formValues.Ownership === 'private') {
         ResourceControlService.setVolumeResourceControl(Authentication.getUserDetails().ID, data.Name)
         .then(function success() {
-          Messages.send("Volume created", data.Name);
+          Messages.success("Volume created", data.Name);
           $state.go('volumes', {}, {reload: true});
         })
         .catch(function error(err) {
           Messages.error("Failure", err, 'Unable to apply resource control on volume');
         });
       } else {
-        Messages.send("Volume created", data.Name);
+        Messages.success("Volume created", data.Name);
         $state.go('volumes', {}, {reload: true});
       }
     })

@@ -28,7 +28,7 @@ function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
     UserService.updateUser($scope.user.Id, undefined, role)
     .then(function success(data) {
       var newRole = role === 1 ? 'administrator' : 'user';
-      Messages.send('Permissions successfully updated', $scope.user.Username + ' is now ' + newRole);
+      Messages.success('Permissions successfully updated', $scope.user.Username + ' is now ' + newRole);
       $state.reload();
     })
     .catch(function error(err) {
@@ -43,7 +43,7 @@ function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
     $('#loadingViewSpinner').show();
     UserService.updateUser($scope.user.Id, $scope.formValues.newPassword, undefined)
     .then(function success(data) {
-      Messages.send('Password successfully updated');
+      Messages.success('Password successfully updated');
       $state.reload();
     })
     .catch(function error(err) {
@@ -58,7 +58,7 @@ function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
     $('#loadingViewSpinner').show();
     UserService.deleteUser($scope.user.Id)
     .then(function success(data) {
-      Messages.send('User successfully deleted', $scope.user.Username);
+      Messages.success('User successfully deleted', $scope.user.Username);
       $state.go('users');
     })
     .catch(function error(err) {
