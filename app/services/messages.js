@@ -7,14 +7,6 @@ angular.module('portainer.services')
     toastr.success($sanitize(text), $sanitize(title));
   };
 
-  service.warning = function(title, text) {
-    toastr.success($sanitize(text), $sanitize(title));
-  };
-
-  service.info = function(title, text) {
-    toastr.info($sanitize(text), $sanitize(title));
-  };
-
   service.error = function(title, e, fallbackText) {
     var msg = fallbackText;
     if (e.data && e.data.message) {
@@ -27,10 +19,6 @@ angular.module('portainer.services')
       msg = e.msg;
     }
     toastr.error($sanitize(msg), $sanitize(title), {timeOut: 6000});
-  };
-
-  service.send = function(title, text) {
-    toastr.success($sanitize(text), $sanitize(title));
   };
 
   return service;
