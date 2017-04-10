@@ -103,8 +103,8 @@
             <tr dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><input type="checkbox" ng-model="container.Checked" ng-change="selectItem(container)"/></td>
               <td>
-								<span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container have a Healthcheck">{{ container.Status }}</span>
-								<span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) === -1" class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span>
+                <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container have a Healthcheck">{{ container.Status }}</span>
+                <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) === -1" class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span>
               </td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: 40}}</a></td>
               <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: 40}}</a></td>
