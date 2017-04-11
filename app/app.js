@@ -51,7 +51,7 @@ angular.module('portainer', [
   'user',
   'users',
   'volumes'])
-  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider) {
+  .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', function ($stateProvider, $urlRouterProvider, $locationProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider) {
     'use strict';
 
     localStorageServiceProvider
@@ -70,6 +70,8 @@ angular.module('portainer', [
 
     AnalyticsProvider.setAccount('@@CONFIG_GA_ID');
     AnalyticsProvider.startOffline(true);
+
+    $locationProvider.html5Mode(true);
 
     $urlRouterProvider.otherwise('/auth');
 
