@@ -20,6 +20,7 @@ type EndpointHandler struct {
 	authorizeEndpointManagement bool
 	EndpointService             portainer.EndpointService
 	FileService                 portainer.FileService
+	ProxyService                *ProxyService
 }
 
 const (
@@ -281,6 +282,12 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		}
 	}
 
+	_, err = handler.ProxyService.CreateAndRegisterProxy(endpoint)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
 	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
@@ -319,6 +326,8 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+
+	handler.ProxyService.DeleteProxy(string(endpointID))
 
 	err = handler.EndpointService.DeleteEndpoint(portainer.EndpointID(endpointID))
 	if err != nil {

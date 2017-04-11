@@ -1,8 +1,6 @@
 package portainer
 
-import (
-	"io"
-)
+import "io"
 
 type (
 	// Pair defines a key/value string pair
@@ -187,7 +185,7 @@ type (
 
 const (
 	// APIVersion is the version number of Portainer API.
-	APIVersion = "1.12.2"
+	APIVersion = "1.12.4"
 	// DBVersion is the version number of Portainer database.
 	DBVersion = 1
 )
