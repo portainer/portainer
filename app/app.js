@@ -73,6 +73,8 @@ angular.module('portainer', [
 
     $urlRouterProvider.otherwise('/auth');
 
+    toastr.options.timeOut = 3000;
+
     $uibTooltipProvider.setTriggers({
       'mouseenter': 'mouseleave',
       'click': 'click',
@@ -540,25 +542,8 @@ angular.module('portainer', [
         }
       }
     });
-
-    // The Docker API likes to return plaintext errors, this catches them and disp
-    $httpProvider.interceptors.push(function() {
-      return {
-        'response': function(response) {
-          if (typeof(response.data) === 'string' &&
-          (_.startsWith(response.data, 'Conflict.') || _.startsWith(response.data, 'conflict:'))) {
-            $.gritter.add({
-              title: 'Error',
-              text: $('<div>').text(response.data).html(),
-              time: 10000
-            });
-          }
-          return response;
-        }
-      };
-    });
   }])
-  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Messages', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Messages, Analytics) {
+  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics) {
     EndpointProvider.initialize();
     StateManager.initialize().then(function success(state) {
       if (state.application.authentication) {
@@ -579,7 +564,7 @@ angular.module('portainer', [
         });
       }
     }, function error(err) {
-      Messages.error("Failure", err, 'Unable to retrieve application settings');
+      Notifications.error("Failure", err, 'Unable to retrieve application settings');
     });
 
     $rootScope.$state = $state;

@@ -1,6 +1,6 @@
 angular.module('endpoint', [])
-.controller('EndpointController', ['$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'Messages',
-function ($scope, $state, $stateParams, $filter, EndpointService, Messages) {
+.controller('EndpointController', ['$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'Notifications',
+function ($scope, $state, $stateParams, $filter, EndpointService, Notifications) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('endpoints');
@@ -31,7 +31,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Messages) {
 
     EndpointService.updateEndpoint(ID, endpointParams)
     .then(function success(data) {
-      Messages.send("Endpoint updated", $scope.endpoint.Name);
+      Notifications.success("Endpoint updated", $scope.endpoint.Name);
       $state.go('endpoints');
     }, function error(err) {
       $scope.state.error = err.msg;
@@ -58,7 +58,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Messages) {
       $scope.formValues.TLSKey = data.TLSKey;
     }, function error(err) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", err, "Unable to retrieve endpoint details");
+      Notifications.error("Failure", err, "Unable to retrieve endpoint details");
     });
   }
 

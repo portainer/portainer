@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$scope', '$state', 'Service', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Messages',
-function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication, ResourceControlService, Messages) {
+.controller('CreateServiceController', ['$scope', '$state', 'Service', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications',
+function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication, ResourceControlService, Notifications) {
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
@@ -219,21 +219,21 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
         ResourceControlService.setServiceResourceControl(Authentication.getUserDetails().ID, d.ID)
         .then(function success() {
           $('#createServiceSpinner').hide();
-          Messages.send('Service created', d.ID);
+          Notifications.success('Service created', d.ID);
           $state.go('services', {}, {reload: true});
         })
         .catch(function error(err) {
           $('#createContainerSpinner').hide();
-          Messages.error("Failure", err, 'Unable to apply resource control on service');
+          Notifications.error("Failure", err, 'Unable to apply resource control on service');
         });
       } else {
         $('#createServiceSpinner').hide();
-        Messages.send('Service created', d.ID);
+        Notifications.success('Service created', d.ID);
         $state.go('services', {}, {reload: true});
       }
     }, function (e) {
       $('#createServiceSpinner').hide();
-      Messages.error("Failure", e, 'Unable to create service');
+      Notifications.error("Failure", e, 'Unable to create service');
     });
   }
 
@@ -246,7 +246,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
   Volume.query({}, function (d) {
     $scope.availableVolumes = d.Volumes;
   }, function (e) {
-    Messages.error("Failure", e, "Unable to retrieve volumes");
+    Notifications.error("Failure", e, "Unable to retrieve volumes");
   });
 
   Network.query({}, function (d) {
@@ -256,6 +256,6 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
       }
     });
   }, function (e) {
-    Messages.error("Failure", e, "Unable to retrieve networks");
+    Notifications.error("Failure", e, "Unable to retrieve networks");
   });
 }]);

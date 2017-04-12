@@ -1,6 +1,6 @@
 angular.module('user', [])
-.controller('UserController', ['$scope', '$state', '$stateParams', 'UserService', 'ModalService', 'Messages',
-function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
+.controller('UserController', ['$scope', '$state', '$stateParams', 'UserService', 'ModalService', 'Notifications',
+function ($scope, $state, $stateParams, UserService, ModalService, Notifications) {
 
   $scope.state = {
     updatePasswordError: '',
@@ -28,11 +28,11 @@ function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
     UserService.updateUser($scope.user.Id, undefined, role)
     .then(function success(data) {
       var newRole = role === 1 ? 'administrator' : 'user';
-      Messages.send('Permissions successfully updated', $scope.user.Username + ' is now ' + newRole);
+      Notifications.success('Permissions successfully updated', $scope.user.Username + ' is now ' + newRole);
       $state.reload();
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, 'Unable to update user permissions');
+      Notifications.error("Failure", err, 'Unable to update user permissions');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
@@ -43,7 +43,7 @@ function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
     $('#loadingViewSpinner').show();
     UserService.updateUser($scope.user.Id, $scope.formValues.newPassword, undefined)
     .then(function success(data) {
-      Messages.send('Password successfully updated');
+      Notifications.success('Password successfully updated');
       $state.reload();
     })
     .catch(function error(err) {
@@ -58,11 +58,11 @@ function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
     $('#loadingViewSpinner').show();
     UserService.deleteUser($scope.user.Id)
     .then(function success(data) {
-      Messages.send('User successfully deleted', $scope.user.Username);
+      Notifications.success('User successfully deleted', $scope.user.Username);
       $state.go('users');
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, 'Unable to remove user');
+      Notifications.error("Failure", err, 'Unable to remove user');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
@@ -78,7 +78,7 @@ function ($scope, $state, $stateParams, UserService, ModalService, Messages) {
       $scope.formValues.Administrator = user.RoleId === 1 ? true : false;
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, 'Unable to retrieve user information');
+      Notifications.error("Failure", err, 'Unable to retrieve user information');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
