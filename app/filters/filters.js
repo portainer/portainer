@@ -61,12 +61,12 @@ angular.module('portainer.filters', [])
     } else if (status.indexOf('exited') !== -1) {
       return 'stopped';
     } else if (status.indexOf('(healthy)') !== -1) {
-			return 'healthy';
-		} else if (status.indexOf('(unhealthy)') !== -1) {
-			return 'unhealthy';
+      return 'healthy';
+    } else if (status.indexOf('(unhealthy)') !== -1) {
+      return 'unhealthy';
     } else if (status.indexOf('(health: starting)') !== -1) {
       return 'starting';
-		}
+    }
     return 'running';
   };
 })
