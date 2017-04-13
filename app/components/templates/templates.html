@@ -14,25 +14,21 @@
       </rd-widget-custom-header>
       <rd-widget-body classes="padding">
         <form class="form-horizontal">
-          <div class="form-group" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
+          <!-- description -->
+          <div class="form-group" ng-if="state.selectedTemplate.Description">
             <div class="col-sm-12">
-              <span class="small text-muted">When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref="networks">networks view</a> to create one.</span>
+              <span class="small" style="margin-left: 5px;">{{ state.selectedTemplate.Description }}</span>
             </div>
           </div>
-          <div class="form-group" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-            <div class="col-sm-12">
-              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-              <span class="small text-muted">App templates cannot be used with swarm-mode at the moment. You can still use them to quickly deploy containers to the Docker host.</span>
-            </div>
-          </div>
+          <!-- !description -->
           <!-- name-and-network-inputs -->
           <div class="form-group">
             <label for="container_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-5">
               <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)">
             </div>
-            <label for="container_network" class="col-sm-1 control-label text-right">Network</label>
-            <div class="col-sm-5">
+            <label for="container_network" class="col-sm-2 col-lg-1 control-label text-right">Network</label>
+            <div class="col-sm-4 col-lg-5">
               <select class="form-control" ng-options="net.Name for net in availableNetworks" ng-model="formValues.network">
                 <option disabled hidden value="">Select a network</option>
               </select>
@@ -61,8 +57,8 @@
                 <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing public, everybody will be able to access it."></portainer-tooltip>
               </label>
               <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                <label class="btn btn-default" ng-model="formValues.Ownership" uib-btn-radio="'private'">Private</label>
-                <label class="btn btn-default" ng-model="formValues.Ownership" uib-btn-radio="'public'">Public</label>
+                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'private'">Private</label>
+                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'public'">Public</label>
               </div>
             </div>
           </div>
@@ -113,8 +109,8 @@
                     <!-- protocol-actions -->
                     <div class="input-group col-sm-3 input-group-sm">
                       <div class="btn-group btn-group-sm">
-                        <label class="btn btn-default" ng-model="portBinding.protocol" uib-btn-radio="'tcp'" ng-click="volume.name = ''">TCP</label>
-                        <label class="btn btn-default" ng-model="portBinding.protocol" uib-btn-radio="'udp'" ng-click="volume.name = ''">UDP</label>
+                        <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'tcp'">TCP</label>
+                        <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
                       </div>
                       <button class="btn btn-sm btn-danger" type="button" ng-click="removePortBinding($index)">
                         <i class="fa fa-trash" aria-hidden="true"></i>
@@ -183,8 +179,8 @@
                     <!-- read-only -->
                     <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
                       <div class="btn-group btn-group-sm">
-                        <label class="btn btn-default" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
-                        <label class="btn btn-default" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
+                        <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
+                        <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
                       </div>
                     </div>
                     <!-- !read-only -->
@@ -198,8 +194,15 @@
           <!-- !advanced-options -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-default btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
               <i id="createContainerSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <span class="small text-muted" style="margin-left: 10px" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
+                When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref="networks">networks view</a> to create one.
+              </span>
+              <span ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'" style="margin-left: 10px">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span class="small text-muted" style="margin-left: 5px;">App templates cannot be deployed as Swarm Mode services for the moment. You can still use them to quickly deploy containers on the Docker host.</span>
+              </span>
             </div>
           </div>
         </form>
@@ -228,7 +231,7 @@
           <div dir-paginate="tpl in templates | itemsPerPage: state.pagination_count" class="container-template hvr-underline-from-center" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index)">
             <img class="logo" ng-src="{{ tpl.Logo }}" />
             <div class="title">{{ tpl.Title }}</div>
-            <div class="description">{{ tpl.Description }}</div>
+            <div class="description" ng-if="tpl.Description && !state.hideDescriptions">{{ tpl.Description }}</div>
           </div>
           <div ng-if="!templates" class="text-center text-muted">
             Loading...

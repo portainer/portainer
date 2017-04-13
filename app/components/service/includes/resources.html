@@ -1,0 +1,36 @@
+<div>
+  <rd-widget>
+    <rd-widget-header icon="fa-list-alt" title="Resource limits and reservations">
+    </rd-widget-header>
+    <rd-widget-body classes="no-padding">
+      <table class="table">
+        <tbody>
+          <tr>
+            <td>CPU limits</td>
+            <td ng-if="service.LimitNanoCPUs">
+              {{ service.LimitNanoCPUs / 1000000000 }}
+            </td>
+            <td ng-if="!service.LimitNanoCPUs">None</td>
+          </tr>
+          <tr>
+            <td>Memory limits</td>
+            <td ng-if="service.LimitMemoryBytes">{{service.LimitMemoryBytes|humansize}}</td>
+            <td ng-if="!service.LimitMemoryBytes">None</td>
+          </tr>
+          <tr>
+            <td>CPU reservation</td>
+            <td ng-if="service.ReservationNanoCPUs">
+              {{service.ReservationNanoCPUs / 1000000000}}
+            </td>
+            <td ng-if="!service.ReservationNanoCPUs">None</td>
+          </tr>
+          <tr>
+            <td>Memory reservation</td>
+            <td ng-if="service.ReservationMemoryBytes">{{service.ReservationMemoryBytes|humansize}}</td>
+            <td ng-if="!service.ReservationMemoryBytes">None</td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+  </rd-widget>
+</div>

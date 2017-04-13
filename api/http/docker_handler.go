@@ -7,7 +7,6 @@ import (
 
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 
 	"github.com/gorilla/mux"
@@ -18,8 +17,7 @@ type DockerHandler struct {
 	*mux.Router
 	Logger          *log.Logger
 	EndpointService portainer.EndpointService
-	ProxyFactory    ProxyFactory
-	proxies         map[portainer.EndpointID]http.Handler
+	ProxyService    *ProxyService
 }
 
 // NewDockerHandler returns a new instance of DockerHandler.
@@ -27,10 +25,6 @@ func NewDockerHandler(mw *middleWareService, resourceControlService portainer.Re
 	h := &DockerHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
-		ProxyFactory: ProxyFactory{
-			ResourceControlService: resourceControlService,
-		},
-		proxies: make(map[portainer.EndpointID]http.Handler),
 	}
 	h.PathPrefix("/{id}/").Handler(
 		mw.authenticated(http.HandlerFunc(h.proxyRequestsToDockerAPI)))
@@ -72,39 +66,15 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 		return
 	}
 
-	proxy := handler.proxies[endpointID]
+	var proxy http.Handler
+	proxy = handler.ProxyService.GetProxy(string(endpointID))
 	if proxy == nil {
-		proxy, err = handler.createAndRegisterEndpointProxy(endpoint)
+		proxy, err = handler.ProxyService.CreateAndRegisterProxy(endpoint)
 		if err != nil {
 			Error(w, err, http.StatusBadRequest, handler.Logger)
 			return
 		}
 	}
+
 	http.StripPrefix("/"+id, proxy).ServeHTTP(w, r)
-}
-
-func (handler *DockerHandler) createAndRegisterEndpointProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	var proxy http.Handler
-
-	endpointURL, err := url.Parse(endpoint.URL)
-	if err != nil {
-		return nil, err
-	}
-
-	if endpointURL.Scheme == "tcp" {
-		if endpoint.TLS {
-			proxy, err = handler.ProxyFactory.newHTTPSProxy(endpointURL, endpoint)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			proxy = handler.ProxyFactory.newHTTPProxy(endpointURL)
-		}
-	} else {
-		// Assume unix:// scheme
-		proxy = handler.ProxyFactory.newSocketProxy(endpointURL.Path)
-	}
-
-	handler.proxies[endpoint.ID] = proxy
-	return proxy, nil
 }

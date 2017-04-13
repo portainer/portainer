@@ -1,6 +1,6 @@
 angular.module('sidebar', [])
-.controller('SidebarController', ['$scope', '$state', 'Settings', 'Config', 'EndpointService', 'StateManager', 'EndpointProvider', 'Messages', 'Authentication',
-function ($scope, $state, Settings, Config, EndpointService, StateManager, EndpointProvider, Messages, Authentication) {
+.controller('SidebarController', ['$scope', '$state', 'Settings', 'Config', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication',
+function ($scope, $state, Settings, Config, EndpointService, StateManager, EndpointProvider, Notifications, Authentication) {
 
   Config.$promise.then(function (c) {
     $scope.logo = c.logo;
@@ -17,7 +17,7 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
       $state.go('dashboard');
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, "Unable to connect to the Docker endpoint");
+      Notifications.error("Failure", err, "Unable to connect to the Docker endpoint");
       EndpointProvider.setEndpointID(activeEndpointID);
       StateManager.updateEndpointState(true)
       .then(function success() {});

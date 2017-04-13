@@ -93,5 +93,22 @@ angular.module('portainer.helpers')
     return count;
   };
 
+  helper.filterLinuxServerIOTemplates = function(templates) {
+    return templates.filter(function f(template) {
+      var valid = false;
+      if (template.Category) {
+        angular.forEach(template.Category, function(category) {
+          if (_.startsWith(category, 'Network')) {
+            valid = true;
+          }
+        });
+      }
+      return valid;
+    }).map(function(template, idx) {
+      template.index = idx;
+      return template;
+    });
+  };
+
   return helper;
 }]);
