@@ -26,6 +26,9 @@ type (
 		TLSCacert         *string
 		TLSCert           *string
 		TLSKey            *string
+		SSL               *bool
+		SSLCert           *string
+		SSLKey            *string
 	}
 
 	// Settings represents Portainer settings.
