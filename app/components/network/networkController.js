@@ -1,21 +1,21 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Network', 'Container', 'ContainerHelper', 'Messages',
-function ($scope, $state, $stateParams, $filter, Config, Network, Container, ContainerHelper, Messages) {
+.controller('NetworkController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Network', 'Container', 'ContainerHelper', 'Notifications',
+function ($scope, $state, $stateParams, $filter, Config, Network, Container, ContainerHelper, Notifications) {
 
   $scope.removeNetwork = function removeNetwork(networkId) {
     $('#loadingViewSpinner').show();
     Network.remove({id: $stateParams.id}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Messages.send("Error", {}, d.message);
+        Notifications.error("Error", d, "Unable to remove network");
       } else {
         $('#loadingViewSpinner').hide();
-        Messages.send("Network removed", $stateParams.id);
+        Notifications.success("Network removed", $stateParams.id);
         $state.go('networks', {});
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to remove network");
+      Notifications.error("Failure", e, "Unable to remove network");
     });
   };
 
@@ -24,15 +24,15 @@ function ($scope, $state, $stateParams, $filter, Config, Network, Container, Con
     Network.disconnect({id: $stateParams.id}, { Container: containerId, Force: false }, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Messages.send("Error", {}, d.message);
+        Notifications.error("Error", d, "Unable to disconnect container from network");
       } else {
         $('#loadingViewSpinner').hide();
-        Messages.send("Container left network", $stateParams.id);
+        Notifications.success("Container left network", $stateParams.id);
         $state.go('network', {id: network.Id}, {reload: true});
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to disconnect container from network");
+      Notifications.error("Failure", e, "Unable to disconnect container from network");
     });
   };
 
@@ -43,7 +43,7 @@ function ($scope, $state, $stateParams, $filter, Config, Network, Container, Con
       getContainersInNetwork(data);
     }, function error(err) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", err, "Unable to retrieve network info");
+      Notifications.error("Failure", err, "Unable to retrieve network info");
     });
   }
 
@@ -77,7 +77,7 @@ function ($scope, $state, $stateParams, $filter, Config, Network, Container, Con
           $('#loadingViewSpinner').hide();
         }, function error(err) {
           $('#loadingViewSpinner').hide();
-          Messages.error("Failure", err, "Unable to retrieve containers in network");
+          Notifications.error("Failure", err, "Unable to retrieve containers in network");
         });
       } else {
         Container.query({
@@ -87,7 +87,7 @@ function ($scope, $state, $stateParams, $filter, Config, Network, Container, Con
           $('#loadingViewSpinner').hide();
         }, function error(err) {
           $('#loadingViewSpinner').hide();
-          Messages.error("Failure", err, "Unable to retrieve containers in network");
+          Notifications.error("Failure", err, "Unable to retrieve containers in network");
         });
       }
     }

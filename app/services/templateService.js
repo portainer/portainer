@@ -3,9 +3,9 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.getTemplates = function() {
+  service.getTemplates = function(key) {
     var deferred = $q.defer();
-    Template.get().$promise
+    Template.get({key: key}).$promise
     .then(function success(data) {
       var templates = data.map(function (tpl, idx) {
         var template = new TemplateViewModel(tpl);
@@ -20,18 +20,15 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.createTemplateConfiguration = function(template, containerName, network, containerMapping) {
-    var imageConfiguration = service.createImageConfiguration(template);
-    var containerConfiguration = service.createContainerConfiguration(template, containerName, network, containerMapping);
-    containerConfiguration.Image = imageConfiguration.fromImage + ':' + imageConfiguration.tag;
-    return {
-      container: containerConfiguration,
-      image: imageConfiguration
-    };
+  service.filterLinuxServerIOTemplates = function(templates) {
+    return TemplateHelper.filterLinuxServerIOTemplates(templates);
   };
 
-  service.createImageConfiguration = function(template) {
-    return ImageHelper.createImageConfigForContainer(template.Image, template.Registry);
+  service.createTemplateConfiguration = function(template, containerName, network, containerMapping) {
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(template.Image, template.Registry);
+    var containerConfiguration = service.createContainerConfiguration(template, containerName, network, containerMapping);
+    containerConfiguration.Image = imageConfiguration.fromImage + ':' + imageConfiguration.tag;
+    return containerConfiguration;
   };
 
   service.createContainerConfiguration = function(template, containerName, network, containerMapping) {
