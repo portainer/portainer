@@ -53,11 +53,11 @@
     <li class="sidebar-list" ng-if="applicationState.application.authentication">
       <a ui-sref="settings" ui-sref-active="active">Password <span class="menu-icon fa fa-lock"></span></a>
     </li>
-    <li class="sidebar-list" ng-if="applicationState.application.authentication && userRole === 1">
-      <a ui-sref="users" ui-sref-active="active">Users <span class="menu-icon fa fa-user"></span></a>
-    </li>
-    <li class="sidebar-list" ng-if="applicationState.application.authentication && userRole === 1">
-      <a ui-sref="usergroups" ui-sref-active="active">User groups <span class="menu-icon fa fa-users"></span></a>
+    <li class="sidebar-list">
+      <a ui-sref="users" ui-sref-active="active">User management <span class="menu-icon fa fa-users"></span></a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'users' || $state.current.name === 'usergroups')">
+        <a ui-sref="usergroups" ui-sref-active="active">Teams</span></a>
+      </div>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || userRole === 1">
       <a ui-sref="endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug"></span></a>

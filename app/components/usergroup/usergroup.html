@@ -1,0 +1,146 @@
+<rd-header>
+  <rd-header-title title="User group details">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="usergroups">User groups</a> > <a ui-sref="usergroup({id: usergroup.Id})">{{ usergroup.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-users" title="User group details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>
+                {{ usergroup.Name }}
+                <button class="btn btn-xs btn-danger" ng-click="deleteUserGroup()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this group</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Users in group</td>
+              <td>%COUNT%</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="usergroup">
+  <div class="col-sm-6">
+    <rd-widget>
+      <rd-widget-header classes="col-sm-12 col-md-6 nopadding" icon="fa-users" title="Users">
+        <div class="pull-md-right pull-lg-right">
+          Items per page:
+          <select ng-model="state.pagination_count_users" ng-change="changePaginationCountUsers()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-sm-12 nopadding">
+        <div class="col-sm-12 col-md-6 nopadding">
+          <button class="btn btn-primary btn-sm" ng-click="addAllUsers()" ng-disabled="users.length ===  0 || filteredUsers.length === 0"><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Add all users</button>
+        </div>
+        <div class="col-sm-12 col-md-6 nopadding">
+          <input type="text" id="filter" ng-model="state.filterUsers" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderUsers('Username')">
+                    Name
+                    <span ng-show="sortTypeUsers == 'Username' && !sortReverseUsers" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeUsers == 'Username' && sortReverseUsers" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-click="addUser(user)" class="interactive" dir-paginate="user in (state.filteredUsers = (users | filter:state.filterUsers | orderBy:sortTypeUsers:sortReverseUsers | itemsPerPage: state.pagination_count_users))">
+                <td>{{ user.Username }}</td>
+              </tr>
+              <tr ng-if="!users">
+                <td colspan="2" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="users.length === 0 || state.filteredUsers.length === 0">
+                <td colspan="2" class="text-center text-muted">No users.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="users" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-sm-6">
+    <rd-widget>
+      <rd-widget-header classes="col-sm-12 col-md-6 nopadding" icon="fa-users" title="Group members">
+        <div class="pull-md-right pull-lg-right">
+          Items per page:
+          <select ng-model="state.pagination_count_groupMembers" ng-change="changePaginationCountGroupMembers()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-sm-12 nopadding">
+        <div class="col-sm-12 col-md-6 nopadding">
+          <button class="btn btn-primary btn-sm" ng-click="removeAllUsers()" ng-disabled="groupMembers.length ===  0 || filteredGroupMembers.length === 0"><i class="fa fa-user-times space-right" aria-hidden="true"></i>Remove all users</button>
+        </div>
+        <div class="col-sm-12 col-md-6 nopadding">
+          <input type="text" id="filter" ng-model="state.filterGroupMembers" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderGroupMembers('Username')">
+                    Name
+                    <span ng-show="sortTypeGroupMembers == 'Username' && !sortReverseGroupMembers" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeGroupMembers == 'Username' && sortReverseGroupMembers" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-click="removeUser(user)" class="interactive" dir-paginate="user in (state.filteredGroupMembers = (groupMembers | filter:state.filterGroupMembers | orderBy:sortTypeGroupMembers:sortReverseGroupMembers | itemsPerPage: state.pagination_count_groupMembers))">
+                <td>{{ user.Username }}</td>
+              </tr>
+              <tr ng-if="!groupMembers">
+                <td colspan="2" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="groupMembers.length === 0 || state.filteredGroupMembers.length === 0">
+                <td colspan="2" class="text-center text-muted">No group members.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="groupMembers" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

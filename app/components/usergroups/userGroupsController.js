@@ -1,11 +1,11 @@
 angular.module('usergroups', [])
-.controller('UserGroupsController', ['$scope', '$state', 'UserService', 'ModalService', 'Messages', 'Pagination',
-function ($scope, $state, UserService, ModalService, Messages, Pagination) {
+.controller('UserGroupsController', ['$scope', '$state', 'UserGroupService', 'ModalService', 'Messages', 'Pagination',
+function ($scope, $state, UserGroupService, ModalService, Messages, Pagination) {
   $scope.state = {
     userGroupGroupCreationError: '',
     selectedItemCount: 0,
     validName: false,
-    pagination_count: Pagination.getPaginationCount('userGroupgroups')
+    pagination_count: Pagination.getPaginationCount('usergroups')
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
@@ -43,13 +43,13 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
   $scope.checkNameValidity = function() {
     var valid = true;
     for (var i = 0; i < $scope.userGroups.length; i++) {
-      if ($scope.formValues.Username === $scope.userGroups[i].Username) {
+      if ($scope.formValues.Name === $scope.userGroups[i].Name) {
         valid = false;
         break;
       }
     }
-    $scope.state.validUsername = valid;
-    $scope.state.userGroupGroupCreationError = valid ? '' : 'Group name already existing';
+    $scope.state.validName = valid;
+    $scope.state.userGroupCreationError = valid ? '' : 'Group name already existing';
   };
 
   $scope.addUserGroup = function() {
@@ -69,7 +69,7 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
     angular.forEach($scope.userGroups, function (userGroup) {
       if (userGroup.Checked) {
         counter = counter + 1;
-        UserService.deleteUser(userGroup.Id)
+        UserGroupService.deleteUserGroup(userGroup.Id)
         .then(function success(data) {
           var index = $scope.userGroups.indexOf(userGroup);
           $scope.userGroups.splice(index, 1);
@@ -96,7 +96,17 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
   };
 
   function initView() {
-    $('#loadUserGroupsSpinner').show();
+    $('#loadingViewSpinner').show();
+    UserGroupService.userGroups()
+    .then(function success(data) {
+      $scope.userGroups = data;
+    })
+    .catch(function error(err) {
+      Messages.error("Failure", err, 'Unable to retrieve user groups');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
   }
 
   initView();

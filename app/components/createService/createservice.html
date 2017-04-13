@@ -112,12 +112,16 @@
             <div class="col-sm-12">
               <label for="ownership" class="control-label text-left">
                 Ownership
-                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing public, everybody will be able to access it."></portainer-tooltip>
+                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing group, you can select which user group will be able to access it. When choosing public, everybody will be able to access it."></portainer-tooltip>
               </label>
               <div class="btn-group btn-group-sm" style="margin-left: 20px;">
                 <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'private'">
                   <i class="fa fa-eye-slash" aria-hidden="true"></i>
                   Private
+                </label>
+                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'group'">
+                  <i class="fa fa-users" aria-hidden="true"></i>
+                  Group
                 </label>
                 <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'public'">
                   <i class="fa fa-eye" aria-hidden="true"></i>
@@ -127,6 +131,38 @@
             </div>
           </div>
           <!-- !ownership -->
+          <!-- authorized-groups -->
+          <div class="form-group" ng-if="formValues.Ownership === 'group' && UserGroups.length > 1" >
+            <div class="col-sm-12">
+              <label for="group-access" class="control-label text-left">
+                Authorized groups
+                <portainer-tooltip position="bottom" message="As you are a member of multiple groups, you can select which group(s) will be able to manage this object."></portainer-tooltip>
+              </label>
+              <span isteven-multi-select
+               input-model="UserGroups"
+               output-model="formValues.Ownership_groups"
+               button-label="Name"
+               item-label="Name"
+               tick-property="ticked"
+               helper-elements="filter"
+               search-property="Name"
+               default-label="Select one or more groups"
+               orientation="horizontal"
+               style="margin-left: 20px;"
+             </span>
+            </div>
+            <!-- <div class="col-sm-9 col-lg-10"> -->
+              <!--
+              <ui-select multiple ng-model="formValues.UserGroups" close-on-select="false" title="Choose a group">
+                <ui-select-match placeholder="Select one or more groups...">{{$item.Name}}</ui-select-match>
+                <ui-select-choices repeat="group in UserGroups | filter:$select.search">
+                  {{group.Name}}
+                </ui-select-choices>
+              </ui-select>
+               -->
+            <!-- </div> -->
+          </div>
+          <!-- !authorized-groups -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions

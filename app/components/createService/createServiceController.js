@@ -6,6 +6,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
+    Ownership_groups: [],
     Name: '',
     Image: '',
     Registry: '',
@@ -26,6 +27,8 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
     UpdateDelay: 0,
     FailureAction: 'pause'
   };
+
+  $scope.UserGroups = [{Id: 1, Name: 'groupA'}];
 
   $scope.addPortBinding = function() {
     $scope.formValues.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp' });

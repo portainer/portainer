@@ -399,6 +399,37 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
 }
 
+/*bootbox override*/
 .modal-open {
   padding-right: 0px !important;
 }
+/*!bootbox override*/
+
+/*angular-multi-select override*/
+.multiSelect > button {
+  min-height: 30px !important;
+  /*color: unset;*/
+  background-color: unset;
+  background-image: unset;
+}
+
+.multiSelect .multiSelectItem:not(.multiSelectGroup).selected
+{
+  background-image: linear-gradient( #337ab7, #337ab7 );
+  color: #fff;
+  border: none;
+}
+
+.multiSelect .multiSelectItem:hover,
+.multiSelect .multiSelectGroup:hover {
+  background-image: linear-gradient( #337ab7 , #337ab7 ) !important;
+  color: #fff !important;
+  /*border: 1px solid #ccc !important;*/
+}
+
+.multiSelect .tickMark {
+  top: 2px;
+  right: 12px;
+  font-size: 20px;
+}
+/*!angular-multi-select override*/

@@ -140,6 +140,7 @@ module.exports = function (grunt) {
         'bower_components/moment/min/moment.min.js',
         'bower_components/xterm.js/dist/xterm.js',
         'bower_components/bootbox.js/bootbox.js',
+        'bower_components/angular-multi-select/isteven-multi-select.js',
         'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
         'assets/js/legend.js' // Not a bower package
       ],
@@ -152,7 +153,8 @@ module.exports = function (grunt) {
         'bower_components/font-awesome/css/font-awesome.min.css',
         'bower_components/rdash-ui/dist/css/rdash.min.css',
         'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/xterm.js/dist/xterm.css'
+        'bower_components/xterm.js/dist/xterm.css',
+        'bower_components/angular-multi-select/isteven-multi-select.css'
       ]
     },
     clean: {
@@ -408,7 +410,7 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics --templates http://192.168.1.47:8080/templates.json'
+          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
         ].join(';')
       },
       runSwarm: {

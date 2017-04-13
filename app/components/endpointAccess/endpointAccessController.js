@@ -1,133 +1,146 @@
 angular.module('endpointAccess', [])
-.controller('EndpointAccessController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'UserService', 'Pagination', 'Messages',
-function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserService, Pagination, Messages) {
+.controller('EndpointAccessController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'UserService', 'UserGroupService', 'Pagination', 'Messages',
+function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserService, UserGroupService, Pagination, Messages) {
 
   $scope.state = {
-    pagination_count_users: Pagination.getPaginationCount('endpoint_access_users'),
-    pagination_count_authorizedUsers: Pagination.getPaginationCount('endpoint_access_authorizedUsers')
+    pagination_count_accesses: Pagination.getPaginationCount('endpoint_access_accesses'),
+    pagination_count_authorizedAccesses: Pagination.getPaginationCount('endpoint_access_authorizedAccesses')
   };
 
-  $scope.sortTypeUsers = 'Username';
-  $scope.sortReverseUsers = true;
+  $scope.sortTypeAccesses = 'Name';
+  $scope.sortReverseAccesses = true;
 
-  $scope.orderUsers = function(sortType) {
-    $scope.sortReverseUsers = ($scope.sortTypeUsers === sortType) ? !$scope.sortReverseUsers : false;
-    $scope.sortTypeUsers = sortType;
+  $scope.orderAccesses = function(sortType) {
+    $scope.sortReverseAccesses = ($scope.sortTypeAccesses === sortType) ? !$scope.sortReverseAccesses : false;
+    $scope.sortTypeAccesses = sortType;
   };
 
-  $scope.changePaginationCountUsers = function() {
-    Pagination.setPaginationCount('endpoint_access_users', $scope.state.pagination_count_users);
+  $scope.changePaginationCountAccesses = function() {
+    Pagination.setPaginationCount('endpoint_access_accesses', $scope.state.pagination_count_accesses);
   };
 
-  $scope.sortTypeAuthorizedUsers = 'Username';
-  $scope.sortReverseAuthorizedUsers = true;
+  $scope.sortTypeAuthorizedAccesses = 'Name';
+  $scope.sortReverseAuthorizedAccesses = true;
 
-  $scope.orderAuthorizedUsers = function(sortType) {
-    $scope.sortReverseAuthorizedUsers = ($scope.sortTypeAuthorizedUsers === sortType) ? !$scope.sortReverseAuthorizedUsers : false;
-    $scope.sortTypeAuthorizedUsers = sortType;
+  $scope.orderAuthorizedAccesses = function(sortType) {
+    $scope.sortReverseAuthorizedAccesses = ($scope.sortTypeAuthorizedAccesses === sortType) ? !$scope.sortReverseAuthorizedAccesses : false;
+    $scope.sortTypeAuthorizedAccesses = sortType;
   };
 
-  $scope.changePaginationCountAuthorizedUsers = function() {
-    Pagination.setPaginationCount('endpoint_access_authorizedUsers', $scope.state.pagination_count_authorizedUsers);
+  $scope.changePaginationCountAuthorizedAccesses = function() {
+    Pagination.setPaginationCount('endpoint_access_authorizedAccesses', $scope.state.pagination_count_authorizedAccesses);
   };
 
-  $scope.authorizeAllUsers = function() {
-    var authorizedUserIDs = [];
-    angular.forEach($scope.authorizedUsers, function (user) {
-      authorizedUserIDs.push(user.Id);
+  $scope.authorizeAllAccesses = function() {
+    var authorizedAccessIDs = [];
+    angular.forEach($scope.authorizedAccesses, function (access) {
+      authorizedAccessIDs.push(access.Id);
     });
-    angular.forEach($scope.users, function (user) {
-      authorizedUserIDs.push(user.Id);
+    angular.forEach($scope.accesses, function (access) {
+      authorizedAccessIDs.push(access.Id);
     });
-    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedUserIDs)
+    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedAccessIDs)
     .then(function success(data) {
-      $scope.authorizedUsers = $scope.authorizedUsers.concat($scope.users);
-      $scope.users = [];
-      Messages.send('Access granted for all users');
+      $scope.authorizedAccesses = $scope.authorizedAccesses.concat($scope.accesses);
+      $scope.accesses = [];
+      Messages.send('Accesses granted successfully');
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to update endpoint permissions");
     });
   };
 
-  $scope.unauthorizeAllUsers = function() {
+  $scope.unauthorizeAllAccesses = function() {
     EndpointService.updateAuthorizedUsers($stateParams.id, [])
     .then(function success(data) {
-      $scope.users = $scope.users.concat($scope.authorizedUsers);
-      $scope.authorizedUsers = [];
-      Messages.send('Access removed for all users');
+      $scope.accesses = $scope.accesses.concat($scope.authorizedAccesses);
+      $scope.authorizedAccesses = [];
+      Messages.send('All accesses removed successfully');
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to update endpoint permissions");
     });
   };
 
-  $scope.authorizeUser = function(user) {
-    var authorizedUserIDs = [];
-    angular.forEach($scope.authorizedUsers, function (u) {
-      authorizedUserIDs.push(u.Id);
+  $scope.authorizeAccess = function(access) {
+    var authorizedAccessIDs = [];
+    angular.forEach($scope.authorizedAccesses, function (a) {
+      authorizedAccessIDs.push(a.Id);
     });
-    authorizedUserIDs.push(user.Id);
-    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedUserIDs)
+    authorizedAccessIDs.push(access.Id);
+    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedAccessIDs)
     .then(function success(data) {
-      removeUserFromArray(user.Id, $scope.users);
-      $scope.authorizedUsers.push(user);
-      Messages.send('Access granted for user', user.Username);
+      removeAccessFromArray(access.Id, $scope.accesses);
+      $scope.authorizedAccesses.push(access);
+      Messages.send('Access granted', access.Name);
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to update endpoint permissions");
     });
   };
 
-  $scope.unauthorizeUser = function(user) {
-    var authorizedUserIDs = $scope.authorizedUsers.filter(function (u) {
-      if (u.Id !== user.Id) {
-        return u;
+  $scope.unauthorizeAccess = function(access) {
+    var authorizedAccessIDs = $scope.authorizedAccesses.filter(function (a) {
+      if (a.Id !== access.Id) {
+        return a;
       }
-    }).map(function (u) {
-      return u.Id;
+    }).map(function (a) {
+      return a.Id;
     });
-    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedUserIDs)
+    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedAccessIDs)
     .then(function success(data) {
-      removeUserFromArray(user.Id, $scope.authorizedUsers);
-      $scope.users.push(user);
-      Messages.send('Access removed for user', user.Username);
+      removeAccessFromArray(access.Id, $scope.authorizedAccesses);
+      $scope.accesses.push(access);
+      Messages.send('Access removed', access.Name);
     })
     .catch(function error(err) {
       Messages.error("Failure", err, "Unable to update endpoint permissions");
     });
   };
 
-  function getEndpointAndUsers(endpointID) {
+  function initView() {
     $('#loadingViewSpinner').show();
     $q.all({
       endpoint: EndpointService.endpoint($stateParams.id),
       users: UserService.users(),
+      usergroups: UserGroupService.userGroups(),
     })
     .then(function success(data) {
       $scope.endpoint = data.endpoint;
-      $scope.users = data.users.filter(function (user) {
+      $scope.accesses = [];
+      var users = data.users.filter(function (user) {
         if (user.Role !== 1) {
           return user;
         }
       }).map(function (user) {
-        return new UserViewModel(user);
+        return new EndpointAccessUserViewModel(user);
       });
-      $scope.authorizedUsers = [];
+      var usergroups = data.usergroups.map(function (user) {
+        return new EndpointAccessUserGroupViewModel(user);
+      });
+      $scope.accesses = $scope.accesses.concat(users, usergroups);
+
+      // $scope.accesses = data.users.filter(function (user) {
+      //   if (user.Role !== 1) {
+      //     return user;
+      //   }
+      // }).map(function (user) {
+      //   return new UserViewModel(user);
+      // });
+      $scope.authorizedAccesses = [];
       angular.forEach($scope.endpoint.AuthorizedUsers, function(userID) {
-        for (var i = 0, l = $scope.users.length; i < l; i++) {
-          if ($scope.users[i].Id === userID) {
-            $scope.authorizedUsers.push($scope.users[i]);
-            $scope.users.splice(i, 1);
+        for (var i = 0, l = $scope.accesses.length; i < l; i++) {
+          if ($scope.accesses[i].Id === userID) {
+            $scope.authorizedAccesses.push($scope.accesses[i]);
+            $scope.accesses.splice(i, 1);
             return;
           }
         }
       });
     })
     .catch(function error(err) {
-      $scope.templates = [];
-      $scope.users = [];
-      $scope.authorizedUsers = [];
+      $scope.accesses = [];
+      $scope.authorizedAccesses = [];
       Messages.error("Failure", err, "Unable to retrieve endpoint details");
     })
     .finally(function final(){
@@ -135,7 +148,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     });
   }
 
-  function removeUserFromArray(id, users) {
+  function removeAccessFromArray(id, users) {
     for (var i = 0, l = users.length; i < l; i++) {
       if (users[i].Id === id) {
         users.splice(i, 1);
@@ -144,5 +157,5 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     }
   }
 
-  getEndpointAndUsers($stateParams.id);
+  initView();
 }]);

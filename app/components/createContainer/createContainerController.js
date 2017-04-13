@@ -6,14 +6,17 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
+    Ownership_groups: [],
     alwaysPull: true,
     Console: 'none',
     Volumes: [],
     Registry: '',
     NetworkContainer: '',
     Labels: [],
-    ExtraHosts: []
+    ExtraHosts: [],
   };
+
+  $scope.UserGroups = [{Id: 1, Name: 'groupA'}, {Id: 2, Name: 'groupB'}, {Id: 3, Name: 'groupC'}, {Id: 4, Name: 'groupD'}];
 
   $scope.imageConfig = {};
 

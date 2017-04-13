@@ -1,9 +1,9 @@
 <rd-header>
   <rd-header-title title="User groups">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="users" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="usergroups" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
-    <i id="loadUserGroupsSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>User groups management</rd-header-content>
 </rd-header>
@@ -17,10 +17,10 @@
         <form class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
-            <label for="username" class="col-sm-2 control-label text-left">Name</label>
+            <label for="usergroupname" class="col-sm-2 control-label text-left">Name</label>
             <div class="col-sm-8">
               <div class="input-group">
-                <input type="text" class="form-control" id="username" ng-model="formValues.Name" ng-change="checkNameValidity()" placeholder="e.g. development">
+                <input type="text" class="form-control" id="usergroupname" ng-model="formValues.Name" ng-change="checkNameValidity()" placeholder="e.g. development">
                 <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[state.validName]" aria-hidden="true"></i></span>
               </div>
             </div>
@@ -34,7 +34,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!state.validName || formValues.Name === ''" ng-click="addUserGroup()"><i class="fa fa-plus" aria-hidden="true"></i> Add user group</button>
-              <i id="createUserSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <i id="createUserGroupSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               <span class="text-danger" ng-if="state.userGroupCreationError" style="margin: 5px;">
                 <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.userGroupCreationError }}
               </span>
@@ -88,26 +88,22 @@
               </tr>
             </thead>
             <tbody>
-              <!-- <tr dir-paginate="user in (state.filteredUsers = (users | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(user)" /></td>
-                <td>{{ user.Username }}</td>
+              <tr dir-paginate="usergroup in (state.filteredUserGroups = (userGroups | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+                <td><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(usergroup)" /></td>
+                <td>{{ usergroup.Name }}</td>
                 <td>
-                  {{ user.RoleName }}
-                  <i class="fa" ng-class="user.RoleId === 1 ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
+                  <a ui-sref="usergroup({id: usergroup.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
                 </td>
-                <td>
-                  <a ui-sref="user({id: user.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
-                </td>
-              </tr> -->
-            <tr ng-if="!groups">
-              <td colspan="3" class="text-center text-muted">Loading...</td>
-            </tr>
-            <tr ng-if="groups.length == 0">
-              <td colspan="3" class="text-center text-muted">No user groups available.</td>
-            </tr>
+              </tr>
+              <tr ng-if="!userGroups">
+                <td colspan="3" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="userGroups.length == 0">
+                <td colspan="3" class="text-center text-muted">No user groups available.</td>
+              </tr>
             </tbody>
           </table>
-          <div ng-if="users" class="pull-left pagination-controls">
+          <div ng-if="userGroups" class="pull-left pagination-controls">
             <dir-pagination-controls></dir-pagination-controls>
           </div>
         </div>

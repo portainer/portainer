@@ -4,10 +4,13 @@ function ($scope, $state, VolumeService, InfoService, ResourceControlService, Au
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
+    Ownership_groups: [],
     Driver: 'local',
     DriverOptions: []
   };
   $scope.availableVolumeDrivers = [];
+
+  $scope.UserGroups = [{Id: 1, Name: 'groupA'}];
 
   $scope.addDriverOption = function() {
     $scope.formValues.DriverOptions.push({ name: '', value: '' });

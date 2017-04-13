@@ -5,7 +5,8 @@ angular.module('portainer.helpers', []);
 angular.module('portainer', [
   'ui.bootstrap',
   'ui.router',
-  'ui.select',
+  // 'ui.select',
+  'isteven-multi-select',
   'ngCookies',
   'ngSanitize',
   'ngFileUpload',
@@ -50,6 +51,7 @@ angular.module('portainer', [
   'templates',
   'user',
   'users',
+  'usergroup',
   'usergroups',
   'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider) {
@@ -541,6 +543,19 @@ angular.module('portainer', [
         }
       }
     })
+    .state('usergroup', {
+      url: '^/usergroups/:id',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/usergroup/usergroup.html',
+          controller: 'UserGroupController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('swarm', {
       url: '/swarm/',
       views: {
@@ -605,6 +620,7 @@ angular.module('portainer', [
   .constant('CONFIG_ENDPOINT', 'api/settings')
   .constant('AUTH_ENDPOINT', 'api/auth')
   .constant('USERS_ENDPOINT', 'api/users')
+  .constant('USERGROUPS_ENDPOINT', 'api/usergroups')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('PAGINATION_MAX_ITEMS', 10)
