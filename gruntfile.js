@@ -110,6 +110,22 @@ module.exports = function (grunt) {
     'clean:tmp',
     'replace'
   ]);
+  grunt.registerTask('release-ppc64le', [
+    'clean:all',
+    'if:unixPpc64leBinaryNotExist',
+    'html2js',
+    'useminPrepare',
+    'recess:build',
+    'concat',
+    'clean:tmpl',
+    'cssmin',
+    'uglify',
+    'copy',
+    'filerev',
+    'usemin',
+    'clean:tmp',
+    'replace'
+  ]);
   grunt.registerTask('lint', ['jshint']);
   grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
   grunt.registerTask('run-swarm', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
@@ -140,7 +156,7 @@ module.exports = function (grunt) {
         'bower_components/moment/min/moment.min.js',
         'bower_components/xterm.js/dist/xterm.js',
         'bower_components/bootbox.js/bootbox.js',
-        'bower_components/toastr/toastr.min.js',
+        'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
         'assets/js/legend.js' // Not a bower package
       ],
       html: ['index.html'],
@@ -148,11 +164,11 @@ module.exports = function (grunt) {
       css: ['assets/css/app.css'],
       cssVendor: [
         'bower_components/bootstrap/dist/css/bootstrap.css',
+        'bower_components/jquery.gritter/css/jquery.gritter.css',
         'bower_components/font-awesome/css/font-awesome.min.css',
         'bower_components/rdash-ui/dist/css/rdash.min.css',
         'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/xterm.js/dist/xterm.css',
-        'bower_components/toastr/toastr.min.css'
+        'bower_components/xterm.js/dist/xterm.css'
       ]
     },
     clean: {
@@ -211,6 +227,12 @@ module.exports = function (grunt) {
           {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
           {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
           {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
+          {
+            dest: '<%= distdir %>/images/',
+            src: ['**', '!trees.jpg'],
+            expand: true,
+            cwd: 'bower_components/jquery.gritter/images/'
+          },
           {
             dest: '<%= distdir %>/images/',
             src: ['**'],
@@ -374,7 +396,7 @@ module.exports = function (grunt) {
           'mv api/cmd/portainer/portainer-linux-arm dist/portainer'
         ].join(' && ')
       },
-        buildUnixArm64Binary: {
+      buildUnixArm64Binary: {
             command: [
                 'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm64" portainer/golang-builder:cross-platform /src/cmd/portainer',
                 'shasum api/cmd/portainer/portainer-linux-arm64 > portainer-checksum.txt',
@@ -396,6 +418,14 @@ module.exports = function (grunt) {
           'shasum api/cmd/portainer/portainer-windows-amd64 > portainer-checksum.txt',
           'mkdir -p dist',
           'mv api/cmd/portainer/portainer-windows-amd64 dist/portainer.exe'
+        ].join(' && ')
+      },
+      buildUnixPpc64leBinary: {
+        command: [
+          'docker run -e BUILD_GOOS="linux" -e BUILD_GOARCH="ppc64le" --rm -v $(pwd)/api:/src portainer/golang-builder:cross-platform /src/cmd/portainer',
+          'shasum api/cmd/portainer/portainer-linux-ppc64le > portainer-checksum.txt',
+          'mkdir -p dist',
+          'mv api/cmd/portainer/portainer-linux-ppc64le dist/portainer'
         ].join(' && ')
       },
       run: {
@@ -454,6 +484,12 @@ module.exports = function (grunt) {
           executable: 'dist/portainer'
         },
         ifFalse: ['shell:buildDarwinBinary']
+      },
+      unixPpc64leBinaryNotExist: {
+        options: {
+          executable: 'dist/portainer'
+        },
+        ifFalse: ['shell:buildUnixPpc64leBinary']
       },
       windowsBinaryNotExist: {
         options: {
