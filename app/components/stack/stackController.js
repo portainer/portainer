@@ -1,6 +1,6 @@
 angular.module('stack', [])
-.controller('StackController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Pagination',
-function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Messages, Pagination) {
+.controller('StackController', ['$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Task', 'Node', 'Notifications', 'Pagination',
+function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Notifications, Pagination) {
 
   $scope.state = {};
   $scope.state.pagination_count_services = Pagination.getPaginationCount('stack_services');
@@ -66,11 +66,11 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Mess
         });
       }, function(e) {
         $('#loadingViewSpinner').hide();
-        Messages.error("Failure", e, "Unable to retrieve tasks associated to the stack");
+        Notifications.error("Failure", e, "Unable to retrieve tasks associated to the stack");
       });
     }, function(e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to retrieve services associated to the stack");
+      Notifications.error("Failure", e, "Unable to retrieve services associated to the stack");
     });
 
 

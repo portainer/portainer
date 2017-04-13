@@ -1,6 +1,6 @@
 angular.module('stacks', [])
-.controller('StacksController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Container', 'Messages', 'Pagination', 'Task', 'Node', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Container, Messages, Pagination, Task, Node, Authentication, UserService, ModalService, ResourceControlService) {
+.controller('StacksController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Container', 'Notifications', 'Pagination', 'Task', 'Node', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Container, Notifications, Pagination, Task, Node, Authentication, UserService, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('stacks');
@@ -75,7 +75,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Container, M
     })
     .catch(function error(err) {
       $scope.services = [];
-      Messages.error("Failure", err, "Unable to retrieve services");
+      Notifications.error("Failure", err, "Unable to retrieve services");
     })
     .finally(function final() {
       $('#loadStacksSpinner').hide();

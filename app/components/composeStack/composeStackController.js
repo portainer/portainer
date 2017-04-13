@@ -1,6 +1,6 @@
 angular.module('composeStack', [])
-.controller('ComposeStackController', ['$scope', '$filter', '$stateParams', '$state', 'Container', 'ServiceHelper', 'Task', 'Node', 'Messages', 'Pagination',
-function ($scope, $filter, $stateParams, $state, Container, ServiceHelper, Task, Node, Messages, Pagination) {
+.controller('ComposeStackController', ['$scope', '$filter', '$stateParams', '$state', 'Container', 'ServiceHelper', 'Task', 'Node', 'Notifications', 'Pagination',
+function ($scope, $filter, $stateParams, $state, Container, ServiceHelper, Task, Node, Notifications, Pagination) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('composeStack');
@@ -47,7 +47,7 @@ function ($scope, $filter, $stateParams, $state, Container, ServiceHelper, Task,
 
     }, function(e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to retrieve containers associated to the stack");
+      Notifications.error("Failure", e, "Unable to retrieve containers associated to the stack");
     });
   }
 
