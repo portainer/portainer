@@ -22,11 +22,13 @@ Some of the open issues are labeled with prefix `exp/`, this is used to mark the
 * **beginner**: a task that should be accessible with users not familiar with the codebase
 * **intermediate**: a task that require some understanding of the project codebase or some experience in
 either AngularJS or Golang
+* **advanced**: a task that require a deep understanding of the project codebase
 
 You can have a use Github filters to list these issues:
 
 * beginner labeled issues: https://github.com/portainer/portainer/labels/exp%2Fbeginner
 * intermediate labeled issues: https://github.com/portainer/portainer/labels/exp%2Fintermediate
+* advanced labeled issues: https://github.com/portainer/portainer/labels/exp%2Fadvanced
 
 ### Linting
 

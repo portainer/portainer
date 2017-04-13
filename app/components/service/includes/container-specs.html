@@ -1,0 +1,56 @@
+<div>
+  <rd-widget>
+    <rd-widget-header icon="fa-list-alt" title="Container spec"></rd-widget-header>
+    <rd-widget-body classes="no-padding">
+      <table class="table">
+        <tbody>
+          <tr>
+            <td>CMD</td>
+            <td><code ng-if="service.Command">{{ service.Command|command }}</code></td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Command to execute.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td>Args</td>
+            <td><code ng-if="service.Arguments">{{ service.Arguments }}</code></td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Arguments passed to command in container.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td>User</td>
+            <td>{{ service.User }}</td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Username or UID.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td>Working directory</td>
+            <td>{{ service.Dir }}</td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Working directory inside the container.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td>Stop grace period</td>
+            <td>{{ service.StopGracePeriod }}</td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Time to wait before force killing a container (default none).
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+  </rd-widget>
+</div>

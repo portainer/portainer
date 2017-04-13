@@ -140,7 +140,7 @@ module.exports = function (grunt) {
         'bower_components/moment/min/moment.min.js',
         'bower_components/xterm.js/dist/xterm.js',
         'bower_components/bootbox.js/bootbox.js',
-        'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
+        'bower_components/toastr/toastr.min.js',
         'assets/js/legend.js' // Not a bower package
       ],
       html: ['index.html'],
@@ -148,11 +148,11 @@ module.exports = function (grunt) {
       css: ['assets/css/app.css'],
       cssVendor: [
         'bower_components/bootstrap/dist/css/bootstrap.css',
-        'bower_components/jquery.gritter/css/jquery.gritter.css',
         'bower_components/font-awesome/css/font-awesome.min.css',
         'bower_components/rdash-ui/dist/css/rdash.min.css',
         'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/xterm.js/dist/xterm.css'
+        'bower_components/xterm.js/dist/xterm.css',
+        'bower_components/toastr/toastr.min.css'
       ]
     },
     clean: {
@@ -211,12 +211,6 @@ module.exports = function (grunt) {
           {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
           {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
           {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
-          {
-            dest: '<%= distdir %>/images/',
-            src: ['**', '!trees.jpg'],
-            expand: true,
-            cwd: 'bower_components/jquery.gritter/images/'
-          },
           {
             dest: '<%= distdir %>/images/',
             src: ['**'],
@@ -408,7 +402,7 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
+          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics --templates http://192.168.1.47:8080/templates.json'
         ].join(';')
       },
       runSwarm: {

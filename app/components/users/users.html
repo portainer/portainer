@@ -51,21 +51,22 @@
           <!-- !confirm-password-input -->
           <!-- role-checkbox -->
           <div class="form-group">
-            <label for="permissions" class="col-sm-2 control-label text-left">Permissions</label>
-            <div class="col-sm-8">
-              <div class="btn-group btn-group-sm">
-                <label class="btn btn-default" ng-model="formValues.Role" uib-btn-radio="2">
-                  <i class="fa fa-user" aria-hidden="true"></i>
-                  User
-                </label>
-                <label class="btn btn-default" ng-model="formValues.Role" uib-btn-radio="1">
-                  <i class="fa fa-user-circle-o" aria-hidden="true"></i>
-                  Administrator
-                </label>
-              </div>
+            <div class="col-sm-12">
+              <label for="permissions" class="control-label text-left">
+                Administrator
+                <portainer-tooltip position="bottom" message="Administrators have access to Portainer settings management as well as full control over all defined endpoints and their resources."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.Administrator"><i></i>
+              </label>
             </div>
           </div>
           <!-- !role-checkbox -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">Note: non-administrator users do not have access to any endpoint by default. Head over the <a ui-sref="endpoints">endpoints view</a> to manage their accesses.</span>
+            </div>
+          </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!state.validUsername || formValues.Username === '' || formValues.Password === '' || formValues.Password !== formValues.ConfirmPassword" ng-click="addUser()"><i class="fa fa-user-plus" aria-hidden="true"></i> Add user</button>

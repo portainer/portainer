@@ -26,7 +26,7 @@
       <rd-widget-taskbar classes="col-lg-12 col-md-12 col-xs-12">
         <div class="pull-left">
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-          <a class="btn btn-default btn-responsive" type="button" ui-sref="actions.create.service">Add service</a>
+          <a class="btn btn-primary" type="button" ui-sref="actions.create.service"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add service</a>
         </div>
         <div class="pull-right">
           <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
@@ -64,8 +64,22 @@
                   <span ng-show="sortType == 'Mode' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th>
+                <a ui-sref="services" ng-click="order('Ports')">
+                  Published Ports
+                  <span ng-show="sortType == 'Ports' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="services" ng-click="order('UpdatedAt')">
+                  Updated at
+                  <span ng-show="sortType == 'UpdatedAt' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'UpdatedAt' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
               <th ng-if="applicationState.application.authentication">
-                <a ui-sref="containers" ng-click="order('Metadata.ResourceControl.OwnerId')">
+                <a ui-sref="services" ng-click="order('Metadata.ResourceControl.OwnerId')">
                   Ownership
                   <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
@@ -95,6 +109,15 @@
                     <a class="interactive" ng-click="scaleService(service)"><i class="fa fa-check-square-o"></i></a>
                   </span>
                 </td>
+                <td>
+                  <a ng-if="service.Ports && service.Ports.length > 0 && swarmManagerIP" ng-repeat="p in service.Ports" class="image-tag" ng-href="http://{{swarmManagerIP}}:{{p.PublishedPort}}" target="_blank">
+                    <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
+                  </a>
+                  <span ng-if="!service.Ports || service.Ports.length === 0 || !swarmManagerIP" >-</span>
+                </td>
+                <td>
+                  {{ service.UpdatedAt|getisodate }}
+                </td>
                 <td ng-if="applicationState.application.authentication">
                   <span ng-if="user.role === 1 && service.Metadata.ResourceControl">
                     <i class="fa fa-eye-slash" aria-hidden="true"></i>
@@ -118,10 +141,10 @@
                 </td>
               </tr>
               <tr ng-if="!services">
-                <td colspan="5" class="text-center text-muted">Loading...</td>
+                <td colspan="7" class="text-center text-muted">Loading...</td>
               </tr>
               <tr ng-if="services.length == 0">
-                <td colspan="5" class="text-center text-muted">No services available.</td>
+                <td colspan="7" class="text-center text-muted">No services available.</td>
               </tr>
             </tbody>
           </table>

@@ -51,7 +51,7 @@ angular.module('portainer', [
   'user',
   'users',
   'volumes'])
-  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider) {
+  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider) {
     'use strict';
 
     localStorageServiceProvider
@@ -72,6 +72,15 @@ angular.module('portainer', [
     AnalyticsProvider.startOffline(true);
 
     $urlRouterProvider.otherwise('/auth');
+
+    toastr.options.timeOut = 3000;
+
+    $uibTooltipProvider.setTriggers({
+      'mouseenter': 'mouseleave',
+      'click': 'click',
+      'focus': 'blur',
+      'outsideClick': 'outsideClick'
+    });
 
     $stateProvider
     .state('root', {
@@ -449,6 +458,27 @@ angular.module('portainer', [
     })
     .state('templates', {
       url: '/templates/',
+      params: {
+        key: 'containers',
+        hide_descriptions: false
+      },
+      views: {
+        "content@": {
+          templateUrl: 'app/components/templates/templates.html',
+          controller: 'TemplatesController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('templates_linuxserver', {
+      url: '^/templates/linuxserver.io',
+      params: {
+        key: 'linuxserver.io',
+        hide_descriptions: true
+      },
       views: {
         "content@": {
           templateUrl: 'app/components/templates/templates.html',
@@ -512,25 +542,8 @@ angular.module('portainer', [
         }
       }
     });
-
-    // The Docker API likes to return plaintext errors, this catches them and disp
-    $httpProvider.interceptors.push(function() {
-      return {
-        'response': function(response) {
-          if (typeof(response.data) === 'string' &&
-          (_.startsWith(response.data, 'Conflict.') || _.startsWith(response.data, 'conflict:'))) {
-            $.gritter.add({
-              title: 'Error',
-              text: $('<div>').text(response.data).html(),
-              time: 10000
-            });
-          }
-          return response;
-        }
-      };
-    });
   }])
-  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Messages', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Messages, Analytics) {
+  .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics) {
     EndpointProvider.initialize();
     StateManager.initialize().then(function success(state) {
       if (state.application.authentication) {
@@ -551,7 +564,7 @@ angular.module('portainer', [
         });
       }
     }, function error(err) {
-      Messages.error("Failure", err, 'Unable to retrieve application settings');
+      Notifications.error("Failure", err, 'Unable to retrieve application settings');
     });
 
     $rootScope.$state = $state;
@@ -566,4 +579,4 @@ angular.module('portainer', [
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('PAGINATION_MAX_ITEMS', 10)
-  .constant('UI_VERSION', 'v1.11.4');
+  .constant('UI_VERSION', 'v1.12.4');

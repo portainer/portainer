@@ -25,15 +25,15 @@
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
         <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-primary btn-responsive" ng-click="startAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
-          <button type="button" class="btn btn-primary btn-responsive" ng-click="stopAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
-          <button type="button" class="btn btn-primary btn-responsive" ng-click="killAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
+          <button type="button" class="btn btn-success btn-responsive" ng-click="startAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
+          <button type="button" class="btn btn-danger btn-responsive" ng-click="stopAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
+          <button type="button" class="btn btn-danger btn-responsive" ng-click="killAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
           <button type="button" class="btn btn-primary btn-responsive" ng-click="restartAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
           <button type="button" class="btn btn-primary btn-responsive" ng-click="pauseAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
           <button type="button" class="btn btn-primary btn-responsive" ng-click="unpauseAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
           <button type="button" class="btn btn-danger btn-responsive" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
         </div>
-        <a class="btn btn-default btn-responsive" type="button" ui-sref="actions.create.container">Add container</a>
+        <a class="btn btn-primary" type="button" ui-sref="actions.create.container"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add container</a>
       </div>
       <div class="pull-right">
         <input type="checkbox" ng-model="state.displayAll" id="displayAll" ng-change="toggleGetAll()" style="margin-top: -2px; margin-right: 5px;"/><label for="displayAll">Show all containers</label>
@@ -103,8 +103,8 @@
             <tr dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><input type="checkbox" ng-model="container.Checked" ng-change="selectItem(container)"/></td>
               <td><span class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span></td>
-              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername}}</a></td>
-              <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername}}</a></td>
+              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: 40}}</a></td>
+              <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: 40}}</a></td>
               <td><a ui-sref="image({id: container.Image})">{{ container.Image | hideshasum }}</a></td>
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">{{ container.hostIP }}</td>
