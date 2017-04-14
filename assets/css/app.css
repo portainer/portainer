@@ -408,7 +408,6 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 /*angular-multi-select override*/
 .multiSelect > button {
   min-height: 30px !important;
-  /*color: unset;*/
   background-color: unset;
   background-image: unset;
 }
@@ -424,7 +423,6 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .multiSelect .multiSelectGroup:hover {
   background-image: linear-gradient( #337ab7 , #337ab7 ) !important;
   color: #fff !important;
-  /*border: 1px solid #ccc !important;*/
 }
 
 .multiSelect .tickMark {
@@ -433,3 +431,9 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   font-size: 20px;
 }
 /*!angular-multi-select override*/
+
+/*toaster override*/
+#toast-container > div {
+  opacity: 0.9;
+}
+/*!toaster override*/

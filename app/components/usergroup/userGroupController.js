@@ -1,6 +1,6 @@
 angular.module('usergroup', [])
-.controller('UserGroupController', ['$q', '$scope', '$state', '$stateParams', 'UserGroupService', 'UserService', 'ModalService', 'Messages', 'Pagination',
-function ($q, $scope, $state, $stateParams, UserGroupService, UserService, ModalService, Messages, Pagination) {
+.controller('UserGroupController', ['$q', '$scope', '$state', '$stateParams', 'UserGroupService', 'UserService', 'ModalService', 'Notifications', 'Pagination',
+function ($q, $scope, $state, $stateParams, UserGroupService, UserService, ModalService, Notifications, Pagination) {
 
   $scope.state = {
     pagination_count_users: Pagination.getPaginationCount('usergroup_available_users'),
@@ -33,7 +33,7 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
 
   $scope.deleteUserGroup = function() {
     ModalService.confirmDeletion(
-      'Do you want to delete this user group? Users in this group will not be deleted.',
+      'Do you want to delete this team? Users in this team will not be deleted.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
       }
@@ -52,14 +52,14 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .then(function success(data) {
     //   $scope.authorizedUsers = $scope.authorizedUsers.concat($scope.users);
     //   $scope.users = [];
-    //   Messages.send('Access granted for all users');
+    //   Notifications.send('Access granted for all users');
     // })
     // .catch(function error(err) {
-    //   Messages.error("Failure", err, "Unable to update endpoint permissions");
+    //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
     $scope.groupMembers = $scope.groupMembers.concat($scope.users);
     $scope.users = [];
-    Messages.send('All users successfully added');
+    Notifications.send('All users successfully added');
   };
 
   $scope.removeAllUsers = function() {
@@ -67,14 +67,14 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .then(function success(data) {
     //   $scope.users = $scope.users.concat($scope.authorizedUsers);
     //   $scope.authorizedUsers = [];
-    //   Messages.send('Access removed for all users');
+    //   Notifications.send('Access removed for all users');
     // })
     // .catch(function error(err) {
-    //   Messages.error("Failure", err, "Unable to update endpoint permissions");
+    //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
     $scope.users = $scope.users.concat($scope.groupMembers);
     $scope.groupMembers = [];
-    Messages.send('All users successfully removed');
+    Notifications.send('All users successfully removed');
   };
 
   $scope.addUser = function(user) {
@@ -87,14 +87,14 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .then(function success(data) {
     //   removeUserFromArray(user.Id, $scope.users);
     //   $scope.authorizedUsers.push(user);
-    //   Messages.send('Access granted for user', user.Username);
+    //   Notifications.send('Access granted for user', user.Username);
     // })
     // .catch(function error(err) {
-    //   Messages.error("Failure", err, "Unable to update endpoint permissions");
+    //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
     removeUserFromArray(user.Id, $scope.users);
     $scope.groupMembers.push(user);
-    Messages.send('User added to group', user.Username);
+    Notifications.send('User added to team', user.Username);
   };
 
   $scope.removeUser = function(user) {
@@ -109,14 +109,14 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .then(function success(data) {
     //   removeUserFromArray(user.Id, $scope.authorizedUsers);
     //   $scope.users.push(user);
-    //   Messages.send('Access removed for user', user.Username);
+    //   Notifications.send('Access removed for user', user.Username);
     // })
     // .catch(function error(err) {
-    //   Messages.error("Failure", err, "Unable to update endpoint permissions");
+    //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
     removeUserFromArray(user.Id, $scope.groupMembers);
     $scope.users.push(user);
-    Messages.send('User removed from group', user.Username);
+    Notifications.send('User removed from team', user.Username);
   };
 
   function initView() {
@@ -140,7 +140,7 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
       $scope.usergroup = [];
       $scope.users = [];
       $scope.groupMembers = [];
-      Messages.error("Failure", err, 'Unable to retrieve user group details');
+      Notifications.error("Failure", err, 'Unable to retrieve team details');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();

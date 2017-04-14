@@ -112,16 +112,16 @@
             <div class="col-sm-12">
               <label for="ownership" class="control-label text-left">
                 Ownership
-                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing group, you can select which user group will be able to access it. When choosing public, everybody will be able to access it."></portainer-tooltip>
+                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing team, one or multiple of your teams will be able to access it. When choosing public, everybody will be able to access it."></portainer-tooltip>
               </label>
               <div class="btn-group btn-group-sm" style="margin-left: 20px;">
                 <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'private'">
                   <i class="fa fa-eye-slash" aria-hidden="true"></i>
                   Private
                 </label>
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'group'">
+                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'team'">
                   <i class="fa fa-users" aria-hidden="true"></i>
-                  Group
+                  Team
                 </label>
                 <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'public'">
                   <i class="fa fa-eye" aria-hidden="true"></i>
@@ -132,11 +132,11 @@
           </div>
           <!-- !ownership -->
           <!-- authorized-groups -->
-          <div class="form-group" ng-if="formValues.Ownership === 'group' && UserGroups.length > 1" >
+          <div class="form-group" ng-if="formValues.Ownership === 'team' && UserGroups.length > 1" >
             <div class="col-sm-12">
               <label for="group-access" class="control-label text-left">
-                Authorized groups
-                <portainer-tooltip position="bottom" message="As you are a member of multiple groups, you can select which group(s) will be able to manage this object."></portainer-tooltip>
+                Authorized teams
+                <portainer-tooltip position="bottom" message="As you are a member of multiple teams, you can select which team(s) will be able to manage this object."></portainer-tooltip>
               </label>
               <span isteven-multi-select
                input-model="UserGroups"

@@ -1,16 +1,16 @@
 <rd-header>
-  <rd-header-title title="User group details">
+  <rd-header-title title="Team details">
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="usergroups">User groups</a> > <a ui-sref="usergroup({id: usergroup.Id})">{{ usergroup.Name }}</a>
+    <a ui-sref="usergroups">Teams</a> > <a ui-sref="usergroup({id: usergroup.Id})">{{ usergroup.Name }}</a>
   </rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-users" title="User group details"></rd-widget-header>
+      <rd-widget-header icon="fa-users" title="Team details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -18,11 +18,11 @@
               <td>Name</td>
               <td>
                 {{ usergroup.Name }}
-                <button class="btn btn-xs btn-danger" ng-click="deleteUserGroup()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this group</button>
+                <button class="btn btn-xs btn-danger" ng-click="deleteUserGroup()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this team</button>
               </td>
             </tr>
             <tr>
-              <td>Users in group</td>
+              <td>Users in team</td>
               <td>%COUNT%</td>
             </tr>
           </tbody>
@@ -90,7 +90,7 @@
   </div>
   <div class="col-sm-6">
     <rd-widget>
-      <rd-widget-header classes="col-sm-12 col-md-6 nopadding" icon="fa-users" title="Group members">
+      <rd-widget-header classes="col-sm-12 col-md-6 nopadding" icon="fa-users" title="Team members">
         <div class="pull-md-right pull-lg-right">
           Items per page:
           <select ng-model="state.pagination_count_groupMembers" ng-change="changePaginationCountGroupMembers()">
@@ -132,7 +132,7 @@
                 <td colspan="2" class="text-center text-muted">Loading...</td>
               </tr>
               <tr ng-if="groupMembers.length === 0 || state.filteredGroupMembers.length === 0">
-                <td colspan="2" class="text-center text-muted">No group members.</td>
+                <td colspan="2" class="text-center text-muted">No team members.</td>
               </tr>
             </tbody>
           </table>

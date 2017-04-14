@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Messages',
-function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Messages) {
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications',
+function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications) {
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
@@ -16,7 +16,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     ExtraHosts: [],
   };
 
-  $scope.UserGroups = [{Id: 1, Name: 'groupA'}, {Id: 2, Name: 'groupB'}, {Id: 3, Name: 'groupC'}, {Id: 4, Name: 'groupD'}];
+  $scope.UserGroups = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
 
   $scope.imageConfig = {};
 
@@ -86,7 +86,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
     }, function (e) {
-      Messages.error("Failure", e, "Unable to retrieve volumes");
+      Notifications.error("Failure", e, "Unable to retrieve volumes");
     });
 
     Network.query({}, function (d) {
@@ -108,7 +108,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
         $scope.config.HostConfig.NetworkMode = 'nat';
       }
     }, function (e) {
-      Messages.error("Failure", e, "Unable to retrieve networks");
+      Notifications.error("Failure", e, "Unable to retrieve networks");
     });
 
     Container.query({}, function (d) {
@@ -118,7 +118,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       }
       $scope.runningContainers = containers;
     }, function(e) {
-      Messages.error("Failure", e, "Unable to retrieve running containers");
+      Notifications.error("Failure", e, "Unable to retrieve running containers");
     });
   });
 
@@ -126,15 +126,15 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Container.start({id: containerID}, {}, function (cd) {
       if (cd.message) {
         $('#createContainerSpinner').hide();
-        Messages.error('Error', {}, cd.message);
+        Notifications.error('Error', {}, cd.message);
       } else {
         $('#createContainerSpinner').hide();
-        Messages.send('Container Started', containerID);
+        Notifications.success('Container Started', containerID);
         $state.go('containers', {}, {reload: true});
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Messages.error("Failure", e, 'Unable to start container');
+      Notifications.error("Failure", e, 'Unable to start container');
     });
   }
 
@@ -142,7 +142,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Container.create(config, function (d) {
       if (d.message) {
         $('#createContainerSpinner').hide();
-        Messages.error('Error', {}, d.message);
+        Notifications.error('Error', {}, d.message);
       } else {
         if ($scope.formValues.Ownership === 'private') {
           ResourceControlService.setContainerResourceControl(Authentication.getUserDetails().ID, d.Id)
@@ -151,7 +151,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
           })
           .catch(function error(err) {
             $('#createContainerSpinner').hide();
-            Messages.error("Failure", err, 'Unable to apply resource control on container');
+            Notifications.error("Failure", err, 'Unable to apply resource control on container');
           });
         } else {
           startContainer(d.Id);
@@ -159,7 +159,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Messages.error("Failure", e, 'Unable to create container');
+      Notifications.error("Failure", e, 'Unable to create container');
     });
   }
 
@@ -168,7 +168,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       createContainer(config);
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Messages.error('Failure', e, 'Unable to pull image');
+      Notifications.error('Failure', e, 'Unable to pull image');
     });
   }
 

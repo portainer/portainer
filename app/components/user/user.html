@@ -15,7 +15,7 @@
         <table class="table">
           <tbody>
             <tr>
-              <td>Name</td>
+              <td><label>Name</label></td>
               <td>
                 {{ user.Username }}
                 <button class="btn btn-xs btn-danger" ng-click="deleteUser()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this user</button>
@@ -30,6 +30,28 @@
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" ng-model="formValues.Administrator" ng-change="updatePermissions()"><i></i>
                 </label>
+              </td>
+            </tr>
+            <tr ng-if="!formValues.Administrator">
+              <td colspan="2">
+                <label for="teams" class="control-label text-left">
+                  Teams
+                </label>
+                <span class="small text-muted" style="margin-left: 20px;" ng-if="UserGroups.length === 0">
+                  You have not yet created any team. Head over the <a ui-sref="usergroups">teams view</a> to manage user teams.</span>
+                </span>
+                <span isteven-multi-select
+                 ng-if="UserGroups.length > 0"
+                 input-model="UserGroups"
+                 output-model="formValues.Teams"
+                 button-label="Name"
+                 item-label="Name"
+                 tick-property="ticked"
+                 helper-elements="filter"
+                 search-property="Name"
+                 translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
+                 style="margin-left: 20px;"
+               </span>
               </td>
             </tr>
           </tbody>

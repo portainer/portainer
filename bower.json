@@ -40,7 +40,6 @@
     "bootstrap": "~3.3.6",
     "filesize": "~3.3.0",
     "jquery": "1.11.1",
-    "jquery.gritter": "1.7.4",
     "lodash": "4.12.0",
     "rdash-ui": "1.0.*",
     "moment": "~2.14.1",
@@ -49,8 +48,8 @@
     "ng-file-upload": "~12.2.13",
     "splitargs": "~0.2.0",
     "bootbox.js": "bootbox#^4.4.0",
-    "angular-multi-select-alexandernst": "~7.4.6",
-    "angular-multi-select": "~4.0.0"
+    "angular-multi-select": "~4.0.0",
+    "toastr": "~2.1.3"
   },
   "resolutions": {
     "angular": "1.5.11"

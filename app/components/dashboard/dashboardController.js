@@ -1,6 +1,6 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$scope', '$q', 'Config', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'Info', 'Messages',
-function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume, Info, Messages) {
+.controller('DashboardController', ['$scope', '$q', 'Config', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'Info', 'Notifications',
+function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume, Info, Notifications) {
 
   $scope.containerData = {
     total: 0
@@ -82,7 +82,7 @@ function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume
       $('#loadingViewSpinner').hide();
     }, function(e) {
       $('#loadingViewSpinner').hide();
-      Messages.error("Failure", e, "Unable to load dashboard data");
+      Notifications.error("Failure", e, "Unable to load dashboard data");
     });
   }
 

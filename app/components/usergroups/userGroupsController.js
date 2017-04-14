@@ -1,6 +1,6 @@
 angular.module('usergroups', [])
-.controller('UserGroupsController', ['$scope', '$state', 'UserGroupService', 'ModalService', 'Messages', 'Pagination',
-function ($scope, $state, UserGroupService, ModalService, Messages, Pagination) {
+.controller('UserGroupsController', ['$scope', '$state', 'UserGroupService', 'ModalService', 'Notifications', 'Pagination',
+function ($scope, $state, UserGroupService, ModalService, Notifications, Pagination) {
   $scope.state = {
     userGroupGroupCreationError: '',
     selectedItemCount: 0,
@@ -49,7 +49,7 @@ function ($scope, $state, UserGroupService, ModalService, Messages, Pagination) 
       }
     }
     $scope.state.validName = valid;
-    $scope.state.userGroupCreationError = valid ? '' : 'Group name already existing';
+    $scope.state.userGroupCreationError = valid ? '' : 'Team name already existing';
   };
 
   $scope.addUserGroup = function() {
@@ -73,10 +73,10 @@ function ($scope, $state, UserGroupService, ModalService, Messages, Pagination) 
         .then(function success(data) {
           var index = $scope.userGroups.indexOf(userGroup);
           $scope.userGroups.splice(index, 1);
-          Messages.send('User successfully deleted', userGroup.Username);
+          Notifications.send('Team successfully deleted', userGroup.Username);
         })
         .catch(function error(err) {
-          Messages.error("Failure", err, 'Unable to remove userGroup');
+          Notifications.error("Failure", err, 'Unable to remove team');
         })
         .finally(function final() {
           complete();
@@ -87,7 +87,7 @@ function ($scope, $state, UserGroupService, ModalService, Messages, Pagination) 
 
   $scope.removeAction = function () {
     ModalService.confirmDeletion(
-      'Do you want to delete the selected user group(s)? Users in the selected group(s) will not be deleted.',
+      'Do you want to delete the selected team(s)? Users in the team(s) will not be deleted.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
         deleteSelectedUserGroups();
@@ -102,7 +102,7 @@ function ($scope, $state, UserGroupService, ModalService, Messages, Pagination) 
       $scope.userGroups = data;
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, 'Unable to retrieve user groups');
+      Notifications.error("Failure", err, 'Unable to retrieve teams');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();

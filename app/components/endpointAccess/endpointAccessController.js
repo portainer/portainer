@@ -1,6 +1,6 @@
 angular.module('endpointAccess', [])
-.controller('EndpointAccessController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'UserService', 'UserGroupService', 'Pagination', 'Messages',
-function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserService, UserGroupService, Pagination, Messages) {
+.controller('EndpointAccessController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'UserService', 'UserGroupService', 'Pagination', 'Notifications',
+function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserService, UserGroupService, Pagination, Notifications) {
 
   $scope.state = {
     pagination_count_accesses: Pagination.getPaginationCount('endpoint_access_accesses'),
@@ -43,10 +43,10 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       $scope.authorizedAccesses = $scope.authorizedAccesses.concat($scope.accesses);
       $scope.accesses = [];
-      Messages.send('Accesses granted successfully');
+      Notifications.send('Accesses granted successfully');
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, "Unable to update endpoint permissions");
+      Notifications.error("Failure", err, "Unable to update endpoint permissions");
     });
   };
 
@@ -55,10 +55,13 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       $scope.accesses = $scope.accesses.concat($scope.authorizedAccesses);
       $scope.authorizedAccesses = [];
-      Messages.send('All accesses removed successfully');
+      Notifications.send('All accesses removed successfully');
+      $scope.users = $scope.users.concat($scope.authorizedUsers);
+      $scope.authorizedUsers = [];
+      Notifications.success('Access removed for all users');
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, "Unable to update endpoint permissions");
+      Notifications.error("Failure", err, "Unable to update endpoint permissions");
     });
   };
 
@@ -72,10 +75,10 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       removeAccessFromArray(access.Id, $scope.accesses);
       $scope.authorizedAccesses.push(access);
-      Messages.send('Access granted', access.Name);
+      Notifications.send('Access granted', access.Name);
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, "Unable to update endpoint permissions");
+      Notifications.error("Failure", err, "Unable to update endpoint permissions");
     });
   };
 
@@ -91,10 +94,10 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       removeAccessFromArray(access.Id, $scope.authorizedAccesses);
       $scope.accesses.push(access);
-      Messages.send('Access removed', access.Name);
+      Notifications.send('Access removed', access.Name);
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, "Unable to update endpoint permissions");
+      Notifications.error("Failure", err, "Unable to update endpoint permissions");
     });
   };
 
@@ -141,7 +144,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .catch(function error(err) {
       $scope.accesses = [];
       $scope.authorizedAccesses = [];
-      Messages.error("Failure", err, "Unable to retrieve endpoint details");
+      Notifications.error("Failure", err, "Unable to retrieve endpoint details");
     })
     .finally(function final(){
       $('#loadingViewSpinner').hide();

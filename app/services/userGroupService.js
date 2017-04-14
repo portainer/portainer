@@ -5,7 +5,7 @@ angular.module('portainer.services')
 
   service.userGroups = function() {
     var deferred = $q.defer();
-    var data = [{Id: 1, Name: "groupA"}, {Id: 2, Name: "groupB"}];
+    var data = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
     var usergroups = data.map(function (item) {
       return new UserGroupViewModel(item);
     });

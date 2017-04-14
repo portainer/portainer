@@ -1,6 +1,6 @@
 angular.module('users', [])
-.controller('UsersController', ['$scope', '$state', 'UserService', 'ModalService', 'Messages', 'Pagination',
-function ($scope, $state, UserService, ModalService, Messages, Pagination) {
+.controller('UsersController', ['$scope', '$state', 'UserService', 'ModalService', 'Notifications', 'Pagination',
+function ($scope, $state, UserService, ModalService, Notifications, Pagination) {
   $scope.state = {
     userCreationError: '',
     selectedItemCount: 0,
@@ -10,11 +10,14 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
   $scope.sortType = 'RoleName';
   $scope.sortReverse = false;
 
+  $scope.UserGroups = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
+
   $scope.formValues = {
     Username: '',
     Password: '',
     ConfirmPassword: '',
     Administrator: false,
+    Teams: [],
   };
 
   $scope.order = function(sortType) {
@@ -62,7 +65,7 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
     var role = $scope.formValues.Administrator ? 1 : 2;
     UserService.createUser(username, password, role)
     .then(function success(data) {
-      Messages.send("User created", username);
+      Notifications.success("User created", username);
       $state.reload();
     })
     .catch(function error(err) {
@@ -89,10 +92,10 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
         .then(function success(data) {
           var index = $scope.users.indexOf(user);
           $scope.users.splice(index, 1);
-          Messages.send('User successfully deleted', user.Username);
+          Notifications.success('User successfully deleted', user.Username);
         })
         .catch(function error(err) {
-          Messages.error("Failure", err, 'Unable to remove user');
+          Notifications.error("Failure", err, 'Unable to remove user');
         })
         .finally(function final() {
           complete();
@@ -120,7 +123,7 @@ function ($scope, $state, UserService, ModalService, Messages, Pagination) {
       });
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, "Unable to retrieve users");
+      Notifications.error("Failure", err, "Unable to retrieve users");
       $scope.users = [];
     })
     .finally(function final() {

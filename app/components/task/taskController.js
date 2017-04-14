@@ -1,6 +1,6 @@
 angular.module('task', [])
-.controller('TaskController', ['$scope', '$stateParams', '$state', 'Task', 'Service', 'Messages',
-function ($scope, $stateParams, $state, Task, Service, Messages) {
+.controller('TaskController', ['$scope', '$stateParams', '$state', 'Task', 'Service', 'Notifications',
+function ($scope, $stateParams, $state, Task, Service, Notifications) {
 
   $scope.task = {};
   $scope.serviceName = 'service';
@@ -13,7 +13,7 @@ function ($scope, $stateParams, $state, Task, Service, Messages) {
       fetchAssociatedServiceDetails(d.ServiceID);
       $('#loadingViewSpinner').hide();
     }, function (e) {
-      Messages.error("Failure", e, "Unable to retrieve task details");
+      Notifications.error("Failure", e, "Unable to retrieve task details");
     });
   }
 
@@ -21,7 +21,7 @@ function ($scope, $stateParams, $state, Task, Service, Messages) {
     Service.get({id: serviceId}, function (d) {
       $scope.serviceName = d.Spec.Name;
     }, function (e) {
-      Messages.error("Failure", e, "Unable to retrieve associated service details");
+      Notifications.error("Failure", e, "Unable to retrieve associated service details");
     });
   }
 

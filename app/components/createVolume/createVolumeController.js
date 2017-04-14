@@ -1,6 +1,6 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$scope', '$state', 'VolumeService', 'InfoService', 'ResourceControlService', 'Authentication', 'Messages',
-function ($scope, $state, VolumeService, InfoService, ResourceControlService, Authentication, Messages) {
+.controller('CreateVolumeController', ['$scope', '$state', 'VolumeService', 'InfoService', 'ResourceControlService', 'Authentication', 'Notifications',
+function ($scope, $state, VolumeService, InfoService, ResourceControlService, Authentication, Notifications) {
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
@@ -33,19 +33,19 @@ function ($scope, $state, VolumeService, InfoService, ResourceControlService, Au
       if ($scope.formValues.Ownership === 'private') {
         ResourceControlService.setVolumeResourceControl(Authentication.getUserDetails().ID, data.Name)
         .then(function success() {
-          Messages.send("Volume created", data.Name);
+          Notifications.success("Volume created", data.Name);
           $state.go('volumes', {}, {reload: true});
         })
         .catch(function error(err) {
-          Messages.error("Failure", err, 'Unable to apply resource control on volume');
+          Notifications.error("Failure", err, 'Unable to apply resource control on volume');
         });
       } else {
-        Messages.send("Volume created", data.Name);
+        Notifications.success("Volume created", data.Name);
         $state.go('volumes', {}, {reload: true});
       }
     })
     .catch(function error(err) {
-      Messages.error('Failure', err, 'Unable to create volume');
+      Notifications.error('Failure', err, 'Unable to create volume');
     })
     .finally(function final() {
       $('#createVolumeSpinner').hide();
@@ -59,7 +59,7 @@ function ($scope, $state, VolumeService, InfoService, ResourceControlService, Au
       $scope.availableVolumeDrivers = data;
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, 'Unable to retrieve volume plugin information');
+      Notifications.error("Failure", err, 'Unable to retrieve volume plugin information');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();

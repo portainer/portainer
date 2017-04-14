@@ -49,7 +49,7 @@
             </div>
           </div>
           <!-- !confirm-password-input -->
-          <!-- role-checkbox -->
+          <!-- admin-checkbox -->
           <div class="form-group">
             <div class="col-sm-12">
               <label for="permissions" class="control-label text-left">
@@ -61,10 +61,32 @@
               </label>
             </div>
           </div>
-          <!-- !role-checkbox -->
-          <div class="form-group">
+          <!-- !admin-checkbox -->
+          <div class="form-group" ng-if="!formValues.Administrator">
             <div class="col-sm-12">
-              <span class="small text-muted">Note: non-administrator users do not have access to any endpoint by default. Head over the <a ui-sref="endpoints">endpoints view</a> to manage their accesses.</span>
+              <label for="group-access" class="control-label text-left">
+                Team member
+              </label>
+              <span class="small text-muted" style="margin-left: 20px;" ng-if="UserGroups.length === 0">
+                You have not yet created any team. Head over the <a ui-sref="usergroups">teams view</a> to manage user teams.</span>
+              </span>
+              <span isteven-multi-select
+               ng-if="UserGroups.length > 0"
+               input-model="UserGroups"
+               output-model="formValues.Teams"
+               button-label="Name"
+               item-label="Name"
+               tick-property="ticked"
+               helper-elements="filter"
+               search-property="Name"
+               translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
+               style="margin-left: 20px;"
+             </span>
+            </div>
+          </div>
+          <div class="form-group" ng-if="!formValues.Administrator && formValues.Teams.length === 0">
+            <div class="col-sm-12">
+              <span class="small text-muted">Note: non-administrator users with no team do not have access to any endpoint by default. Head over the <a ui-sref="endpoints">endpoints view</a> to manage their accesses.</span>
             </div>
           </div>
           <div class="form-group">
