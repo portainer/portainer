@@ -52,14 +52,14 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .then(function success(data) {
     //   $scope.authorizedUsers = $scope.authorizedUsers.concat($scope.users);
     //   $scope.users = [];
-    //   Notifications.send('Access granted for all users');
+    //   Notifications.success('Access granted for all users');
     // })
     // .catch(function error(err) {
     //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
     $scope.groupMembers = $scope.groupMembers.concat($scope.users);
     $scope.users = [];
-    Notifications.send('All users successfully added');
+    Notifications.success('All users successfully added');
   };
 
   $scope.removeAllUsers = function() {
@@ -67,14 +67,14 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .then(function success(data) {
     //   $scope.users = $scope.users.concat($scope.authorizedUsers);
     //   $scope.authorizedUsers = [];
-    //   Notifications.send('Access removed for all users');
+    //   Notifications.success('Access removed for all users');
     // })
     // .catch(function error(err) {
     //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
     $scope.users = $scope.users.concat($scope.groupMembers);
     $scope.groupMembers = [];
-    Notifications.send('All users successfully removed');
+    Notifications.success('All users successfully removed');
   };
 
   $scope.addUser = function(user) {
@@ -87,14 +87,14 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .then(function success(data) {
     //   removeUserFromArray(user.Id, $scope.users);
     //   $scope.authorizedUsers.push(user);
-    //   Notifications.send('Access granted for user', user.Username);
+    //   Notifications.success('Access granted for user', user.Username);
     // })
     // .catch(function error(err) {
     //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
     removeUserFromArray(user.Id, $scope.users);
     $scope.groupMembers.push(user);
-    Notifications.send('User added to team', user.Username);
+    Notifications.success('User added to team', user.Username);
   };
 
   $scope.removeUser = function(user) {
@@ -109,14 +109,14 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .then(function success(data) {
     //   removeUserFromArray(user.Id, $scope.authorizedUsers);
     //   $scope.users.push(user);
-    //   Notifications.send('Access removed for user', user.Username);
+    //   Notifications.success('Access removed for user', user.Username);
     // })
     // .catch(function error(err) {
     //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
     removeUserFromArray(user.Id, $scope.groupMembers);
     $scope.users.push(user);
-    Notifications.send('User removed from team', user.Username);
+    Notifications.success('User removed from team', user.Username);
   };
 
   function initView() {

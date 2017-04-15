@@ -43,7 +43,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       $scope.authorizedAccesses = $scope.authorizedAccesses.concat($scope.accesses);
       $scope.accesses = [];
-      Notifications.send('Accesses granted successfully');
+      Notifications.success('Accesses granted successfully');
     })
     .catch(function error(err) {
       Notifications.error("Failure", err, "Unable to update endpoint permissions");
@@ -55,7 +55,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       $scope.accesses = $scope.accesses.concat($scope.authorizedAccesses);
       $scope.authorizedAccesses = [];
-      Notifications.send('All accesses removed successfully');
+      Notifications.success('All accesses removed successfully');
       $scope.users = $scope.users.concat($scope.authorizedUsers);
       $scope.authorizedUsers = [];
       Notifications.success('Access removed for all users');
@@ -75,7 +75,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       removeAccessFromArray(access.Id, $scope.accesses);
       $scope.authorizedAccesses.push(access);
-      Notifications.send('Access granted', access.Name);
+      Notifications.success('Access granted', access.Name);
     })
     .catch(function error(err) {
       Notifications.error("Failure", err, "Unable to update endpoint permissions");
@@ -94,7 +94,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .then(function success(data) {
       removeAccessFromArray(access.Id, $scope.authorizedAccesses);
       $scope.accesses.push(access);
-      Notifications.send('Access removed', access.Name);
+      Notifications.success('Access removed', access.Name);
     })
     .catch(function error(err) {
       Notifications.error("Failure", err, "Unable to update endpoint permissions");
@@ -118,10 +118,10 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
       }).map(function (user) {
         return new EndpointAccessUserViewModel(user);
       });
-      var usergroups = data.usergroups.map(function (user) {
-        return new EndpointAccessUserGroupViewModel(user);
+      var teams = data.usergroups.map(function (team) {
+        return new EndpointAccessTeamViewModel(team);
       });
-      $scope.accesses = $scope.accesses.concat(users, usergroups);
+      $scope.accesses = $scope.accesses.concat(users, teams);
 
       // $scope.accesses = data.users.filter(function (user) {
       //   if (user.Role !== 1) {

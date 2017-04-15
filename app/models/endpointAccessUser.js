@@ -4,8 +4,8 @@ function EndpointAccessUserViewModel(data) {
   this.Type = "user";
 }
 
-function EndpointAccessUserGroupViewModel(data) {
+function EndpointAccessTeamViewModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
-  this.Type = "usergroup";
+  this.Type = "team";
 }

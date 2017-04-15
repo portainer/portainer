@@ -73,7 +73,7 @@ function ($scope, $state, UserGroupService, ModalService, Notifications, Paginat
         .then(function success(data) {
           var index = $scope.userGroups.indexOf(userGroup);
           $scope.userGroups.splice(index, 1);
-          Notifications.send('Team successfully deleted', userGroup.Username);
+          Notifications.success('Team successfully deleted', userGroup.Username);
         })
         .catch(function error(err) {
           Notifications.error("Failure", err, 'Unable to remove team');
