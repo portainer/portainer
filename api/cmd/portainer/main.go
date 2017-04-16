@@ -140,6 +140,19 @@ func main() {
 		}
 	}
 
+	if *flags.AdminPassword != "" {
+		log.Printf("Creating admin user with password hash %s", *flags.AdminPassword)
+		user := &portainer.User{
+			Username: "admin",
+			Role:     portainer.AdministratorRole,
+			Password: *flags.AdminPassword,
+		}
+		err := store.UserService.CreateUser(user)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	var server portainer.Server = &http.Server{
 		BindAddress:            *flags.Addr,
 		AssetsPath:             *flags.Assets,
