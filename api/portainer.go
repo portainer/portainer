@@ -29,6 +29,7 @@ type (
 		SSL               *bool
 		SSLCert           *string
 		SSLKey            *string
+		AdminPassword     *string
 	}
 
 	// Settings represents Portainer settings.

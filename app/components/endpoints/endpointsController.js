@@ -1,6 +1,6 @@
 angular.module('endpoints', [])
-.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Messages', 'Pagination',
-function ($scope, $state, EndpointService, EndpointProvider, Messages, Pagination) {
+.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Notifications', 'Pagination',
+function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagination) {
   $scope.state = {
     error: '',
     uploadInProgress: false,
@@ -54,7 +54,7 @@ function ($scope, $state, EndpointService, EndpointProvider, Messages, Paginatio
     var TLSCertFile = $scope.formValues.TLSCert;
     var TLSKeyFile = $scope.formValues.TLSKey;
     EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, false).then(function success(data) {
-      Messages.send("Endpoint created", name);
+      Notifications.success("Endpoint created", name);
       $state.reload();
     }, function error(err) {
       $scope.state.uploadInProgress = false;
@@ -79,12 +79,12 @@ function ($scope, $state, EndpointService, EndpointProvider, Messages, Paginatio
       if (endpoint.Checked) {
         counter = counter + 1;
         EndpointService.deleteEndpoint(endpoint.Id).then(function success(data) {
-          Messages.send("Endpoint deleted", endpoint.Name);
+          Notifications.success("Endpoint deleted", endpoint.Name);
           var index = $scope.endpoints.indexOf(endpoint);
           $scope.endpoints.splice(index, 1);
           complete();
         }, function error(err) {
-          Messages.error("Failure", err, 'Unable to remove endpoint');
+          Notifications.error("Failure", err, 'Unable to remove endpoint');
           complete();
         });
       }
@@ -99,7 +99,7 @@ function ($scope, $state, EndpointService, EndpointProvider, Messages, Paginatio
       $scope.activeEndpointID = EndpointProvider.endpointID();
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, "Unable to retrieve endpoints");
+      Notifications.error("Failure", err, "Unable to retrieve endpoints");
       $scope.endpoints = [];
     })
     .finally(function final() {

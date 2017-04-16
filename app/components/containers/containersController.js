@@ -1,6 +1,6 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Messages', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
-  function ($q, $scope, $filter, Container, ContainerHelper, Info, Settings, Messages, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Notifications', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
+  function ($q, $scope, $filter, Container, ContainerHelper, Info, Settings, Notifications, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = Settings.displayAll;
@@ -29,10 +29,10 @@ angular.module('containers', [])
     })
     .then(function success() {
       delete container.Metadata.ResourceControl;
-      Messages.send('Ownership changed to public', container.Id);
+      Notifications.success('Ownership changed to public', container.Id);
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, "Unable to change container ownership");
+      Notifications.error("Failure", err, "Unable to change container ownership");
     });
   }
 
@@ -90,7 +90,7 @@ angular.module('containers', [])
           mapUsersToContainers(data);
         })
         .catch(function error(err) {
-          Messages.error("Failure", err, "Unable to retrieve users");
+          Notifications.error("Failure", err, "Unable to retrieve users");
         })
         .finally(function final() {
           $('#loadContainersSpinner').hide();
@@ -100,7 +100,7 @@ angular.module('containers', [])
       }
     }, function (e) {
       $('#loadContainersSpinner').hide();
-      Messages.error("Failure", e, "Unable to retrieve containers");
+      Notifications.error("Failure", e, "Unable to retrieve containers");
       $scope.containers = [];
     });
   };
@@ -120,56 +120,56 @@ angular.module('containers', [])
         counter = counter + 1;
         if (action === Container.start) {
           action({id: c.Id}, {}, function (d) {
-            Messages.send("Container " + msg, c.Id);
+            Notifications.success("Container " + msg, c.Id);
             complete();
           }, function (e) {
-            Messages.error("Failure", e, "Unable to start container");
+            Notifications.error("Failure", e, "Unable to start container");
             complete();
           });
         }
         else if (action === Container.remove) {
           action({id: c.Id}, function (d) {
             if (d.message) {
-              Messages.send("Error", d.message);
+              Notifications.error("Error", d, "Unable to remove container");
             }
             else {
               if (c.Metadata && c.Metadata.ResourceControl) {
                 ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, c.Id)
                 .then(function success() {
-                  Messages.send("Container " + msg, c.Id);
+                  Notifications.success("Container " + msg, c.Id);
                 })
                 .catch(function error(err) {
-                  Messages.error("Failure", err, "Unable to remove container ownership");
+                  Notifications.error("Failure", err, "Unable to remove container ownership");
                 });
               } else {
-                Messages.send("Container " + msg, c.Id);
+                Notifications.success("Container " + msg, c.Id);
               }
             }
             complete();
           }, function (e) {
-            Messages.error("Failure", e, 'Unable to remove container');
+            Notifications.error("Failure", e, 'Unable to remove container');
             complete();
           });
         }
         else if (action === Container.pause) {
           action({id: c.Id}, function (d) {
             if (d.message) {
-              Messages.send("Container is already paused", c.Id);
+              Notifications.success("Container is already paused", c.Id);
             } else {
-              Messages.send("Container " + msg, c.Id);
+              Notifications.success("Container " + msg, c.Id);
             }
             complete();
           }, function (e) {
-            Messages.error("Failure", e, 'Unable to pause container');
+            Notifications.error("Failure", e, 'Unable to pause container');
             complete();
           });
         }
         else {
           action({id: c.Id}, function (d) {
-            Messages.send("Container " + msg, c.Id);
+            Notifications.success("Container " + msg, c.Id);
             complete();
           }, function (e) {
-            Messages.error("Failure", e, 'An error occured');
+            Notifications.error("Failure", e, 'An error occured');
             complete();
           });
 
