@@ -28,7 +28,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
     FailureAction: 'pause'
   };
 
-  $scope.UserGroups = [{Id: 1, Name: 'groupA'}];
+  $scope.Teams = [{Id: 1, Name: 'groupA'}];
 
   $scope.addPortBinding = function() {
     $scope.formValues.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp' });

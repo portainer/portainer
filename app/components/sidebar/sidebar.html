@@ -52,8 +52,8 @@
     <li class="sidebar-title"><span>Portainer settings</span></li>
     <li class="sidebar-list">
       <a ui-sref="users" ui-sref-active="active">User management <span class="menu-icon fa fa-users"></span></a>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'users' || $state.current.name === 'usergroups')">
-        <a ui-sref="usergroups" ui-sref-active="active">Teams</span></a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'users' || $state.current.name === 'teams')">
+        <a ui-sref="teams" ui-sref-active="active">Teams</span></a>
       </div>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || userRole === 1">

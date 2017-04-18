@@ -10,7 +10,7 @@ function ($scope, $state, VolumeService, InfoService, ResourceControlService, Au
   };
   $scope.availableVolumeDrivers = [];
 
-  $scope.UserGroups = [{Id: 1, Name: 'groupA'}];
+  $scope.Teams = [{Id: 1, Name: 'groupA'}];
 
   $scope.addDriverOption = function() {
     $scope.formValues.DriverOptions.push({ name: '', value: '' });

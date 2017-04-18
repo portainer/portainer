@@ -92,14 +92,14 @@
           </div>
           <!-- !ownership -->
           <!-- authorized-groups -->
-          <div class="form-group" ng-if="formValues.Ownership === 'team' && UserGroups.length > 1" >
+          <div class="form-group" ng-if="formValues.Ownership === 'team' && Teams.length > 1" >
             <div class="col-sm-12">
               <label for="group-access" class="control-label text-left">
                 Authorized teams
                 <portainer-tooltip position="bottom" message="As you are a member of multiple teams, you can select which teams(s) will be able to manage this object."></portainer-tooltip>
               </label>
               <span isteven-multi-select
-               input-model="UserGroups"
+               input-model="Teams"
                output-model="formValues.Ownership_groups"
                button-label="Name"
                item-label="Name"
@@ -113,9 +113,9 @@
             </div>
             <!-- <div class="col-sm-9 col-lg-10"> -->
               <!--
-              <ui-select multiple ng-model="formValues.UserGroups" close-on-select="false" title="Choose a group">
+              <ui-select multiple ng-model="formValues.Teams" close-on-select="false" title="Choose a group">
                 <ui-select-match placeholder="Select one or more groups...">{{$item.Name}}</ui-select-match>
-                <ui-select-choices repeat="group in UserGroups | filter:$select.search">
+                <ui-select-choices repeat="group in Teams | filter:$select.search">
                   {{group.Name}}
                 </ui-select-choices>
               </ui-select>

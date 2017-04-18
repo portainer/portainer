@@ -47,11 +47,11 @@ angular.module('portainer', [
   'stats',
   'swarm',
   'task',
+  'team',
+  'teams',
   'templates',
   'user',
   'users',
-  'usergroup',
-  'usergroups',
   'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider) {
     'use strict';
@@ -531,12 +531,12 @@ angular.module('portainer', [
         }
       }
     })
-    .state('usergroups', {
-      url: '/usergroups/',
+    .state('teams', {
+      url: '/teams/',
       views: {
         "content@": {
-          templateUrl: 'app/components/usergroups/usergroups.html',
-          controller: 'UserGroupsController'
+          templateUrl: 'app/components/teams/teams.html',
+          controller: 'TeamsController'
         },
         "sidebar@": {
           templateUrl: 'app/components/sidebar/sidebar.html',
@@ -544,12 +544,12 @@ angular.module('portainer', [
         }
       }
     })
-    .state('usergroup', {
-      url: '^/usergroups/:id',
+    .state('team', {
+      url: '^/teams/:id',
       views: {
         "content@": {
-          templateUrl: 'app/components/usergroup/usergroup.html',
-          controller: 'UserGroupController'
+          templateUrl: 'app/components/team/team.html',
+          controller: 'TeamController'
         },
         "sidebar@": {
           templateUrl: 'app/components/sidebar/sidebar.html',
@@ -604,7 +604,7 @@ angular.module('portainer', [
   .constant('CONFIG_ENDPOINT', 'api/settings')
   .constant('AUTH_ENDPOINT', 'api/auth')
   .constant('USERS_ENDPOINT', 'api/users')
-  .constant('USERGROUPS_ENDPOINT', 'api/usergroups')
+  .constant('TEAMS_ENDPOINT', 'api/teams')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('PAGINATION_MAX_ITEMS', 10)

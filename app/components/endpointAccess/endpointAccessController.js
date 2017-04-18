@@ -1,6 +1,6 @@
 angular.module('endpointAccess', [])
-.controller('EndpointAccessController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'UserService', 'UserGroupService', 'Pagination', 'Notifications',
-function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserService, UserGroupService, Pagination, Notifications) {
+.controller('EndpointAccessController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'UserService', 'TeamService', 'Pagination', 'Notifications',
+function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserService, TeamService, Pagination, Notifications) {
 
   $scope.state = {
     pagination_count_accesses: Pagination.getPaginationCount('endpoint_access_accesses'),
@@ -106,7 +106,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     $q.all({
       endpoint: EndpointService.endpoint($stateParams.id),
       users: UserService.users(),
-      usergroups: UserGroupService.userGroups(),
+      teams: TeamService.teams(),
     })
     .then(function success(data) {
       $scope.endpoint = data.endpoint;
@@ -118,7 +118,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
       }).map(function (user) {
         return new EndpointAccessUserViewModel(user);
       });
-      var teams = data.usergroups.map(function (team) {
+      var teams = data.teams.map(function (team) {
         return new EndpointAccessTeamViewModel(team);
       });
       $scope.accesses = $scope.accesses.concat(users, teams);

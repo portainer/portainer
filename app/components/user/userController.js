@@ -13,8 +13,8 @@ function ($scope, $state, $stateParams, UserService, ModalService, Notifications
     Teams: [],
   };
 
-  $scope.UserGroups = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
-  // $scope.UserGroups = [];
+  $scope.Teams = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
+  // $scope.Teams = [];
 
   $scope.deleteUser = function() {
     ModalService.confirmDeletion(

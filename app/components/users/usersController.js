@@ -10,7 +10,7 @@ function ($scope, $state, UserService, ModalService, Notifications, Pagination) 
   $scope.sortType = 'RoleName';
   $scope.sortReverse = false;
 
-  $scope.UserGroups = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
+  $scope.Teams = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
 
   $scope.formValues = {
     Username: '',

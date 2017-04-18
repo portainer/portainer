@@ -1,11 +1,11 @@
-angular.module('usergroups', [])
-.controller('UserGroupsController', ['$scope', '$state', 'UserGroupService', 'ModalService', 'Notifications', 'Pagination',
-function ($scope, $state, UserGroupService, ModalService, Notifications, Pagination) {
+angular.module('teams', [])
+.controller('TeamsController', ['$scope', '$state', 'TeamService', 'ModalService', 'Notifications', 'Pagination',
+function ($scope, $state, TeamService, ModalService, Notifications, Pagination) {
   $scope.state = {
     userGroupGroupCreationError: '',
     selectedItemCount: 0,
     validName: false,
-    pagination_count: Pagination.getPaginationCount('usergroups')
+    pagination_count: Pagination.getPaginationCount('teams')
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
@@ -20,14 +20,14 @@ function ($scope, $state, UserGroupService, ModalService, Notifications, Paginat
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('endpoints', $scope.state.pagination_count);
+    Pagination.setPaginationCount('teams', $scope.state.pagination_count);
   };
 
   $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredUserGroups, function (userGroup) {
-      if (userGroup.Checked !== allSelected) {
-        userGroup.Checked = allSelected;
-        $scope.selectItem(userGroup);
+    angular.forEach($scope.state.filteredTeams, function (team) {
+      if (team.Checked !== allSelected) {
+        team.Checked = allSelected;
+        $scope.selectItem(team);
       }
     });
   };
@@ -42,22 +42,21 @@ function ($scope, $state, UserGroupService, ModalService, Notifications, Paginat
 
   $scope.checkNameValidity = function() {
     var valid = true;
-    for (var i = 0; i < $scope.userGroups.length; i++) {
-      if ($scope.formValues.Name === $scope.userGroups[i].Name) {
+    for (var i = 0; i < $scope.teams.length; i++) {
+      if ($scope.formValues.Name === $scope.teams[i].Name) {
         valid = false;
         break;
       }
     }
     $scope.state.validName = valid;
-    $scope.state.userGroupCreationError = valid ? '' : 'Team name already existing';
+    $scope.state.teamCreationError = valid ? '' : 'Team name already existing';
   };
 
-  $scope.addUserGroup = function() {
-    $scope.state.userGroupCreationError = '';
-    var userGroupname = $scope.formValues.Name;
+  $scope.addTeam = function() {
+    $scope.state.teamCreationError = '';
   };
 
-  function deleteSelectedUserGroups() {
+  function deleteSelectedTeams() {
     $('#loadUsersSpinner').show();
     var counter = 0;
     var complete = function () {
@@ -66,14 +65,14 @@ function ($scope, $state, UserGroupService, ModalService, Notifications, Paginat
         $('#loadUsersSpinner').hide();
       }
     };
-    angular.forEach($scope.userGroups, function (userGroup) {
-      if (userGroup.Checked) {
+    angular.forEach($scope.teams, function (team) {
+      if (team.Checked) {
         counter = counter + 1;
-        UserGroupService.deleteUserGroup(userGroup.Id)
+        TeamService.deleteTeam(team.Id)
         .then(function success(data) {
-          var index = $scope.userGroups.indexOf(userGroup);
-          $scope.userGroups.splice(index, 1);
-          Notifications.success('Team successfully deleted', userGroup.Username);
+          var index = $scope.teams.indexOf(team);
+          $scope.teams.splice(index, 1);
+          Notifications.success('Team successfully deleted', team.Name);
         })
         .catch(function error(err) {
           Notifications.error("Failure", err, 'Unable to remove team');
@@ -90,16 +89,16 @@ function ($scope, $state, UserGroupService, ModalService, Notifications, Paginat
       'Do you want to delete the selected team(s)? Users in the team(s) will not be deleted.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
-        deleteSelectedUserGroups();
+        deleteSelectedTeams();
       }
     );
   };
 
   function initView() {
     $('#loadingViewSpinner').show();
-    UserGroupService.userGroups()
+    TeamService.teams()
     .then(function success(data) {
-      $scope.userGroups = data;
+      $scope.teams = data;
     })
     .catch(function error(err) {
       Notifications.error("Failure", err, 'Unable to retrieve teams');

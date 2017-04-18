@@ -16,7 +16,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     ExtraHosts: [],
   };
 
-  $scope.UserGroups = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
+  $scope.Teams = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
 
   $scope.imageConfig = {};
 

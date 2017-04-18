@@ -67,12 +67,12 @@
               <label for="group-access" class="control-label text-left">
                 Add to team(s)
               </label>
-              <span class="small text-muted" style="margin-left: 20px;" ng-if="UserGroups.length === 0">
-                You have not yet created any team. Head over the <a ui-sref="usergroups">teams view</a> to manage user teams.</span>
+              <span class="small text-muted" style="margin-left: 20px;" ng-if="Teams.length === 0">
+                You have not yet created any team. Head over the <a ui-sref="teams">teams view</a> to manage user teams.</span>
               </span>
               <span isteven-multi-select
-               ng-if="UserGroups.length > 0"
-               input-model="UserGroups"
+               ng-if="Teams.length > 0"
+               input-model="Teams"
                output-model="formValues.Teams"
                button-label="Name"
                item-label="Name"

@@ -1,10 +1,10 @@
-angular.module('usergroup', [])
-.controller('UserGroupController', ['$q', '$scope', '$state', '$stateParams', 'UserGroupService', 'UserService', 'ModalService', 'Notifications', 'Pagination',
-function ($q, $scope, $state, $stateParams, UserGroupService, UserService, ModalService, Notifications, Pagination) {
+angular.module('team', [])
+.controller('TeamController', ['$q', '$scope', '$state', '$stateParams', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Pagination',
+function ($q, $scope, $state, $stateParams, TeamService, UserService, ModalService, Notifications, Pagination) {
 
   $scope.state = {
-    pagination_count_users: Pagination.getPaginationCount('usergroup_available_users'),
-    pagination_count_members: Pagination.getPaginationCount('usergroup_members')
+    pagination_count_users: Pagination.getPaginationCount('team_available_users'),
+    pagination_count_members: Pagination.getPaginationCount('team_members')
   };
 
   $scope.sortTypeUsers = 'Username';
@@ -16,7 +16,7 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
   };
 
   $scope.changePaginationCountUsers = function() {
-    Pagination.setPaginationCount('endpoint_access_users', $scope.state.pagination_count_users);
+    Pagination.setPaginationCount('team_available_users', $scope.state.pagination_count_users);
   };
 
   $scope.sortTypeGroupMembers = 'Username';
@@ -28,10 +28,10 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
   };
 
   $scope.changePaginationCountGroupMembers = function() {
-    Pagination.setPaginationCount('endpoint_access_groupMembers', $scope.state.pagination_count_groupMembers);
+    Pagination.setPaginationCount('team_members', $scope.state.pagination_count_members);
   };
 
-  $scope.deleteUserGroup = function() {
+  $scope.deleteTeam = function() {
     ModalService.confirmDeletion(
       'Do you want to delete this team? Users in this team will not be deleted.',
       function onConfirm(confirmed) {
@@ -57,7 +57,7 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .catch(function error(err) {
     //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
-    $scope.groupMembers = $scope.groupMembers.concat($scope.users);
+    $scope.teamMembers = $scope.teamMembers.concat($scope.users);
     $scope.users = [];
     Notifications.success('All users successfully added');
   };
@@ -72,8 +72,8 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .catch(function error(err) {
     //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
-    $scope.users = $scope.users.concat($scope.groupMembers);
-    $scope.groupMembers = [];
+    $scope.users = $scope.users.concat($scope.teamMembers);
+    $scope.teamMembers = [];
     Notifications.success('All users successfully removed');
   };
 
@@ -93,7 +93,7 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
     removeUserFromArray(user.Id, $scope.users);
-    $scope.groupMembers.push(user);
+    $scope.teamMembers.push(user);
     Notifications.success('User added to team', user.Username);
   };
 
@@ -114,7 +114,7 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
     // .catch(function error(err) {
     //   Notifications.error("Failure", err, "Unable to update endpoint permissions");
     // });
-    removeUserFromArray(user.Id, $scope.groupMembers);
+    removeUserFromArray(user.Id, $scope.teamMembers);
     $scope.users.push(user);
     Notifications.success('User removed from team', user.Username);
   };
@@ -122,11 +122,11 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
   function initView() {
     $('#loadingViewSpinner').show();
     $q.all({
-      usergroup: UserGroupService.userGroup($stateParams.id),
+      team: TeamService.team($stateParams.id),
       users: UserService.users(),
     })
     .then(function success(data) {
-      $scope.usergroup = data.usergroup;
+      $scope.team = data.team;
       $scope.users = data.users.filter(function (user) {
         if (user.Role !== 1) {
           return user;
@@ -134,12 +134,11 @@ function ($q, $scope, $state, $stateParams, UserGroupService, UserService, Modal
       }).map(function (user) {
         return new UserViewModel(user);
       });
-      $scope.groupMembers = [];
+      $scope.teamMembers = [];
     })
     .catch(function error(err) {
-      $scope.usergroup = [];
       $scope.users = [];
-      $scope.groupMembers = [];
+      $scope.teamMembers = [];
       Notifications.error("Failure", err, 'Unable to retrieve team details');
     })
     .finally(function final() {
