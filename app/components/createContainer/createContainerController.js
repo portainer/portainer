@@ -34,7 +34,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       Binds: [],
       NetworkMode: 'bridge',
       Privileged: false,
-      ExtraHosts: []
+      ExtraHosts: [],
+      Devices:[]
     },
     Labels: {}
   };
@@ -78,7 +79,14 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   $scope.removeExtraHost = function(index) {
     $scope.formValues.ExtraHosts.splice(index, 1);
   };
+  
+  $scope.addDevice = function() {
+    $scope.config.HostConfig.Devices.push({ pathOnHost: '', pathInContainer: '' });
+  };
 
+  $scope.removeDevice = function(index) {
+    $scope.config.HostConfig.Devices.splice(index, 1);
+  };
 
   Config.$promise.then(function (c) {
     var containersToHideLabels = c.hiddenLabels;
@@ -278,6 +286,19 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     });
     config.Labels = labels;
   }
+  
+  function prepareDevices(config) {
+    var path = [];
+    config.HostConfig.Devices.forEach(function (p) {
+      if (p.pathOnHost) {
+        if(p.pathInContainer === '') {
+          p.pathInContainer = p.pathOnHost;
+        }
+        path.push({PathOnHost:p.pathOnHost,PathInContainer:p.pathInContainer,CgroupPermissions:'rwm'});  
+      }
+    });
+    config.HostConfig.Devices = path; 
+  }
 
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
@@ -289,6 +310,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     prepareEnvironmentVariables(config);
     prepareVolumes(config);
     prepareLabels(config);
+    prepareDevices(config);
     return config;
   }
 

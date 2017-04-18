@@ -510,8 +510,38 @@
               </div>
               <!-- !privileged-mode -->
             </form>
+            <form class="form-horizontal" style="margin-top: 15px;">
+              <!-- devices -->
+              <div class="form-group">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                  <label class="control-label text-left">Devices</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addDevice()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add device
+                  </span>
+                </div>
+               <!-- devices-input-list -->
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="device in config.HostConfig.Devices" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">host</span>
+                      <input type="text" class="form-control" ng-model="device.pathOnHost" placeholder="e.g. /dev/tty0">
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">container</span>
+                      <input type="text" class="form-control" ng-model="device.pathInContainer" placeholder="e.g. /dev/tty0">
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeDevice($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- !devices-input-list -->
+              </div>
+              <!-- !devices-->
+            </form>
+
           </div>
-          <!-- !tab-runtime -->
+          <!-- !tab-runtime --> 
         </div>
       </rd-widget-body>
     </rd-widget>
