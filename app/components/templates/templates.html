@@ -15,9 +15,9 @@
       <rd-widget-body classes="padding">
         <form class="form-horizontal">
           <!-- description -->
-          <div class="form-group" ng-if="state.selectedTemplate.Description">
+          <div class="form-group" ng-if="state.selectedTemplate.Note">
             <div class="col-sm-12">
-              <span class="small" style="margin-left: 5px;">{{ state.selectedTemplate.Description }}</span>
+              <span class="small" style="margin-left: 5px;" ng-bind-html="state.selectedTemplate.Note"></span>
             </div>
           </div>
           <!-- !description -->
