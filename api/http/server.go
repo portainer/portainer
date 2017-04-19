@@ -41,6 +41,8 @@ func (server *Server) Start() error {
 	userHandler.UserService = server.UserService
 	userHandler.CryptoService = server.CryptoService
 	userHandler.ResourceControlService = server.ResourceControlService
+	var teamHandler = NewTeamHandler(middleWareService)
+	teamHandler.TeamService = server.TeamService
 	var settingsHandler = NewSettingsHandler(middleWareService)
 	settingsHandler.settings = server.Settings
 	var templatesHandler = NewTemplatesHandler(middleWareService)
@@ -62,6 +64,7 @@ func (server *Server) Start() error {
 	server.Handler = &Handler{
 		AuthHandler:      authHandler,
 		UserHandler:      userHandler,
+		TeamHandler:      teamHandler,
 		EndpointHandler:  endpointHandler,
 		SettingsHandler:  settingsHandler,
 		TemplatesHandler: templatesHandler,

@@ -161,6 +161,7 @@ func main() {
 		AuthDisabled:           *flags.NoAuth,
 		EndpointManagement:     authorizeEndpointMgmt,
 		UserService:            store.UserService,
+		TeamService:            store.TeamService,
 		EndpointService:        store.EndpointService,
 		ResourceControlService: store.ResourceControlService,
 		CryptoService:          cryptoService,

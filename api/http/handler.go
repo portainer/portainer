@@ -13,6 +13,7 @@ import (
 type Handler struct {
 	AuthHandler      *AuthHandler
 	UserHandler      *UserHandler
+	TeamHandler      *TeamHandler
 	EndpointHandler  *EndpointHandler
 	SettingsHandler  *SettingsHandler
 	TemplatesHandler *TemplatesHandler
@@ -39,6 +40,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/users") {
 		http.StripPrefix("/api", h.UserHandler).ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/api/teams") {
+		http.StripPrefix("/api", h.TeamHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/endpoints") {
 		http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/settings") {
