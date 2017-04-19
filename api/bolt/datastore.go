@@ -17,6 +17,7 @@ type Store struct {
 
 	// Services
 	UserService            *UserService
+	TeamService            *TeamService
 	EndpointService        *EndpointService
 	ResourceControlService *ResourceControlService
 	VersionService         *VersionService
@@ -29,6 +30,7 @@ const (
 	databaseFileName                   = "portainer.db"
 	versionBucketName                  = "version"
 	userBucketName                     = "users"
+	teamBucketName                     = "teams"
 	endpointBucketName                 = "endpoints"
 	containerResourceControlBucketName = "containerResourceControl"
 	serviceResourceControlBucketName   = "serviceResourceControl"
@@ -40,11 +42,13 @@ func NewStore(storePath string) (*Store, error) {
 	store := &Store{
 		Path:                   storePath,
 		UserService:            &UserService{},
+		TeamService:            &TeamService{},
 		EndpointService:        &EndpointService{},
 		ResourceControlService: &ResourceControlService{},
 		VersionService:         &VersionService{},
 	}
 	store.UserService.store = store
+	store.TeamService.store = store
 	store.EndpointService.store = store
 	store.ResourceControlService.store = store
 	store.VersionService.store = store
@@ -75,6 +79,10 @@ func (store *Store) Open() error {
 			return err
 		}
 		_, err = tx.CreateBucketIfNotExists([]byte(userBucketName))
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(teamBucketName))
 		if err != nil {
 			return err
 		}

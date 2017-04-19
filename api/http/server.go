@@ -13,6 +13,7 @@ type Server struct {
 	AuthDisabled           bool
 	EndpointManagement     bool
 	UserService            portainer.UserService
+	TeamService            portainer.TeamService
 	EndpointService        portainer.EndpointService
 	ResourceControlService portainer.ResourceControlService
 	CryptoService          portainer.CryptoService

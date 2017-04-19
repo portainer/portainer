@@ -49,15 +49,15 @@ type (
 	// UserID represents a user identifier
 	UserID int
 
-	// UserGroup represents a list of user accounts.
-	UserGroup struct {
-		ID    UserGroupID `json:"Id"`
-		Name  string      `json:"Name"`
-		Users []UserID    `json:"Users"`
+	// Team represents a list of user accounts.
+	Team struct {
+		ID    TeamID   `json:"Id"`
+		Name  string   `json:"Name"`
+		Users []UserID `json:"Users"`
 	}
 
-	// UserGroupID represents a user group identifier
-	UserGroupID int
+	// TeamID represents a team identifier
+	TeamID int
 
 	// UserRole represents the role of a user. It can be either an administrator
 	// or a regular user.
@@ -76,15 +76,15 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
-		ID                   EndpointID    `json:"Id"`
-		Name                 string        `json:"Name"`
-		URL                  string        `json:"URL"`
-		TLS                  bool          `json:"TLS"`
-		TLSCACertPath        string        `json:"TLSCACert,omitempty"`
-		TLSCertPath          string        `json:"TLSCert,omitempty"`
-		TLSKeyPath           string        `json:"TLSKey,omitempty"`
-		AuthorizedUsers      []UserID      `json:"AuthorizedUsers"`
-		AuthorizedUserGroups []UserGroupID `json:"AuthorizedGroups"`
+		ID              EndpointID `json:"Id"`
+		Name            string     `json:"Name"`
+		URL             string     `json:"URL"`
+		TLS             bool       `json:"TLS"`
+		TLSCACertPath   string     `json:"TLSCACert,omitempty"`
+		TLSCertPath     string     `json:"TLSCert,omitempty"`
+		TLSKeyPath      string     `json:"TLSKey,omitempty"`
+		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
 	}
 
 	// ResourceControl represent a reference to a Docker resource with specific controls
@@ -133,6 +133,16 @@ type (
 		CreateUser(user *User) error
 		UpdateUser(ID UserID, user *User) error
 		DeleteUser(ID UserID) error
+	}
+
+	// TeamService represents a service for managing user data.
+	TeamService interface {
+		Team(ID TeamID) (*Team, error)
+		TeamByName(name string) (*Team, error)
+		Teams() ([]Team, error)
+		CreateTeam(team *Team) error
+		UpdateTeam(ID TeamID, team *Team) error
+		DeleteTeam(ID TeamID) error
 	}
 
 	// EndpointService represents a service for managing endpoint data.

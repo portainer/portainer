@@ -13,6 +13,12 @@ const (
 	ErrAdminAlreadyInitialized = Error("Admin user already initialized")
 )
 
+// Team errors.
+const (
+	ErrTeamNotFound      = Error("Team not found")
+	ErrTeamAlreadyExists = Error("Team already exists")
+)
+
 // Endpoint errors.
 const (
 	ErrEndpointNotFound     = Error("Endpoint not found")
