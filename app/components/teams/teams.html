@@ -17,24 +17,19 @@
         <form class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
-            <label for="usergroupname" class="col-sm-2 control-label text-left">Name</label>
+            <label for="teamname" class="col-sm-2 control-label text-left">Name</label>
             <div class="col-sm-8">
               <div class="input-group">
-                <input type="text" class="form-control" id="usergroupname" ng-model="formValues.Name" ng-change="checkNameValidity()" placeholder="e.g. development">
+                <input type="text" class="form-control" id="teamname" ng-model="formValues.Name" ng-change="checkNameValidity()" placeholder="e.g. development">
                 <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[state.validName]" aria-hidden="true"></i></span>
               </div>
             </div>
           </div>
           <!-- !name-input -->
-          <!-- <div class="form-group">
-            <div class="col-sm-12">
-              <span class="small text-muted">Note: tag note.</span>
-            </div>
-          </div> -->
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!state.validName || formValues.Name === ''" ng-click="addTeam()"><i class="fa fa-plus" aria-hidden="true"></i> Add team</button>
-              <i id="createUserGroupSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <i id="createTeamSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               <span class="text-danger" ng-if="state.teamCreationError" style="margin: 5px;">
                 <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.teamCreationError }}
               </span>
@@ -89,7 +84,7 @@
             </thead>
             <tbody>
               <tr dir-paginate="team in (state.filteredTeams = (teams | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(team)" /></td>
+                <td><input type="checkbox" ng-model="team.Checked" ng-change="selectItem(team)" /></td>
                 <td>{{ team.Name }}</td>
                 <td>
                   <a ui-sref="team({id: team.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>

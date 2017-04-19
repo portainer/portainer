@@ -1,6 +1,6 @@
 angular.module('user', [])
-.controller('UserController', ['$scope', '$state', '$stateParams', 'UserService', 'ModalService', 'Notifications',
-function ($scope, $state, $stateParams, UserService, ModalService, Notifications) {
+.controller('UserController', ['$q', '$scope', '$state', '$stateParams', 'UserService', 'TeamService', 'ModalService', 'Notifications',
+function ($q, $scope, $state, $stateParams, UserService, TeamService, ModalService, Notifications) {
 
   $scope.state = {
     updatePasswordError: '',
@@ -12,9 +12,6 @@ function ($scope, $state, $stateParams, UserService, ModalService, Notifications
     Administrator: false,
     Teams: [],
   };
-
-  $scope.Teams = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
-  // $scope.Teams = [];
 
   $scope.deleteUser = function() {
     ModalService.confirmDeletion(
@@ -58,6 +55,30 @@ function ($scope, $state, $stateParams, UserService, ModalService, Notifications
     });
   };
 
+  $scope.onTeamClick = function(team) {
+    $('#loadingViewSpinner').show();
+    var teamMemberIDs = team.Users;
+
+    if (team.ticked) {
+      teamMemberIDs.push($scope.user.Id);
+    } else {
+      _.remove(teamMemberIDs, function(n) {
+        return n === $scope.user.Id;
+      });
+    }
+
+    TeamService.updateTeam(team.Id, team.Name, teamMemberIDs)
+    .then(function success(data) {
+      Notifications.success('User team membership successfully updated', team.Name);
+    })
+    .catch(function error(err) {
+      Notifications.error("Failure", err, "Unable to update user team membership");
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
+  };
+
   function deleteUser() {
     $('#loadingViewSpinner').show();
     UserService.deleteUser($scope.user.Id)
@@ -73,13 +94,23 @@ function ($scope, $state, $stateParams, UserService, ModalService, Notifications
     });
   }
 
-  function getUser() {
+  function initView() {
     $('#loadingViewSpinner').show();
-    UserService.user($stateParams.id)
+    $q.all({
+      user: UserService.user($stateParams.id),
+      teams: TeamService.teams()
+    })
     .then(function success(data) {
-      var user = new UserViewModel(data);
+      var user = new UserViewModel(data.user);
       $scope.user = user;
+      $scope.teams = data.teams;
       $scope.formValues.Administrator = user.RoleId === 1 ? true : false;
+      angular.forEach(data.teams, function (team) {
+        if (_.includes(team.Users, user.Id)) {
+          team.ticked = true;
+          $scope.formValues.Teams.push(team);
+        }
+      });
     })
     .catch(function error(err) {
       Notifications.error("Failure", err, 'Unable to retrieve user information');
@@ -89,5 +120,5 @@ function ($scope, $state, $stateParams, UserService, ModalService, Notifications
     });
   }
 
-  getUser();
+  initView();
 }]);

@@ -37,12 +37,12 @@
                 <label for="teams" class="control-label text-left">
                   Teams
                 </label>
-                <span class="small text-muted" style="margin-left: 20px;" ng-if="Teams.length === 0">
+                <span class="small text-muted" style="margin-left: 20px;" ng-if="teams.length === 0">
                   You have not yet created any team. Head over the <a ui-sref="teams">teams view</a> to manage user teams.</span>
                 </span>
                 <span isteven-multi-select
-                 ng-if="Teams.length > 0"
-                 input-model="Teams"
+                 ng-if="teams.length > 0"
+                 input-model="teams"
                  output-model="formValues.Teams"
                  button-label="Name"
                  item-label="Name"
@@ -51,6 +51,7 @@
                  search-property="Name"
                  translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
                  style="margin-left: 20px;"
+                 on-item-click="onTeamClick(data)"
                </span>
               </td>
             </tr>

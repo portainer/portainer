@@ -31,11 +31,11 @@ func NewTeamHandler(mw *middleWareService) *TeamHandler {
 	h.Handle("/teams",
 		mw.administrator(http.HandlerFunc(h.handlePostTeams))).Methods(http.MethodPost)
 	h.Handle("/teams",
-		mw.administrator(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
+		mw.authenticated(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
 		mw.administrator(http.HandlerFunc(h.handleGetTeam))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
-		mw.authenticated(http.HandlerFunc(h.handlePutTeam))).Methods(http.MethodPut)
+		mw.administrator(http.HandlerFunc(h.handlePutTeam))).Methods(http.MethodPut)
 	h.Handle("/teams/{id}",
 		mw.administrator(http.HandlerFunc(h.handleDeleteTeam))).Methods(http.MethodDelete)
 	h.Handle("/teams/{teamId}/resources/{resourceType}",
@@ -71,7 +71,8 @@ func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Reque
 	}
 
 	team = &portainer.Team{
-		Name: req.Name,
+		Name:  req.Name,
+		Users: []portainer.UserID{},
 	}
 
 	err = handler.TeamService.CreateTeam(team)
@@ -151,6 +152,18 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	if req.Name != "" {
+		team.Name = req.Name
+	}
+
+	if req.Users != nil {
+		userIDs := []portainer.UserID{}
+		for _, value := range req.Users {
+			userIDs = append(userIDs, portainer.UserID(value))
+		}
+		team.Users = userIDs
+	}
+
 	err = handler.TeamService.UpdateTeam(team.ID, team)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
@@ -159,7 +172,8 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 }
 
 type putTeamRequest struct {
-	Name string `valid:"alphanum,required"`
+	Name  string `valid:"-"`
+	Users []int  `valid:"-"`
 }
 
 // handleDeleteTeam handles DELETE requests on /teams/:id

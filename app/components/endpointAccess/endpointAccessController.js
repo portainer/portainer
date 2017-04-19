@@ -123,13 +123,6 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
       });
       $scope.accesses = $scope.accesses.concat(users, teams);
 
-      // $scope.accesses = data.users.filter(function (user) {
-      //   if (user.Role !== 1) {
-      //     return user;
-      //   }
-      // }).map(function (user) {
-      //   return new UserViewModel(user);
-      // });
       $scope.authorizedAccesses = [];
       angular.forEach($scope.endpoint.AuthorizedUsers, function(userID) {
         for (var i = 0, l = $scope.accesses.length; i < l; i++) {

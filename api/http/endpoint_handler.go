@@ -110,6 +110,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		URL:             req.URL,
 		TLS:             req.TLS,
 		AuthorizedUsers: []portainer.UserID{},
+		AuthorizedTeams: []portainer.TeamID{},
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)

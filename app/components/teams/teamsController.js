@@ -53,16 +53,29 @@ function ($scope, $state, TeamService, ModalService, Notifications, Pagination) 
   };
 
   $scope.addTeam = function() {
+    $('#createTeamSpinner').show();
     $scope.state.teamCreationError = '';
+    var teamName = $scope.formValues.Name;
+    TeamService.createTeam(teamName)
+    .then(function success(data) {
+      Notifications.success("Team successfully created", teamName);
+      $state.reload();
+    })
+    .catch(function error(err) {
+      $scope.state.teamCreationError = err.msg;
+    })
+    .finally(function final() {
+      $('#createTeamSpinner').hide();
+    });
   };
 
   function deleteSelectedTeams() {
-    $('#loadUsersSpinner').show();
+    $('#loadingViewSpinner').show();
     var counter = 0;
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        $('#loadUsersSpinner').hide();
+        $('#loadingViewSpinner').hide();
       }
     };
     angular.forEach($scope.teams, function (team) {

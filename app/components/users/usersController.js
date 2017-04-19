@@ -1,6 +1,6 @@
 angular.module('users', [])
-.controller('UsersController', ['$scope', '$state', 'UserService', 'ModalService', 'Notifications', 'Pagination',
-function ($scope, $state, UserService, ModalService, Notifications, Pagination) {
+.controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'ModalService', 'Notifications', 'Pagination',
+function ($q, $scope, $state, UserService, TeamService, ModalService, Notifications, Pagination) {
   $scope.state = {
     userCreationError: '',
     selectedItemCount: 0,
@@ -9,8 +9,6 @@ function ($scope, $state, UserService, ModalService, Notifications, Pagination) 
   };
   $scope.sortType = 'RoleName';
   $scope.sortReverse = false;
-
-  $scope.Teams = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
 
   $scope.formValues = {
     Username: '',
@@ -59,20 +57,30 @@ function ($scope, $state, UserService, ModalService, Notifications, Pagination) 
   };
 
   $scope.addUser = function() {
+    $('#createUserSpinner').show();
     $scope.state.userCreationError = '';
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
     var role = $scope.formValues.Administrator ? 1 : 2;
     UserService.createUser(username, password, role)
     .then(function success(data) {
-      Notifications.success("User created", username);
-      $state.reload();
+      teamUpdateQueries = [];
+      angular.forEach($scope.formValues.Teams, function(team) {
+        var teamMemberIDs = team.Users;
+        teamMemberIDs.push(data.Id);
+        teamUpdateQueries.push(TeamService.updateTeam(team.Id, team.Name, teamMemberIDs));
+      });
+      $q.all(teamUpdateQueries)
+      .then(function success(data) {
+        Notifications.success("User successfully created", username);
+        $state.reload();
+      });
     })
     .catch(function error(err) {
       $scope.state.userCreationError = err.msg;
     })
     .finally(function final() {
-
+      $('#createUserSpinner').hide();
     });
   };
 
@@ -114,22 +122,27 @@ function ($scope, $state, UserService, ModalService, Notifications, Pagination) 
     );
   };
 
-  function fetchUsers() {
+  function initView() {
     $('#loadUsersSpinner').show();
-    UserService.users()
+    $q.all({
+      users: UserService.users(),
+      teams: TeamService.teams(),
+    })
     .then(function success(data) {
-      $scope.users = data.map(function(user) {
+      $scope.users = data.users.map(function(user) {
         return new UserViewModel(user);
       });
+      $scope.teams = data.teams;
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to retrieve users");
+      Notifications.error("Failure", err, "Unable to retrieve users and teams");
       $scope.users = [];
+      $scope.teams = [];
     })
     .finally(function final() {
       $('#loadUsersSpinner').hide();
     });
   }
 
-  fetchUsers();
+  initView();
 }]);

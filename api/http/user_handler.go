@@ -99,6 +99,12 @@ func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Reque
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+
+	encodeJSON(w, &postUsersResponse{ID: int(user.ID)}, handler.Logger)
+}
+
+type postUsersResponse struct {
+	ID int `json:"Id"`
 }
 
 type postUsersRequest struct {
