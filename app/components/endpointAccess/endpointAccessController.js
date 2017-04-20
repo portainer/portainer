@@ -7,8 +7,8 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     pagination_count_authorizedAccesses: Pagination.getPaginationCount('endpoint_access_authorizedAccesses')
   };
 
-  $scope.sortTypeAccesses = 'Name';
-  $scope.sortReverseAccesses = true;
+  $scope.sortTypeAccesses = 'Type';
+  $scope.sortReverseAccesses = false;
 
   $scope.orderAccesses = function(sortType) {
     $scope.sortReverseAccesses = ($scope.sortTypeAccesses === sortType) ? !$scope.sortReverseAccesses : false;
@@ -19,8 +19,8 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     Pagination.setPaginationCount('endpoint_access_accesses', $scope.state.pagination_count_accesses);
   };
 
-  $scope.sortTypeAuthorizedAccesses = 'Name';
-  $scope.sortReverseAuthorizedAccesses = true;
+  $scope.sortTypeAuthorizedAccesses = 'Type';
+  $scope.sortReverseAuthorizedAccesses = false;
 
   $scope.orderAuthorizedAccesses = function(sortType) {
     $scope.sortReverseAuthorizedAccesses = ($scope.sortTypeAuthorizedAccesses === sortType) ? !$scope.sortReverseAuthorizedAccesses : false;
@@ -32,72 +32,103 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
   };
 
   $scope.authorizeAllAccesses = function() {
-    var authorizedAccessIDs = [];
-    angular.forEach($scope.authorizedAccesses, function (access) {
-      authorizedAccessIDs.push(access.Id);
+    var authorizedUsers = [];
+    var authorizedTeams = [];
+    angular.forEach($scope.authorizedAccesses, function (a) {
+      if (a.Type === "user") {
+        authorizedUsers.push(a.Id);
+      } else if (a.Type === "team") {
+        authorizedTeams.push(a.Id);
+      }
     });
-    angular.forEach($scope.accesses, function (access) {
-      authorizedAccessIDs.push(access.Id);
+    angular.forEach($scope.accesses, function (a) {
+      if (a.Type === "user") {
+        authorizedUsers.push(a.Id);
+      } else if (a.Type === "team") {
+        authorizedTeams.push(a.Id);
+      }
     });
-    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedAccessIDs)
+
+    EndpointService.updateAccess($stateParams.id, authorizedUsers, authorizedTeams)
     .then(function success(data) {
       $scope.authorizedAccesses = $scope.authorizedAccesses.concat($scope.accesses);
       $scope.accesses = [];
-      Notifications.success('Accesses granted successfully');
+      Notifications.success('Endpoint accesses successfully updated');
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update endpoint permissions");
+      Notifications.error("Failure", err, "Unable to update endpoint accesses");
     });
   };
 
   $scope.unauthorizeAllAccesses = function() {
-    EndpointService.updateAuthorizedUsers($stateParams.id, [])
+    EndpointService.updateAccess($stateParams.id, [], [])
     .then(function success(data) {
       $scope.accesses = $scope.accesses.concat($scope.authorizedAccesses);
       $scope.authorizedAccesses = [];
-      Notifications.success('All accesses removed successfully');
-      $scope.users = $scope.users.concat($scope.authorizedUsers);
-      $scope.authorizedUsers = [];
-      Notifications.success('Access removed for all users');
+      Notifications.success('Endpoint accesses successfully updated');
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update endpoint permissions");
+      Notifications.error("Failure", err, "Unable to update endpoint accesses");
     });
   };
 
   $scope.authorizeAccess = function(access) {
-    var authorizedAccessIDs = [];
+    var authorizedUsers = [];
+    var authorizedTeams = [];
     angular.forEach($scope.authorizedAccesses, function (a) {
-      authorizedAccessIDs.push(a.Id);
+      if (a.Type === "user") {
+        authorizedUsers.push(a.Id);
+      } else if (a.Type === "team") {
+        authorizedTeams.push(a.Id);
+      }
     });
-    authorizedAccessIDs.push(access.Id);
-    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedAccessIDs)
+
+    if (access.Type === "user") {
+      authorizedUsers.push(access.Id);
+    } else if (access.Type === "team") {
+      authorizedTeams.push(access.Id);
+    }
+
+    EndpointService.updateAccess($stateParams.id, authorizedUsers, authorizedTeams)
     .then(function success(data) {
       removeAccessFromArray(access.Id, $scope.accesses);
       $scope.authorizedAccesses.push(access);
-      Notifications.success('Access granted', access.Name);
+      Notifications.success('Endpoint accesses successfully updated', access.Name);
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update endpoint permissions");
+      Notifications.error("Failure", err, "Unable to update endpoint accesses");
     });
   };
 
   $scope.unauthorizeAccess = function(access) {
-    var authorizedAccessIDs = $scope.authorizedAccesses.filter(function (a) {
-      if (a.Id !== access.Id) {
-        return a;
+    var authorizedUsers = [];
+    var authorizedTeams = [];
+    angular.forEach($scope.authorizedAccesses, function (a) {
+      if (a.Type === "user") {
+        authorizedUsers.push(a.Id);
+      } else if (a.Type === "team") {
+        authorizedTeams.push(a.Id);
       }
-    }).map(function (a) {
-      return a.Id;
     });
-    EndpointService.updateAuthorizedUsers($stateParams.id, authorizedAccessIDs)
+
+    if (access.Type === "user") {
+      _.remove(authorizedUsers, function(n) {
+        return n === access.Id;
+      });
+    } else if (access.Type === "team") {
+      _.remove(authorizedTeams, function(n) {
+        return n === access.Id;
+      });
+    }
+
+    EndpointService.updateAccess($stateParams.id, authorizedUsers, authorizedTeams)
     .then(function success(data) {
       removeAccessFromArray(access.Id, $scope.authorizedAccesses);
       $scope.accesses.push(access);
-      Notifications.success('Access removed', access.Name);
+      Notifications.success('Endpoint accesses successfully updated', access.Name);
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update endpoint permissions");
+      Notifications.error("Failure", err, "Unable to update endpoint accesses");
     });
   };
 
@@ -122,11 +153,19 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
         return new EndpointAccessTeamViewModel(team);
       });
       $scope.accesses = $scope.accesses.concat(users, teams);
-
       $scope.authorizedAccesses = [];
       angular.forEach($scope.endpoint.AuthorizedUsers, function(userID) {
         for (var i = 0, l = $scope.accesses.length; i < l; i++) {
-          if ($scope.accesses[i].Id === userID) {
+          if ($scope.accesses[i].Type === "user" && $scope.accesses[i].Id === userID) {
+            $scope.authorizedAccesses.push($scope.accesses[i]);
+            $scope.accesses.splice(i, 1);
+            return;
+          }
+        }
+      });
+      angular.forEach($scope.endpoint.AuthorizedTeams, function(teamID) {
+        for (var i = 0, l = $scope.accesses.length; i < l; i++) {
+          if ($scope.accesses[i].Type === "team" && $scope.accesses[i].Id === teamID) {
             $scope.authorizedAccesses.push($scope.accesses[i]);
             $scope.accesses.splice(i, 1);
             return;

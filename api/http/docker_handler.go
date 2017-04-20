@@ -17,6 +17,7 @@ type DockerHandler struct {
 	*mux.Router
 	Logger          *log.Logger
 	EndpointService portainer.EndpointService
+	TeamService     portainer.TeamService
 	ProxyService    *ProxyService
 }
 
@@ -31,10 +32,19 @@ func NewDockerHandler(mw *middleWareService, resourceControlService portainer.Re
 	return h
 }
 
-func checkEndpointAccessControl(endpoint *portainer.Endpoint, userID portainer.UserID) bool {
+func (handler *DockerHandler) checkEndpointAccessControl(endpoint *portainer.Endpoint, userID portainer.UserID) bool {
 	for _, authorizedUserID := range endpoint.AuthorizedUsers {
 		if authorizedUserID == userID {
 			return true
+		}
+	}
+
+	teams, _ := handler.TeamService.TeamsByUserID(userID)
+	for _, authorizedTeamID := range endpoint.AuthorizedTeams {
+		for _, team := range teams {
+			if team.ID == authorizedTeamID {
+				return true
+			}
 		}
 	}
 	return false
@@ -61,7 +71,7 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, handler.Logger)
 	}
-	if tokenData.Role != portainer.AdministratorRole && !checkEndpointAccessControl(endpoint, tokenData.ID) {
+	if tokenData.Role != portainer.AdministratorRole && !handler.checkEndpointAccessControl(endpoint, tokenData.ID) {
 		Error(w, portainer.ErrEndpointAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}

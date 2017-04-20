@@ -70,7 +70,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-click="addUser(user)" class="interactive" dir-paginate="user in (state.filteredUsers = (users | filter:state.filterUsers | orderBy:sortTypeUsers:sortReverseUsers | itemsPerPage: state.pagination_count_users))">
+              <tr ng-click="addUser(user)" class="interactive" pagination-id="table1" dir-paginate="user in users | filter:state.filterUsers | orderBy:sortTypeUsers:sortReverseUsers | itemsPerPage: state.pagination_count_users">
                 <td>{{ user.Username }}</td>
               </tr>
               <tr ng-if="!users">
@@ -82,7 +82,7 @@
             </tbody>
           </table>
           <div ng-if="users" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
+            <dir-pagination-controls pagination-id="table1"></dir-pagination-controls>
           </div>
         </div>
       </rd-widget-body>
@@ -125,7 +125,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-click="removeUser(user)" class="interactive" dir-paginate="user in (state.filteredGroupMembers = (teamMembers | filter:state.filterGroupMembers | orderBy:sortTypeGroupMembers:sortReverseGroupMembers | itemsPerPage: state.pagination_count_groupMembers))">
+              <tr ng-click="removeUser(user)" class="interactive" pagination-id="table2" dir-paginate="user in teamMembers | filter:state.filterGroupMembers | orderBy:sortTypeGroupMembers:sortReverseGroupMembers | itemsPerPage: state.pagination_count_groupMembers">
                 <td>{{ user.Username }}</td>
               </tr>
               <tr ng-if="!teamMembers">
@@ -137,7 +137,7 @@
             </tbody>
           </table>
           <div ng-if="teamMembers" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
+            <dir-pagination-controls pagination-id="table2"></dir-pagination-controls>
           </div>
         </div>
       </rd-widget-body>

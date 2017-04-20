@@ -67,7 +67,7 @@ func (service *TeamService) TeamByName(name string) (*portainer.Team, error) {
 	return team, nil
 }
 
-// Teams return an array containing all the Teams.
+// Teams return an array containing all the teams.
 func (service *TeamService) Teams() ([]portainer.Team, error) {
 	var teams = make([]portainer.Team, 0)
 	err := service.store.db.View(func(tx *bolt.Tx) error {
@@ -81,6 +81,35 @@ func (service *TeamService) Teams() ([]portainer.Team, error) {
 				return err
 			}
 			teams = append(teams, team)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return teams, nil
+}
+
+// TeamsByUserID return an array containing all the teams where the specified userID is present.
+func (service *TeamService) TeamsByUserID(userID portainer.UserID) ([]portainer.Team, error) {
+	var teams = make([]portainer.Team, 0)
+	err := service.store.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(teamBucketName))
+
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var team portainer.Team
+			err := internal.UnmarshalTeam(v, &team)
+			if err != nil {
+				return err
+			}
+			for _, v := range team.Users {
+				if v == userID {
+					teams = append(teams, team)
+				}
+			}
 		}
 
 		return nil

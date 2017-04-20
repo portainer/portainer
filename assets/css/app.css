@@ -425,10 +425,11 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   color: #fff !important;
 }
 
-.multiSelect .tickMark {
+.multiSelect .tickMark,
+.widget .widget-body table tbody .multiSelect .tickMark {
   top: 2px;
   right: 12px;
-  font-size: 20px;
+  font-size: 20px !important;
 }
 /*!angular-multi-select override*/
 

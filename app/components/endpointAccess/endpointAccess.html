@@ -29,8 +29,8 @@
             <tr>
               <td colspan="2">
                 <span class="small text-muted">
-                  You can select which user or user group can access this endpoint by moving them to the authorized accesses table. Simply click
-                  on a user or user group entry to move it from one table to the other.
+                  You can select which user or team can access this endpoint by moving them to the authorized accesses table. Simply click
+                  on a user or team entry to move it from one table to the other.
                 </span>
               </td>
             </tr>
@@ -70,10 +70,10 @@
             <thead>
               <tr>
                 <th>
-                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderAccesses('Username')">
+                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderAccesses('Name')">
                     Name
-                    <span ng-show="sortTypeAccesses == 'Username' && !sortReverseAccesses" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortTypeAccesses == 'Username' && sortReverseAccesses" class="glyphicon glyphicon-chevron-up"></span>
+                    <span ng-show="sortTypeAccesses == 'Name' && !sortReverseAccesses" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeAccesses == 'Name' && sortReverseAccesses" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
                 <th>
@@ -86,7 +86,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-click="authorizeAccess(user)" class="interactive" dir-paginate="user in (state.filteredUsers = (accesses | filter:state.filterUsers | orderBy:sortTypeAccesses:sortReverseAccesses | itemsPerPage: state.pagination_count_accesses))">
+              <tr ng-click="authorizeAccess(user)" class="interactive" pagination-id="table1" dir-paginate="user in accesses | filter:state.filterUsers | orderBy:sortTypeAccesses:sortReverseAccesses | itemsPerPage: state.pagination_count_accesses">
                 <td>{{ user.Name }}</td>
                 <td>
                   {{ user.Type }}
@@ -96,13 +96,13 @@
               <tr ng-if="!accesses">
                 <td colspan="2" class="text-center text-muted">Loading...</td>
               </tr>
-              <tr ng-if="accesses.length === 0 || state.filteredUsers.length === 0">
-                <td colspan="2" class="text-center text-muted">No users or user groups available.</td>
+              <tr ng-if="accesses.length === 0 || (accesses | filter:state.filterUsers | orderBy:sortTypeAccesses:sortReverseAccesses | itemsPerPage: state.pagination_count_accesses).length === 0">
+                <td colspan="2" class="text-center text-muted">No user or team available.</td>
               </tr>
             </tbody>
           </table>
           <div ng-if="accesses" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
+            <dir-pagination-controls pagination-id="table1"></dir-pagination-controls>
           </div>
         </div>
       </rd-widget-body>
@@ -136,23 +136,23 @@
             <thead>
               <tr>
                 <th>
-                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderAuthorizedAccesses('Username')">
+                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderAuthorizedAccesses('Name')">
                     Name
-                    <span ng-show="sortReverseAuthorizedAccesses == 'Username' && !sortReverseAuthorizedUsers" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortReverseAuthorizedAccesses == 'Username' && sortReverseAuthorizedUsers" class="glyphicon glyphicon-chevron-up"></span>
+                    <span ng-show="sortReverseAuthorizedAccesses == 'Name' && !sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortReverseAuthorizedAccesses == 'Name' && sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
                 <th>
                   <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderAuthorizedAccesses('Type')">
                     Type
-                    <span ng-show="sortReverseAuthorizedAccesses == 'Type' && !sortReverseAuthorizedUsers" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortReverseAuthorizedAccesses == 'Type' && sortReverseAuthorizedUsers" class="glyphicon glyphicon-chevron-up"></span>
+                    <span ng-show="sortReverseAuthorizedAccesses == 'Type' && !sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortReverseAuthorizedAccesses == 'Type' && sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr ng-click="unauthorizeAccess(user)" class="interactive" dir-paginate="user in (state.filteredAuthorizedUsers = (authorizedAccesses | filter:state.filterAuthorizedUsers | orderBy:sortReverseAuthorizedAccesses:sortReverseAuthorizedUsers | itemsPerPage: state.pagination_count_authorizedAccesses))">
+              <tr ng-click="unauthorizeAccess(user)" class="interactive" pagination-id="table2" dir-paginate="user in authorizedAccesses | filter:state.filterAuthorizedUsers | orderBy:sortTypeAuthorizedAccesses:sortReverseAuthorizedAccesses | itemsPerPage: state.pagination_count_authorizedAccesses">
                 <td>{{ user.Name }}</td>
                 <td>
                   {{ user.Type }}
@@ -162,13 +162,13 @@
               <tr ng-if="!authorizedAccesses">
                 <td colspan="2" class="text-center text-muted">Loading...</td>
               </tr>
-              <tr ng-if="authorizedAccesses.length === 0 || state.filteredAuthorizedUsers.length === 0">
-                <td colspan="2" class="text-center text-muted">No authorized users or user groups.</td>
+              <tr ng-if="authorizedAccesses.length === 0 || (authorizedAccesses | filter:state.filterAuthorizedUsers | orderBy:sortTypeAuthorizedAccesses:sortReverseAuthorizedAccesses | itemsPerPage: state.pagination_count_authorizedAccesses).length === 0">
+                <td colspan="2" class="text-center text-muted">No authorized user or team.</td>
               </tr>
             </tbody>
           </table>
           <div ng-if="authorizedAccesses" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
+            <dir-pagination-controls pagination-id="table2"></dir-pagination-controls>
           </div>
         </div>
       </rd-widget-body>

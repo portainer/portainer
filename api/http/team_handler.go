@@ -83,7 +83,7 @@ func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Reque
 }
 
 type postTeamsRequest struct {
-	Name string `valid:"alphanum,required"`
+	Name string `valid:"required"`
 }
 
 // handleGetTeams handles GET requests on /teams

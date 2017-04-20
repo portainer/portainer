@@ -11,8 +11,8 @@ angular.module('portainer.services')
     return Endpoints.query({}).$promise;
   };
 
-  service.updateAuthorizedUsers = function(id, authorizedUserIDs) {
-    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs}).$promise;
+  service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
+    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
   };
 
   service.updateEndpoint = function(id, endpointParams) {

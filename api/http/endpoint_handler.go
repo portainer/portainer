@@ -19,6 +19,7 @@ type EndpointHandler struct {
 	Logger                      *log.Logger
 	authorizeEndpointManagement bool
 	EndpointService             portainer.EndpointService
+	TeamService                 portainer.TeamService
 	FileService                 portainer.FileService
 	ProxyService                *ProxyService
 }
@@ -71,11 +72,20 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 	var allowedEndpoints []portainer.Endpoint
 	if tokenData.Role != portainer.AdministratorRole {
 		allowedEndpoints = make([]portainer.Endpoint, 0)
+		teams, _ := handler.TeamService.TeamsByUserID(tokenData.ID)
 		for _, endpoint := range endpoints {
 			for _, authorizedUserID := range endpoint.AuthorizedUsers {
 				if authorizedUserID == tokenData.ID {
 					allowedEndpoints = append(allowedEndpoints, endpoint)
 					break
+				}
+			}
+			for _, authorizedTeamID := range endpoint.AuthorizedTeams {
+				for _, team := range teams {
+					if team.ID == authorizedTeamID {
+						allowedEndpoints = append(allowedEndpoints, endpoint)
+						break
+					}
 				}
 			}
 		}
@@ -201,11 +211,21 @@ func (handler *EndpointHandler) handlePutEndpointAccess(w http.ResponseWriter, r
 		return
 	}
 
-	authorizedUserIDs := []portainer.UserID{}
-	for _, value := range req.AuthorizedUsers {
-		authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
+	if req.AuthorizedUsers != nil {
+		authorizedUserIDs := []portainer.UserID{}
+		for _, value := range req.AuthorizedUsers {
+			authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
+		}
+		endpoint.AuthorizedUsers = authorizedUserIDs
 	}
-	endpoint.AuthorizedUsers = authorizedUserIDs
+
+	if req.AuthorizedTeams != nil {
+		authorizedTeamIDs := []portainer.TeamID{}
+		for _, value := range req.AuthorizedTeams {
+			authorizedTeamIDs = append(authorizedTeamIDs, portainer.TeamID(value))
+		}
+		endpoint.AuthorizedTeams = authorizedTeamIDs
+	}
 
 	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
@@ -216,6 +236,7 @@ func (handler *EndpointHandler) handlePutEndpointAccess(w http.ResponseWriter, r
 
 type putEndpointAccessRequest struct {
 	AuthorizedUsers []int `valid:"-"`
+	AuthorizedTeams []int `valid:"-"`
 }
 
 // handlePutEndpoint handles PUT requests on /endpoints/:id
