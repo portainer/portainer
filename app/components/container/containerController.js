@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Network', 'Notifications', 'Pagination',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Network, Notifications, Pagination) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Network, Notifications, Pagination, ModalService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -116,9 +116,34 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     });
   };
 
-  $scope.remove = function () {
+  $scope.confirmRemove = function () {
+    var force = false;
+    if ($scope.container.State.Running) {
+      force = true;
+      ModalService.confirm({
+        title: "Are you sure?",
+        message: "You are removing a running container. Please confirm your action",
+        buttons: {
+          confirm: {
+            label: 'Force remove the container',
+          },
+          cancel: {
+            label: 'Cancel'
+          }
+        },
+        callback: function (confirmed) {
+          if(!confirmed) { return; }
+          $scope.remove(force);
+        }
+      });
+    } else {
+      $scope.remove(force);
+    }
+  };
+
+  $scope.remove = function(force) {
     $('#loadingViewSpinner').show();
-    Container.remove({id: $stateParams.id}, function (d) {
+    Container.remove({id: $stateParams.id, force: force}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error("Failure", d, "Unable to remove container");
