@@ -8,6 +8,7 @@ angular.module('containers', [])
   $scope.sortType = 'State';
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
+  $scope.state.selectedItemRunning = 0;
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
@@ -63,6 +64,7 @@ angular.module('containers', [])
     var userDetails = Authentication.getUserDetails();
     $scope.user = userDetails;
     $scope.state.selectedItemCount = 0;
+    $scope.state.selectedItemRunning = 0;
     Container.query(data, function (d) {
       var containers = d;
       if ($scope.containersToHideLabels) {
@@ -128,7 +130,11 @@ angular.module('containers', [])
           });
         }
         else if (action === Container.remove) {
-          action({id: c.Id}, function (d) {
+          var force = false;
+          if (c.State === 'running') {
+            force = true;
+          }
+          action({id: c.Id, force: force}, function (d) {
             if (d.message) {
               Notifications.error("Error", d, "Unable to remove container");
             }
@@ -193,8 +199,14 @@ angular.module('containers', [])
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
+      if (item.State === 'running') {
+        $scope.state.selectedItemRunning++;
+      }
     } else {
       $scope.state.selectedItemCount--;
+      if (item.State === 'running') {
+        $scope.state.selectedItemRunning--;
+      }
     }
   };
 
@@ -229,6 +241,30 @@ angular.module('containers', [])
 
   $scope.removeAction = function () {
     batch($scope.containers, Container.remove, "Removed");
+  };
+
+  $scope.confirmRemoveAction = function () {
+    if ($scope.state.selectedItemRunning > 0) {
+      force = true;
+      ModalService.confirm({
+        title: "Are you sure?",
+        message: "Some selected containers are running. Please confirm your action",
+        buttons: {
+          confirm: {
+            label: 'Force remove the containers',
+          },
+          cancel: {
+            label: 'Cancel'
+          }
+        },
+        callback: function (confirmed) {
+          if(!confirmed) { return; }
+          $scope.removeAction();
+        }
+      });
+    } else {
+      $scope.removeAction();
+    }
   };
 
   function retrieveSwarmHostsInfo(data) {
