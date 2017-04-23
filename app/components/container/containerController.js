@@ -125,7 +125,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
         message: "You are removing a running container. Please confirm your action",
         buttons: {
           confirm: {
-            label: 'Force remove the container',
+            label: 'Force remove the container'
           },
           cancel: {
             label: 'Cancel'
