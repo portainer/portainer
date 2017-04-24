@@ -232,14 +232,14 @@ angular.module('containers', [])
   };
 
   $scope.confirmRemoveAction = function () {
-    var selectedItemsRunning = false;
+    var isOneContainerRunning = false;
     angular.forEach($scope.containers, function (c) {
       if (c.Checked && c.State === 'running') {
-        selectedItemsRunning = true;
+        isOneContainerRunning = true;
         return;
       }
     });
-    if (selectedItemsRunning) {
+    if (isOneContainerRunning) {
       ModalService.confirm({
         title: "Are you sure?",
         message: "You are about to remove one or more running containers.",
