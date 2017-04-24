@@ -40,10 +40,10 @@
                 <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
               </th>
               <th>
-                <a ui-sref="volumes" ng-click="order('Name')">
+                <a ui-sref="volumes" ng-click="order('Id')">
                   Name
-                  <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
@@ -61,10 +61,10 @@
                 </a>
               </th>
               <th ng-if="applicationState.application.authentication">
-                <a ui-sref="volumes" ng-click="order('Metadata.ResourceControl.OwnerId')">
+                <a ui-sref="volumes" ng-click="order('Ownership')">
                   Ownership
-                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
@@ -72,10 +72,30 @@
           <tbody>
             <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
-              <td>{{ volume.Name|truncate:50 }}</td>
+              <td><a ui-sref="volume({id: volume.Id})">{{ volume.Id|truncate:50 }}</a></td>
               <td>{{ volume.Driver }}</td>
               <td>{{ volume.Mountpoint }}</td>
               <td ng-if="applicationState.application.authentication">
+                <span ng-if="!volume.Metadata.ResourceControl">
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                  {{ volume.Ownership }}
+                </span>
+                <span ng-if="volume.Metadata.ResourceControl">
+                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                  {{ volume.Ownership }}
+                </span>
+
+                <!--
+                <span ng-if="volume.Owners.length === 0">
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                  Public
+                </span>
+                <span ng-if="volume.Owners.length > 0">
+                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                  {{ volume.Owners.join(', ') }}
+                </span>
+                 -->
+                <!--
                 <span ng-if="user.role === 1 && volume.Metadata.ResourceControl">
                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
                  <span ng-if="volume.Metadata.ResourceControl.OwnerId === user.ID">
@@ -95,6 +115,7 @@
                   <i class="fa fa-eye" aria-hidden="true"></i>
                   Public
                 </span>
+                -->
               </td>
             </tr>
             <tr ng-if="!volumes">
