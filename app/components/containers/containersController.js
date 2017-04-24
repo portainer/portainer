@@ -235,10 +235,10 @@ angular.module('containers', [])
 		var selectedItemsRunning = false;
 		angular.forEach($scope.containers, function (c) {
       if (c.Checked && c.State === 'running') {
-				selectedItemsRunning = true;
-				return;
-			}
-		});
+        selectedItemsRunning = true;
+        return;
+      }
+    });
     if (selectedItemsRunning) {
       ModalService.confirm({
         title: "Are you sure?",
