@@ -241,7 +241,7 @@ angular.module('containers', [])
     });
     if (isOneContainerRunning) {
       ModalService.confirmDeletion(
-        'You are about to delete one or more running containers.',
+        'You are about to remove one or more running containers.',
         function (confirmed) {
           if(!confirmed) { return; }
           $scope.removeAction();

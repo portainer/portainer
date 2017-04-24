@@ -119,7 +119,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
   $scope.confirmRemove = function () {
     if ($scope.container.State.Running) {
       ModalService.confirmDeletion(
-        'You are about to delete a running container.',
+        'You are about to remove a running container.',
         function (confirmed) {
           if(!confirmed) { return; }
           $scope.remove();
