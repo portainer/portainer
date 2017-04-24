@@ -8,7 +8,6 @@ angular.module('containers', [])
   $scope.sortType = 'State';
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
-  $scope.state.selectedItemRunning = 0;
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
@@ -64,7 +63,6 @@ angular.module('containers', [])
     var userDetails = Authentication.getUserDetails();
     $scope.user = userDetails;
     $scope.state.selectedItemCount = 0;
-    $scope.state.selectedItemRunning = 0;
     Container.query(data, function (d) {
       var containers = d;
       if ($scope.containersToHideLabels) {
@@ -199,14 +197,8 @@ angular.module('containers', [])
   $scope.selectItem = function (item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
-      if (item.State === 'running') {
-        $scope.state.selectedItemRunning++;
-      }
     } else {
       $scope.state.selectedItemCount--;
-      if (item.State === 'running') {
-        $scope.state.selectedItemRunning--;
-      }
     }
   };
 
@@ -244,7 +236,14 @@ angular.module('containers', [])
   };
 
   $scope.confirmRemoveAction = function () {
-    if ($scope.state.selectedItemRunning > 0) {
+		var selectedItemsRunning = false;
+		angular.forEach($scope.containers, function (c) {
+      if (c.Checked && c.State === 'running') {
+				selectedItemsRunning = true;
+				return;
+			}
+		});
+    if (selectedItemsRunning) {
       force = true;
       ModalService.confirm({
         title: "Are you sure?",
