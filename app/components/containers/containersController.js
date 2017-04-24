@@ -232,8 +232,8 @@ angular.module('containers', [])
   };
 
   $scope.confirmRemoveAction = function () {
-		var selectedItemsRunning = false;
-		angular.forEach($scope.containers, function (c) {
+    var selectedItemsRunning = false;
+    angular.forEach($scope.containers, function (c) {
       if (c.Checked && c.State === 'running') {
         selectedItemsRunning = true;
         return;
