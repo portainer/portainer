@@ -117,9 +117,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.confirmRemove = function () {
-    var force = false;
     if ($scope.container.State.Running) {
-      force = true;
       ModalService.confirm({
         title: "Are you sure?",
         message: "You are removing a running container. Please confirm your action",
@@ -133,17 +131,17 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
         },
         callback: function (confirmed) {
           if(!confirmed) { return; }
-          $scope.remove(force);
+          $scope.remove();
         }
       });
     } else {
-      $scope.remove(force);
+      $scope.remove();
     }
   };
 
-  $scope.remove = function(force) {
+  $scope.remove = function() {
     $('#loadingViewSpinner').show();
-    Container.remove({id: $stateParams.id, force: force}, function (d) {
+    Container.remove({id: $stateParams.id, force: true}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error("Failure", d, "Unable to remove container");

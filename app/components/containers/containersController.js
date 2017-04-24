@@ -128,11 +128,7 @@ angular.module('containers', [])
           });
         }
         else if (action === Container.remove) {
-          var force = false;
-          if (c.State === 'running') {
-            force = true;
-          }
-          action({id: c.Id, force: force}, function (d) {
+          action({id: c.Id, force: true}, function (d) {
             if (d.message) {
               Notifications.error("Error", d, "Unable to remove container");
             }
@@ -244,7 +240,6 @@ angular.module('containers', [])
 			}
 		});
     if (selectedItemsRunning) {
-      force = true;
       ModalService.confirm({
         title: "Are you sure?",
         message: "You are about to remove one or more running containers.",
