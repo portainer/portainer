@@ -1,53 +1,46 @@
-package http
+package middleware
 
 import (
-	"context"
-
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/http/context"
+	httperror "github.com/portainer/portainer/http/error"
 
 	"net/http"
 	"strings"
 )
 
 type (
-	// middleWareService represents a service to manage HTTP middlewares
-	middleWareService struct {
+	// Service represents a service to manage HTTP middlewares
+	Service struct {
 		jwtService   portainer.JWTService
 		authDisabled bool
 	}
-	contextKey int
 )
 
-const (
-	contextAuthenticationKey contextKey = iota
-)
-
-func extractTokenDataFromRequestContext(request *http.Request) (*portainer.TokenData, error) {
-	contextData := request.Context().Value(contextAuthenticationKey)
-	if contextData == nil {
-		return nil, portainer.ErrMissingContextData
+// NewService initializes a new middleware Service
+func NewService(jwtService portainer.JWTService, authDisabled bool) *Service {
+	return &Service{
+		jwtService:   jwtService,
+		authDisabled: authDisabled,
 	}
-
-	tokenData := contextData.(*portainer.TokenData)
-	return tokenData, nil
 }
 
-// public defines a chain of middleware for public endpoints (no authentication required)
-func (service *middleWareService) public(h http.Handler) http.Handler {
+// Public defines a chain of middleware for public endpoints (no authentication required)
+func (service *Service) Public(h http.Handler) http.Handler {
 	h = mwSecureHeaders(h)
 	return h
 }
 
-// authenticated defines a chain of middleware for private endpoints (authentication required)
-func (service *middleWareService) authenticated(h http.Handler) http.Handler {
+// Authenticated defines a chain of middleware for private endpoints (authentication required)
+func (service *Service) Authenticated(h http.Handler) http.Handler {
 	h = service.mwCheckAuthentication(h)
 	h = mwSecureHeaders(h)
 	return h
 }
 
-// administrator defines a chain of middleware for private administrator restricted endpoints
+// Administrator defines a chain of middleware for private administrator restricted endpoints
 // (authentication and role admin required)
-func (service *middleWareService) administrator(h http.Handler) http.Handler {
+func (service *Service) Administrator(h http.Handler) http.Handler {
 	h = mwCheckAdministratorRole(h)
 	h = service.mwCheckAuthentication(h)
 	h = mwSecureHeaders(h)
@@ -66,14 +59,14 @@ func mwSecureHeaders(next http.Handler) http.Handler {
 // mwCheckAdministratorRole check the role of the user associated to the request
 func mwCheckAdministratorRole(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenData, err := extractTokenDataFromRequestContext(r)
+		tokenData, err := context.GetTokenData(r)
 		if err != nil {
-			Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+			httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
 			return
 		}
 
 		if tokenData.Role != portainer.AdministratorRole {
-			Error(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+			httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
 			return
 		}
 
@@ -82,7 +75,7 @@ func mwCheckAdministratorRole(next http.Handler) http.Handler {
 }
 
 // mwCheckAuthentication provides Authentication middleware for handlers
-func (service *middleWareService) mwCheckAuthentication(next http.Handler) http.Handler {
+func (service *Service) mwCheckAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tokenData *portainer.TokenData
 		if !service.authDisabled {
@@ -96,14 +89,14 @@ func (service *middleWareService) mwCheckAuthentication(next http.Handler) http.
 			}
 
 			if token == "" {
-				Error(w, portainer.ErrUnauthorized, http.StatusUnauthorized, nil)
+				httperror.WriteErrorResponse(w, portainer.ErrUnauthorized, http.StatusUnauthorized, nil)
 				return
 			}
 
 			var err error
 			tokenData, err = service.jwtService.ParseAndVerifyToken(token)
 			if err != nil {
-				Error(w, err, http.StatusUnauthorized, nil)
+				httperror.WriteErrorResponse(w, err, http.StatusUnauthorized, nil)
 				return
 			}
 		} else {
@@ -112,7 +105,8 @@ func (service *middleWareService) mwCheckAuthentication(next http.Handler) http.
 			}
 		}
 
-		ctx := context.WithValue(r.Context(), contextAuthenticationKey, tokenData)
+		// ctx := context.WithValue(r.Context(), contextAuthenticationKey, tokenData)
+		ctx := context.StoreTokenData(r, tokenData)
 		next.ServeHTTP(w, r.WithContext(ctx))
 		return
 	})

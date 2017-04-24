@@ -1,4 +1,4 @@
-package http
+package handler
 
 import (
 	"bytes"
@@ -17,6 +17,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/crypto"
 	"golang.org/x/net/websocket"
 )
 
@@ -71,7 +72,7 @@ func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
 	// Should not be managed here
 	var tlsConfig *tls.Config
 	if endpoint.TLS {
-		tlsConfig, err = createTLSConfiguration(endpoint.TLSCACertPath,
+		tlsConfig, err = crypto.CreateTLSConfiguration(endpoint.TLSCACertPath,
 			endpoint.TLSCertPath,
 			endpoint.TLSKeyPath)
 		if err != nil {

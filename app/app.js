@@ -52,6 +52,7 @@ angular.module('portainer', [
   'templates',
   'user',
   'users',
+  'volume',
   'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider) {
     'use strict';
@@ -505,6 +506,19 @@ angular.module('portainer', [
         }
       }
     })
+    .state('volume', {
+      url: '^/volumes/:id',
+      views: {
+        "content@": {
+          templateUrl: 'app/components/volume/volume.html',
+          controller: 'VolumeController'
+        },
+        "sidebar@": {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('users', {
       url: '/users/',
       views: {
@@ -605,6 +619,7 @@ angular.module('portainer', [
   .constant('AUTH_ENDPOINT', 'api/auth')
   .constant('USERS_ENDPOINT', 'api/users')
   .constant('TEAMS_ENDPOINT', 'api/teams')
+  .constant('RESOURCE_ENDPOINT', 'api/resources')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('PAGINATION_MAX_ITEMS', 10)

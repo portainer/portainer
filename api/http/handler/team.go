@@ -1,9 +1,11 @@
-package http
+package handler
 
 import (
 	"strconv"
 
 	"github.com/portainer/portainer"
+	httperror "github.com/portainer/portainer/http/error"
+	"github.com/portainer/portainer/http/middleware"
 
 	"encoding/json"
 	"log"
@@ -23,25 +25,25 @@ type TeamHandler struct {
 }
 
 // NewTeamHandler returns a new instance of TeamHandler.
-func NewTeamHandler(mw *middleWareService) *TeamHandler {
+func NewTeamHandler(mw *middleware.Service) *TeamHandler {
 	h := &TeamHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/teams",
-		mw.administrator(http.HandlerFunc(h.handlePostTeams))).Methods(http.MethodPost)
+		mw.Administrator(http.HandlerFunc(h.handlePostTeams))).Methods(http.MethodPost)
 	h.Handle("/teams",
-		mw.authenticated(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
+		mw.Authenticated(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
-		mw.administrator(http.HandlerFunc(h.handleGetTeam))).Methods(http.MethodGet)
+		mw.Administrator(http.HandlerFunc(h.handleGetTeam))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
-		mw.administrator(http.HandlerFunc(h.handlePutTeam))).Methods(http.MethodPut)
+		mw.Administrator(http.HandlerFunc(h.handlePutTeam))).Methods(http.MethodPut)
 	h.Handle("/teams/{id}",
-		mw.administrator(http.HandlerFunc(h.handleDeleteTeam))).Methods(http.MethodDelete)
+		mw.Administrator(http.HandlerFunc(h.handleDeleteTeam))).Methods(http.MethodDelete)
 	h.Handle("/teams/{teamId}/resources/{resourceType}",
-		mw.authenticated(http.HandlerFunc(h.handlePostTeamResource))).Methods(http.MethodPost)
+		mw.Authenticated(http.HandlerFunc(h.handlePostTeamResource))).Methods(http.MethodPost)
 	h.Handle("/teams/{teamId}/resources/{resourceType}/{resourceId}",
-		mw.authenticated(http.HandlerFunc(h.handleDeleteTeamResource))).Methods(http.MethodDelete)
+		mw.Authenticated(http.HandlerFunc(h.handleDeleteTeamResource))).Methods(http.MethodDelete)
 
 	return h
 }
@@ -50,23 +52,23 @@ func NewTeamHandler(mw *middleWareService) *TeamHandler {
 func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Request) {
 	var req postTeamsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err := govalidator.ValidateStruct(req)
 	if err != nil {
-		Error(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	team, err := handler.TeamService.TeamByName(req.Name)
 	if err != nil && err != portainer.ErrTeamNotFound {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 	if team != nil {
-		Error(w, portainer.ErrTeamAlreadyExists, http.StatusConflict, handler.Logger)
+		httperror.WriteErrorResponse(w, portainer.ErrTeamAlreadyExists, http.StatusConflict, handler.Logger)
 		return
 	}
 
@@ -77,7 +79,7 @@ func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Reque
 
 	err = handler.TeamService.CreateTeam(team)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 }
@@ -90,7 +92,7 @@ type postTeamsRequest struct {
 func (handler *TeamHandler) handleGetTeams(w http.ResponseWriter, r *http.Request) {
 	teams, err := handler.TeamService.Teams()
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
@@ -104,16 +106,16 @@ func (handler *TeamHandler) handleGetTeam(w http.ResponseWriter, r *http.Request
 
 	teamID, err := strconv.Atoi(id)
 	if err != nil {
-		Error(w, err, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	team, err := handler.TeamService.Team(portainer.TeamID(teamID))
 	if err == portainer.ErrTeamNotFound {
-		Error(w, err, http.StatusNotFound, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
@@ -127,28 +129,28 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 
 	teamID, err := strconv.Atoi(id)
 	if err != nil {
-		Error(w, err, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	var req putTeamRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err = govalidator.ValidateStruct(req)
 	if err != nil {
-		Error(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	team, err := handler.TeamService.Team(portainer.TeamID(teamID))
 	if err == portainer.ErrTeamNotFound {
-		Error(w, err, http.StatusNotFound, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
@@ -166,7 +168,7 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 
 	err = handler.TeamService.UpdateTeam(team.ID, team)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 }
@@ -183,23 +185,23 @@ func (handler *TeamHandler) handleDeleteTeam(w http.ResponseWriter, r *http.Requ
 
 	teamID, err := strconv.Atoi(id)
 	if err != nil {
-		Error(w, err, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err = handler.TeamService.Team(portainer.TeamID(teamID))
 
 	if err == portainer.ErrTeamNotFound {
-		Error(w, err, http.StatusNotFound, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
 	err = handler.TeamService.DeleteTeam(portainer.TeamID(teamID))
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 }

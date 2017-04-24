@@ -1,7 +1,9 @@
-package http
+package handler
 
 import (
 	"github.com/portainer/portainer"
+	httperror "github.com/portainer/portainer/http/error"
+	"github.com/portainer/portainer/http/middleware"
 
 	"log"
 	"net/http"
@@ -18,13 +20,14 @@ type SettingsHandler struct {
 }
 
 // NewSettingsHandler returns a new instance of SettingsHandler.
-func NewSettingsHandler(mw *middleWareService) *SettingsHandler {
+func NewSettingsHandler(mw *middleware.Service, settings *portainer.Settings) *SettingsHandler {
 	h := &SettingsHandler{
-		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		Router:   mux.NewRouter(),
+		Logger:   log.New(os.Stderr, "", log.LstdFlags),
+		settings: settings,
 	}
 	h.Handle("/settings",
-		mw.public(http.HandlerFunc(h.handleGetSettings)))
+		mw.Public(http.HandlerFunc(h.handleGetSettings)))
 
 	return h
 }
@@ -32,7 +35,7 @@ func NewSettingsHandler(mw *middleWareService) *SettingsHandler {
 // handleGetSettings handles GET requests on /settings
 func (handler *SettingsHandler) handleGetSettings(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		handleNotAllowed(w, []string{http.MethodGet})
+		httperror.WriteMethodNotAllowedResponse(w, []string{http.MethodGet})
 		return
 	}
 

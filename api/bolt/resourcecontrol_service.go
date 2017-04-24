@@ -79,16 +79,18 @@ func (service *ResourceControlService) ResourceControls(rcType portainer.Resourc
 }
 
 // CreateResourceControl creates a new resource control
-func (service *ResourceControlService) CreateResourceControl(resourceID string, rc *portainer.ResourceControl, rcType portainer.ResourceControlType) error {
+func (service *ResourceControlService) CreateResourceControl(rc *portainer.ResourceControl, rcType portainer.ResourceControlType) error {
 	bucketName := getBucketNameByResourceControlType(rcType)
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
+		id, _ := bucket.NextSequence()
+		rc.ID = portainer.ResourceControlID(id)
 		data, err := internal.MarshalResourceControl(rc)
 		if err != nil {
 			return err
 		}
 
-		err = bucket.Put([]byte(resourceID), data)
+		err = bucket.Put(internal.Itob(int(rc.ID)), data)
 		if err != nil {
 			return err
 		}
@@ -97,11 +99,11 @@ func (service *ResourceControlService) CreateResourceControl(resourceID string, 
 }
 
 // DeleteResourceControl deletes a resource control object by resource ID
-func (service *ResourceControlService) DeleteResourceControl(resourceID string, rcType portainer.ResourceControlType) error {
+func (service *ResourceControlService) DeleteResourceControl(ID portainer.ResourceControlID, rcType portainer.ResourceControlType) error {
 	bucketName := getBucketNameByResourceControlType(rcType)
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
-		err := bucket.Delete([]byte(resourceID))
+		err := bucket.Delete(internal.Itob(int(ID)))
 		if err != nil {
 			return err
 		}

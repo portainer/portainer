@@ -1,4 +1,4 @@
-package http
+package handler
 
 import (
 	"io/ioutil"
@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	httperror "github.com/portainer/portainer/http/error"
+	"github.com/portainer/portainer/http/middleware"
 )
 
 // TemplatesHandler represents an HTTP API handler for managing templates.
@@ -21,26 +23,27 @@ const (
 )
 
 // NewTemplatesHandler returns a new instance of TemplatesHandler.
-func NewTemplatesHandler(mw *middleWareService) *TemplatesHandler {
+func NewTemplatesHandler(mw *middleware.Service, containerTemplatesURL string) *TemplatesHandler {
 	h := &TemplatesHandler{
-		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		Router:                mux.NewRouter(),
+		Logger:                log.New(os.Stderr, "", log.LstdFlags),
+		containerTemplatesURL: containerTemplatesURL,
 	}
 	h.Handle("/templates",
-		mw.authenticated(http.HandlerFunc(h.handleGetTemplates)))
+		mw.Authenticated(http.HandlerFunc(h.handleGetTemplates)))
 	return h
 }
 
 // handleGetTemplates handles GET requests on /templates?key=<key>
 func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		handleNotAllowed(w, []string{http.MethodGet})
+		httperror.WriteMethodNotAllowedResponse(w, []string{http.MethodGet})
 		return
 	}
 
 	key := r.FormValue("key")
 	if key == "" {
-		Error(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -50,19 +53,19 @@ func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *ht
 	} else if key == "linuxserver.io" {
 		templatesURL = containerTemplatesURLLinuxServerIo
 	} else {
-		Error(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	resp, err := http.Get(templatesURL)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

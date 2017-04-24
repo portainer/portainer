@@ -1,7 +1,11 @@
-package http
+package handler
 
 import (
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/http/context"
+	httperror "github.com/portainer/portainer/http/error"
+	"github.com/portainer/portainer/http/middleware"
+	"github.com/portainer/portainer/http/proxy"
 
 	"encoding/json"
 	"log"
@@ -21,7 +25,7 @@ type EndpointHandler struct {
 	EndpointService             portainer.EndpointService
 	TeamService                 portainer.TeamService
 	FileService                 portainer.FileService
-	ProxyService                *ProxyService
+	ProxyService                *proxy.Service
 }
 
 const (
@@ -31,23 +35,24 @@ const (
 )
 
 // NewEndpointHandler returns a new instance of EndpointHandler.
-func NewEndpointHandler(mw *middleWareService) *EndpointHandler {
+func NewEndpointHandler(mw *middleware.Service, authorizeEndpointManagement bool) *EndpointHandler {
 	h := &EndpointHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		authorizeEndpointManagement: authorizeEndpointManagement,
 	}
 	h.Handle("/endpoints",
-		mw.administrator(http.HandlerFunc(h.handlePostEndpoints))).Methods(http.MethodPost)
+		mw.Administrator(http.HandlerFunc(h.handlePostEndpoints))).Methods(http.MethodPost)
 	h.Handle("/endpoints",
-		mw.authenticated(http.HandlerFunc(h.handleGetEndpoints))).Methods(http.MethodGet)
+		mw.Authenticated(http.HandlerFunc(h.handleGetEndpoints))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
-		mw.administrator(http.HandlerFunc(h.handleGetEndpoint))).Methods(http.MethodGet)
+		mw.Administrator(http.HandlerFunc(h.handleGetEndpoint))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
-		mw.administrator(http.HandlerFunc(h.handlePutEndpoint))).Methods(http.MethodPut)
+		mw.Administrator(http.HandlerFunc(h.handlePutEndpoint))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}/access",
-		mw.administrator(http.HandlerFunc(h.handlePutEndpointAccess))).Methods(http.MethodPut)
+		mw.Administrator(http.HandlerFunc(h.handlePutEndpointAccess))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}",
-		mw.administrator(http.HandlerFunc(h.handleDeleteEndpoint))).Methods(http.MethodDelete)
+		mw.Administrator(http.HandlerFunc(h.handleDeleteEndpoint))).Methods(http.MethodDelete)
 
 	return h
 }
@@ -56,16 +61,16 @@ func NewEndpointHandler(mw *middleWareService) *EndpointHandler {
 func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *http.Request) {
 	endpoints, err := handler.EndpointService.Endpoints()
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	tokenData, err := extractTokenDataFromRequestContext(r)
+	tokenData, err := context.GetTokenData(r)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
 	if tokenData == nil {
-		Error(w, portainer.ErrInvalidJWTToken, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, portainer.ErrInvalidJWTToken, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -99,19 +104,19 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 // handlePostEndpoints handles POST requests on /endpoints
 func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *http.Request) {
 	if !handler.authorizeEndpointManagement {
-		Error(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
 		return
 	}
 
 	var req postEndpointsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err := govalidator.ValidateStruct(req)
 	if err != nil {
-		Error(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -125,7 +130,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
@@ -138,7 +143,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		endpoint.TLSKeyPath = keyPath
 		err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 		if err != nil {
-			Error(w, err, http.StatusInternalServerError, handler.Logger)
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return
 		}
 	}
@@ -163,16 +168,16 @@ func (handler *EndpointHandler) handleGetEndpoint(w http.ResponseWriter, r *http
 
 	endpointID, err := strconv.Atoi(id)
 	if err != nil {
-		Error(w, err, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrEndpointNotFound {
-		Error(w, err, http.StatusNotFound, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
@@ -186,28 +191,28 @@ func (handler *EndpointHandler) handlePutEndpointAccess(w http.ResponseWriter, r
 
 	endpointID, err := strconv.Atoi(id)
 	if err != nil {
-		Error(w, err, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	var req putEndpointAccessRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err = govalidator.ValidateStruct(req)
 	if err != nil {
-		Error(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrEndpointNotFound {
-		Error(w, err, http.StatusNotFound, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
@@ -229,7 +234,7 @@ func (handler *EndpointHandler) handlePutEndpointAccess(w http.ResponseWriter, r
 
 	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 }
@@ -242,7 +247,7 @@ type putEndpointAccessRequest struct {
 // handlePutEndpoint handles PUT requests on /endpoints/:id
 func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http.Request) {
 	if !handler.authorizeEndpointManagement {
-		Error(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
 		return
 	}
 
@@ -251,28 +256,28 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 
 	endpointID, err := strconv.Atoi(id)
 	if err != nil {
-		Error(w, err, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	var req putEndpointsRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		Error(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err = govalidator.ValidateStruct(req)
 	if err != nil {
-		Error(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrEndpointNotFound {
-		Error(w, err, http.StatusNotFound, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
@@ -299,20 +304,20 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		endpoint.TLSKeyPath = ""
 		err = handler.FileService.DeleteTLSFiles(endpoint.ID)
 		if err != nil {
-			Error(w, err, http.StatusInternalServerError, handler.Logger)
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return
 		}
 	}
 
 	_, err = handler.ProxyService.CreateAndRegisterProxy(endpoint)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
 	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 }
@@ -326,7 +331,7 @@ type putEndpointsRequest struct {
 // handleDeleteEndpoint handles DELETE requests on /endpoints/:id
 func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *http.Request) {
 	if !handler.authorizeEndpointManagement {
-		Error(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrEndpointManagementDisabled, http.StatusServiceUnavailable, handler.Logger)
 		return
 	}
 
@@ -335,17 +340,17 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 
 	endpointID, err := strconv.Atoi(id)
 	if err != nil {
-		Error(w, err, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 
 	if err == portainer.ErrEndpointNotFound {
-		Error(w, err, http.StatusNotFound, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
@@ -353,14 +358,14 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 
 	err = handler.EndpointService.DeleteEndpoint(portainer.EndpointID(endpointID))
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
 	if endpoint.TLS {
 		err = handler.FileService.DeleteTLSFiles(portainer.EndpointID(endpointID))
 		if err != nil {
-			Error(w, err, http.StatusInternalServerError, handler.Logger)
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		}
 	}
 }

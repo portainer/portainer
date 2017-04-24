@@ -50,9 +50,9 @@
       <a ui-sref="docker" ui-sref-active="active">Docker <span class="menu-icon fa fa-th"></span></a>
     </li>
     <li class="sidebar-title"><span>Portainer settings</span></li>
-    <li class="sidebar-list">
+    <li class="sidebar-list" ng-if="applicationState.application.authentication && userRole === 1">
       <a ui-sref="users" ui-sref-active="active">User management <span class="menu-icon fa fa-users"></span></a>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'users' || $state.current.name === 'teams')">
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'users' || $state.current.name === 'teams' || $state.current.name === 'team')">
         <a ui-sref="teams" ui-sref-active="active">Teams</span></a>
       </div>
     </li>

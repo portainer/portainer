@@ -87,16 +87,27 @@ type (
 		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
 	}
 
-	// ResourceControl represent a reference to a Docker resource with specific controls
+	// ResourceControlID represents a resource control identifier.
+	ResourceControlID int
+
+	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
-		OwnerID     UserID              `json:"OwnerId"`
-		ResourceID  string              `json:"ResourceId"`
+		// Deprecated: OwnerID field is deprecated in DBVersion == 2
+		OwnerID UserID `json:"OwnerId"`
+		// Deprecated: AccessLevel field is deprecated in DBVersion == 2
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+
+		ID         ResourceControlID `json:"Id"`
+		ResourceID string            `json:"ResourceId"`
+		Users      []UserID          `json:"Users"`
+		Teams      []TeamID          `json:"Teams"`
 	}
 
 	// ResourceControlType represents a type of resource control.
 	// Can be one of: container, service or volume.
 	ResourceControlType int
+
+	// Deprecated: ResourceAccessLevel is deprecated in DBVersion == 2
 
 	// ResourceAccessLevel represents the level of control associated to a resource for a specific owner.
 	// Can be one of: full, restricted, limited.
@@ -140,6 +151,7 @@ type (
 		Team(ID TeamID) (*Team, error)
 		TeamByName(name string) (*Team, error)
 		Teams() ([]Team, error)
+		TeamsByUserID(ID UserID) ([]Team, error)
 		CreateTeam(team *Team) error
 		UpdateTeam(ID TeamID, team *Team) error
 		DeleteTeam(ID TeamID) error
@@ -163,10 +175,11 @@ type (
 
 	// ResourceControlService represents a service for managing resource control data.
 	ResourceControlService interface {
-		ResourceControl(resourceID string, rcType ResourceControlType) (*ResourceControl, error)
+		// ResourceControl(ID ResourceControlID, rcType ResourceControlType) (*ResourceControl, error)
+		// ResourceControlByResourceID(resourceID string, rcType ResourceControlType) (*ResourceControl, error)
 		ResourceControls(rcType ResourceControlType) ([]ResourceControl, error)
-		CreateResourceControl(resourceID string, rc *ResourceControl, rcType ResourceControlType) error
-		DeleteResourceControl(resourceID string, rcType ResourceControlType) error
+		CreateResourceControl(rc *ResourceControl, rcType ResourceControlType) error
+		DeleteResourceControl(ID ResourceControlID, rcType ResourceControlType) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data.
@@ -195,10 +208,10 @@ type (
 )
 
 const (
-	// APIVersion is the version number of Portainer API.
+	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.12.4"
-	// DBVersion is the version number of Portainer database.
-	DBVersion = 1
+	// DBVersion is the version number of the Portainer database.
+	DBVersion = 2
 )
 
 const (
@@ -218,6 +231,8 @@ const (
 	StandardUserRole
 )
 
+// ResourceControlType exists to ensure that there is no ResourceID conflict between
+// the managed resources (a service ID conflict with a container conflict for example).
 const (
 	_ ResourceControlType = iota
 	// ContainerResourceControl represents a resource control for a container
@@ -228,8 +243,11 @@ const (
 	VolumeResourceControl
 )
 
+// Deprecated: ResourceAccessLevel values are deprecated in DBVersion == 2
 const (
 	_ ResourceAccessLevel = iota
 	// RestrictedResourceAccessLevel represents a restricted access level on a resource (private ownership)
 	RestrictedResourceAccessLevel
+	// TeamResourceAccessLevel represents a multi team access level on a resource (team ownership)
+	TeamResourceAccessLevel
 )

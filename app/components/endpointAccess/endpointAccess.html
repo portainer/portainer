@@ -86,7 +86,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-click="authorizeAccess(user)" class="interactive" pagination-id="table1" dir-paginate="user in accesses | filter:state.filterUsers | orderBy:sortTypeAccesses:sortReverseAccesses | itemsPerPage: state.pagination_count_accesses">
+              <tr ng-click="authorizeAccess(user)" class="interactive" dir-paginate="user in accesses | filter:state.filterUsers | orderBy:sortTypeAccesses:sortReverseAccesses | itemsPerPage: state.pagination_count_accesses">
                 <td>{{ user.Name }}</td>
                 <td>
                   {{ user.Type }}
@@ -102,7 +102,7 @@
             </tbody>
           </table>
           <div ng-if="accesses" class="pull-left pagination-controls">
-            <dir-pagination-controls pagination-id="table1"></dir-pagination-controls>
+            <dir-pagination-controls></dir-pagination-controls>
           </div>
         </div>
       </rd-widget-body>
@@ -152,7 +152,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-click="unauthorizeAccess(user)" class="interactive" pagination-id="table2" dir-paginate="user in authorizedAccesses | filter:state.filterAuthorizedUsers | orderBy:sortTypeAuthorizedAccesses:sortReverseAuthorizedAccesses | itemsPerPage: state.pagination_count_authorizedAccesses">
+              <tr ng-click="unauthorizeAccess(user)" class="interactive" pagination-id="table_authaccess" dir-paginate="user in authorizedAccesses | filter:state.filterAuthorizedUsers | orderBy:sortTypeAuthorizedAccesses:sortReverseAuthorizedAccesses | itemsPerPage: state.pagination_count_authorizedAccesses">
                 <td>{{ user.Name }}</td>
                 <td>
                   {{ user.Type }}
@@ -168,7 +168,7 @@
             </tbody>
           </table>
           <div ng-if="authorizedAccesses" class="pull-left pagination-controls">
-            <dir-pagination-controls pagination-id="table2"></dir-pagination-controls>
+            <dir-pagination-controls pagination-id="table_authaccess"></dir-pagination-controls>
           </div>
         </div>
       </rd-widget-body>

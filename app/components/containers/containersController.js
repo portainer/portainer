@@ -20,7 +20,7 @@ angular.module('containers', [])
   function removeContainerResourceControl(container) {
     volumeResourceControlQueries = [];
     angular.forEach(container.Mounts, function (volume) {
-      volumeResourceControlQueries.push(ResourceControlService.removeVolumeResourceControl(container.Metadata.ResourceControl.OwnerId, volume.Name));
+      volumeResourceControlQueries.push(ResourceControlService.removeVolumeResourceControl(container.Metadata.ResourceControl.OwnerId, volume.Id));
     });
 
     $q.all(volumeResourceControlQueries)

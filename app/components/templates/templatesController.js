@@ -46,7 +46,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
       var volumeResourceControlQueries = [];
       if ($scope.formValues.Ownership === 'private') {
         angular.forEach(data, function (volume) {
-          volumeResourceControlQueries.push(ResourceControlService.setVolumeResourceControl(Authentication.getUserDetails().ID, volume.Name));
+          volumeResourceControlQueries.push(ResourceControlService.setVolumeResourceControl(Authentication.getUserDetails().ID, volume.Id));
         });
       }
       TemplateService.updateContainerConfigurationWithVolumes(templateConfiguration, template, data);

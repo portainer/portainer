@@ -91,7 +91,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
 
     EndpointService.updateAccess($stateParams.id, authorizedUsers, authorizedTeams)
     .then(function success(data) {
-      removeAccessFromArray(access.Id, $scope.accesses);
+      removeAccessFromArray(access, $scope.accesses);
       $scope.authorizedAccesses.push(access);
       Notifications.success('Endpoint accesses successfully updated', access.Name);
     })
@@ -123,7 +123,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
 
     EndpointService.updateAccess($stateParams.id, authorizedUsers, authorizedTeams)
     .then(function success(data) {
-      removeAccessFromArray(access.Id, $scope.authorizedAccesses);
+      removeAccessFromArray(access, $scope.authorizedAccesses);
       $scope.accesses.push(access);
       Notifications.success('Endpoint accesses successfully updated', access.Name);
     })
@@ -183,10 +183,10 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     });
   }
 
-  function removeAccessFromArray(id, users) {
-    for (var i = 0, l = users.length; i < l; i++) {
-      if (users[i].Id === id) {
-        users.splice(i, 1);
+  function removeAccessFromArray(access, accesses) {
+    for (var i = 0, l = accesses.length; i < l; i++) {
+      if (access.Type === accesses[i].Type && access.Id === accesses[i].Id) {
+        accesses.splice(i, 1);
         return;
       }
     }

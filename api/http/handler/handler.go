@@ -1,12 +1,13 @@
-package http
+package handler
 
 import (
-	"github.com/portainer/portainer"
-
 	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/portainer/portainer"
+	httperror "github.com/portainer/portainer/http/error"
 )
 
 // Handler is a collection of all the service handlers.
@@ -15,6 +16,7 @@ type Handler struct {
 	UserHandler      *UserHandler
 	TeamHandler      *TeamHandler
 	EndpointHandler  *EndpointHandler
+	ResourceHandler  *ResourceHandler
 	SettingsHandler  *SettingsHandler
 	TemplatesHandler *TemplatesHandler
 	DockerHandler    *DockerHandler
@@ -31,7 +33,7 @@ const (
 	// ErrInvalidQueryFormat defines an error raised when the data sent in the query or the URL is invalid
 	ErrInvalidQueryFormat = portainer.Error("Invalid query format")
 	// ErrEmptyResponseBody defines an error raised when portainer excepts to parse the body of a HTTP response and there is nothing to parse
-	ErrEmptyResponseBody = portainer.Error("Empty response body")
+	// ErrEmptyResponseBody = portainer.Error("Empty response body")
 )
 
 // ServeHTTP delegates a request to the appropriate subhandler.
@@ -44,6 +46,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.TeamHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/endpoints") {
 		http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/api/resources") {
+		http.StripPrefix("/api", h.ResourceHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/settings") {
 		http.StripPrefix("/api", h.SettingsHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/templates") {
@@ -59,33 +63,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Error writes an API error message to the response and logger.
-func Error(w http.ResponseWriter, err error, code int, logger *log.Logger) {
-	// Log error.
-	if logger != nil {
-		logger.Printf("http error: %s (code=%d)", err, code)
-	}
-
-	// Write generic error response.
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(&errorResponse{Err: err.Error()})
-}
-
-// errorResponse is a generic response for sending a error.
-type errorResponse struct {
-	Err string `json:"err,omitempty"`
-}
-
-// handleNotAllowed writes an API error message to the response and sets the Allow header.
-func handleNotAllowed(w http.ResponseWriter, allowedMethods []string) {
-	w.Header().Set("Allow", strings.Join(allowedMethods, ", "))
-	w.WriteHeader(http.StatusMethodNotAllowed)
-	json.NewEncoder(w).Encode(&errorResponse{Err: http.StatusText(http.StatusMethodNotAllowed)})
-}
-
 // encodeJSON encodes v to w in JSON format. Error() is called if encoding fails.
 func encodeJSON(w http.ResponseWriter, v interface{}, logger *log.Logger) {
 	if err := json.NewEncoder(w).Encode(v); err != nil {
-		Error(w, err, http.StatusInternalServerError, logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, logger)
 	}
 }

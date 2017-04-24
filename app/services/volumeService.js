@@ -1,10 +1,44 @@
 angular.module('portainer.services')
-.factory('VolumeService', ['$q', 'Volume', 'VolumeHelper', function VolumeServiceFactory($q, Volume, VolumeHelper) {
+.factory('VolumeService', ['$q', 'Volume', 'VolumeHelper', 'ResourceControlService', function VolumeServiceFactory($q, Volume, VolumeHelper, ResourceControlService) {
   'use strict';
   var service = {};
 
+  service.volume = function(id) {
+    var deferred = $q.defer();
+    Volume.get({id: id}).$promise
+    .then(function success(data) {
+      var volume = new VolumeViewModel(data);
+      deferred.resolve(volume);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve volume details', err: err});
+    });
+    return deferred.promise;
+  };
+
   service.getVolumes = function() {
     return Volume.query({}).$promise;
+  };
+
+  service.remove = function(volume) {
+    var deferred = $q.defer();
+    Volume.remove({id: volume.Id}).$promise
+    .then(function success(data) {
+      if (data.message) {
+        deferred.reject({ msg: data.message, err: err });
+      }
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to remove volume', err: err });
+    });
+
+    var queries = [];
+    queries.push(deferred.promise);
+    if (volume.Metadata && volume.Metadata.ResourceControl) {
+      queries.push(ResourceControlService.deleteResourceControl(volume.Metadata.ResourceControl.Id));
+    }
+    return $q.all(queries);
   };
 
   service.createVolumeConfiguration = function(name, driver, driverOptions) {

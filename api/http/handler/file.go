@@ -1,4 +1,4 @@
-package http
+package handler
 
 import (
 	"net/http"
@@ -10,7 +10,8 @@ type FileHandler struct {
 	http.Handler
 }
 
-func newFileHandler(assetPath string) *FileHandler {
+// NewFileHandler returns a new instance of FileHandler.
+func NewFileHandler(assetPath string) *FileHandler {
 	h := &FileHandler{
 		Handler: http.FileServer(http.Dir(assetPath)),
 	}

@@ -1,4 +1,4 @@
-package http
+package proxy
 
 import (
 	"net/http"
@@ -8,25 +8,26 @@ import (
 	"github.com/portainer/portainer"
 )
 
-// ProxyService represents a service used to manage Docker proxies.
-type ProxyService struct {
-	proxyFactory *ProxyFactory
+// Service represents a service used to manage Docker proxies.
+type Service struct {
+	proxyFactory *proxyFactory
 	proxies      cmap.ConcurrentMap
 }
 
-// NewProxyService initializes a new ProxyService
-func NewProxyService(resourceControlService portainer.ResourceControlService) *ProxyService {
-	return &ProxyService{
+// NewService initializes a new proxy Service
+func NewService(resourceControlService portainer.ResourceControlService, teamService portainer.TeamService) *Service {
+	return &Service{
 		proxies: cmap.New(),
-		proxyFactory: &ProxyFactory{
+		proxyFactory: &proxyFactory{
 			ResourceControlService: resourceControlService,
+			TeamService:            teamService,
 		},
 	}
 }
 
 // CreateAndRegisterProxy creates a new HTTP reverse proxy and adds it to the registered proxies.
 // It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
-func (service *ProxyService) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+func (service *Service) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	var proxy http.Handler
 
 	endpointURL, err := url.Parse(endpoint.URL)
@@ -53,7 +54,7 @@ func (service *ProxyService) CreateAndRegisterProxy(endpoint *portainer.Endpoint
 }
 
 // GetProxy returns the proxy associated to a key
-func (service *ProxyService) GetProxy(key string) http.Handler {
+func (service *Service) GetProxy(key string) http.Handler {
 	proxy, ok := service.proxies.Get(key)
 	if !ok {
 		return nil
@@ -62,6 +63,6 @@ func (service *ProxyService) GetProxy(key string) http.Handler {
 }
 
 // DeleteProxy deletes the proxy associated to a key
-func (service *ProxyService) DeleteProxy(key string) {
+func (service *Service) DeleteProxy(key string) {
 	service.proxies.Remove(key)
 }

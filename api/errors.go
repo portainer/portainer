@@ -4,6 +4,7 @@ package portainer
 const (
 	ErrUnauthorized         = Error("Unauthorized")
 	ErrResourceAccessDenied = Error("Access denied to resource")
+	ErrUnsupportedDockerAPI = Error("Unsupported Docker API response")
 )
 
 // User errors.

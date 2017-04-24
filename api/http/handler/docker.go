@@ -1,9 +1,13 @@
-package http
+package handler
 
 import (
 	"strconv"
 
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/http/context"
+	httperror "github.com/portainer/portainer/http/error"
+	"github.com/portainer/portainer/http/middleware"
+	"github.com/portainer/portainer/http/proxy"
 
 	"log"
 	"net/http"
@@ -18,17 +22,17 @@ type DockerHandler struct {
 	Logger          *log.Logger
 	EndpointService portainer.EndpointService
 	TeamService     portainer.TeamService
-	ProxyService    *ProxyService
+	ProxyService    *proxy.Service
 }
 
 // NewDockerHandler returns a new instance of DockerHandler.
-func NewDockerHandler(mw *middleWareService, resourceControlService portainer.ResourceControlService) *DockerHandler {
+func NewDockerHandler(mw *middleware.Service) *DockerHandler {
 	h := &DockerHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.PathPrefix("/{id}/").Handler(
-		mw.authenticated(http.HandlerFunc(h.proxyRequestsToDockerAPI)))
+		mw.Authenticated(http.HandlerFunc(h.proxyRequestsToDockerAPI)))
 	return h
 }
 
@@ -56,23 +60,23 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 
 	parsedID, err := strconv.Atoi(id)
 	if err != nil {
-		Error(w, err, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	endpointID := portainer.EndpointID(parsedID)
 	endpoint, err := handler.EndpointService.Endpoint(endpointID)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	tokenData, err := extractTokenDataFromRequestContext(r)
+	tokenData, err := context.GetTokenData(r)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
 	if tokenData.Role != portainer.AdministratorRole && !handler.checkEndpointAccessControl(endpoint, tokenData.ID) {
-		Error(w, portainer.ErrEndpointAccessDenied, http.StatusForbidden, handler.Logger)
+		httperror.WriteErrorResponse(w, portainer.ErrEndpointAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}
 
@@ -81,7 +85,7 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 	if proxy == nil {
 		proxy, err = handler.ProxyService.CreateAndRegisterProxy(endpoint)
 		if err != nil {
-			Error(w, err, http.StatusBadRequest, handler.Logger)
+			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 			return
 		}
 	}
