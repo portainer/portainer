@@ -120,10 +120,10 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     if ($scope.container.State.Running) {
       ModalService.confirm({
         title: "Are you sure?",
-        message: "You are removing a running container. Please confirm your action",
+        message: "You are about to remove a running container.",
         buttons: {
           confirm: {
-            label: 'Force remove the container'
+            label: 'Remove'
           },
           cancel: {
             label: 'Cancel'
