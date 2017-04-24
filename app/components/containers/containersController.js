@@ -248,10 +248,10 @@ angular.module('containers', [])
       force = true;
       ModalService.confirm({
         title: "Are you sure?",
-        message: "Some selected containers are running. Please confirm your action",
+        message: "You are about to remove one or more running containers.",
         buttons: {
           confirm: {
-            label: 'Force remove the containers',
+            label: 'Remove',
           },
           cancel: {
             label: 'Cancel'
