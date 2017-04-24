@@ -124,7 +124,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
           if(!confirmed) { return; }
           $scope.remove();
         }
-      });
+      );
     } else {
       $scope.remove();
     }

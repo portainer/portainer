@@ -246,7 +246,7 @@ angular.module('containers', [])
           if(!confirmed) { return; }
           $scope.removeAction();
         }
-      });
+      );
     } else {
       $scope.removeAction();
     }
