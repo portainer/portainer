@@ -118,13 +118,27 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
 
   $scope.confirmRemove = function () {
     if ($scope.container.State.Running) {
-      ModalService.confirmDeletion(
+      ModalService.confirm({
+        title: 'Are you sure ?',
+        message: 'You are about to remove a running container.<br/>Automatically clean associated volumes ? <input type="checkbox" data-toggle="toggle" data-on="Clean" data-off="Keep">',
+        buttons: {
+          confirm: {
+            label: 'Remove',
+            className: 'btn-danger'
+          }
+        },
+        callback: function (confirmed) {
+          if(!confirmed) { return; }
+          $scope.remove();
+        }
+      });
+      /*ModalService.confirmDeletion(
         'You are about to remove a running container.',
         function (confirmed) {
           if(!confirmed) { return; }
           $scope.remove();
         }
-      );
+      );*/
     } else {
       $scope.remove();
     }
@@ -132,7 +146,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
 
   $scope.remove = function() {
     $('#loadingViewSpinner').show();
-    Container.remove({id: $stateParams.id, force: true}, function (d) {
+    Container.remove({id: $stateParams.id, removeVolumes: '0', force: true}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error("Failure", d, "Unable to remove container");
