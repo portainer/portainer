@@ -82,6 +82,35 @@
   </div>
 </div>
 
+<div ng-if="container.State.Health" class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-server" title="Container health"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Status</td>
+              <td>
+                <i ng-class="{'healthy': 'fa fa-heartbeat space-right green-icon', 'unhealthy': 'fa fa-heartbeat space-right red-icon', 'starting': 'fa fa-heartbeat space-right orange-icon'}[container.State.Health.Status]"></i>
+                {{ container.State.Health.Status }}
+              </td>
+            </tr>
+            <tr>
+              <td>Failure count</td>
+              <td>{{ container.State.Health.FailingStreak }}</td>
+            </tr>
+            <tr>
+              <td>Last output</td>
+              <td>{{ container.State.Health.Log[container.State.Health.Log.length - 1].Output }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widge>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
