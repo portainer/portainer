@@ -12,7 +12,9 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Registry: '',
     NetworkContainer: '',
     Labels: [],
-    ExtraHosts: []
+    ExtraHosts: [],
+    IPv4: '',
+    IPv6: ''
   };
 
   $scope.imageConfig = {};
@@ -33,6 +35,9 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       Privileged: false,
       ExtraHosts: [],
       Devices:[]
+    },
+    NetworkingConfig: {
+      EndpointsConfig: {}
     },
     Labels: {}
   };
@@ -266,6 +271,13 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       networkMode += ':' + containerName;
     }
     config.HostConfig.NetworkMode = networkMode;
+
+    config.NetworkingConfig.EndpointsConfig[networkMode] = {
+      IPAMConfig: {
+        IPv4Address: $scope.formValues.IPv4,
+        IPv6Address: $scope.formValues.IPv6
+      }
+    };
 
     $scope.formValues.ExtraHosts.forEach(function (v) {
     if (v.value) {
