@@ -70,7 +70,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notification
 
   $scope.removeAction = function() {
     ModalService.confirmDeletion(
-      'Do you want to delete the selected service(s)? All the containers associated to the selected service(s) will be removed too.',
+      'Do you want to remove the selected service(s)? All the containers associated to the selected service(s) will be removed too.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
         removeServices();
@@ -154,7 +154,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notification
       $scope.swarmManagerIP = NodeHelper.getManagerIP(data.nodes);
       $scope.services = data.services.map(function (service) {
         var serviceTasks = data.tasks.filter(function (task) {
-          return task.ServiceID === service.ID;
+          return task.ServiceID === service.ID && task.Status.State === "running";
         });
         var taskNodes = data.nodes.filter(function (node) {
           return node.Spec.Availability === 'active' && node.Status.State === 'ready';

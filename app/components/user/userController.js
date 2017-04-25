@@ -15,7 +15,7 @@ function ($q, $scope, $state, $stateParams, UserService, TeamService, ModalServi
 
   $scope.deleteUser = function() {
     ModalService.confirmDeletion(
-      'Do you want to delete this user? This user will not be able to login into Portainer anymore.',
+      'Do you want to remove this user? This user will not be able to login into Portainer anymore.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
         deleteUser();

@@ -128,7 +128,7 @@ angular.module('containers', [])
           });
         }
         else if (action === Container.remove) {
-          action({id: c.Id}, function (d) {
+          action({id: c.Id, force: true}, function (d) {
             if (d.message) {
               Notifications.error("Error", d, "Unable to remove container");
             }
@@ -229,6 +229,27 @@ angular.module('containers', [])
 
   $scope.removeAction = function () {
     batch($scope.containers, Container.remove, "Removed");
+  };
+
+  $scope.confirmRemoveAction = function () {
+    var isOneContainerRunning = false;
+    angular.forEach($scope.containers, function (c) {
+      if (c.Checked && c.State === 'running') {
+        isOneContainerRunning = true;
+        return;
+      }
+    });
+    if (isOneContainerRunning) {
+      ModalService.confirmDeletion(
+        'You are about to remove one or more running containers.',
+        function (confirmed) {
+          if(!confirmed) { return; }
+          $scope.removeAction();
+        }
+      );
+    } else {
+      $scope.removeAction();
+    }
   };
 
   function retrieveSwarmHostsInfo(data) {

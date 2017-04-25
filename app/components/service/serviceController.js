@@ -224,7 +224,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
 
   $scope.removeService = function() {
     ModalService.confirmDeletion(
-      'Do you want to delete this service? All the containers associated to this service will be removed too.',
+      'Do you want to remove this service? All the containers associated to this service will be removed too.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
         removeService();

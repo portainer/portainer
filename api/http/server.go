@@ -25,6 +25,9 @@ type Server struct {
 	Settings               *portainer.Settings
 	TemplatesURL           string
 	Handler                *handler.Handler
+	SSL                    bool
+	SSLCert                string
+	SSLKey                 string
 }
 
 // Start starts the HTTP server
@@ -75,5 +78,8 @@ func (server *Server) Start() error {
 		UploadHandler:    uploadHandler,
 	}
 
+	if server.SSL {
+		return http.ListenAndServeTLS(server.BindAddress, server.SSLCert, server.SSLKey, server.Handler)
+	}
 	return http.ListenAndServe(server.BindAddress, server.Handler)
 }

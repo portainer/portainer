@@ -23,7 +23,7 @@ angular.module('portainer.rest')
       transformResponse: genericHandler
     },
     remove: {
-      method: 'DELETE', params: {id: '@id', v: 0},
+      method: 'DELETE', params: {id: '@id', v: 0, force: '@force'},
       transformResponse: genericHandler
     },
     rename: {

@@ -169,6 +169,9 @@ func main() {
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,
+		SSL:                    *flags.SSL,
+		SSLCert:                *flags.SSLCert,
+		SSLKey:                 *flags.SSLKey,
 	}
 
 	log.Printf("Starting Portainer on %s", *flags.Addr)
