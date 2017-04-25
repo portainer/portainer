@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"net/http"
+	"path"
 	"strings"
 
 	"github.com/portainer/portainer"
@@ -45,6 +46,7 @@ func (p *proxyTransport) proxyVolumeRequests(request *http.Request, response *ht
 	if err != nil {
 		return err
 	}
+	userID := tokenData.ID
 
 	volumeResourceControls, err := p.ResourceControlService.ResourceControls(portainer.VolumeResourceControl)
 	if err != nil {
@@ -61,15 +63,54 @@ func (p *proxyTransport) proxyVolumeRequests(request *http.Request, response *ht
 		userTeamIDs = append(userTeamIDs, team.ID)
 	}
 
-	if tokenData.Role == portainer.AdministratorRole {
-		err = proxyAdministratorVolumeRequests(request, response, volumeResourceControls)
-	} else {
-		err = proxyUserVolumeRequests(request, response, tokenData.ID, userTeamIDs, volumeResourceControls)
+	switch requestPath := request.URL.Path; requestPath {
+	case "/volumes/create":
+		return nil
+
+	case "/volumes/prune":
+		if tokenData.Role != portainer.AdministratorRole {
+			return writeAccessDeniedResponse(response)
+		}
+
+	case "/volumes":
+		if tokenData.Role != portainer.AdministratorRole {
+			// return filterVolumeListResponse(response, userID, userTeamIDs, volumeResourceControls)
+		}
+		// return decorateVolumeListResponse(response, volumeResourceControls)
+	default:
+		// assume /volumes/{name}
+		// if tokenData.Role == portainer.AdministratorRole {
+		// 	if request.Method == http.MethodGet {
+		// 		// return decorateVolumeInspect(response, volumeResourceControls)
+		// 	}
+		// 	return nil
+		// }
+
+		if request.Method == http.MethodGet {
+			proxyRequest := &proxyVolumeInspectRequest{
+				userID:           tokenData.ID,
+				userRole:         tokenData.Role,
+				userTeamIDs:      userTeamIDs,
+				resourceControls: volumeResourceControls,
+			}
+			return proxyRequest.decorateVolumeInspectResponse(response)
+		}
+		volumeID := path.Base(requestPath)
+		if !isResourceAccessAuthorized(userID, userTeamIDs, volumeID, volumeResourceControls) {
+			return writeAccessDeniedResponse(response)
+		}
 	}
 
-	if err != nil {
-		return err
-	}
+	//
+	// if tokenData.Role == portainer.AdministratorRole {
+	// 	err = proxyAdministratorVolumeRequests(request, response, volumeResourceControls)
+	// } else {
+	//
+	// 	err = proxyUserVolumeRequests(request, response, tokenData.ID, userTeamIDs, volumeResourceControls)
+	// }
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }

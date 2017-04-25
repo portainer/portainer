@@ -2,9 +2,21 @@ package proxy
 
 import (
 	"net/http"
-	"path"
 
 	"github.com/portainer/portainer"
+)
+
+type (
+	proxyVolumeListRequest struct {
+	}
+	proxyVolumeInspectRequest struct {
+		responseObject   map[string]interface{}
+		volumeID         string
+		userRole         portainer.UserRole
+		userID           portainer.UserID
+		userTeamIDs      []portainer.TeamID
+		resourceControls []portainer.ResourceControl
+	}
 )
 
 const (
@@ -13,62 +25,61 @@ const (
 	volumeIdentifier                  = "Name"
 )
 
-func proxyAdministratorVolumeRequests(request *http.Request, response *http.Response, resourceControls []portainer.ResourceControl) error {
-	requestPath := request.URL.Path
-	if requestPath == "/volumes" {
-		return decorateVolumeListResponse(response, resourceControls)
-	}
-	if request.Method == http.MethodGet {
-		return decorateVolumeInspect(response, resourceControls)
-	}
-	// Decorate VolumeInspect here
-	return nil
-}
+// func proxyAdministratorVolumeRequests(request *http.Request, response *http.Response, resourceControls []portainer.ResourceControl) error {
+// 	requestPath := request.URL.Path
+// 	if requestPath == "/volumes" {
+// 		return decorateVolumeListResponse(response, resourceControls)
+// 	}
+// 	if request.Method == http.MethodGet {
+// 		return decorateVolumeInspect(response, resourceControls)
+// 	}
+// 	return nil
+// }
 
-func proxyUserVolumeRequests(request *http.Request, response *http.Response, userID portainer.UserID, userTeamIDs []portainer.TeamID, resourceControls []portainer.ResourceControl) error {
-	switch requestPath := request.URL.Path; requestPath {
-	case "/volumes/create":
-		return nil
-	case "/volumes/prune":
-		return writeAccessDeniedResponse(response)
-	case "/volumes":
-		return filterVolumeListResponse(response, userID, userTeamIDs, resourceControls)
-	default:
-		// assume /volumes/{name}
-		if request.Method == http.MethodGet {
-			return decorateVolumeInspectResponse(response, userID, userTeamIDs, resourceControls)
-		}
-		volumeID := path.Base(requestPath)
-		if !isResourceAccessAuthorized(userID, userTeamIDs, volumeID, resourceControls) {
-			return writeAccessDeniedResponse(response)
-		}
-	}
+// func proxyUserVolumeRequests(request *http.Request, response *http.Response) error {
+// 	switch requestPath := request.URL.Path; requestPath {
+// 	case "/volumes/create":
+// 		return nil
+// 	case "/volumes/prune":
+// 		return writeAccessDeniedResponse(response)
+// 	case "/volumes":
+// 		return filterVolumeListResponse(response, userID, userTeamIDs, resourceControls)
+// 	default:
+// 		// assume /volumes/{name}
+// 		if request.Method == http.MethodGet {
+// 			return decorateVolumeInspectResponse(response, userID, userTeamIDs, resourceControls)
+// 		}
+// 		volumeID := path.Base(requestPath)
+// 		if !isResourceAccessAuthorized(userID, userTeamIDs, volumeID, resourceControls) {
+// 			return writeAccessDeniedResponse(response)
+// 		}
+// 	}
+//
+// 	return nil
+// }
 
-	// requestPath := request.URL.Path
-	// if requestPath == "/volumes/prune" {
-	// 	return writeAccessDeniedResponse(response)
-	// }
-	//
-	// if requestPath == "/volumes/create" {
-	// 	return nil
-	// }
-	//
-	// if requestPath == "/volumes" {
-	// 	return filterVolumeListResponse(response, userID, userTeamIDs, resourceControls)
-	// }
-	//
-	// // volume requests matching /volumes/{name}
-	// if match, _ := path.Match("/volumes/*", requestPath); match {
-	// 	resourceID := path.Base(requestPath)
-	// 	if !isResourceAccessAuthorized(userID, userTeamIDs, resourceID, resourceControls) {
-	// 		return writeAccessDeniedResponse(response)
-	// 	}
-	// }
+// func decorateVolumeInspect(response *http.Response, resourceControls []portainer.ResourceControl) error {
+// 	// VolumeInspect response is a JSON object
+// 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
+// 	responseObject, err := getResponseAsJSONOBject(response)
+// 	if err != nil {
+// 		return err
+// 	}
+//
+// 	if responseObject[volumeIdentifier] == nil {
+// 		return ErrDockerVolumeIdentifierNotFound
+// 	}
+// 	volumeID := responseObject[volumeIdentifier].(string)
+//
+// 	volumeResourceControl := getResourceControlByResourceID(volumeID, resourceControls)
+// 	if volumeResourceControl != nil {
+// 		responseObject = decorateObject(responseObject, volumeResourceControl)
+// 	}
+//
+// 	return rewriteResponse(response, responseObject, http.StatusOK)
+// }
 
-	return nil
-}
-
-func decorateVolumeInspect(response *http.Response, resourceControls []portainer.ResourceControl) error {
+func (proxyRequest *proxyVolumeInspectRequest) decorateVolumeInspectResponse(response *http.Response) error {
 	// VolumeInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
 	responseObject, err := getResponseAsJSONOBject(response)
@@ -81,35 +92,38 @@ func decorateVolumeInspect(response *http.Response, resourceControls []portainer
 	}
 	volumeID := responseObject[volumeIdentifier].(string)
 
-	volumeResourceControl := getResourceControlByResourceID(volumeID, resourceControls)
+	volumeResourceControl := getResourceControlByResourceID(volumeID, proxyRequest.resourceControls)
 	if volumeResourceControl != nil {
-		responseObject = decorateObject(responseObject, volumeResourceControl)
+		if proxyRequest.userRole == portainer.AdministratorRole || canUserAccessResource(proxyRequest.userID, proxyRequest.userTeamIDs, volumeResourceControl) {
+			responseObject = decorateObject(responseObject, volumeResourceControl)
+		} else {
+			return writeAccessDeniedResponse(response)
+		}
 	}
 
 	return rewriteResponse(response, responseObject, http.StatusOK)
 }
 
-func decorateVolumeInspectResponse(response *http.Response, userID portainer.UserID, userTeamIDs []portainer.TeamID, resourceControls []portainer.ResourceControl) error {
-	// VolumeInspect response is a JSON object
-	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
-	responseObject, err := getResponseAsJSONOBject(response)
-	if err != nil {
-		return err
-	}
-
-	if responseObject[volumeIdentifier] == nil {
-		return ErrDockerVolumeIdentifierNotFound
-	}
-	volumeID := responseObject[volumeIdentifier].(string)
-
-	volumeResourceControl := getResourceControlByResourceID(volumeID, resourceControls)
-	if volumeResourceControl != nil && canUserAccessResource(userID, userTeamIDs, volumeResourceControl) {
-		responseObject = decorateObject(responseObject, volumeResourceControl)
-		return rewriteResponse(response, responseObject, http.StatusOK)
-	}
-
-	return nil
-}
+// func decorateVolumeInspectResponse(response *http.Response, userID portainer.UserID, userTeamIDs []portainer.TeamID, resourceControls []portainer.ResourceControl) error {
+// 	// VolumeInspect response is a JSON object
+// 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
+// 	responseObject, err := getResponseAsJSONOBject(response)
+// 	if err != nil {
+// 		return err
+// 	}
+//
+// 	if responseObject[volumeIdentifier] == nil {
+// 		return ErrDockerVolumeIdentifierNotFound
+// 	}
+// 	volumeID := responseObject[volumeIdentifier].(string)
+//
+// 	volumeResourceControl := getResourceControlByResourceID(volumeID, resourceControls)
+// 	if volumeResourceControl != nil && canUserAccessResource(userID, userTeamIDs, volumeResourceControl) {
+// 		responseObject = decorateObject(responseObject, volumeResourceControl)
+// 	}
+//
+// 	return rewriteResponse(response, responseObject, http.StatusOK)
+// }
 
 // The "Volumes" field contains the list of volumes as an array of JSON objects
 // Response schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
