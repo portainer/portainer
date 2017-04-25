@@ -75,7 +75,7 @@ angular.module('portainer.services')
       message: message,
       buttons: {
         confirm: {
-          label: 'Delete',
+          label: 'Remove',
           className: 'btn-danger'
         }
       },
