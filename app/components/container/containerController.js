@@ -14,8 +14,6 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     Pagination.setPaginationCount('container_networks', $scope.state.pagination_count);
   };
 
-  $scope.cleanAssociatedVolumes = false;
-
   var update = function () {
     $('#loadingViewSpinner').show();
     Container.get({id: $stateParams.id}, function (d) {
