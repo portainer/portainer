@@ -63,8 +63,8 @@ angular.module('containers', [])
     // Get current endpoint Publish URL
     var currentEndpointId = EndpointProvider.endpointID();
     EndpointService.endpoints()
-    .then(function success(data) {
-      var currentEndpoint = data.filter(function(e) {
+    .then(function success(endpointsData) {
+      var currentEndpoint = endpointsData.filter(function(e) {
         return e.Id === currentEndpointId;
       })[0];
       var userDetails = Authentication.getUserDetails();
@@ -113,10 +113,6 @@ angular.module('containers', [])
     })
     .catch(function error(err) {
       Notifications.error("Failure", err, "Unable to retrieve endpoints");
-      $scope.endpoints = [];
-    })
-    .finally(function final() {
-      $('#loadEndpointsSpinner').hide();
     });
   };
 
