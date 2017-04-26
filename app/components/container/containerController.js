@@ -14,6 +14,8 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     Pagination.setPaginationCount('container_networks', $scope.state.pagination_count);
   };
 
+  $scope.cleanAssociatedVolumes = false;
+
   var update = function () {
     $('#loadingViewSpinner').show();
     Container.get({id: $stateParams.id}, function (d) {
@@ -117,21 +119,63 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.confirmRemove = function () {
-    var title = 'You are about to remove a container.';
+    /*var title = 'You are about to remove a container.';
     if ($scope.container.State.Running) {
       title = 'You are about to remove a running container.';
     }
-    var text = 'Automatically clean associated volumes';
+    var text = 'Automatically clean associated volumes';*/
 
-    ModalService.promptDeletionCheckbox(
+    /*ModalService.promptDeletionCheckbox(
       title,
       text,
-        function (result) {
-          if(!result) { return; }
-          var cleanAssociatedVolumes = result.length;
-          $scope.remove(cleanAssociatedVolumes);
+      function (result) {
+        if(!result) { return; }
+        var cleanAssociatedVolumes = result.length;
+        $scope.remove(cleanAssociatedVolumes);
+      }
+    );*/
+    var title = 'Are you sure ?';
+    var message = 'You are about to remove a container.';
+    if ($scope.container.State.Running) {
+      message = 'You are about to remove a running container.';
+    }
+    //message += '<div><label class="switch" style="margin-left: 20px;"><input id="#cleanAssociatedVolumes" type="checkbox" ng-model="cleanAssociatedVolumes"><i></i></label>Value {{cleanAssociatedVolumes}}</div>';
+    /*var template = angular.element(message);
+    var linkFn = $compile(template);
+    var html= linkFn($scope);*/
+
+    /*ModalService.confirmDeletion(
+      message,
+      function (confirmed) {
+        $scope.$apply(function(){
+          console.log($('#cleanAssociatedVolumes').val());
+        });
+      }
+    );*/
+    ModalService.dialog({
+      "title": title,
+      "message": message,
+      "buttons": {
+        confirm: {
+          label: 'Remove container',
+          className: 'btn-danger btn-block',
+          callback: function () {
+            $scope.remove(0);
+          }
+        },
+        confirm2: {
+          label: 'Remove container and associated volumes',
+          className: 'btn-danger btn-block',
+          callback: function () {
+            $scope.remove(1);
+          }
+        },
+        cancel: {
+          label: 'Cancel',
+          className: 'btn-block'
         }
-      );
+      }
+    });
   };
 
   $scope.remove = function(cleanAssociatedVolumes) {

@@ -26,6 +26,21 @@ angular.module('portainer.services')
     });
   };
 
+  service.dialog = function(options){
+    var box = bootbox.dialog({
+      title: options.title,
+      message: options.message,
+      buttons: options.buttons,
+      callback: options.callback
+    });
+    box.css({
+      'top': '50%',
+      'margin-top': function () {
+        return -(box.height() / 2);
+      }
+    });
+  };
+
   service.prompt = function(options){
     var box = bootbox.prompt({
       title: options.title,
