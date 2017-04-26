@@ -26,6 +26,30 @@ angular.module('portainer.services')
     });
   };
 
+  service.prompt = function(options){
+    var box = bootbox.prompt({
+      title: options.title,
+      inputType: options.inputType,
+      inputOptions: options.inputOptions,
+      buttons: {
+        confirm: {
+          label: options.buttons.confirm.label,
+          className: options.buttons.confirm.className
+        },
+        cancel: {
+          label: options.buttons.cancel && options.buttons.cancel.label ? options.buttons.cancel.label : 'Cancel'
+        }
+      },
+      callback: options.callback
+    });
+    box.css({
+      'top': '50%',
+      'margin-top': function () {
+        return -(box.height() / 2);
+      }
+    });
+  };
+
   service.confirmOwnershipChange = function(callback, msg) {
     service.confirm({
       title: 'Are you sure ?',
@@ -82,5 +106,26 @@ angular.module('portainer.services')
       callback: callback,
     });
   };
+
+  service.promptDeletionCheckbox = function(title, text, callback) {
+    service.prompt({
+      title: title,
+      inputType: 'checkbox',
+      inputOptions: [
+        {
+          text: text,
+          value: '1'
+        }
+      ],
+      buttons: {
+        confirm: {
+          label: 'Remove',
+          className: 'btn-danger'
+        }
+      },
+      callback: callback,
+    });
+  };
+
   return service;
 }]);
