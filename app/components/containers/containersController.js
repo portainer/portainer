@@ -1,6 +1,6 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Notifications', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
-  function ($q, $scope, $filter, Container, ContainerHelper, Info, Settings, Notifications, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Notifications', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService', 'EndpointProvider', 'EndpointService',
+  function ($q, $scope, $filter, Container, ContainerHelper, Info, Settings, Notifications, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService, EndpointProvider, EndpointService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = Settings.displayAll;
@@ -60,48 +60,63 @@ angular.module('containers', [])
 
   var update = function (data) {
     $('#loadContainersSpinner').show();
-    var userDetails = Authentication.getUserDetails();
-    $scope.user = userDetails;
-    $scope.state.selectedItemCount = 0;
-    Container.query(data, function (d) {
-      var containers = d;
-      if ($scope.containersToHideLabels) {
-        containers = ContainerHelper.hideContainers(d, $scope.containersToHideLabels);
-      }
-      $scope.containers = containers.map(function (container) {
-        var model = new ContainerViewModel(container);
-        model.Status = $filter('containerstatus')(model.Status);
+    // Get current endpoint Publish URL
+    var currentEndpointId = EndpointProvider.endpointID();
+    EndpointService.endpoints()
+    .then(function success(data) {
+      var currentEndpoint = data.filter(function(e) {
+        return e.Id === currentEndpointId;
+      })[0];
+      var userDetails = Authentication.getUserDetails();
+      $scope.user = userDetails;
+      $scope.state.selectedItemCount = 0;
+      Container.query(data, function (d) {
+        var containers = d;
+        if ($scope.containersToHideLabels) {
+          containers = ContainerHelper.hideContainers(d, $scope.containersToHideLabels);
+        }
+        $scope.containers = containers.map(function (container) {
+          var model = new ContainerViewModel(container, currentEndpoint);
+          model.Status = $filter('containerstatus')(model.Status);
 
-        EntityListService.rememberPreviousSelection($scope.containers, model, function onSelect(model){
-          $scope.selectItem(model);
+          EntityListService.rememberPreviousSelection($scope.containers, model, function onSelect(model){
+            $scope.selectItem(model);
+          });
+
+          if (model.IP) {
+            $scope.state.displayIP = true;
+          }
+          if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
+            model.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
+          }
+          return model;
         });
-
-        if (model.IP) {
-          $scope.state.displayIP = true;
-        }
-        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
-          model.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
-        }
-        return model;
-      });
-      if (userDetails.role === 1) {
-        UserService.users()
-        .then(function success(data) {
-          mapUsersToContainers(data);
-        })
-        .catch(function error(err) {
-          Notifications.error("Failure", err, "Unable to retrieve users");
-        })
-        .finally(function final() {
+        if (userDetails.role === 1) {
+          UserService.users()
+          .then(function success(data) {
+            mapUsersToContainers(data);
+          })
+          .catch(function error(err) {
+            Notifications.error("Failure", err, "Unable to retrieve users");
+          })
+          .finally(function final() {
+            $('#loadContainersSpinner').hide();
+          });
+        } else {
           $('#loadContainersSpinner').hide();
-        });
-      } else {
+        }
+      }, function (e) {
         $('#loadContainersSpinner').hide();
-      }
-    }, function (e) {
-      $('#loadContainersSpinner').hide();
-      Notifications.error("Failure", e, "Unable to retrieve containers");
-      $scope.containers = [];
+        Notifications.error("Failure", e, "Unable to retrieve containers");
+        $scope.containers = [];
+      });
+    })
+    .catch(function error(err) {
+      Notifications.error("Failure", err, "Unable to retrieve endpoints");
+      $scope.endpoints = [];
+    })
+    .finally(function final() {
+      $('#loadEndpointsSpinner').hide();
     });
   };
 

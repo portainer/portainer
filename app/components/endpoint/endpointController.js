@@ -22,6 +22,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
     var endpointParams = {
       name: $scope.endpoint.Name,
       URL: $scope.endpoint.URL,
+      URLPublish: $scope.endpoint.URLPublish,
       TLS: $scope.endpoint.TLS,
       TLSCACert: $scope.formValues.TLSCACert !== $scope.endpoint.TLSCACert ? $scope.formValues.TLSCACert : null,
       TLSCert: $scope.formValues.TLSCert !== $scope.endpoint.TLSCert ? $scope.formValues.TLSCert : null,

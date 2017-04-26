@@ -31,6 +31,17 @@
             </div>
           </div>
           <!-- !endpoint-url-input -->
+          <!-- endpoint-url-publish-input -->
+          <div class="form-group">
+            <label for="endpoint_url_publish" class="col-sm-3 col-lg-2 control-label text-left">
+              Endpoint URL Publish
+              <portainer-tooltip position="bottom" message="URL or IP address where the services will be exposed."></portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <input ng-disabled="endpointType === 'local'" type="text" class="form-control" id="endpoint_url_publish" ng-model="endpoint.URLPublish" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com">
+            </div>
+          </div>
+          <!-- !endpoint-url-publish-input -->
           <!-- tls-checkbox -->
           <div class="form-group" ng-if="endpointType === 'remote'">
             <div class="col-sm-12">

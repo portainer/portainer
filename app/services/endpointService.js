@@ -18,6 +18,7 @@ angular.module('portainer.services')
   service.updateEndpoint = function(id, endpointParams) {
     var query = {
       name: endpointParams.name,
+      URLPublish: endpointParams.URLPublish,
       TLS: endpointParams.TLS,
       authorizedUsers: endpointParams.authorizedUsers
     };
@@ -54,10 +55,11 @@ angular.module('portainer.services')
     return Endpoints.create({}, endpoint).$promise;
   };
 
-  service.createRemoteEndpoint = function(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  service.createRemoteEndpoint = function(name, URL, URLPublish, TLS, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var endpoint = {
       Name: name,
       URL: 'tcp://' + URL,
+      URLPublish: URLPublish,
       TLS: TLS
     };
     var deferred = $q.defer();

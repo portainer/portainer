@@ -1,4 +1,4 @@
-function ContainerViewModel(data) {
+function ContainerViewModel(data, currentEndpoint) {
   this.Id = data.Id;
   this.Status = data.Status;
   this.State = data.State;
@@ -16,6 +16,9 @@ function ContainerViewModel(data) {
   for (var i = 0; i < data.Ports.length; ++i) {
     var p = data.Ports[i];
     if (p.PublicPort) {
+      if (undefined !== currentEndpoint && currentEndpoint.URLPublish !== '') {
+        p.IP = currentEndpoint.URLPublish;
+      }
       this.Ports.push({ host: p.IP, private: p.PrivatePort, public: p.PublicPort });
     }
   }

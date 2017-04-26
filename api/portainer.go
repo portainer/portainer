@@ -72,6 +72,7 @@ type (
 		ID              EndpointID `json:"Id"`
 		Name            string     `json:"Name"`
 		URL             string     `json:"URL"`
+		URLPublish      string     `json:"URLPublish"`
 		TLS             bool       `json:"TLS"`
 		TLSCACertPath   string     `json:"TLSCACert,omitempty"`
 		TLSCertPath     string     `json:"TLSCert,omitempty"`
