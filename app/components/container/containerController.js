@@ -139,6 +139,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     if ($scope.container.State.Running) {
       message = 'You are about to remove a running container.';
     }
+    message += '<br/>You can either choose to remove the container only or the container and all its associated volumes';
     //message += '<div><label class="switch" style="margin-left: 20px;"><input id="#cleanAssociatedVolumes" type="checkbox" ng-model="cleanAssociatedVolumes"><i></i></label>Value {{cleanAssociatedVolumes}}</div>';
     /*var template = angular.element(message);
     var linkFn = $compile(template);
@@ -158,21 +159,21 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       "buttons": {
         confirm: {
           label: 'Remove container',
-          className: 'btn-danger btn-block',
+          className: 'btn-danger',
           callback: function () {
             $scope.remove(0);
           }
         },
         confirm2: {
-          label: 'Remove container and associated volumes',
-          className: 'btn-danger btn-block',
+          label: 'Remove container and volumes',
+          className: 'btn-danger',
           callback: function () {
             $scope.remove(1);
           }
         },
         cancel: {
           label: 'Cancel',
-          className: 'btn-block'
+          className: 'pull-left'
         }
       }
     });
