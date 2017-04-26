@@ -121,14 +121,17 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     if ($scope.container.State.Running) {
       title = 'You are about to remove a running container.';
     }
-    var text = 'Automatically clean associated volumes';
-
+    //var text = '<label for="clean" class="control-label text-left">Clean associated volumes<portainer-tooltip position="bottom" message="Enable this option to remove associated volumes."></portainer-tooltip></label><label class="switch" style="margin-left: 20px;"><input type="checkbox"><i></i></label>';
+    var text = '<label for="clean" class="control-label text-left">Automatically clean associated volumes</label><label class="switch" style="margin-left: 21px;"><input type="checkbox"><i></i></label>';
     ModalService.promptDeletionCheckbox(
       title,
       text,
         function (result) {
           if(!result) { return; }
-          var cleanAssociatedVolumes = result.length;
+          var cleanAssociatedVolumes = 0;
+          for (var i in result) {
+            if (result[i] === 'on') cleanAssociatedVolumes = 1;
+          }
           $scope.remove(cleanAssociatedVolumes);
         }
       );

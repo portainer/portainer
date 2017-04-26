@@ -371,6 +371,10 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   float: none !important;
 }
 
+form.bootbox-form input.bootbox-input-checkbox {
+  display: none
+}
+
 .switch input {
   display: none;
 }
