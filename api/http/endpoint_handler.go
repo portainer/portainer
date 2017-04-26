@@ -108,7 +108,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 	endpoint := &portainer.Endpoint{
 		Name:            req.Name,
 		URL:             req.URL,
-    URLPublish:      req.URLPublish,
+		URLPublish:      req.URLPublish,
 		TLS:             req.TLS,
 		AuthorizedUsers: []portainer.UserID{},
 	}
@@ -302,10 +302,10 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 }
 
 type putEndpointsRequest struct {
-	Name        string `valid:"-"`
-	URL         string `valid:"-"`
-	URLPublish  string `valid:"-"`
-	TLS         bool   `valid:"-"`
+	Name       string `valid:"-"`
+	URL        string `valid:"-"`
+	URLPublish string `valid:"-"`
+	TLS        bool   `valid:"-"`
 }
 
 // handleDeleteEndpoint handles DELETE requests on /endpoints/:id
