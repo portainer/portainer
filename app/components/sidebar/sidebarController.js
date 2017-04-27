@@ -11,7 +11,9 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
 
   $scope.switchEndpoint = function(endpoint) {
     var activeEndpointID = EndpointProvider.endpointID();
+    var activeEndpointURLPublish = EndpointProvider.endpointURLPublish();
     EndpointProvider.setEndpointID(endpoint.Id);
+    EndpointProvider.setEndpointURLPublish(endpoint.URLPublish);
     StateManager.updateEndpointState(true)
     .then(function success() {
       $state.go('dashboard');
@@ -19,6 +21,7 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
     .catch(function error(err) {
       Notifications.error("Failure", err, "Unable to connect to the Docker endpoint");
       EndpointProvider.setEndpointID(activeEndpointID);
+      EndpointProvider.setEndpointURLPublish(activeEndpointURLPublish);
       StateManager.updateEndpointState(true)
       .then(function success() {});
     });

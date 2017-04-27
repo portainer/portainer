@@ -5,8 +5,12 @@ angular.module('portainer.services')
   var service = {};
   service.initialize = function() {
     var endpointID = LocalStorage.getEndpointID();
+    var endpointURLPublish = LocalStorage.getEndpointURLPublish();
     if (endpointID) {
       endpoint.ID = endpointID;
+    }
+    if (endpointURLPublish) {
+      endpoint.URLPublish = endpointURLPublish;
     }
   };
   service.clean = function() {
@@ -19,5 +23,12 @@ angular.module('portainer.services')
     endpoint.ID = id;
     LocalStorage.storeEndpointID(id);
   };
+  service.endpointURLPublish = function() {
+    return endpoint.URLPublish;
+  }
+  service.setEndpointURLPublish = function(urlPublish) {
+    endpoint.URLPublish = urlPublish;
+    LocalStorage.storeEndpointURLPublish(urlPublish);
+  }
   return service;
 }]);
