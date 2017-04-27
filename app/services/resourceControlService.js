@@ -3,8 +3,8 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.createVolumeResourceControl = function(userIDs, teamIDs, resourceID) {
-    return RC.create({}, {ResourceID: resourceID, Users: userIDs, Teams: teamIDs, resourceType: 'volume'}).$promise;
+  service.createResourceControl = function(userIDs, teamIDs, resourceID) {
+    return RC.create({}, {ResourceID: resourceID, Users: userIDs, Teams: teamIDs}).$promise;
   };
 
   service.deleteResourceControl = function(rcID) {

@@ -23,9 +23,9 @@ func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.R
 		}
 
 		volumeID := volumeObject[volumeIdentifier].(string)
-		volumeResourceControl := getResourceControlByResourceID(volumeID, resourceControls)
-		if volumeResourceControl != nil {
-			volumeObject = decorateObject(volumeObject, volumeResourceControl)
+		resourceControl := getResourceControlByResourceID(volumeID, resourceControls)
+		if resourceControl != nil {
+			volumeObject = decorateObject(volumeObject, resourceControl)
 		}
 		decoratedVolumeData = append(decoratedVolumeData, volumeObject)
 	}

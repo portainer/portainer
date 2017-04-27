@@ -109,13 +109,13 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 			userTeamIDs = append(userTeamIDs, team.ID)
 		}
 
-		volumeResourceControls, err := p.ResourceControlService.ResourceControls(portainer.VolumeResourceControl)
+		resourceControls, err := p.ResourceControlService.ResourceControls()
 		if err != nil {
 			return nil, err
 		}
 
-		volumeResourceControl := getResourceControlByResourceID(resourceID, volumeResourceControls)
-		if volumeResourceControl != nil && !canUserAccessResource(tokenData.ID, userTeamIDs, volumeResourceControl) {
+		resourceControl := getResourceControlByResourceID(resourceID, resourceControls)
+		if resourceControl != nil && !canUserAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
 			return writeAccessDeniedResponse()
 		}
 	}
@@ -132,7 +132,7 @@ func (p *proxyTransport) rewriteOperation(request *http.Request, operation restr
 		return nil, err
 	}
 
-	volumeResourceControls, err := p.ResourceControlService.ResourceControls(portainer.VolumeResourceControl)
+	resourceControls, err := p.ResourceControlService.ResourceControls()
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (p *proxyTransport) rewriteOperation(request *http.Request, operation restr
 	operationContext := &restrictedOperationContext{
 		isAdmin:          true,
 		userID:           tokenData.ID,
-		resourceControls: volumeResourceControls,
+		resourceControls: resourceControls,
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {

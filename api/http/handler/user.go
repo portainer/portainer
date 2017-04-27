@@ -401,14 +401,7 @@ func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *htt
 		return
 	}
 
-	var rcType portainer.ResourceControlType
-	if resourceType == "container" {
-		rcType = portainer.ContainerResourceControl
-	} else if resourceType == "service" {
-		rcType = portainer.ServiceResourceControl
-	} else if resourceType == "volume" {
-		rcType = portainer.VolumeResourceControl
-	} else {
+	if resourceType != "container" && resourceType != "service" && resourceType != "volume" {
 		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
@@ -440,8 +433,7 @@ func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *htt
 		AccessLevel: portainer.RestrictedResourceAccessLevel,
 	}
 
-	// err = handler.ResourceControlService.CreateResourceControl(req.ResourceID, &resource, rcType)
-	err = handler.ResourceControlService.CreateResourceControl(&resource, rcType)
+	err = handler.ResourceControlService.CreateResourceControl(&resource)
 	if err != nil {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return

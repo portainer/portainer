@@ -60,10 +60,10 @@ func volumeInspectOperation(request *http.Request, response *http.Response, oper
 	}
 	volumeID := responseObject[volumeIdentifier].(string)
 
-	volumeResourceControl := getResourceControlByResourceID(volumeID, operationContext.resourceControls)
-	if volumeResourceControl != nil {
-		if operationContext.isAdmin || canUserAccessResource(operationContext.userID, operationContext.userTeamIDs, volumeResourceControl) {
-			responseObject = decorateObject(responseObject, volumeResourceControl)
+	resourceControl := getResourceControlByResourceID(volumeID, operationContext.resourceControls)
+	if resourceControl != nil {
+		if operationContext.isAdmin || canUserAccessResource(operationContext.userID, operationContext.userTeamIDs, resourceControl) {
+			responseObject = decorateObject(responseObject, resourceControl)
 		} else {
 			return rewriteAccessDeniedResponse(response)
 		}

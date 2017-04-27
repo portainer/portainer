@@ -15,11 +15,11 @@ func filterVolumeList(volumeData []interface{}, resourceControls []portainer.Res
 		}
 
 		volumeID := volumeObject[volumeIdentifier].(string)
-		volumeResourceControl := getResourceControlByResourceID(volumeID, resourceControls)
-		if volumeResourceControl == nil {
+		resourceControl := getResourceControlByResourceID(volumeID, resourceControls)
+		if resourceControl == nil {
 			filteredVolumeData = append(filteredVolumeData, volumeObject)
-		} else if volumeResourceControl != nil && canUserAccessResource(userID, userTeamIDs, volumeResourceControl) {
-			volumeObject = decorateObject(volumeObject, volumeResourceControl)
+		} else if resourceControl != nil && canUserAccessResource(userID, userTeamIDs, resourceControl) {
+			volumeObject = decorateObject(volumeObject, resourceControl)
 			filteredVolumeData = append(filteredVolumeData, volumeObject)
 		}
 	}

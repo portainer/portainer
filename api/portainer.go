@@ -106,10 +106,6 @@ type (
 		Teams      []TeamID          `json:"Teams"`
 	}
 
-	// ResourceControlType represents a type of resource control.
-	// Can be one of: container, service or volume.
-	ResourceControlType int
-
 	// Deprecated: ResourceAccessLevel is deprecated in DBVersion == 2
 
 	// ResourceAccessLevel represents the level of control associated to a resource for a specific owner.
@@ -178,11 +174,9 @@ type (
 
 	// ResourceControlService represents a service for managing resource control data.
 	ResourceControlService interface {
-		// ResourceControl(ID ResourceControlID, rcType ResourceControlType) (*ResourceControl, error)
-		// ResourceControlByResourceID(resourceID string, rcType ResourceControlType) (*ResourceControl, error)
-		ResourceControls(rcType ResourceControlType) ([]ResourceControl, error)
-		CreateResourceControl(rc *ResourceControl, rcType ResourceControlType) error
-		DeleteResourceControl(ID ResourceControlID, rcType ResourceControlType) error
+		ResourceControls() ([]ResourceControl, error)
+		CreateResourceControl(rc *ResourceControl) error
+		DeleteResourceControl(ID ResourceControlID) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data.
@@ -232,18 +226,6 @@ const (
 	AdministratorRole
 	// StandardUserRole represents a regular user role
 	StandardUserRole
-)
-
-// ResourceControlType exists to ensure that there is no ResourceID conflict between
-// the managed resources (a service ID conflict with a container conflict for example).
-const (
-	_ ResourceControlType = iota
-	// ContainerResourceControl represents a resource control for a container
-	ContainerResourceControl
-	// ServiceResourceControl represents a resource control for a service
-	ServiceResourceControl
-	// VolumeResourceControl represents a resource control for a volume
-	VolumeResourceControl
 )
 
 // Deprecated: ResourceAccessLevel values are deprecated in DBVersion == 2

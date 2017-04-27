@@ -33,7 +33,7 @@ function ($q, $scope, $state, VolumeService, InfoService, ResourceControlService
       if ($scope.formValues.Ownership === 'private') {
         var users = [];
         users.push(Authentication.getUserDetails().ID);
-        ResourceControlService.createVolumeResourceControl(users, [], data.Name)
+        ResourceControlService.createResourceControl(users, [], data.Name)
         // ResourceControlService.setVolumeResourceControl(Authentication.getUserDetails().ID, data.Name)
         .then(function success() {
           Notifications.success("Volume created", data.Name);
@@ -50,8 +50,8 @@ function ($q, $scope, $state, VolumeService, InfoService, ResourceControlService
           teamIDs.push(team.Id);
         });
 
-        ResourceControlService.createVolumeResourceControl([], teamIDs, data.Name)
-        .then(function success(data) {
+        ResourceControlService.createResourceControl([], teamIDs, data.Name)
+        .then(function success() {
           Notifications.success("Volume created", data.Name);
           $state.go('volumes', {}, {reload: true});
         })

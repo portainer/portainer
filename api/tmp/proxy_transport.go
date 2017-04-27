@@ -51,15 +51,15 @@ func (p *proxyTransport) proxyVolumeRequests(request *http.Request, response *ht
 	// 	return err
 	// }
 	//
-	// volumeResourceControls, err := p.ResourceControlService.ResourceControls(portainer.VolumeResourceControl)
+	// resourceControls, err := p.ResourceControlService.ResourceControls(portainer.VolumeResourceControl)
 	// if err != nil {
 	// 	return err
 	// }
 	//
 	// if tokenData.Role == portainer.AdministratorRole {
-	// 	err = proxy.ProxyAdministratorVolumeRequests(request, response, volumeResourceControls)
+	// 	err = proxy.ProxyAdministratorVolumeRequests(request, response, resourceControls)
 	// } else {
-	// 	err = proxy.ProxyUserVolumeRequests(request, response, tokenData.ID, volumeResourceControls)
+	// 	err = proxy.ProxyUserVolumeRequests(request, response, tokenData.ID, resourceControls)
 	// }
 	//
 	// if err != nil {
