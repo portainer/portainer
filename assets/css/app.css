@@ -371,11 +371,11 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   float: none !important;
 }
 
-form.bootbox-form input.bootbox-input-checkbox {
+.bootbox-form .bootbox-input-checkbox {
   display: none
 }
 
-form.bootbox-form label {
+.bootbox-form label {
   padding-left: 0;
 }
 

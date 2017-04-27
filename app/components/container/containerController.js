@@ -123,14 +123,14 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     }
     //var text = '<label for="clean" class="control-label text-left">Clean associated volumes<portainer-tooltip position="bottom" message="Enable this option to remove associated volumes."></portainer-tooltip></label><label class="switch" style="margin-left: 20px;"><input type="checkbox"><i></i></label>';
     var text = '<label for="clean" class="control-label text-left">Automatically clean associated volumes</label><label class="switch" style="margin-left: 21px;"><input type="checkbox"><i></i></label>';
-    ModalService.promptDeletionCheckbox(
+    ModalService.confirmContainerDeletion(
       title,
       text,
         function (result) {
           if(!result) { return; }
-          var cleanAssociatedVolumes = 0;
+          var cleanAssociatedVolumes = false;
           for (var i in result) {
-            if (result[i] === 'on') cleanAssociatedVolumes = 1;
+            if (result[i] === 'on') cleanAssociatedVolumes = true;
           }
           $scope.remove(cleanAssociatedVolumes);
         }
@@ -139,7 +139,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
 
   $scope.remove = function(cleanAssociatedVolumes) {
     $('#loadingViewSpinner').show();
-    Container.remove({id: $stateParams.id, v: cleanAssociatedVolumes, force: true}, function (d) {
+    Container.remove({id: $stateParams.id, v: (cleanAssociatedVolumes) ? 1 : 0, force: true}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error("Failure", d, "Unable to remove container");
