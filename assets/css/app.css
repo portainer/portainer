@@ -375,6 +375,10 @@ form.bootbox-form input.bootbox-input-checkbox {
   display: none
 }
 
+form.bootbox-form label {
+  padding-left: 0;
+}
+
 .switch input {
   display: none;
 }
