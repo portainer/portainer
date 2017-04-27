@@ -48,7 +48,13 @@ func getResponseBodyAsGenericJSON(response *http.Response) (interface{}, error) 
 	return nil, ErrEmptyResponseBody
 }
 
-func writeAccessDeniedResponse(response *http.Response) error {
+func writeAccessDeniedResponse() (*http.Response, error) {
+	response := &http.Response{}
+	err := rewriteResponse(response, portainer.ErrResourceAccessDenied, http.StatusForbidden)
+	return response, err
+}
+
+func rewriteAccessDeniedResponse(response *http.Response) error {
 	return rewriteResponse(response, portainer.ErrResourceAccessDenied, http.StatusForbidden)
 }
 

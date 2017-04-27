@@ -8,15 +8,15 @@ import (
 	"github.com/portainer/portainer"
 )
 
-// Service represents a service used to manage Docker proxies.
-type Service struct {
+// Manager represents a service used to manage Docker proxies.
+type Manager struct {
 	proxyFactory *proxyFactory
 	proxies      cmap.ConcurrentMap
 }
 
-// NewService initializes a new proxy Service
-func NewService(resourceControlService portainer.ResourceControlService, teamService portainer.TeamService) *Service {
-	return &Service{
+// NewManager initializes a new proxy Service
+func NewManager(resourceControlService portainer.ResourceControlService, teamService portainer.TeamService) *Manager {
+	return &Manager{
 		proxies: cmap.New(),
 		proxyFactory: &proxyFactory{
 			ResourceControlService: resourceControlService,
@@ -27,7 +27,7 @@ func NewService(resourceControlService portainer.ResourceControlService, teamSer
 
 // CreateAndRegisterProxy creates a new HTTP reverse proxy and adds it to the registered proxies.
 // It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
-func (service *Service) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	var proxy http.Handler
 
 	endpointURL, err := url.Parse(endpoint.URL)
@@ -37,25 +37,25 @@ func (service *Service) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 
 	if endpointURL.Scheme == "tcp" {
 		if endpoint.TLS {
-			proxy, err = service.proxyFactory.newHTTPSProxy(endpointURL, endpoint)
+			proxy, err = manager.proxyFactory.newHTTPSProxy(endpointURL, endpoint)
 			if err != nil {
 				return nil, err
 			}
 		} else {
-			proxy = service.proxyFactory.newHTTPProxy(endpointURL)
+			proxy = manager.proxyFactory.newHTTPProxy(endpointURL)
 		}
 	} else {
 		// Assume unix:// scheme
-		proxy = service.proxyFactory.newSocketProxy(endpointURL.Path)
+		proxy = manager.proxyFactory.newSocketProxy(endpointURL.Path)
 	}
 
-	service.proxies.Set(string(endpoint.ID), proxy)
+	manager.proxies.Set(string(endpoint.ID), proxy)
 	return proxy, nil
 }
 
 // GetProxy returns the proxy associated to a key
-func (service *Service) GetProxy(key string) http.Handler {
-	proxy, ok := service.proxies.Get(key)
+func (manager *Manager) GetProxy(key string) http.Handler {
+	proxy, ok := manager.proxies.Get(key)
 	if !ok {
 		return nil
 	}
@@ -63,6 +63,6 @@ func (service *Service) GetProxy(key string) http.Handler {
 }
 
 // DeleteProxy deletes the proxy associated to a key
-func (service *Service) DeleteProxy(key string) {
-	service.proxies.Remove(key)
+func (manager *Manager) DeleteProxy(key string) {
+	manager.proxies.Remove(key)
 }

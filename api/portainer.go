@@ -251,6 +251,4 @@ const (
 	_ ResourceAccessLevel = iota
 	// RestrictedResourceAccessLevel represents a restricted access level on a resource (private ownership)
 	RestrictedResourceAccessLevel
-	// TeamResourceAccessLevel represents a multi team access level on a resource (team ownership)
-	TeamResourceAccessLevel
 )

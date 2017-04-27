@@ -22,7 +22,7 @@ type DockerHandler struct {
 	Logger          *log.Logger
 	EndpointService portainer.EndpointService
 	TeamService     portainer.TeamService
-	ProxyService    *proxy.Service
+	ProxyManager    *proxy.Manager
 }
 
 // NewDockerHandler returns a new instance of DockerHandler.
@@ -81,9 +81,9 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 	}
 
 	var proxy http.Handler
-	proxy = handler.ProxyService.GetProxy(string(endpointID))
+	proxy = handler.ProxyManager.GetProxy(string(endpointID))
 	if proxy == nil {
-		proxy, err = handler.ProxyService.CreateAndRegisterProxy(endpoint)
+		proxy, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 			return

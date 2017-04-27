@@ -33,7 +33,7 @@ type Server struct {
 // Start starts the HTTP server
 func (server *Server) Start() error {
 	middlewareService := middleware.NewService(server.JWTService, server.AuthDisabled)
-	proxyService := proxy.NewService(server.ResourceControlService, server.TeamService)
+	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamService)
 
 	var authHandler = handler.NewAuthHandler(middlewareService, server.AuthDisabled)
 	authHandler.UserService = server.UserService
@@ -50,14 +50,14 @@ func (server *Server) Start() error {
 	var dockerHandler = handler.NewDockerHandler(middlewareService)
 	dockerHandler.EndpointService = server.EndpointService
 	dockerHandler.TeamService = server.TeamService
-	dockerHandler.ProxyService = proxyService
+	dockerHandler.ProxyManager = proxyManager
 	var websocketHandler = handler.NewWebSocketHandler()
 	websocketHandler.EndpointService = server.EndpointService
 	var endpointHandler = handler.NewEndpointHandler(middlewareService, server.EndpointManagement)
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.TeamService = server.TeamService
-	endpointHandler.ProxyService = proxyService
+	endpointHandler.ProxyManager = proxyManager
 	var resourceHandler = handler.NewResourceHandler(middlewareService)
 	resourceHandler.ResourceControlService = server.ResourceControlService
 	var uploadHandler = handler.NewUploadHandler(middlewareService)
