@@ -17,6 +17,8 @@ angular.module('containers', [])
     Pagination.setPaginationCount('containers', $scope.state.pagination_count);
   };
 
+  $scope.cleanAssociatedVolumes = false;
+
   function removeContainerResourceControl(container) {
     volumeResourceControlQueries = [];
     angular.forEach(container.Mounts, function (volume) {
@@ -128,7 +130,7 @@ angular.module('containers', [])
           });
         }
         else if (action === Container.remove) {
-          action({id: c.Id, force: true}, function (d) {
+          action({id: c.Id, v: ($scope.cleanAssociatedVolumes) ? 1 : 0, force: true}, function (d) {
             if (d.message) {
               Notifications.error("Error", d, "Unable to remove container");
             }
@@ -239,17 +241,23 @@ angular.module('containers', [])
         return;
       }
     });
+    var title = 'You are about to remove one or more container.';
     if (isOneContainerRunning) {
-      ModalService.confirmDeletion(
-        'You are about to remove one or more running containers.',
-        function (confirmed) {
-          if(!confirmed) { return; }
-          $scope.removeAction();
-        }
-      );
-    } else {
-      $scope.removeAction();
+      title = 'You are about to remove one or more running containers.';
     }
+    var text = '<label for="clean" class="control-label text-left">Automatically clean associated volumes</label><label class="switch" style="margin-left: 21px;"><input type="checkbox"><i></i></label>';
+    ModalService.confirmContainerDeletion(
+      title,
+      text,
+      function (result) {
+        if(!result) { return; }
+        $scope.cleanAssociatedVolumes = false;
+        for (var i in result) {
+          if (result[i] === 'on') $scope.cleanAssociatedVolumes = true;
+        }
+        $scope.removeAction();
+      }
+    );
   };
 
   function retrieveSwarmHostsInfo(data) {
