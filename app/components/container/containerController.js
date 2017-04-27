@@ -23,6 +23,8 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
 
       if (d.State.Running) {
         $scope.activityTime = moment.duration(moment(d.State.StartedAt).utc().diff(moment().utc())).humanize();
+      } else if (d.State.Status === "created") {
+        $scope.activityTime = moment.duration(moment(d.Created).utc().diff(moment().utc())).humanize();
       } else {
         $scope.activityTime = moment.duration(moment().utc().diff(moment(d.State.FinishedAt).utc())).humanize();
       }

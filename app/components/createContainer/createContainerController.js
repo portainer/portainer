@@ -14,6 +14,8 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     NetworkContainer: '',
     Labels: [],
     ExtraHosts: [],
+    IPv4: '',
+    IPv6: ''
   };
 
   $scope.Teams = [{Id: 1, Name: 'dev-projectA'}, {Id: 2, Name: 'dev-projectB'}, {Id: 3, Name: 'qa-01'}, {Id: 4, Name: 'qa-02'}];
@@ -36,6 +38,9 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       Privileged: false,
       ExtraHosts: [],
       Devices:[]
+    },
+    NetworkingConfig: {
+      EndpointsConfig: {}
     },
     Labels: {}
   };
@@ -79,7 +84,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   $scope.removeExtraHost = function(index) {
     $scope.formValues.ExtraHosts.splice(index, 1);
   };
-  
+
   $scope.addDevice = function() {
     $scope.config.HostConfig.Devices.push({ pathOnHost: '', pathInContainer: '' });
   };
@@ -94,7 +99,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
     }, function (e) {
-      Notifications.error("Failure", e, "Unable to retrieve volumes");
+      Notifications.error('Failure', e, 'Unable to retrieve volumes');
     });
 
     Network.query({}, function (d) {
@@ -106,17 +111,17 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
           }
         });
         $scope.globalNetworkCount = networks.length;
-        networks.push({Name: "bridge"});
-        networks.push({Name: "host"});
-        networks.push({Name: "none"});
+        networks.push({Name: 'bridge'});
+        networks.push({Name: 'host'});
+        networks.push({Name: 'none'});
       }
-      networks.push({Name: "container"});
+      networks.push({Name: 'container'});
       $scope.availableNetworks = networks;
       if (!_.find(networks, {'Name': 'bridge'})) {
         $scope.config.HostConfig.NetworkMode = 'nat';
       }
     }, function (e) {
-      Notifications.error("Failure", e, "Unable to retrieve networks");
+      Notifications.error('Failure', e, 'Unable to retrieve networks');
     });
 
     Container.query({}, function (d) {
@@ -126,7 +131,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       }
       $scope.runningContainers = containers;
     }, function(e) {
-      Notifications.error("Failure", e, "Unable to retrieve running containers");
+      Notifications.error('Failure', e, 'Unable to retrieve running containers');
     });
   });
 
@@ -142,7 +147,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Notifications.error("Failure", e, 'Unable to start container');
+      Notifications.error('Failure', e, 'Unable to start container');
     });
   }
 
@@ -159,7 +164,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
           })
           .catch(function error(err) {
             $('#createContainerSpinner').hide();
-            Notifications.error("Failure", err, 'Unable to apply resource control on container');
+            Notifications.error('Failure', err, 'Unable to apply resource control on container');
           });
         } else {
           startContainer(d.Id);
@@ -167,7 +172,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       }
     }, function (e) {
       $('#createContainerSpinner').hide();
-      Notifications.error("Failure", e, 'Unable to create container');
+      Notifications.error('Failure', e, 'Unable to create container');
     });
   }
 
@@ -192,7 +197,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var bindings = {};
     config.HostConfig.PortBindings.forEach(function (portBinding) {
       if (portBinding.containerPort) {
-        var key = portBinding.containerPort + "/" + portBinding.protocol;
+        var key = portBinding.containerPort + '/' + portBinding.protocol;
         var binding = {};
         if (portBinding.hostPort && portBinding.hostPort.indexOf(':') > -1) {
           var hostAndPort = portBinding.hostPort.split(':');
@@ -228,7 +233,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var env = [];
     config.Env.forEach(function (v) {
       if (v.name && v.value) {
-        env.push(v.name + "=" + v.value);
+        env.push(v.name + '=' + v.value);
       }
     });
     config.Env = env;
@@ -270,6 +275,13 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     }
     config.HostConfig.NetworkMode = networkMode;
 
+    config.NetworkingConfig.EndpointsConfig[networkMode] = {
+      IPAMConfig: {
+        IPv4Address: $scope.formValues.IPv4,
+        IPv6Address: $scope.formValues.IPv6
+      }
+    };
+
     $scope.formValues.ExtraHosts.forEach(function (v) {
     if (v.value) {
         config.HostConfig.ExtraHosts.push(v.value);
@@ -286,7 +298,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     });
     config.Labels = labels;
   }
-  
+
   function prepareDevices(config) {
     var path = [];
     config.HostConfig.Devices.forEach(function (p) {
@@ -294,10 +306,10 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
         if(p.pathInContainer === '') {
           p.pathInContainer = p.pathOnHost;
         }
-        path.push({PathOnHost:p.pathOnHost,PathInContainer:p.pathInContainer,CgroupPermissions:'rwm'});  
+        path.push({PathOnHost:p.pathOnHost,PathInContainer:p.pathInContainer,CgroupPermissions:'rwm'});
       }
     });
-    config.HostConfig.Devices = path; 
+    config.HostConfig.Devices = path;
   }
 
   function prepareConfiguration() {

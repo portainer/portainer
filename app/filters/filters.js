@@ -109,6 +109,9 @@ angular.module('portainer.filters', [])
     if (state.Running) {
       return 'Running';
     }
+    if (state.Status === 'created') {
+      return 'Created';
+    }
     return 'Stopped';
   };
 })
