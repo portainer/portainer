@@ -35,6 +35,7 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
       angular.forEach($scope.endpoints, function (endpoint) {
         if (endpoint.Id === activeEndpointID) {
           $scope.activeEndpoint = endpoint;
+          EndpointProvider.setEndpointURLPublish(endpoint.URLPublish);
         }
       });
     })

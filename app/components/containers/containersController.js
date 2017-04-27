@@ -12,7 +12,7 @@ angular.module('containers', [])
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
   };
-  $scope.URLPublish = EndpointProvider.endpointURLPublish() || '0.0.0.0';
+  $scope.URLPublish = EndpointProvider.endpointURLPublish();
 
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('containers', $scope.state.pagination_count);
