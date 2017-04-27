@@ -1,6 +1,6 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$state', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Notifications', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService', 'EndpointProvider', 'EndpointService',
-  function ($q, $state, $scope, $filter, Container, ContainerHelper, Info, Settings, Notifications, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService, EndpointProvider, EndpointService) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Notifications', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService', 'EndpointProvider',
+  function ($q, $scope, $filter, Container, ContainerHelper, Info, Settings, Notifications, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService, EndpointProvider) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = Settings.displayAll;
@@ -70,7 +70,6 @@ angular.module('containers', [])
         containers = ContainerHelper.hideContainers(d, $scope.containersToHideLabels);
       }
       $scope.containers = containers.map(function (container) {
-        //var model = new ContainerViewModel(container, currentEndpoint);
         var model = new ContainerViewModel(container);
         model.Status = $filter('containerstatus')(model.Status);
 
@@ -105,10 +104,6 @@ angular.module('containers', [])
       Notifications.error("Failure", e, "Unable to retrieve containers");
       $scope.containers = [];
     });
-    //})
-    //.catch(function error(err) {
-    //  Notifications.error("Failure", err, "Unable to retrieve endpoints");
-    //});
   };
 
   var batch = function (items, action, msg) {
