@@ -81,12 +81,11 @@ func (p *proxyTransport) proxyVolumeRequest(request *http.Request) (*http.Respon
 	default:
 		// assume /volumes/{name}
 		if request.Method == http.MethodGet {
-			p.rewriteOperation(request, volumeInspectOperation)
+			return p.rewriteOperation(request, volumeInspectOperation)
 		}
 		volumeID := path.Base(requestPath)
-		p.restrictedOperation(request, volumeID)
+		return p.restrictedOperation(request, volumeID)
 	}
-	return p.executeDockerRequest(request)
 }
 
 // restrictedOperation ensures that the current user has the required authorizations
@@ -116,7 +115,7 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 		}
 
 		volumeResourceControl := getResourceControlByResourceID(resourceID, volumeResourceControls)
-		if !canUserAccessResource(tokenData.ID, userTeamIDs, volumeResourceControl) {
+		if volumeResourceControl != nil && !canUserAccessResource(tokenData.ID, userTeamIDs, volumeResourceControl) {
 			return writeAccessDeniedResponse()
 		}
 	}
