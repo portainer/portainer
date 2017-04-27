@@ -105,7 +105,12 @@ func (service *TeamService) TeamsByUserID(userID portainer.UserID) ([]portainer.
 			if err != nil {
 				return err
 			}
-			for _, v := range team.Users {
+			for _, v := range team.Members {
+				if v == userID {
+					teams = append(teams, team)
+				}
+			}
+			for _, v := range team.Leaders {
 				if v == userID {
 					teams = append(teams, team)
 				}

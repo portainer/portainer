@@ -162,7 +162,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notification
         return new ServiceViewModel(service, serviceTasks, taskNodes);
       });
       if (userDetails.role === 1) {
-        UserService.users()
+        UserService.users(true)
         .then(function success(data) {
           mapUsersToServices(data);
         })

@@ -136,17 +136,13 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     $('#loadingViewSpinner').show();
     $q.all({
       endpoint: EndpointService.endpoint($stateParams.id),
-      users: UserService.users(),
+      users: UserService.users(false),
       teams: TeamService.teams(),
     })
     .then(function success(data) {
       $scope.endpoint = data.endpoint;
       $scope.accesses = [];
-      var users = data.users.filter(function (user) {
-        if (user.Role !== 1) {
-          return user;
-        }
-      }).map(function (user) {
+      var users = data.users.map(function (user) {
         return new EndpointAccessUserViewModel(user);
       });
       var teams = data.teams.map(function (team) {

@@ -51,8 +51,12 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.createTeam = function(name) {
-    return Teams.create({}, {name: name}).$promise;
+  service.createTeam = function(name, leaders) {
+    var payload = {
+      Name: name,
+      Leaders: leaders
+    };
+    return Teams.create({}, payload).$promise;
   };
 
   service.deleteTeam = function(id) {
@@ -60,11 +64,11 @@ angular.module('portainer.services')
   };
 
   service.updateTeam = function(id, name, users) {
-    var query = {
-      name: name,
-      users: users
+    var payload = {
+      Name: name,
+      Users: users
     };
-    return Teams.update({id: id}, query).$promise;
+    return Teams.update({id: id}, payload).$promise;
   };
 
   return service;

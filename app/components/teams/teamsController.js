@@ -1,6 +1,6 @@
 angular.module('teams', [])
-.controller('TeamsController', ['$scope', '$state', 'TeamService', 'ModalService', 'Notifications', 'Pagination',
-function ($scope, $state, TeamService, ModalService, Notifications, Pagination) {
+.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Pagination',
+function ($q, $scope, $state, TeamService, UserService, ModalService, Notifications, Pagination) {
   $scope.state = {
     userGroupGroupCreationError: '',
     selectedItemCount: 0,
@@ -11,7 +11,8 @@ function ($scope, $state, TeamService, ModalService, Notifications, Pagination) 
   $scope.sortReverse = false;
 
   $scope.formValues = {
-    Name: ''
+    Name: '',
+    Leaders: []
   };
 
   $scope.order = function(sortType) {
@@ -56,13 +57,25 @@ function ($scope, $state, TeamService, ModalService, Notifications, Pagination) 
     $('#createTeamSpinner').show();
     $scope.state.teamCreationError = '';
     var teamName = $scope.formValues.Name;
-    TeamService.createTeam(teamName)
+
+    var leaders = [];
+    var updateUserQueries = [];
+    angular.forEach($scope.formValues.Leaders, function(user) {
+      leaders.push(user.Id);
+      if (user.RoleId !== 3) {
+        updateUserQueries.push(UserService.updateUser(user.Id, undefined, 3));
+      }
+    });
+    $q.all({
+      team: TeamService.createTeam(teamName, leaders),
+      users: updateUserQueries
+    })
     .then(function success(data) {
-      Notifications.success("Team successfully created", teamName);
+      Notifications.success('Team successfully created', teamName);
       $state.reload();
     })
     .catch(function error(err) {
-      $scope.state.teamCreationError = err.msg;
+      Notifications.error('Failure', err, 'Unable to create team');
     })
     .finally(function final() {
       $('#createTeamSpinner').hide();
@@ -88,7 +101,7 @@ function ($scope, $state, TeamService, ModalService, Notifications, Pagination) 
           Notifications.success('Team successfully deleted', team.Name);
         })
         .catch(function error(err) {
-          Notifications.error("Failure", err, 'Unable to remove team');
+          Notifications.error('Failure', err, 'Unable to remove team');
         })
         .finally(function final() {
           complete();
@@ -109,12 +122,18 @@ function ($scope, $state, TeamService, ModalService, Notifications, Pagination) 
 
   function initView() {
     $('#loadingViewSpinner').show();
-    TeamService.teams()
+    $q.all({
+      users: UserService.users(false),
+      teams: TeamService.teams()
+    })
     .then(function success(data) {
-      $scope.teams = data;
+      $scope.teams = data.teams;
+      $scope.users = data.users;
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, 'Unable to retrieve teams');
+      $scope.teams = [];
+      $scope.users = [];
+      Notifications.error('Failure', err, 'Unable to retrieve teams');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();

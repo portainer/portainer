@@ -15,7 +15,7 @@ function ($q, $scope, $state, UserService, TeamService, ModalService, Notificati
     Password: '',
     ConfirmPassword: '',
     Administrator: false,
-    Teams: [],
+    Teams: []
   };
 
   $scope.order = function(sortType) {
@@ -72,7 +72,7 @@ function ($q, $scope, $state, UserService, TeamService, ModalService, Notificati
       });
       $q.all(teamUpdateQueries)
       .then(function success(data) {
-        Notifications.success("User successfully created", username);
+        Notifications.success('User successfully created', username);
         $state.reload();
       });
     })
@@ -103,7 +103,7 @@ function ($q, $scope, $state, UserService, TeamService, ModalService, Notificati
           Notifications.success('User successfully deleted', user.Username);
         })
         .catch(function error(err) {
-          Notifications.error("Failure", err, 'Unable to remove user');
+          Notifications.error('Failure', err, 'Unable to remove user');
         })
         .finally(function final() {
           complete();
@@ -125,17 +125,15 @@ function ($q, $scope, $state, UserService, TeamService, ModalService, Notificati
   function initView() {
     $('#loadUsersSpinner').show();
     $q.all({
-      users: UserService.users(),
-      teams: TeamService.teams(),
+      users: UserService.users(true),
+      teams: TeamService.teams()
     })
     .then(function success(data) {
-      $scope.users = data.users.map(function(user) {
-        return new UserViewModel(user);
-      });
+      $scope.users = data.users;
       $scope.teams = data.teams;
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to retrieve users and teams");
+      Notifications.error('Failure', err, 'Unable to retrieve users and teams');
       $scope.users = [];
       $scope.teams = [];
     })

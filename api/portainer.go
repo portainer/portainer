@@ -54,9 +54,10 @@ type (
 
 	// Team represents a list of user accounts.
 	Team struct {
-		ID    TeamID   `json:"Id"`
-		Name  string   `json:"Name"`
-		Users []UserID `json:"Users"`
+		ID      TeamID   `json:"Id"`
+		Name    string   `json:"Name"`
+		Members []UserID `json:"Members"`
+		Leaders []UserID `json:"Leaders"`
 	}
 
 	// TeamID represents a team identifier
@@ -226,6 +227,8 @@ const (
 	AdministratorRole
 	// StandardUserRole represents a regular user role
 	StandardUserRole
+	// TeamLeaderRole represents a team leader role
+	TeamLeaderRole
 )
 
 // Deprecated: ResourceAccessLevel values are deprecated in DBVersion == 2

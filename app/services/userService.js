@@ -1,9 +1,24 @@
 angular.module('portainer.services')
-.factory('UserService', ['$q', 'Users', function UserServiceFactory($q, Users) {
+.factory('UserService', ['$q', 'Users', 'UserHelper', function UserServiceFactory($q, Users, UserHelper) {
   'use strict';
   var service = {};
-  service.users = function() {
-    return Users.query({}).$promise;
+
+  service.users = function(includeAdministrators) {
+    var deferred = $q.defer();
+    Users.query({}).$promise
+    .then(function success(data) {
+      var users = data.map(function (user) {
+        return new UserViewModel(user);
+      });
+      if (!includeAdministrators) {
+        users = UserHelper.filterNonAdministratorUsers(users);
+      }
+      deferred.resolve(users);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve users', err: err });
+    });
+    return deferred.promise;
   };
 
   service.user = function(id) {

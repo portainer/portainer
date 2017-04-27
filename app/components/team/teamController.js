@@ -125,17 +125,11 @@ function ($q, $scope, $state, $stateParams, TeamService, UserService, ModalServi
     $('#loadingViewSpinner').show();
     $q.all({
       team: TeamService.team($stateParams.id),
-      users: UserService.users(),
+      users: UserService.users(false)
     })
     .then(function success(data) {
       $scope.team = data.team;
-      $scope.users = data.users.filter(function (user) {
-        if (user.Role !== 1) {
-          return user;
-        }
-      }).map(function (user) {
-        return new UserViewModel(user);
-      });
+      $scope.users = data.users;
       $scope.teamMembers = [];
       angular.forEach($scope.team.Users, function(userID) {
         for (var i = 0, l = $scope.users.length; i < l; i++) {

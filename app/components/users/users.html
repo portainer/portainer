@@ -62,9 +62,10 @@
             </div>
           </div>
           <!-- !admin-checkbox -->
+          <!-- teams -->
           <div class="form-group" ng-if="!formValues.Administrator">
             <div class="col-sm-12">
-              <label for="group-access" class="control-label text-left">
+              <label class="control-label text-left">
                 Add to team(s)
               </label>
               <span class="small text-muted" style="margin-left: 20px;" ng-if="teams.length === 0">
@@ -84,6 +85,7 @@
              </span>
             </div>
           </div>
+          <!-- !teams -->
           <div class="form-group" ng-if="!formValues.Administrator && formValues.Teams.length === 0">
             <div class="col-sm-12">
               <span class="small text-muted">Note: non-administrator users with no team do not have access to any endpoint by default. Head over the <a ui-sref="endpoints">endpoints view</a> to manage their accesses.</span>
@@ -158,7 +160,9 @@
                 <td>{{ user.Username }}</td>
                 <td>
                   {{ user.RoleName }}
-                  <i class="fa" ng-class="user.RoleId === 1 ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
+                  <i ng-if="user.RoleId === 1" class="fa fa-user-circle-o" aria-hidden="true" style="margin-left: 2px;"></i>
+                  <i ng-if="user.RoleId === 2" class="fa fa-user" aria-hidden="true" style="margin-left: 2px;"></i>
+                  <i ng-if="user.RoleId === 3" class="fa fa-user-plus" aria-hidden="true" style="margin-left: 2px;"></i>
                 </td>
                 <td>
                   <a ui-sref="user({id: user.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>

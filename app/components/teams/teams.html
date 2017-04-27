@@ -17,8 +17,8 @@
         <form class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
-            <label for="teamname" class="col-sm-2 control-label text-left">Name</label>
-            <div class="col-sm-8">
+            <label for="teamname" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-9">
               <div class="input-group">
                 <input type="text" class="form-control" id="teamname" ng-model="formValues.Name" ng-change="checkNameValidity()" placeholder="e.g. development">
                 <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[state.validName]" aria-hidden="true"></i></span>
@@ -26,6 +26,31 @@
             </div>
           </div>
           <!-- !name-input -->
+          <!-- team-leaders -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label class="control-label text-left">
+                Select team leader(s)
+                <portainer-tooltip position="bottom" message="You can assign one or more leaders to this team. Team leaders can manage their teams users and resources."></portainer-tooltip>
+              </label>
+              <span class="small text-muted" style="margin-left: 20px;" ng-if="users.length === 0">
+                You have not yet added any user. Head over the <a ui-sref="users">users view</a> to manage users.</span>
+              </span>
+              <span isteven-multi-select
+               ng-if="users.length > 0"
+               input-model="users"
+               output-model="formValues.Leaders"
+               button-label="Username"
+               item-label="Username"
+               tick-property="ticked"
+               helper-elements="filter"
+               search-property="Username"
+               translation="{nothingSelected: 'Select one or more team leaders', search: 'Search...'}"
+               style="margin-left: 20px;"
+             </span>
+            </div>
+          </div>
+          <!-- !team-leaders -->
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!state.validName || formValues.Name === ''" ng-click="addTeam()"><i class="fa fa-plus" aria-hidden="true"></i> Add team</button>

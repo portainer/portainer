@@ -75,8 +75,10 @@ func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Reque
 	var role portainer.UserRole
 	if req.Role == 1 {
 		role = portainer.AdministratorRole
-	} else {
+	} else if req.Role == 2 {
 		role = portainer.StandardUserRole
+	} else {
+		role = portainer.TeamLeaderRole
 	}
 
 	user, err := handler.UserService.UserByUsername(req.Username)

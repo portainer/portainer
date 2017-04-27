@@ -85,7 +85,7 @@ angular.module('containers', [])
         return model;
       });
       if (userDetails.role === 1) {
-        UserService.users()
+        UserService.users(true)
         .then(function success(data) {
           mapUsersToContainers(data);
         })

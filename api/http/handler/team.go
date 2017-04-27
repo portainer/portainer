@@ -73,8 +73,16 @@ func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Reque
 	}
 
 	team = &portainer.Team{
-		Name:  req.Name,
-		Users: []portainer.UserID{},
+		Name:    req.Name,
+		Members: []portainer.UserID{},
+	}
+
+	if req.Leaders != nil {
+		userIDs := []portainer.UserID{}
+		for _, value := range req.Leaders {
+			userIDs = append(userIDs, portainer.UserID(value))
+		}
+		team.Leaders = userIDs
 	}
 
 	err = handler.TeamService.CreateTeam(team)
@@ -85,7 +93,8 @@ func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Reque
 }
 
 type postTeamsRequest struct {
-	Name string `valid:"required"`
+	Name    string `valid:"required"`
+	Leaders []int  `valid:"-"`
 }
 
 // handleGetTeams handles GET requests on /teams
@@ -158,12 +167,20 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 		team.Name = req.Name
 	}
 
-	if req.Users != nil {
+	if req.Members != nil {
 		userIDs := []portainer.UserID{}
-		for _, value := range req.Users {
+		for _, value := range req.Members {
 			userIDs = append(userIDs, portainer.UserID(value))
 		}
-		team.Users = userIDs
+		team.Members = userIDs
+	}
+
+	if req.Leaders != nil {
+		userIDs := []portainer.UserID{}
+		for _, value := range req.Leaders {
+			userIDs = append(userIDs, portainer.UserID(value))
+		}
+		team.Leaders = userIDs
 	}
 
 	err = handler.TeamService.UpdateTeam(team.ID, team)
@@ -174,8 +191,9 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 }
 
 type putTeamRequest struct {
-	Name  string `valid:"-"`
-	Users []int  `valid:"-"`
+	Name    string `valid:"-"`
+	Members []int  `valid:"-"`
+	Leaders []int  `valid:"-"`
 }
 
 // handleDeleteTeam handles DELETE requests on /teams/:id
