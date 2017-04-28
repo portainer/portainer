@@ -3,7 +3,7 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  var boxcss = function(box) {
+  var applyBoxCSS = function(box) {
     box.css({
       'top': '50%',
       'margin-top': function () {
@@ -32,7 +32,7 @@ angular.module('portainer.services')
       buttons: confirmButtons(options),
       callback: options.callback
     });
-    boxcss(box);
+    applyBoxCSS(box);
   };
 
   service.prompt = function(options){
@@ -43,7 +43,7 @@ angular.module('portainer.services')
       buttons: confirmButtons(options),
       callback: options.callback
     });
-    boxcss(box);
+    applyBoxCSS(box);
   };
 
   service.confirmOwnershipChange = function(callback, msg) {
