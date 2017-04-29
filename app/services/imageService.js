@@ -30,7 +30,7 @@ angular.module('portainer.services')
         var layers = [];
         angular.forEach(data, function(imageLayer) {
           layers.push(new ImageLayerViewModel(imageLayer));
-        })
+        });
         deferred.resolve(layers);
       }
     })
