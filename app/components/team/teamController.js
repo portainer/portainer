@@ -1,14 +1,16 @@
 angular.module('team', [])
-.controller('TeamController', ['$q', '$scope', '$state', '$stateParams', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Pagination',
-function ($q, $scope, $state, $stateParams, TeamService, UserService, ModalService, Notifications, Pagination) {
+.controller('TeamController', ['$q', '$scope', '$state', '$stateParams', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination',
+function ($q, $scope, $state, $stateParams, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Pagination) {
 
   $scope.state = {
     pagination_count_users: Pagination.getPaginationCount('team_available_users'),
     pagination_count_members: Pagination.getPaginationCount('team_members')
   };
-
-  $scope.sortTypeUsers = 'Name';
+  $scope.sortTypeUsers = 'Username';
   $scope.sortReverseUsers = true;
+  $scope.users = [];
+  $scope.teamMembers = [];
+  $scope.leaderCount = 0;
 
   $scope.orderUsers = function(sortType) {
     $scope.sortReverseUsers = ($scope.sortTypeUsers === sortType) ? !$scope.sortReverseUsers : false;
@@ -19,8 +21,8 @@ function ($q, $scope, $state, $stateParams, TeamService, UserService, ModalServi
     Pagination.setPaginationCount('team_available_users', $scope.state.pagination_count_users);
   };
 
-  $scope.sortTypeGroupMembers = 'Name';
-  $scope.sortReverseGroupMembers = true;
+  $scope.sortTypeGroupMembers = 'TeamRole';
+  $scope.sortReverseGroupMembers = false;
 
   $scope.orderGroupMembers = function(sortType) {
     $scope.sortReverseGroupMembers = ($scope.sortTypeGroupMembers === sortType) ? !$scope.sortReverseGroupMembers : false;
@@ -42,36 +44,25 @@ function ($q, $scope, $state, $stateParams, TeamService, UserService, ModalServi
   };
 
   $scope.addAllUsers = function() {
-    var teamMemberIDs = [];
-    angular.forEach($scope.teamMembers, function (user) {
-      teamMemberIDs.push(user.Id);
-    });
+    $('#loadingViewSpinner').show();
+    var teamMembershipQueries = [];
     angular.forEach($scope.users, function (user) {
-      teamMemberIDs.push(user.Id);
+      teamMembershipQueries.push(TeamMembershipService.createMembership(user.Id, $scope.team.Id, 2));
     });
-    TeamService.updateTeam($scope.team.Id, $scope.team.Name, teamMemberIDs)
+    $q.all(teamMembershipQueries)
     .then(function success(data) {
-      $scope.teamMembers = $scope.teamMembers.concat($scope.users);
+      var users = $scope.users;
+      for (var i = 0; i < users.length; i++) {
+        var user = users[i];
+        user.MembershipId = data[i].Id;
+        user.TeamRole = 'Member';
+      }
+      $scope.teamMembers = $scope.teamMembers.concat(users);
       $scope.users = [];
       Notifications.success('All users successfully added');
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update team members");
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
-    });
-  };
-
-  $scope.removeAllUsers = function() {
-    TeamService.updateTeam($scope.team.Id, $scope.team.Name, [])
-    .then(function success(data) {
-      $scope.users = $scope.users.concat($scope.teamMembers);
-      $scope.teamMembers = [];
-      Notifications.success('All users successfully removed');
-    })
-    .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update team members");
+      Notifications.error('Failure', err, 'Unable to update team members');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
@@ -80,19 +71,36 @@ function ($q, $scope, $state, $stateParams, TeamService, UserService, ModalServi
 
   $scope.addUser = function(user) {
     $('#loadingViewSpinner').show();
-    var teamMemberIDs = [];
-    angular.forEach($scope.teamMembers, function (u) {
-      teamMemberIDs.push(u.Id);
-    });
-    teamMemberIDs.push(user.Id);
-    TeamService.updateTeam($scope.team.Id, $scope.team.Name, teamMemberIDs)
+    TeamMembershipService.createMembership(user.Id, $scope.team.Id, 2)
     .then(function success(data) {
       removeUserFromArray(user.Id, $scope.users);
+      user.TeamRole = 'Member';
+      user.MembershipId = data.Id;
       $scope.teamMembers.push(user);
       Notifications.success('User added to team', user.Username);
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update team members");
+      Notifications.error('Failure', err, 'Unable to update team members');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
+  };
+
+  $scope.removeAllUsers = function() {
+    $('#loadingViewSpinner').show();
+    var teamMembershipQueries = [];
+    angular.forEach($scope.teamMembers, function (user) {
+      teamMembershipQueries.push(TeamMembershipService.deleteMembership(user.MembershipId));
+    });
+    $q.all(teamMembershipQueries)
+    .then(function success(data) {
+      $scope.users = $scope.users.concat($scope.teamMembers);
+      $scope.teamMembers = [];
+      Notifications.success('All users successfully removed');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to update team members');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
@@ -100,56 +108,20 @@ function ($q, $scope, $state, $stateParams, TeamService, UserService, ModalServi
   };
 
   $scope.removeUser = function(user) {
-    var teamMemberIDs = $scope.teamMembers.filter(function (u) {
-      if (u.Id !== user.Id) {
-        return u;
-      }
-    }).map(function (u) {
-      return u.Id;
-    });
-    TeamService.updateTeam($scope.team.Id, $scope.team.Name, teamMemberIDs)
-    .then(function success(data) {
+    $('#loadingViewSpinner').show();
+    TeamMembershipService.deleteMembership(user.MembershipId)
+    .then(function success() {
       removeUserFromArray(user.Id, $scope.teamMembers);
       $scope.users.push(user);
       Notifications.success('User removed from team', user.Username);
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update team members");
+      Notifications.error('Failure', err, 'Unable to update team members');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
     });
   };
-
-  function initView() {
-    $('#loadingViewSpinner').show();
-    $q.all({
-      team: TeamService.team($stateParams.id),
-      users: UserService.users(false)
-    })
-    .then(function success(data) {
-      $scope.team = data.team;
-      $scope.users = data.users;
-      $scope.teamMembers = [];
-      angular.forEach($scope.team.Users, function(userID) {
-        for (var i = 0, l = $scope.users.length; i < l; i++) {
-          if ($scope.users[i].Id === userID) {
-            $scope.teamMembers.push($scope.users[i]);
-            $scope.users.splice(i, 1);
-            return;
-          }
-        }
-      });
-    })
-    .catch(function error(err) {
-      $scope.users = [];
-      $scope.teamMembers = [];
-      Notifications.error("Failure", err, 'Unable to retrieve team details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
-    });
-  }
 
   function deleteTeam() {
     $('#loadingViewSpinner').show();
@@ -159,7 +131,7 @@ function ($q, $scope, $state, $stateParams, TeamService, UserService, ModalServi
       $state.go('teams');
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, 'Unable to remove team');
+      Notifications.error('Failure', err, 'Unable to remove team');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
@@ -173,6 +145,51 @@ function ($q, $scope, $state, $stateParams, TeamService, UserService, ModalServi
         return;
       }
     }
+  }
+
+  function assignUsersAndMembers(users, memberships) {
+    for (var i = 0; i < users.length; i++) {
+      var user = users[i];
+      var member = false;
+      for (var j = 0; j < memberships.length; j++) {
+        var membership = memberships[j];
+        if (user.Id === membership.UserId) {
+          member = true;
+          if (membership.Role === 1) {
+            user.TeamRole = 'Leader';
+            $scope.leaderCount++;
+          } else {
+            user.TeamRole = 'Member';
+          }
+          user.MembershipId = membership.Id;
+          $scope.teamMembers.push(user);
+          break;
+        }
+      }
+      if (!member) {
+        $scope.users.push(user);
+      }
+    }
+  }
+
+  function initView() {
+    $('#loadingViewSpinner').show();
+    $q.all({
+      team: TeamService.team($stateParams.id),
+      users: UserService.users(false),
+      memberships: TeamService.userMemberships($stateParams.id)
+    })
+    .then(function success(data) {
+      var users = data.users;
+      $scope.team = data.team;
+      assignUsersAndMembers(users, data.memberships);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve team details');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
   }
 
   initView();

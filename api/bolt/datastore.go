@@ -18,6 +18,7 @@ type Store struct {
 	// Services
 	UserService            *UserService
 	TeamService            *TeamService
+	TeamMembershipService  *TeamMembershipService
 	EndpointService        *EndpointService
 	ResourceControlService *ResourceControlService
 	VersionService         *VersionService
@@ -31,6 +32,7 @@ const (
 	versionBucketName         = "version"
 	userBucketName            = "users"
 	teamBucketName            = "teams"
+	teamMembershipBucketName  = "team_membership"
 	endpointBucketName        = "endpoints"
 	resourceControlBucketName = "resource_control"
 )
@@ -41,12 +43,14 @@ func NewStore(storePath string) (*Store, error) {
 		Path:                   storePath,
 		UserService:            &UserService{},
 		TeamService:            &TeamService{},
+		TeamMembershipService:  &TeamMembershipService{},
 		EndpointService:        &EndpointService{},
 		ResourceControlService: &ResourceControlService{},
 		VersionService:         &VersionService{},
 	}
 	store.UserService.store = store
 	store.TeamService.store = store
+	store.TeamMembershipService.store = store
 	store.EndpointService.store = store
 	store.ResourceControlService.store = store
 	store.VersionService.store = store
@@ -89,6 +93,10 @@ func (store *Store) Open() error {
 			return err
 		}
 		_, err = tx.CreateBucketIfNotExists([]byte(resourceControlBucketName))
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(teamMembershipBucketName))
 		if err != nil {
 			return err
 		}

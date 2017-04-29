@@ -22,6 +22,7 @@ type UserHandler struct {
 	*mux.Router
 	Logger                 *log.Logger
 	UserService            portainer.UserService
+	TeamMembershipService  portainer.TeamMembershipService
 	ResourceControlService portainer.ResourceControlService
 	CryptoService          portainer.CryptoService
 }
@@ -42,6 +43,12 @@ func NewUserHandler(mw *middleware.Service) *UserHandler {
 		mw.Authenticated(http.HandlerFunc(h.handlePutUser))).Methods(http.MethodPut)
 	h.Handle("/users/{id}",
 		mw.Administrator(http.HandlerFunc(h.handleDeleteUser))).Methods(http.MethodDelete)
+	h.Handle("/users/{id}/memberships",
+		mw.Authenticated(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
+	// h.Handle("/users/{id}/memberships/{teamID}",
+	// 	mw.Authenticated(http.HandlerFunc(h.handleGetMembership))).Methods(http.MethodGet)
+	// h.Handle("/users/{id}/memberships/{teamID}",
+	// 	mw.Authenticated(http.HandlerFunc(h.handleDeleteMembership))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/passwd",
 		mw.Authenticated(http.HandlerFunc(h.handlePostUserPasswd)))
 	h.Handle("/users/admin/check",
@@ -75,10 +82,8 @@ func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Reque
 	var role portainer.UserRole
 	if req.Role == 1 {
 		role = portainer.AdministratorRole
-	} else if req.Role == 2 {
-		role = portainer.StandardUserRole
 	} else {
-		role = portainer.TeamLeaderRole
+		role = portainer.StandardUserRole
 	}
 
 	user, err := handler.UserService.UserByUsername(req.Username)
@@ -387,6 +392,40 @@ func (handler *UserHandler) handleDeleteUser(w http.ResponseWriter, r *http.Requ
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+
+	err = handler.TeamMembershipService.DeleteTeamMembershipByUserID(portainer.UserID(userID))
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+}
+
+// handleGetMemberships handles GET requests on /users/:id/memberships
+func (handler *UserHandler) handleGetMemberships(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	memberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(portainer.UserID(userID))
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	encodeJSON(w, memberships, handler.Logger)
+}
+
+// handleGetMemberships handles GET requests on /users/:id/memberships/:teamId
+func (handler *UserHandler) handleGetMembership(w http.ResponseWriter, r *http.Request) {
+}
+
+// handleGetMemberships handles DELETE requests on /users/:id/memberships/:teamId
+func (handler *UserHandler) handleDeleteMembership(w http.ResponseWriter, r *http.Request) {
 }
 
 // Deprecated: handlePostUserResource handles POST requests on /users/:userId/resources/:resourceType

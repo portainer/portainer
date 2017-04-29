@@ -21,6 +21,7 @@ type TeamHandler struct {
 	*mux.Router
 	Logger                 *log.Logger
 	TeamService            portainer.TeamService
+	TeamMembershipService  portainer.TeamMembershipService
 	ResourceControlService portainer.ResourceControlService
 }
 
@@ -40,10 +41,13 @@ func NewTeamHandler(mw *middleware.Service) *TeamHandler {
 		mw.Administrator(http.HandlerFunc(h.handlePutTeam))).Methods(http.MethodPut)
 	h.Handle("/teams/{id}",
 		mw.Administrator(http.HandlerFunc(h.handleDeleteTeam))).Methods(http.MethodDelete)
-	h.Handle("/teams/{teamId}/resources/{resourceType}",
-		mw.Authenticated(http.HandlerFunc(h.handlePostTeamResource))).Methods(http.MethodPost)
-	h.Handle("/teams/{teamId}/resources/{resourceType}/{resourceId}",
-		mw.Authenticated(http.HandlerFunc(h.handleDeleteTeamResource))).Methods(http.MethodDelete)
+	h.Handle("/teams/{id}/memberships",
+		mw.Authenticated(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
+
+	// h.Handle("/teams/{teamId}/resources/{resourceType}",
+	// 	mw.Authenticated(http.HandlerFunc(h.handlePostTeamResource))).Methods(http.MethodPost)
+	// h.Handle("/teams/{teamId}/resources/{resourceType}/{resourceId}",
+	// 	mw.Authenticated(http.HandlerFunc(h.handleDeleteTeamResource))).Methods(http.MethodDelete)
 
 	return h
 }
@@ -73,16 +77,7 @@ func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Reque
 	}
 
 	team = &portainer.Team{
-		Name:    req.Name,
-		Members: []portainer.UserID{},
-	}
-
-	if req.Leaders != nil {
-		userIDs := []portainer.UserID{}
-		for _, value := range req.Leaders {
-			userIDs = append(userIDs, portainer.UserID(value))
-		}
-		team.Leaders = userIDs
+		Name: req.Name,
 	}
 
 	err = handler.TeamService.CreateTeam(team)
@@ -90,11 +85,16 @@ func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Reque
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+
+	encodeJSON(w, &postTeamsResponse{ID: int(team.ID)}, handler.Logger)
+}
+
+type postTeamsResponse struct {
+	ID int `json:"Id"`
 }
 
 type postTeamsRequest struct {
-	Name    string `valid:"required"`
-	Leaders []int  `valid:"-"`
+	Name string `valid:"required"`
 }
 
 // handleGetTeams handles GET requests on /teams
@@ -167,22 +167,6 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 		team.Name = req.Name
 	}
 
-	if req.Members != nil {
-		userIDs := []portainer.UserID{}
-		for _, value := range req.Members {
-			userIDs = append(userIDs, portainer.UserID(value))
-		}
-		team.Members = userIDs
-	}
-
-	if req.Leaders != nil {
-		userIDs := []portainer.UserID{}
-		for _, value := range req.Leaders {
-			userIDs = append(userIDs, portainer.UserID(value))
-		}
-		team.Leaders = userIDs
-	}
-
 	err = handler.TeamService.UpdateTeam(team.ID, team)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -191,9 +175,7 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 }
 
 type putTeamRequest struct {
-	Name    string `valid:"-"`
-	Members []int  `valid:"-"`
-	Leaders []int  `valid:"-"`
+	Name string `valid:"-"`
 }
 
 // handleDeleteTeam handles DELETE requests on /teams/:id
@@ -222,18 +204,30 @@ func (handler *TeamHandler) handleDeleteTeam(w http.ResponseWriter, r *http.Requ
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+
+	err = handler.TeamMembershipService.DeleteTeamMembershipByTeamID(portainer.TeamID(teamID))
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
 }
 
-// handlePostTeamResource handles POST requests on /teams/:teamId/resources/:resourceType
-func (handler *TeamHandler) handlePostTeamResource(w http.ResponseWriter, r *http.Request) {
-	return
-}
+// handleGetMemberships handles GET requests on /teams/:id/memberships
+func (handler *TeamHandler) handleGetMemberships(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
 
-type postTeamResourceRequest struct {
-	ResourceID string `valid:"required"`
-}
+	teamID, err := strconv.Atoi(id)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
 
-// handleDeleteTeamResource handles DELETE requests on /teams/:teamId/resources/:resourceType/:resourceId
-func (handler *TeamHandler) handleDeleteTeamResource(w http.ResponseWriter, r *http.Request) {
-	return
+	memberships, err := handler.TeamMembershipService.TeamMembershipsByTeamID(portainer.TeamID(teamID))
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	encodeJSON(w, memberships, handler.Logger)
 }

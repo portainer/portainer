@@ -20,6 +20,12 @@ const (
 	ErrTeamAlreadyExists = Error("Team already exists")
 )
 
+// TeamMembership errors.
+const (
+	ErrTeamMembershipNotFound      = Error("Team membership not found")
+	ErrTeamMembershipAlreadyExists = Error("Team membership already exists for this user and team.")
+)
+
 // Endpoint errors.
 const (
 	ErrEndpointNotFound     = Error("Endpoint not found")

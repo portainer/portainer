@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('UserService', ['$q', 'Users', 'UserHelper', function UserServiceFactory($q, Users, UserHelper) {
+.factory('UserService', ['$q', 'Users', 'UserHelper', 'TeamMembershipService', function UserServiceFactory($q, Users, UserHelper, TeamMembershipService) {
   'use strict';
   var service = {};
 
@@ -22,11 +22,36 @@ angular.module('portainer.services')
   };
 
   service.user = function(id) {
-    return Users.get({id: id}).$promise;
+    var deferred = $q.defer();
+    Users.get({id: id}).$promise
+    .then(function success(data) {
+      var user = new UserViewModel(data);
+      deferred.resolve(user);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve user details', err: err });
+    });
+    return deferred.promise;
   };
 
-  service.createUser = function(username, password, role) {
-    return Users.create({}, {username: username, password: password, role: role}).$promise;
+  service.createUser = function(username, password, role, teamIds) {
+    var deferred = $q.defer();
+    Users.create({}, {username: username, password: password, role: role}).$promise
+    .then(function success(data) {
+      var userId = data.Id;
+      var teamMembershipQueries = [];
+      angular.forEach(teamIds, function(teamId) {
+        teamMembershipQueries.push(TeamMembershipService.createMembership(userId, teamId, 2));
+      });
+      $q.all(teamMembershipQueries)
+      .then(function success() {
+        deferred.resolve();
+      });
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to create user', err: err });
+    });
+    return deferred.promise;
   };
 
   service.deleteUser = function(id) {
@@ -55,6 +80,21 @@ angular.module('portainer.services')
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to update user password', err: err});
+    });
+    return deferred.promise;
+  };
+
+  service.userMemberships = function(id) {
+    var deferred = $q.defer();
+    Users.queryMemberships({id: id}).$promise
+    .then(function success(data) {
+      var memberships = data.map(function (item) {
+        return new TeamMembershipModel(item);
+      });
+      deferred.resolve(memberships);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve user memberships', err: err });
     });
     return deferred.promise;
   };

@@ -164,6 +164,7 @@ func main() {
 		EndpointManagement:     authorizeEndpointMgmt,
 		UserService:            store.UserService,
 		TeamService:            store.TeamService,
+		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
 		ResourceControlService: store.ResourceControlService,
 		CryptoService:          cryptoService,

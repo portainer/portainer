@@ -1,6 +1,6 @@
 angular.module('teams', [])
-.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Pagination',
-function ($q, $scope, $state, TeamService, UserService, ModalService, Notifications, Pagination) {
+.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination',
+function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Pagination) {
   $scope.state = {
     userGroupGroupCreationError: '',
     selectedItemCount: 0,
@@ -57,19 +57,12 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
     $('#createTeamSpinner').show();
     $scope.state.teamCreationError = '';
     var teamName = $scope.formValues.Name;
-
-    var leaders = [];
-    var updateUserQueries = [];
+    var leaderIds = [];
     angular.forEach($scope.formValues.Leaders, function(user) {
-      leaders.push(user.Id);
-      if (user.RoleId !== 3) {
-        updateUserQueries.push(UserService.updateUser(user.Id, undefined, 3));
-      }
+      leaderIds.push(user.Id);
     });
-    $q.all({
-      team: TeamService.createTeam(teamName, leaders),
-      users: updateUserQueries
-    })
+
+    TeamService.createTeam(teamName, leaderIds)
     .then(function success(data) {
       Notifications.success('Team successfully created', teamName);
       $state.reload();

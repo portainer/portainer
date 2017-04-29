@@ -14,7 +14,8 @@ type (
 	proxyTransport struct {
 		dockerTransport        *http.Transport
 		ResourceControlService portainer.ResourceControlService
-		TeamService            portainer.TeamService
+		TeamMembershipService  portainer.TeamMembershipService
+		// TeamService            portainer.TeamService
 	}
 	restrictedOperationContext struct {
 		isAdmin          bool
@@ -99,14 +100,15 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 
 	if tokenData.Role != portainer.AdministratorRole {
 
-		userTeams, err := p.TeamService.TeamsByUserID(tokenData.ID)
+		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		// userTeams, err := p.TeamService.TeamsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}
 
 		userTeamIDs := make([]portainer.TeamID, 0)
-		for _, team := range userTeams {
-			userTeamIDs = append(userTeamIDs, team.ID)
+		for _, membership := range teamMemberships {
+			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 
 		resourceControls, err := p.ResourceControlService.ResourceControls()
@@ -146,14 +148,19 @@ func (p *proxyTransport) rewriteOperation(request *http.Request, operation restr
 	if tokenData.Role != portainer.AdministratorRole {
 		operationContext.isAdmin = false
 
-		userTeams, err := p.TeamService.TeamsByUserID(tokenData.ID)
+		// userTeams, err := p.TeamService.TeamsByUserID(tokenData.ID)
+		// if err != nil {
+		// 	return nil, err
+		// }
+
+		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}
 
 		userTeamIDs := make([]portainer.TeamID, 0)
-		for _, team := range userTeams {
-			userTeamIDs = append(userTeamIDs, team.ID)
+		for _, membership := range teamMemberships {
+			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 		operationContext.userTeamIDs = userTeamIDs
 	}

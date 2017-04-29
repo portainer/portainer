@@ -12,17 +12,18 @@ import (
 
 // Handler is a collection of all the service handlers.
 type Handler struct {
-	AuthHandler      *AuthHandler
-	UserHandler      *UserHandler
-	TeamHandler      *TeamHandler
-	EndpointHandler  *EndpointHandler
-	ResourceHandler  *ResourceHandler
-	SettingsHandler  *SettingsHandler
-	TemplatesHandler *TemplatesHandler
-	DockerHandler    *DockerHandler
-	WebSocketHandler *WebSocketHandler
-	UploadHandler    *UploadHandler
-	FileHandler      *FileHandler
+	AuthHandler           *AuthHandler
+	UserHandler           *UserHandler
+	TeamHandler           *TeamHandler
+	TeamMembershipHandler *TeamMembershipHandler
+	EndpointHandler       *EndpointHandler
+	ResourceHandler       *ResourceHandler
+	SettingsHandler       *SettingsHandler
+	TemplatesHandler      *TemplatesHandler
+	DockerHandler         *DockerHandler
+	WebSocketHandler      *WebSocketHandler
+	UploadHandler         *UploadHandler
+	FileHandler           *FileHandler
 }
 
 const (
@@ -44,6 +45,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.UserHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/teams") {
 		http.StripPrefix("/api", h.TeamHandler).ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/api/team_memberships") {
+		http.StripPrefix("/api", h.TeamMembershipHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/endpoints") {
 		http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/resources") {

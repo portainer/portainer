@@ -619,6 +619,7 @@ angular.module('portainer', [
   .constant('AUTH_ENDPOINT', 'api/auth')
   .constant('USERS_ENDPOINT', 'api/users')
   .constant('TEAMS_ENDPOINT', 'api/teams')
+  .constant('TEAM_MEMBERSHIPS_ENDPOINT', 'api/team_memberships')
   .constant('RESOURCE_ENDPOINT', 'api/resources')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')

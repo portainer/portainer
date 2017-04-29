@@ -52,20 +52,34 @@ type (
 	// UserID represents a user identifier
 	UserID int
 
+	// UserRole represents the role of a user. It can be either an administrator
+	// or a regular user
+	UserRole int
+
 	// Team represents a list of user accounts.
 	Team struct {
-		ID      TeamID   `json:"Id"`
-		Name    string   `json:"Name"`
-		Members []UserID `json:"Members"`
-		Leaders []UserID `json:"Leaders"`
+		ID   TeamID `json:"Id"`
+		Name string `json:"Name"`
+		// Members []UserID `json:"Members"`
+		// Leaders []UserID `json:"Leaders"`
 	}
 
 	// TeamID represents a team identifier
 	TeamID int
 
-	// UserRole represents the role of a user. It can be either an administrator
-	// or a regular user.
-	UserRole int
+	// TeamMembership represents a membership association between a user and a team
+	TeamMembership struct {
+		ID     TeamMembershipID `json:"Id"`
+		UserID UserID           `json:"UserID"`
+		TeamID TeamID           `json:"TeamID"`
+		Role   MembershipRole   `json:"Role"`
+	}
+
+	// TeamMembershipID represents a team membership identifier
+	TeamMembershipID int
+
+	// MembershipRole represents the role of a user within a team
+	MembershipRole int
 
 	// TokenData represents the data embedded in a JWT token.
 	TokenData struct {
@@ -151,10 +165,23 @@ type (
 		Team(ID TeamID) (*Team, error)
 		TeamByName(name string) (*Team, error)
 		Teams() ([]Team, error)
-		TeamsByUserID(ID UserID) ([]Team, error)
+		// TeamsByUserID(ID UserID) ([]Team, error)
 		CreateTeam(team *Team) error
 		UpdateTeam(ID TeamID, team *Team) error
 		DeleteTeam(ID TeamID) error
+	}
+
+	// TeamMembershipService represents a service for managing team membership data.
+	TeamMembershipService interface {
+		TeamMembership(ID TeamMembershipID) (*TeamMembership, error)
+		TeamMemberships() ([]TeamMembership, error)
+		TeamMembershipsByUserID(userID UserID) ([]TeamMembership, error)
+		TeamMembershipsByTeamID(teamID TeamID) ([]TeamMembership, error)
+		CreateTeamMembership(membership *TeamMembership) error
+		UpdateTeamMembership(ID TeamMembershipID, membership *TeamMembership) error
+		DeleteTeamMembership(ID TeamMembershipID) error
+		DeleteTeamMembershipByUserID(userID UserID) error
+		DeleteTeamMembershipByTeamID(teamID TeamID) error
 	}
 
 	// EndpointService represents a service for managing endpoint data.
@@ -222,13 +249,19 @@ const (
 )
 
 const (
+	_ MembershipRole = iota
+	// Leader represents a leader role inside a team
+	Leader
+	// Member represents a member role inside a team
+	Member
+)
+
+const (
 	_ UserRole = iota
 	// AdministratorRole represents an administrator user role
 	AdministratorRole
 	// StandardUserRole represents a regular user role
 	StandardUserRole
-	// TeamLeaderRole represents a team leader role
-	TeamLeaderRole
 )
 
 // Deprecated: ResourceAccessLevel values are deprecated in DBVersion == 2

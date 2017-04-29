@@ -1,6 +1,6 @@
 angular.module('users', [])
-.controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'ModalService', 'Notifications', 'Pagination',
-function ($q, $scope, $state, UserService, TeamService, ModalService, Notifications, Pagination) {
+.controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination',
+function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Pagination) {
   $scope.state = {
     userCreationError: '',
     selectedItemCount: 0,
@@ -62,22 +62,17 @@ function ($q, $scope, $state, UserService, TeamService, ModalService, Notificati
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
     var role = $scope.formValues.Administrator ? 1 : 2;
-    UserService.createUser(username, password, role)
+    var teamIds = [];
+    angular.forEach($scope.formValues.Teams, function(team) {
+      teamIds.push(team.Id);
+    });
+    UserService.createUser(username, password, role, teamIds)
     .then(function success(data) {
-      teamUpdateQueries = [];
-      angular.forEach($scope.formValues.Teams, function(team) {
-        var teamMemberIDs = team.Users;
-        teamMemberIDs.push(data.Id);
-        teamUpdateQueries.push(TeamService.updateTeam(team.Id, team.Name, teamMemberIDs));
-      });
-      $q.all(teamUpdateQueries)
-      .then(function success(data) {
-        Notifications.success('User successfully created', username);
-        $state.reload();
-      });
+      Notifications.success('User successfully created', username);
+      $state.reload();
     })
     .catch(function error(err) {
-      $scope.state.userCreationError = err.msg;
+      Notifications.error('Failure', err, 'Unable to create user');
     })
     .finally(function final() {
       $('#createUserSpinner').hide();
@@ -122,14 +117,32 @@ function ($q, $scope, $state, UserService, TeamService, ModalService, Notificati
     );
   };
 
+  function assignTeamLeaders(users, memberships) {
+    for (var i = 0; i < users.length; i++) {
+      var user = users[i];
+      user.isTeamLeader = false;
+      for (var j = 0; j < memberships.length; j++) {
+        var membership = memberships[j];
+        if (user.Id === membership.UserId && membership.Role === 1) {
+          user.isTeamLeader = true;
+          user.RoleName = 'team leader';
+          break;
+        }
+      }
+    }
+  }
+
   function initView() {
     $('#loadUsersSpinner').show();
     $q.all({
       users: UserService.users(true),
-      teams: TeamService.teams()
+      teams: TeamService.teams(),
+      memberships: TeamMembershipService.memberships()
     })
     .then(function success(data) {
-      $scope.users = data.users;
+      var users = data.users;
+      assignTeamLeaders(users, data.memberships);
+      $scope.users = users;
       $scope.teams = data.teams;
     })
     .catch(function error(err) {

@@ -21,8 +21,9 @@ type DockerHandler struct {
 	*mux.Router
 	Logger          *log.Logger
 	EndpointService portainer.EndpointService
-	TeamService     portainer.TeamService
-	ProxyManager    *proxy.Manager
+	// TeamService           portainer.TeamService
+	TeamMembershipService portainer.TeamMembershipService
+	ProxyManager          *proxy.Manager
 }
 
 // NewDockerHandler returns a new instance of DockerHandler.
@@ -43,10 +44,10 @@ func (handler *DockerHandler) checkEndpointAccessControl(endpoint *portainer.End
 		}
 	}
 
-	teams, _ := handler.TeamService.TeamsByUserID(userID)
+	memberships, _ := handler.TeamMembershipService.TeamMembershipsByUserID(userID)
 	for _, authorizedTeamID := range endpoint.AuthorizedTeams {
-		for _, team := range teams {
-			if team.ID == authorizedTeamID {
+		for _, membership := range memberships {
+			if membership.TeamID == authorizedTeamID {
 				return true
 			}
 		}

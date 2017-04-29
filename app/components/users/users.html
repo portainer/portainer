@@ -160,9 +160,9 @@
                 <td>{{ user.Username }}</td>
                 <td>
                   {{ user.RoleName }}
-                  <i ng-if="user.RoleId === 1" class="fa fa-user-circle-o" aria-hidden="true" style="margin-left: 2px;"></i>
-                  <i ng-if="user.RoleId === 2" class="fa fa-user" aria-hidden="true" style="margin-left: 2px;"></i>
-                  <i ng-if="user.RoleId === 3" class="fa fa-user-plus" aria-hidden="true" style="margin-left: 2px;"></i>
+                  <i ng-if="user.Role === 1" class="fa fa-user-circle-o" aria-hidden="true" style="margin-left: 2px;"></i>
+                  <i ng-if="user.Role !== 1 && !user.isTeamLeader" class="fa fa-user" aria-hidden="true" style="margin-left: 2px;"></i>
+                  <i ng-if="user.isTeamLeader" class="fa fa-user-plus" aria-hidden="true" style="margin-left: 2px;"></i>
                 </td>
                 <td>
                   <a ui-sref="user({id: user.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>

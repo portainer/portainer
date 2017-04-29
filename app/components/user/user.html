@@ -32,7 +32,7 @@
                 </label>
               </td>
             </tr>
-            <tr ng-if="!formValues.Administrator">
+            <!-- <tr ng-if="!formValues.Administrator">
               <td colspan="2">
                 <label for="teams" class="control-label text-left">
                   Teams
@@ -54,7 +54,7 @@
                  on-item-click="onTeamClick(data)"
                </span>
               </td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
       </rd-widget-body>
@@ -94,11 +94,6 @@
           <div class="form-group">
             <div class="col-sm-2">
               <button type="submit" class="btn btn-primary btn-sm" ng-disabled="formValues.newPassword === '' || formValues.newPassword !== formValues.confirmPassword" ng-click="updatePassword()">Update password</button>
-            </div>
-            <div class="col-sm-10">
-              <p class="pull-left text-danger" ng-if="state.updatePasswordError" style="margin: 5px;">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.updatePasswordError }}
-              </p>
             </div>
           </div>
         </form>

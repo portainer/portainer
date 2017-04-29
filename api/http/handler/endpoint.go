@@ -23,7 +23,7 @@ type EndpointHandler struct {
 	Logger                      *log.Logger
 	authorizeEndpointManagement bool
 	EndpointService             portainer.EndpointService
-	TeamService                 portainer.TeamService
+	TeamMembershipService       portainer.TeamMembershipService
 	FileService                 portainer.FileService
 	ProxyManager                *proxy.Manager
 }
@@ -77,7 +77,7 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 	var allowedEndpoints []portainer.Endpoint
 	if tokenData.Role != portainer.AdministratorRole {
 		allowedEndpoints = make([]portainer.Endpoint, 0)
-		teams, _ := handler.TeamService.TeamsByUserID(tokenData.ID)
+		memberships, _ := handler.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		for _, endpoint := range endpoints {
 			for _, authorizedUserID := range endpoint.AuthorizedUsers {
 				if authorizedUserID == tokenData.ID {
@@ -86,8 +86,8 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 				}
 			}
 			for _, authorizedTeamID := range endpoint.AuthorizedTeams {
-				for _, team := range teams {
-					if team.ID == authorizedTeamID {
+				for _, membership := range memberships {
+					if membership.TeamID == authorizedTeamID {
 						allowedEndpoints = append(allowedEndpoints, endpoint)
 						break
 					}

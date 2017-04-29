@@ -22,7 +22,11 @@
               </td>
             </tr>
             <tr>
-              <td>Users in team</td>
+              <td>Leaders</td>
+              <td>{{ leaderCount }}</td>
+            </tr>
+            <tr>
+              <td>Total users in team</td>
               <td>{{ teamMembers.length }}</td>
             </tr>
           </tbody>
@@ -70,8 +74,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-click="addUser(user)" class="interactive" pagination-id="table1" dir-paginate="user in users | filter:state.filterUsers | orderBy:sortTypeUsers:sortReverseUsers | itemsPerPage: state.pagination_count_users">
-                <td>{{ user.Username }}</td>
+              <tr pagination-id="table1" dir-paginate="user in users | filter:state.filterUsers | orderBy:sortTypeUsers:sortReverseUsers | itemsPerPage: state.pagination_count_users">
+                <td>
+                  {{ user.Username }}
+                  <span style="margin-left: 5px;">
+                    <a class="btn-outline-secondary" ng-click="addUser(user)"><i class="fa fa-plus-circle space-right" aria-hidden="true"></i>Add</a>
+                  </span>
+                </td>
               </tr>
               <tr ng-if="!users">
                 <td colspan="2" class="text-center text-muted">Loading...</td>
@@ -93,7 +102,7 @@
       <rd-widget-header classes="col-sm-12 col-md-6 nopadding" icon="fa-users" title="Team members">
         <div class="pull-md-right pull-lg-right">
           Items per page:
-          <select ng-model="state.pagination_count_groupMembers" ng-change="changePaginationCountGroupMembers()">
+          <select ng-model="state.pagination_count_members" ng-change="changePaginationCountGroupMembers()">
             <option value="0">All</option>
             <option value="10">10</option>
             <option value="25">25</option>
@@ -116,17 +125,32 @@
             <thead>
               <tr>
                 <th>
-                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderGroupMembers('Username')">
+                  <a ui-sref="team({id: team.Id})" ng-click="orderGroupMembers('Username')">
                     Name
                     <span ng-show="sortTypeGroupMembers == 'Username' && !sortReverseGroupMembers" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortTypeGroupMembers == 'Username' && sortReverseGroupMembers" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
+                <th>
+                  <a ui-sref="team({id: team.Id})" ng-click="orderGroupMembers('TeamRole')">
+                    Team Role
+                    <span ng-show="sortTypeGroupMembers == 'TeamRole' && !sortReverseGroupMembers" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeGroupMembers == 'TeamRole' && sortReverseGroupMembers" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr ng-click="removeUser(user)" class="interactive" pagination-id="table2" dir-paginate="user in teamMembers | filter:state.filterGroupMembers | orderBy:sortTypeGroupMembers:sortReverseGroupMembers | itemsPerPage: state.pagination_count_groupMembers">
+              <tr pagination-id="table2" dir-paginate="user in teamMembers | filter:state.filterGroupMembers | orderBy:sortTypeGroupMembers:sortReverseGroupMembers | itemsPerPage: state.pagination_count_groupMembers">
                 <td>{{ user.Username }}</td>
+                <td>
+                  {{ user.TeamRole }}
+                  <span style="margin-left: 5px;">
+                    <a class="btn-outline-secondary" ng-click="removeUser(user)"><i class="fa fa-minus-circle space-right" aria-hidden="true"></i>Remove</a>
+                    <!-- <a class="btn-outline-secondary" style="margin-left: 5px;" ng-click="up()" ng-if="user.RoleId === 2"><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Leader</a> -->
+                    <!-- <a class="btn-outline-secondary" style="margin-left: 5px;" ng-click="down()" ng-if="user.RoleId === 3"><i class="fa fa-user-times space-right" aria-hidden="true"></i>Member</a> -->
+                  </span>
+                </td>
               </tr>
               <tr ng-if="!teamMembers">
                 <td colspan="2" class="text-center text-muted">Loading...</td>
