@@ -245,15 +245,15 @@ angular.module('containers', [])
     if (isOneContainerRunning) {
       title = 'You are about to remove one or more running containers.';
     }
-    var text = '<label for="clean" class="control-label text-left">Automatically clean associated volumes</label><label class="switch" style="margin-left: 21px;"><input type="checkbox"><i></i></label>';
+    var text = 'Automatically clean associated volumes<i></i>';
     ModalService.confirmContainerDeletion(
       title,
       text,
       function (result) {
         if(!result) { return; }
         $scope.cleanAssociatedVolumes = false;
-        for (var i in result) {
-          if (result[i] === 'on') $scope.cleanAssociatedVolumes = true;
+        if (result[0]) {
+          $scope.cleanAssociatedVolumes = true;
         }
         $scope.removeAction();
       }

@@ -121,19 +121,19 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     if ($scope.container.State.Running) {
       title = 'You are about to remove a running container.';
     }
-    var text = '<label for="clean" class="control-label text-left">Automatically clean associated volumes</label><label class="switch" style="margin-left: 21px;"><input type="checkbox"><i></i></label>';
+    var text = 'Automatically clean associated volumes<i></i>';
     ModalService.confirmContainerDeletion(
       title,
       text,
-        function (result) {
-          if(!result) { return; }
-          var cleanAssociatedVolumes = false;
-          for (var i in result) {
-            if (result[i] === 'on') cleanAssociatedVolumes = true;
-          }
-          $scope.remove(cleanAssociatedVolumes);
+      function (result) {
+        if(!result) { return; }
+        var cleanAssociatedVolumes = false;
+        if (result[0]) {
+          cleanAssociatedVolumes = true;
         }
-      );
+        $scope.remove(cleanAssociatedVolumes);
+      }
+    );
   };
 
   $scope.remove = function(cleanAssociatedVolumes) {
