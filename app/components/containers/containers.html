@@ -112,7 +112,7 @@
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">{{ container.hostIP }}</td>
               <td>
-                <a ng-if="container.Ports.length > 0" ng-repeat="p in container.Ports" class="image-tag" ng-href="http://{{ URLPublish && URLPublish !== '_' ? URLPublish : p.host }}:{{p.public}}" target="_blank">
+                <a ng-if="container.Ports.length > 0" ng-repeat="p in container.Ports" class="image-tag" ng-href="http://{{ URLPublish || p.host }}:{{p.public}}" target="_blank">
                   <i class="fa fa-external-link" aria-hidden="true"></i> {{p.public}}:{{ p.private }}
                 </a>
                 <span ng-if="container.Ports.length == 0" >-</span>

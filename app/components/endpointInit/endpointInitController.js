@@ -48,10 +48,9 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     $scope.state.error = '';
     var name = "local";
     var URL = "unix:///var/run/docker.sock";
-    var URLPublish = "_";
     var TLS = false;
 
-    EndpointService.createLocalEndpoint(name, URL, URLPublish, TLS, true)
+    EndpointService.createLocalEndpoint(name, URL, TLS, true)
     .then(function success(data) {
       var endpointID = data.Id;
       updateEndpointState(data.Id);

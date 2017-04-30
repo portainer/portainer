@@ -139,7 +139,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 type postEndpointsRequest struct {
 	Name       string `valid:"required"`
 	URL        string `valid:"required"`
-	URLPublish string `valid:"required"`
+	URLPublish string `valid:"-"`
 	TLS        bool
 }
 

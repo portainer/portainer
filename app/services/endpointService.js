@@ -46,11 +46,10 @@ angular.module('portainer.services')
     return Endpoints.remove({id: endpointID}).$promise;
   };
 
-  service.createLocalEndpoint = function(name, URL, URLPublish, TLS, active) {
+  service.createLocalEndpoint = function(name, URL, TLS, active) {
     var endpoint = {
       Name: "local",
       URL: "unix:///var/run/docker.sock",
-      URLPublish: "_",
       TLS: false
     };
     return Endpoints.create({}, endpoint).$promise;
