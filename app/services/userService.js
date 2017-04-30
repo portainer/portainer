@@ -72,8 +72,9 @@ angular.module('portainer.services')
     .then(function success(data) {
       if (!data.valid) {
         deferred.reject({invalidPassword: true});
+      } else {
+        return service.updateUser(id, newPassword, undefined);
       }
-      return service.updateUser(id, newPassword, undefined);
     })
     .then(function success(data) {
       deferred.resolve();

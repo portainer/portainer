@@ -159,10 +159,10 @@
                 <td><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(user)" /></td>
                 <td>{{ user.Username }}</td>
                 <td>
+                  <i ng-if="user.Role === 1" class="fa fa-user-circle-o" aria-hidden="true" style="margin-right: 2px;"></i>
+                  <i ng-if="user.Role !== 1 && !user.isTeamLeader" class="fa fa-user" aria-hidden="true" style="margin-right: 2px;"></i>
+                  <i ng-if="user.isTeamLeader" class="fa fa-user-plus" aria-hidden="true" style="margin-right: 2px;"></i>
                   {{ user.RoleName }}
-                  <i ng-if="user.Role === 1" class="fa fa-user-circle-o" aria-hidden="true" style="margin-left: 2px;"></i>
-                  <i ng-if="user.Role !== 1 && !user.isTeamLeader" class="fa fa-user" aria-hidden="true" style="margin-left: 2px;"></i>
-                  <i ng-if="user.isTeamLeader" class="fa fa-user-plus" aria-hidden="true" style="margin-left: 2px;"></i>
                 </td>
                 <td>
                   <a ui-sref="user({id: user.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>

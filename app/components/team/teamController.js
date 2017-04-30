@@ -43,6 +43,38 @@ function ($q, $scope, $state, $stateParams, TeamService, UserService, TeamMember
     );
   };
 
+  $scope.promoteToLeader = function(user) {
+    $('#loadingViewSpinner').show();
+    TeamMembershipService.updateMembership(user.MembershipId, user.Id, $scope.team.Id, 1)
+    .then(function success(data) {
+      $scope.leaderCount++;
+      user.TeamRole = 'Leader';
+      Notifications.success('User is now team leader', user.Username);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to update user role');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
+  };
+
+  $scope.demoteToMember = function(user) {
+    $('#loadingViewSpinner').show();
+    TeamMembershipService.updateMembership(user.MembershipId, user.Id, $scope.team.Id, 2)
+    .then(function success(data) {
+      user.TeamRole = 'Member';
+      $scope.leaderCount--;
+      Notifications.success('User is now team member', user.Username);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to update user role');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
+  };
+
   $scope.addAllUsers = function() {
     $('#loadingViewSpinner').show();
     var teamMembershipQueries = [];
