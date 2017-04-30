@@ -15,14 +15,14 @@ function ($scope, $state, $sanitize, Authentication, UserService, Notifications)
 
     UserService.updateUserPassword(userID, currentPassword, newPassword)
     .then(function success() {
-      Notifications.success("Success", "Password successfully updated");
+      Notifications.success('Success', 'Password successfully updated');
       $state.reload();
     })
     .catch(function error(err) {
       if (err.invalidPassword) {
         $scope.invalidPassword = true;
       } else {
-        Notifications.error("Failure", err, err.msg);
+        Notifications.error('Failure', err, err.msg);
       }
     });
   };
