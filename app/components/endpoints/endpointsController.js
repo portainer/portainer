@@ -13,6 +13,7 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
   $scope.formValues = {
     Name: '',
     URL: '',
+    PublicURL: '',
     TLS: false,
     TLSCACert: null,
     TLSCert: null,
@@ -49,11 +50,15 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
     $scope.state.error = '';
     var name = $scope.formValues.Name;
     var URL = $scope.formValues.URL;
+    var PublicURL = $scope.formValues.PublicURL;
+    if (PublicURL === '') {
+      PublicURL = URL.split(':')[0];
+    }
     var TLS = $scope.formValues.TLS;
     var TLSCAFile = $scope.formValues.TLSCACert;
     var TLSCertFile = $scope.formValues.TLSCert;
     var TLSKeyFile = $scope.formValues.TLSKey;
-    EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, false).then(function success(data) {
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, false).then(function success(data) {
       Notifications.success("Endpoint created", name);
       $state.reload();
     }, function error(err) {
