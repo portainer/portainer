@@ -8,11 +8,11 @@ angular.module('portainer.services')
     getEndpointID: function() {
       return localStorageService.get('ENDPOINT_ID');
     },
-    storeEndpointURLPublish: function(urlPublish) {
-      localStorageService.set('ENDPOINT_URL_PUBLISH', urlPublish);
+    storeEndpointPublicURL: function(publicURL) {
+      localStorageService.set('ENDPOINT_PUBLIC_URL', publicURL);
     },
-    getEndpointURLPublish: function() {
-      return localStorageService.get('ENDPOINT_URL_PUBLISH');
+    getEndpointPublicURL: function() {
+      return localStorageService.get('ENDPOINT_PUBLIC_URL');
     },
     storeEndpointState: function(state) {
       localStorageService.set('ENDPOINT_STATE', state);

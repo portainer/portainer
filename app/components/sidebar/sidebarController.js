@@ -11,9 +11,9 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
 
   $scope.switchEndpoint = function(endpoint) {
     var activeEndpointID = EndpointProvider.endpointID();
-    var activeEndpointURLPublish = EndpointProvider.endpointURLPublish();
+    var activeEndpointPublicURL = EndpointProvider.endpointPublicURL();
     EndpointProvider.setEndpointID(endpoint.Id);
-    EndpointProvider.setEndpointURLPublish(endpoint.URLPublish);
+    EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
     StateManager.updateEndpointState(true)
     .then(function success() {
       $state.go('dashboard');
@@ -21,7 +21,7 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
     .catch(function error(err) {
       Notifications.error("Failure", err, "Unable to connect to the Docker endpoint");
       EndpointProvider.setEndpointID(activeEndpointID);
-      EndpointProvider.setEndpointURLPublish(activeEndpointURLPublish);
+      EndpointProvider.setEndpointPublicURL(activeEndpointPublicURL);
       StateManager.updateEndpointState(true)
       .then(function success() {});
     });
@@ -35,7 +35,7 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
       angular.forEach($scope.endpoints, function (endpoint) {
         if (endpoint.Id === activeEndpointID) {
           $scope.activeEndpoint = endpoint;
-          EndpointProvider.setEndpointURLPublish(endpoint.URLPublish);
+          EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
         }
       });
     })
