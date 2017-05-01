@@ -108,6 +108,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 	endpoint := &portainer.Endpoint{
 		Name:            req.Name,
 		URL:             req.URL,
+		PublicURL:       req.PublicURL,
 		TLS:             req.TLS,
 		AuthorizedUsers: []portainer.UserID{},
 	}
@@ -136,9 +137,10 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 }
 
 type postEndpointsRequest struct {
-	Name string `valid:"required"`
-	URL  string `valid:"required"`
-	TLS  bool
+	Name      string `valid:"required"`
+	URL       string `valid:"required"`
+	PublicURL string `valid:"-"`
+	TLS       bool
 }
 
 type postEndpointsResponse struct {
@@ -262,6 +264,10 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		endpoint.URL = req.URL
 	}
 
+	if req.PublicURL != "" {
+		endpoint.PublicURL = req.PublicURL
+	}
+
 	if req.TLS {
 		endpoint.TLS = true
 		caCertPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCA)
@@ -296,9 +302,10 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 }
 
 type putEndpointsRequest struct {
-	Name string `valid:"-"`
-	URL  string `valid:"-"`
-	TLS  bool   `valid:"-"`
+	Name      string `valid:"-"`
+	URL       string `valid:"-"`
+	PublicURL string `valid:"-"`
+	TLS       bool   `valid:"-"`
 }
 
 // handleDeleteEndpoint handles DELETE requests on /endpoints/:id
