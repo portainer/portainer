@@ -34,9 +34,9 @@ func NewUserHandler(mw *middleware.Service) *UserHandler {
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/users",
-		mw.Administrator(http.HandlerFunc(h.handlePostUsers))).Methods(http.MethodPost)
+		mw.Authenticated(http.HandlerFunc(h.handlePostUsers))).Methods(http.MethodPost)
 	h.Handle("/users",
-		mw.Administrator(http.HandlerFunc(h.handleGetUsers))).Methods(http.MethodGet)
+		mw.Authenticated(http.HandlerFunc(h.handleGetUsers))).Methods(http.MethodGet)
 	h.Handle("/users/{id}",
 		mw.Administrator(http.HandlerFunc(h.handleGetUser))).Methods(http.MethodGet)
 	h.Handle("/users/{id}",
