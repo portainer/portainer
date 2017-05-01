@@ -103,13 +103,13 @@ angular.module('portainer.services')
     });
   };
 
-  service.confirmContainerDeletion = function(title, text, callback) {
+  service.confirmContainerDeletion = function(title, callback) {
     service.prompt({
       title: title,
       inputType: 'checkbox',
       inputOptions: [
         {
-          text: text,
+          text: 'Automatically remove non-persistent volumes<i></i>',
           value: '1'
         }
       ],

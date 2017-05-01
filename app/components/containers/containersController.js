@@ -245,10 +245,8 @@ angular.module('containers', [])
     if (isOneContainerRunning) {
       title = 'You are about to remove one or more running containers.';
     }
-    var text = 'Automatically remove non-persistent volumes<i></i>';
     ModalService.confirmContainerDeletion(
       title,
-      text,
       function (result) {
         if(!result) { return; }
         $scope.cleanAssociatedVolumes = false;

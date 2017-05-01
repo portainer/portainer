@@ -121,10 +121,8 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     if ($scope.container.State.Running) {
       title = 'You are about to remove a running container.';
     }
-    var text = 'Automatically remove non-persistent volumes<i></i>';
     ModalService.confirmContainerDeletion(
       title,
-      text,
       function (result) {
         if(!result) { return; }
         var cleanAssociatedVolumes = false;
