@@ -119,22 +119,26 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.confirmRemove = function () {
+    var title = 'You are about to remove a container.';
     if ($scope.container.State.Running) {
-      ModalService.confirmDeletion(
-        'You are about to remove a running container.',
-        function (confirmed) {
-          if(!confirmed) { return; }
-          $scope.remove();
-        }
-      );
-    } else {
-      $scope.remove();
+      title = 'You are about to remove a running container.';
     }
+    ModalService.confirmContainerDeletion(
+      title,
+      function (result) {
+        if(!result) { return; }
+        var cleanAssociatedVolumes = false;
+        if (result[0]) {
+          cleanAssociatedVolumes = true;
+        }
+        $scope.remove(cleanAssociatedVolumes);
+      }
+    );
   };
 
-  $scope.remove = function() {
+  $scope.remove = function(cleanAssociatedVolumes) {
     $('#loadingViewSpinner').show();
-    Container.remove({id: $stateParams.id, force: true}, function (d) {
+    Container.remove({id: $stateParams.id, v: (cleanAssociatedVolumes) ? 1 : 0, force: true}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error("Failure", d, "Unable to remove container");

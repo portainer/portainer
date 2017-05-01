@@ -3,27 +3,47 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.confirm = function(options){
-    var box = bootbox.confirm({
-      title: options.title,
-      message: options.message,
-      buttons: {
-        confirm: {
-          label: options.buttons.confirm.label,
-          className: options.buttons.confirm.className
-        },
-        cancel: {
-          label: options.buttons.cancel && options.buttons.cancel.label ? options.buttons.cancel.label : 'Cancel'
-        }
-      },
-      callback: options.callback
-    });
+  var applyBoxCSS = function(box) {
     box.css({
       'top': '50%',
       'margin-top': function () {
         return -(box.height() / 2);
       }
     });
+  };
+
+  var confirmButtons = function(options) {
+    var buttons = {
+      confirm: {
+        label: options.buttons.confirm.label,
+        className: options.buttons.confirm.className
+      },
+      cancel: {
+        label: options.buttons.cancel && options.buttons.cancel.label ? options.buttons.cancel.label : 'Cancel'
+      }
+    };
+    return buttons;
+  };
+
+  service.confirm = function(options){
+    var box = bootbox.confirm({
+      title: options.title,
+      message: options.message,
+      buttons: confirmButtons(options),
+      callback: options.callback
+    });
+    applyBoxCSS(box);
+  };
+
+  service.prompt = function(options){
+    var box = bootbox.prompt({
+      title: options.title,
+      inputType: options.inputType,
+      inputOptions: options.inputOptions,
+      buttons: confirmButtons(options),
+      callback: options.callback
+    });
+    applyBoxCSS(box);
   };
 
   service.confirmOwnershipChange = function(callback, msg) {
@@ -82,5 +102,26 @@ angular.module('portainer.services')
       callback: callback,
     });
   };
+
+  service.confirmContainerDeletion = function(title, callback) {
+    service.prompt({
+      title: title,
+      inputType: 'checkbox',
+      inputOptions: [
+        {
+          text: 'Automatically remove non-persistent volumes<i></i>',
+          value: '1'
+        }
+      ],
+      buttons: {
+        confirm: {
+          label: 'Remove',
+          className: 'btn-danger'
+        }
+      },
+      callback: callback
+    });
+  };
+
   return service;
 }]);
