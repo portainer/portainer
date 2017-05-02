@@ -2,10 +2,9 @@ package handler
 
 import (
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/context"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/middleware"
 	"github.com/portainer/portainer/http/proxy"
+	"github.com/portainer/portainer/http/security"
 
 	"encoding/json"
 	"log"
@@ -23,7 +22,6 @@ type EndpointHandler struct {
 	Logger                      *log.Logger
 	authorizeEndpointManagement bool
 	EndpointService             portainer.EndpointService
-	TeamMembershipService       portainer.TeamMembershipService
 	FileService                 portainer.FileService
 	ProxyManager                *proxy.Manager
 }
@@ -35,70 +33,47 @@ const (
 )
 
 // NewEndpointHandler returns a new instance of EndpointHandler.
-func NewEndpointHandler(mw *middleware.Service, authorizeEndpointManagement bool) *EndpointHandler {
+func NewEndpointHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bool) *EndpointHandler {
 	h := &EndpointHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 		authorizeEndpointManagement: authorizeEndpointManagement,
 	}
 	h.Handle("/endpoints",
-		mw.Administrator(http.HandlerFunc(h.handlePostEndpoints))).Methods(http.MethodPost)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePostEndpoints))).Methods(http.MethodPost)
 	h.Handle("/endpoints",
-		mw.Authenticated(http.HandlerFunc(h.handleGetEndpoints))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetEndpoints))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
-		mw.Administrator(http.HandlerFunc(h.handleGetEndpoint))).Methods(http.MethodGet)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handleGetEndpoint))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
-		mw.Administrator(http.HandlerFunc(h.handlePutEndpoint))).Methods(http.MethodPut)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutEndpoint))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}/access",
-		mw.Administrator(http.HandlerFunc(h.handlePutEndpointAccess))).Methods(http.MethodPut)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutEndpointAccess))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}",
-		mw.Administrator(http.HandlerFunc(h.handleDeleteEndpoint))).Methods(http.MethodDelete)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteEndpoint))).Methods(http.MethodDelete)
 
 	return h
 }
 
 // handleGetEndpoints handles GET requests on /endpoints
 func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *http.Request) {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+	}
+
 	endpoints, err := handler.EndpointService.Endpoints()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	tokenData, err := context.GetTokenData(r)
+	filteredEndpoints, err := security.FilterEndpoints(endpoints, securityContext)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
-	if tokenData == nil {
-		httperror.WriteErrorResponse(w, portainer.ErrInvalidJWTToken, http.StatusBadRequest, handler.Logger)
-		return
-	}
 
-	var allowedEndpoints []portainer.Endpoint
-	if tokenData.Role != portainer.AdministratorRole {
-		allowedEndpoints = make([]portainer.Endpoint, 0)
-		memberships, _ := handler.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
-		for _, endpoint := range endpoints {
-			for _, authorizedUserID := range endpoint.AuthorizedUsers {
-				if authorizedUserID == tokenData.ID {
-					allowedEndpoints = append(allowedEndpoints, endpoint)
-					break
-				}
-			}
-			for _, authorizedTeamID := range endpoint.AuthorizedTeams {
-				for _, membership := range memberships {
-					if membership.TeamID == authorizedTeamID {
-						allowedEndpoints = append(allowedEndpoints, endpoint)
-						break
-					}
-				}
-			}
-		}
-	} else {
-		allowedEndpoints = endpoints
-	}
-
-	encodeJSON(w, allowedEndpoints, handler.Logger)
+	encodeJSON(w, filteredEndpoints, handler.Logger)
 }
 
 // handlePostEndpoints handles POST requests on /endpoints

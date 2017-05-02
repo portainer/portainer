@@ -2,9 +2,10 @@ package portainer
 
 // General errors.
 const (
-	ErrUnauthorized         = Error("Unauthorized")
-	ErrResourceAccessDenied = Error("Access denied to resource")
-	ErrUnsupportedDockerAPI = Error("Unsupported Docker API response")
+	ErrUnauthorized           = Error("Unauthorized")
+	ErrResourceAccessDenied   = Error("Access denied to resource")
+	ErrUnsupportedDockerAPI   = Error("Unsupported Docker API response")
+	ErrMissingSecurityContext = Error("Unable to find security details in request context")
 )
 
 // User errors.

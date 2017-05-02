@@ -11,7 +11,7 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/middleware"
+	"github.com/portainer/portainer/http/security"
 )
 
 // AuthHandler represents an HTTP API handler for managing authentication.
@@ -35,14 +35,14 @@ const (
 )
 
 // NewAuthHandler returns a new instance of AuthHandler.
-func NewAuthHandler(mw *middleware.Service, authDisabled bool) *AuthHandler {
+func NewAuthHandler(bouncer *security.RequestBouncer, authDisabled bool) *AuthHandler {
 	h := &AuthHandler{
 		Router:       mux.NewRouter(),
 		Logger:       log.New(os.Stderr, "", log.LstdFlags),
 		authDisabled: authDisabled,
 	}
 	h.Handle("/auth",
-		mw.Public(http.HandlerFunc(h.handlePostAuth)))
+		bouncer.PublicAccess(http.HandlerFunc(h.handlePostAuth)))
 
 	return h
 }

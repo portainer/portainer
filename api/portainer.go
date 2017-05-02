@@ -251,10 +251,10 @@ const (
 
 const (
 	_ MembershipRole = iota
-	// Leader represents a leader role inside a team
-	Leader
-	// Member represents a member role inside a team
-	Member
+	// TeamLeader represents a leader role inside a team
+	TeamLeader
+	// TeamMember represents a member role inside a team
+	TeamMember
 )
 
 const (

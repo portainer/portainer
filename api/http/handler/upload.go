@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/middleware"
+	"github.com/portainer/portainer/http/security"
 
 	"log"
 	"net/http"
@@ -21,13 +21,13 @@ type UploadHandler struct {
 }
 
 // NewUploadHandler returns a new instance of UploadHandler.
-func NewUploadHandler(mw *middleware.Service) *UploadHandler {
+func NewUploadHandler(bouncer *security.RequestBouncer) *UploadHandler {
 	h := &UploadHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/upload/tls/{endpointID}/{certificate:(?:ca|cert|key)}",
-		mw.Authenticated(http.HandlerFunc(h.handlePostUploadTLS)))
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUploadTLS)))
 	return h
 }
 

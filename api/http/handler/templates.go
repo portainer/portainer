@@ -8,7 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/middleware"
+	"github.com/portainer/portainer/http/security"
 )
 
 // TemplatesHandler represents an HTTP API handler for managing templates.
@@ -23,14 +23,14 @@ const (
 )
 
 // NewTemplatesHandler returns a new instance of TemplatesHandler.
-func NewTemplatesHandler(mw *middleware.Service, containerTemplatesURL string) *TemplatesHandler {
+func NewTemplatesHandler(bouncer *security.RequestBouncer, containerTemplatesURL string) *TemplatesHandler {
 	h := &TemplatesHandler{
 		Router:                mux.NewRouter(),
 		Logger:                log.New(os.Stderr, "", log.LstdFlags),
 		containerTemplatesURL: containerTemplatesURL,
 	}
 	h.Handle("/templates",
-		mw.Authenticated(http.HandlerFunc(h.handleGetTemplates)))
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTemplates)))
 	return h
 }
 

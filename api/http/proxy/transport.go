@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/context"
+	"github.com/portainer/portainer/http/security"
 )
 
 type (
@@ -93,7 +93,7 @@ func (p *proxyTransport) proxyVolumeRequest(request *http.Request) (*http.Respon
 // before executing the original request.
 func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID string) (*http.Response, error) {
 	var err error
-	tokenData, err := context.GetTokenData(request)
+	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 // to decorate the original request's response.
 func (p *proxyTransport) rewriteOperation(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
 	var err error
-	tokenData, err := context.GetTokenData(request)
+	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (p *proxyTransport) rewriteOperation(request *http.Request, operation restr
 // administratorOperation ensures that the user has administrator privileges
 // before executing the original request.
 func (p *proxyTransport) administratorOperation(request *http.Request) (*http.Response, error) {
-	tokenData, err := context.GetTokenData(request)
+	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
 	}

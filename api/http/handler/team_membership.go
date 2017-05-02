@@ -5,7 +5,7 @@ import (
 
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/middleware"
+	"github.com/portainer/portainer/http/security"
 
 	"encoding/json"
 	"log"
@@ -25,21 +25,21 @@ type TeamMembershipHandler struct {
 }
 
 // NewTeamMembershipHandler returns a new instance of TeamMembershipHandler.
-func NewTeamMembershipHandler(mw *middleware.Service) *TeamMembershipHandler {
+func NewTeamMembershipHandler(bouncer *security.RequestBouncer) *TeamMembershipHandler {
 	h := &TeamMembershipHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/team_memberships",
-		mw.Authenticated(http.HandlerFunc(h.handlePostTeamMemberships))).Methods(http.MethodPost)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostTeamMemberships))).Methods(http.MethodPost)
 	h.Handle("/team_memberships",
-		mw.Authenticated(http.HandlerFunc(h.handleGetTeamsMemberships))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTeamsMemberships))).Methods(http.MethodGet)
 	// h.Handle("/team_memberships/{id}",
-	// 	mw.Administrator(http.HandlerFunc(h.handleGetTeamsMembership))).Methods(http.MethodGet)
+	// 	bouncer.AdministratorAccess(http.HandlerFunc(h.handleGetTeamsMembership))).Methods(http.MethodGet)
 	h.Handle("/team_memberships/{id}",
-		mw.Authenticated(http.HandlerFunc(h.handlePutTeamMembership))).Methods(http.MethodPut)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutTeamMembership))).Methods(http.MethodPut)
 	h.Handle("/team_memberships/{id}",
-		mw.Authenticated(http.HandlerFunc(h.handleDeleteTeamMembership))).Methods(http.MethodDelete)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteTeamMembership))).Methods(http.MethodDelete)
 
 	return h
 }

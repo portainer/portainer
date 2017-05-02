@@ -6,7 +6,7 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/middleware"
+	"github.com/portainer/portainer/http/security"
 
 	"log"
 	"net/http"
@@ -23,19 +23,19 @@ type ResourceHandler struct {
 }
 
 // NewResourceHandler returns a new instance of ResourceHandler.
-func NewResourceHandler(mw *middleware.Service) *ResourceHandler {
+func NewResourceHandler(bouncer *security.RequestBouncer) *ResourceHandler {
 	h := &ResourceHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/resources",
-		mw.Authenticated(http.HandlerFunc(h.handlePostResources))).Methods(http.MethodPost)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostResources))).Methods(http.MethodPost)
 	// h.Handle("/resources/{id}",
-	// 	mw.Authenticated(http.HandlerFunc(h.handleGetUser))).Methods(http.MethodGet)
+	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetUser))).Methods(http.MethodGet)
 	h.Handle("/resources/{id}",
-		mw.Authenticated(http.HandlerFunc(h.handlePutResources))).Methods(http.MethodPut)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutResources))).Methods(http.MethodPut)
 	h.Handle("/resources/{id}",
-		mw.Authenticated(http.HandlerFunc(h.handleDeleteResources))).Methods(http.MethodDelete)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteResources))).Methods(http.MethodDelete)
 
 	return h
 }

@@ -4,9 +4,8 @@ import (
 	"strconv"
 
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/context"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/middleware"
+	"github.com/portainer/portainer/http/security"
 
 	"encoding/json"
 	"log"
@@ -28,39 +27,39 @@ type UserHandler struct {
 }
 
 // NewUserHandler returns a new instance of UserHandler.
-func NewUserHandler(mw *middleware.Service) *UserHandler {
+func NewUserHandler(bouncer *security.RequestBouncer) *UserHandler {
 	h := &UserHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/users",
-		mw.Authenticated(http.HandlerFunc(h.handlePostUsers))).Methods(http.MethodPost)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUsers))).Methods(http.MethodPost)
 	h.Handle("/users",
-		mw.Authenticated(http.HandlerFunc(h.handleGetUsers))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetUsers))).Methods(http.MethodGet)
 	h.Handle("/users/{id}",
-		mw.Administrator(http.HandlerFunc(h.handleGetUser))).Methods(http.MethodGet)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handleGetUser))).Methods(http.MethodGet)
 	h.Handle("/users/{id}",
-		mw.Authenticated(http.HandlerFunc(h.handlePutUser))).Methods(http.MethodPut)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutUser))).Methods(http.MethodPut)
 	h.Handle("/users/{id}",
-		mw.Administrator(http.HandlerFunc(h.handleDeleteUser))).Methods(http.MethodDelete)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteUser))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/memberships",
-		mw.Authenticated(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
 	// h.Handle("/users/{id}/memberships/{teamID}",
-	// 	mw.Authenticated(http.HandlerFunc(h.handleGetMembership))).Methods(http.MethodGet)
+	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMembership))).Methods(http.MethodGet)
 	// h.Handle("/users/{id}/memberships/{teamID}",
-	// 	mw.Authenticated(http.HandlerFunc(h.handleDeleteMembership))).Methods(http.MethodDelete)
+	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteMembership))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/passwd",
-		mw.Authenticated(http.HandlerFunc(h.handlePostUserPasswd)))
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUserPasswd)))
 	h.Handle("/users/admin/check",
-		mw.Public(http.HandlerFunc(h.handleGetAdminCheck)))
+		bouncer.PublicAccess(http.HandlerFunc(h.handleGetAdminCheck)))
 	h.Handle("/users/admin/init",
-		mw.Public(http.HandlerFunc(h.handlePostAdminInit)))
+		bouncer.PublicAccess(http.HandlerFunc(h.handlePostAdminInit)))
 	// Deprecated in APIVersion == 1.12.5
 	h.Handle("/users/{userId}/resources/{resourceType}",
-		mw.Authenticated(http.HandlerFunc(h.handlePostUserResource))).Methods(http.MethodPost)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUserResource))).Methods(http.MethodPost)
 	// Deprecated in APIVersion == 1.12.5
 	h.Handle("/users/{userId}/resources/{resourceType}/{resourceId}",
-		mw.Authenticated(http.HandlerFunc(h.handleDeleteUserResource))).Methods(http.MethodDelete)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteUserResource))).Methods(http.MethodDelete)
 
 	return h
 }
@@ -127,16 +126,29 @@ type postUsersRequest struct {
 
 // handleGetUsers handles GET requests on /users
 func (handler *UserHandler) handleGetUsers(w http.ResponseWriter, r *http.Request) {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+	}
+
+	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	users, err := handler.UserService.Users()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	for i := range users {
-		users[i].Password = ""
+	filteredUsers := security.FilterUsers(users, securityContext)
+
+	for i := range filteredUsers {
+		filteredUsers[i].Password = ""
 	}
-	encodeJSON(w, users, handler.Logger)
+
+	encodeJSON(w, filteredUsers, handler.Logger)
 }
 
 // handlePostUserPasswd handles POST requests on /users/:id/passwd
@@ -230,7 +242,7 @@ func (handler *UserHandler) handlePutUser(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	tokenData, err := context.GetTokenData(r)
+	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
@@ -447,7 +459,7 @@ func (handler *UserHandler) handlePostUserResource(w http.ResponseWriter, r *htt
 		return
 	}
 
-	tokenData, err := context.GetTokenData(r)
+	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
@@ -512,7 +524,7 @@ func (handler *UserHandler) handleDeleteUserResource(w http.ResponseWriter, r *h
 	// 	return
 	// }
 	//
-	// tokenData, err := context.GetTokenData(r)
+	// tokenData, err := security.RetrieveTokenData(r)
 	// if err != nil {
 	// 	httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	// }

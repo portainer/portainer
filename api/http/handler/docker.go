@@ -4,10 +4,9 @@ import (
 	"strconv"
 
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/context"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/middleware"
 	"github.com/portainer/portainer/http/proxy"
+	"github.com/portainer/portainer/http/security"
 
 	"log"
 	"net/http"
@@ -27,13 +26,13 @@ type DockerHandler struct {
 }
 
 // NewDockerHandler returns a new instance of DockerHandler.
-func NewDockerHandler(mw *middleware.Service) *DockerHandler {
+func NewDockerHandler(bouncer *security.RequestBouncer) *DockerHandler {
 	h := &DockerHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.PathPrefix("/{id}/").Handler(
-		mw.Authenticated(http.HandlerFunc(h.proxyRequestsToDockerAPI)))
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.proxyRequestsToDockerAPI)))
 	return h
 }
 
@@ -72,7 +71,7 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 		return
 	}
 
-	tokenData, err := context.GetTokenData(r)
+	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}

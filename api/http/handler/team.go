@@ -5,7 +5,7 @@ import (
 
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/middleware"
+	"github.com/portainer/portainer/http/security"
 
 	"encoding/json"
 	"log"
@@ -26,28 +26,28 @@ type TeamHandler struct {
 }
 
 // NewTeamHandler returns a new instance of TeamHandler.
-func NewTeamHandler(mw *middleware.Service) *TeamHandler {
+func NewTeamHandler(bouncer *security.RequestBouncer) *TeamHandler {
 	h := &TeamHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/teams",
-		mw.Administrator(http.HandlerFunc(h.handlePostTeams))).Methods(http.MethodPost)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePostTeams))).Methods(http.MethodPost)
 	h.Handle("/teams",
-		mw.Authenticated(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
-		mw.Administrator(http.HandlerFunc(h.handleGetTeam))).Methods(http.MethodGet)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handleGetTeam))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
-		mw.Administrator(http.HandlerFunc(h.handlePutTeam))).Methods(http.MethodPut)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutTeam))).Methods(http.MethodPut)
 	h.Handle("/teams/{id}",
-		mw.Administrator(http.HandlerFunc(h.handleDeleteTeam))).Methods(http.MethodDelete)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteTeam))).Methods(http.MethodDelete)
 	h.Handle("/teams/{id}/memberships",
-		mw.Authenticated(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
 
 	// h.Handle("/teams/{teamId}/resources/{resourceType}",
-	// 	mw.Authenticated(http.HandlerFunc(h.handlePostTeamResource))).Methods(http.MethodPost)
+	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostTeamResource))).Methods(http.MethodPost)
 	// h.Handle("/teams/{teamId}/resources/{resourceType}/{resourceId}",
-	// 	mw.Authenticated(http.HandlerFunc(h.handleDeleteTeamResource))).Methods(http.MethodDelete)
+	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteTeamResource))).Methods(http.MethodDelete)
 
 	return h
 }
