@@ -34,9 +34,9 @@ func NewTeamHandler(bouncer *security.RequestBouncer) *TeamHandler {
 	h.Handle("/teams",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePostTeams))).Methods(http.MethodPost)
 	h.Handle("/teams",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
-		bouncer.AdministratorAccess(http.HandlerFunc(h.handleGetTeam))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeam))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutTeam))).Methods(http.MethodPut)
 	h.Handle("/teams/{id}",
@@ -99,13 +99,25 @@ type postTeamsRequest struct {
 
 // handleGetTeams handles GET requests on /teams
 func (handler *TeamHandler) handleGetTeams(w http.ResponseWriter, r *http.Request) {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+	}
+
+	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	teams, err := handler.TeamService.Teams()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	encodeJSON(w, teams, handler.Logger)
+	filteredTeams := security.FilterTeams(teams, securityContext)
+
+	encodeJSON(w, filteredTeams, handler.Logger)
 }
 
 // handleGetTeam handles GET requests on /teams/:id
@@ -113,13 +125,24 @@ func (handler *TeamHandler) handleGetTeam(w http.ResponseWriter, r *http.Request
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	teamID, err := strconv.Atoi(id)
+	tid, err := strconv.Atoi(id)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
+	teamID := portainer.TeamID(tid)
 
-	team, err := handler.TeamService.Team(portainer.TeamID(teamID))
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+	}
+
+	if !security.AuthorizedTeamManagement(teamID, securityContext) {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
+	team, err := handler.TeamService.Team(teamID)
 	if err == portainer.ErrTeamNotFound {
 		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return

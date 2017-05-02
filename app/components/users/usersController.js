@@ -1,6 +1,6 @@
 angular.module('users', [])
-.controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination',
-function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Pagination) {
+.controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication',
+function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication) {
   $scope.state = {
     userCreationError: '',
     selectedItemCount: 0,
@@ -134,6 +134,7 @@ function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, M
 
   function initView() {
     $('#loadUsersSpinner').show();
+    $scope.isAdmin = Authentication.getUserDetails().role === 1 ? true: false;
     $q.all({
       users: UserService.users(true),
       teams: TeamService.teams(),

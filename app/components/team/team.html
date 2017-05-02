@@ -18,7 +18,7 @@
               <td>Name</td>
               <td>
                 {{ team.Name }}
-                <button class="btn btn-xs btn-danger" ng-click="deleteTeam()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this team</button>
+                <button class="btn btn-xs btn-danger" ng-if="isAdmin" ng-click="deleteTeam()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this team</button>
               </td>
             </tr>
             <tr>
@@ -144,7 +144,7 @@
               <tr pagination-id="table2" dir-paginate="user in teamMembers | filter:state.filterGroupMembers | orderBy:sortTypeGroupMembers:sortReverseGroupMembers | itemsPerPage: state.pagination_count_groupMembers">
                 <td>
                   {{ user.Username }}
-                  <span style="margin-left: 5px;">
+                  <span style="margin-left: 5px;" ng-if="!isAdmin && user.TeamRole === 'Member'">
                     <a class="btn-outline-secondary" ng-click="removeUser(user)"><i class="fa fa-minus-circle space-right" aria-hidden="true"></i>Remove</a>
                   </span>
                 </td>
@@ -152,7 +152,7 @@
                   <i ng-if="user.TeamRole === 'Leader'" class="fa fa-user-plus" aria-hidden="true" style="margin-right: 2px;"></i>
                   <i ng-if="user.TeamRole === 'Member'" class="fa fa-user" aria-hidden="true" style="margin-right: 2px;"></i>
                   {{ user.TeamRole }}
-                  <span style="margin-left: 5px;">
+                  <span style="margin-left: 5px;" ng-if="isAdmin">
                     <a class="btn-outline-secondary" style="margin-left: 5px;" ng-click="promoteToLeader(user)" ng-if="user.TeamRole === 'Member'"><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Leader</a>
                     <a class="btn-outline-secondary" style="margin-left: 5px;" ng-click="demoteToMember(user)" ng-if="user.TeamRole === 'Leader'"><i class="fa fa-user-times space-right" aria-hidden="true"></i>Member</a>
                   </span>

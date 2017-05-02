@@ -1,6 +1,6 @@
 angular.module('teams', [])
-.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination',
-function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Pagination) {
+.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication',
+function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication) {
   $scope.state = {
     userGroupGroupCreationError: '',
     selectedItemCount: 0,
@@ -115,6 +115,7 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
 
   function initView() {
     $('#loadingViewSpinner').show();
+    $scope.isAdmin = Authentication.getUserDetails().role === 1 ? true: false;
     $q.all({
       users: UserService.users(false),
       teams: TeamService.teams()

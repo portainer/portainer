@@ -8,7 +8,7 @@
   <rd-header-content>Teams management</rd-header-content>
 </rd-header>
 
-<div class="row">
+<div class="row" ng-if="isAdmin">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-plus" title="Add a new team">
@@ -82,7 +82,7 @@
         </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12">
-        <div class="pull-left">
+        <div class="pull-left" ng-if="isAdmin">
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
         </div>
         <div class="pull-right">
@@ -94,7 +94,7 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th>
+                <th ng-if="isAdmin">
                   <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
                 </th>
                 <th>
@@ -109,7 +109,7 @@
             </thead>
             <tbody>
               <tr dir-paginate="team in (state.filteredTeams = (teams | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td><input type="checkbox" ng-model="team.Checked" ng-change="selectItem(team)" /></td>
+                <td ng-if="isAdmin"><input type="checkbox" ng-model="team.Checked" ng-change="selectItem(team)" /></td>
                 <td>{{ team.Name }}</td>
                 <td>
                   <a ui-sref="team({id: team.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>

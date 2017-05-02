@@ -50,7 +50,7 @@
           </div>
           <!-- !confirm-password-input -->
           <!-- admin-checkbox -->
-          <div class="form-group">
+          <div class="form-group" ng-if="isAdmin">
             <div class="col-sm-12">
               <label for="permissions" class="control-label text-left">
                 Administrator
@@ -88,7 +88,10 @@
           <!-- !teams -->
           <div class="form-group" ng-if="!formValues.Administrator && formValues.Teams.length === 0">
             <div class="col-sm-12">
-              <span class="small text-muted">Note: non-administrator users with no team do not have access to any endpoint by default. Head over the <a ui-sref="endpoints">endpoints view</a> to manage their accesses.</span>
+              <span class="small text-muted">
+                Note: non-administrator users with no team do not have access to any endpoint by default.
+                <span ng-if="isAdmin"> Head over the <a ui-sref="endpoints">endpoints view</a> to manage their accesses.</span>
+              </span>
             </div>
           </div>
           <div class="form-group">
@@ -122,7 +125,7 @@
         </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12">
-        <div class="pull-left">
+        <div class="pull-left" ng-if="isAdmin">
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
         </div>
         <div class="pull-right">
@@ -134,7 +137,7 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th>
+                <th ng-if="isAdmin">
                   <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
                 </th>
                 <th>
@@ -151,12 +154,12 @@
                     <span ng-show="sortType == 'RoleName' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
-                <th></th>
+                <th ng-if="isAdmin"></th>
               </tr>
             </thead>
             <tbody>
               <tr dir-paginate="user in (state.filteredUsers = (users | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(user)" /></td>
+                <td ng-if="isAdmin"><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(user)" /></td>
                 <td>{{ user.Username }}</td>
                 <td>
                   <i ng-if="user.Role === 1" class="fa fa-user-circle-o" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -164,7 +167,7 @@
                   <i ng-if="user.isTeamLeader" class="fa fa-user-plus" aria-hidden="true" style="margin-right: 2px;"></i>
                   {{ user.RoleName }}
                 </td>
-                <td>
+                <td ng-if="isAdmin">
                   <a ui-sref="user({id: user.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
                 </td>
               </tr>

@@ -1,6 +1,6 @@
 angular.module('team', [])
-.controller('TeamController', ['$q', '$scope', '$state', '$stateParams', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination',
-function ($q, $scope, $state, $stateParams, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Pagination) {
+.controller('TeamController', ['$q', '$scope', '$state', '$stateParams', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication',
+function ($q, $scope, $state, $stateParams, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication) {
 
   $scope.state = {
     pagination_count_users: Pagination.getPaginationCount('team_available_users'),
@@ -206,6 +206,7 @@ function ($q, $scope, $state, $stateParams, TeamService, UserService, TeamMember
 
   function initView() {
     $('#loadingViewSpinner').show();
+    $scope.isAdmin = Authentication.getUserDetails().role === 1 ? true: false;
     $q.all({
       team: TeamService.team($stateParams.id),
       users: UserService.users(false),
