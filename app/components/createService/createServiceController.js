@@ -28,7 +28,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
   };
 
   $scope.addPortBinding = function() {
-    $scope.formValues.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp' });
+    $scope.formValues.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp', PublishMode: 'ingress' });
   };
 
   $scope.removePortBinding = function(index) {
@@ -84,7 +84,8 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
     var ports = [];
     input.Ports.forEach(function (binding) {
       var port = {
-        Protocol: binding.Protocol
+        Protocol: binding.Protocol,
+        PublishMode: binding.PublishMode
       };
       if (binding.TargetPort) {
         port.TargetPort = +binding.TargetPort;

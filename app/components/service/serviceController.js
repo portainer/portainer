@@ -118,7 +118,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     if (!service.Ports) {
       service.Ports = [];
     }
-    service.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp' });
+    service.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp', PublishMode: 'ingress' });
   };
   $scope.updatePublishedPort = function updatePublishedPort(service, portMapping) {
     updateServiceArray(service, 'Ports', service.Ports);
