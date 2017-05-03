@@ -324,7 +324,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     if (env) {
       var variables = [];
       env.forEach(function(variable) {
-        if (variable.key && variable.key !== '' && variable.value && variable.value !== '') {
+        if (variable.key && variable.key !== '') {
           variables.push(variable.key + '=' + variable.value);
         }
       });

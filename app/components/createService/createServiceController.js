@@ -132,7 +132,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
   function prepareEnvConfig(config, input) {
     var env = [];
     input.Env.forEach(function (v) {
-      if (v.name && v.value) {
+      if (v.name) {
         env.push(v.name + "=" + v.value);
       }
     });
