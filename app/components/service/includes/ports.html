@@ -17,6 +17,7 @@
             <th>Host port</th>
             <th>Container port</th>
             <th>Protocol</th>
+            <th>Publish mode</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -39,6 +40,14 @@
                 <select class="selectpicker form-control" ng-model="portBinding.Protocol" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
                   <option value="tcp">tcp</option>
                   <option value="udp">udp</option>
+                </select>
+              </div>
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <select class="selectpicker form-control" ng-model="portBinding.PublishMode" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
+                  <option value="ingress">ingress</option>
+                  <option value="host">host</option>
                 </select>
               </div>
             </td>

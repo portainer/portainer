@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$scope', '$state', 'SecretHelper', 'Secret', 'Service', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications',
-function ($scope, $state, SecretHelper, Secret, Service, Volume, Network, ImageHelper, Authentication, ResourceControlService, Notifications) {
+.controller('CreateServiceController', ['$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'Secret', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications',
+function ($scope, $state, Service, ServiceHelper, SecretHelper, Secret, Volume, Network, ImageHelper, Authentication, ResourceControlService, Notifications) {
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
@@ -23,13 +23,14 @@ function ($scope, $state, SecretHelper, Secret, Service, Volume, Network, ImageH
     ExtraNetworks: [],
     Ports: [],
     Parallelism: 1,
+    PlacementConstraints: [],
     UpdateDelay: 0,
     FailureAction: 'pause',
     Secrets: []
   };
 
   $scope.addPortBinding = function() {
-    $scope.formValues.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp' });
+    $scope.formValues.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp', PublishMode: 'ingress' });
   };
 
   $scope.removePortBinding = function(index) {
@@ -59,7 +60,18 @@ function ($scope, $state, SecretHelper, Secret, Service, Volume, Network, ImageH
   $scope.removeEnvironmentVariable = function(index) {
     $scope.formValues.Env.splice(index, 1);
   };
-
+  $scope.addPlacementConstraint = function() {
+    $scope.formValues.PlacementConstraints.push({ key: '', operator: '==', value: '' });
+  };
+  $scope.removePlacementConstraint = function(index) {
+    $scope.formValues.PlacementConstraints.splice(index, 1);
+  };
+  $scope.addPlacementPreference = function() {
+    $scope.formValues.PlacementPreferences.push({ key: '', operator: '==', value: '' });
+  };
+  $scope.removePlacementPreference = function(index) {
+    $scope.formValues.PlacementPreferences.splice(index, 1);
+  };
   $scope.addLabel = function() {
     $scope.formValues.Labels.push({ name: '', value: ''});
   };
@@ -93,7 +105,8 @@ function ($scope, $state, SecretHelper, Secret, Service, Volume, Network, ImageH
     var ports = [];
     input.Ports.forEach(function (binding) {
       var port = {
-        Protocol: binding.Protocol
+        Protocol: binding.Protocol,
+        PublishMode: binding.PublishMode
       };
       if (binding.TargetPort) {
         port.TargetPort = +binding.TargetPort;
@@ -197,6 +210,9 @@ function ($scope, $state, SecretHelper, Secret, Service, Volume, Network, ImageH
       FailureAction: input.FailureAction
     };
   }
+  function preparePlacementConfig(config, input) {
+    config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(input.PlacementConstraints);
+  }
 
   function prepareSecretConfig(config, input) {
     if (input.Secrets) {
@@ -211,7 +227,8 @@ function ($scope, $state, SecretHelper, Secret, Service, Volume, Network, ImageH
       TaskTemplate: {
         ContainerSpec: {
           Mounts: []
-        }
+        },
+        Placement: {}
       },
       Mode: {},
       EndpointSpec: {}
@@ -226,6 +243,7 @@ function ($scope, $state, SecretHelper, Secret, Service, Volume, Network, ImageH
     prepareNetworks(config, input);
     prepareUpdateConfig(config, input);
     prepareSecretConfig(config, input);
+    preparePlacementConfig(config, input);
     return config;
   }
 

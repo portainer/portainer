@@ -130,7 +130,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Secret, Secret
     if (!service.Ports) {
       service.Ports = [];
     }
-    service.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp' });
+    service.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp', PublishMode: 'ingress' });
   };
   $scope.updatePublishedPort = function updatePublishedPort(service, portMapping) {
     updateServiceArray(service, 'Ports', service.Ports);
@@ -185,7 +185,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Secret, Secret
     if (typeof config.TaskTemplate.Placement === 'undefined') {
       config.TaskTemplate.Placement = {};
     }
-    config.TaskTemplate.Placement.Constraints = translateKeyValueToConstraints(service.ServiceConstraints);
+    config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(service.ServiceConstraints);
 
     config.TaskTemplate.Resources = {
       Limits: {
@@ -407,19 +407,6 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Secret, Secret
         });
       });
       return keyValueConstraints;
-    }
-    return [];
-  }
-
-  function translateKeyValueToConstraints(keyValueConstraints) {
-    if (keyValueConstraints) {
-      var constraints = [];
-      keyValueConstraints.forEach(function(keyValueConstraint) {
-        if (keyValueConstraint.key && keyValueConstraint.key !== '' && keyValueConstraint.value && keyValueConstraint.value !== '') {
-          constraints.push(keyValueConstraint.key + keyValueConstraint.operator + keyValueConstraint.value);
-        }
-      });
-      return constraints;
     }
     return [];
   }
