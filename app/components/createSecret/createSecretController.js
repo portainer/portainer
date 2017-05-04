@@ -1,6 +1,6 @@
 angular.module('createSecret', [])
 .controller('CreateSecretController', ['$scope', '$state', 'Notifications', 'Secret',
-function ($scope, $state, Messages, Secret) {
+function ($scope, $state, Notifications, Secret) {
   $scope.formValues = {
     Name: '',
     Data: '',
