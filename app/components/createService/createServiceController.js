@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$scope', '$state', 'Service', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications',
-function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication, ResourceControlService, Notifications) {
+.controller('CreateServiceController', ['$scope', '$state', 'Service', 'ServiceHelper', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications',
+function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, Authentication, ResourceControlService, Notifications) {
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
@@ -23,6 +23,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
     ExtraNetworks: [],
     Ports: [],
     Parallelism: 1,
+    PlacementConstraints: [],
     UpdateDelay: 0,
     FailureAction: 'pause'
   };
@@ -58,7 +59,18 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
   $scope.removeEnvironmentVariable = function(index) {
     $scope.formValues.Env.splice(index, 1);
   };
-
+  $scope.addPlacementConstraint = function() {
+    $scope.formValues.PlacementConstraints.push({ key: '', operator: '==', value: '' });
+  };
+  $scope.removePlacementConstraint = function(index) {
+    $scope.formValues.PlacementConstraints.splice(index, 1);
+  };
+  $scope.addPlacementPreference = function() {
+    $scope.formValues.PlacementPreferences.push({ key: '', operator: '==', value: '' });
+  };
+  $scope.removePlacementPreference = function(index) {
+    $scope.formValues.PlacementPreferences.splice(index, 1);
+  };
   $scope.addLabel = function() {
     $scope.formValues.Labels.push({ name: '', value: ''});
   };
@@ -188,6 +200,9 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
       FailureAction: input.FailureAction
     };
   }
+  function preparePlacementConfig(config, input) {
+    config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(input.PlacementConstraints);
+  }
 
   function prepareConfiguration() {
     var input = $scope.formValues;
@@ -196,7 +211,8 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
       TaskTemplate: {
         ContainerSpec: {
           Mounts: []
-        }
+        },
+        Placement: {}
       },
       Mode: {},
       EndpointSpec: {}
@@ -210,6 +226,7 @@ function ($scope, $state, Service, Volume, Network, ImageHelper, Authentication,
     prepareVolumes(config, input);
     prepareNetworks(config, input);
     prepareUpdateConfig(config, input);
+    preparePlacementConfig(config, input);
     return config;
   }
 

@@ -155,6 +155,7 @@
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
+          <li class="interactive"><a data-target="#placement" data-toggle="tab">Placement</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -436,6 +437,10 @@
             </form>
           </div>
           <!-- !tab-update-config -->
+
+          <!-- tab-placement -->
+          <div class="tab-pane" id="placement" ng-include="'app/components/createService/includes/placement.html'"></div>
+          <!-- !tab-placement -->
         </div>
       </rd-widget-body>
     </rd-widget>

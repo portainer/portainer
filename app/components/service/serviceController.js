@@ -173,7 +173,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     if (typeof config.TaskTemplate.Placement === 'undefined') {
       config.TaskTemplate.Placement = {};
     }
-    config.TaskTemplate.Placement.Constraints = translateKeyValueToConstraints(service.ServiceConstraints);
+    config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(service.ServiceConstraints);
 
     config.TaskTemplate.Resources = {
       Limits: {
@@ -378,19 +378,6 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
         });
       });
       return keyValueConstraints;
-    }
-    return [];
-  }
-
-  function translateKeyValueToConstraints(keyValueConstraints) {
-    if (keyValueConstraints) {
-      var constraints = [];
-      keyValueConstraints.forEach(function(keyValueConstraint) {
-        if (keyValueConstraint.key && keyValueConstraint.key !== '' && keyValueConstraint.value && keyValueConstraint.value !== '') {
-          constraints.push(keyValueConstraint.key + keyValueConstraint.operator + keyValueConstraint.value);
-        }
-      });
-      return constraints;
     }
     return [];
   }
