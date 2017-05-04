@@ -45,6 +45,18 @@ tar cvpfz portainer-${VERSION}-linux-arm64.tar.gz portainer
 mv portainer-${VERSION}-linux-arm64.tar.gz /tmp/portainer-builds/
 cd -
 
+grunt release-ppc64le
+docker build -t portainer/portainer:linux-ppc64le-${VERSION} -f build/linux/Dockerfile .
+docker push portainer/portainer:linux-ppc64le-${VERSION}
+docker build -t portainer/portainer:linux-ppc64le -f build/linux/Dockerfile .
+docker push portainer/portainer:linux-ppc64le
+rm -rf /tmp/portainer-builds/ppc64le && mkdir -pv /tmp/portainer-builds/ppc64le/portainer
+mv dist/* /tmp/portainer-builds/ppc64le/portainer
+cd /tmp/portainer-builds/ppc64le
+tar cvpfz portainer-${VERSION}-linux-ppc64le.tar.gz portainer
+mv portainer-${VERSION}-linux-ppc64le.tar.gz /tmp/portainer-builds/
+cd -
+
 grunt release-macos
 rm -rf /tmp/portainer-builds/darwin && mkdir -pv /tmp/portainer-builds/darwin/portainer
 mv dist/* /tmp/portainer-builds/darwin/portainer
