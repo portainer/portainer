@@ -134,10 +134,10 @@ func (handler *UserHandler) handleGetUsers(w http.ResponseWriter, r *http.Reques
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
 
-	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
-		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
-		return
-	}
+	// if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
+	// 	httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+	// 	return
+	// }
 
 	users, err := handler.UserService.Users()
 	if err != nil {

@@ -35,16 +35,16 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     var authorizedUsers = [];
     var authorizedTeams = [];
     angular.forEach($scope.authorizedAccesses, function (a) {
-      if (a.Type === "user") {
+      if (a.Type === 'user') {
         authorizedUsers.push(a.Id);
-      } else if (a.Type === "team") {
+      } else if (a.Type === 'team') {
         authorizedTeams.push(a.Id);
       }
     });
     angular.forEach($scope.accesses, function (a) {
-      if (a.Type === "user") {
+      if (a.Type === 'user') {
         authorizedUsers.push(a.Id);
-      } else if (a.Type === "team") {
+      } else if (a.Type === 'team') {
         authorizedTeams.push(a.Id);
       }
     });
@@ -56,7 +56,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
       Notifications.success('Endpoint accesses successfully updated');
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update endpoint accesses");
+      Notifications.error('Failure', err, 'Unable to update endpoint accesses');
     });
   };
 
@@ -68,7 +68,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
       Notifications.success('Endpoint accesses successfully updated');
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update endpoint accesses");
+      Notifications.error('Failure', err, 'Unable to update endpoint accesses');
     });
   };
 
@@ -76,16 +76,16 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     var authorizedUsers = [];
     var authorizedTeams = [];
     angular.forEach($scope.authorizedAccesses, function (a) {
-      if (a.Type === "user") {
+      if (a.Type === 'user') {
         authorizedUsers.push(a.Id);
-      } else if (a.Type === "team") {
+      } else if (a.Type === 'team') {
         authorizedTeams.push(a.Id);
       }
     });
 
-    if (access.Type === "user") {
+    if (access.Type === 'user') {
       authorizedUsers.push(access.Id);
-    } else if (access.Type === "team") {
+    } else if (access.Type === 'team') {
       authorizedTeams.push(access.Id);
     }
 
@@ -96,7 +96,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
       Notifications.success('Endpoint accesses successfully updated', access.Name);
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update endpoint accesses");
+      Notifications.error('Failure', err, 'Unable to update endpoint accesses');
     });
   };
 
@@ -104,18 +104,18 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     var authorizedUsers = [];
     var authorizedTeams = [];
     angular.forEach($scope.authorizedAccesses, function (a) {
-      if (a.Type === "user") {
+      if (a.Type === 'user') {
         authorizedUsers.push(a.Id);
-      } else if (a.Type === "team") {
+      } else if (a.Type === 'team') {
         authorizedTeams.push(a.Id);
       }
     });
 
-    if (access.Type === "user") {
+    if (access.Type === 'user') {
       _.remove(authorizedUsers, function(n) {
         return n === access.Id;
       });
-    } else if (access.Type === "team") {
+    } else if (access.Type === 'team') {
       _.remove(authorizedTeams, function(n) {
         return n === access.Id;
       });
@@ -128,7 +128,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
       Notifications.success('Endpoint accesses successfully updated', access.Name);
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to update endpoint accesses");
+      Notifications.error('Failure', err, 'Unable to update endpoint accesses');
     });
   };
 
@@ -137,7 +137,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     $q.all({
       endpoint: EndpointService.endpoint($stateParams.id),
       users: UserService.users(false),
-      teams: TeamService.teams(),
+      teams: TeamService.teams()
     })
     .then(function success(data) {
       $scope.endpoint = data.endpoint;
@@ -152,7 +152,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
       $scope.authorizedAccesses = [];
       angular.forEach($scope.endpoint.AuthorizedUsers, function(userID) {
         for (var i = 0, l = $scope.accesses.length; i < l; i++) {
-          if ($scope.accesses[i].Type === "user" && $scope.accesses[i].Id === userID) {
+          if ($scope.accesses[i].Type === 'user' && $scope.accesses[i].Id === userID) {
             $scope.authorizedAccesses.push($scope.accesses[i]);
             $scope.accesses.splice(i, 1);
             return;
@@ -161,7 +161,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
       });
       angular.forEach($scope.endpoint.AuthorizedTeams, function(teamID) {
         for (var i = 0, l = $scope.accesses.length; i < l; i++) {
-          if ($scope.accesses[i].Type === "team" && $scope.accesses[i].Id === teamID) {
+          if ($scope.accesses[i].Type === 'team' && $scope.accesses[i].Id === teamID) {
             $scope.authorizedAccesses.push($scope.accesses[i]);
             $scope.accesses.splice(i, 1);
             return;
@@ -172,7 +172,7 @@ function ($q, $scope, $state, $stateParams, $filter, EndpointService, UserServic
     .catch(function error(err) {
       $scope.accesses = [];
       $scope.authorizedAccesses = [];
-      Notifications.error("Failure", err, "Unable to retrieve endpoint details");
+      Notifications.error('Failure', err, 'Unable to retrieve endpoint details');
     })
     .finally(function final(){
       $('#loadingViewSpinner').hide();

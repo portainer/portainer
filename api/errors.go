@@ -27,6 +27,11 @@ const (
 	ErrTeamMembershipAlreadyExists = Error("Team membership already exists for this user and team.")
 )
 
+// ResourceControl errors.
+const (
+	ErrResourceControlNotFound = Error("Resource control not found")
+)
+
 // Endpoint errors.
 const (
 	ErrEndpointNotFound     = Error("Endpoint not found")

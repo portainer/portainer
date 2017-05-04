@@ -12,6 +12,32 @@ type ResourceControlService struct {
 	store *Store
 }
 
+// ResourceControl returns a ResourceControl object by ID
+func (service *ResourceControlService) ResourceControl(ID portainer.ResourceControlID) (*portainer.ResourceControl, error) {
+	var data []byte
+	err := service.store.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(resourceControlBucketName))
+		value := bucket.Get(internal.Itob(int(ID)))
+		if value == nil {
+			return portainer.ErrResourceControlNotFound
+		}
+
+		data = make([]byte, len(value))
+		copy(data, value)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var resourceControl portainer.ResourceControl
+	err = internal.UnmarshalResourceControl(data, &resourceControl)
+	if err != nil {
+		return nil, err
+	}
+	return &resourceControl, nil
+}
+
 // ResourceControls returns all the ResourceControl objects
 func (service *ResourceControlService) ResourceControls() ([]portainer.ResourceControl, error) {
 	var rcs = make([]portainer.ResourceControl, 0)
@@ -20,12 +46,12 @@ func (service *ResourceControlService) ResourceControls() ([]portainer.ResourceC
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var rc portainer.ResourceControl
-			err := internal.UnmarshalResourceControl(v, &rc)
+			var resourceControl portainer.ResourceControl
+			err := internal.UnmarshalResourceControl(v, &resourceControl)
 			if err != nil {
 				return err
 			}
-			rcs = append(rcs, rc)
+			rcs = append(rcs, resourceControl)
 		}
 
 		return nil
@@ -38,17 +64,35 @@ func (service *ResourceControlService) ResourceControls() ([]portainer.ResourceC
 }
 
 // CreateResourceControl creates a new ResourceControl object
-func (service *ResourceControlService) CreateResourceControl(rc *portainer.ResourceControl) error {
+func (service *ResourceControlService) CreateResourceControl(resourceControl *portainer.ResourceControl) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(resourceControlBucketName))
 		id, _ := bucket.NextSequence()
-		rc.ID = portainer.ResourceControlID(id)
-		data, err := internal.MarshalResourceControl(rc)
+		resourceControl.ID = portainer.ResourceControlID(id)
+		data, err := internal.MarshalResourceControl(resourceControl)
 		if err != nil {
 			return err
 		}
 
-		err = bucket.Put(internal.Itob(int(rc.ID)), data)
+		err = bucket.Put(internal.Itob(int(resourceControl.ID)), data)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+// UpdateResourceControl saves a ResourceControl object.
+func (service *ResourceControlService) UpdateResourceControl(ID portainer.ResourceControlID, resourceControl *portainer.ResourceControl) error {
+	data, err := internal.MarshalResourceControl(resourceControl)
+	if err != nil {
+		return err
+	}
+
+	return service.store.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(resourceControlBucketName))
+		err = bucket.Put(internal.Itob(int(ID)), data)
+
 		if err != nil {
 			return err
 		}

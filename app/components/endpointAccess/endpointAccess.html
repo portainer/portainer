@@ -89,8 +89,8 @@
               <tr ng-click="authorizeAccess(user)" class="interactive" dir-paginate="user in accesses | filter:state.filterUsers | orderBy:sortTypeAccesses:sortReverseAccesses | itemsPerPage: state.pagination_count_accesses">
                 <td>{{ user.Name }}</td>
                 <td>
+                  <i class="fa" ng-class="user.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-right: 2px;"></i>
                   {{ user.Type }}
-                  <i class="fa" ng-class="user.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-left: 2px;"></i>
                 </td>
               </tr>
               <tr ng-if="!accesses">
@@ -138,15 +138,15 @@
                 <th>
                   <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderAuthorizedAccesses('Name')">
                     Name
-                    <span ng-show="sortReverseAuthorizedAccesses == 'Name' && !sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortReverseAuthorizedAccesses == 'Name' && sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-up"></span>
+                    <span ng-show="sortTypeAuthorizedAccesses == 'Name' && !sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeAuthorizedAccesses == 'Name' && sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
                 <th>
                   <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderAuthorizedAccesses('Type')">
                     Type
-                    <span ng-show="sortReverseAuthorizedAccesses == 'Type' && !sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortReverseAuthorizedAccesses == 'Type' && sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-up"></span>
+                    <span ng-show="sortTypeAuthorizedAccesses == 'Type' && !sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortTypeAuthorizedAccesses == 'Type' && sortReverseAuthorizedAccesses" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
               </tr>
@@ -155,8 +155,8 @@
               <tr ng-click="unauthorizeAccess(user)" class="interactive" pagination-id="table_authaccess" dir-paginate="user in authorizedAccesses | filter:state.filterAuthorizedUsers | orderBy:sortTypeAuthorizedAccesses:sortReverseAuthorizedAccesses | itemsPerPage: state.pagination_count_authorizedAccesses">
                 <td>{{ user.Name }}</td>
                 <td>
+                  <i class="fa" ng-class="user.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-right: 2px;"></i>
                   {{ user.Type }}
-                  <i class="fa" ng-class="user.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-left: 2px;"></i>
                 </td>
               </tr>
               <tr ng-if="!authorizedAccesses">

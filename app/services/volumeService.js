@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('VolumeService', ['$q', 'Volume', 'VolumeHelper', 'ResourceControlService', function VolumeServiceFactory($q, Volume, VolumeHelper, ResourceControlService) {
+.factory('VolumeService', ['$q', 'Volume', 'VolumeHelper', 'ResourceControlService', 'UserService', 'TeamService', function VolumeServiceFactory($q, Volume, VolumeHelper, ResourceControlService, UserService, TeamService) {
   'use strict';
   var service = {};
 
@@ -24,7 +24,19 @@ angular.module('portainer.services')
     Volume.get({id: id}).$promise
     .then(function success(data) {
       var volume = new VolumeViewModel(data);
-      deferred.resolve(volume);
+
+      if (volume.Metadata && volume.Metadata.ResourceControl) {
+        $q.all({
+          users: UserService.users(true),
+          teams: TeamService.teams()
+        })
+        .then(function success(data) {
+          VolumeHelper.decorateWithAuthorizations(volume, data.users, data.teams);
+          deferred.resolve(volume);
+        });
+      } else {
+        deferred.resolve(volume);
+      }
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve volume details', err: err});

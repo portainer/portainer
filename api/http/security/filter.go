@@ -43,11 +43,11 @@ func FilterLeaderTeams(teams []portainer.Team, context *RestrictedRequestContext
 }
 
 // FilterUsers filters users based on user role.
-// Team leaders only have access to non-administrator users.
+// Non-administrator users only have access to non-administrator users.
 func FilterUsers(users []portainer.User, context *RestrictedRequestContext) []portainer.User {
 	filteredUsers := users
 
-	if context.IsTeamLeader {
+	if !context.IsAdmin {
 		filteredUsers = make([]portainer.User, 0)
 
 		for _, user := range users {

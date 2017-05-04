@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
@@ -87,10 +88,85 @@ type postResourcesRequest struct {
 
 // handlePutResources handles PUT requests on /resources/:id
 func (handler *ResourceHandler) handlePutResources(w http.ResponseWriter, r *http.Request) {
-	return
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	resourceControlID, err := strconv.Atoi(id)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	var req putResourcesRequest
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = govalidator.ValidateStruct(req)
+	if err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	resourceControl, err := handler.ResourceControlService.ResourceControl(portainer.ResourceControlID(resourceControlID))
+
+	if err == portainer.ErrResourceControlNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	var users = make([]portainer.UserID, 0)
+	for _, v := range req.Users {
+		users = append(users, portainer.UserID(v))
+	}
+	resourceControl.Users = users
+
+	var teams = make([]portainer.TeamID, 0)
+	for _, v := range req.Teams {
+		teams = append(teams, portainer.TeamID(v))
+	}
+	resourceControl.Teams = teams
+
+	err = handler.ResourceControlService.UpdateResourceControl(resourceControl.ID, resourceControl)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+}
+
+type putResourcesRequest struct {
+	Users []int `valid:"-"`
+	Teams []int `valid:"-"`
 }
 
 // handleDeleteResources handles DELETE requests on /resources/:id
 func (handler *ResourceHandler) handleDeleteResources(w http.ResponseWriter, r *http.Request) {
-	return
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	resourceControlID, err := strconv.Atoi(id)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = handler.ResourceControlService.ResourceControl(portainer.ResourceControlID(resourceControlID))
+
+	if err == portainer.ErrResourceControlNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.ResourceControlService.DeleteResourceControl(portainer.ResourceControlID(resourceControlID))
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
 }

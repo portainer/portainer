@@ -203,8 +203,10 @@ type (
 
 	// ResourceControlService represents a service for managing resource control data.
 	ResourceControlService interface {
+		ResourceControl(ID ResourceControlID) (*ResourceControl, error)
 		ResourceControls() ([]ResourceControl, error)
 		CreateResourceControl(rc *ResourceControl) error
+		UpdateResourceControl(ID ResourceControlID, resourceControl *ResourceControl) error
 		DeleteResourceControl(ID ResourceControlID) error
 	}
 
