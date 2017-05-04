@@ -2,9 +2,29 @@ package security
 
 import "github.com/portainer/portainer"
 
-// FilterTeams filters teams based on user role.
+// FilterUserTeams filters teams based on user role.
+// non-administrator users only have access to team they are member of.
+func FilterUserTeams(teams []portainer.Team, context *RestrictedRequestContext) []portainer.Team {
+	filteredTeams := teams
+
+	if !context.IsAdmin {
+		filteredTeams = make([]portainer.Team, 0)
+		for _, membership := range context.UserMemberships {
+			for _, team := range teams {
+				if team.ID == membership.TeamID {
+					filteredTeams = append(filteredTeams, team)
+					break
+				}
+			}
+		}
+	}
+
+	return filteredTeams
+}
+
+// FilterLeaderTeams filters teams based on user role.
 // Team leaders only have access to team they lead.
-func FilterTeams(teams []portainer.Team, context *RestrictedRequestContext) []portainer.Team {
+func FilterLeaderTeams(teams []portainer.Team, context *RestrictedRequestContext) []portainer.Team {
 	filteredTeams := teams
 
 	if context.IsTeamLeader {

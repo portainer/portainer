@@ -1,33 +1,11 @@
   angular.module('volumes', [])
-.controller('VolumesController', ['$q', '$scope', '$state', 'Volume', 'Notifications', 'Pagination', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService', 'TeamService',
-function ($q, $scope, $state, Volume, Notifications, Pagination, ModalService, Authentication, ResourceControlService, UserService, TeamService) {
+.controller('VolumesController', ['$q', '$scope', 'VolumeService', 'Notifications', 'Pagination',
+function ($q, $scope, VolumeService, Notifications, Pagination) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('volumes');
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Id';
-  $scope.sortReverse = true;
-  $scope.config = {
-    Name: ''
-  };
-
-  // function removeVolumeResourceControl(volume) {
-  //   ResourceControlService.deleteResourceControl(volume.Metadata.ResourceControl.Id)
-  //   // ResourceControlService.removeVolumeResourceControl(volume.Metadata.ResourceControl.OwnerId, volume.Id)
-  //   .then(function success() {
-  //     delete volume.Metadata.ResourceControl;
-  //     Notifications.success('Ownership changed to public', volume.Id);
-  //   })
-  //   .catch(function error(err) {
-  //     Notifications.error("Failure", err, "Unable to change volume ownership");
-  //   });
-  // }
-  //
-  // $scope.switchOwnership = function(volume) {
-  //   ModalService.confirmVolumeOwnershipChange(function (confirmed) {
-  //     if(!confirmed) { return; }
-  //     removeVolumeResourceControl(volume);
-  //   });
-  // };
+  $scope.sortReverse = false;
 
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('volumes', $scope.state.pagination_count);
@@ -58,105 +36,46 @@ function ($q, $scope, $state, Volume, Notifications, Pagination, ModalService, A
   $scope.removeAction = function () {
     $('#loadVolumesSpinner').show();
     var counter = 0;
+
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
         $('#loadVolumesSpinner').hide();
       }
     };
+
     angular.forEach($scope.volumes, function (volume) {
       if (volume.Checked) {
         counter = counter + 1;
-        Volume.remove({id: volume.Id}, function (d) {
-          if (d.message) {
-            Notifications.error("Unable to remove volume", {}, d.message);
-          } else {
-            if (volume.Metadata && volume.Metadata.ResourceControl) {
-              ResourceControlService.deleteResourceControl(volume.Metadata.ResourceControl.Id)
-              // ResourceControlService.removeVolumeResourceControl(volume.Metadata.ResourceControl.OwnerId, volume.Id)
-              .then(function success() {
-                Notifications.success("Volume deleted", volume.Id);
-                var index = $scope.volumes.indexOf(volume);
-                $scope.volumes.splice(index, 1);
-              })
-              .catch(function error(err) {
-                Notifications.error("Failure", err, "Unable to remove volume ownership");
-              });
-            } else {
-              Notifications.success("Volume deleted", volume.Id);
-              var index = $scope.volumes.indexOf(volume);
-              $scope.volumes.splice(index, 1);
-            }
-          }
-          complete();
-        }, function (e) {
-          Notifications.error("Failure", e, "Unable to remove volume");
+        VolumeService.remove(volume)
+        .then(function success() {
+          Notifications.success('Volume deleted', volume.Id);
+          var index = $scope.volumes.indexOf(volume);
+          $scope.volumes.splice(index, 1);
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to remove volume');
+        })
+        .finally(function final() {
           complete();
         });
       }
     });
   };
 
-  // function mapUsersToVolumes(users) {
-  //   angular.forEach($scope.volumes, function (volume) {
-  //     if (volume.Metadata) {
-  //       var volumeRC = volume.Metadata.ResourceControl;
-  //       if (volumeRC && volumeRC.OwnerId !== $scope.user.ID) {
-  //         angular.forEach(users, function (user) {
-  //           if (volumeRC.OwnerId === user.Id) {
-  //             volume.Owner = user.Username;
-  //           }
-  //         });
-  //       }
-  //     }
-  //   });
-  // }
-
   function initView() {
     $('#loadVolumesSpinner').show();
-
-    var userDetails = Authentication.getUserDetails();
-    $scope.user = userDetails;
-
-    Volume.query({}).$promise
+    VolumeService.volumes()
     .then(function success(data) {
-      var volumes = data.Volumes || [];
-      $scope.volumes = volumes.map(function (v) {
-        return new VolumeViewModel(v);
-      });
+      $scope.volumes = data;
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to retrieve volumes");
+      Notifications.error('Failure', err, 'Unable to retrieve volumes');
       $scope.volumes = [];
     })
     .finally(function final() {
       $('#loadVolumesSpinner').hide();
     });
-
-    // Volume.query({}, function (d) {
-    //   var volumes = d.Volumes || [];
-    //   $scope.volumes = volumes.map(function (v) {
-    //     return new VolumeViewModel(v);
-    //   });
-    //   if (userDetails.role === 1) {
-    //     UserService.users()
-    //     .then(function success(data) {
-    //       mapUsersToVolumes(data);
-    //     })
-    //     .catch(function error(err) {
-    //       Notifications.error("Failure", err, "Unable to retrieve users");
-    //     })
-    //     .finally(function final() {
-    //       $('#loadVolumesSpinner').hide();
-    //     });
-    //   } else {
-    //     $('#loadVolumesSpinner').hide();
-    //   }
-    // }, function (e) {
-    //   $('#loadVolumesSpinner').hide();
-    //   Notifications.error("Failure", e, "Unable to retrieve volumes");
-    //   $scope.volumes = [];
-    // });
   }
   initView();
 }]);

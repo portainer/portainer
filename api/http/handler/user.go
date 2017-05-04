@@ -21,6 +21,7 @@ type UserHandler struct {
 	*mux.Router
 	Logger                 *log.Logger
 	UserService            portainer.UserService
+	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
 	ResourceControlService portainer.ResourceControlService
 	CryptoService          portainer.CryptoService
@@ -44,6 +45,8 @@ func NewUserHandler(bouncer *security.RequestBouncer) *UserHandler {
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteUser))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/memberships",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
+	h.Handle("/users/{id}/teams",
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
 	// h.Handle("/users/{id}/memberships/{teamID}",
 	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMembership))).Methods(http.MethodGet)
 	// h.Handle("/users/{id}/memberships/{teamID}",
@@ -430,6 +433,39 @@ func (handler *UserHandler) handleGetMemberships(w http.ResponseWriter, r *http.
 	}
 
 	encodeJSON(w, memberships, handler.Logger)
+}
+
+// handleGetTeams handles GET requests on /users/:id/teams
+func (handler *UserHandler) handleGetTeams(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	uid, err := strconv.Atoi(id)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+	userID := portainer.UserID(uid)
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+	}
+
+	if !security.AuthorizedUserManagement(userID, securityContext) {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
+	teams, err := handler.TeamService.Teams()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredTeams := security.FilterUserTeams(teams, securityContext)
+
+	encodeJSON(w, filteredTeams, handler.Logger)
 }
 
 // handleGetMemberships handles GET requests on /users/:id/memberships/:teamId

@@ -42,6 +42,7 @@ func (server *Server) Start() error {
 	authHandler.JWTService = server.JWTService
 	var userHandler = handler.NewUserHandler(requestBouncer)
 	userHandler.UserService = server.UserService
+	userHandler.TeamService = server.TeamService
 	userHandler.TeamMembershipService = server.TeamMembershipService
 	userHandler.CryptoService = server.CryptoService
 	userHandler.ResourceControlService = server.ResourceControlService

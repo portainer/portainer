@@ -12,36 +12,7 @@ type ResourceControlService struct {
 	store *Store
 }
 
-// ResourceControl returns a resource control object by resource ID
-// func (service *ResourceControlService) ResourceControl(resourceID string) (*portainer.ResourceControl, error) {
-// 	var data []byte
-// 	err := service.store.db.View(func(tx *bolt.Tx) error {
-// 		bucket := tx.Bucket([]byte(resourceControlBucketName))
-// 		value := bucket.Get([]byte(resourceID))
-// 		if value == nil {
-// 			return nil
-// 		}
-//
-// 		data = make([]byte, len(value))
-// 		copy(data, value)
-// 		return nil
-// 	})
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if data == nil {
-// 		return nil, nil
-// 	}
-//
-// 	var rc portainer.ResourceControl
-// 	err = internal.UnmarshalResourceControl(data, &rc)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &rc, nil
-// }
-
-// ResourceControls returns all resource control objects
+// ResourceControls returns all the ResourceControl objects
 func (service *ResourceControlService) ResourceControls() ([]portainer.ResourceControl, error) {
 	var rcs = make([]portainer.ResourceControl, 0)
 	err := service.store.db.View(func(tx *bolt.Tx) error {
@@ -66,7 +37,7 @@ func (service *ResourceControlService) ResourceControls() ([]portainer.ResourceC
 	return rcs, nil
 }
 
-// CreateResourceControl creates a new resource control
+// CreateResourceControl creates a new ResourceControl object
 func (service *ResourceControlService) CreateResourceControl(rc *portainer.ResourceControl) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(resourceControlBucketName))
@@ -85,7 +56,7 @@ func (service *ResourceControlService) CreateResourceControl(rc *portainer.Resou
 	})
 }
 
-// DeleteResourceControl deletes a resource control object by resource ID
+// DeleteResourceControl deletes a ResourceControl object by ID
 func (service *ResourceControlService) DeleteResourceControl(ID portainer.ResourceControlID) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(resourceControlBucketName))

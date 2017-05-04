@@ -101,7 +101,6 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 	if tokenData.Role != portainer.AdministratorRole {
 
 		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
-		// userTeams, err := p.TeamService.TeamsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -147,11 +146,6 @@ func (p *proxyTransport) rewriteOperation(request *http.Request, operation restr
 
 	if tokenData.Role != portainer.AdministratorRole {
 		operationContext.isAdmin = false
-
-		// userTeams, err := p.TeamService.TeamsByUserID(tokenData.ID)
-		// if err != nil {
-		// 	return nil, err
-		// }
 
 		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {

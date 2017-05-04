@@ -7,7 +7,7 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row">
+<div class="row" ng-if="volume">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-cube" title="Volume details"></rd-widget-header>
@@ -43,15 +43,13 @@
             <tr>
               <td>Ownership</td>
               <td>
-                <span ng-if="volume.Ownership === 'Public'">
-                  <i class="fa fa-eye" aria-hidden="true"></i>
+                <span>
+                  <i class="fa fa-eye" aria-hidden="true" ng-if="!volume.Metadata.ResourceControl"></i>
+                  <i class="fa fa-eye-slash" aria-hidden="true" ng-if="volume.Metadata.ResourceControl"></i>
                   {{ volume.Ownership }}
-                  <portainer-tooltip  position="bottom" style="margin-left: -3px;" message="This object can be managed by any user having access to this endpoint."></portainer-tooltip>
-                </span>
-                <span ng-if="volume.Ownership === 'Restricted'">
-                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                  {{ volume.Ownership }}
-                  <portainer-tooltip  position="bottom" style="margin-left: -3px;" message="This object can only be managed by a specific set of users and teams."></portainer-tooltip>
+                  <portainer-tooltip ng-if="!volume.Metadata.ResourceControl" position="bottom" style="margin-left: -3px;" message="This object can be managed by any user having access to this endpoint."></portainer-tooltip>
+                  <portainer-tooltip ng-if="volume.Metadata.ResourceControl" position="bottom" style="margin-left: -3px;" message="This object can only be managed by a specific set of users and teams."></portainer-tooltip>
+                  <a class="btn-outline-secondary" style="margin-left: 5px;" ng-click=""><i class="fa fa-edit space-right" aria-hidden="true"></i>Change ownership</a>
                 </span>
               </td>
             </tr>

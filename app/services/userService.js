@@ -100,5 +100,20 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.userTeams = function(id) {
+    var deferred = $q.defer();
+    Users.queryTeams({id: id}).$promise
+    .then(function success(data) {
+      var teams = data.map(function (item) {
+        return new TeamViewModel(item);
+      });
+      deferred.resolve(teams);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve user teams', err: err });
+    });
+    return deferred.promise;
+  };
+
   return service;
 }]);

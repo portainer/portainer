@@ -18,26 +18,6 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.teamsByUserID = function(userID) {
-    var deferred = $q.defer();
-    service.teams()
-    .then(function success(data) {
-      var userTeams = [];
-      angular.forEach(data, function(team) {
-        angular.forEach(team.Users, function(id) {
-          if (id === userID) {
-            userTeams.push(team);
-          }
-        });
-      });
-      deferred.resolve(userTeams);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: err.msg, err: err.err });
-    });
-    return deferred.promise;
-  };
-
   service.team = function(id) {
     var deferred = $q.defer();
     Teams.get({id: id}).$promise

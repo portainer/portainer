@@ -3,6 +3,22 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
+  service.volumes = function() {
+    var deferred = $q.defer();
+    Volume.query().$promise
+    .then(function success(data) {
+      var volumes = data.Volumes || [];
+      volumes = volumes.map(function (item) {
+        return new VolumeViewModel(item);
+      });
+      deferred.resolve(volumes);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve volumes', err: err});
+    });
+    return deferred.promise;
+  };
+
   service.volume = function(id) {
     var deferred = $q.defer();
     Volume.get({id: id}).$promise

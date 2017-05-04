@@ -144,7 +144,7 @@
               <tr pagination-id="table2" dir-paginate="user in teamMembers | filter:state.filterGroupMembers | orderBy:sortTypeGroupMembers:sortReverseGroupMembers | itemsPerPage: state.pagination_count_groupMembers">
                 <td>
                   {{ user.Username }}
-                  <span style="margin-left: 5px;" ng-if="!isAdmin && user.TeamRole === 'Member'">
+                  <span style="margin-left: 5px;" ng-if="isAdmin || user.TeamRole === 'Member'")>
                     <a class="btn-outline-secondary" ng-click="removeUser(user)"><i class="fa fa-minus-circle space-right" aria-hidden="true"></i>Remove</a>
                   </span>
                 </td>

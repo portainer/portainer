@@ -17,3 +17,10 @@ func AuthorizedTeamManagement(teamID portainer.TeamID, context *RestrictedReques
 
 	return false
 }
+
+func AuthorizedUserManagement(userID portainer.UserID, context *RestrictedRequestContext) bool {
+	if context.IsAdmin || context.UserID == userID {
+		return true
+	}
+	return false
+}

@@ -1,16 +1,18 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'InfoService', 'ResourceControlService', 'TeamService', 'Authentication', 'Notifications',
-function ($q, $scope, $state, VolumeService, InfoService, ResourceControlService, TeamService, Authentication, Notifications) {
+.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'InfoService', 'ResourceControlService', 'UserService', 'TeamService', 'Authentication', 'Notifications',
+function ($q, $scope, $state, VolumeService, InfoService, ResourceControlService, UserService, TeamService, Authentication, Notifications) {
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     Ownership_Teams: [],
+    Ownership_Users: [],
     Driver: 'local',
     DriverOptions: []
   };
 
   $scope.availableVolumeDrivers = [];
   $scope.teams = [];
+  $scope.users = [];
 
   $scope.addDriverOption = function() {
     $scope.formValues.DriverOptions.push({ name: '', value: '' });
@@ -19,6 +21,17 @@ function ($q, $scope, $state, VolumeService, InfoService, ResourceControlService
   $scope.removeDriverOption = function(index) {
     $scope.formValues.DriverOptions.splice(index, 1);
   };
+
+  function createResourceControl(userIDs, teamIDs, volumeIdentifier) {
+    ResourceControlService.createResourceControl(userIDs, teamIDs, volumeIdentifier)
+    .then(function success() {
+      Notifications.success('Volume created', volumeIdentifier);
+      $state.go('volumes', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to apply resource control on volume');
+    });
+  }
 
   $scope.create = function () {
     $('#createVolumeSpinner').show();
@@ -30,39 +43,27 @@ function ($q, $scope, $state, VolumeService, InfoService, ResourceControlService
 
     VolumeService.createVolume(volumeConfiguration)
     .then(function success(data) {
-      if ($scope.formValues.Ownership === 'private') {
-        var users = [];
-        users.push(Authentication.getUserDetails().ID);
-        ResourceControlService.createResourceControl(users, [], data.Name)
-        // ResourceControlService.setVolumeResourceControl(Authentication.getUserDetails().ID, data.Name)
-        .then(function success() {
-          Notifications.success("Volume created", data.Name);
-          $state.go('volumes', {}, {reload: true});
-        })
-        .catch(function error(err) {
-          Notifications.error("Failure", err, 'Unable to apply resource control on volume');
-        });
+      var volumeIdentifier = data.Name;
 
-      } else if ($scope.formValues.Ownership === 'team') {
-
-        var teamIDs = [];
-        angular.forEach($scope.formValues.Ownership_Teams, function(team) {
-          teamIDs.push(team.Id);
-        });
-
-        ResourceControlService.createResourceControl([], teamIDs, data.Name)
-        .then(function success() {
-          Notifications.success("Volume created", data.Name);
-          $state.go('volumes', {}, {reload: true});
-        })
-        .catch(function error(err) {
-          Notifications.error("Failure", err, 'Unable to apply resource control on volume');
-        });
-
-      } else {
-        Notifications.success("Volume created", data.Name);
+      if ($scope.formValues.Ownership === 'public') {
+        Notifications.success('Volume created', volumeIdentifier);
         $state.go('volumes', {}, {reload: true});
+        return;
       }
+
+      var users = [];
+      var teams = [];
+      if ($scope.formValues.Ownership === 'private') {
+        users.push(Authentication.getUserDetails().ID);
+      } else if ($scope.formValues.Ownership === 'restricted') {
+        angular.forEach($scope.formValues.Ownership_Users, function(user) {
+          users.push(user.Id);
+        });
+        angular.forEach($scope.formValues.Ownership_Teams, function(team) {
+          teams.push(team.Id);
+        });
+      }
+      createResourceControl(users, teams, volumeIdentifier);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to create volume');
@@ -74,19 +75,24 @@ function ($q, $scope, $state, VolumeService, InfoService, ResourceControlService
 
   function initView() {
     $('#loadingViewSpinner').show();
+    var userDetails = Authentication.getUserDetails();
+    var isAdmin = userDetails.role === 1 ? true: false;
+    $scope.isAdmin = isAdmin;
     $q.all({
       drivers: InfoService.getVolumePlugins(),
-      teams: TeamService.teamsByUserID(Authentication.getUserDetails().ID)
+      teams: UserService.userTeams(userDetails.ID),
+      users: isAdmin ? UserService.users(false) : null
     })
     .then(function success(data) {
       $scope.availableVolumeDrivers = data.drivers;
       $scope.teams = data.teams;
-      if (data.teams.length == 1) {
+      $scope.users = isAdmin ? data.users : [];
+      if (data.teams.length === 1) {
         $scope.formValues.Ownership_Teams = data.teams;
       }
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, 'Unable to retrieve volume plugin information');
+      Notifications.error('Failure', err, 'Unable to initialize volume creation view');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();

@@ -104,18 +104,13 @@ func (handler *TeamHandler) handleGetTeams(w http.ResponseWriter, r *http.Reques
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
 
-	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
-		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
-		return
-	}
-
 	teams, err := handler.TeamService.Teams()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	filteredTeams := security.FilterTeams(teams, securityContext)
+	filteredTeams := security.FilterLeaderTeams(teams, securityContext)
 
 	encodeJSON(w, filteredTeams, handler.Logger)
 }

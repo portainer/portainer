@@ -103,7 +103,7 @@ angular.module('portainer', [
         error: ''
       },
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/auth/auth.html',
           controller: 'AuthenticationController'
         }
@@ -116,63 +116,63 @@ angular.module('portainer', [
       parent: 'root',
       url: '/containers/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/containers/containers.html',
           controller: 'ContainersController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
       }
     })
     .state('container', {
-      url: "^/containers/:id",
+      url: '^/containers/:id',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/container/container.html',
           controller: 'ContainerController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
       }
     })
     .state('stats', {
-      url: "^/containers/:id/stats",
+      url: '^/containers/:id/stats',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/stats/stats.html',
           controller: 'StatsController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
       }
     })
     .state('logs', {
-      url: "^/containers/:id/logs",
+      url: '^/containers/:id/logs',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/containerLogs/containerlogs.html',
           controller: 'ContainerLogsController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
       }
     })
     .state('console', {
-      url: "^/containers/:id/console",
+      url: '^/containers/:id/console',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/containerConsole/containerConsole.html',
           controller: 'ContainerConsoleController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -182,11 +182,11 @@ angular.module('portainer', [
       parent: 'root',
       url: '/dashboard',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/dashboard/dashboard.html',
           controller: 'DashboardController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -194,75 +194,75 @@ angular.module('portainer', [
     })
     .state('actions', {
       abstract: true,
-      url: "/actions",
+      url: '/actions',
       views: {
-        "content@": {
+        'content@': {
           template: '<div ui-view="content@"></div>'
         },
-        "sidebar@": {
+        'sidebar@': {
           template: '<div ui-view="sidebar@"></div>'
         }
       }
     })
     .state('actions.create', {
       abstract: true,
-      url: "/create",
+      url: '/create',
       views: {
-        "content@": {
+        'content@': {
           template: '<div ui-view="content@"></div>'
         },
-        "sidebar@": {
+        'sidebar@': {
           template: '<div ui-view="sidebar@"></div>'
         }
       }
     })
     .state('actions.create.container', {
-      url: "/container",
+      url: '/container',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/createContainer/createcontainer.html',
           controller: 'CreateContainerController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
       }
     })
     .state('actions.create.network', {
-      url: "/network",
+      url: '/network',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/createNetwork/createnetwork.html',
           controller: 'CreateNetworkController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
       }
     })
     .state('actions.create.service', {
-      url: "/service",
+      url: '/service',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/createService/createservice.html',
           controller: 'CreateServiceController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
       }
     })
     .state('actions.create.volume', {
-      url: "/volume",
+      url: '/volume',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/createVolume/createvolume.html',
           controller: 'CreateVolumeController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -271,11 +271,11 @@ angular.module('portainer', [
     .state('docker', {
       url: '/docker/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/docker/docker.html',
           controller: 'DockerController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -284,11 +284,11 @@ angular.module('portainer', [
     .state('endpoints', {
       url: '/endpoints/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/endpoints/endpoints.html',
           controller: 'EndpointsController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -297,11 +297,11 @@ angular.module('portainer', [
     .state('endpoint', {
       url: '^/endpoints/:id',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/endpoint/endpoint.html',
           controller: 'EndpointController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -310,11 +310,11 @@ angular.module('portainer', [
     .state('endpoint.access', {
       url: '^/endpoints/:id/access',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/endpointAccess/endpointAccess.html',
           controller: 'EndpointAccessController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -323,7 +323,7 @@ angular.module('portainer', [
     .state('endpointInit', {
       url: '/init/endpoint',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/endpointInit/endpointInit.html',
           controller: 'EndpointInitController'
         }
@@ -332,11 +332,11 @@ angular.module('portainer', [
     .state('events', {
       url: '/events/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/events/events.html',
           controller: 'EventsController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -345,11 +345,11 @@ angular.module('portainer', [
     .state('images', {
       url: '/images/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/images/images.html',
           controller: 'ImagesController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -358,11 +358,11 @@ angular.module('portainer', [
     .state('image', {
       url: '^/images/:id/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/image/image.html',
           controller: 'ImageController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -371,11 +371,11 @@ angular.module('portainer', [
     .state('networks', {
       url: '/networks/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/networks/networks.html',
           controller: 'NetworksController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -384,11 +384,11 @@ angular.module('portainer', [
     .state('network', {
       url: '^/networks/:id/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/network/network.html',
           controller: 'NetworkController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -397,11 +397,11 @@ angular.module('portainer', [
     .state('node', {
       url: '^/nodes/:id/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/node/node.html',
           controller: 'NodeController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -410,11 +410,11 @@ angular.module('portainer', [
     .state('services', {
       url: '/services/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/services/services.html',
           controller: 'ServicesController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -423,11 +423,11 @@ angular.module('portainer', [
     .state('service', {
       url: '^/service/:id/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/service/service.html',
           controller: 'ServiceController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -436,11 +436,11 @@ angular.module('portainer', [
     .state('settings', {
       url: '/settings/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/settings/settings.html',
           controller: 'SettingsController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -449,11 +449,11 @@ angular.module('portainer', [
     .state('task', {
       url: '^/task/:id',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/task/task.html',
           controller: 'TaskController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -466,11 +466,11 @@ angular.module('portainer', [
         hide_descriptions: false
       },
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/templates/templates.html',
           controller: 'TemplatesController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -483,11 +483,11 @@ angular.module('portainer', [
         hide_descriptions: true
       },
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/templates/templates.html',
           controller: 'TemplatesController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -496,11 +496,11 @@ angular.module('portainer', [
     .state('volumes', {
       url: '/volumes/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/volumes/volumes.html',
           controller: 'VolumesController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -509,11 +509,11 @@ angular.module('portainer', [
     .state('volume', {
       url: '^/volumes/:id',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/volume/volume.html',
           controller: 'VolumeController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -522,11 +522,11 @@ angular.module('portainer', [
     .state('users', {
       url: '/users/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/users/users.html',
           controller: 'UsersController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -535,11 +535,11 @@ angular.module('portainer', [
     .state('user', {
       url: '^/users/:id',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/user/user.html',
           controller: 'UserController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -548,11 +548,11 @@ angular.module('portainer', [
     .state('teams', {
       url: '/teams/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/teams/teams.html',
           controller: 'TeamsController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -561,11 +561,11 @@ angular.module('portainer', [
     .state('team', {
       url: '^/teams/:id',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/team/team.html',
           controller: 'TeamController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -574,11 +574,11 @@ angular.module('portainer', [
     .state('swarm', {
       url: '/swarm/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/swarm/swarm.html',
           controller: 'SwarmController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -606,7 +606,7 @@ angular.module('portainer', [
         });
       }
     }, function error(err) {
-      Notifications.error("Failure", err, 'Unable to retrieve application settings');
+      Notifications.error('Failure', err, 'Unable to retrieve application settings');
     });
 
     $rootScope.$state = $state;

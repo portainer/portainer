@@ -8,6 +8,7 @@ angular.module('portainer.rest')
     update: { method: 'PUT', params: { id: '@id' } },
     remove: { method: 'DELETE', params: { id: '@id'} },
     queryMemberships: { method: 'GET', isArray: true, params: { id: '@id', entity: 'memberships' } },
+    queryTeams: { method: 'GET', isArray: true, params: { id: '@id', entity: 'teams' } },
     // RPCs should be moved to a specific endpoint
     checkPassword: { method: 'POST', params: { id: '@id', entity: 'passwd' } },
     checkAdminUser: { method: 'GET', params: { id: 'admin', entity: 'check' }, isArray: true },

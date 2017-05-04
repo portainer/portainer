@@ -74,11 +74,6 @@ input[type="checkbox"] {
   vertical-align: middle;
 }
 
-input[type="radio"] {
-  margin-top: 1px;
-  vertical-align: middle;
-}
-
 a[ng-click]{
   cursor: pointer;
 }

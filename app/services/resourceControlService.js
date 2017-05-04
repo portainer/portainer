@@ -33,13 +33,5 @@ angular.module('portainer.services')
     return ResourceControl.remove({ userId: userID, resourceId: resourceID, resourceType: 'service' }).$promise;
   };
 
-  service.setVolumeResourceControl = function(userID, resourceID) {
-    return ResourceControl.create({ userId: userID, resourceType: 'volume' }, { ResourceID: resourceID }).$promise;
-  };
-
-  service.removeVolumeResourceControl = function(userID, resourceID) {
-    return ResourceControl.remove({ userId: userID, resourceId: resourceID, resourceType: 'volume' }).$promise;
-  };
-
   return service;
 }]);
