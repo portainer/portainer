@@ -1,7 +1,7 @@
 module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('gruntify-eslint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
@@ -16,7 +16,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-replace');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'build']);
+  grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('build', [
     'clean:app',
     'if:unixBinaryNotExist',
@@ -110,7 +110,7 @@ module.exports = function (grunt) {
     'clean:tmp',
     'replace'
   ]);
-  grunt.registerTask('lint', ['jshint']);
+  grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
   grunt.registerTask('run-swarm', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
   grunt.registerTask('run-swarm-local', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarmLocal', 'watch:buildSwarm']);
@@ -337,24 +337,11 @@ module.exports = function (grunt) {
         tasks: ['build', 'shell:buildImage', 'shell:runSsl', 'shell:cleanImages']
       }
     },
-    jshint: {
-      files: ['gruntfile.js', '<%= src.js %>'],
+    eslint: {
+      src: ['gruntfile.js', '<%= src.js %>'],
       options: {
-        curly: true,
-        eqeqeq: true,
-        immed: true,
-        indent: 2,
-        latedef: 'nofunc',
-        newcap: true,
-        noarg: true,
-        sub: true,
-        boss: true,
-        eqnull: true,
-        globals: {
-          angular: false,
-          '$': false
-        }
-      }
+			  configFile: '.eslintrc.yml'
+		  }
     },
     shell: {
       buildImage: {

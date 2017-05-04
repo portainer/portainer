@@ -41,7 +41,8 @@
     "grunt-recess": "~0.3",
     "grunt-replace": "^1.0.1",
     "grunt-shell": "^1.1.2",
-    "grunt-usemin": "^3.1.1"
+    "grunt-usemin": "^3.1.1",
+    "gruntify-eslint": "^3.1.0"
   },
   "scripts": {
     "postinstall": "bower install"
