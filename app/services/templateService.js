@@ -42,6 +42,9 @@ angular.module('portainer.services')
     var portConfiguration = TemplateHelper.portArrayToPortConfiguration(template.Ports);
     configuration.HostConfig.PortBindings = portConfiguration.bindings;
     configuration.ExposedPorts = portConfiguration.exposedPorts;
+    var consoleConfiguration = TemplateHelper.getConsoleConfiguration(template.Interactive);
+    configuration.OpenStdin = consoleConfiguration.openStdin;
+    configuration.Tty = consoleConfiguration.tty;
     return configuration;
   };
 
