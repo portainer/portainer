@@ -7,6 +7,10 @@ angular.module('portainer.helpers')
     return splitargs(command);
   };
 
+  helper.commandArrayToString = function(array) {
+    return array.join(' ');
+  };
+
   helper.hideContainers = function(containers, containersToHideLabels) {
     return containers.filter(function (container) {
       var filterContainer = false;

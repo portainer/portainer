@@ -393,12 +393,22 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     });
   };
 
+	// If we got a template, we prefill fields
   if ($stateParams.from !== '') {
     // Get container
     Container.get({id: $stateParams.from}, function(d) {
+			// Add Config
+			$scope.config = d.Config;
+			$scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
+			// Add HostConfig
+			$scope.config.HostConfig = d.HostConfig;
+			for (var p in $scope.config.HostConfig.PortBindings) {
+				$scope.config.HostConfig.PortBindings[p].hostPort = $scope.config.HostConfig.PortBindings[p][0].HostPort;
+				$scope.config.HostConfig.PortBindings[p].containerPort = p.split('/')[0];
+				$scope.config.HostConfig.PortBindings[p].protocol = p.split('/')[1];
+			}
+			// Add name
       $scope.config.name = d.Name.replace(/^\//g, '');
-      $scope.config.Image = d.Image;
-      console.log(d);
     });
   }
 
