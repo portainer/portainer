@@ -20,6 +20,7 @@
           <button class="btn btn-primary" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
           <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
           <button class="btn btn-danger" ng-click="confirmRemove()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+          <button class="btn btn-primary" ui-sref="actions.create.container({from: container.Id})"><i class="fa fa-files-o space-right" aria-hidden="true"></i>Duplicate/Recreate</button>
         </div>
       </rd-widget-body>
     </rd-widget>

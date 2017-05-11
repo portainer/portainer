@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications',
-function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications) {
+.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ModalService',
+function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ModalService) {
 
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
@@ -323,13 +323,83 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     return config;
   }
 
+  function confirmCreateContainer(cb) {
+    Container.query({
+      all: 1,
+      filters: {name: [$scope.config.name]}
+    }, function (data) {
+      var confirmDialog = false;
+      var containerId;
+      // Prompt if we found name to confirm replacement
+      for (var c in data) {
+        for (var n in data[c].Names) {
+          if (data[c].Names[n] === '/' + $scope.config.name) {
+            confirmDialog = true;
+            containerId = data[c].Id;
+          }
+        }
+      }
+      if (confirmDialog) {
+        ModalService.confirmDeletion(
+          'A container with the same name is already present on this host. Do you want to remove it?',
+          function onConfirm(confirmed) {
+            if(!confirmed) { cb(false); }
+            else {
+              // Remove old container
+              Container.remove({id: containerId, v: 0, force: true}, function(d) {
+                if (d.message) {
+                  Notifications.error("Error", d, "Unable to remove container");
+                  cb(false);
+                } else {
+                  if (c.Metadata && c.Metadata.ResourceControl) {
+                    ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, containerId)
+                    .then(function success() {
+                      Notifications.success("Container Removed", containerId);
+                      cb(true);
+                    })
+                    .catch(function error(err) {
+                      Notifications.error("Failure", err, "Unable to remove container ownership");
+                      cb(false);
+                    });
+                  } else {
+                    Notifications.success("Container Removed", containerId);
+                    cb(true);
+                  }
+                }
+              });
+            }
+          }
+        );
+      } else {
+        cb(true);
+      }
+    }, function error(err) {
+      cb(false);
+      Notifications.error("Failure", err, "Unable to retrieve containers");
+    });
+  }
+
   $scope.create = function () {
-    var config = prepareConfiguration();
-    $('#createContainerSpinner').show();
-    if ($scope.formValues.alwaysPull) {
-      pullImageAndCreateContainer(config);
-    } else {
-      createContainer(config);
-    }
+    confirmCreateContainer(function(doIt) {
+      if (doIt) {
+        var config = prepareConfiguration();
+        $('#createContainerSpinner').show();
+        if ($scope.formValues.alwaysPull) {
+          pullImageAndCreateContainer(config);
+        } else {
+          createContainer(config);
+        }
+      }
+    });
   };
+
+  if ($stateParams.from !== '') {
+    // Get container
+    Container.get({id: $stateParams.from}, function(d) {
+      $scope.config.name = d.Name.replace(/^\//g, '');
+      $scope.config.Image = d.Image;
+      console.log(d);
+    });
+  }
+
 }]);
