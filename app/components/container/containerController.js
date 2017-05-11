@@ -196,5 +196,64 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     });
   };
 
+  $scope.recreate = function() {
+    console.log($scope.container);
+    var config = $scope.container.Config;
+    config.HostConfig = $scope.container.HostConfig;
+    config.name = $scope.container.Name.replace(/^\//g, '');
+    Container.remove({id: $scope.container.Id, v: 0, force: true}, function(d) {
+      if (d.message) {
+        Notifications.error("Error", d, "Unable to remove container");
+      } else {
+        var c = $scope.container;
+        if (c.Metadata && c.Metadata.ResourceControl) {
+          ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, $scope.container.Id)
+          .then(function success() {
+            Notifications.success("Container Removed", $scope.container.Id);
+            createContainer(config);
+          })
+          .catch(function error(err) {
+            Notifications.error("Failure", err, "Unable to remove container ownership");
+          });
+        } else {
+          Notifications.success("Container Removed", $scope.container.Id);
+          createContainer(config);
+        }
+      }
+    });
+  };
+
+  function createContainer(config) {
+    Container.create(config, function (d) {
+      if (d.message) {
+        Notifications.error('Error', {}, d.message);
+      } else {
+        /*if ($scope.formValues.Ownership === 'private') {
+          ResourceControlService.setContainerResourceControl(Authentication.getUserDetails().ID, d.Id)
+          .then(function success() {
+            startContainer(d.Id);
+          })
+          .catch(function error(err) {
+            $('#createContainerSpinner').hide();
+            Notifications.error("Failure", err, 'Unable to apply resource control on container');
+          });
+        } else {*/
+        Container.start({id: d.Id}, {}, function (cd) {
+          if (cd.message) {
+            Notifications.error('Error', {}, cd.message);
+          } else {
+            Notifications.success('Container Started', d.Id);
+            $state.go('containers', {}, {reload: true});
+          }
+        }, function (e) {
+          Notifications.error("Failure", e, 'Unable to start container');
+        });
+        //}
+      }
+    }, function (e) {
+      Notifications.error("Failure", e, 'Unable to create container');
+    });
+  }
+
   update();
 }]);

@@ -149,6 +149,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   }
 
   function createContainer(config) {
+    console.log(config);
     Container.create(config, function (d) {
       if (d.message) {
         $('#createContainerSpinner').hide();
