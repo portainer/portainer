@@ -78,6 +78,7 @@ func (p *proxyTransport) proxyContainerRequest(request *http.Request) (*http.Res
 			// Handle /containers/{id}/{action} requests
 			containerID := path.Base(path.Dir(requestPath))
 			action := path.Base(requestPath)
+
 			if action == "json" {
 				return p.rewriteOperation(request, containerInspectOperation)
 			}
@@ -92,7 +93,33 @@ func (p *proxyTransport) proxyContainerRequest(request *http.Request) (*http.Res
 }
 
 func (p *proxyTransport) proxyServiceRequest(request *http.Request) (*http.Response, error) {
-	return p.executeDockerRequest(request)
+	switch requestPath := request.URL.Path; requestPath {
+	case "/services/create":
+		return p.executeDockerRequest(request)
+
+	case "/volumes/prune":
+		return p.administratorOperation(request)
+
+	case "/services":
+		return p.rewriteOperation(request, serviceListOperation)
+
+	default:
+		// This section assumes /services/**
+		if match, _ := path.Match("/services/*/*", requestPath); match {
+			// Handle /services/{id}/{action} requests
+			serviceID := path.Base(path.Dir(requestPath))
+			return p.restrictedOperation(request, serviceID)
+		} else if match, _ := path.Match("/services/*", requestPath); match {
+			// Handle /services/{id} requests
+			serviceID := path.Base(requestPath)
+
+			if request.Method == http.MethodGet {
+				return p.rewriteOperation(request, serviceInspectOperation)
+			}
+			return p.restrictedOperation(request, serviceID)
+		}
+		return p.executeDockerRequest(request)
+	}
 }
 
 func (p *proxyTransport) proxyVolumeRequest(request *http.Request) (*http.Response, error) {

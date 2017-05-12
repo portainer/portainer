@@ -79,11 +79,8 @@ function ServiceViewModel(data, runningTasks, nodes) {
   this.EditName = false;
 
   if (data.Portainer) {
-    this.Metadata = {};
     if (data.Portainer.ResourceControl) {
-      this.Metadata.ResourceControl = {
-        OwnerId: data.Portainer.ResourceControl.OwnerId
-      };
+      this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
     }
   }
 }

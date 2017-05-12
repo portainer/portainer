@@ -48,6 +48,29 @@ func decorateContainerList(containerData []interface{}, resourceControls []porta
 	return decoratedContainerData, nil
 }
 
+// decorateServiceList loops through all services and will decorate any service with an existing resource control.
+// Service object format reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
+func decorateServiceList(serviceData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+	decoratedServiceData := make([]interface{}, 0)
+
+	for _, service := range serviceData {
+
+		serviceObject := service.(map[string]interface{})
+		if serviceObject[serviceIdentifier] == nil {
+			return nil, ErrDockerServiceIdentifierNotFound
+		}
+
+		serviceID := serviceObject[serviceIdentifier].(string)
+		resourceControl := getResourceControlByResourceID(serviceID, resourceControls)
+		if resourceControl != nil {
+			serviceObject = decorateObject(serviceObject, resourceControl)
+		}
+		decoratedServiceData = append(decoratedServiceData, serviceObject)
+	}
+
+	return decoratedServiceData, nil
+}
+
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {
 	metadata := make(map[string]interface{})
 	metadata["ResourceControl"] = resourceControl

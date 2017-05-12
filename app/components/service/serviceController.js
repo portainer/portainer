@@ -1,10 +1,9 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Notifications', 'Pagination', 'ModalService',
-function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
+function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Notifications, Pagination, ModalService, ControllerDataPipeline) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
-  $scope.service = {};
   $scope.tasks = [];
   $scope.displayNode = false;
   $scope.sortType = 'Status';
@@ -213,12 +212,12 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadingViewSpinner').hide();
-      Notifications.success("Service successfully updated", "Service updated");
+      Notifications.success('Service successfully updated', 'Service updated');
       $scope.cancelChanges({});
-      fetchServiceDetails();
+      initView();
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Notifications.error("Failure", e, "Unable to update service");
+      Notifications.error('Failure', e, 'Unable to update service');
     });
   };
 
@@ -237,15 +236,15 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     Service.remove({id: $stateParams.id}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Notifications.error("Error", d, "Unable to remove service");
+        Notifications.error('Error', d, 'Unable to remove service');
       } else {
         $('#loadingViewSpinner').hide();
-        Notifications.success("Service removed", $stateParams.id);
+        Notifications.success('Service removed', $stateParams.id);
         $state.go('services', {});
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Notifications.error("Failure", e, "Unable to remove service");
+      Notifications.error('Failure', e, 'Unable to remove service');
     });
   }
 
@@ -258,7 +257,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     service.ServiceConstraints = translateConstraintsToKeyValue(service.Constraints);
   }
 
-  function fetchServiceDetails() {
+  function initView() {
     $('#loadingViewSpinner').show();
     Service.get({id: $stateParams.id}, function (d) {
       var service = new ServiceViewModel(d);
@@ -269,6 +268,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
 
       translateServiceArrays(service);
       $scope.service = service;
+      ControllerDataPipeline.setAccessControlData($stateParams.id, service.ResourceControl);
       originalService = angular.copy(service);
 
       Task.query({filters: {service: [service.Name]}}, function (tasks) {
@@ -283,15 +283,15 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
           $scope.tasks = tasks.map(function (task) {
             return new TaskViewModel(task, null);
           });
-          Notifications.error("Failure", e, "Unable to retrieve node information");
+          Notifications.error('Failure', e, 'Unable to retrieve node information');
         });
       }, function (e) {
         $('#loadingViewSpinner').hide();
-        Notifications.error("Failure", e, "Unable to retrieve tasks associated to the service");
+        Notifications.error('Failure', e, 'Unable to retrieve tasks associated to the service');
       });
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Notifications.error("Failure", e, "Unable to retrieve service details");
+      Notifications.error('Failure', e, 'Unable to retrieve service details');
     });
   }
 
@@ -382,5 +382,5 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
     return [];
   }
 
-  fetchServiceDetails();
+  initView();
 }]);
