@@ -410,6 +410,77 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
 }
 
+.ownership_wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0.5rem;
+}
+
+.ownership_wrapper > div {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.ownership_wrapper .ownership_header {
+  font-size: 14px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.ownership_wrapper input[type="radio"] {
+  display: none;
+}
+
+.ownership_wrapper input[type="radio"]:not(:disabled) ~ label {
+  cursor: pointer;
+}
+
+.ownership_wrapper label {
+  font-weight: normal;
+  font-size: 12px;
+  display: block;
+  background: white;
+  border: 1px solid #333333;
+  border-radius: 2px;
+  padding: 10px 10px 0 10px;
+  text-align: center;
+  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+  position: relative;
+}
+
+.ownership_wrapper input[type="radio"]:checked + label {
+  background: #337ab7;
+  color: white;
+  padding-top: 2rem;
+  border-color: #337ab7;
+}
+
+.ownership_wrapper input[type="radio"]:checked + label::after {
+  color: #337ab7;
+  font-family: FontAwesome;
+  border: 2px solid #337ab7;
+  content: "\f00c";
+  font-size: 16px;
+  font-weight: bold;
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 30px;
+  width: 30px;
+  line-height: 26px;
+  text-align: center;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 5px -2px rgba(0, 0, 0, 0.25);
+}
+
+@media only screen and (max-width: 700px) {
+  .ownership_wrapper {
+    flex-direction: column;
+  }
+}
+
 /*bootbox override*/
 .modal-open {
   padding-right: 0px !important;

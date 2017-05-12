@@ -1,0 +1,164 @@
+<div class="row" ng-controller="AccessControlPanelController">
+  <div class="col-sm-12" ng-if="state.displayAccessControlPanel">
+    <rd-widget>
+      <rd-widget-header icon="fa-eye" title="Access control"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <!-- ownership -->
+            <tr>
+              <td>Ownership</td>
+              <td>
+                <i ng-class="resourceControl.Ownership | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <span ng-if="!resourceControl">
+                  public
+                  <portainer-tooltip message="This resource can be managed by any user with access to this endpoint." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                </span>
+                <span ng-if="resourceControl">
+                  {{ resourceControl.Ownership }}
+                  <portainer-tooltip ng-if="resourceControl.Ownership === 'administrators'" message="This resource can only be managed by administrators." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                  <portainer-tooltip ng-if="resourceControl.Ownership === 'private'" message="Management of this resource is restricted to a single user." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                  <portainer-tooltip ng-if="resourceControl.Ownership === 'restricted'" message="This resource can be managed by a restricted set of users and/or teams." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                </span>
+              </td>
+            </tr>
+            <!-- !ownership -->
+            <!-- authorized-users -->
+            <tr ng-if="resourceControl.Users.length > 0">
+              <td>Authorized users</td>
+              <td>
+                <span ng-repeat="user in authorizedUsers">{{user.Username}}{{$last ? '' : ', '}} </span>
+              </td>
+            </tr>
+            <!-- !authorized-users -->
+            <!-- authorized-teams -->
+            <tr ng-if="resourceControl.Teams.length > 0">
+              <td>Authorized teams</td>
+              <td>
+                <span ng-repeat="team in authorizedTeams">{{team.Name}}{{$last ? '' : ', '}} </span>
+              </td>
+            </tr>
+            <!-- !authorized-teams -->
+            <!-- edit-ownership -->
+            <tr ng-if="!state.editOwnership && (isAdmin || state.canEditOwnership)">
+              <td colspan="2">
+                <a class="btn-outline-secondary" ng-click="state.editOwnership = true"><i class="fa fa-edit space-right" aria-hidden="true"></i>Change ownership</a>
+              </td>
+            </tr>
+            <!-- !edit-ownership -->
+            <!-- edit-ownership-choices -->
+            <tr ng-if="state.editOwnership">
+              <td colspan="2">
+                <div class="ownership_wrapper">
+                  <div ng-if="isAdmin">
+                    <input type="radio" id="access_administrators" ng-model="formValues.Ownership" value="administrators">
+                    <label for="access_administrators">
+                      <div class="ownership_header">
+                        <i ng-class="'administrators' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Administrators
+                      </div>
+                      <p>I want to restrict the management of this resource to administrators only</p>
+                    </label>
+                  </div>
+                  <div ng-if="isAdmin">
+                    <input type="radio" id="access_restricted" ng-model="formValues.Ownership" value="restricted">
+                    <label for="access_restricted">
+                      <div class="ownership_header">
+                        <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Restricted
+                      </div>
+                      <p>
+                        I want to restrict the management of this resource to a set of users and/or teams
+                      </p>
+                    </label>
+                  </div>
+                  <div ng-if="!isAdmin && state.canChangeOwnershipToTeam && availableTeams.length > 0">
+                    <input type="radio" id="access_restricted" ng-model="formValues.Ownership" value="restricted">
+                    <label for="access_restricted">
+                      <div class="ownership_header">
+                        <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Restricted
+                      </div>
+                      <p ng-if="availableTeams.length === 1">
+                        I want any member of my team (<b>{{ availableTeams[0].Name }}</b>) to be able to manage this resource
+                      </p>
+                      <p ng-if="availableTeams.length > 1">
+                        I want to restrict the management of this resource to one or more of my teams
+                      </p>
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" id="access_public" ng-model="formValues.Ownership" value="public">
+                    <label for="access_public">
+                      <div class="ownership_header">
+                        <i ng-class="'public' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Public
+                      </div>
+                      <p>I want any user with access to this endpoint to be able to manage this resource</p>
+                    </label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <!-- edit-ownership-choices -->
+            <!-- select-teams -->
+            <tr ng-if="state.editOwnership && formValues.Ownership === 'restricted' && (isAdmin || !isAdmin && availableTeams.length > 1)">
+              <td colspan="2">
+                <span>Teams</span>
+                <span ng-if="isAdmin && availableTeams.length === 0" class="small text-muted" style="margin-left: 10px;">
+                  You have not yet created any team. Head over the <a ui-sref="teams">teams view</a> to manage user teams.</span>
+                </span>
+                <span isteven-multi-select
+                  ng-if="(isAdmin && availableTeams.length > 0) || (!isAdmin && availableTeams.length > 1)"
+                  input-model="availableTeams"
+                  output-model="formValues.Ownership_Teams"
+                  button-label="Name"
+                  item-label="Name"
+                  tick-property="selected"
+                  helper-elements="filter"
+                  search-property="Name"
+                  max-labels="3"
+                  translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
+                </span>
+              </td>
+            </tr>
+            <!-- !select-teams -->
+            <!-- select-users -->
+            <tr ng-if="isAdmin && state.editOwnership && formValues.Ownership === 'restricted'">
+              <td colspan="2">
+                <span>Users</span>
+                <span ng-if="availableUsers.length === 0" class="small text-muted" style="margin-left: 10px;">
+                  You have not yet created any user. Head over the <a ui-sref="users">users view</a> to manage users.</span>
+                </span>
+                <span isteven-multi-select
+                  ng-if="availableUsers.length > 0"
+                  input-model="availableUsers"
+                  output-model="formValues.Ownership_Users"
+                  button-label="Username"
+                  item-label="Username"
+                  tick-property="selected"
+                  helper-elements="filter"
+                  search-property="Username"
+                  max-labels="3"
+                  translation="{nothingSelected: 'Select one or more users', search: 'Search...'}"
+                </span>
+              </td>
+            </tr>
+            <!-- !select-users -->
+            <!-- ownership-actions -->
+            <tr ng-if="state.editOwnership">
+              <td colspan="2">
+                <div>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="state.editOwnership = false">Cancel</a>
+                  <a type="button" class="btn btn-primary btn-sm" ng-click="confirmUpdateOwnership()">Update ownership</a>
+                  <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+                </div>
+              </td>
+            </tr>
+            <!-- !ownership-actions -->
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

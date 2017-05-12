@@ -3,11 +3,12 @@ package proxy
 import "github.com/portainer/portainer"
 
 type (
-	resourceControlMetadata struct {
-		ID    portainer.ResourceControlID `json:"Id"`
-		Users []portainer.UserID          `json:"Users"`
-		Teams []portainer.TeamID          `json:"Teams"`
-	}
+// resourceControlMetadata struct {
+// 	ID    portainer.ResourceControlID `json:"Id"`
+// 	AdministratorsOnly
+// 	Users []portainer.UserID          `json:"Users"`
+// 	Teams []portainer.TeamID          `json:"Teams"`
+// }
 )
 
 // decorateVolumeList loops through all volumes and will decorate any volume with an existing resource control.
@@ -35,11 +36,7 @@ func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.R
 
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {
 	metadata := make(map[string]interface{})
-	metadata["ResourceControl"] = resourceControlMetadata{
-		ID:    resourceControl.ID,
-		Users: resourceControl.Users,
-		Teams: resourceControl.Teams,
-	}
+	metadata["ResourceControl"] = resourceControl
 	object["Portainer"] = metadata
 	return object
 }

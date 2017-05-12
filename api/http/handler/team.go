@@ -34,7 +34,7 @@ func NewTeamHandler(bouncer *security.RequestBouncer) *TeamHandler {
 	h.Handle("/teams",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePostTeams))).Methods(http.MethodPost)
 	h.Handle("/teams",
-		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
 		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeam))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
@@ -99,20 +99,13 @@ type postTeamsRequest struct {
 
 // handleGetTeams handles GET requests on /teams
 func (handler *TeamHandler) handleGetTeams(w http.ResponseWriter, r *http.Request) {
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-	}
-
 	teams, err := handler.TeamService.Teams()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	filteredTeams := security.FilterLeaderTeams(teams, securityContext)
-
-	encodeJSON(w, filteredTeams, handler.Logger)
+	encodeJSON(w, teams, handler.Logger)
 }
 
 // handleGetTeam handles GET requests on /teams/:id

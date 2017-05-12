@@ -56,7 +56,7 @@ angular.module('portainer.services')
           className: 'btn-primary'
         }
       },
-      callback: callback,
+      callback: callback
     });
   };
 
@@ -71,21 +71,21 @@ angular.module('portainer.services')
   };
 
   service.confirmVolumeOwnershipChange = function(callback) {
-    var msg = 'You can change the ownership of a volume one way only. You will not be able to make this volume private again.';
+    var msg = 'Changing the ownership of this volume will potentially restrict its management to some users.';
     service.confirmOwnershipChange(callback, msg);
   };
 
   service.confirmImageForceRemoval = function(callback) {
     service.confirm({
-      title: "Are you sure?",
-      message: "Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.",
+      title: 'Are you sure?',
+      message: 'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
       buttons: {
         confirm: {
           label: 'Remove the image',
           className: 'btn-danger'
         }
       },
-      callback: callback,
+      callback: callback
     });
   };
 
@@ -99,7 +99,7 @@ angular.module('portainer.services')
           className: 'btn-danger'
         }
       },
-      callback: callback,
+      callback: callback
     });
   };
 

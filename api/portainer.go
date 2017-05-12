@@ -116,10 +116,11 @@ type (
 		// Deprecated: AccessLevel field is deprecated in DBVersion == 2
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 
-		ID         ResourceControlID `json:"Id"`
-		ResourceID string            `json:"ResourceId"`
-		Users      []UserID          `json:"Users"`
-		Teams      []TeamID          `json:"Teams"`
+		ID                 ResourceControlID `json:"Id"`
+		ResourceID         string            `json:"ResourceId"`
+		AdministratorsOnly bool              `json:"AdministratorsOnly"`
+		Users              []UserID          `json:"Users"`
+		Teams              []TeamID          `json:"Teams"`
 	}
 
 	// Deprecated: ResourceAccessLevel is deprecated in DBVersion == 2

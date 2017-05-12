@@ -61,10 +61,10 @@
                 </a>
               </th>
               <th ng-if="applicationState.application.authentication">
-                <a ui-sref="volumes" ng-click="order('Ownership')">
+                <a ui-sref="volumes" ng-click="order('ResourceControl.Ownership')">
                   Ownership
-                  <span ng-show="sortType == 'Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'ResourceControl.Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'ResourceControl.Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
@@ -77,9 +77,8 @@
               <td>{{ volume.Mountpoint }}</td>
               <td ng-if="applicationState.application.authentication">
                 <span>
-                  <i class="fa fa-eye" aria-hidden="true" ng-if="!volume.Metadata.ResourceControl"></i>
-                  <i class="fa fa-eye-slash" aria-hidden="true" ng-if="volume.Metadata.ResourceControl"></i>
-                  {{ volume.Ownership }}
+                  <i ng-class="volume.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
+                  {{ volume.ResourceControl.Ownership ? volume.ResourceControl.Ownership : volume.ResourceControl.Ownership = 'public' }}
                 </span>
               </td>
             </tr>

@@ -66,9 +66,10 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 	}
 
 	resource := portainer.ResourceControl{
-		ResourceID: req.ResourceID,
-		Users:      users,
-		Teams:      teams,
+		ResourceID:         req.ResourceID,
+		AdministratorsOnly: req.AdministratorsOnly,
+		Users:              users,
+		Teams:              teams,
 	}
 
 	err = handler.ResourceControlService.CreateResourceControl(&resource)
@@ -81,9 +82,10 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 }
 
 type postResourcesRequest struct {
-	ResourceID string `valid:"required"`
-	Users      []int  `valid:"-"`
-	Teams      []int  `valid:"-"`
+	ResourceID         string `valid:"required"`
+	AdministratorsOnly bool   `valid:"-"`
+	Users              []int  `valid:"-"`
+	Teams              []int  `valid:"-"`
 }
 
 // handlePutResources handles PUT requests on /resources/:id
@@ -131,6 +133,8 @@ func (handler *ResourceHandler) handlePutResources(w http.ResponseWriter, r *htt
 	}
 	resourceControl.Teams = teams
 
+	resourceControl.AdministratorsOnly = req.AdministratorsOnly
+
 	err = handler.ResourceControlService.UpdateResourceControl(resourceControl.ID, resourceControl)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -139,8 +143,9 @@ func (handler *ResourceHandler) handlePutResources(w http.ResponseWriter, r *htt
 }
 
 type putResourcesRequest struct {
-	Users []int `valid:"-"`
-	Teams []int `valid:"-"`
+	AdministratorsOnly bool  `valid:"-"`
+	Users              []int `valid:"-"`
+	Teams              []int `valid:"-"`
 }
 
 // handleDeleteResources handles DELETE requests on /resources/:id

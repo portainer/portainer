@@ -8,7 +8,7 @@
 </rd-header>
 
 <div class="row" ng-if="volume">
-  <div class="col-lg-12 col-md-12 col-xs-12">
+  <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-cube" title="Volume details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
@@ -40,142 +40,14 @@
                 </table>
               </td>
             </tr>
-            <tr ng-if="applicationState.application.authentication">
-              <td>Ownership</td>
-              <td>
-                <span>
-                  <i class="fa fa-eye" aria-hidden="true" ng-if="!volume.Metadata.ResourceControl"></i>
-                  <i class="fa fa-eye-slash" aria-hidden="true" ng-if="volume.Metadata.ResourceControl"></i>
-                  {{ volume.Ownership }}
-                  <portainer-tooltip ng-if="!volume.Metadata.ResourceControl" position="bottom" style="margin-left: -3px;" message="This object can be managed by any user having access to this endpoint."></portainer-tooltip>
-                  <portainer-tooltip ng-if="volume.Metadata.ResourceControl" position="bottom" style="margin-left: -3px;" message="This object can only be managed by a specific set of users and teams."></portainer-tooltip>
-                  <a class="btn-outline-secondary" style="margin-left: 15px;" ng-if="!state.editOwnership && (isAdmin || isTeamLeader || isOwner)" ng-click="displayEditOwnership(volume)"><i class="fa fa-edit space-right" aria-hidden="true"></i>Change ownership</a>
-                </span>
-              </td>
-            </tr>
-            <tr ng-if="volume.Metadata.ResourceControl">
-              <td>
-                Authorizations
-              </td>
-              <td>
-                <div ng-if="volume.Metadata.authorizedUsers.length > 0">
-                  <i class="fa fa-user" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Users: <span>{{ volume.Metadata.authorizedUsers.join(', ') }}</span>
-                </div>
-                <div ng-if="volume.Metadata.authorizedTeams.length > 0" style="margin-top: 2px;">
-                  <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Teams: <span>{{ volume.Metadata.authorizedTeams.join(', ') }}</span>
-                </div>
-              </td>
-            </tr>
-            <tr ng-if="state.editOwnership">
-              <td>
-                Update ownership
-                <div style="margin-top: 10px;">
-                  <a type="button" class="btn btn-primary btn-xs" ng-click="updateOwnership(volume)">Update</a>
-                  <a type="button" class="btn btn-default btn-xs" ng-click="state.editOwnership = false;">Cancel</a>
-                </div>
-              </td>
-              <td>
-                <!-- private-ownership -->
-                <span ng-if="isAdmin">
-                  <label class="radio-inline" style="padding-top: 0px; margin-right: 15px;">
-                    <input type="radio" name="ownership" ng-model="formValues.Ownership" ng-click="privateOwnership()" value="private">
-                    <span>
-                      <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                      Admins
-                    </span>
-                  </label>
-                  <portainer-tooltip position="bottom" message="Only the administrators will be able manage this resource."></portainer-tooltip>
-                </span>
-                <!-- !private-ownership -->
-                <!-- restricted-ownership -->
-                <span style="margin-right: 15px;" ng-if="isAdmin || isOwner && teams.length > 0">
-                  <label class="radio-inline" style="padding-top: 0px;">
-                    <input type="radio" name="ownership" ng-model="formValues.Ownership" ng-click="restrictedOwnership(volume)" value="restricted">
-                    <span>
-                      <i class="fa fa-users" aria-hidden="true"></i>
-                      {{ isAdmin ? 'Restricted' : 'Teams' }}
-                    </span>
-                  </label>
-                  <portainer-tooltip ng-if="isAdmin" position="bottom" message="A restricted set of users and/or teams will be able to manage this resource."></portainer-tooltip>
-                  <portainer-tooltip ng-if="!isAdmin && isOwner && teams.length > 1" position="bottom" message="Members of the selected team(s) will be able to manage this resource."></portainer-tooltip>
-                  <portainer-tooltip ng-if="!isAdmin && isOwner && teams.length === 1" position="bottom" message="Members of your team will be able to manage this resource."></portainer-tooltip>
-                </span>
-                <!-- !restricted-ownership -->
-                <!-- public-ownership -->
-                <span ng-if="isAdmin || isOwner || isTeamLeader">
-                  <label class="radio-inline" style="padding-top: 0px;">
-                    <input type="radio" name="ownership" ng-model="formValues.Ownership" ng-click="publicOwnership()" value="public">
-                    <span>
-                      <i class="fa fa-eye" aria-hidden="true"></i>
-                      Public
-                    </span>
-                  </label>
-                  <portainer-tooltip position="bottom" message="Any user with access to this endpoint will be able to manage this resource."></portainer-tooltip>
-                </span>
-                <!-- !public-ownership -->
-
-                <div style="margin-top: 10px;" ng-if="formValues.Ownership === 'restricted' && (isAdmin || (isOwner && teams.length > 0))">
-                  <!-- authorized-teams -->
-                  <span>
-                    <span ng-if="teams.length !== 1" style="margin-right: 20px;">
-                      Authorized teams
-                      <portainer-tooltip ng-if="isAdmin && teams.length > 0" position="bottom" message="You can select which teams(s) will be able to manage this resource."></portainer-tooltip>
-                      <portainer-tooltip ng-if="!isAdmin && isOwner && teams.length > 1" position="bottom" message="As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource."></portainer-tooltip>
-                    </span>
-                    <span ng-if="!isAdmin && isOwner && teams.length === 1" style="margin-right: 20px;">
-                      Ownership will be updated to the team: {{ teams[0].Name }}
-                    </span>
-                    <span ng-if="isAdmin && teams.length === 0" class="small text-muted" style="margin-right: 20px;">
-                      You have not yet created any team. Head over the <a ui-sref="teams">teams view</a> to manage user teams.</span>
-                    </span>
-                    <span isteven-multi-select
-                    ng-if="(isAdmin && teams.length > 0) || (!isAdmin && isOwner && teams.length > 1)"
-                      input-model="teams"
-                      output-model="formValues.Ownership_Teams"
-                      button-label="Name"
-                      item-label="Name"
-                      tick-property="ticked"
-                      helper-elements="filter"
-                      search-property="Name"
-                      translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
-                    </span>
-                  </span>
-                  <!-- !authorized-teams -->
-                  <!-- authorized-users -->
-                  <span ng-if="formValues.Ownership === 'restricted' && isAdmin" style="margin-left: 25px;">
-                    <span>
-                      Authorized users
-                      <portainer-tooltip ng-if="isAdmin && users.length > 0" position="bottom" message="You can select which user(s) will be able to manage this object."></portainer-tooltip>
-                    </span>
-                    <span ng-if="users.length === 0" class="small text-muted" style="margin-left: 20px;">
-                      You have not yet created any user. Head over the <a ui-sref="users">users view</a> to manage users.</span>
-                    </span>
-                    <span isteven-multi-select
-                      ng-if="users.length > 0 && isAdmin"
-                      input-model="users"
-                      output-model="formValues.Ownership_Users"
-                      button-label="Username"
-                      item-label="Username"
-                      tick-property="ticked"
-                      helper-elements="filter"
-                      search-property="Username"
-                      translation="{nothingSelected: 'Select one or more users', search: 'Search...'}"
-                      style="margin-left: 20px;"
-                    </span>
-                  </span>
-                  <!-- !authorized-users -->
-                </div>
-
-              </td>
-            </tr>
           </tbody>
         </table>
       </rd-widget-body>
     </rd-widget>
   </div>
 </div>
+
+<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="volume"></div>
 
 <div class="row" ng-if="!(volume.Options | emptyobject)">
   <div class="col-lg-12 col-md-12 col-xs-12">
@@ -194,18 +66,3 @@
     </rd-widget>
   </div>
 </div>
-
-<!-- <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-eye" title="Access control"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div> -->
