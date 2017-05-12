@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Network, Notifications, Pagination, ModalService) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Network, Notifications, Pagination, ModalService, ControllerDataPipeline) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -17,25 +17,27 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
   var update = function () {
     $('#loadingViewSpinner').show();
     Container.get({id: $stateParams.id}, function (d) {
-      $scope.container = d;
+      var container = new ContainerDetailsViewModel(d);
+      $scope.container = container;
+      ControllerDataPipeline.setAccessControlData($stateParams.id, container.ResourceControl);
       $scope.container.edit = false;
-      $scope.container.newContainerName = $filter('trimcontainername')(d.Name);
+      $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
 
-      if (d.State.Running) {
-        $scope.activityTime = moment.duration(moment(d.State.StartedAt).utc().diff(moment().utc())).humanize();
-      } else if (d.State.Status === "created") {
-        $scope.activityTime = moment.duration(moment(d.Created).utc().diff(moment().utc())).humanize();
+      if (container.State.Running) {
+        $scope.activityTime = moment.duration(moment(container.State.StartedAt).utc().diff(moment().utc())).humanize();
+      } else if (container.State.Status === 'created') {
+        $scope.activityTime = moment.duration(moment(container.Created).utc().diff(moment().utc())).humanize();
       } else {
-        $scope.activityTime = moment.duration(moment().utc().diff(moment(d.State.FinishedAt).utc())).humanize();
+        $scope.activityTime = moment.duration(moment().utc().diff(moment(container.State.FinishedAt).utc())).humanize();
       }
 
       $scope.portBindings = [];
-      if (d.NetworkSettings.Ports) {
-        angular.forEach(Object.keys(d.NetworkSettings.Ports), function(portMapping) {
-          if (d.NetworkSettings.Ports[portMapping]) {
+      if (container.NetworkSettings.Ports) {
+        angular.forEach(Object.keys(container.NetworkSettings.Ports), function(portMapping) {
+          if (container.NetworkSettings.Ports[portMapping]) {
             var mapping = {};
             mapping.container = portMapping;
-            mapping.host = d.NetworkSettings.Ports[portMapping][0].HostIp + ':' + d.NetworkSettings.Ports[portMapping][0].HostPort;
+            mapping.host = container.NetworkSettings.Ports[portMapping][0].HostIp + ':' + container.NetworkSettings.Ports[portMapping][0].HostPort;
             $scope.portBindings.push(mapping);
           }
         });
@@ -43,7 +45,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       $('#loadingViewSpinner').hide();
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Notifications.error("Failure", e, "Unable to retrieve container info");
+      Notifications.error('Failure', e, 'Unable to retrieve container info');
     });
   };
 
@@ -51,10 +53,10 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.start({id: $scope.container.Id}, {}, function (d) {
       update();
-      Notifications.success("Container started", $stateParams.id);
+      Notifications.success('Container started', $stateParams.id);
     }, function (e) {
       update();
-      Notifications.error("Failure", e, "Unable to start container");
+      Notifications.error('Failure', e, 'Unable to start container');
     });
   };
 
@@ -62,10 +64,10 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.stop({id: $stateParams.id}, function (d) {
       update();
-      Notifications.success("Container stopped", $stateParams.id);
+      Notifications.success('Container stopped', $stateParams.id);
     }, function (e) {
       update();
-      Notifications.error("Failure", e, "Unable to stop container");
+      Notifications.error('Failure', e, 'Unable to stop container');
     });
   };
 
@@ -73,10 +75,10 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.kill({id: $stateParams.id}, function (d) {
       update();
-      Notifications.success("Container killed", $stateParams.id);
+      Notifications.success('Container killed', $stateParams.id);
     }, function (e) {
       update();
-      Notifications.error("Failure", e, "Unable to kill container");
+      Notifications.error('Failure', e, 'Unable to kill container');
     });
   };
 
@@ -88,11 +90,11 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     ContainerCommit.commit({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
       $('#createImageSpinner').hide();
       update();
-      Notifications.success("Container commited", $stateParams.id);
+      Notifications.success('Container commited', $stateParams.id);
     }, function (e) {
       $('#createImageSpinner').hide();
       update();
-      Notifications.error("Failure", e, "Unable to commit container");
+      Notifications.error('Failure', e, 'Unable to commit container');
     });
   };
 
@@ -100,10 +102,10 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.pause({id: $stateParams.id}, function (d) {
       update();
-      Notifications.success("Container paused", $stateParams.id);
+      Notifications.success('Container paused', $stateParams.id);
     }, function (e) {
       update();
-      Notifications.error("Failure", e, "Unable to pause container");
+      Notifications.error('Failure', e, 'Unable to pause container');
     });
   };
 
@@ -111,10 +113,10 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.unpause({id: $stateParams.id}, function (d) {
       update();
-      Notifications.success("Container unpaused", $stateParams.id);
+      Notifications.success('Container unpaused', $stateParams.id);
     }, function (e) {
       update();
-      Notifications.error("Failure", e, "Unable to unpause container");
+      Notifications.error('Failure', e, 'Unable to unpause container');
     });
   };
 
@@ -139,17 +141,17 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
   $scope.remove = function(cleanAssociatedVolumes) {
     $('#loadingViewSpinner').show();
     Container.remove({id: $stateParams.id, v: (cleanAssociatedVolumes) ? 1 : 0, force: true}, function (d) {
-      if (d.message) {
+      if (container.message) {
         $('#loadingViewSpinner').hide();
-        Notifications.error("Failure", d, "Unable to remove container");
+        Notifications.error('Failure', d, 'Unable to remove container');
       }
       else {
         $state.go('containers', {}, {reload: true});
-        Notifications.success("Container removed", $stateParams.id);
+        Notifications.success('Container removed', $stateParams.id);
       }
     }, function (e) {
       update();
-      Notifications.error("Failure", e, "Unable to remove container");
+      Notifications.error('Failure', e, 'Unable to remove container');
     });
   };
 
@@ -157,24 +159,24 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     $('#loadingViewSpinner').show();
     Container.restart({id: $stateParams.id}, function (d) {
       update();
-      Notifications.success("Container restarted", $stateParams.id);
+      Notifications.success('Container restarted', $stateParams.id);
     }, function (e) {
       update();
-      Notifications.error("Failure", e, "Unable to restart container");
+      Notifications.error('Failure', e, 'Unable to restart container');
     });
   };
 
   $scope.renameContainer = function () {
     Container.rename({id: $stateParams.id, 'name': $scope.container.newContainerName}, function (d) {
-      if (d.message) {
+      if (container.message) {
         $scope.container.newContainerName = $scope.container.Name;
-        Notifications.error("Unable to rename container", {}, d.message);
+        Notifications.error('Unable to rename container', {}, container.message);
       } else {
         $scope.container.Name = $scope.container.newContainerName;
-        Notifications.success("Container successfully renamed", d.name);
+        Notifications.success('Container successfully renamed', container.name);
       }
     }, function (e) {
-      Notifications.error("Failure", e, 'Unable to rename container');
+      Notifications.error('Failure', e, 'Unable to rename container');
     });
     $scope.container.edit = false;
   };
@@ -182,17 +184,17 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
   $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
     $('#loadingViewSpinner').show();
     Network.disconnect({id: networkId}, { Container: $stateParams.id, Force: false }, function (d) {
-      if (d.message) {
+      if (container.message) {
         $('#loadingViewSpinner').hide();
-        Notifications.error("Error", d, "Unable to disconnect container from network");
+        Notifications.error('Error', d, 'Unable to disconnect container from network');
       } else {
         $('#loadingViewSpinner').hide();
-        Notifications.success("Container left network", $stateParams.id);
+        Notifications.success('Container left network', $stateParams.id);
         $state.go('container', {id: $stateParams.id}, {reload: true});
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Notifications.error("Failure", e, "Unable to disconnect container from network");
+      Notifications.error('Failure', e, 'Unable to disconnect container from network');
     });
   };
 

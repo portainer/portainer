@@ -25,6 +25,16 @@ func getResponseAsJSONOBject(response *http.Response) (map[string]interface{}, e
 	return responseObject, nil
 }
 
+func getResponseAsJSONArray(response *http.Response) ([]interface{}, error) {
+	responseData, err := getResponseBodyAsGenericJSON(response)
+	if err != nil {
+		return nil, err
+	}
+
+	responseObject := responseData.([]interface{})
+	return responseObject, nil
+}
+
 func getResponseBodyAsGenericJSON(response *http.Response) (interface{}, error) {
 	var data interface{}
 	if response.Body != nil {

@@ -2,15 +2,6 @@ package proxy
 
 import "github.com/portainer/portainer"
 
-type (
-// resourceControlMetadata struct {
-// 	ID    portainer.ResourceControlID `json:"Id"`
-// 	AdministratorsOnly
-// 	Users []portainer.UserID          `json:"Users"`
-// 	Teams []portainer.TeamID          `json:"Teams"`
-// }
-)
-
 // decorateVolumeList loops through all volumes and will decorate any volume with an existing resource control.
 // Volume object format reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
 func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
@@ -32,6 +23,29 @@ func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.R
 	}
 
 	return decoratedVolumeData, nil
+}
+
+// decorateContainerList loops through all containers and will decorate any container with an existing resource control.
+// Container object format reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
+func decorateContainerList(containerData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+	decoratedContainerData := make([]interface{}, 0)
+
+	for _, container := range containerData {
+
+		containerObject := container.(map[string]interface{})
+		if containerObject[containerIdentifier] == nil {
+			return nil, ErrDockerContainerIdentifierNotFound
+		}
+
+		containerID := containerObject[containerIdentifier].(string)
+		resourceControl := getResourceControlByResourceID(containerID, resourceControls)
+		if resourceControl != nil {
+			containerObject = decorateObject(containerObject, resourceControl)
+		}
+		decoratedContainerData = append(decoratedContainerData, containerObject)
+	}
+
+	return decoratedContainerData, nil
 }
 
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {

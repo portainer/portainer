@@ -2,6 +2,7 @@ package tmp
 
 import (
 	"net/http"
+	"path"
 	"strings"
 
 	"github.com/portainer/portainer"
@@ -166,33 +167,34 @@ func (p *proxyTransport) filterVolumes(userID portainer.UserID, userTeams []port
 	return nil, nil
 }
 
-// func (p *proxyTransport) handleContainerRequests(request *http.Request, response *http.Response) error {
-// 	requestPath := request.URL.Path
-//
-// 	tokenData, err := extractTokenDataFromRequestContext(request)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	if requestPath == "/containers/prune" && tokenData.Role != portainer.AdministratorRole {
-// 		return writeAccessDeniedResponse(response)
-// 	}
-// 	if requestPath == "/containers/json" {
-// 		if tokenData.Role == portainer.AdministratorRole {
-// 			return p.decorateContainerResponse(response)
-// 		}
-// 		return p.proxyContainerResponseWithResourceControl(response, tokenData.ID)
-// 	}
-// 	// /containers/{id}/action
-// 	if match, _ := path.Match("/containers/*/*", requestPath); match {
-// 		if tokenData.Role != portainer.AdministratorRole {
-// 			resourceID := path.Base(path.Dir(requestPath))
-// 			return p.proxyContainerResponseWithAccessControl(response, tokenData.ID, resourceID)
-// 		}
-// 	}
-//
-// 	return nil
-// }
+func (p *proxyTransport) handleContainerRequests(request *http.Request, response *http.Response) error {
+	requestPath := request.URL.Path
+
+	tokenData, err := extractTokenDataFromRequestContext(request)
+	if err != nil {
+		return err
+	}
+
+	if requestPath == "/containers/prune" && tokenData.Role != portainer.AdministratorRole {
+		return writeAccessDeniedResponse(response)
+	}
+	if requestPath == "/containers/json" {
+		if tokenData.Role == portainer.AdministratorRole {
+			return p.decorateContainerResponse(response)
+		}
+		return p.proxyContainerResponseWithResourceControl(response, tokenData.ID)
+	}
+	// /containers/{id}/action
+	if match, _ := path.Match("/containers/*/*", requestPath); match {
+		if tokenData.Role != portainer.AdministratorRole {
+			resourceID := path.Base(path.Dir(requestPath))
+			return p.proxyContainerResponseWithAccessControl(response, tokenData.ID, resourceID)
+		}
+	}
+
+	return nil
+}
+
 //
 // func (p *proxyTransport) handleServiceRequests(request *http.Request, response *http.Response) error {
 // 	requestPath := request.URL.Path

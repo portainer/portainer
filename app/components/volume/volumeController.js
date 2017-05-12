@@ -22,7 +22,6 @@ function ($scope, $state, $stateParams, VolumeService, Notifications, Controller
     VolumeService.volume($stateParams.id)
     .then(function success(data) {
       var volume = data;
-
       ControllerDataPipeline.setAccessControlData(volume.Id, volume.ResourceControl);
       $scope.volume = volume;
     })
