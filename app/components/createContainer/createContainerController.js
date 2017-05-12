@@ -403,11 +403,39 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
 			$scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
 			// Add HostConfig
 			$scope.config.HostConfig = d.HostConfig;
+      // Add Ports
+      var bindings = [];
 			for (var p in $scope.config.HostConfig.PortBindings) {
-				$scope.config.HostConfig.PortBindings[p].hostPort = $scope.config.HostConfig.PortBindings[p][0].HostPort;
-				$scope.config.HostConfig.PortBindings[p].containerPort = p.split('/')[0];
-				$scope.config.HostConfig.PortBindings[p].protocol = p.split('/')[1];
+        var b = {
+				  "hostPort": $scope.config.HostConfig.PortBindings[p][0].HostPort,
+				  "containerPort": p.split('/')[0],
+				  "protocol": p.split('/')[1]
+        };
+        bindings.push(b);
 			}
+		  $scope.config.HostConfig.PortBindings = bindings;
+      // Add volumes
+      for (var v in d.Mounts) {
+        var mount = d.Mounts[v];
+        var volume = {
+          "type": mount.Type,
+          "name": mount.Name || mount.Source,
+          "containerPath": mount.Destination,
+          "readOnly": mount.RW === false
+        };
+        /*if (arr[0].indexOf('/') === 0) {
+          volume.type = "bind";
+        }
+        if (arr[2] && arr[2] === 'ro') {
+          volume.readOnly = true;
+        }*/
+        $scope.formValues.Volumes.push(volume);
+      }
+      // Add network
+      $scope.config.NetworkingConfig = {
+        EndpointsConfig: {}
+      };
+
 			// Add name
       $scope.config.name = d.Name.replace(/^\//g, '');
     });
