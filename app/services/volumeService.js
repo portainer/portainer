@@ -85,7 +85,8 @@ angular.module('portainer.services')
       if (data.message) {
         deferred.reject({ msg: data.message });
       } else {
-        deferred.resolve(data);
+        var volume = new VolumeViewModel(data);
+        deferred.resolve(volume);
       }
     })
     .catch(function error(err) {

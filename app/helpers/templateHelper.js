@@ -28,7 +28,7 @@ angular.module('portainer.helpers')
     };
     ports.forEach(function (p) {
       if (p.containerPort) {
-        var key = p.containerPort + "/" + p.protocol;
+        var key = p.containerPort + '/' + p.protocol;
         var binding = {};
         if (p.hostPort) {
           binding.HostPort = p.hostPort;
@@ -60,7 +60,7 @@ angular.module('portainer.helpers')
             value = $filter('swarmcontainername')(envvar.value);
           }
         }
-        env.push(envvar.name + "=" + value);
+        env.push(envvar.name + '=' + value);
       }
     });
     return env;
@@ -71,7 +71,7 @@ angular.module('portainer.helpers')
       if (volume.containerPath) {
         var binding;
         if (volume.type === 'auto') {
-          binding = generatedVolumesPile.pop().Name + ':' + volume.containerPath;
+          binding = generatedVolumesPile.pop().Id + ':' + volume.containerPath;
         } else if (volume.type !== 'auto' && volume.name) {
           binding = volume.name + ':' + volume.containerPath;
         }

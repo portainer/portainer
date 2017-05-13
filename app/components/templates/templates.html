@@ -49,51 +49,9 @@
             </div>
           </div>
           <!-- !env -->
-          <!-- ownership -->
-          <div class="form-group" ng-if="applicationState.application.authentication">
-            <div class="col-sm-12">
-              <label for="ownership" class="control-label text-left">
-                Ownership
-                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing team, one or multiple of your teams will be able to access it. When choosing public, everybody will be able to access it."></portainer-tooltip>
-              </label>
-              <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'private'">
-                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                  Private
-                </label>
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'team'">
-                  <i class="fa fa-users" aria-hidden="true"></i>
-                  Team
-                </label>
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'public'">
-                  <i class="fa fa-eye" aria-hidden="true"></i>
-                  Public
-                </label>
-              </div>
-            </div>
-          </div>
-          <!-- !ownership -->
-          <!-- authorized-groups -->
-          <div class="form-group" ng-if="formValues.Ownership === 'team' && Teams.length > 1" >
-            <div class="col-sm-12">
-              <label for="group-access" class="control-label text-left">
-                Authorized teams
-                <portainer-tooltip position="bottom" message="As you are a member of multiple teams, you can select which team(s) will be able to manage this object."></portainer-tooltip>
-              </label>
-              <span isteven-multi-select
-               input-model="Teams"
-               output-model="formValues.Ownership_groups"
-               button-label="Name"
-               item-label="Name"
-               tick-property="ticked"
-               helper-elements="filter"
-               search-property="Name"
-               default-label="Select one or more groups"
-               style="margin-left: 20px;"
-             </span>
-            </div>
-          </div>
-          <!-- !authorized-groups -->
+          <!-- access-control -->
+          <div ng-include="'app/components/common/accessControlForm/accessControlForm.html'" ng-if="applicationState.application.authentication"></div>
+          <!-- !access-control -->
           <div class="form-group">
             <div class="col-sm-12">
               <a class="small interactive" ng-if="!state.showAdvancedOptions" ng-click="state.showAdvancedOptions = true;">
