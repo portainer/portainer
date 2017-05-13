@@ -116,11 +116,12 @@ type (
 		// Deprecated: AccessLevel field is deprecated in DBVersion == 2
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 
-		ID                 ResourceControlID `json:"Id"`
-		ResourceID         string            `json:"ResourceId"`
-		AdministratorsOnly bool              `json:"AdministratorsOnly"`
-		Users              []UserID          `json:"Users"`
-		Teams              []TeamID          `json:"Teams"`
+		ID                 ResourceControlID   `json:"Id"`
+		ResourceID         string              `json:"ResourceId"`
+		Type               ResourceControlType `json:"Type"`
+		AdministratorsOnly bool                `json:"AdministratorsOnly"`
+		Users              []UserID            `json:"Users"`
+		Teams              []TeamID            `json:"Teams"`
 	}
 
 	// Deprecated: ResourceAccessLevel is deprecated in DBVersion == 2
@@ -128,6 +129,9 @@ type (
 	// ResourceAccessLevel represents the level of control associated to a resource for a specific owner.
 	// Can be one of: full, restricted, limited.
 	ResourceAccessLevel int
+
+	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service).
+	ResourceControlType int
 
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file.
@@ -273,4 +277,14 @@ const (
 	_ ResourceAccessLevel = iota
 	// RestrictedResourceAccessLevel represents a restricted access level on a resource (private ownership)
 	RestrictedResourceAccessLevel
+)
+
+const (
+	_ ResourceControlType = iota
+	// ContainerResourceControl represents a resource control associated to a Docker container
+	ContainerResourceControl
+	// ServiceResourceControl represents a resource control associated to a Docker service
+	ServiceResourceControl
+	// VolumeResourceControl represents a resource control associated to a Docker volume
+	VolumeResourceControl
 )

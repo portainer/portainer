@@ -4,7 +4,7 @@ import "github.com/portainer/portainer"
 
 // filterVolumeList loops through all volumes, filters volumes without any resource control (public resources) or with
 // any resource control giving access to the user (these volumes will be decorated).
-// Volume object format reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
+// Volume object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
 func filterVolumeList(volumeData []interface{}, resourceControls []portainer.ResourceControl, userID portainer.UserID, userTeamIDs []portainer.TeamID) ([]interface{}, error) {
 	filteredVolumeData := make([]interface{}, 0)
 
@@ -28,8 +28,8 @@ func filterVolumeList(volumeData []interface{}, resourceControls []portainer.Res
 }
 
 // filterContainerList loops through all containers, filters containers without any resource control (public resources) or with
-// any resource control giving access to the user (these containers will be decorated).
-// Container object format reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
+// any resource control giving access to the user (check on container ID and optional Swarm service ID, these containers will be decorated).
+// Container object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
 func filterContainerList(containerData []interface{}, resourceControls []portainer.ResourceControl, userID portainer.UserID, userTeamIDs []portainer.TeamID) ([]interface{}, error) {
 	filteredContainerData := make([]interface{}, 0)
 
@@ -47,6 +47,18 @@ func filterContainerList(containerData []interface{}, resourceControls []portain
 			containerObject = decorateObject(containerObject, resourceControl)
 			filteredContainerData = append(filteredContainerData, containerObject)
 		}
+
+		containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
+		if containerLabels != nil && containerLabels[containerLabelForServiceIdentifier] != nil {
+			serviceID := containerLabels[containerLabelForServiceIdentifier].(string)
+			resourceControl := getResourceControlByResourceID(serviceID, resourceControls)
+			if resourceControl == nil {
+				filteredContainerData = append(filteredContainerData, containerObject)
+			} else if resourceControl != nil && canUserAccessResource(userID, userTeamIDs, resourceControl) {
+				containerObject = decorateObject(containerObject, resourceControl)
+				filteredContainerData = append(filteredContainerData, containerObject)
+			}
+		}
 	}
 
 	return filteredContainerData, nil
@@ -54,7 +66,7 @@ func filterContainerList(containerData []interface{}, resourceControls []portain
 
 // filterServiceList loops through all services, filters services without any resource control (public resources) or with
 // any resource control giving access to the user (these services will be decorated).
-// Service object format reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
+// Service object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
 func filterServiceList(serviceData []interface{}, resourceControls []portainer.ResourceControl, userID portainer.UserID, userTeamIDs []portainer.TeamID) ([]interface{}, error) {
 	filteredServiceData := make([]interface{}, 0)
 

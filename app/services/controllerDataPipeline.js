@@ -6,12 +6,10 @@ angular.module('portainer.services')
   var pipeline = {};
 
   // accessControlData is used to manage the data required by the accessControlPanelController.
-  var accessControlData = {
-    resourceControl: null,
-    resourceId: null
-  };
+  var accessControlData = {};
 
-  pipeline.setAccessControlData = function (resourceId, resourceControl) {
+  pipeline.setAccessControlData = function (type, resourceId, resourceControl) {
+    accessControlData.resourceType = type;
     accessControlData.resourceId = resourceId;
     accessControlData.resourceControl = resourceControl;
   };
@@ -21,12 +19,7 @@ angular.module('portainer.services')
   };
 
   // accessControlFormData is used to manage the data available in the scope of the accessControlFormController.
-  var accessControlFormData = {
-    accessControlEnabled: true,
-    ownership: '',
-    authorizedUsers: [],
-    authorizedTeams: []
-  };
+  var accessControlFormData = {};
 
   pipeline.setAccessControlFormData = function(accessControlEnabled, ownership, authorizedUsers, authorizedTeams) {
     accessControlFormData.accessControlEnabled = accessControlEnabled;

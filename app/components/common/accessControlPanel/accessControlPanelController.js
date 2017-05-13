@@ -74,7 +74,8 @@ function ($q, $scope, $state, UserService, ResourceControlService, Notifications
     var resourceId = accessControlData.resourceId;
     var ownershipParameters = processOwnershipFormValues();
 
-    ResourceControlService.applyResourceControlChange(resourceId, $scope.resourceControl, ownershipParameters)
+    ResourceControlService.applyResourceControlChange(accessControlData.resourceType, resourceId,
+      $scope.resourceControl, ownershipParameters)
     .then(function success(data) {
       Notifications.success('Volume ownership successfully updated');
       $state.reload();
@@ -97,6 +98,7 @@ function ($q, $scope, $state, UserService, ResourceControlService, Notifications
 
     var accessControlData = ControllerDataPipeline.getAccessControlData();
     var resourceControl = accessControlData.resourceControl;
+    $scope.resourceType = accessControlData.resourceType;
     $scope.resourceControl = resourceControl;
 
     if (isAdmin) {

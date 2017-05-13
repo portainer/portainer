@@ -268,7 +268,7 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
 
       translateServiceArrays(service);
       $scope.service = service;
-      ControllerDataPipeline.setAccessControlData($stateParams.id, service.ResourceControl);
+      ControllerDataPipeline.setAccessControlData('service', $stateParams.id, service.ResourceControl);
       originalService = angular.copy(service);
 
       Task.query({filters: {service: [service.Name]}}, function (tasks) {

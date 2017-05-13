@@ -19,7 +19,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     Container.get({id: $stateParams.id}, function (d) {
       var container = new ContainerDetailsViewModel(d);
       $scope.container = container;
-      ControllerDataPipeline.setAccessControlData($stateParams.id, container.ResourceControl);
+      ControllerDataPipeline.setAccessControlData('container', $stateParams.id, container.ResourceControl);
       $scope.container.edit = false;
       $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
 
@@ -141,7 +141,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
   $scope.remove = function(cleanAssociatedVolumes) {
     $('#loadingViewSpinner').show();
     Container.remove({id: $stateParams.id, v: (cleanAssociatedVolumes) ? 1 : 0, force: true}, function (d) {
-      if (container.message) {
+      if (d.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error('Failure', d, 'Unable to remove container');
       }

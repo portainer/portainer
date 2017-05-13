@@ -3,7 +3,31 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.applyResourceControl = function(resourceIdentifier, userId, accessControlData) {
+  service.createResourceControl = function(administratorsOnly, userIDs, teamIDs, resourceID, type) {
+    var payload = {
+      Type: type,
+      AdministratorsOnly: administratorsOnly,
+      ResourceID: resourceID,
+      Users: userIDs,
+      Teams: teamIDs
+    };
+    return RC.create({}, payload).$promise;
+  };
+
+  service.deleteResourceControl = function(rcID) {
+    return RC.remove({id: rcID}).$promise;
+  };
+
+  service.updateResourceControl = function(admin, userIDs, teamIDs, resourceControlId) {
+    var payload = {
+      AdministratorsOnly: admin,
+      Users: userIDs,
+      Teams: teamIDs
+    };
+    return RC.update({id: resourceControlId}, payload).$promise;
+  };
+
+  service.applyResourceControl = function(resourceControlType, resourceIdentifier, userId, accessControlData) {
     if (!accessControlData.accessControlEnabled) {
       return;
     }
@@ -28,33 +52,10 @@ angular.module('portainer.services')
         break;
     }
     return service.createResourceControl(administratorsOnly, authorizedUserIds,
-      authorizedTeamIds, resourceIdentifier);
+      authorizedTeamIds, resourceIdentifier, resourceControlType);
   };
 
-  service.createResourceControl = function(administratorsOnly, userIDs, teamIDs, resourceID) {
-    var payload = {
-      AdministratorsOnly: administratorsOnly,
-      ResourceID: resourceID,
-      Users: userIDs,
-      Teams: teamIDs
-    };
-    return RC.create({}, payload).$promise;
-  };
-
-  service.deleteResourceControl = function(rcID) {
-    return RC.remove({id: rcID}).$promise;
-  };
-
-  service.updateResourceControl = function(admin, userIDs, teamIDs, resourceControlId) {
-    var payload = {
-      AdministratorsOnly: admin,
-      Users: userIDs,
-      Teams: teamIDs
-    };
-    return RC.update({id: resourceControlId}, payload).$promise;
-  };
-
-  service.applyResourceControlChange = function(resourceId, resourceControl, ownershipParameters) {
+  service.applyResourceControlChange = function(resourceControlType, resourceId, resourceControl, ownershipParameters) {
     if (resourceControl) {
       if (ownershipParameters.ownership === 'public') {
         return service.deleteResourceControl(resourceControl.Id);
@@ -64,7 +65,7 @@ angular.module('portainer.services')
       }
     } else {
         return service.createResourceControl(ownershipParameters.administratorsOnly, ownershipParameters.authorizedUserIds,
-          ownershipParameters.authorizedTeamIds, resourceId);
+          ownershipParameters.authorizedTeamIds, resourceId, resourceControlType);
     }
   };
 

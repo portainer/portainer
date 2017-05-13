@@ -15,6 +15,14 @@ const (
 	ErrEmptyResponseBody = portainer.Error("Empty response body")
 )
 
+func extractJSONField(jsonObject map[string]interface{}, key string) map[string]interface{} {
+	object := jsonObject[key]
+	if object != nil {
+		return object.(map[string]interface{})
+	}
+	return nil
+}
+
 func getResponseAsJSONOBject(response *http.Response) (map[string]interface{}, error) {
 	responseData, err := getResponseBodyAsGenericJSON(response)
 	if err != nil {

@@ -1,5 +1,7 @@
 function ResourceControlViewModel(data) {
   this.Id = data.Id;
+  this.Type = data.Type;
+  this.ResourceId = data.ResourceId;
   this.Users = data.Users;
   this.Teams = data.Teams;
   this.AdministratorsOnly = data.AdministratorsOnly;

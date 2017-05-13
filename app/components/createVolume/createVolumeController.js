@@ -53,7 +53,7 @@ function ($scope, $state, VolumeService, InfoService, ResourceControlService, Au
     .then(function success(data) {
       var volumeIdentifier = data.Name;
       var userId = userDetails.ID;
-      return ResourceControlService.applyResourceControl(volumeIdentifier, userId, accessControlData);
+      return ResourceControlService.applyResourceControl('volume', volumeIdentifier, userId, accessControlData);
     })
     .then(function success(data) {
       Notifications.success('Volume successfully created');

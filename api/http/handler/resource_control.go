@@ -55,6 +55,19 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 		return
 	}
 
+	var resourceControlType portainer.ResourceControlType
+	switch req.Type {
+	case "container":
+		resourceControlType = portainer.ContainerResourceControl
+	case "service":
+		resourceControlType = portainer.ServiceResourceControl
+	case "volume":
+		resourceControlType = portainer.VolumeResourceControl
+	default:
+		httperror.WriteErrorResponse(w, portainer.ErrInvalidResourceControlType, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
 	var users = make([]portainer.UserID, 0)
 	for _, v := range req.Users {
 		users = append(users, portainer.UserID(v))
@@ -67,6 +80,7 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 
 	resource := portainer.ResourceControl{
 		ResourceID:         req.ResourceID,
+		Type:               resourceControlType,
 		AdministratorsOnly: req.AdministratorsOnly,
 		Users:              users,
 		Teams:              teams,
@@ -83,6 +97,7 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 
 type postResourcesRequest struct {
 	ResourceID         string `valid:"required"`
+	Type               string `valid:"required"`
 	AdministratorsOnly bool   `valid:"-"`
 	Users              []int  `valid:"-"`
 	Teams              []int  `valid:"-"`

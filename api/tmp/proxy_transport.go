@@ -228,23 +228,24 @@ func (p *proxyTransport) handleContainerRequests(request *http.Request, response
 // 	return nil
 // }
 //
-// func (p *proxyTransport) proxyContainerResponseWithAccessControl(response *http.Response, userID portainer.UserID, resourceID string) error {
-// 	rcs, err := p.ResourceControlService.ResourceControls(portainer.ContainerResourceControl)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	userOwnedResources, err := getResourceIDsOwnedByUser(userID, rcs)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	if !isStringInArray(resourceID, userOwnedResources) && isResourceIDInRCs(resourceID, rcs) {
-// 		return writeAccessDeniedResponse(response)
-// 	}
-//
-// 	return nil
-// }
+func (p *proxyTransport) proxyContainerResponseWithAccessControl(response *http.Response, userID portainer.UserID, resourceID string) error {
+	rcs, err := p.ResourceControlService.ResourceControls(portainer.ContainerResourceControl)
+	if err != nil {
+		return err
+	}
+
+	userOwnedResources, err := getResourceIDsOwnedByUser(userID, rcs)
+	if err != nil {
+		return err
+	}
+
+	if !isStringInArray(resourceID, userOwnedResources) && isResourceIDInRCs(resourceID, rcs) {
+		return writeAccessDeniedResponse(response)
+	}
+
+	return nil
+}
+
 //
 // func (p *proxyTransport) proxyServiceResponseWithAccessControl(response *http.Response, userID portainer.UserID, resourceID string) error {
 // 	rcs, err := p.ResourceControlService.ResourceControls(portainer.ServiceResourceControl)
@@ -339,49 +340,51 @@ func (p *proxyTransport) handleContainerRequests(request *http.Request, response
 // 	return nil
 // }
 //
-// func (p *proxyTransport) decorateContainers(responseData interface{}) ([]interface{}, error) {
-// 	responseDataArray := responseData.([]interface{})
-//
-// 	containerRCs, err := p.ResourceControlService.ResourceControls(portainer.ContainerResourceControl)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-//
-// 	serviceRCs, err := p.ResourceControlService.ResourceControls(portainer.ServiceResourceControl)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-//
-// 	decoratedResources := make([]interface{}, 0)
-//
-// 	for _, container := range responseDataArray {
-// 		jsonObject := container.(map[string]interface{})
-// 		containerID := jsonObject["Id"].(string)
-// 		containerRC := getRCByResourceID(containerID, containerRCs)
-// 		if containerRC != nil {
-// 			decoratedObject := decorateWithResourceControlMetadata(jsonObject, containerRC.OwnerID)
-// 			decoratedResources = append(decoratedResources, decoratedObject)
-// 			continue
-// 		}
-//
-// 		containerLabels := jsonObject["Labels"]
-// 		if containerLabels != nil {
-// 			jsonLabels := containerLabels.(map[string]interface{})
-// 			serviceID := jsonLabels["com.docker.swarm.service.id"]
-// 			if serviceID != nil {
-// 				serviceRC := getRCByResourceID(serviceID.(string), serviceRCs)
-// 				if serviceRC != nil {
-// 					decoratedObject := decorateWithResourceControlMetadata(jsonObject, serviceRC.OwnerID)
-// 					decoratedResources = append(decoratedResources, decoratedObject)
-// 					continue
-// 				}
-// 			}
-// 		}
-// 		decoratedResources = append(decoratedResources, container)
-// 	}
-//
-// 	return decoratedResources, nil
-// }
+func (p *proxyTransport) decorateContainers(responseData interface{}) ([]interface{}, error) {
+	responseDataArray := responseData.([]interface{})
+
+	containerRCs, err := p.ResourceControlService.ResourceControls(portainer.ContainerResourceControl)
+	if err != nil {
+		return nil, err
+	}
+
+	serviceRCs, err := p.ResourceControlService.ResourceControls(portainer.ServiceResourceControl)
+	if err != nil {
+		return nil, err
+	}
+
+	decoratedResources := make([]interface{}, 0)
+
+	for _, container := range responseDataArray {
+		jsonObject := container.(map[string]interface{})
+		containerID := jsonObject["Id"].(string)
+		containerRC := getRCByResourceID(containerID, containerRCs)
+		if containerRC != nil {
+			decoratedObject := decorateWithResourceControlMetadata(jsonObject, containerRC.OwnerID)
+			decoratedResources = append(decoratedResources, decoratedObject)
+			continue
+		}
+
+		// Labels are stored under Config.Labels
+		containerLabels := jsonObject["Labels"]
+		if containerLabels != nil {
+			jsonLabels := containerLabels.(map[string]interface{})
+			serviceID := jsonLabels["com.docker.swarm.service.id"]
+			if serviceID != nil {
+				serviceRC := getRCByResourceID(serviceID.(string), serviceRCs)
+				if serviceRC != nil {
+					decoratedObject := decorateWithResourceControlMetadata(jsonObject, serviceRC.OwnerID)
+					decoratedResources = append(decoratedResources, decoratedObject)
+					continue
+				}
+			}
+		}
+		decoratedResources = append(decoratedResources, container)
+	}
+
+	return decoratedResources, nil
+}
+
 //
 // func (p *proxyTransport) filterContainers(userID portainer.UserID, responseData interface{}) ([]interface{}, error) {
 // 	responseDataArray := responseData.([]interface{})

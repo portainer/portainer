@@ -312,7 +312,7 @@ function ($q, $scope, $state, $stateParams, $filter, Config, Info, Container, Co
     .then(function success(data) {
       var containerIdentifier = data.Id;
       var userId = Authentication.getUserDetails().ID;
-      return ResourceControlService.applyResourceControl(containerIdentifier, userId, accessControlData);
+      return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData);
     })
     .then(function success() {
       Notifications.success('Container successfully created');
