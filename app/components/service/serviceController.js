@@ -1,11 +1,10 @@
 angular.module('service', [])
-.controller('ServiceController', ['$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Service', 'ServiceHelper', 'Task', 'Node', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
-function ($scope, $stateParams, $state, $location, $anchorScroll, Service, ServiceHelper, Task, Node, Notifications, Pagination, ModalService, ControllerDataPipeline) {
+.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'ServiceService', 'Service', 'ServiceHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
+function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceService, Service, ServiceHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ControllerDataPipeline) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
   $scope.tasks = [];
-  $scope.displayNode = false;
   $scope.sortType = 'Status';
   $scope.sortReverse = false;
 
@@ -259,8 +258,10 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
 
   function initView() {
     $('#loadingViewSpinner').show();
-    Service.get({id: $stateParams.id}, function (d) {
-      var service = new ServiceViewModel(d);
+
+    ServiceService.service($stateParams.id)
+    .then(function success(data) {
+      var service = data;
       $scope.isUpdating = $scope.lastVersion >= service.Version;
       if (!$scope.isUpdating) {
         $scope.lastVersion = service.Version;
@@ -271,27 +272,20 @@ function ($scope, $stateParams, $state, $location, $anchorScroll, Service, Servi
       ControllerDataPipeline.setAccessControlData('service', $stateParams.id, service.ResourceControl);
       originalService = angular.copy(service);
 
-      Task.query({filters: {service: [service.Name]}}, function (tasks) {
-        Node.query({}, function (nodes) {
-          $scope.displayNode = true;
-          $scope.tasks = tasks.map(function (task) {
-            return new TaskViewModel(task, nodes);
-          });
-          $('#loadingViewSpinner').hide();
-        }, function (e) {
-          $('#loadingViewSpinner').hide();
-          $scope.tasks = tasks.map(function (task) {
-            return new TaskViewModel(task, null);
-          });
-          Notifications.error('Failure', e, 'Unable to retrieve node information');
-        });
-      }, function (e) {
-        $('#loadingViewSpinner').hide();
-        Notifications.error('Failure', e, 'Unable to retrieve tasks associated to the service');
+      return $q.all({
+        tasks: TaskService.serviceTasks(service.Name),
+        nodes: NodeService.nodes()
       });
-    }, function (e) {
+    })
+    .then(function success(data) {
+      $scope.tasks = data.tasks;
+      $scope.nodes = data.nodes;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve service details');
+    })
+    .finally(function final() {
       $('#loadingViewSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to retrieve service details');
     });
   }
 

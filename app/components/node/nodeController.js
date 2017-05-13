@@ -1,3 +1,5 @@
+// @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
+// See app/components/templates/templatesController.js as a reference.
 angular.module('node', [])
 .controller('NodeController', ['$scope', '$state', '$stateParams', 'LabelHelper', 'Node', 'NodeHelper', 'Task', 'Pagination', 'Notifications',
 function ($scope, $state, $stateParams, LabelHelper, Node, NodeHelper, Task, Pagination, Notifications) {
@@ -6,7 +8,6 @@ function ($scope, $state, $stateParams, LabelHelper, Node, NodeHelper, Task, Pag
   $scope.state.pagination_count = Pagination.getPaginationCount('node_tasks');
   $scope.loading = true;
   $scope.tasks = [];
-  $scope.displayNode = false;
   $scope.sortType = 'Status';
   $scope.sortReverse = false;
 
@@ -99,7 +100,7 @@ function ($scope, $state, $stateParams, LabelHelper, Node, NodeHelper, Task, Pag
     if (node) {
       Task.query({filters: {node: [node.ID]}}, function (tasks) {
         $scope.tasks = tasks.map(function (task) {
-          return new TaskViewModel(task, [node]);
+          return new TaskViewModel(task);
         });
       }, function (e) {
         Notifications.error('Failure', e, 'Unable to retrieve tasks associated to the node');

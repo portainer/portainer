@@ -1,4 +1,4 @@
-<div ng-if="tasks.length > 0">
+<div ng-if="tasks.length > 0 && nodes">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title="Associated tasks">
       <div class="pull-right">
@@ -31,7 +31,7 @@
           <span ng-show="sortType == 'Slot' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
           </a>
         </th>
-        <th ng-if="displayNode">
+        <th>
           <a ui-sref="service" ng-click="order('Node')">
           Node
           <span ng-show="sortType == 'Node' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -52,8 +52,8 @@
         <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
         <td><span class="label label-{{ task.Status.State|taskstatusbadge }}">{{ task.Status.State }}</span></td>
         <td ng-if="service.Mode !== 'global'">{{ task.Slot }}</td>
-        <td ng-if="displayNode">{{ task.Node }}</td>
-        <td>{{ task.Updated|getisodate }}</td>
+        <td>{{ task.NodeId | tasknodename: nodes }}</td>
+        <td>{{ task.Updated | getisodate }}</td>
         </tr>
       </tbody>
       </table>

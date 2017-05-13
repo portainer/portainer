@@ -261,4 +261,14 @@ angular.module('portainer.filters', [])
         return 'fa fa-eye';
     }
   };
+})
+.filter('tasknodename', function () {
+  'use strict';
+  return function (nodeId, nodes) {
+    var node = _.find(nodes, { Id: nodeId });
+    if (node) {
+      return node.Hostname;
+    }
+    return '';
+  };
 });
