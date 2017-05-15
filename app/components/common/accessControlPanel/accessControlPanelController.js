@@ -24,7 +24,7 @@ function ($q, $scope, $state, UserService, ResourceControlService, Notifications
     if (!validateForm()) {
       return;
     }
-    ModalService.confirmVolumeOwnershipChange(function (confirmed) {
+    ModalService.confirmAccessControlUpdate(function (confirmed) {
       if(!confirmed) { return; }
       updateOwnership();
     });
@@ -77,11 +77,11 @@ function ($q, $scope, $state, UserService, ResourceControlService, Notifications
     ResourceControlService.applyResourceControlChange(accessControlData.resourceType, resourceId,
       $scope.resourceControl, ownershipParameters)
     .then(function success(data) {
-      Notifications.success('Volume ownership successfully updated');
+      Notifications.success('Access control successfully updated');
       $state.reload();
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to update volume ownership');
+      Notifications.error('Failure', err, 'Unable to update access control');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
