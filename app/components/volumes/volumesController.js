@@ -1,4 +1,4 @@
-  angular.module('volumes', [])
+angular.module('volumes', [])
 .controller('VolumesController', ['$q', '$scope', 'VolumeService', 'Notifications', 'Pagination',
 function ($q, $scope, VolumeService, Notifications, Pagination) {
   $scope.state = {};

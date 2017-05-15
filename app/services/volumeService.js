@@ -53,7 +53,7 @@ angular.module('portainer.services')
     Volume.remove({id: volume.Id}).$promise
     .then(function success(data) {
       if (data.message) {
-        deferred.reject({ msg: data.message, err: err });
+        deferred.reject({ msg: data.message, err: data.message });
       }
       deferred.resolve(data);
     })
