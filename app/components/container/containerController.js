@@ -197,7 +197,6 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
   };
 
   $scope.recreate = function() {
-    console.log($scope.container);
     var config = $scope.container.Config;
     // HostConfig
     config.HostConfig = $scope.container.HostConfig;
@@ -221,6 +220,33 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
       delete config.Hostname;
       delete config.ExposedPorts;
     }
+    // Set volumes
+    var binds = [];
+    var volumes = {};
+    for (var v in $scope.container.Mounts) {
+      console.log($scope.container.Mounts[v]);
+      var mount = $scope.container.Mounts[v];
+      var volume = {
+        "type": mount.Type,
+        "name": mount.Name || mount.Source,
+        "containerPath": mount.Destination,
+        "readOnly": mount.RW === false
+      };
+
+      var name = mount.Name || mount.Source;
+      var containerPath = mount.Destination;
+      if (name && containerPath) {
+        var bind = name + ':' + containerPath;
+        volumes[containerPath] = {};
+        if (mount.RW === false) {
+          bind += ':ro';
+        }
+        binds.push(bind);
+      }
+    }
+    config.HostConfig.Binds = binds;
+    config.Volumes = volumes;
+
     Container.remove({id: $scope.container.Id, v: 0, force: true}, function(d) {
       if (d.message) {
         Notifications.error("Error", d, "Unable to remove container");
