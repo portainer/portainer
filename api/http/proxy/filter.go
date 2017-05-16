@@ -42,22 +42,23 @@ func filterContainerList(containerData []interface{}, resourceControls []portain
 		containerID := containerObject[containerIdentifier].(string)
 		resourceControl := getResourceControlByResourceID(containerID, resourceControls)
 		if resourceControl == nil {
-			filteredContainerData = append(filteredContainerData, containerObject)
+			// check if container is part of a Swarm service
+			containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
+			if containerLabels != nil && containerLabels[containerLabelForServiceIdentifier] != nil {
+				serviceID := containerLabels[containerLabelForServiceIdentifier].(string)
+				serviceResourceControl := getResourceControlByResourceID(serviceID, resourceControls)
+				if serviceResourceControl == nil {
+					filteredContainerData = append(filteredContainerData, containerObject)
+				} else if serviceResourceControl != nil && canUserAccessResource(userID, userTeamIDs, serviceResourceControl) {
+					containerObject = decorateObject(containerObject, serviceResourceControl)
+					filteredContainerData = append(filteredContainerData, containerObject)
+				}
+			} else {
+				filteredContainerData = append(filteredContainerData, containerObject)
+			}
 		} else if resourceControl != nil && canUserAccessResource(userID, userTeamIDs, resourceControl) {
 			containerObject = decorateObject(containerObject, resourceControl)
 			filteredContainerData = append(filteredContainerData, containerObject)
-		}
-
-		containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
-		if containerLabels != nil && containerLabels[containerLabelForServiceIdentifier] != nil {
-			serviceID := containerLabels[containerLabelForServiceIdentifier].(string)
-			resourceControl := getResourceControlByResourceID(serviceID, resourceControls)
-			if resourceControl == nil {
-				filteredContainerData = append(filteredContainerData, containerObject)
-			} else if resourceControl != nil && canUserAccessResource(userID, userTeamIDs, resourceControl) {
-				containerObject = decorateObject(containerObject, resourceControl)
-				filteredContainerData = append(filteredContainerData, containerObject)
-			}
 		}
 	}
 
