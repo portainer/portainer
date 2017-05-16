@@ -7,6 +7,11 @@ func getResourceControlByResourceID(resourceID string, resourceControls []portai
 		if resourceID == resourceControl.ResourceID {
 			return &resourceControl
 		}
+		for _, subResourceID := range resourceControl.SubResourceIDs {
+			if resourceID == subResourceID {
+				return &resourceControl
+			}
+		}
 	}
 	return nil
 }

@@ -3,13 +3,14 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.createResourceControl = function(administratorsOnly, userIDs, teamIDs, resourceID, type) {
+  service.createResourceControl = function(administratorsOnly, userIDs, teamIDs, resourceID, type, subResourceIDs) {
     var payload = {
       Type: type,
       AdministratorsOnly: administratorsOnly,
       ResourceID: resourceID,
       Users: userIDs,
-      Teams: teamIDs
+      Teams: teamIDs,
+      SubResourceIDs: subResourceIDs
     };
     return RC.create({}, payload).$promise;
   };
@@ -27,7 +28,7 @@ angular.module('portainer.services')
     return RC.update({id: resourceControlId}, payload).$promise;
   };
 
-  service.applyResourceControl = function(resourceControlType, resourceIdentifier, userId, accessControlData) {
+  service.applyResourceControl = function(resourceControlType, resourceIdentifier, userId, accessControlData, subResources) {
     if (!accessControlData.accessControlEnabled) {
       return;
     }
@@ -52,7 +53,7 @@ angular.module('portainer.services')
         break;
     }
     return service.createResourceControl(administratorsOnly, authorizedUserIds,
-      authorizedTeamIds, resourceIdentifier, resourceControlType);
+      authorizedTeamIds, resourceIdentifier, resourceControlType, subResources);
   };
 
   service.applyResourceControlChange = function(resourceControlType, resourceId, resourceControl, ownershipParameters) {

@@ -118,6 +118,7 @@ type (
 
 		ID                 ResourceControlID   `json:"Id"`
 		ResourceID         string              `json:"ResourceId"`
+		SubResourceIDs     []string            `json:"SubResourceIds"`
 		Type               ResourceControlType `json:"Type"`
 		AdministratorsOnly bool                `json:"AdministratorsOnly"`
 		Users              []UserID            `json:"Users"`

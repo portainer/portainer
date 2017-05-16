@@ -26,8 +26,15 @@
             <tr ng-if="resourceControl.Type === 2 && resourceType === 'container'">
               <td colspan="2">
                 <i class="fa fa-info-circle" aria-hidden="true" style="margin-right: 2px;"></i>
-                Access control on this resource is inherited from the following service: <a ui-sref="service({ id: resourceControl.ResourceId })">{{ resourceControl.ResourceId }}</a>
+                Access control on this resource is inherited from the following service: <a ui-sref="service({ id: resourceControl.ResourceId })">{{ resourceControl.ResourceId | truncate }}</a>
                 <portainer-tooltip message="Access control applied on a service is also applied on each container of that service." position="bottom" style="margin-left: 2px;"></portainer-tooltip>
+              </td>
+            </tr>
+            <tr ng-if="resourceControl.Type === 1 && resourceType === 'volume'">
+              <td colspan="2">
+                <i class="fa fa-info-circle" aria-hidden="true" style="margin-right: 2px;"></i>
+                Access control on this resource is inherited from the following container: <a ui-sref="container({ id: resourceControl.ResourceId })">{{ resourceControl.ResourceId | truncate }}</a>
+                <portainer-tooltip message="Access control applied on a container created using a template is also applied on each volume associated to the container." position="bottom" style="margin-left: 2px;"></portainer-tooltip>
               </td>
             </tr>
             <!-- authorized-users -->
@@ -47,7 +54,7 @@
             </tr>
             <!-- !authorized-teams -->
             <!-- edit-ownership -->
-            <tr ng-if="!(resourceControl.Type === 2 && resourceType === 'container') && !state.editOwnership && (isAdmin || state.canEditOwnership)">
+            <tr ng-if="!(resourceControl.Type === 1 && resourceType === 'volume') && !(resourceControl.Type === 2 && resourceType === 'container') && !state.editOwnership && (isAdmin || state.canEditOwnership)">
               <td colspan="2">
                 <a class="btn-outline-secondary" ng-click="state.editOwnership = true"><i class="fa fa-edit space-right" aria-hidden="true"></i>Change ownership</a>
               </td>

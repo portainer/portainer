@@ -241,7 +241,7 @@ function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, 
     .then(function success(data) {
       var serviceIdentifier = data.ID;
       var userId = Authentication.getUserDetails().ID;
-      return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData);
+      return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData, []);
     })
     .then(function success() {
       Notifications.success('Service successfully created');

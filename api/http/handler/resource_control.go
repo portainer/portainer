@@ -84,6 +84,7 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 		AdministratorsOnly: req.AdministratorsOnly,
 		Users:              users,
 		Teams:              teams,
+		SubResourceIDs:     req.SubResourceIDs,
 	}
 
 	err = handler.ResourceControlService.CreateResourceControl(&resource)
@@ -96,11 +97,12 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 }
 
 type postResourcesRequest struct {
-	ResourceID         string `valid:"required"`
-	Type               string `valid:"required"`
-	AdministratorsOnly bool   `valid:"-"`
-	Users              []int  `valid:"-"`
-	Teams              []int  `valid:"-"`
+	ResourceID         string   `valid:"required"`
+	Type               string   `valid:"required"`
+	AdministratorsOnly bool     `valid:"-"`
+	Users              []int    `valid:"-"`
+	Teams              []int    `valid:"-"`
+	SubResourceIDs     []string `valid:"-"`
 }
 
 // handlePutResources handles PUT requests on /resources/:id
