@@ -134,10 +134,12 @@ function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, M
 
   function initView() {
     $('#loadUsersSpinner').show();
-    $scope.isAdmin = Authentication.getUserDetails().role === 1 ? true: false;
+    var userDetails = Authentication.getUserDetails();
+    var isAdmin = userDetails.role === 1 ? true: false;
+    $scope.isAdmin = isAdmin;
     $q.all({
       users: UserService.users(true),
-      teams: TeamService.teams(),
+      teams: isAdmin ? TeamService.teams() : UserService.userLeadingTeams(userDetails.ID),
       memberships: TeamMembershipService.memberships()
     })
     .then(function success(data) {

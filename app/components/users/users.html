@@ -86,11 +86,10 @@
             </div>
           </div>
           <!-- !teams -->
-          <div class="form-group" ng-if="!formValues.Administrator && formValues.Teams.length === 0">
+          <div class="form-group" ng-if="isAdmin && !formValues.Administrator && formValues.Teams.length === 0">
             <div class="col-sm-12">
               <span class="small text-muted">
-                Note: non-administrator users with no team do not have access to any endpoint by default.
-                <span ng-if="isAdmin"> Head over the <a ui-sref="endpoints">endpoints view</a> to manage their accesses.</span>
+                Note: non-administrator users with no team do not have access to any endpoint by default. Head over the <a ui-sref="endpoints">endpoints view</a> to manage their accesses.
               </span>
             </div>
           </div>
