@@ -400,7 +400,9 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Container.get({id: $stateParams.from}, function(d) {
 			// Add Config
 			$scope.config = d.Config;
-			$scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
+			if ($scope.config.Cmd) {
+				$scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
+      }
 			// Add HostConfig
 			$scope.config.HostConfig = d.HostConfig;
       // Add Ports
@@ -435,6 +437,13 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       $scope.config.NetworkingConfig = {
         EndpointsConfig: {}
       };
+      // Add Env
+      var envArr = [];
+      for (var e in $scope.config.Env) {
+				var arr = $scope.config.Env[e].split(/=(.+)/);
+        envArr.push({"name": arr[0], "value": arr[1]});
+      }
+      $scope.config.Env = envArr;
 
 			// Add name
       $scope.config.name = d.Name.replace(/^\//g, '');
