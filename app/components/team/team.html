@@ -53,7 +53,7 @@
       </rd-widget-header>
       <rd-widget-taskbar classes="col-sm-12 nopadding">
         <div class="col-sm-12 col-md-6 nopadding">
-          <button class="btn btn-primary btn-sm" ng-click="addAllUsers()" ng-disabled="users.length ===  0 || filteredUsers.length === 0"><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Add all users</button>
+          <button class="btn btn-primary btn-sm" ng-click="addAllUsers()" ng-if="isAdmin" ng-disabled="users.length ===  0 || filteredUsers.length === 0"><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Add all users</button>
         </div>
         <div class="col-sm-12 col-md-6 nopadding">
           <input type="text" id="filter" ng-model="state.filterUsers" placeholder="Filter..." class="form-control input-sm" />
@@ -113,7 +113,7 @@
       </rd-widget-header>
       <rd-widget-taskbar classes="col-sm-12 nopadding">
         <div class="col-sm-12 col-md-6 nopadding">
-          <button class="btn btn-primary btn-sm" ng-click="removeAllUsers()" ng-disabled="teamMembers.length ===  0 || filteredGroupMembers.length === 0"><i class="fa fa-user-times space-right" aria-hidden="true"></i>Remove all users</button>
+          <button class="btn btn-primary btn-sm" ng-click="removeAllUsers()" ng-if="isAdmin" ng-disabled="teamMembers.length ===  0 || filteredGroupMembers.length === 0"><i class="fa fa-user-times space-right" aria-hidden="true"></i>Remove all users</button>
         </div>
         <div class="col-sm-12 col-md-6 nopadding">
           <input type="text" id="filter" ng-model="state.filterGroupMembers" placeholder="Filter..." class="form-control input-sm" />
