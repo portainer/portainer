@@ -462,14 +462,34 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       $scope.config.Env = envArr;
 
       // Add ExtraHost
-      for (h in $scope.config.HostConfig.ExtraHosts) {
+      for (var h in $scope.config.HostConfig.ExtraHosts) {
         $scope.formValues.ExtraHosts.push({"value": $scope.config.HostConfig.ExtraHosts[h]});
+        $scope.config.HostConfig.ExtraHosts = [];
       }
 
       // Add labels
-      for (l in $scope.config.Labels) {
+      for (var l in $scope.config.Labels) {
         $scope.formValues.Labels.push({ name: l, value: $scope.config.Labels[l]});
       }
+
+      // Add Console
+      if ($scope.config.OpenStdin && $scope.config.Tty) {
+        $scope.formValues.Console = 'both';
+      } else if (!$scope.config.OpenStdin && $scope.config.Tty) {
+        $scope.formValues.Console = 'tty';
+      } else if ($scope.config.OpenStdin && !$scope.config.Tty) {
+        $scope.formValues.Console = 'interactive';
+      } else if (!$scope.config.OpenStdin && !$scope.config.Tty) {
+        $scope.formValues.Console = 'none';
+      }
+
+      // Add Devices
+      var path = [];
+      for (var dev in $scope.config.HostConfig.Devices) {
+        var device = $scope.config.HostConfig.Devices[dev];
+        path.push({"pathOnHost": device.PathOnHost, "pathInContainer": device.PathInContainer});
+      }
+      $scope.config.HostConfig.Devices = path;
 
 			// Add name
       $scope.config.name = d.Name.replace(/^\//g, '');
