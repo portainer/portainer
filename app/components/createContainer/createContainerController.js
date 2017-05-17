@@ -466,6 +466,11 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
         $scope.formValues.ExtraHosts.push({"value": $scope.config.HostConfig.ExtraHosts[h]});
       }
 
+      // Add labels
+      for (l in $scope.config.Labels) {
+        $scope.formValues.Labels.push({ name: l, value: $scope.config.Labels[l]});
+      }
+
 			// Add name
       $scope.config.name = d.Name.replace(/^\//g, '');
     });
