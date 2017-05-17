@@ -9,8 +9,8 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
   };
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
-    network: "",
-    name: "",
+    network: '',
+    name: ''
   };
 
   $scope.changePaginationCount = function() {
@@ -76,7 +76,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
 
   var selectedItem = -1;
   $scope.selectTemplate = function(idx) {
-    $('#template_' + idx).toggleClass("container-template--selected");
+    $('#template_' + idx).toggleClass('container-template--selected');
     if (selectedItem === idx) {
       unselectTemplate();
     } else {
@@ -90,14 +90,14 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
   }
 
   function selectTemplate(idx) {
-    $('#template_' + selectedItem).toggleClass("container-template--selected");
+    $('#template_' + selectedItem).toggleClass('container-template--selected');
     selectedItem = idx;
     var selectedTemplate = $scope.templates[idx];
     $scope.state.selectedTemplate = selectedTemplate;
     if (selectedTemplate.Network) {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === selectedTemplate.Network; });
     } else {
-      $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === "bridge"; });
+      $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === 'bridge'; });
     }
     $anchorScroll('selectedTemplate');
   }
@@ -114,7 +114,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
     var containerMapping = 'BY_CONTAINER_IP';
     if (endpointProvider === 'DOCKER_SWARM' && network.Scope === 'global') {
       containerMapping = 'BY_SWARM_CONTAINER_NAME';
-    } else if (network.Name !== "bridge") {
+    } else if (network.Name !== 'bridge') {
       containerMapping = 'BY_CONTAINER_NAME';
     }
     return containerMapping;
@@ -155,7 +155,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
       })
       .catch(function error(err) {
         $scope.templates = [];
-        Notifications.error("Failure", err, "An error occured during apps initialization.");
+        Notifications.error('Failure', err, 'An error occured during apps initialization.');
       })
       .finally(function final(){
         $('#loadTemplatesSpinner').hide();
