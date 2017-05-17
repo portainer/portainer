@@ -102,11 +102,18 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     Network.query({}, function (d) {
       var networks = d;
       if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-        networks = d.filter(function (network) {
-          if (network.Scope === 'global') {
-            return network;
-          }
-        });
+        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
+          networks = d.filter(function (network) {
+            if (network.Scope === 'global') {
+              return network;
+            }
+          });
+        }
+        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
+          networks = d.filter(function (network) {
+            return network.Driver !== 'overlay' || network.Attachable;
+          });
+        }
         $scope.globalNetworkCount = networks.length;
         networks.push({Name: "bridge"});
         networks.push({Name: "host"});
@@ -453,6 +460,11 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
         envArr.push({"name": arr[0], "value": arr[1]});
       }
       $scope.config.Env = envArr;
+
+      // Add ExtraHost
+      for (h in $scope.config.HostConfig.ExtraHosts) {
+        $scope.formValues.ExtraHosts.push({"value": $scope.config.HostConfig.ExtraHosts[h]});
+      }
 
 			// Add name
       $scope.config.name = d.Name.replace(/^\//g, '');
