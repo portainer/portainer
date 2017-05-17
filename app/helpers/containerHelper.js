@@ -8,7 +8,9 @@ angular.module('portainer.helpers')
   };
 
   helper.commandArrayToString = function(array) {
-    return array.join(' ');
+    return array.map(function(elem) {
+      return '"' + elem + '"';
+    }).join(' ');
   };
 
   helper.hideContainers = function(containers, containersToHideLabels) {
