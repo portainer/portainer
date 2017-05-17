@@ -270,6 +270,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var networkMode = mode;
     if (containerName) {
       networkMode += ':' + containerName;
+      config.Hostname = '';
     }
     config.HostConfig.NetworkMode = networkMode;
 
@@ -437,6 +438,14 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       $scope.config.NetworkingConfig = {
         EndpointsConfig: {}
       };
+      if ($scope.config.HostConfig.NetworkMode.indexOf('container:') === 0) {
+        console.log($scope.config.HostConfig.NetworkMode);
+        console.log($scope.config.HostConfig.NetworkMode.split(/^container:/));
+        console.log($scope.config.HostConfig.NetworkMode.split(/^container:/)[1]);
+				$scope.config.HostConfig.NetworkMode = 'container';
+				$scope.formValues.NetworkContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
+			}
+
       // Add Env
       var envArr = [];
       for (var e in $scope.config.Env) {
