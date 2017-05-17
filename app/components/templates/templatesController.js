@@ -76,7 +76,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
 
   var selectedItem = -1;
   $scope.selectTemplate = function(idx) {
-    $('#template_' + idx).toggleClass('container-template--selected');
+    $('#template_' + idx).toggleClass('tpl-container--selected');
     if (selectedItem === idx) {
       unselectTemplate();
     } else {
@@ -90,7 +90,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
   }
 
   function selectTemplate(idx) {
-    $('#template_' + selectedItem).toggleClass('container-template--selected');
+    $('#template_' + selectedItem).toggleClass('tpl-container--selected');
     selectedItem = idx;
     var selectedTemplate = $scope.templates[idx];
     $scope.state.selectedTemplate = selectedTemplate;
