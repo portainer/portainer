@@ -12,6 +12,7 @@ function TemplateViewModel(data) {
   this.Env = data.env ? data.env : [];
   this.Privileged = data.privileged ? data.privileged : false;
   this.Volumes = [];
+  this.Interactive = data.interactive ? data.interactive : false;
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
       return {

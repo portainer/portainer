@@ -66,6 +66,18 @@ angular.module('portainer.helpers')
     return env;
   };
 
+  helper.getConsoleConfiguration = function(interactiveFlag) {
+    var consoleConfiguration = {
+      openStdin: false,
+      tty: false
+    };
+    if (interactiveFlag === true) {
+      consoleConfiguration.openStdin = true;
+      consoleConfiguration.tty = true;
+    }
+    return consoleConfiguration;
+  };
+
   helper.createVolumeBindings = function(volumes, generatedVolumesPile) {
     volumes.forEach(function (volume) {
       if (volume.containerPath) {
