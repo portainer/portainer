@@ -51,6 +51,7 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.User = containerSpec.User;
     this.Dir = containerSpec.Dir;
     this.Command = containerSpec.Command;
+    this.Arguments = containerSpec.Args;
     this.Secrets = containerSpec.Secrets;
   }
   if (data.Endpoint) {
