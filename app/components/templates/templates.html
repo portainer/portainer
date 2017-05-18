@@ -13,10 +13,28 @@
   <div ng-class="state.selectedTemplate ? 'col-sm-12 col-lg-7 col-lg-push-5' : 'col-sm-12'" ng-if="state.selectedTemplate">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Image">
+        <div class="pull-right">
+          <button type="button" class="btn btn-sm btn-primary" ng-click="unselectTemplate()">Hide</button>
+        </div>
       </rd-widget-custom-header>
       <rd-widget-body classes="padding">
 
         <form class="form-horizontal">
+          <!-- description -->
+          <div ng-if="state.selectedTemplate.Note">
+            <div class="col-sm-12 form-section-title">
+              Information
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="template-note" ng-bind-html="state.selectedTemplate.Note"></span>
+              </div>
+            </div>
+          </div>
+          <!-- !description -->
+          <div class="col-sm-12 form-section-title">
+            Configuration
+          </div>
           <!-- name-input -->
           <div class="form-group">
             <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
@@ -215,16 +233,33 @@
   <div ng-class="state.selectedTemplate ? 'col-sm-12 col-lg-5 col-lg-pull-7' : 'col-sm-12'" style="height: 100%">
     <rd-template-widget>
       <rd-widget-header icon="fa-rocket" title="Templates">
-        <div class="pull-right" ng-if="availableCategories.length > 0">
-          Category:
+        <div ng-if="availableCategories.length > 0" class="pull-right">
+          Category
           <select ng-model="state.filters.Categories">
-          <!-- <select ng-options="category for category in availableCategories" ng-model="state.filters"> -->
             <option value="!">All</option>
             <option ng-repeat="category in availableCategories" value="{{ category }}">{{ category }}</option>
           </select>
         </div>
       </rd-widget-header>
-      <rd-widget-body classes="padding">
+      <rd-widget-taskbar>
+        <div>
+          <!-- Platform -->
+          <span class="btn-group btn-group-sm" style="margin-right: 15px;">
+            <label class="btn btn-primary" ng-model="state.filters.Platform" uib-btn-radio="'!'">
+              All templates
+            </label>
+            <label class="btn btn-primary" ng-model="state.filters.Platform" uib-btn-radio="'windows'">
+              <i class="fa fa-windows" aria-hidden="true"></i>
+              Windows templates
+            </label>
+            <label class="btn btn-primary" ng-model="state.filters.Platform" uib-btn-radio="'linux'">
+              <i class="fa fa-linux" aria-hidden="true"></i>
+              Linux templates
+            </label>
+          </span>
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="padding template-widget-body">
         <div class="template-list">
           <!-- template -->
           <div dir-paginate="tpl in templates | filter:state.filters:true | itemsPerPage: state.pagination_count" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
@@ -242,7 +277,9 @@
                     {{ tpl.Title }}
                   </span>
                   <span>
-                    Arch / Platform
+                    <i class="fa fa-windows" aria-hidden="true" ng-if="tpl.Platform === 'windows'"></i>
+                    <i class="fa fa-linux" aria-hidden="true" ng-if="tpl.Platform === 'linux'"></i>
+                    <!-- Arch / Platform -->
                   </span>
                 </div>
                 <!-- !template-line1 -->
@@ -259,15 +296,12 @@
               </span>
               <!-- !template-details -->
             </div>
-            <div class="template-note" ng-if="state.selectedTemplate.index === tpl.index && tpl.Note">
-              {{ tpl.Note }}
-            </div>
             <!-- !template -->
           </div>
           <div ng-if="!templates" class="text-center text-muted">
             Loading...
           </div>
-          <div ng-if="templates.length == 0" class="text-center text-muted">
+          <div ng-if="(templates | filter:state.filters:true | itemsPerPage: state.pagination_count).length == 0" class="text-center text-muted">
             No templates available.
           </div>
         </div>

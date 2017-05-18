@@ -64,6 +64,13 @@ html, body, #content-wrapper, .page-content, #view {
   color: #777;
 }
 
+.form-section-title {
+  border-bottom: 1px solid #777;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  color: #777;
+}
+
 .form-horizontal .control-label.text-left{
   text-align: left;
   font-size: 0.9em;
@@ -340,7 +347,11 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 }
 
 .template-widget {
-  max-height: 100%;
+  height: 100%;
+}
+
+.template-widget-body {
+  max-height: 91%;
   overflow-y: auto;
 }
 

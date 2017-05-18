@@ -7,7 +7,8 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
     hideDescriptions: $stateParams.hide_descriptions,
     pagination_count: Pagination.getPaginationCount('templates'),
     filters: {
-      Categories: '!'
+      Categories: '!',
+      Platform: '!'
     }
   };
   $scope.formValues = {
@@ -77,31 +78,32 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
     });
   };
 
+  $scope.unselectTemplate = function() {
+    var currentTemplateIndex = $scope.state.selectedTemplate.index;
+    $('#template_' + currentTemplateIndex).toggleClass('template-container--selected');
+    $scope.state.selectedTemplate = null;
+  };
+
   $scope.selectTemplate = function(index, pos) {
     if ($scope.toggle) {
       $scope.toggleSidebar();
     }
 
     if ($scope.state.selectedTemplate && $scope.state.selectedTemplate.index !== index) {
-      var currentTemplateIndex = $scope.state.selectedTemplate.index;
-      $('#template_' + currentTemplateIndex).toggleClass('template-container--selected');
+      $scope.unselectTemplate();
     }
-    $('#template_' + index).toggleClass('template-container--selected');
 
     var templates = $filter('filter')($scope.templates, $scope.state.filters, true);
     var template = templates[pos];
     if (template === $scope.state.selectedTemplate) {
-      unselectTemplate();
+      $scope.unselectTemplate();
     } else {
       selectTemplate(index, pos, templates);
     }
   };
 
-  function unselectTemplate() {
-    $scope.state.selectedTemplate = null;
-  }
-
   function selectTemplate(index, pos, filteredTemplates) {
+    $('#template_' + index).toggleClass('template-container--selected');
     var selectedTemplate = filteredTemplates[pos];
     $scope.state.selectedTemplate = selectedTemplate;
 
@@ -169,7 +171,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
         angular.forEach($scope.templates, function(template) {
           availableCategories = availableCategories.concat(template.Categories);
         });
-        $scope.availableCategories = _.uniq(availableCategories);
+        $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
         $scope.runningContainers = data.containers;
         $scope.availableNetworks = filterNetworksBasedOnProvider(data.networks);
         $scope.availableVolumes = data.volumes.Volumes;
