@@ -1,4 +1,4 @@
-<rd-header>
+<rd-header id="view-top">
   <rd-header-title title="Application templates list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="templates" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
@@ -8,59 +8,9 @@
   <rd-header-content>Templates</rd-header-content>
 </rd-header>
 
-<div class="row flex-row">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-rocket" title="Templates">
-      </rd-widget-header>
-      <rd-widget-body classes="padding">
-        <div class="tpl-list">
-          <div dir-paginate="tpl in templates | itemsPerPage: state.pagination_count" class="tpl-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index)">
-            <!-- template -->
-            <!-- template-image -->
-            <span class="">
-              <img class="tpl-logo" ng-src="{{ tpl.Logo }}" />
-            </span>
-            <!-- !template-image -->
-            <!-- template-details -->
-            <span class="col-sm-12">
-              <!-- template-line1 -->
-              <div class="tpl-line">
-                <span class="tpl-title">
-                  {{ tpl.Title }}
-                </span>
-                <span>
-                  Arch / Platform
-                </span>
-              </div>
-              <!-- !template-line1 -->
-              <!-- template-line2 -->
-              <div class="tpl-line">
-                <span class="tpl-description">
-                  {{ tpl.Description }}
-                </span>
-                <span class="small text-muted">
-                  database
-                </span>
-              </div>
-              <!-- !template-line2 -->
-            </span>
-            <!-- !template-details -->
-            <!-- !template -->
-          </div>
-          <div ng-if="!templates" class="text-center text-muted">
-            Loading...
-          </div>
-          <div ng-if="templates.length == 0" class="text-center text-muted">
-            No templates available.
-          </div>
+<div class="row">
 
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-
-  <div class="col-sm-12" ng-if="state.selectedTemplate">
+  <div ng-class="state.selectedTemplate ? 'col-sm-12 col-lg-7 col-lg-push-5' : 'col-sm-12'" ng-if="state.selectedTemplate">
     <rd-widget>
       <rd-widget-header icon="fa-cog" title="Template creation">
       </rd-widget-header>
@@ -69,8 +19,8 @@
         <form class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
-            <label for="container_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11">
+            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
+            <div class="col-sm-10">
               <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)">
             </div>
           </div>
@@ -261,4 +211,56 @@
       </rd-widget-body>
     </rd-widget>
   </div>
+
+  <div ng-class="state.selectedTemplate ? 'col-sm-12 col-lg-5 col-lg-pull-7' : 'col-sm-12'">
+    <rd-widget>
+      <rd-widget-header icon="fa-rocket" title="Templates">
+      </rd-widget-header>
+      <rd-widget-body classes="padding">
+        <div class="tpl-list">
+          <div dir-paginate="tpl in templates | itemsPerPage: state.pagination_count" class="tpl-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index)">
+            <!-- template -->
+            <!-- template-image -->
+            <span class="">
+              <img class="tpl-logo" ng-src="{{ tpl.Logo }}" />
+            </span>
+            <!-- !template-image -->
+            <!-- template-details -->
+            <span class="col-sm-12">
+              <!-- template-line1 -->
+              <div class="tpl-line">
+                <span class="tpl-title">
+                  {{ tpl.Title }}
+                </span>
+                <span>
+                  Arch / Platform
+                </span>
+              </div>
+              <!-- !template-line1 -->
+              <!-- template-line2 -->
+              <div class="tpl-line">
+                <span class="tpl-description">
+                  {{ tpl.Description }}
+                </span>
+                <span class="small text-muted">
+                  database
+                </span>
+              </div>
+              <!-- !template-line2 -->
+            </span>
+            <!-- !template-details -->
+            <!-- !template -->
+          </div>
+          <div ng-if="!templates" class="text-center text-muted">
+            Loading...
+          </div>
+          <div ng-if="templates.length == 0" class="text-center text-muted">
+            No templates available.
+          </div>
+
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+
 </div>

@@ -429,13 +429,10 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 }
 
 .tpl-logo {
-  /*margin-right: 10px;*/
-  /*display: inline;*/
-  /*width: 100%;*/
-  /*max-width: 155px;*/
-  /*height: 100%;*/
-  /*max-height: 55px;*/
-  /*margin-bottom: 5px;*/
+  width: 100%;
+  max-width: 60px;
+  height: 100%;
+  max-height: 60px;
 }
 
 .tpl-container {
@@ -466,6 +463,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 
 .tpl-description {
   font-size: 0.9em;
+  padding-right: 1em;
 }
 
 .tpl-line {

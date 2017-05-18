@@ -74,32 +74,44 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
     });
   };
 
-  var selectedItem = -1;
-  $scope.selectTemplate = function(idx) {
-    $('#template_' + idx).toggleClass('tpl-container--selected');
-    if (selectedItem === idx) {
+  // var selectedItem = -1;
+  $scope.selectTemplate = function(index) {
+    if ($scope.state.selectedTemplate) {
+      var currentTemplateIndex = $scope.state.selectedTemplate.index;
+      $('#template_' + currentTemplateIndex).toggleClass('tpl-container--selected');
+    }
+    $('#template_' + index).toggleClass('tpl-container--selected');
+    var template = $scope.templates[index];
+    if (template === $scope.state.selectedTemplate) {
       unselectTemplate();
     } else {
-      selectTemplate(idx);
+      selectTemplate(index);
     }
   };
 
   function unselectTemplate() {
-    selectedItem = -1;
+    // selectedItem = -1;
     $scope.state.selectedTemplate = null;
   }
 
-  function selectTemplate(idx) {
-    $('#template_' + selectedItem).toggleClass('tpl-container--selected');
-    selectedItem = idx;
-    var selectedTemplate = $scope.templates[idx];
+  function selectTemplate(index) {
+    // selectedItem = index;
+    var currentTemplate = $scope.templates[0];
+    var selectedTemplate = $scope.templates[index];
+    // $scope.templates.splice(index, 1);
+    // $scope.templates = [selectedTemplate].concat($scope.templates);
+    // $scope.templates.splice(currentTemplate.index, 0, currentTemplate);
+    // console.log(JSON.stringify(selectedTemplate, null, 4));
+    // console.log(JSON.stringify(switchTemplate, null, 4));
+    $scope.templates[0] = selectedTemplate;
     $scope.state.selectedTemplate = selectedTemplate;
+    // $scope.templates[index] = switchTemplate;
     if (selectedTemplate.Network) {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === selectedTemplate.Network; });
     } else {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === 'bridge'; });
     }
-    $anchorScroll('selectedTemplate');
+    $anchorScroll('view-top');
   }
 
   function createTemplateConfiguration(template) {
