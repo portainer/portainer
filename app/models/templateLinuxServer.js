@@ -1,9 +1,8 @@
-function TemplateViewModel(data) {
+function TemplateLSIOViewModel(data) {
   this.Title = data.title;
-  this.Description = data.description;
-  this.Note = data.note;
-  this.Categories = data.categories ? data.categories : [];
-  this.Platform = data.platform ? data.platform : '';
+  this.Note = data.description;
+  this.Categories = data.category ? data.category : [];
+  this.Platform = data.platform ? data.platform : 'linux';
   this.Logo = data.logo;
   this.Image = data.image;
   this.Registry = data.registry ? data.registry : '';
@@ -12,7 +11,6 @@ function TemplateViewModel(data) {
   this.Env = data.env ? data.env : [];
   this.Privileged = data.privileged ? data.privileged : false;
   this.Volumes = [];
-  this.Interactive = data.interactive ? data.interactive : false;
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
       return {

@@ -127,6 +127,71 @@ a[ng-click]{
   font-size: 90% !important;
 }
 
+.template-widget {
+  height: 100%;
+}
+
+.template-widget-body {
+  max-height: 86%;
+  overflow-y: auto;
+}
+
+.template-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.template-logo {
+  width: 100%;
+  max-width: 60px;
+  height: 100%;
+  max-height: 60px;
+}
+
+.template-container {
+  padding: 0.7rem;
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  border: 1px solid #333333;
+  border-radius: 2px;
+  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+}
+
+.template-container--selected {
+  border: 2px solid #333333;
+  background-color: #ececec;
+  color: #2d3e63;
+}
+
+.template-container:hover {
+  background-color: #ececec;
+  color: #2d3e63;
+}
+
+.template-main {
+  display: flex;
+}
+
+.template-note {
+  padding: 0.5em;
+  font-size: 0.9em;
+}
+
+.template-title {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.template-description {
+  font-size: 0.9em;
+  padding-right: 1em;
+}
+
+.template-line {
+  display: flex;
+  justify-content: space-between;
+}
+
 .nopadding {
   padding: 0 !important;
 }
@@ -142,11 +207,6 @@ a[ng-click]{
 
 .interactive {
   cursor: pointer;
-}
-
-.template-list {
-  display: flex;
-  flex-wrap: wrap;
 }
 
 .custom-header-ico {
@@ -169,81 +229,6 @@ a[ng-click]{
     line-height: 1.42857143;
     border-radius: 4px;
   }
-}
-
-/* Underline From Center */
-.hvr-underline-from-center {
-  display: inline-block;
-  vertical-align: middle;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -moz-osx-font-smoothing: grayscale;
-  position: relative;
-  overflow: hidden;
-}
-.hvr-underline-from-center:before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: 50%;
-  right: 50%;
-  bottom: 0;
-  background: #85898b;
-  height: 2px;
-  -webkit-transition-property: left, right;
-  transition-property: left, right;
-  -webkit-transition-duration: 0.3s;
-  transition-duration: 0.3s;
-  -webkit-transition-timing-function: ease-out;
-  transition-timing-function: ease-out;
-}
-.hvr-underline-from-center:hover:before, .hvr-underline-from-center:focus:before, .hvr-underline-from-center:active:before {
-  left: 0;
-  right: 0;
-}
-
-.container-template {
-  font-size: 1em;
-  width: 256px;
-  height: 128px;
-  margin: 15px;
-  padding: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-  cursor: pointer;
-  border: 2px solid #f6f6f6;
-  color: #30426a;
-}
-
-.container-template--selected {
-  background-color: #ececec;
-  color: #2d3e63;
-}
-
-.container-template:hover {
-  background-color: #ececec;
-  color: #2d3e63;
-}
-
-.container-template .logo {
-  max-width: 48px;
-  max-height: 48px;
-}
-
-.container-template .title {
-  text-align: center;
-}
-
-.container-template .description {
-  text-align: center;
-  font-size: 0.8em;
-  margin-bottom: 5px;
 }
 
 .page-wrapper {

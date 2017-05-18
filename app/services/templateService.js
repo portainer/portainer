@@ -8,20 +8,24 @@ angular.module('portainer.services')
     Template.get({key: key}).$promise
     .then(function success(data) {
       var templates = data.map(function (tpl, idx) {
-        var template = new TemplateViewModel(tpl);
+        var template;
+        if (key === 'linuxserver.io') {
+          template = new TemplateLSIOViewModel(tpl);
+        } else {
+          template = new TemplateViewModel(tpl);
+        }
         template.index = idx;
         return template;
       });
+      if (key === 'linuxserver.io') {
+        templates = TemplateHelper.filterLinuxServerIOTemplates(templates);
+      }
       deferred.resolve(templates);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve templates', err: err });
     });
     return deferred.promise;
-  };
-
-  service.filterLinuxServerIOTemplates = function(templates) {
-    return TemplateHelper.filterLinuxServerIOTemplates(templates);
   };
 
   service.createTemplateConfiguration = function(template, containerName, network, containerMapping) {
