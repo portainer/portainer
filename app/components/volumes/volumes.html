@@ -53,13 +53,6 @@
                   <span ng-show="sortType == 'Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
-              <th>
-                <a ui-sref="volumes" ng-click="order('Mountpoint')">
-                  Mountpoint
-                  <span ng-show="sortType == 'Mountpoint' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Mountpoint' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
               <th ng-if="applicationState.application.authentication">
                 <a ui-sref="volumes" ng-click="order('ResourceControl.Ownership')">
                   Ownership
@@ -74,7 +67,6 @@
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
               <td><a ui-sref="volume({id: volume.Id})">{{ volume.Id|truncate:50 }}</a></td>
               <td>{{ volume.Driver }}</td>
-              <td>{{ volume.Mountpoint }}</td>
               <td ng-if="applicationState.application.authentication">
                 <span>
                   <i ng-class="volume.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
