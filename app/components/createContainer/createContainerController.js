@@ -446,12 +446,19 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
         EndpointsConfig: {}
       };
       if ($scope.config.HostConfig.NetworkMode.indexOf('container:') === 0) {
-        console.log($scope.config.HostConfig.NetworkMode);
-        console.log($scope.config.HostConfig.NetworkMode.split(/^container:/));
-        console.log($scope.config.HostConfig.NetworkMode.split(/^container:/)[1]);
 				$scope.config.HostConfig.NetworkMode = 'container';
 				$scope.formValues.NetworkContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
 			}
+      if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]) {
+        console.log(d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]);
+        if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address) {
+          $scope.formValues.IPv4 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address;
+        }
+        if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address) {
+          $scope.formValues.IPv6 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address;
+        }
+      }
+      $scope.config.NetworkingConfig.EndpointsConfig = d.NetworkSettings.Networks;
 
       // Add Env
       var envArr = [];
