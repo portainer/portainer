@@ -1,16 +1,20 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication',
-function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', '$filter', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication',
+function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
     hideDescriptions: $stateParams.hide_descriptions,
-    pagination_count: Pagination.getPaginationCount('templates')
+    pagination_count: Pagination.getPaginationCount('templates'),
+    filters: {
+      Categories: '!',
+      Platform: '!'
+    }
   };
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
-    network: "",
-    name: "",
+    network: '',
+    name: ''
   };
 
   $scope.changePaginationCount = function() {
@@ -74,32 +78,38 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
     });
   };
 
-  var selectedItem = -1;
-  $scope.selectTemplate = function(idx) {
-    $('#template_' + idx).toggleClass("container-template--selected");
-    if (selectedItem === idx) {
-      unselectTemplate();
+  $scope.unselectTemplate = function() {
+    var currentTemplateIndex = $scope.state.selectedTemplate.index;
+    $('#template_' + currentTemplateIndex).toggleClass('template-container--selected');
+    $scope.state.selectedTemplate = null;
+  };
+
+  $scope.selectTemplate = function(index, pos) {
+    if ($scope.state.selectedTemplate && $scope.state.selectedTemplate.index !== index) {
+      $scope.unselectTemplate();
+    }
+
+    var templates = $filter('filter')($scope.templates, $scope.state.filters, true);
+    var template = templates[pos];
+    if (template === $scope.state.selectedTemplate) {
+      $scope.unselectTemplate();
     } else {
-      selectTemplate(idx);
+      selectTemplate(index, pos, templates);
     }
   };
 
-  function unselectTemplate() {
-    selectedItem = -1;
-    $scope.state.selectedTemplate = null;
-  }
-
-  function selectTemplate(idx) {
-    $('#template_' + selectedItem).toggleClass("container-template--selected");
-    selectedItem = idx;
-    var selectedTemplate = $scope.templates[idx];
+  function selectTemplate(index, pos, filteredTemplates) {
+    $('#template_' + index).toggleClass('template-container--selected');
+    var selectedTemplate = filteredTemplates[pos];
     $scope.state.selectedTemplate = selectedTemplate;
+
     if (selectedTemplate.Network) {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === selectedTemplate.Network; });
     } else {
-      $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === "bridge"; });
+      $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === 'bridge'; });
     }
-    $anchorScroll('selectedTemplate');
+
+    $anchorScroll('view-top');
   }
 
   function createTemplateConfiguration(template) {
@@ -114,7 +124,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
     var containerMapping = 'BY_CONTAINER_IP';
     if (endpointProvider === 'DOCKER_SWARM' && network.Scope === 'global') {
       containerMapping = 'BY_SWARM_CONTAINER_NAME';
-    } else if (network.Name !== "bridge") {
+    } else if (network.Name !== 'bridge') {
       containerMapping = 'BY_CONTAINER_NAME';
     }
     return containerMapping;
@@ -144,18 +154,19 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
         volumes: VolumeService.getVolumes()
       })
       .then(function success(data) {
-        var templates = data.templates;
-        if (templatesKey === 'linuxserver.io') {
-          templates = TemplateService.filterLinuxServerIOTemplates(templates);
-        }
-        $scope.templates = templates;
+        $scope.templates = data.templates;
+        var availableCategories = [];
+        angular.forEach($scope.templates, function(template) {
+          availableCategories = availableCategories.concat(template.Categories);
+        });
+        $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
         $scope.runningContainers = data.containers;
         $scope.availableNetworks = filterNetworksBasedOnProvider(data.networks);
         $scope.availableVolumes = data.volumes.Volumes;
       })
       .catch(function error(err) {
         $scope.templates = [];
-        Notifications.error("Failure", err, "An error occured during apps initialization.");
+        Notifications.error('Failure', err, 'An error occured during apps initialization.');
       })
       .finally(function final(){
         $('#loadTemplatesSpinner').hide();

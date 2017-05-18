@@ -19,7 +19,7 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
       $state.go('dashboard');
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to connect to the Docker endpoint");
+      Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
       EndpointProvider.setEndpointID(activeEndpointID);
       EndpointProvider.setEndpointPublicURL(activeEndpointPublicURL);
       StateManager.updateEndpointState(true)
