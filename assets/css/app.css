@@ -351,7 +351,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 }
 
 .template-widget-body {
-  max-height: 91%;
+  max-height: 86%;
   overflow-y: auto;
 }
 

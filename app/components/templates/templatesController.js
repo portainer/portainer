@@ -85,10 +85,6 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
   };
 
   $scope.selectTemplate = function(index, pos) {
-    if ($scope.toggle) {
-      $scope.toggleSidebar();
-    }
-
     if ($scope.state.selectedTemplate && $scope.state.selectedTemplate.index !== index) {
       $scope.unselectTemplate();
     }
@@ -107,20 +103,12 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
     var selectedTemplate = filteredTemplates[pos];
     $scope.state.selectedTemplate = selectedTemplate;
 
-    // var reorderedTemplates = _.filter(filteredTemplates, function(o) {
-    //   return o.index !== index;
-    // });
-    // reorderedTemplates = _.orderBy(reorderedTemplates, 'index', 'asc');
-    // reorderedTemplates = [selectedTemplate].concat(reorderedTemplates);
-    // $scope.templates = reorderedTemplates;
-
     if (selectedTemplate.Network) {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === selectedTemplate.Network; });
     } else {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === 'bridge'; });
     }
 
-    // $('#template-widget').animate({ scrollTop:0 }, 'fast');
     $anchorScroll('view-top');
   }
 

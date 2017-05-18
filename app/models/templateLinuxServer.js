@@ -2,7 +2,7 @@ function TemplateLSIOViewModel(data) {
   this.Title = data.title;
   this.Note = data.description;
   this.Categories = data.category ? data.category : [];
-  this.Platform = data.platform ? data.platform : '';
+  this.Platform = data.platform ? data.platform : 'linux';
   this.Logo = data.logo;
   this.Image = data.image;
   this.Registry = data.registry ? data.registry : '';
