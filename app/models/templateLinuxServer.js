@@ -1,7 +1,6 @@
-function TemplateViewModel(data) {
+function TemplateLSIOViewModel(data) {
   this.Title = data.title;
-  this.Description = data.description;
-  this.Note = data.note;
+  this.Note = data.description;
   this.Category = data.category ? data.category : '';
   this.Logo = data.logo;
   this.Image = data.image;

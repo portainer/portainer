@@ -74,43 +74,47 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
     });
   };
 
-  // var selectedItem = -1;
-  $scope.selectTemplate = function(index) {
-    if ($scope.state.selectedTemplate) {
+  $scope.selectTemplate = function(index, pos) {
+    if ($scope.toggle) {
+      $scope.toggleSidebar();
+    }
+
+    if ($scope.state.selectedTemplate && $scope.state.selectedTemplate.index !== index) {
       var currentTemplateIndex = $scope.state.selectedTemplate.index;
       $('#template_' + currentTemplateIndex).toggleClass('tpl-container--selected');
     }
     $('#template_' + index).toggleClass('tpl-container--selected');
-    var template = $scope.templates[index];
+
+    var template = $scope.templates[pos];
     if (template === $scope.state.selectedTemplate) {
       unselectTemplate();
     } else {
-      selectTemplate(index);
+      selectTemplate(index, pos);
     }
   };
 
   function unselectTemplate() {
-    // selectedItem = -1;
     $scope.state.selectedTemplate = null;
   }
 
-  function selectTemplate(index) {
-    // selectedItem = index;
-    var currentTemplate = $scope.templates[0];
-    var selectedTemplate = $scope.templates[index];
-    // $scope.templates.splice(index, 1);
-    // $scope.templates = [selectedTemplate].concat($scope.templates);
-    // $scope.templates.splice(currentTemplate.index, 0, currentTemplate);
-    // console.log(JSON.stringify(selectedTemplate, null, 4));
-    // console.log(JSON.stringify(switchTemplate, null, 4));
-    $scope.templates[0] = selectedTemplate;
+  function selectTemplate(index, pos) {
+    var selectedTemplate = $scope.templates[pos];
     $scope.state.selectedTemplate = selectedTemplate;
-    // $scope.templates[index] = switchTemplate;
+
+    var reorderedTemplates = _.filter($scope.templates, function(o) {
+      return o.index !== index;
+    });
+    reorderedTemplates = _.orderBy(reorderedTemplates, 'index', 'asc');
+    reorderedTemplates = [selectedTemplate].concat(reorderedTemplates);
+    $scope.templates = reorderedTemplates;
+
     if (selectedTemplate.Network) {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === selectedTemplate.Network; });
     } else {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === 'bridge'; });
     }
+
+    $('#template-widget').animate({ scrollTop:0 }, 'fast');
     $anchorScroll('view-top');
   }
 
@@ -156,11 +160,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
         volumes: VolumeService.getVolumes()
       })
       .then(function success(data) {
-        var templates = data.templates;
-        if (templatesKey === 'linuxserver.io') {
-          templates = TemplateService.filterLinuxServerIOTemplates(templates);
-        }
-        $scope.templates = templates;
+        $scope.templates = data.templates;
         $scope.runningContainers = data.containers;
         $scope.availableNetworks = filterNetworksBasedOnProvider(data.networks);
         $scope.availableVolumes = data.volumes.Volumes;
