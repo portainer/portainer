@@ -1,11 +1,14 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication',
-function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', '$filter', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication',
+function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
     hideDescriptions: $stateParams.hide_descriptions,
-    pagination_count: Pagination.getPaginationCount('templates')
+    pagination_count: Pagination.getPaginationCount('templates'),
+    filters: {
+      Categories: '!'
+    }
   };
   $scope.formValues = {
     Ownership: $scope.applicationState.application.authentication ? 'private' : '',
@@ -81,15 +84,16 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
 
     if ($scope.state.selectedTemplate && $scope.state.selectedTemplate.index !== index) {
       var currentTemplateIndex = $scope.state.selectedTemplate.index;
-      $('#template_' + currentTemplateIndex).toggleClass('tpl-container--selected');
+      $('#template_' + currentTemplateIndex).toggleClass('template-container--selected');
     }
-    $('#template_' + index).toggleClass('tpl-container--selected');
+    $('#template_' + index).toggleClass('template-container--selected');
 
-    var template = $scope.templates[pos];
+    var templates = $filter('filter')($scope.templates, $scope.state.filters, true);
+    var template = templates[pos];
     if (template === $scope.state.selectedTemplate) {
       unselectTemplate();
     } else {
-      selectTemplate(index, pos);
+      selectTemplate(index, pos, templates);
     }
   };
 
@@ -97,16 +101,16 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
     $scope.state.selectedTemplate = null;
   }
 
-  function selectTemplate(index, pos) {
-    var selectedTemplate = $scope.templates[pos];
+  function selectTemplate(index, pos, filteredTemplates) {
+    var selectedTemplate = filteredTemplates[pos];
     $scope.state.selectedTemplate = selectedTemplate;
 
-    var reorderedTemplates = _.filter($scope.templates, function(o) {
-      return o.index !== index;
-    });
-    reorderedTemplates = _.orderBy(reorderedTemplates, 'index', 'asc');
-    reorderedTemplates = [selectedTemplate].concat(reorderedTemplates);
-    $scope.templates = reorderedTemplates;
+    // var reorderedTemplates = _.filter(filteredTemplates, function(o) {
+    //   return o.index !== index;
+    // });
+    // reorderedTemplates = _.orderBy(reorderedTemplates, 'index', 'asc');
+    // reorderedTemplates = [selectedTemplate].concat(reorderedTemplates);
+    // $scope.templates = reorderedTemplates;
 
     if (selectedTemplate.Network) {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === selectedTemplate.Network; });
@@ -114,7 +118,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === 'bridge'; });
     }
 
-    $('#template-widget').animate({ scrollTop:0 }, 'fast');
+    // $('#template-widget').animate({ scrollTop:0 }, 'fast');
     $anchorScroll('view-top');
   }
 
@@ -161,6 +165,11 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, Config, ContainerServ
       })
       .then(function success(data) {
         $scope.templates = data.templates;
+        var availableCategories = [];
+        angular.forEach($scope.templates, function(template) {
+          availableCategories = availableCategories.concat(template.Categories);
+        });
+        $scope.availableCategories = _.uniq(availableCategories);
         $scope.runningContainers = data.containers;
         $scope.availableNetworks = filterNetworksBasedOnProvider(data.networks);
         $scope.availableVolumes = data.volumes.Volumes;

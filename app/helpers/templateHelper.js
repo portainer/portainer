@@ -28,7 +28,7 @@ angular.module('portainer.helpers')
     };
     ports.forEach(function (p) {
       if (p.containerPort) {
-        var key = p.containerPort + "/" + p.protocol;
+        var key = p.containerPort + '/' + p.protocol;
         var binding = {};
         if (p.hostPort) {
           binding.HostPort = p.hostPort;
@@ -60,7 +60,7 @@ angular.module('portainer.helpers')
             value = $filter('swarmcontainername')(envvar.value);
           }
         }
-        env.push(envvar.name + "=" + value);
+        env.push(envvar.name + '=' + value);
       }
     });
     return env;
@@ -96,8 +96,8 @@ angular.module('portainer.helpers')
   helper.filterLinuxServerIOTemplates = function(templates) {
     return templates.filter(function f(template) {
       var valid = false;
-      if (template.Category) {
-        angular.forEach(template.Category, function(category) {
+      if (template.Categories) {
+        angular.forEach(template.Categories, function(category) {
           if (_.startsWith(category, 'Network')) {
             valid = true;
           }

@@ -2,7 +2,7 @@ function TemplateViewModel(data) {
   this.Title = data.title;
   this.Description = data.description;
   this.Note = data.note;
-  this.Category = data.category ? data.category : '';
+  this.Categories = data.categories ? data.categories : [];
   this.Logo = data.logo;
   this.Image = data.image;
   this.Registry = data.registry ? data.registry : '';

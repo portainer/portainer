@@ -215,11 +215,19 @@
   <div ng-class="state.selectedTemplate ? 'col-sm-12 col-lg-5 col-lg-pull-7' : 'col-sm-12'" style="height: 100%">
     <rd-template-widget>
       <rd-widget-header icon="fa-rocket" title="Templates">
+        <div class="pull-right" ng-if="availableCategories.length > 0">
+          Category:
+          <select ng-model="state.filters.Categories">
+          <!-- <select ng-options="category for category in availableCategories" ng-model="state.filters"> -->
+            <option value="!">All</option>
+            <option ng-repeat="category in availableCategories" value="{{ category }}">{{ category }}</option>
+          </select>
+        </div>
       </rd-widget-header>
       <rd-widget-body classes="padding">
         <div class="template-list">
           <!-- template -->
-          <div dir-paginate="tpl in templates | itemsPerPage: state.pagination_count" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
+          <div dir-paginate="tpl in templates | filter:state.filters:true | itemsPerPage: state.pagination_count" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
             <div class="template-main">
               <!-- template-image -->
               <span class="">
@@ -243,8 +251,8 @@
                   <span class="template-description">
                     {{ tpl.Description }}
                   </span>
-                  <span class="small text-muted">
-                    database
+                  <span class="small text-muted" ng-if="tpl.Categories.length > 0">
+                    {{ tpl.Categories.join(', ') }}
                   </span>
                 </div>
                 <!-- !template-line2 -->
