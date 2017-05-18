@@ -27,15 +27,12 @@
           </div>
           <!-- !name-input -->
           <!-- team-leaders -->
-          <div class="form-group">
-            <div class="col-sm-12">
+          <div class="form-group" ng-if="users.length > 0">
+            <div class="col-sm-12" >
               <label class="control-label text-left">
                 Select team leader(s)
                 <portainer-tooltip position="bottom" message="You can assign one or more leaders to this team. Team leaders can manage their teams users and resources."></portainer-tooltip>
               </label>
-              <span class="small text-muted" style="margin-left: 20px;" ng-if="users.length === 0">
-                You have not yet added any user. Head over the <a ui-sref="users">users view</a> to manage users.</span>
-              </span>
               <span isteven-multi-select
                ng-if="users.length > 0"
                input-model="users"
