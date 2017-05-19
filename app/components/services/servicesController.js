@@ -1,39 +1,11 @@
 angular.module('services', [])
-.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, Authentication, UserService, ModalService, ResourceControlService) {
+.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
-
-  function removeServiceResourceControl(service) {
-    volumeResourceControlQueries = [];
-    angular.forEach(service.Mounts, function (mount) {
-      if (mount.Type === 'volume') {
-        volumeResourceControlQueries.push(ResourceControlService.removeVolumeResourceControl(service.Metadata.ResourceControl.OwnerId, mount.Source));
-      }
-    });
-
-    $q.all(volumeResourceControlQueries)
-    .then(function success() {
-      return ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id);
-    })
-    .then(function success() {
-      delete service.Metadata.ResourceControl;
-      Notifications.success('Ownership changed to public', service.Id);
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to change service ownership');
-    });
-  }
-
-  $scope.switchOwnership = function(volume) {
-    ModalService.confirmServiceOwnershipChange(function (confirmed) {
-      if(!confirmed) { return; }
-      removeServiceResourceControl(volume);
-    });
-  };
 
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('services', $scope.state.pagination_count);
@@ -95,8 +67,8 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notification
             $('#loadServicesSpinner').hide();
             Notifications.error('Unable to remove service', {}, d[0].message);
           } else {
-            if (service.Metadata && service.Metadata.ResourceControl) {
-              ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id)
+            if (service.ResourceControl) {
+              ResourceControlService.deleteResourceControl(service.ResourceControl.Id)
               .then(function success() {
                 Notifications.success('Service deleted', service.Id);
                 var index = $scope.services.indexOf(service);
@@ -137,10 +109,6 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notification
 
   function initView() {
     $('#loadServicesSpinner').show();
-
-    var userDetails = Authentication.getUserDetails();
-    $scope.user = userDetails;
-
     $q.all({
       services: Service.query({}).$promise,
       tasks: Task.query({filters: {'desired-state': ['running']}}).$promise,
@@ -157,15 +125,6 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notification
         });
         return new ServiceViewModel(service, serviceTasks, taskNodes);
       });
-      if (userDetails.role === 1) {
-        UserService.users(true)
-        .then(function success(data) {
-          mapUsersToServices(data);
-        })
-        .finally(function final() {
-          $('#loadServicesSpinner').hide();
-        });
-      }
     })
     .catch(function error(err) {
       $scope.services = [];
