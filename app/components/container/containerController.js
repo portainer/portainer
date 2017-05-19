@@ -204,18 +204,11 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
     config.name = $scope.container.Name.replace(/^\//g, '');
     // Network
     var mode = config.HostConfig.NetworkMode;
-    var IPv4 = '';
-    var IPv6 = '';
     // TODO get ip addrs
     config.NetworkingConfig = {
       "EndpointsConfig": {}
     };
-    config.NetworkingConfig.EndpointsConfig[mode] = {
-      IPAMConfig: {
-        IPv4Address: IPv4,
-        IPv6Address: IPv6
-      }
-    };
+    config.NetworkingConfig.EndpointsConfig = $scope.container.NetworkSettings.Networks;
     if (mode.indexOf('container:') !== -1) {
       delete config.Hostname;
       delete config.ExposedPorts;
