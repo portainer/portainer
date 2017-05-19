@@ -31,8 +31,6 @@ func NewResourceHandler(bouncer *security.RequestBouncer) *ResourceHandler {
 	}
 	h.Handle("/resource_controls",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostResources))).Methods(http.MethodPost)
-	// h.Handle("/resources/{id}",
-	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetUser))).Methods(http.MethodGet)
 	h.Handle("/resource_controls/{id}",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutResources))).Methods(http.MethodPut)
 	h.Handle("/resource_controls/{id}",

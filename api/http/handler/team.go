@@ -44,11 +44,6 @@ func NewTeamHandler(bouncer *security.RequestBouncer) *TeamHandler {
 	h.Handle("/teams/{id}/memberships",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
 
-	// h.Handle("/teams/{teamId}/resources/{resourceType}",
-	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostTeamResource))).Methods(http.MethodPost)
-	// h.Handle("/teams/{teamId}/resources/{resourceType}/{resourceId}",
-	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteTeamResource))).Methods(http.MethodDelete)
-
 	return h
 }
 

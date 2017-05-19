@@ -10,7 +10,6 @@ import (
 // NewSingleHostReverseProxyWithHostHeader is based on NewSingleHostReverseProxy
 // from golang.org/src/net/http/httputil/reverseproxy.go and merely sets the Host
 // HTTP header, which NewSingleHostReverseProxy deliberately preserves.
-// It also adds an extra Transport to the proxy to allow Portainer to rewrite the responses.
 func newSingleHostReverseProxyWithHostHeader(target *url.URL) *httputil.ReverseProxy {
 	targetQuery := target.RawQuery
 	director := func(req *http.Request) {
@@ -28,12 +27,6 @@ func newSingleHostReverseProxyWithHostHeader(target *url.URL) *httputil.ReverseP
 			req.Header.Set("User-Agent", "")
 		}
 	}
-	// transport := &proxyTransport{
-	// 	ResourceControlService: factory.ResourceControlService,
-	// 	TeamService:            factory.TeamService,
-	// 	transport:              newHTTPTransport(),
-	// }
-	// return &httputil.ReverseProxy{Director: director, Transport: transport}
 	return &httputil.ReverseProxy{Director: director}
 }
 

@@ -60,8 +60,6 @@ type (
 	Team struct {
 		ID   TeamID `json:"Id"`
 		Name string `json:"Name"`
-		// Members []UserID `json:"Members"`
-		// Leaders []UserID `json:"Leaders"`
 	}
 
 	// TeamID represents a team identifier

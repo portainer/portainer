@@ -48,10 +48,6 @@ func NewUserHandler(bouncer *security.RequestBouncer) *UserHandler {
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
 	h.Handle("/users/{id}/teams",
 		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
-	// h.Handle("/users/{id}/memberships/{teamID}",
-	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMembership))).Methods(http.MethodGet)
-	// h.Handle("/users/{id}/memberships/{teamID}",
-	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteMembership))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/passwd",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUserPasswd)))
 	h.Handle("/users/admin/check",

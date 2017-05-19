@@ -34,8 +34,6 @@ func NewTeamMembershipHandler(bouncer *security.RequestBouncer) *TeamMembershipH
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostTeamMemberships))).Methods(http.MethodPost)
 	h.Handle("/team_memberships",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTeamsMemberships))).Methods(http.MethodGet)
-	// h.Handle("/team_memberships/{id}",
-	// 	bouncer.AdministratorAccess(http.HandlerFunc(h.handleGetTeamsMembership))).Methods(http.MethodGet)
 	h.Handle("/team_memberships/{id}",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutTeamMembership))).Methods(http.MethodPut)
 	h.Handle("/team_memberships/{id}",
@@ -111,29 +109,6 @@ func (handler *TeamMembershipHandler) handleGetTeamsMemberships(w http.ResponseW
 
 	encodeJSON(w, memberships, handler.Logger)
 }
-
-// handleGetTeamsMembership handles GET requests on /team_memberships/:id
-// func (handler *TeamMembershipHandler) handleGetTeamsMembership(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	id := vars["id"]
-//
-// 	membershipID, err := strconv.Atoi(id)
-// 	if err != nil {
-// 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-// 		return
-// 	}
-//
-// 	membership, err := handler.TeamMembershipService.TeamMembership(portainer.TeamMembershipID(membershipID))
-// 	if err == portainer.ErrTeamNotFound {
-// 		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-// 		return
-// 	} else if err != nil {
-// 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-// 		return
-// 	}
-//
-// 	encodeJSON(w, &team, handler.Logger)
-// }
 
 // handlePutTeamMembership handles PUT requests on /team_memberships/:id
 func (handler *TeamMembershipHandler) handlePutTeamMembership(w http.ResponseWriter, r *http.Request) {

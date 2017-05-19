@@ -18,9 +18,8 @@ import (
 // DockerHandler represents an HTTP API handler for proxying requests to the Docker API.
 type DockerHandler struct {
 	*mux.Router
-	Logger          *log.Logger
-	EndpointService portainer.EndpointService
-	// TeamService           portainer.TeamService
+	Logger                *log.Logger
+	EndpointService       portainer.EndpointService
 	TeamMembershipService portainer.TeamMembershipService
 	ProxyManager          *proxy.Manager
 }

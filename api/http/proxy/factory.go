@@ -12,8 +12,7 @@ import (
 // proxyFactory is a factory to create reverse proxies to Docker endpoints
 type proxyFactory struct {
 	ResourceControlService portainer.ResourceControlService
-	// TeamService            portainer.TeamService
-	TeamMembershipService portainer.TeamMembershipService
+	TeamMembershipService  portainer.TeamMembershipService
 }
 
 func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {

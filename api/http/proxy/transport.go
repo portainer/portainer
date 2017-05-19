@@ -15,7 +15,6 @@ type (
 		dockerTransport        *http.Transport
 		ResourceControlService portainer.ResourceControlService
 		TeamMembershipService  portainer.TeamMembershipService
-		// TeamService            portainer.TeamService
 	}
 	restrictedOperationContext struct {
 		isAdmin          bool
