@@ -19,7 +19,7 @@ module.exports = function (grunt) {
   // Default task.
   grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('build', [
-    'config:prod',
+    'config:dev',
     'clean:app',
     'if:unixBinaryNotExist',
     'html2js',
@@ -60,12 +60,12 @@ module.exports = function (grunt) {
     'concat',
     'clean:tmpl',
     'cssmin',
+    'replace',
     'uglify',
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
   grunt.registerTask('release-arm', [
     'config:prod',
@@ -77,12 +77,12 @@ module.exports = function (grunt) {
     'concat',
     'clean:tmpl',
     'cssmin',
+    'replace',
     'uglify',
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
   grunt.registerTask('release-arm64', [
     'config:prod',
@@ -94,12 +94,12 @@ module.exports = function (grunt) {
     'concat',
     'clean:tmpl',
     'cssmin',
+    'replace',
     'uglify',
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
   grunt.registerTask('release-macos', [
     'config:prod',
@@ -111,12 +111,12 @@ module.exports = function (grunt) {
     'concat',
     'clean:tmpl',
     'cssmin',
+    'replace',
     'uglify',
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
