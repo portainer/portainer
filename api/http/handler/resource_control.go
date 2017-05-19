@@ -66,6 +66,10 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 		return
 	}
 
+	if len(req.Users) == 0 && len(req.Teams) == 0 && !req.AdministratorsOnly {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+	}
+
 	var users = make([]portainer.UserID, 0)
 	for _, v := range req.Users {
 		users = append(users, portainer.UserID(v))
