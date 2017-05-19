@@ -14,10 +14,12 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-usemin');
   grunt.loadNpmTasks('grunt-replace');
+  grunt.loadNpmTasks('grunt-config');
 
   // Default task.
   grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('build', [
+    'config:prod',
     'clean:app',
     'if:unixBinaryNotExist',
     'html2js',
@@ -25,12 +27,14 @@ module.exports = function (grunt) {
     'recess:build',
     'concat',
     'clean:tmpl',
+    'replace',
     'copy',
     'filerev',
     'usemin',
     'clean:tmp'
   ]);
   grunt.registerTask('release', [
+    'config:prod',
     'clean:all',
     'if:unixBinaryNotExist',
     'html2js',
@@ -39,18 +43,19 @@ module.exports = function (grunt) {
     'concat',
     'clean:tmpl',
     'cssmin',
+    'replace',
     'uglify',
     'copy:assets',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
   grunt.registerTask('release-win', [
+    'config:prod',
     'clean:all',
     'if:windowsBinaryNotExist',
     'html2js',
-    'useminPrepare',
+    'useminPrepare:release',
     'recess:build',
     'concat',
     'clean:tmpl',
@@ -63,10 +68,11 @@ module.exports = function (grunt) {
     'replace'
   ]);
   grunt.registerTask('release-arm', [
+    'config:prod',
     'clean:all',
     'if:unixArmBinaryNotExist',
     'html2js',
-    'useminPrepare',
+    'useminPrepare:release',
     'recess:build',
     'concat',
     'clean:tmpl',
@@ -79,10 +85,11 @@ module.exports = function (grunt) {
     'replace'
   ]);
   grunt.registerTask('release-arm64', [
+    'config:prod',
     'clean:all',
     'if:unixArm64BinaryNotExist',
     'html2js',
-    'useminPrepare',
+    'useminPrepare:release',
     'recess:build',
     'concat',
     'clean:tmpl',
@@ -95,10 +102,11 @@ module.exports = function (grunt) {
     'replace'
   ]);
   grunt.registerTask('release-macos', [
+    'config:prod',
     'clean:all',
     'if:darwinBinaryNotExist',
     'html2js',
-    'useminPrepare',
+    'useminPrepare:release',
     'recess:build',
     'concat',
     'clean:tmpl',
@@ -127,6 +135,22 @@ module.exports = function (grunt) {
   grunt.initConfig({
     distdir: 'dist',
     pkg: grunt.file.readJSON('package.json'),
+    config: {
+      dev: {
+        options: {
+          variables: {
+            'environment': 'development'
+          }
+        }
+      },
+      prod: {
+        options: {
+          variables: {
+            'environment': 'production'
+          }
+        }
+      }
+    },
     src: {
       js: ['app/**/*.js', '!app/**/*.spec.js'],
       jsTpl: ['<%= distdir %>/templates/**/*.js'],
@@ -268,8 +292,6 @@ module.exports = function (grunt) {
     },
     uglify: {
       dist: {
-        // options: {
-        // },
         src: ['<%= src.js %>', '<%= src.jsTpl %>'],
         dest: '<%= distdir %>/js/<%= pkg.name %>.js'
       },
@@ -450,9 +472,13 @@ module.exports = function (grunt) {
       }
     },
     replace: {
-      dist: {
+      concat: {
         options: {
           patterns: [
+            {
+              match: 'ENVIRONMENT',
+              replacement: '<%= grunt.config.get("environment") %>'
+            },
             {
               match: 'CONFIG_GA_ID',
               replacement: '<%= pkg.config.GA_ID %>'
@@ -463,8 +489,8 @@ module.exports = function (grunt) {
           {
             expand: true,
             flatten: true,
-            src: ['dist/js/**.js'],
-            dest: 'dist/js/'
+            src: ['.tmp/concat/js/app.js'],
+            dest: '.tmp/concat/js'
           }
         ]
       }
