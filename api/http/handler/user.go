@@ -2,6 +2,7 @@ package handler
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
@@ -98,6 +99,11 @@ func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	if strings.ContainsAny(req.Username, " ") {
+		httperror.WriteErrorResponse(w, portainer.ErrInvalidUsername, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
 	user = &portainer.User{
 		Username: req.Username,
 		Role:     role,
@@ -122,7 +128,7 @@ type postUsersResponse struct {
 }
 
 type postUsersRequest struct {
-	Username string `valid:"alphanum,required"`
+	Username string `valid:"required"`
 	Password string `valid:"required"`
 	Role     int    `valid:"required"`
 }
