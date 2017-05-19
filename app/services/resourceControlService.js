@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('ResourceControlService', ['$q', 'ResourceControl', 'RC', 'UserService', 'TeamService', 'ResourceControlHelper', function ResourceControlServiceFactory($q, ResourceControl, RC, UserService, TeamService, ResourceControlHelper) {
+.factory('ResourceControlService', ['$q', 'ResourceControl', 'UserService', 'TeamService', 'ResourceControlHelper', function ResourceControlServiceFactory($q, ResourceControl, UserService, TeamService, ResourceControlHelper) {
   'use strict';
   var service = {};
 
@@ -12,11 +12,11 @@ angular.module('portainer.services')
       Teams: teamIDs,
       SubResourceIDs: subResourceIDs
     };
-    return RC.create({}, payload).$promise;
+    return ResourceControl.create({}, payload).$promise;
   };
 
   service.deleteResourceControl = function(rcID) {
-    return RC.remove({id: rcID}).$promise;
+    return ResourceControl.remove({id: rcID}).$promise;
   };
 
   service.updateResourceControl = function(admin, userIDs, teamIDs, resourceControlId) {
@@ -25,7 +25,7 @@ angular.module('portainer.services')
       Users: userIDs,
       Teams: teamIDs
     };
-    return RC.update({id: resourceControlId}, payload).$promise;
+    return ResourceControl.update({id: resourceControlId}, payload).$promise;
   };
 
   service.applyResourceControl = function(resourceControlType, resourceIdentifier, userId, accessControlData, subResources) {
@@ -125,24 +125,6 @@ angular.module('portainer.services')
     }
 
     return deferred.promise;
-  };
-
-  // OLD
-
-  service.setContainerResourceControl = function(userID, resourceID) {
-    return ResourceControl.create({ userId: userID, resourceType: 'container' }, { ResourceID: resourceID }).$promise;
-  };
-
-  service.removeContainerResourceControl = function(userID, resourceID) {
-    return ResourceControl.remove({ userId: userID, resourceId: resourceID, resourceType: 'container' }).$promise;
-  };
-
-  service.setServiceResourceControl = function(userID, resourceID) {
-    return ResourceControl.create({ userId: userID, resourceType: 'service' }, { ResourceID: resourceID }).$promise;
-  };
-
-  service.removeServiceResourceControl = function(userID, resourceID) {
-    return ResourceControl.remove({ userId: userID, resourceId: resourceID, resourceType: 'service' }).$promise;
   };
 
   return service;

@@ -49,7 +49,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.TeamMembershipHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/endpoints") {
 		http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/resources") {
+	} else if strings.HasPrefix(r.URL.Path, "/api/resource_controls") {
 		http.StripPrefix("/api", h.ResourceHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/settings") {
 		http.StripPrefix("/api", h.SettingsHandler).ServeHTTP(w, r)

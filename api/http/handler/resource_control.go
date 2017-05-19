@@ -29,13 +29,13 @@ func NewResourceHandler(bouncer *security.RequestBouncer) *ResourceHandler {
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.Handle("/resources",
+	h.Handle("/resource_controls",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostResources))).Methods(http.MethodPost)
 	// h.Handle("/resources/{id}",
 	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetUser))).Methods(http.MethodGet)
-	h.Handle("/resources/{id}",
+	h.Handle("/resource_controls/{id}",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutResources))).Methods(http.MethodPut)
-	h.Handle("/resources/{id}",
+	h.Handle("/resource_controls/{id}",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteResources))).Methods(http.MethodDelete)
 
 	return h
