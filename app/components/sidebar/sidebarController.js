@@ -48,23 +48,24 @@ function ($q, $scope, $state, Settings, Config, EndpointService, StateManager, E
   }
 
   function initView() {
-    var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true: false;
-    $scope.isAdmin = isAdmin;
-    $q.all({
-      endpoints: EndpointService.endpoints(),
-      memberships: !isAdmin ? UserService.userMemberships(userDetails.ID) : null
-    })
+    EndpointService.endpoints()
     .then(function success(data) {
-      var endpoints = data.endpoints;
+      var endpoints = data;
       $scope.endpoints = endpoints;
       setActiveEndpoint(endpoints);
-      if (!isAdmin) {
-        checkPermissions(data.memberships);
+
+      if (StateManager.getState().application.authentication) {
+        var userDetails = Authentication.getUserDetails();
+        var isAdmin = userDetails.role === 1 ? true: false;
+        $scope.isAdmin = isAdmin;
+        return $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : []);
       }
     })
+    .then(function success(data) {
+      checkPermissions(data);
+    })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve user information');
+      Notifications.error('Failure', err, 'Unable to retrieve endpoints');
     });
   }
 

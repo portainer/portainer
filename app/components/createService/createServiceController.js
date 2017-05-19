@@ -5,8 +5,6 @@ angular.module('createService', [])
 function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator) {
 
   $scope.formValues = {
-    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
-    Ownership_groups: [],
     Name: '',
     Image: '',
     Registry: '',

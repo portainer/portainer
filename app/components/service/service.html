@@ -116,7 +116,7 @@
   </div>
 </div>
 
-<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="service"></div>
+<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="service && applicationState.application.authentication"></div>
 
 <div class="row">
   <hr>

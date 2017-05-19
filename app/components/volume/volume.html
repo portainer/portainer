@@ -47,7 +47,7 @@
   </div>
 </div>
 
-<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="volume"></div>
+<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="volume && applicationState.application.authentication"></div>
 
 <div class="row" ng-if="!(volume.Options | emptyobject)">
   <div class="col-lg-12 col-md-12 col-xs-12">
