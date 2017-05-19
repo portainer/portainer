@@ -202,7 +202,7 @@ angular.module('portainer', [
           template: '<div ui-view="content@"></div>'
         },
         'sidebar@': {
-          template: '<div ui-view"sidebar@"></div>'
+          template: '<div ui-view="sidebar@"></div>'
         }
       }
     })
@@ -214,7 +214,7 @@ angular.module('portainer', [
           template: '<div ui-view="content@"></div>'
         },
         'sidebar@': {
-          template: '<div ui-view"sidebar@"></div>'
+          template: '<div ui-view="sidebar@"></div>'
         }
       }
     })
