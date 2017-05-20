@@ -7,7 +7,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
   };
 
   $scope.formValues = {
-    endpointType: "remote",
+    endpointType: 'remote',
     Name: '',
     URL: '',
     TLS: false,
@@ -46,8 +46,8 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
   $scope.createLocalEndpoint = function() {
     $('#initEndpointSpinner').show();
     $scope.state.error = '';
-    var name = "local";
-    var URL = "unix:///var/run/docker.sock";
+    var name = 'local';
+    var URL = 'unix:///var/run/docker.sock';
     var TLS = false;
 
     EndpointService.createLocalEndpoint(name, URL, TLS, true)
