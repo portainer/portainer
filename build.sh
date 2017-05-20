@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+ARCHIVE_BUILD_FOLDER="/tmp/portainer-builds"
 VERSION=$1
 
 if [[ $# -ne 1 ]] ; then
@@ -7,57 +8,66 @@ if [[ $# -ne 1 ]] ; then
   exit 1
 fi
 
+# parameters platform, architecture
+function build_and_push_images() {
+  PLATFORM=$1
+  ARCH=$2
+
+  docker build -t portainer/portainer:${PLATFORM}-${ARCH}-${VERSION} -f build/linux/Dockerfile .
+  docker push portainer/portainer:${PLATFORM}-${ARCH}-${VERSION}
+  docker build -t portainer/portainer:${PLATFORM}-${ARCH} -f build/linux/Dockerfile .
+  docker push portainer/portainer:${PLATFORM}-${ARCH}
+}
+
+# parameters: platform, architecture
+function build_archive() {
+  PLATFORM=$1
+  ARCH=$2
+
+  BUILD_FOLDER=${ARCHIVE_BUILD_FOLDER}/${PLATFORM}-${ARCH}
+
+  rm -rf ${BUILD_FOLDER} && mkdir -pv ${BUILD_FOLDER}/portainer
+  mv dist/* ${BUILD_FOLDER}/portainer/
+  cd ${BUILD_FOLDER}
+  tar cvpfz portainer-${VERSION}-${PLATFORM}-${ARCH}.tar.gz portainer
+  mv portainer-${VERSION}-${PLATFORM}-${ARCH}.tar.gz ${ARCHIVE_BUILD_FOLDER}/
+  cd -
+}
+
 mkdir -pv /tmp/portainer-builds
 
+PLATFORM="linux"
+ARCH="amd64"
 grunt release
-docker build -t portainer/portainer:linux-amd64-${VERSION} -f build/linux/Dockerfile .
-docker push portainer/portainer:linux-amd64-${VERSION}
-docker build -t portainer/portainer:linux-amd64 -f build/linux/Dockerfile .
-docker push portainer/portainer:linux-amd64
-rm -rf /tmp/portainer-builds/unix && mkdir -pv /tmp/portainer-builds/unix/portainer
-mv dist/* /tmp/portainer-builds/unix/portainer
-cd /tmp/portainer-builds/unix
-tar cvpfz portainer-${VERSION}-linux-amd64.tar.gz portainer
-mv portainer-${VERSION}-linux-amd64.tar.gz /tmp/portainer-builds/
-cd -
+build_and_push_images ${PLATFORM} ${ARCH}
+build_archive ${PLATFORM} ${ARCH}
 
+PLATFORM="linux"
+ARCH="arm"
 grunt release-arm
-docker build -t portainer/portainer:linux-arm-${VERSION} -f build/linux/Dockerfile .
-docker push portainer/portainer:linux-arm-${VERSION}
-docker build -t portainer/portainer:linux-arm -f build/linux/Dockerfile .
-docker push portainer/portainer:linux-arm
-rm -rf /tmp/portainer-builds/arm && mkdir -pv /tmp/portainer-builds/arm/portainer
-mv dist/* /tmp/portainer-builds/arm/portainer
-cd /tmp/portainer-builds/arm
-tar cvpfz portainer-${VERSION}-linux-arm.tar.gz portainer
-mv portainer-${VERSION}-linux-arm.tar.gz /tmp/portainer-builds/
-cd -
+build_and_push_images ${PLATFORM} ${ARCH}
+build_archive ${PLATFORM} ${ARCH}
 
+PLATFORM="linux"
+ARCH="arm64"
 grunt release-arm64
-docker build -t portainer/portainer:linux-arm64-${VERSION} -f build/linux/Dockerfile .
-docker push portainer/portainer:linux-arm64-${VERSION}
-docker build -t portainer/portainer:linux-arm64 -f build/linux/Dockerfile .
-docker push portainer/portainer:linux-arm64
-rm -rf /tmp/portainer-builds/arm64 && mkdir -pv /tmp/portainer-builds/arm64/portainer
-mv dist/* /tmp/portainer-builds/arm64/portainer
-cd /tmp/portainer-builds/arm64
-tar cvpfz portainer-${VERSION}-linux-arm64.tar.gz portainer
-mv portainer-${VERSION}-linux-arm64.tar.gz /tmp/portainer-builds/
-cd -
+build_and_push_images ${PLATFORM} ${ARCH}
+build_archive ${PLATFORM} ${ARCH}
 
+PLATFORM="linux"
+ARCH="ppc64le"
+grunt release-ppc64le
+build_and_push_images ${PLATFORM} ${ARCH}
+build_archive ${PLATFORM} ${ARCH}
+
+PLATFORM="darwin"
+ARCH="amd64"
 grunt release-macos
-rm -rf /tmp/portainer-builds/darwin && mkdir -pv /tmp/portainer-builds/darwin/portainer
-mv dist/* /tmp/portainer-builds/darwin/portainer
-cd /tmp/portainer-builds/darwin
-tar cvpfz portainer-${VERSION}-darwin-amd64.tar.gz portainer
-mv portainer-${VERSION}-darwin-amd64.tar.gz /tmp/portainer-builds/
-cd -
+build_archive ${PLATFORM} ${ARCH}
 
+PLATFORM="windows"
+ARCH="amd64"
 grunt release-win
-rm -rf /tmp/portainer-builds/win && mkdir -pv /tmp/portainer-builds/win/portainer
-cp -r dist/* /tmp/portainer-builds/win/portainer
-cd /tmp/portainer-builds/win
-tar cvpfz portainer-${VERSION}-windows-amd64.tar.gz portainer
-mv portainer-${VERSION}-windows-amd64.tar.gz /tmp/portainer-builds/
+build_archive ${PLATFORM} ${ARCH}
 
 exit 0
