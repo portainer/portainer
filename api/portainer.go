@@ -181,7 +181,6 @@ type (
 		Team(ID TeamID) (*Team, error)
 		TeamByName(name string) (*Team, error)
 		Teams() ([]Team, error)
-		// TeamsByUserID(ID UserID) ([]Team, error)
 		CreateTeam(team *Team) error
 		UpdateTeam(ID TeamID, team *Team) error
 		DeleteTeam(ID TeamID) error

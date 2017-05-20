@@ -93,10 +93,8 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 		SubResourceIDs:     req.SubResourceIDs,
 		Type:               resourceControlType,
 		AdministratorsOnly: req.AdministratorsOnly,
-		// Users:              users,
-		// Teams:              teams,
-		UserAccesses: userAccesses,
-		TeamAccesses: teamAccesses,
+		UserAccesses:       userAccesses,
+		TeamAccesses:       teamAccesses,
 	}
 
 	err = handler.ResourceControlService.CreateResourceControl(&resource)
