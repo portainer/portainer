@@ -43,6 +43,12 @@ build_and_push_images ${PLATFORM} ${ARCH}
 build_archive ${PLATFORM} ${ARCH}
 
 PLATFORM="linux"
+ARCH="386"
+grunt release-${PLATFORM}-${ARCH}
+build_and_push_images ${PLATFORM} ${ARCH}
+build_archive ${PLATFORM} ${ARCH}
+
+PLATFORM="linux"
 ARCH="arm"
 grunt release-${PLATFORM}-${ARCH}
 build_and_push_images ${PLATFORM} ${ARCH}
