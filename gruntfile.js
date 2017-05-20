@@ -16,12 +16,11 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-replace');
   grunt.loadNpmTasks('grunt-config');
 
-  // Default task.
   grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('build', [
     'config:dev',
     'clean:app',
-    'if:unixBinaryNotExist',
+    'if:linuxAmd64BinaryNotExist',
     'html2js',
     'useminPrepare:dev',
     'recess:build',
@@ -33,10 +32,10 @@ module.exports = function (grunt) {
     'usemin',
     'clean:tmp'
   ]);
-  grunt.registerTask('release', [
+  grunt.registerTask('release-linux-386', [
     'config:prod',
     'clean:all',
-    'if:unixBinaryNotExist',
+    'if:linux386BinaryNotExist',
     'html2js',
     'useminPrepare:release',
     'recess:build',
@@ -50,10 +49,27 @@ module.exports = function (grunt) {
     'usemin',
     'clean:tmp'
   ]);
-  grunt.registerTask('release-win', [
+  grunt.registerTask('release-linux-amd64', [
     'config:prod',
     'clean:all',
-    'if:windowsBinaryNotExist',
+    'if:linuxAmd64BinaryNotExist',
+    'html2js',
+    'useminPrepare:release',
+    'recess:build',
+    'concat',
+    'clean:tmpl',
+    'cssmin',
+    'replace',
+    'uglify',
+    'copy:assets',
+    'filerev',
+    'usemin',
+    'clean:tmp'
+  ]);
+  grunt.registerTask('release-linux-arm', [
+    'config:prod',
+    'clean:all',
+    'if:linuxArmBinaryNotExist',
     'html2js',
     'useminPrepare:release',
     'recess:build',
@@ -67,10 +83,10 @@ module.exports = function (grunt) {
     'usemin',
     'clean:tmp'
   ]);
-  grunt.registerTask('release-arm', [
+  grunt.registerTask('release-linux-arm64', [
     'config:prod',
     'clean:all',
-    'if:unixArmBinaryNotExist',
+    'if:linuxArm64BinaryNotExist',
     'html2js',
     'useminPrepare:release',
     'recess:build',
@@ -84,10 +100,10 @@ module.exports = function (grunt) {
     'usemin',
     'clean:tmp'
   ]);
-  grunt.registerTask('release-arm64', [
+  grunt.registerTask('release-linux-ppc64le', [
     'config:prod',
     'clean:all',
-    'if:unixArm64BinaryNotExist',
+    'if:linuxPpc64leBinaryNotExist',
     'html2js',
     'useminPrepare:release',
     'recess:build',
@@ -101,10 +117,27 @@ module.exports = function (grunt) {
     'usemin',
     'clean:tmp'
   ]);
-  grunt.registerTask('release-macos', [
+  grunt.registerTask('release-windows-amd64', [
     'config:prod',
     'clean:all',
-    'if:darwinBinaryNotExist',
+    'if:windowsAmd64BinaryNotExist',
+    'html2js',
+    'useminPrepare:release',
+    'recess:build',
+    'concat',
+    'clean:tmpl',
+    'cssmin',
+    'replace',
+    'uglify',
+    'copy',
+    'filerev',
+    'usemin',
+    'clean:tmp'
+  ]);
+  grunt.registerTask('release-darwin-amd64', [
+    'config:prod',
+    'clean:all',
+    'if:darwinAmd64BinaryNotExist',
     'html2js',
     'useminPrepare:release',
     'recess:build',
@@ -369,7 +402,7 @@ module.exports = function (grunt) {
       buildImage: {
         command: 'docker build --rm -t portainer -f build/linux/Dockerfile .'
       },
-      buildBinary: {
+      buildLinuxAmd64Binary: {
         command: [
           'docker run --rm -v $(pwd)/api:/src portainer/golang-builder /src/cmd/portainer',
           'shasum api/cmd/portainer/portainer > portainer-checksum.txt',
@@ -377,7 +410,15 @@ module.exports = function (grunt) {
           'mv api/cmd/portainer/portainer dist/'
         ].join(' && ')
       },
-      buildUnixArmBinary: {
+      buildLinux386Binary: {
+        command: [
+          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="386" portainer/golang-builder:cross-platform /src/cmd/portainer',
+          'shasum api/cmd/portainer/portainer-linux-386 > portainer-checksum.txt',
+          'mkdir -p dist',
+          'mv api/cmd/portainer/portainer-linux-386 dist/portainer'
+        ].join(' && ')
+      },
+      buildLinuxArmBinary: {
         command: [
           'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm" portainer/golang-builder:cross-platform /src/cmd/portainer',
           'shasum api/cmd/portainer/portainer-linux-arm > portainer-checksum.txt',
@@ -385,15 +426,23 @@ module.exports = function (grunt) {
           'mv api/cmd/portainer/portainer-linux-arm dist/portainer'
         ].join(' && ')
       },
-        buildUnixArm64Binary: {
-            command: [
-                'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm64" portainer/golang-builder:cross-platform /src/cmd/portainer',
-                'shasum api/cmd/portainer/portainer-linux-arm64 > portainer-checksum.txt',
-                'mkdir -p dist',
-                'mv api/cmd/portainer/portainer-linux-arm64 dist/portainer'
-            ].join(' && ')
-        },
-      buildDarwinBinary: {
+      buildLinuxArm64Binary: {
+        command: [
+          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm64" portainer/golang-builder:cross-platform /src/cmd/portainer',
+          'shasum api/cmd/portainer/portainer-linux-arm64 > portainer-checksum.txt',
+          'mkdir -p dist',
+          'mv api/cmd/portainer/portainer-linux-arm64 dist/portainer'
+        ].join(' && ')
+      },
+      buildLinuxPpc64leBinary: {
+        command: [
+          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="ppc64le" portainer/golang-builder:cross-platform /src/cmd/portainer',
+          'shasum api/cmd/portainer/portainer-linux-ppc64le > portainer-checksum.txt',
+          'mkdir -p dist',
+          'mv api/cmd/portainer/portainer-linux-ppc64le dist/portainer'
+        ].join(' && ')
+      },
+      buildDarwinAmd64Binary: {
         command: [
           'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="darwin" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform /src/cmd/portainer',
           'shasum api/cmd/portainer/portainer-darwin-amd64 > portainer-checksum.txt',
@@ -401,7 +450,7 @@ module.exports = function (grunt) {
           'mv api/cmd/portainer/portainer-darwin-amd64 dist/portainer'
         ].join(' && ')
       },
-      buildWindowsBinary: {
+      buildWindowsAmd64Binary: {
         command: [
           'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="windows" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform /src/cmd/portainer',
           'shasum api/cmd/portainer/portainer-windows-amd64 > portainer-checksum.txt',
@@ -442,35 +491,47 @@ module.exports = function (grunt) {
       }
     },
     'if': {
-      unixBinaryNotExist: {
+      linuxAmd64BinaryNotExist: {
         options: {
           executable: 'dist/portainer'
         },
-        ifFalse: ['shell:buildBinary']
+        ifFalse: ['shell:buildLinuxAmd64Binary']
       },
-      unixArmBinaryNotExist: {
+      linux386BinaryNotExist: {
         options: {
           executable: 'dist/portainer'
         },
-        ifFalse: ['shell:buildUnixArmBinary']
+        ifFalse: ['shell:buildLinux386Binary']
       },
-      unixArm64BinaryNotExist: {
+      linuxArmBinaryNotExist: {
         options: {
           executable: 'dist/portainer'
         },
-        ifFalse: ['shell:buildUnixArm64Binary']
+        ifFalse: ['shell:buildLinuxArmBinary']
       },
-      darwinBinaryNotExist: {
+      linuxArm64BinaryNotExist: {
         options: {
           executable: 'dist/portainer'
         },
-        ifFalse: ['shell:buildDarwinBinary']
+        ifFalse: ['shell:buildLinuxArm64Binary']
       },
-      windowsBinaryNotExist: {
+      linuxPpc64leBinaryNotExist: {
+        options: {
+          executable: 'dist/portainer'
+        },
+        ifFalse: ['shell:buildLinuxPpc64leBinary']
+      },
+      darwinAmd64BinaryNotExist: {
+        options: {
+          executable: 'dist/portainer'
+        },
+        ifFalse: ['shell:buildDarwinAmd64Binary']
+      },
+      windowsAmd64BinaryNotExist: {
         options: {
           executable: 'dist/portainer.exe'
         },
-        ifFalse: ['shell:buildWindowsBinary']
+        ifFalse: ['shell:buildWindowsAmd64Binary']
       }
     },
     replace: {
