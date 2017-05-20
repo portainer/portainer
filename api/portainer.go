@@ -109,28 +109,41 @@ type (
 
 	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
-		// Deprecated: OwnerID field is deprecated in DBVersion == 2
-		OwnerID UserID `json:"OwnerId"`
-		// Deprecated: AccessLevel field is deprecated in DBVersion == 2
-		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
-
 		ID                 ResourceControlID   `json:"Id"`
 		ResourceID         string              `json:"ResourceId"`
 		SubResourceIDs     []string            `json:"SubResourceIds"`
 		Type               ResourceControlType `json:"Type"`
 		AdministratorsOnly bool                `json:"AdministratorsOnly"`
-		Users              []UserID            `json:"Users"`
-		Teams              []TeamID            `json:"Teams"`
+		// Teams              []TeamID            `json:"Teams"`
+		// Users              []UserID            `json:"Users"`
+
+		UserAccesses []UserResourceAccess `json:"UserAccesses"`
+		TeamAccesses []TeamResourceAccess `json:"TeamAccesses"`
+
+		// Deprecated fields
+		// Deprecated: OwnerID field is deprecated in DBVersion == 2
+		OwnerID UserID `json:"OwnerId"`
+		// Deprecated: AccessLevel field is deprecated in DBVersion == 2
+		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
-
-	// Deprecated: ResourceAccessLevel is deprecated in DBVersion == 2
-
-	// ResourceAccessLevel represents the level of control associated to a resource for a specific owner.
-	// Can be one of: full, restricted, limited.
-	ResourceAccessLevel int
 
 	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service).
 	ResourceControlType int
+
+	// UserResourceAccess represents the level of control on a resource for a specific user.
+	UserResourceAccess struct {
+		UserID      UserID              `json:"UserId"`
+		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+	}
+
+	// TeamResourceAccess represents the level of control on a resource for a specific team.
+	TeamResourceAccess struct {
+		TeamID      TeamID              `json:"TeamId"`
+		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+	}
+
+	// ResourceAccessLevel represents the level of control associated to a resource.
+	ResourceAccessLevel int
 
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file.
@@ -271,11 +284,10 @@ const (
 	StandardUserRole
 )
 
-// Deprecated: ResourceAccessLevel values are deprecated in DBVersion == 2
 const (
 	_ ResourceAccessLevel = iota
-	// RestrictedResourceAccessLevel represents a restricted access level on a resource (private ownership)
-	RestrictedResourceAccessLevel
+	// ReadWriteAccessLevel represents an access level with read-write permissions on a resource
+	ReadWriteAccessLevel
 )
 
 const (

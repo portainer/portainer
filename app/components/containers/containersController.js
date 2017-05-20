@@ -80,7 +80,7 @@ angular.module('containers', [])
               Notifications.error('Error', d, 'Unable to remove container');
             }
             else {
-              if (c.ResourceControl) {
+              if (c.ResourceControl && c.ResourceControl.Id) {
                 ResourceControlService.deleteResourceControl(c.ResourceControl.Id)
                 .then(function success() {
                   Notifications.success('Container ' + msg, c.Id);

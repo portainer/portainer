@@ -70,23 +70,33 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 	}
 
-	var users = make([]portainer.UserID, 0)
+	var userAccesses = make([]portainer.UserResourceAccess, 0)
 	for _, v := range req.Users {
-		users = append(users, portainer.UserID(v))
+		userAccess := portainer.UserResourceAccess{
+			UserID:      portainer.UserID(v),
+			AccessLevel: portainer.ReadWriteAccessLevel,
+		}
+		userAccesses = append(userAccesses, userAccess)
 	}
 
-	var teams = make([]portainer.TeamID, 0)
+	var teamAccesses = make([]portainer.TeamResourceAccess, 0)
 	for _, v := range req.Teams {
-		teams = append(teams, portainer.TeamID(v))
+		teamAccess := portainer.TeamResourceAccess{
+			TeamID:      portainer.TeamID(v),
+			AccessLevel: portainer.ReadWriteAccessLevel,
+		}
+		teamAccesses = append(teamAccesses, teamAccess)
 	}
 
 	resource := portainer.ResourceControl{
 		ResourceID:         req.ResourceID,
+		SubResourceIDs:     req.SubResourceIDs,
 		Type:               resourceControlType,
 		AdministratorsOnly: req.AdministratorsOnly,
-		Users:              users,
-		Teams:              teams,
-		SubResourceIDs:     req.SubResourceIDs,
+		// Users:              users,
+		// Teams:              teams,
+		UserAccesses: userAccesses,
+		TeamAccesses: teamAccesses,
 	}
 
 	err = handler.ResourceControlService.CreateResourceControl(&resource)
@@ -140,19 +150,27 @@ func (handler *ResourceHandler) handlePutResources(w http.ResponseWriter, r *htt
 		return
 	}
 
-	var users = make([]portainer.UserID, 0)
-	for _, v := range req.Users {
-		users = append(users, portainer.UserID(v))
-	}
-	resourceControl.Users = users
-
-	var teams = make([]portainer.TeamID, 0)
-	for _, v := range req.Teams {
-		teams = append(teams, portainer.TeamID(v))
-	}
-	resourceControl.Teams = teams
-
 	resourceControl.AdministratorsOnly = req.AdministratorsOnly
+
+	var userAccesses = make([]portainer.UserResourceAccess, 0)
+	for _, v := range req.Users {
+		userAccess := portainer.UserResourceAccess{
+			UserID:      portainer.UserID(v),
+			AccessLevel: portainer.ReadWriteAccessLevel,
+		}
+		userAccesses = append(userAccesses, userAccess)
+	}
+	resourceControl.UserAccesses = userAccesses
+
+	var teamAccesses = make([]portainer.TeamResourceAccess, 0)
+	for _, v := range req.Teams {
+		teamAccess := portainer.TeamResourceAccess{
+			TeamID:      portainer.TeamID(v),
+			AccessLevel: portainer.ReadWriteAccessLevel,
+		}
+		teamAccesses = append(teamAccesses, teamAccess)
+	}
+	resourceControl.TeamAccesses = teamAccesses
 
 	err = handler.ResourceControlService.UpdateResourceControl(resourceControl.ID, resourceControl)
 	if err != nil {

@@ -38,7 +38,7 @@
               </td>
             </tr>
             <!-- authorized-users -->
-            <tr ng-if="resourceControl.Users.length > 0">
+            <tr ng-if="resourceControl.UserAccesses.length > 0">
               <td>Authorized users</td>
               <td>
                 <span ng-repeat="user in authorizedUsers">{{user.Username}}{{$last ? '' : ', '}} </span>
@@ -46,7 +46,7 @@
             </tr>
             <!-- !authorized-users -->
             <!-- authorized-teams -->
-            <tr ng-if="resourceControl.Teams.length > 0">
+            <tr ng-if="resourceControl.TeamAccesses.length > 0">
               <td>Authorized teams</td>
               <td>
                 <span ng-repeat="team in authorizedTeams">{{team.Name}}{{$last ? '' : ', '}} </span>

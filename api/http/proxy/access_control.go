@@ -3,18 +3,19 @@ package proxy
 import "github.com/portainer/portainer"
 
 func canUserAccessResource(userID portainer.UserID, userTeamIDs []portainer.TeamID, resourceControl *portainer.ResourceControl) bool {
-	for _, authorizedUserID := range resourceControl.Users {
-		if userID == authorizedUserID {
+	for _, authorizedUserAccess := range resourceControl.UserAccesses {
+		if userID == authorizedUserAccess.UserID {
 			return true
 		}
 	}
 
-	for _, authorizedTeamID := range resourceControl.Teams {
+	for _, authorizedTeamAccess := range resourceControl.TeamAccesses {
 		for _, userTeamID := range userTeamIDs {
-			if userTeamID == authorizedTeamID {
+			if userTeamID == authorizedTeamAccess.TeamID {
 				return true
 			}
 		}
 	}
+
 	return false
 }

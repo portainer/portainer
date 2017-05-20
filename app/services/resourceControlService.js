@@ -79,8 +79,8 @@ angular.module('portainer.services')
     }
 
     $q.all({
-      users: resourceControl.Users.length > 0 ? UserService.users(false) : null,
-      teams: resourceControl.Teams.length > 0 ? TeamService.teams() : null
+      users: resourceControl.UserAccesses.length > 0 ? UserService.users(false) : null,
+      teams: resourceControl.TeamAccesses.length > 0 ? TeamService.teams() : null
     })
     .then(function success(data) {
       var authorizedUserNames = [];
@@ -108,7 +108,7 @@ angular.module('portainer.services')
       return deferred.promise;
     }
 
-    var found = _.includes(resourceControl.Users, userID);
+    var found = _.find(resourceControl.UserAccesses, { UserId: userID });
     if (found) {
       deferred.resolve({ isPartOfRestrictedUsers: true, isLeaderOfAnyRestrictedTeams: false });
     } else {
