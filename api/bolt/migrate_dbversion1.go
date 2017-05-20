@@ -6,7 +6,7 @@ import (
 	"github.com/portainer/portainer/bolt/internal"
 )
 
-func (m *Migrator) UpdateResourceControlsToDBVersion2() error {
+func (m *Migrator) updateResourceControlsToDBVersion2() error {
 	legacyResourceControls, err := m.retrieveLegacyResourceControls()
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func (m *Migrator) UpdateResourceControlsToDBVersion2() error {
 	return nil
 }
 
-func (m *Migrator) UpdateEndpointsToDBVersion2() error {
+func (m *Migrator) updateEndpointsToDBVersion2() error {
 	legacyEndpoints, err := m.EndpointService.Endpoints()
 	if err != nil {
 		return err

@@ -5,7 +5,7 @@ import (
 	"github.com/portainer/portainer"
 )
 
-func (m *Migrator) UpdateAdminUserToDBVersion1() error {
+func (m *Migrator) updateAdminUserToDBVersion1() error {
 	u, err := m.UserService.UserByUsername("admin")
 	if err == nil {
 		admin := &portainer.User{
