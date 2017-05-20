@@ -118,6 +118,23 @@ module.exports = function (grunt) {
     'usemin',
     'clean:tmp'
   ]);
+  grunt.registerTask('release-ppc64le', [
+    'config:prod',
+    'clean:all',
+    'if:unixPpc64leBinaryNotExist',
+    'html2js',
+    'useminPrepare:release',
+    'recess:build',
+    'concat',
+    'clean:tmpl',
+    'cssmin',
+    'replace',
+    'uglify',
+    'copy',
+    'filerev',
+    'usemin',
+    'clean:tmp'
+  ]);
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
   grunt.registerTask('run-swarm', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
@@ -383,14 +400,22 @@ module.exports = function (grunt) {
           'mv api/cmd/portainer/portainer-linux-arm dist/portainer'
         ].join(' && ')
       },
-        buildUnixArm64Binary: {
-            command: [
-                'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm64" portainer/golang-builder:cross-platform /src/cmd/portainer',
-                'shasum api/cmd/portainer/portainer-linux-arm64 > portainer-checksum.txt',
-                'mkdir -p dist',
-                'mv api/cmd/portainer/portainer-linux-arm64 dist/portainer'
-            ].join(' && ')
-        },
+      buildUnixArm64Binary: {
+        command: [
+          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm64" portainer/golang-builder:cross-platform /src/cmd/portainer',
+          'shasum api/cmd/portainer/portainer-linux-arm64 > portainer-checksum.txt',
+          'mkdir -p dist',
+          'mv api/cmd/portainer/portainer-linux-arm64 dist/portainer'
+        ].join(' && ')
+      },
+      buildUnixPpc64leBinary: {
+        command: [
+          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="ppc64le" portainer/golang-builder:cross-platform /src/cmd/portainer',
+          'shasum api/cmd/portainer/portainer-linux-ppc64le > portainer-checksum.txt',
+          'mkdir -p dist',
+          'mv api/cmd/portainer/portainer-linux-ppc64le dist/portainer'
+        ].join(' && ')
+      },
       buildDarwinBinary: {
         command: [
           'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="darwin" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform /src/cmd/portainer',
@@ -457,6 +482,12 @@ module.exports = function (grunt) {
           executable: 'dist/portainer'
         },
         ifFalse: ['shell:buildUnixArm64Binary']
+      },
+      unixPpc64leBinaryNotExist: {
+        options: {
+          executable: 'dist/portainer'
+        },
+        ifFalse: ['shell:buildUnixPpc64leBinary']
       },
       darwinBinaryNotExist: {
         options: {
