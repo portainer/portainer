@@ -153,10 +153,7 @@ module.exports = function (grunt) {
   ]);
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
-  grunt.registerTask('run-swarm', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
-  grunt.registerTask('run-swarm-local', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarmLocal', 'watch:buildSwarm']);
   grunt.registerTask('run-dev', ['if:linuxAmd64BinaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
-  grunt.registerTask('run-ssl', ['if:linuxAmd64BinaryNotExist', 'shell:buildImage', 'shell:runSsl', 'watch:buildSsl']);
   grunt.registerTask('clear', ['clean:app']);
 
   // Print a timestamp (useful for when watching)
@@ -463,27 +460,6 @@ module.exports = function (grunt) {
           'docker stop portainer',
           'docker rm portainer',
           'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
-        ].join(';')
-      },
-      runSwarm: {
-        command: [
-          'docker stop portainer',
-          'docker rm portainer',
-          'docker run -d -p 9000:9000 --name portainer portainer -H tcp://10.0.7.10:2375 --no-analytics'
-        ].join(';')
-      },
-      runSwarmLocal: {
-        command: [
-          'docker stop portainer',
-          'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
-        ].join(';')
-      },
-      runSsl: {
-        command: [
-          'docker stop portainer',
-          'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /tmp/portainer:/data -v /tmp/docker-ssl:/certs --name portainer portainer -H tcp://10.0.7.10:2376 --tlsverify --no-analytics'
         ].join(';')
       },
       cleanImages: {
