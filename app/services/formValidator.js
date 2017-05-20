@@ -5,6 +5,10 @@ angular.module('portainer.services')
   var validator = {};
 
   validator.validateAccessControl = function(accessControlData, isAdmin) {
+    if (!accessControlData.accessControlEnabled) {
+      return '';
+    }
+
     if (isAdmin && accessControlData.ownership === 'restricted' &&
     accessControlData.authorizedUsers.length === 0 &&
     accessControlData.authorizedTeams.length === 0) {
