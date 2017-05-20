@@ -232,18 +232,16 @@ function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceSer
 
   function removeService() {
     $('#loadingViewSpinner').show();
-    Service.remove({id: $stateParams.id}, function (d) {
-      if (d.message) {
-        $('#loadingViewSpinner').hide();
-        Notifications.error('Error', d, 'Unable to remove service');
-      } else {
-        $('#loadingViewSpinner').hide();
-        Notifications.success('Service removed', $stateParams.id);
-        $state.go('services', {});
-      }
-    }, function (e) {
+    ServiceService.remove($scope.service)
+    .then(function success(data) {
+      Notifications.success('Service successfully deleted');
+      $state.go('services', {});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to remove service');
+    })
+    .finally(function final() {
       $('#loadingViewSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to remove service');
     });
   }
 

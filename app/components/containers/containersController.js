@@ -1,6 +1,6 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Notifications', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider',
-  function ($q, $scope, $filter, Container, ContainerHelper, Info, Settings, Notifications, Config, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'Info', 'Settings', 'Notifications', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider',
+  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, Info, Settings, Notifications, Config, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = Settings.displayAll;
@@ -75,26 +75,14 @@ angular.module('containers', [])
           });
         }
         else if (action === Container.remove) {
-          action({id: c.Id, v: ($scope.cleanAssociatedVolumes) ? 1 : 0, force: true}, function (d) {
-            if (d.message) {
-              Notifications.error('Error', d, 'Unable to remove container');
-            }
-            else {
-              if (c.ResourceControl && c.ResourceControl.Id) {
-                ResourceControlService.deleteResourceControl(c.ResourceControl.Id)
-                .then(function success() {
-                  Notifications.success('Container ' + msg, c.Id);
-                })
-                .catch(function error(err) {
-                  Notifications.error('Failure', err, 'Unable to remove access control');
-                });
-              } else {
-                Notifications.success('Container ' + msg, c.Id);
-              }
-            }
-            complete();
-          }, function (e) {
-            Notifications.error('Failure', e, 'Unable to remove container');
+          ContainerService.remove(c, $scope.cleanAssociatedVolumes)
+          .then(function success() {
+            Notifications.success('Container successfully removed');
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to remove container');
+          })
+          .finally(function final() {
             complete();
           });
         }

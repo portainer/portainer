@@ -38,23 +38,24 @@ angular.module('portainer.services')
 
   service.remove = function(volume) {
     var deferred = $q.defer();
+
     Volume.remove({id: volume.Id}).$promise
     .then(function success(data) {
       if (data.message) {
         deferred.reject({ msg: data.message, err: data.message });
       }
-      deferred.resolve(data);
+      if (volume.ResourceControl && volume.ResourceControl.Type === 3) {
+        return ResourceControlService.deleteResourceControl(volume.ResourceControl.Id);
+      }
+    })
+    .then(function success() {
+      deferred.resolve();
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to remove volume', err: err });
     });
 
-    var queries = [];
-    queries.push(deferred.promise);
-    if (volume.Metadata && volume.Metadata.ResourceControl) {
-      queries.push(ResourceControlService.deleteResourceControl(volume.Metadata.ResourceControl.Id));
-    }
-    return $q.all(queries);
+    return deferred.promise;
   };
 
   service.createVolumeConfiguration = function(name, driver, driverOptions) {

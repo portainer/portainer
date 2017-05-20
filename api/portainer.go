@@ -114,8 +114,6 @@ type (
 		SubResourceIDs     []string            `json:"SubResourceIds"`
 		Type               ResourceControlType `json:"Type"`
 		AdministratorsOnly bool                `json:"AdministratorsOnly"`
-		// Teams              []TeamID            `json:"Teams"`
-		// Users              []UserID            `json:"Users"`
 
 		UserAccesses []UserResourceAccess `json:"UserAccesses"`
 		TeamAccesses []TeamResourceAccess `json:"TeamAccesses"`

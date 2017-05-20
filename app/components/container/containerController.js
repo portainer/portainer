@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ImageHelper, Network, Notifications, Pagination, ModalService, ControllerDataPipeline) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ControllerDataPipeline) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -140,18 +140,16 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Ima
 
   $scope.remove = function(cleanAssociatedVolumes) {
     $('#loadingViewSpinner').show();
-    Container.remove({id: $stateParams.id, v: (cleanAssociatedVolumes) ? 1 : 0, force: true}, function (d) {
-      if (d.message) {
-        $('#loadingViewSpinner').hide();
-        Notifications.error('Failure', d, 'Unable to remove container');
-      }
-      else {
-        $state.go('containers', {}, {reload: true});
-        Notifications.success('Container removed', $stateParams.id);
-      }
-    }, function (e) {
-      update();
-      Notifications.error('Failure', e, 'Unable to remove container');
+    ContainerService.remove($scope.container, cleanAssociatedVolumes)
+    .then(function success() {
+      Notifications.success('Container successfully removed');
+      $state.go('containers', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to remove container');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
     });
   };
 

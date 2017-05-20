@@ -1,6 +1,6 @@
 angular.module('services', [])
-.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, ModalService, ResourceControlService) {
+.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $stateParams, $state, Service, ServiceService, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');
@@ -62,30 +62,16 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notification
     angular.forEach($scope.services, function (service) {
       if (service.Checked) {
         counter = counter + 1;
-        Service.remove({id: service.Id}, function (d) {
-          if (d.message) {
-            $('#loadServicesSpinner').hide();
-            Notifications.error('Unable to remove service', {}, d[0].message);
-          } else {
-            if (service.ResourceControl) {
-              ResourceControlService.deleteResourceControl(service.ResourceControl.Id)
-              .then(function success() {
-                Notifications.success('Service deleted', service.Id);
-                var index = $scope.services.indexOf(service);
-                $scope.services.splice(index, 1);
-              })
-              .catch(function error(err) {
-                Notifications.error('Failure', err, 'Unable to remove service ownership');
-              });
-            } else {
-              Notifications.success('Service deleted', service.Id);
-              var index = $scope.services.indexOf(service);
-              $scope.services.splice(index, 1);
-            }
-          }
-          complete();
-        }, function (e) {
-          Notifications.error('Failure', e, 'Unable to remove service');
+        ServiceService.remove(service)
+        .then(function success(data) {
+          Notifications.success('Service successfully deleted');
+          var index = $scope.services.indexOf(service);
+          $scope.services.splice(index, 1);
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to remove service');
+        })
+        .finally(function final() {
           complete();
         });
       }
