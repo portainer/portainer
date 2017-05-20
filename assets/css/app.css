@@ -468,7 +468,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 
 /*bootbox override*/
 .modal-open {
-  padding-right: 0px !important;
+  padding-right: 0 !important;
 }
 /*!bootbox override*/
 
