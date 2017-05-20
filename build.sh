@@ -38,36 +38,36 @@ mkdir -pv /tmp/portainer-builds
 
 PLATFORM="linux"
 ARCH="amd64"
-grunt release
+grunt release-${PLATFORM}-${ARCH}
 build_and_push_images ${PLATFORM} ${ARCH}
 build_archive ${PLATFORM} ${ARCH}
 
 PLATFORM="linux"
 ARCH="arm"
-grunt release-arm
+grunt release-${PLATFORM}-${ARCH}
 build_and_push_images ${PLATFORM} ${ARCH}
 build_archive ${PLATFORM} ${ARCH}
 
 PLATFORM="linux"
 ARCH="arm64"
-grunt release-arm64
+grunt release-${PLATFORM}-${ARCH}
 build_and_push_images ${PLATFORM} ${ARCH}
 build_archive ${PLATFORM} ${ARCH}
 
 PLATFORM="linux"
 ARCH="ppc64le"
-grunt release-ppc64le
+grunt release-${PLATFORM}-${ARCH}
 build_and_push_images ${PLATFORM} ${ARCH}
 build_archive ${PLATFORM} ${ARCH}
 
 PLATFORM="darwin"
 ARCH="amd64"
-grunt release-macos
+grunt release-${PLATFORM}-${ARCH}
 build_archive ${PLATFORM} ${ARCH}
 
 PLATFORM="windows"
 ARCH="amd64"
-grunt release-win
+grunt release-${PLATFORM}-${ARCH}
 build_archive ${PLATFORM} ${ARCH}
 
 exit 0
