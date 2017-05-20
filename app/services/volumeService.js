@@ -24,19 +24,7 @@ angular.module('portainer.services')
     Volume.get({id: id}).$promise
     .then(function success(data) {
       var volume = new VolumeViewModel(data);
-
-      if (volume.Metadata && volume.Metadata.ResourceControl) {
-        $q.all({
-          users: UserService.users(true),
-          teams: TeamService.teams()
-        })
-        .then(function success(data) {
-          VolumeHelper.decorateWithAuthorizations(volume, data.users, data.teams);
-          deferred.resolve(volume);
-        });
-      } else {
-        deferred.resolve(volume);
-      }
+      deferred.resolve(volume);
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve volume details', err: err});
