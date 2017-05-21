@@ -103,7 +103,7 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 }
 
 type postAuthRequest struct {
-	Username string `valid:"alphanum,required"`
+	Username string `valid:"required"`
 	Password string `valid:"required"`
 }
 
