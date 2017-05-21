@@ -1,6 +1,6 @@
 angular.module('user', [])
-.controller('UserController', ['$q', '$scope', '$state', '$stateParams', 'UserService', 'TeamService', 'ModalService', 'Notifications',
-function ($q, $scope, $state, $stateParams, UserService, TeamService, ModalService, Notifications) {
+.controller('UserController', ['$q', '$scope', '$state', '$stateParams', 'UserService', 'ModalService', 'Notifications',
+function ($q, $scope, $state, $stateParams, UserService, ModalService, Notifications) {
 
   $scope.state = {
     updatePasswordError: ''
@@ -10,7 +10,6 @@ function ($q, $scope, $state, $stateParams, UserService, TeamService, ModalServi
     newPassword: '',
     confirmPassword: '',
     Administrator: false
-    // Teams: []
   };
 
   $scope.deleteUser = function() {
@@ -55,30 +54,6 @@ function ($q, $scope, $state, $stateParams, UserService, TeamService, ModalServi
     });
   };
 
-  // $scope.onTeamClick = function(team) {
-  //   $('#loadingViewSpinner').show();
-  //   var teamMemberIDs = team.Users;
-  //
-  //   if (team.ticked) {
-  //     teamMemberIDs.push($scope.user.Id);
-  //   } else {
-  //     _.remove(teamMemberIDs, function(n) {
-  //       return n === $scope.user.Id;
-  //     });
-  //   }
-  //
-  //   TeamService.updateTeam(team.Id, team.Name, teamMemberIDs)
-  //   .then(function success(data) {
-  //     Notifications.success('User team membership successfully updated', team.Name);
-  //   })
-  //   .catch(function error(err) {
-  //     Notifications.error('Failure', err, 'Unable to update user team membership');
-  //   })
-  //   .finally(function final() {
-  //     $('#loadingViewSpinner').hide();
-  //   });
-  // };
-
   function deleteUser() {
     $('#loadingViewSpinner').show();
     UserService.deleteUser($scope.user.Id)
@@ -94,34 +69,15 @@ function ($q, $scope, $state, $stateParams, UserService, TeamService, ModalServi
     });
   }
 
-  // function assignTeams(teams, memberships) {
-  //   for (var i = 0; i < teams.length; i++) {
-  //     var team = teams[i];
-  //     for (var j = 0; j < memberships.length; j++) {
-  //       var membership = memberships[j];
-  //       if (team.Id === membership.TeamId) {
-  //         team.ticked = true;
-  //         $scope.formValues.Teams.push(team);
-  //         break;
-  //       }
-  //     }
-  //   }
-  // }
-
   function initView() {
     $('#loadingViewSpinner').show();
     $q.all({
       user: UserService.user($stateParams.id)
-      // teams: TeamService.teams(),
-      // memberships: UserService.userMemberships($stateParams.id)
     })
     .then(function success(data) {
-      // var teams = data.teams;
       var user = data.user;
       $scope.user = user;
       $scope.formValues.Administrator = user.Role === 1 ? true : false;
-      // $scope.teams = teams;
-      // assignTeams(teams, data.memberships);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve user information');

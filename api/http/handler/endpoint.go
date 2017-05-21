@@ -60,6 +60,7 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
 	}
 
 	endpoints, err := handler.EndpointService.Endpoints()
@@ -71,6 +72,7 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 	filteredEndpoints, err := security.FilterEndpoints(endpoints, securityContext)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
 	}
 
 	encodeJSON(w, filteredEndpoints, handler.Logger)
@@ -348,6 +350,7 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 		err = handler.FileService.DeleteTLSFiles(portainer.EndpointID(endpointID))
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+			return
 		}
 	}
 }

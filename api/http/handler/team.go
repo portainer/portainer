@@ -42,7 +42,7 @@ func NewTeamHandler(bouncer *security.RequestBouncer) *TeamHandler {
 	h.Handle("/teams/{id}",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteTeam))).Methods(http.MethodDelete)
 	h.Handle("/teams/{id}/memberships",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
 
 	return h
 }
@@ -118,6 +118,7 @@ func (handler *TeamHandler) handleGetTeam(w http.ResponseWriter, r *http.Request
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
 	}
 
 	if !security.AuthorizedTeamManagement(teamID, securityContext) {
@@ -223,13 +224,25 @@ func (handler *TeamHandler) handleGetMemberships(w http.ResponseWriter, r *http.
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	teamID, err := strconv.Atoi(id)
+	tid, err := strconv.Atoi(id)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
+	teamID := portainer.TeamID(tid)
 
-	memberships, err := handler.TeamMembershipService.TeamMembershipsByTeamID(portainer.TeamID(teamID))
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if !security.AuthorizedTeamManagement(teamID, securityContext) {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
+	memberships, err := handler.TeamMembershipService.TeamMembershipsByTeamID(teamID)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return

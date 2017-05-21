@@ -35,7 +35,7 @@ func NewUserHandler(bouncer *security.RequestBouncer) *UserHandler {
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/users",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUsers))).Methods(http.MethodPost)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handlePostUsers))).Methods(http.MethodPost)
 	h.Handle("/users",
 		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetUsers))).Methods(http.MethodGet)
 	h.Handle("/users/{id}",
@@ -72,6 +72,27 @@ func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+		return
+	}
+
+	if securityContext.IsTeamLeader && req.Role == 1 {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+		return
+	}
+
+	if strings.ContainsAny(req.Username, " ") {
+		httperror.WriteErrorResponse(w, portainer.ErrInvalidUsername, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
 	var role portainer.UserRole
 	if req.Role == 1 {
 		role = portainer.AdministratorRole
@@ -86,11 +107,6 @@ func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Reque
 	}
 	if user != nil {
 		httperror.WriteErrorResponse(w, portainer.ErrUserAlreadyExists, http.StatusConflict, handler.Logger)
-		return
-	}
-
-	if strings.ContainsAny(req.Username, " ") {
-		httperror.WriteErrorResponse(w, portainer.ErrInvalidUsername, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -128,12 +144,8 @@ func (handler *UserHandler) handleGetUsers(w http.ResponseWriter, r *http.Reques
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
 	}
-
-	// if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
-	// 	httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
-	// 	return
-	// }
 
 	users, err := handler.UserService.Users()
 	if err != nil {
@@ -244,6 +256,7 @@ func (handler *UserHandler) handlePutUser(w http.ResponseWriter, r *http.Request
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
@@ -422,6 +435,17 @@ func (handler *UserHandler) handleGetMemberships(w http.ResponseWriter, r *http.
 		return
 	}
 
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
+		httperror.WriteErrorResponse(w, portainer.ErrUnauthorized, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	memberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(portainer.UserID(userID))
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -446,6 +470,7 @@ func (handler *UserHandler) handleGetTeams(w http.ResponseWriter, r *http.Reques
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
 	}
 
 	if !security.AuthorizedUserManagement(userID, securityContext) {

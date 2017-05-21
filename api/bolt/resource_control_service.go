@@ -38,6 +38,41 @@ func (service *ResourceControlService) ResourceControl(ID portainer.ResourceCont
 	return &resourceControl, nil
 }
 
+// ResourceControlByResourceID returns a ResourceControl object by checking if the resourceID is equal
+// to the main ResourceID or in SubResourceIDs
+func (service *ResourceControlService) ResourceControlByResourceID(resourceID string) (*portainer.ResourceControl, error) {
+	var resourceControl *portainer.ResourceControl
+
+	err := service.store.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(resourceControlBucketName))
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var rc portainer.ResourceControl
+			err := internal.UnmarshalResourceControl(v, &rc)
+			if err != nil {
+				return err
+			}
+			if rc.ResourceID == resourceID {
+				resourceControl = &rc
+			}
+			for _, subResourceID := range rc.SubResourceIDs {
+				if subResourceID == resourceID {
+					resourceControl = &rc
+				}
+			}
+		}
+
+		if resourceControl == nil {
+			return portainer.ErrResourceControlNotFound
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return resourceControl, nil
+}
+
 // ResourceControls returns all the ResourceControl objects
 func (service *ResourceControlService) ResourceControls() ([]portainer.ResourceControl, error) {
 	var rcs = make([]portainer.ResourceControl, 0)

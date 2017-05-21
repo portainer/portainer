@@ -30,8 +30,9 @@ const (
 
 // ResourceControl errors.
 const (
-	ErrResourceControlNotFound    = Error("Resource control not found")
-	ErrInvalidResourceControlType = Error("Unsupported resource control type")
+	ErrResourceControlNotFound      = Error("Resource control not found")
+	ErrResourceControlAlreadyExists = Error("A resource control is already applied on this resource")
+	ErrInvalidResourceControlType   = Error("Unsupported resource control type")
 )
 
 // Endpoint errors.

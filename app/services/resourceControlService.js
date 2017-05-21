@@ -79,18 +79,12 @@ angular.module('portainer.services')
     }
 
     $q.all({
-      users: resourceControl.UserAccesses.length > 0 ? UserService.users(false) : null,
-      teams: resourceControl.TeamAccesses.length > 0 ? TeamService.teams() : null
+      users: resourceControl.UserAccesses.length > 0 ? UserService.users(false) : [],
+      teams: resourceControl.TeamAccesses.length > 0 ? TeamService.teams() : []
     })
     .then(function success(data) {
-      var authorizedUserNames = [];
-      var authorizedTeamNames = [];
-      if (data.users) {
-        authorizedUserNames = ResourceControlHelper.retrieveAuthorizedUsers(resourceControl, data.users);
-      }
-      if (data.teams) {
-        authorizedTeamNames = ResourceControlHelper.retrieveAuthorizedTeams(resourceControl, data.teams);
-      }
+      var authorizedUserNames = ResourceControlHelper.retrieveAuthorizedUsers(resourceControl, data.users);
+      var authorizedTeamNames = ResourceControlHelper.retrieveAuthorizedTeams(resourceControl, data.teams);
       deferred.resolve({ authorizedUsers: authorizedUserNames, authorizedTeams: authorizedTeamNames });
     })
     .catch(function error(err) {

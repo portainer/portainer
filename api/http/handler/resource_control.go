@@ -30,11 +30,11 @@ func NewResourceHandler(bouncer *security.RequestBouncer) *ResourceHandler {
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/resource_controls",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostResources))).Methods(http.MethodPost)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handlePostResources))).Methods(http.MethodPost)
 	h.Handle("/resource_controls/{id}",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutResources))).Methods(http.MethodPut)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handlePutResources))).Methods(http.MethodPut)
 	h.Handle("/resource_controls/{id}",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteResources))).Methods(http.MethodDelete)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handleDeleteResources))).Methods(http.MethodDelete)
 
 	return h
 }
@@ -68,6 +68,17 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 
 	if len(req.Users) == 0 && len(req.Teams) == 0 && !req.AdministratorsOnly {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	rc, err := handler.ResourceControlService.ResourceControlByResourceID(req.ResourceID)
+	if err != nil && err != portainer.ErrResourceControlNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+	if rc != nil {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceControlAlreadyExists, http.StatusConflict, handler.Logger)
+		return
 	}
 
 	var userAccesses = make([]portainer.UserResourceAccess, 0)
@@ -88,7 +99,7 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 		teamAccesses = append(teamAccesses, teamAccess)
 	}
 
-	resource := portainer.ResourceControl{
+	resourceControl := portainer.ResourceControl{
 		ResourceID:         req.ResourceID,
 		SubResourceIDs:     req.SubResourceIDs,
 		Type:               resourceControlType,
@@ -97,7 +108,18 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 		TeamAccesses:       teamAccesses,
 	}
 
-	err = handler.ResourceControlService.CreateResourceControl(&resource)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if !security.AuthorizedResourceControlCreation(&resourceControl, securityContext) {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
+	err = handler.ResourceControlService.CreateResourceControl(&resourceControl)
 	if err != nil {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
@@ -170,6 +192,17 @@ func (handler *ResourceHandler) handlePutResources(w http.ResponseWriter, r *htt
 	}
 	resourceControl.TeamAccesses = teamAccesses
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if !security.AuthorizedResourceControlUpdate(resourceControl, securityContext) {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	err = handler.ResourceControlService.UpdateResourceControl(resourceControl.ID, resourceControl)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -194,13 +227,24 @@ func (handler *ResourceHandler) handleDeleteResources(w http.ResponseWriter, r *
 		return
 	}
 
-	_, err = handler.ResourceControlService.ResourceControl(portainer.ResourceControlID(resourceControlID))
+	resourceControl, err := handler.ResourceControlService.ResourceControl(portainer.ResourceControlID(resourceControlID))
 
 	if err == portainer.ErrResourceControlNotFound {
 		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if !security.AuthorizedResourceControlDeletion(resourceControl, securityContext) {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}
 

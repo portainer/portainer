@@ -69,5 +69,6 @@ func (handler *UploadHandler) handlePostUploadTLS(w http.ResponseWriter, r *http
 	err = handler.FileService.StoreTLSFile(portainer.EndpointID(ID), fileType, file)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
 	}
 }

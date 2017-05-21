@@ -31,26 +31,32 @@ func NewTeamMembershipHandler(bouncer *security.RequestBouncer) *TeamMembershipH
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/team_memberships",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostTeamMemberships))).Methods(http.MethodPost)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handlePostTeamMemberships))).Methods(http.MethodPost)
 	h.Handle("/team_memberships",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTeamsMemberships))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeamsMemberships))).Methods(http.MethodGet)
 	h.Handle("/team_memberships/{id}",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutTeamMembership))).Methods(http.MethodPut)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handlePutTeamMembership))).Methods(http.MethodPut)
 	h.Handle("/team_memberships/{id}",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteTeamMembership))).Methods(http.MethodDelete)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handleDeleteTeamMembership))).Methods(http.MethodDelete)
 
 	return h
 }
 
 // handlePostTeamMemberships handles POST requests on /team_memberships
 func (handler *TeamMembershipHandler) handlePostTeamMemberships(w http.ResponseWriter, r *http.Request) {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
 	var req postTeamMembershipsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
-	_, err := govalidator.ValidateStruct(req)
+	_, err = govalidator.ValidateStruct(req)
 	if err != nil {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
@@ -59,6 +65,11 @@ func (handler *TeamMembershipHandler) handlePostTeamMemberships(w http.ResponseW
 	userID := portainer.UserID(req.UserID)
 	teamID := portainer.TeamID(req.TeamID)
 	role := portainer.MembershipRole(req.Role)
+
+	if !security.AuthorizedTeamManagement(teamID, securityContext) {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
 
 	memberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(userID)
 	if err != nil {
@@ -101,6 +112,17 @@ type postTeamMembershipsRequest struct {
 
 // handleGetTeamsMemberships handles GET requests on /team_memberships
 func (handler *TeamMembershipHandler) handleGetTeamsMemberships(w http.ResponseWriter, r *http.Request) {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	memberships, err := handler.TeamMembershipService.TeamMemberships()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -137,12 +159,28 @@ func (handler *TeamMembershipHandler) handlePutTeamMembership(w http.ResponseWri
 	teamID := portainer.TeamID(req.TeamID)
 	role := portainer.MembershipRole(req.Role)
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if !security.AuthorizedTeamManagement(teamID, securityContext) {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	membership, err := handler.TeamMembershipService.TeamMembership(portainer.TeamMembershipID(membershipID))
 	if err == portainer.ErrTeamMembershipNotFound {
 		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if securityContext.IsTeamLeader && membership.Role != role {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}
 
@@ -174,13 +212,23 @@ func (handler *TeamMembershipHandler) handleDeleteTeamMembership(w http.Response
 		return
 	}
 
-	_, err = handler.TeamMembershipService.TeamMembership(portainer.TeamMembershipID(membershipID))
-
+	membership, err := handler.TeamMembershipService.TeamMembership(portainer.TeamMembershipID(membershipID))
 	if err == portainer.ErrTeamMembershipNotFound {
 		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if !security.AuthorizedTeamManagement(membership.TeamID, securityContext) {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}
 
