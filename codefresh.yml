@@ -20,7 +20,7 @@ steps:
 
   test:
     image: portainer/angular-builder:latest
-    working_directory: ${{build_backend}}
+    working_directory: ${{build_frontend}}
     commands:
       - ls -lah ./
 
