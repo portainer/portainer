@@ -5,6 +5,5 @@ steps:
     working_directory: ${{main_clone}}
     commands:
       - mkdir -p /go/src/github.com/${{CF_REPO_OWNER}}
-      - ln -s /codefresh/volume/${{CF_REPO_NAME}} /go/src/github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
-      - cd /go/src/github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}} && ls -lah
-      # - /build.sh api/cmd/portainer
+      - ln -s /codefresh/volume/${{CF_REPO_NAME}}/api /go/src/github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
+      - /build.sh api/cmd/portainer
