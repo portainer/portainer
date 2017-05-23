@@ -11,6 +11,6 @@ steps:
     image: portainer/angular-builder:latest
     working_directory: ${{build_backend}}
     commands:
-      - npm install -g bower && npm install
+      - npm install -g bower grunt grunt-cli && npm install
       - bower install --allow-root
       - grunt build-webapp
