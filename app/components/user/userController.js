@@ -1,15 +1,15 @@
 angular.module('user', [])
-.controller('UserController', ['$scope', '$state', '$stateParams', 'UserService', 'ModalService', 'Notifications',
-function ($scope, $state, $stateParams, UserService, ModalService, Notifications) {
+.controller('UserController', ['$q', '$scope', '$state', '$stateParams', 'UserService', 'ModalService', 'Notifications',
+function ($q, $scope, $state, $stateParams, UserService, ModalService, Notifications) {
 
   $scope.state = {
-    updatePasswordError: '',
+    updatePasswordError: ''
   };
 
   $scope.formValues = {
     newPassword: '',
     confirmPassword: '',
-    Administrator: false,
+    Administrator: false
   };
 
   $scope.deleteUser = function() {
@@ -32,7 +32,7 @@ function ($scope, $state, $stateParams, UserService, ModalService, Notifications
       $state.reload();
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, 'Unable to update user permissions');
+      Notifications.error('Failure', err, 'Unable to update user permissions');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
@@ -47,7 +47,7 @@ function ($scope, $state, $stateParams, UserService, ModalService, Notifications
       $state.reload();
     })
     .catch(function error(err) {
-      $scope.state.updatePasswordError = 'Unable to update password';
+      Notifications.error('Failure', err, 'Unable to update user password');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
@@ -62,28 +62,30 @@ function ($scope, $state, $stateParams, UserService, ModalService, Notifications
       $state.go('users');
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, 'Unable to remove user');
+      Notifications.error('Failure', err, 'Unable to remove user');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
     });
   }
 
-  function getUser() {
+  function initView() {
     $('#loadingViewSpinner').show();
-    UserService.user($stateParams.id)
+    $q.all({
+      user: UserService.user($stateParams.id)
+    })
     .then(function success(data) {
-      var user = new UserViewModel(data);
+      var user = data.user;
       $scope.user = user;
-      $scope.formValues.Administrator = user.RoleId === 1 ? true : false;
+      $scope.formValues.Administrator = user.Role === 1 ? true : false;
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, 'Unable to retrieve user information');
+      Notifications.error('Failure', err, 'Unable to retrieve user information');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
     });
   }
 
-  getUser();
+  initView();
 }]);

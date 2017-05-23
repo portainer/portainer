@@ -87,6 +87,8 @@
   </div>
 </div>
 
+<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="container && applicationState.application.authentication"></div>
+
 <div ng-if="container.State.Health" class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>

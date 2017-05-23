@@ -5,7 +5,7 @@ angular.module('portainer.helpers', []);
 angular.module('portainer', [
   'ui.bootstrap',
   'ui.router',
-  'ui.select',
+  'isteven-multi-select',
   'ngCookies',
   'ngSanitize',
   'ngFileUpload',
@@ -20,6 +20,8 @@ angular.module('portainer', [
   'portainer.services',
   'auth',
   'dashboard',
+  'common.accesscontrol.panel',
+  'common.accesscontrol.form',
   'container',
   'containerConsole',
   'containerLogs',
@@ -47,9 +49,12 @@ angular.module('portainer', [
   'stats',
   'swarm',
   'task',
+  'team',
+  'teams',
   'templates',
   'user',
   'users',
+  'volume',
   'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider) {
     'use strict';
@@ -508,6 +513,19 @@ angular.module('portainer', [
         }
       }
     })
+    .state('volume', {
+      url: '^/volumes/:id',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/volume/volume.html',
+          controller: 'VolumeController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('users', {
       url: '/users/',
       views: {
@@ -527,6 +545,32 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/user/user.html',
           controller: 'UserController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('teams', {
+      url: '/teams/',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/teams/teams.html',
+          controller: 'TeamsController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('team', {
+      url: '^/teams/:id',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/team/team.html',
+          controller: 'TeamController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
@@ -581,6 +625,9 @@ angular.module('portainer', [
   .constant('CONFIG_ENDPOINT', 'api/settings')
   .constant('AUTH_ENDPOINT', 'api/auth')
   .constant('USERS_ENDPOINT', 'api/users')
+  .constant('TEAMS_ENDPOINT', 'api/teams')
+  .constant('TEAM_MEMBERSHIPS_ENDPOINT', 'api/team_memberships')
+  .constant('RESOURCE_CONTROL_ENDPOINT', 'api/resource_controls')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('PAGINATION_MAX_ITEMS', 10)

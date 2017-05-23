@@ -83,7 +83,7 @@ angular.module('portainer.helpers')
       if (volume.containerPath) {
         var binding;
         if (volume.type === 'auto') {
-          binding = generatedVolumesPile.pop().Name + ':' + volume.containerPath;
+          binding = generatedVolumesPile.pop().Id + ':' + volume.containerPath;
         } else if (volume.type !== 'auto' && volume.name) {
           binding = volume.name + ':' + volume.containerPath;
         }

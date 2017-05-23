@@ -1,13 +1,13 @@
 angular.module('sidebar', [])
-.controller('SidebarController', ['$scope', '$state', 'Settings', 'Config', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication',
-function ($scope, $state, Settings, Config, EndpointService, StateManager, EndpointProvider, Notifications, Authentication) {
+.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'Config', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService',
+function ($q, $scope, $state, Settings, Config, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService) {
 
   Config.$promise.then(function (c) {
     $scope.logo = c.logo;
   });
 
   $scope.uiVersion = Settings.uiVersion;
-  $scope.userRole = Authentication.getUserDetails().role;
+  $scope.endpoints = [];
 
   $scope.switchEndpoint = function(endpoint) {
     var activeEndpointID = EndpointProvider.endpointID();
@@ -27,22 +27,47 @@ function ($scope, $state, Settings, Config, EndpointService, StateManager, Endpo
     });
   };
 
-  function fetchEndpoints() {
-    EndpointService.endpoints()
-    .then(function success(data) {
-      $scope.endpoints = data;
-      var activeEndpointID = EndpointProvider.endpointID();
-      angular.forEach($scope.endpoints, function (endpoint) {
-        if (endpoint.Id === activeEndpointID) {
-          $scope.activeEndpoint = endpoint;
-          EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-        }
-      });
-    })
-    .catch(function error(err) {
-      $scope.endpoints = [];
+  function setActiveEndpoint(endpoints) {
+    var activeEndpointID = EndpointProvider.endpointID();
+    angular.forEach(endpoints, function (endpoint) {
+      if (endpoint.Id === activeEndpointID) {
+        $scope.activeEndpoint = endpoint;
+        EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+      }
     });
   }
 
-  fetchEndpoints();
+  function checkPermissions(memberships) {
+    var isLeader = false;
+    angular.forEach(memberships, function(membership) {
+      if (membership.Role === 1) {
+        isLeader = true;
+      }
+    });
+    $scope.isTeamLeader = isLeader;
+  }
+
+  function initView() {
+    EndpointService.endpoints()
+    .then(function success(data) {
+      var endpoints = data;
+      $scope.endpoints = endpoints;
+      setActiveEndpoint(endpoints);
+
+      if (StateManager.getState().application.authentication) {
+        var userDetails = Authentication.getUserDetails();
+        var isAdmin = userDetails.role === 1 ? true: false;
+        $scope.isAdmin = isAdmin;
+        return $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : []);
+      }
+    })
+    .then(function success(data) {
+      checkPermissions(data);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+    });
+  }
+
+  initView();
 }]);

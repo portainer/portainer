@@ -17,6 +17,8 @@ type Store struct {
 
 	// Services
 	UserService            *UserService
+	TeamService            *TeamService
+	TeamMembershipService  *TeamMembershipService
 	EndpointService        *EndpointService
 	ResourceControlService *ResourceControlService
 	VersionService         *VersionService
@@ -26,13 +28,13 @@ type Store struct {
 }
 
 const (
-	databaseFileName                   = "portainer.db"
-	versionBucketName                  = "version"
-	userBucketName                     = "users"
-	endpointBucketName                 = "endpoints"
-	containerResourceControlBucketName = "containerResourceControl"
-	serviceResourceControlBucketName   = "serviceResourceControl"
-	volumeResourceControlBucketName    = "volumeResourceControl"
+	databaseFileName          = "portainer.db"
+	versionBucketName         = "version"
+	userBucketName            = "users"
+	teamBucketName            = "teams"
+	teamMembershipBucketName  = "team_membership"
+	endpointBucketName        = "endpoints"
+	resourceControlBucketName = "resource_control"
 )
 
 // NewStore initializes a new Store and the associated services
@@ -40,11 +42,15 @@ func NewStore(storePath string) (*Store, error) {
 	store := &Store{
 		Path:                   storePath,
 		UserService:            &UserService{},
+		TeamService:            &TeamService{},
+		TeamMembershipService:  &TeamMembershipService{},
 		EndpointService:        &EndpointService{},
 		ResourceControlService: &ResourceControlService{},
 		VersionService:         &VersionService{},
 	}
 	store.UserService.store = store
+	store.TeamService.store = store
+	store.TeamMembershipService.store = store
 	store.EndpointService.store = store
 	store.ResourceControlService.store = store
 	store.VersionService.store = store
@@ -78,19 +84,19 @@ func (store *Store) Open() error {
 		if err != nil {
 			return err
 		}
+		_, err = tx.CreateBucketIfNotExists([]byte(teamBucketName))
+		if err != nil {
+			return err
+		}
 		_, err = tx.CreateBucketIfNotExists([]byte(endpointBucketName))
 		if err != nil {
 			return err
 		}
-		_, err = tx.CreateBucketIfNotExists([]byte(containerResourceControlBucketName))
+		_, err = tx.CreateBucketIfNotExists([]byte(resourceControlBucketName))
 		if err != nil {
 			return err
 		}
-		_, err = tx.CreateBucketIfNotExists([]byte(serviceResourceControlBucketName))
-		if err != nil {
-			return err
-		}
-		_, err = tx.CreateBucketIfNotExists([]byte(volumeResourceControlBucketName))
+		_, err = tx.CreateBucketIfNotExists([]byte(teamMembershipBucketName))
 		if err != nil {
 			return err
 		}

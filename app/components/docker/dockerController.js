@@ -14,11 +14,11 @@ function ($scope, Info, Version, Notifications) {
       $scope.state.loaded = true;
       $('#loadingViewSpinner').hide();
     }, function (e) {
-      Notifications.error("Failure", e, 'Unable to retrieve engine details');
+      Notifications.error('Failure', e, 'Unable to retrieve engine details');
       $('#loadingViewSpinner').hide();
     });
   }, function (e) {
-    Notifications.error("Failure", e, 'Unable to retrieve engine information');
+    Notifications.error('Failure', e, 'Unable to retrieve engine information');
     $('#loadingViewSpinner').hide();
   });
 }]);

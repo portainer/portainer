@@ -11,8 +11,8 @@ angular.module('portainer.services')
     return Endpoints.query({}).$promise;
   };
 
-  service.updateAuthorizedUsers = function(id, authorizedUserIDs) {
-    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs}).$promise;
+  service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
+    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
   };
 
   service.updateEndpoint = function(id, endpointParams) {
@@ -23,7 +23,7 @@ angular.module('portainer.services')
       authorizedUsers: endpointParams.authorizedUsers
     };
     if (endpointParams.type && endpointParams.URL) {
-      query.URL = endpointParams.type === 'local' ? ("unix://" + endpointParams.URL) : ("tcp://" + endpointParams.URL);
+      query.URL = endpointParams.type === 'local' ? ('unix://' + endpointParams.URL) : ('tcp://' + endpointParams.URL);
     }
 
     var deferred = $q.defer();
@@ -48,8 +48,8 @@ angular.module('portainer.services')
 
   service.createLocalEndpoint = function(name, URL, TLS, active) {
     var endpoint = {
-      Name: "local",
-      URL: "unix:///var/run/docker.sock",
+      Name: 'local',
+      URL: 'unix:///var/run/docker.sock',
       TLS: false
     };
     return Endpoints.create({}, endpoint).$promise;

@@ -107,29 +107,9 @@
             <!-- !port-mapping-input-list -->
           </div>
           <!-- !port-mapping -->
-          <div class="col-sm-12 form-section-title" ng-if="applicationState.application.authentication">
-            Access control
-          </div>
-          <!-- ownership -->
-          <div class="form-group" ng-if="applicationState.application.authentication">
-            <div class="col-sm-12">
-              <label for="ownership" class="control-label text-left">
-                Ownership
-                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing public, everybody will be able to access it."></portainer-tooltip>
-              </label>
-              <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'private'">
-                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                  Private
-                </label>
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'public'">
-                  <i class="fa fa-eye" aria-hidden="true"></i>
-                  Public
-                </label>
-              </div>
-            </div>
-          </div>
-          <!-- !ownership -->
+          <!-- access-control -->
+          <div ng-include="'app/components/common/accessControlForm/accessControlForm.html'" ng-if="applicationState.application.authentication"></div>
+          <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions
@@ -139,6 +119,7 @@
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="create()">Start container</button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="containers">Cancel</a>
               <i id="createContainerSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
           <!-- !actions -->
@@ -532,7 +513,7 @@
             </form>
 
           </div>
-          <!-- !tab-runtime --> 
+          <!-- !tab-runtime -->
         </div>
       </rd-widget-body>
     </rd-widget>
