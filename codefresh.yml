@@ -1,0 +1,7 @@
+version: '1.0'
+steps:
+  build_backend:
+    image: portainer/golang-builder:ci
+    working_directory: ${{main_clone}}
+    commands:
+      - /build.sh api/cmd/portainer
