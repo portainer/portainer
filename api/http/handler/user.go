@@ -406,6 +406,11 @@ func (handler *UserHandler) handleDeleteUser(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	if userID == 1 {
+		httperror.WriteErrorResponse(w, portainer.ErrNotAvailableInDemo, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	_, err = handler.UserService.User(portainer.UserID(userID))
 
 	if err == portainer.ErrUserNotFound {
