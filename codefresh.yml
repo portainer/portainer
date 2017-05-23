@@ -4,4 +4,7 @@ steps:
     image: portainer/golang-builder:ci
     working_directory: ${{main_clone}}
     commands:
+      - echo ${GOPATH}
+      - mkdir -p /go/src/github.com/${{CF_REPO_OWNER}}
+      - ln -s /codefresh/volume/${{CF_REPO_NAME}} /go/src/github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
       - /build.sh api/cmd/portainer
