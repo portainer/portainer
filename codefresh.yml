@@ -18,15 +18,9 @@ steps:
       - bower install --allow-root
       - grunt build-webapp
 
-  test:
-    image: portainer/angular-builder:latest
+  build_image:
+    type: build
     working_directory: ${{build_frontend}}
-    commands:
-      - ls -lah ./
-
-  # build_image:
-  #   type: build
-  #   working_directory: ${{build_frontend}}
-  #   dockerfile: build/linux/Dockerfile
-  #   image_name: portainer/portainer
-  #   tag: develop
+    dockerfile: ./build/linux/Dockerfile
+    image_name: portainer/portainer
+    tag: develop
