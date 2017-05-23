@@ -21,30 +21,34 @@ angular.module('portainer.helpers')
     };
   };
 
-  helper.createImageConfigForCommit = function(imageName, registry) {
+  function extractNameAndTag(imageName, registry) {
     var imageNameAndTag = imageName.split(':');
     var image = imageNameAndTag[0];
+    var tag = imageNameAndTag[1] ? imageNameAndTag[1] : 'latest';
     if (registry) {
       image = registry + '/' + imageNameAndTag[0];
     }
-    var imageConfig = {
-      repo: image,
-      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
+
+    return {
+      image: image,
+      tag: tag
     };
-    return imageConfig;
+  }
+
+  helper.createImageConfigForCommit = function(imageName, registry) {
+    var imageAndTag = extractNameAndTag(imageName, registry);
+    return {
+      repo: imageAndTag.image,
+      tag: imageAndTag.tag
+    };
   };
 
   helper.createImageConfigForContainer = function (imageName, registry) {
-    var imageNameAndTag = imageName.split(':');
-    var image = imageNameAndTag[0];
-    if (registry) {
-      image = registry + '/' + imageNameAndTag[0];
-    }
-    var imageConfig = {
-      fromImage: image,
-      tag: imageNameAndTag[1] ? imageNameAndTag[1] : 'latest'
+    var imageAndTag = extractNameAndTag(imageName, registry);
+    return {
+      fromImage: imageAndTag.image,
+      tag: imageAndTag.tag
     };
-    return imageConfig;
   };
 
   return helper;
