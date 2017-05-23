@@ -8,21 +8,21 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-// EndpointService represents a service for managing users.
+// VersionService represents a service to manage stored versions.
 type VersionService struct {
 	store *Store
 }
 
 const (
-	DBVersionKey = "DB_VERSION"
+	dBVersionKey = "DB_VERSION"
 )
 
-// DBVersion the stored database version.
+// DBVersion retrieves the stored database version.
 func (service *VersionService) DBVersion() (int, error) {
 	var data []byte
 	err := service.store.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(versionBucketName))
-		value := bucket.Get([]byte(DBVersionKey))
+		value := bucket.Get([]byte(dBVersionKey))
 		if value == nil {
 			return portainer.ErrDBVersionNotFound
 		}
@@ -49,7 +49,7 @@ func (service *VersionService) StoreDBVersion(version int) error {
 		bucket := tx.Bucket([]byte(versionBucketName))
 
 		data := []byte(strconv.Itoa(version))
-		err := bucket.Put([]byte(DBVersionKey), data)
+		err := bucket.Put([]byte(dBVersionKey), data)
 		if err != nil {
 			return err
 		}

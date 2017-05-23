@@ -15,12 +15,12 @@ import (
 type Service struct{}
 
 const (
-	errInvalidEndpointProtocol     = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
-	errSocketNotFound              = portainer.Error("Unable to locate Unix socket")
-	errEndpointsFileNotFound       = portainer.Error("Unable to locate external endpoints file")
-	errInvalidSyncInterval         = portainer.Error("Invalid synchronization interval")
-	errEndpointExcludeExternal     = portainer.Error("Cannot use the -H flag mutually with --external-endpoints")
-	errNoAuthExcludeAdminPassword  = portainer.Error("Cannot use --no-auth with --admin-password")
+	errInvalidEndpointProtocol    = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
+	errSocketNotFound             = portainer.Error("Unable to locate Unix socket")
+	errEndpointsFileNotFound      = portainer.Error("Unable to locate external endpoints file")
+	errInvalidSyncInterval        = portainer.Error("Invalid synchronization interval")
+	errEndpointExcludeExternal    = portainer.Error("Cannot use the -H flag mutually with --external-endpoints")
+	errNoAuthExcludeAdminPassword = portainer.Error("Cannot use --no-auth with --admin-password")
 )
 
 // ParseFlags parse the CLI flags and return a portainer.Flags struct
@@ -75,9 +75,9 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 		return err
 	}
 
-  if *flags.NoAuth && (*flags.AdminPassword != "") {
-    return errNoAuthExcludeAdminPassword
-  }
+	if *flags.NoAuth && (*flags.AdminPassword != "") {
+		return errNoAuthExcludeAdminPassword
+	}
 
 	return nil
 }
