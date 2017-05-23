@@ -73,10 +73,10 @@
                 </a>
               </th>
               <th ng-if="applicationState.application.authentication">
-                <a ui-sref="services" ng-click="order('Metadata.ResourceControl.OwnerId')">
+                <a ui-sref="services" ng-click="order('ResourceControl.Ownership')">
                   Ownership
-                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'ResourceControl.Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'ResourceControl.Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </thead>
@@ -109,24 +109,9 @@
                   {{ service.UpdatedAt|getisodate }}
                 </td>
                 <td ng-if="applicationState.application.authentication">
-                  <span ng-if="user.role === 1 && service.Metadata.ResourceControl">
-                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                    <span ng-if="service.Metadata.ResourceControl.OwnerId === user.ID">
-                      Private
-                    </span>
-                    <span ng-if="service.Metadata.ResourceControl.OwnerId !== user.ID">
-                      Private <span ng-if="service.Owner">(owner: {{ service.Owner }})</span>
-                    </span>
-                    <a ng-click="switchOwnership(service)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
-                  </span>
-                  <span ng-if="user.role !== 1 && service.Metadata.ResourceControl.OwnerId === user.ID">
-                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                    Private
-                    <a ng-click="switchOwnership(service)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
-                  </span>
-                  <span ng-if="!service.Metadata.ResourceControl">
-                    <i class="fa fa-eye" aria-hidden="true"></i>
-                    Public
+                  <span>
+                    <i ng-class="service.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
+                    {{ service.ResourceControl.Ownership ? service.ResourceControl.Ownership : service.ResourceControl.Ownership = 'public' }}
                   </span>
                 </td>
               </tr>

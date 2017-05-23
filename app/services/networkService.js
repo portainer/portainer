@@ -24,9 +24,9 @@ angular.module('portainer.services')
   };
 
   service.addPredefinedLocalNetworks = function(networks) {
-    networks.push({Scope: "local", Name: "bridge"});
-    networks.push({Scope: "local", Name: "host"});
-    networks.push({Scope: "local", Name: "none"});
+    networks.push({Scope: 'local', Name: 'bridge'});
+    networks.push({Scope: 'local', Name: 'host'});
+    networks.push({Scope: 'local', Name: 'none'});
   };
 
   return service;

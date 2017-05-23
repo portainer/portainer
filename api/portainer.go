@@ -1,8 +1,6 @@
 package portainer
 
-import (
-	"io"
-)
+import "io"
 
 type (
 	// Pair defines a key/value string pair
@@ -28,6 +26,10 @@ type (
 		TLSCacert         *string
 		TLSCert           *string
 		TLSKey            *string
+		SSL               *bool
+		SSLCert           *string
+		SSLKey            *string
+		AdminPassword     *string
 	}
 
 	// Settings represents Portainer settings.
@@ -39,7 +41,7 @@ type (
 		EndpointManagement bool   `json:"endpointManagement"`
 	}
 
-	// User represent a user account.
+	// User represents a user account.
 	User struct {
 		ID       UserID   `json:"Id"`
 		Username string   `json:"Username"`
@@ -51,8 +53,31 @@ type (
 	UserID int
 
 	// UserRole represents the role of a user. It can be either an administrator
-	// or a regular user.
+	// or a regular user
 	UserRole int
+
+	// Team represents a list of user accounts.
+	Team struct {
+		ID   TeamID `json:"Id"`
+		Name string `json:"Name"`
+	}
+
+	// TeamID represents a team identifier
+	TeamID int
+
+	// TeamMembership represents a membership association between a user and a team
+	TeamMembership struct {
+		ID     TeamMembershipID `json:"Id"`
+		UserID UserID           `json:"UserID"`
+		TeamID TeamID           `json:"TeamID"`
+		Role   MembershipRole   `json:"Role"`
+	}
+
+	// TeamMembershipID represents a team membership identifier
+	TeamMembershipID int
+
+	// MembershipRole represents the role of a user within a team
+	MembershipRole int
 
 	// TokenData represents the data embedded in a JWT token.
 	TokenData struct {
@@ -70,26 +95,52 @@ type (
 		ID              EndpointID `json:"Id"`
 		Name            string     `json:"Name"`
 		URL             string     `json:"URL"`
+		PublicURL       string     `json:"PublicURL"`
 		TLS             bool       `json:"TLS"`
 		TLSCACertPath   string     `json:"TLSCACert,omitempty"`
 		TLSCertPath     string     `json:"TLSCert,omitempty"`
 		TLSKeyPath      string     `json:"TLSKey,omitempty"`
 		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
 	}
 
-	// ResourceControl represent a reference to a Docker resource with specific controls
+	// ResourceControlID represents a resource control identifier.
+	ResourceControlID int
+
+	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
-		OwnerID     UserID              `json:"OwnerId"`
-		ResourceID  string              `json:"ResourceId"`
+		ID                 ResourceControlID   `json:"Id"`
+		ResourceID         string              `json:"ResourceId"`
+		SubResourceIDs     []string            `json:"SubResourceIds"`
+		Type               ResourceControlType `json:"Type"`
+		AdministratorsOnly bool                `json:"AdministratorsOnly"`
+
+		UserAccesses []UserResourceAccess `json:"UserAccesses"`
+		TeamAccesses []TeamResourceAccess `json:"TeamAccesses"`
+
+		// Deprecated fields
+		// Deprecated: OwnerID field is deprecated in DBVersion == 2
+		OwnerID UserID `json:"OwnerId"`
+		// Deprecated: AccessLevel field is deprecated in DBVersion == 2
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
-	// ResourceControlType represents a type of resource control.
-	// Can be one of: container, service or volume.
+	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service).
 	ResourceControlType int
 
-	// ResourceAccessLevel represents the level of control associated to a resource for a specific owner.
-	// Can be one of: full, restricted, limited.
+	// UserResourceAccess represents the level of control on a resource for a specific user.
+	UserResourceAccess struct {
+		UserID      UserID              `json:"UserId"`
+		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+	}
+
+	// TeamResourceAccess represents the level of control on a resource for a specific team.
+	TeamResourceAccess struct {
+		TeamID      TeamID              `json:"TeamId"`
+		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+	}
+
+	// ResourceAccessLevel represents the level of control associated to a resource.
 	ResourceAccessLevel int
 
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
@@ -125,6 +176,29 @@ type (
 		DeleteUser(ID UserID) error
 	}
 
+	// TeamService represents a service for managing user data.
+	TeamService interface {
+		Team(ID TeamID) (*Team, error)
+		TeamByName(name string) (*Team, error)
+		Teams() ([]Team, error)
+		CreateTeam(team *Team) error
+		UpdateTeam(ID TeamID, team *Team) error
+		DeleteTeam(ID TeamID) error
+	}
+
+	// TeamMembershipService represents a service for managing team membership data.
+	TeamMembershipService interface {
+		TeamMembership(ID TeamMembershipID) (*TeamMembership, error)
+		TeamMemberships() ([]TeamMembership, error)
+		TeamMembershipsByUserID(userID UserID) ([]TeamMembership, error)
+		TeamMembershipsByTeamID(teamID TeamID) ([]TeamMembership, error)
+		CreateTeamMembership(membership *TeamMembership) error
+		UpdateTeamMembership(ID TeamMembershipID, membership *TeamMembership) error
+		DeleteTeamMembership(ID TeamMembershipID) error
+		DeleteTeamMembershipByUserID(userID UserID) error
+		DeleteTeamMembershipByTeamID(teamID TeamID) error
+	}
+
 	// EndpointService represents a service for managing endpoint data.
 	EndpointService interface {
 		Endpoint(ID EndpointID) (*Endpoint, error)
@@ -143,10 +217,12 @@ type (
 
 	// ResourceControlService represents a service for managing resource control data.
 	ResourceControlService interface {
-		ResourceControl(resourceID string, rcType ResourceControlType) (*ResourceControl, error)
-		ResourceControls(rcType ResourceControlType) ([]ResourceControl, error)
-		CreateResourceControl(resourceID string, rc *ResourceControl, rcType ResourceControlType) error
-		DeleteResourceControl(resourceID string, rcType ResourceControlType) error
+		ResourceControl(ID ResourceControlID) (*ResourceControl, error)
+		ResourceControlByResourceID(resourceID string) (*ResourceControl, error)
+		ResourceControls() ([]ResourceControl, error)
+		CreateResourceControl(rc *ResourceControl) error
+		UpdateResourceControl(ID ResourceControlID, resourceControl *ResourceControl) error
+		DeleteResourceControl(ID ResourceControlID) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data.
@@ -175,10 +251,10 @@ type (
 )
 
 const (
-	// APIVersion is the version number of Portainer API.
+	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.12.4"
-	// DBVersion is the version number of Portainer database.
-	DBVersion = 1
+	// DBVersion is the version number of the Portainer database.
+	DBVersion = 2
 )
 
 const (
@@ -191,6 +267,14 @@ const (
 )
 
 const (
+	_ MembershipRole = iota
+	// TeamLeader represents a leader role inside a team
+	TeamLeader
+	// TeamMember represents a member role inside a team
+	TeamMember
+)
+
+const (
 	_ UserRole = iota
 	// AdministratorRole represents an administrator user role
 	AdministratorRole
@@ -199,17 +283,17 @@ const (
 )
 
 const (
-	_ ResourceControlType = iota
-	// ContainerResourceControl represents a resource control for a container
-	ContainerResourceControl
-	// ServiceResourceControl represents a resource control for a service
-	ServiceResourceControl
-	// VolumeResourceControl represents a resource control for a volume
-	VolumeResourceControl
+	_ ResourceAccessLevel = iota
+	// ReadWriteAccessLevel represents an access level with read-write permissions on a resource
+	ReadWriteAccessLevel
 )
 
 const (
-	_ ResourceAccessLevel = iota
-	// RestrictedResourceAccessLevel represents a restricted access level on a resource (private ownership)
-	RestrictedResourceAccessLevel
+	_ ResourceControlType = iota
+	// ContainerResourceControl represents a resource control associated to a Docker container
+	ContainerResourceControl
+	// ServiceResourceControl represents a resource control associated to a Docker service
+	ServiceResourceControl
+	// VolumeResourceControl represents a resource control associated to a Docker volume
+	VolumeResourceControl
 )

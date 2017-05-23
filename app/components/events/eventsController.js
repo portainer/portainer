@@ -1,6 +1,6 @@
 angular.module('events', [])
-.controller('EventsController', ['$scope', 'Messages', 'Events', 'Pagination',
-function ($scope, Messages, Events, Pagination) {
+.controller('EventsController', ['$scope', 'Notifications', 'Events', 'Pagination',
+function ($scope, Notifications, Events, Pagination) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('events');
   $scope.sortType = 'Time';
@@ -27,6 +27,6 @@ function ($scope, Messages, Events, Pagination) {
   },
   function (e) {
     $('#loadEventsSpinner').hide();
-    Messages.error("Failure", e, "Unable to load events");
+    Notifications.error('Failure', e, 'Unable to load events');
   });
 }]);

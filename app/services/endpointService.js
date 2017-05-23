@@ -11,26 +11,28 @@ angular.module('portainer.services')
     return Endpoints.query({}).$promise;
   };
 
-  service.updateAuthorizedUsers = function(id, authorizedUserIDs) {
-    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs}).$promise;
+  service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
+    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
   };
 
   service.updateEndpoint = function(id, endpointParams) {
     var query = {
       name: endpointParams.name,
+      PublicURL: endpointParams.PublicURL,
       TLS: endpointParams.TLS,
       authorizedUsers: endpointParams.authorizedUsers
     };
     if (endpointParams.type && endpointParams.URL) {
-      query.URL = endpointParams.type === 'local' ? ("unix://" + endpointParams.URL) : ("tcp://" + endpointParams.URL);
+      query.URL = endpointParams.type === 'local' ? ('unix://' + endpointParams.URL) : ('tcp://' + endpointParams.URL);
     }
+
     var deferred = $q.defer();
-    Endpoints.update({id: id}, query).$promise
+    FileUploadService.uploadTLSFilesForEndpoint(id, endpointParams.TLSCACert, endpointParams.TLSCert, endpointParams.TLSKey)
     .then(function success() {
-      return FileUploadService.uploadTLSFilesForEndpoint(id, endpointParams.TLSCAFile, endpointParams.TLSCertFile, endpointParams.TLSKeyFile);
+      deferred.notify({upload: false});
+      return Endpoints.update({id: id}, query).$promise;
     })
     .then(function success(data) {
-      deferred.notify({upload: false});
       deferred.resolve(data);
     })
     .catch(function error(err) {
@@ -46,44 +48,38 @@ angular.module('portainer.services')
 
   service.createLocalEndpoint = function(name, URL, TLS, active) {
     var endpoint = {
-      Name: "local",
-      URL: "unix:///var/run/docker.sock",
+      Name: 'local',
+      URL: 'unix:///var/run/docker.sock',
       TLS: false
     };
     return Endpoints.create({}, endpoint).$promise;
   };
 
-  service.createRemoteEndpoint = function(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, active) {
+  service.createRemoteEndpoint = function(name, URL, PublicURL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var endpoint = {
       Name: name,
       URL: 'tcp://' + URL,
+      PublicURL: PublicURL,
       TLS: TLS
     };
     var deferred = $q.defer();
-    Endpoints.create({active: active}, endpoint, function success(data) {
+    Endpoints.create({}, endpoint).$promise
+    .then(function success(data) {
       var endpointID = data.Id;
       if (TLS) {
         deferred.notify({upload: true});
-        FileUploadService.uploadTLSFilesForEndpoint(endpointID, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
+        FileUploadService.uploadTLSFilesForEndpoint(endpointID, TLSCAFile, TLSCertFile, TLSKeyFile)
+        .then(function success() {
           deferred.notify({upload: false});
-          if (active) {
-            Endpoints.setActiveEndpoint({}, {id: endpointID}, function success(data) {
-              deferred.resolve(data);
-            }, function error(err) {
-              deferred.reject({msg: 'Unable to create endpoint', err: err});
-            });
-          } else {
-            deferred.resolve(data);
-          }
-        }, function error(err) {
-          deferred.notify({upload: false});
-          deferred.reject({msg: 'Unable to upload TLS certs', err: err});
+          deferred.resolve(data);
         });
       } else {
         deferred.resolve(data);
       }
-    }, function error(err) {
-      deferred.reject({msg: 'Unable to create endpoint', err: err});
+    })
+    .catch(function error(err) {
+      deferred.notify({upload: false});
+      deferred.reject({msg: 'Unable to upload TLS certs', err: err});
     });
     return deferred.promise;
   };

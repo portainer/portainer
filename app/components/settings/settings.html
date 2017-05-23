@@ -33,11 +33,11 @@
             </div>
           </div>
           <!-- !current-password-input -->
-          <div class="form-group" style="margin-left: 5px;">
-            <p>
-              <i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[formValues.newPassword.length >= 8]" aria-hidden="true"></i>
-              Your new password must be at least 8 characters long
-            </p>
+          <div class="form-group" ng-if="invalidPassword">
+            <div class="col-sm-12">
+              <i class="fa fa-times red-icon" aria-hidden="true"></i>
+              <span class="small text-muted">Current password is not valid</span>
+            </div>
           </div>
           <!-- new-password-input -->
           <div class="form-group">
@@ -50,6 +50,12 @@
             </div>
           </div>
           <!-- !new-password-input -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[formValues.newPassword.length >= 8]" aria-hidden="true"></i>
+              <span class="small text-muted">Your new password must be at least 8 characters long</span>
+            </div>
+          </div>
           <!-- confirm-password-input -->
           <div class="form-group">
             <label for="confirm_password" class="col-sm-2 control-label text-left">Confirm password</label>
@@ -65,11 +71,6 @@
           <div class="form-group">
             <div class="col-sm-2">
               <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.currentPassword || formValues.newPassword.length < 8 || formValues.newPassword !== formValues.confirmPassword || UserId === 1" ng-click="updatePassword()">Update password</button>
-            </div>
-            <div class="col-sm-10">
-              <p class="pull-left text-danger" ng-if="invalidPassword" style="margin: 5px;">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Current password is not valid
-              </p>
             </div>
           </div>
         </form>

@@ -74,7 +74,7 @@
             <div class="col-sm-12 form-inline" style="margin-top: 10px;">
               <div ng-repeat="portBinding in formValues.Ports" style="margin-top: 2px;">
                 <!-- host-port -->
-                <div class="input-group col-sm-4 input-group-sm">
+                <div class="input-group col-sm-3 input-group-sm">
                   <span class="input-group-addon">host</span>
                   <input type="text" class="form-control" ng-model="portBinding.PublishedPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
                 </div>
@@ -83,16 +83,20 @@
                   <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 </span>
                 <!-- container-port -->
-                <div class="input-group col-sm-4 input-group-sm">
+                <div class="input-group col-sm-3 input-group-sm">
                   <span class="input-group-addon">container</span>
                   <input type="text" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80">
                 </div>
                 <!-- !container-port -->
                 <!-- protocol-actions -->
-                <div class="input-group col-sm-3 input-group-sm">
+                <div class="input-group col-sm-5 input-group-sm">
                   <div class="btn-group btn-group-sm">
                     <label class="btn btn-primary" ng-model="portBinding.Protocol" uib-btn-radio="'tcp'">TCP</label>
                     <label class="btn btn-primary" ng-model="portBinding.Protocol" uib-btn-radio="'udp'">UDP</label>
+                  </div>
+                  <div class="btn-group btn-group-sm">
+                    <label class="btn btn-primary" ng-model="portBinding.PublishMode" uib-btn-radio="'ingress'">Ingress</label>
+                    <label class="btn btn-primary" ng-model="portBinding.PublishMode" uib-btn-radio="'host'">Host</label>
                   </div>
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removePortBinding($index)">
                     <i class="fa fa-trash" aria-hidden="true"></i>
@@ -104,29 +108,9 @@
             <!-- !port-mapping-input-list -->
           </div>
           <!-- !port-mapping -->
-          <div class="col-sm-12 form-section-title" ng-if="applicationState.application.authentication">
-            Access control
-          </div>
-          <!-- ownership -->
-          <div class="form-group" ng-if="applicationState.application.authentication">
-            <div class="col-sm-12">
-              <label for="ownership" class="control-label text-left">
-                Ownership
-                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing public, everybody will be able to access it."></portainer-tooltip>
-              </label>
-              <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'private'">
-                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                  Private
-                </label>
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'public'">
-                  <i class="fa fa-eye" aria-hidden="true"></i>
-                  Public
-                </label>
-              </div>
-            </div>
-          </div>
-          <!-- !ownership -->
+          <!-- access-control -->
+          <div ng-include="'app/components/common/accessControlForm/accessControlForm.html'" ng-if="applicationState.application.authentication"></div>
+          <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions
@@ -136,6 +120,7 @@
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Image" ng-click="create()">Create service</button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="services">Cancel</a>
               <i id="createServiceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
           <!-- !actions -->
@@ -155,6 +140,7 @@
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
+          <li class="interactive"><a data-target="#placement" data-toggle="tab">Placement</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -246,7 +232,7 @@
                         <div class="input-group col-sm-5" style="margin-left: 5px;">
                           <div class="btn-group btn-group-sm">
                             <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
-                            <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'bind'" ng-click="volume.Name = ''">Bind</label>
+                            <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'bind'" ng-click="volume.Id = ''">Bind</label>
                           </div>
                           <button class="btn btn-sm btn-danger" type="button" ng-click="removeVolume($index)">
                             <i class="fa fa-trash" aria-hidden="true"></i>
@@ -436,6 +422,10 @@
             </form>
           </div>
           <!-- !tab-update-config -->
+
+          <!-- tab-placement -->
+          <div class="tab-pane" id="placement" ng-include="'app/components/createService/includes/placement.html'"></div>
+          <!-- !tab-placement -->
         </div>
       </rd-widget-body>
     </rd-widget>
