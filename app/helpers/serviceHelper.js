@@ -12,6 +12,18 @@ angular.module('portainer.helpers')
         Networks: service.Spec.Networks,
         EndpointSpec: service.Spec.EndpointSpec
       };
-    }
+    },
+    translateKeyValueToPlacementConstraints: function(keyValueConstraints) {
+      if (keyValueConstraints) {
+        var constraints = [];
+        keyValueConstraints.forEach(function(keyValueConstraint) {
+          if (keyValueConstraint.key && keyValueConstraint.key !== '' && keyValueConstraint.value && keyValueConstraint.value !== '') {
+            constraints.push(keyValueConstraint.key + keyValueConstraint.operator + keyValueConstraint.value);
+          }
+        });
+        return constraints;
+      }
+      return [];
+    }    
   };
 }]);

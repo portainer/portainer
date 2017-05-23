@@ -1,12 +1,13 @@
 angular.module('endpointInit', [])
-.controller('EndpointInitController', ['$scope', '$state', 'EndpointService', 'StateManager', 'EndpointProvider', 'Messages',
-function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messages) {
+.controller('EndpointInitController', ['$scope', '$state', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
+function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notifications) {
   $scope.state = {
     error: '',
     uploadInProgress: false
   };
+
   $scope.formValues = {
-    endpointType: "remote",
+    endpointType: 'remote',
     Name: '',
     URL: '',
     TLS: false,
@@ -19,34 +20,41 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     $state.go('dashboard');
   }
 
-  $scope.cleanError = function() {
+  $scope.resetErrorMessage = function() {
     $scope.state.error = '';
   };
+
+  function showErrorMessage(message) {
+    $scope.state.uploadInProgress = false;
+    $scope.state.error = message;
+  }
+
+  function updateEndpointState(endpointID) {
+    EndpointProvider.setEndpointID(endpointID);
+    StateManager.updateEndpointState(false)
+    .then(function success(data) {
+      $state.go('dashboard');
+    })
+    .catch(function error(err) {
+      EndpointService.deleteEndpoint(endpointID)
+      .then(function success() {
+        showErrorMessage('Unable to connect to the Docker endpoint');
+      });
+    });
+  }
 
   $scope.createLocalEndpoint = function() {
     $('#initEndpointSpinner').show();
     $scope.state.error = '';
-    var name = "local";
-    var URL = "unix:///var/run/docker.sock";
+    var name = 'local';
+    var URL = 'unix:///var/run/docker.sock';
     var TLS = false;
 
     EndpointService.createLocalEndpoint(name, URL, TLS, true)
-    .then(
-    function success(data) {
+    .then(function success(data) {
       var endpointID = data.Id;
-      EndpointProvider.setEndpointID(endpointID);
-      StateManager.updateEndpointState(false).then(
-      function success() {
-        $state.go('dashboard');
-      },
-      function error(err) {
-        EndpointService.deleteEndpoint(endpointID)
-        .then(function success() {
-          $scope.state.error = 'Unable to connect to the Docker endpoint';
-        });
-      });
-    },
-    function error() {
+      updateEndpointState(data.Id);
+    }, function error() {
       $scope.state.error = 'Unable to create endpoint';
     })
     .finally(function final() {
@@ -59,32 +67,25 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Messa
     $scope.state.error = '';
     var name = $scope.formValues.Name;
     var URL = $scope.formValues.URL;
+    var PublicURL = URL.split(':')[0];
     var TLS = $scope.formValues.TLS;
     var TLSCAFile = $scope.formValues.TLSCACert;
     var TLSCertFile = $scope.formValues.TLSCert;
     var TLSKeyFile = $scope.formValues.TLSKey;
-    EndpointService.createRemoteEndpoint(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, TLS ? false : true)
+
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       var endpointID = data.Id;
-      EndpointProvider.setEndpointID(endpointID);
-      StateManager.updateEndpointState(false)
-      .then(function success() {
-        $state.go('dashboard');
-      }, function error(err) {
-        EndpointService.deleteEndpoint(endpointID)
-        .then(function success() {
-          $('#initEndpointSpinner').hide();
-          $scope.state.error = 'Unable to connect to the Docker endpoint';
-        });
-      });
+      updateEndpointState(endpointID);
     }, function error(err) {
-      $('#initEndpointSpinner').hide();
-      $scope.state.uploadInProgress = false;
-      $scope.state.error = err.msg;
+      showErrorMessage(err.msg);
     }, function update(evt) {
       if (evt.upload) {
         $scope.state.uploadInProgress = evt.upload;
       }
+    })
+    .finally(function final() {
+      $('#initEndpointSpinner').hide();
     });
   };
 }]);

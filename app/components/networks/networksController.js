@@ -1,6 +1,6 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Messages', 'Pagination',
-function ($scope, $state, Network, Config, Messages, Pagination) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Notifications', 'Pagination',
+function ($scope, $state, Network, Config, Notifications, Pagination) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('networks');
   $scope.state.selectedItemCount = 0;
@@ -34,15 +34,15 @@ function ($scope, $state, Network, Config, Messages, Pagination) {
     Network.create(config, function (d) {
       if (d.message) {
         $('#createNetworkSpinner').hide();
-        Messages.error('Unable to create network', {}, d.message);
+        Notifications.error('Unable to create network', {}, d.message);
       } else {
-        Messages.send("Network created", d.Id);
+        Notifications.success('Network created', d.Id);
         $('#createNetworkSpinner').hide();
         $state.reload();
       }
     }, function (e) {
       $('#createNetworkSpinner').hide();
-      Messages.error("Failure", e, 'Unable to create network');
+      Notifications.error('Failure', e, 'Unable to create network');
     });
   };
 
@@ -82,15 +82,15 @@ function ($scope, $state, Network, Config, Messages, Pagination) {
         counter = counter + 1;
         Network.remove({id: network.Id}, function (d) {
           if (d.message) {
-            Messages.send("Error", d.message);
+            Notifications.error('Error', d, 'Unable to remove network');
           } else {
-            Messages.send("Network removed", network.Id);
+            Notifications.success('Network removed', network.Id);
             var index = $scope.networks.indexOf(network);
             $scope.networks.splice(index, 1);
           }
           complete();
         }, function (e) {
-          Messages.error("Failure", e, 'Unable to remove network');
+          Notifications.error('Failure', e, 'Unable to remove network');
           complete();
         });
       }
@@ -104,7 +104,7 @@ function ($scope, $state, Network, Config, Messages, Pagination) {
       $('#loadNetworksSpinner').hide();
     }, function (e) {
       $('#loadNetworksSpinner').hide();
-      Messages.error("Failure", e, "Unable to retrieve networks");
+      Notifications.error('Failure', e, 'Unable to retrieve networks');
       $scope.networks = [];
     });
   }

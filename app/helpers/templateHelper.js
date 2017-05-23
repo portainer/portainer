@@ -28,7 +28,7 @@ angular.module('portainer.helpers')
     };
     ports.forEach(function (p) {
       if (p.containerPort) {
-        var key = p.containerPort + "/" + p.protocol;
+        var key = p.containerPort + '/' + p.protocol;
         var binding = {};
         if (p.hostPort) {
           binding.HostPort = p.hostPort;
@@ -60,10 +60,22 @@ angular.module('portainer.helpers')
             value = $filter('swarmcontainername')(envvar.value);
           }
         }
-        env.push(envvar.name + "=" + value);
+        env.push(envvar.name + '=' + value);
       }
     });
     return env;
+  };
+
+  helper.getConsoleConfiguration = function(interactiveFlag) {
+    var consoleConfiguration = {
+      openStdin: false,
+      tty: false
+    };
+    if (interactiveFlag === true) {
+      consoleConfiguration.openStdin = true;
+      consoleConfiguration.tty = true;
+    }
+    return consoleConfiguration;
   };
 
   helper.createVolumeBindings = function(volumes, generatedVolumesPile) {
@@ -71,7 +83,7 @@ angular.module('portainer.helpers')
       if (volume.containerPath) {
         var binding;
         if (volume.type === 'auto') {
-          binding = generatedVolumesPile.pop().Name + ':' + volume.containerPath;
+          binding = generatedVolumesPile.pop().Id + ':' + volume.containerPath;
         } else if (volume.type !== 'auto' && volume.name) {
           binding = volume.name + ':' + volume.containerPath;
         }
@@ -96,8 +108,8 @@ angular.module('portainer.helpers')
   helper.filterLinuxServerIOTemplates = function(templates) {
     return templates.filter(function f(template) {
       var valid = false;
-      if (template.Category) {
-        angular.forEach(template.Category, function(category) {
+      if (template.Categories) {
+        angular.forEach(template.Categories, function(category) {
           if (_.startsWith(category, 'Network')) {
             valid = true;
           }

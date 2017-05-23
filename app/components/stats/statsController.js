@@ -1,6 +1,6 @@
 angular.module('stats', [])
-.controller('StatsController', ['Pagination', '$scope', 'Messages', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
-function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stateParams, humansizeFilter, $sce, $document) {
+.controller('StatsController', ['Pagination', '$scope', 'Notifications', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
+function (Pagination, $scope, Notifications, $timeout, Container, ContainerTop, $stateParams, humansizeFilter, $sce, $document) {
   // TODO: Force scale to 0-100 for cpu, fix charts on dashboard,
   // TODO: Force memory scale to 0 - max memory
   $scope.ps_args = '';
@@ -42,33 +42,33 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
       networkRxData.push(0);
     }
     var cpuDataset = { // CPU Usage
-      fillColor: "rgba(151,187,205,0.5)",
-      strokeColor: "rgba(151,187,205,1)",
-      pointColor: "rgba(151,187,205,1)",
-      pointStrokeColor: "#fff",
+      fillColor: 'rgba(151,187,205,0.5)',
+      strokeColor: 'rgba(151,187,205,1)',
+      pointColor: 'rgba(151,187,205,1)',
+      pointStrokeColor: '#fff',
       data: cpuData
     };
     var memoryDataset = {
-      fillColor: "rgba(151,187,205,0.5)",
-      strokeColor: "rgba(151,187,205,1)",
-      pointColor: "rgba(151,187,205,1)",
-      pointStrokeColor: "#fff",
+      fillColor: 'rgba(151,187,205,0.5)',
+      strokeColor: 'rgba(151,187,205,1)',
+      pointColor: 'rgba(151,187,205,1)',
+      pointStrokeColor: '#fff',
       data: memoryData
     };
     var networkRxDataset = {
-      label: "Rx Bytes",
-      fillColor: "rgba(151,187,205,0.5)",
-      strokeColor: "rgba(151,187,205,1)",
-      pointColor: "rgba(151,187,205,1)",
-      pointStrokeColor: "#fff",
+      label: 'Rx Bytes',
+      fillColor: 'rgba(151,187,205,0.5)',
+      strokeColor: 'rgba(151,187,205,1)',
+      pointColor: 'rgba(151,187,205,1)',
+      pointStrokeColor: '#fff',
       data: networkRxData
     };
     var networkTxDataset = {
-      label: "Tx Bytes",
-      fillColor: "rgba(255,180,174,0.5)",
-      strokeColor: "rgba(255,180,174,1)",
-      pointColor: "rgba(255,180,174,1)",
-      pointStrokeColor: "#fff",
+      label: 'Tx Bytes',
+      fillColor: 'rgba(255,180,174,0.5)',
+      strokeColor: 'rgba(255,180,174,1)',
+      pointColor: 'rgba(255,180,174,1)',
+      pointStrokeColor: '#fff',
       data: networkTxData
     };
     var networkLegendData = [
@@ -87,7 +87,7 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
     legend($('#network-legend').get(0), networkLegendData);
 
     Chart.defaults.global.animationSteps = 30; // Lower from 60 to ease CPU load.
-    var cpuChart = new Chart($('#cpu-stats-chart').get(0).getContext("2d")).Line({
+    var cpuChart = new Chart($('#cpu-stats-chart').get(0).getContext('2d')).Line({
       labels: cpuLabels,
       datasets: [cpuDataset]
     }, {
@@ -108,7 +108,7 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
       //scaleStepWidth: Math.ceil(initialStats.memory_stats.limit / 10),
       //scaleStartValue: 0
     });
-    var networkChart = new Chart($('#network-stats-chart').get(0).getContext("2d")).Line({
+    var networkChart = new Chart($('#network-stats-chart').get(0).getContext('2d')).Line({
       labels: networkLabels,
       datasets: [networkRxDataset, networkTxDataset]
     }, {
@@ -126,7 +126,7 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
           return d[key];
         });
         if (arr.join('').indexOf('no such id') !== -1) {
-          Messages.error('Unable to retrieve stats', {}, 'Is this container running?');
+          Notifications.error('Unable to retrieve stats', {}, 'Is this container running?');
           return;
         }
 
@@ -137,7 +137,7 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
         updateNetworkChart(d);
         setUpdateStatsTimeout();
       }, function () {
-        Messages.error('Unable to retrieve stats', {}, 'Is this container running?');
+        Notifications.error('Unable to retrieve stats', {}, 'Is this container running?');
         setUpdateStatsTimeout();
       });
     }
@@ -211,7 +211,7 @@ function (Pagination, $scope, Messages, $timeout, Container, ContainerTop, $stat
   Container.get({id: $stateParams.id}, function (d) {
     $scope.container = d;
   }, function (e) {
-    Messages.error("Failure", e, "Unable to retrieve container info");
+    Notifications.error('Failure', e, 'Unable to retrieve container info');
   });
   $scope.getTop();
 }]);

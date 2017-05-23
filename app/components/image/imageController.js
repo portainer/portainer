@@ -1,6 +1,6 @@
 angular.module('image', [])
-.controller('ImageController', ['$scope', '$stateParams', '$state', 'ImageService', 'Messages',
-function ($scope, $stateParams, $state, ImageService, Messages) {
+.controller('ImageController', ['$scope', '$stateParams', '$state', 'ImageService', 'Notifications',
+function ($scope, $stateParams, $state, ImageService, Notifications) {
 	$scope.config = {
 		Image: '',
 		Registry: ''
@@ -13,42 +13,40 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 
 		ImageService.tagImage($stateParams.id, image, registry)
 		.then(function success(data) {
-			Messages.send('Image successfully tagged');
+			Notifications.success('Image successfully tagged');
 			$state.go('image', {id: $stateParams.id}, {reload: true});
 		})
 		.catch(function error(err) {
-			Messages.error("Failure", err, "Unable to tag image");
+			Notifications.error('Failure', err, 'Unable to tag image');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
 		});
 	};
 
-	$scope.pushImage = function(tag) {
+	$scope.pushTag = function(tag) {
 		$('#loadingViewSpinner').show();
 		ImageService.pushImage(tag)
 		.then(function success() {
-			Messages.send('Image successfully pushed');
+			Notifications.success('Image successfully pushed');
 		})
 		.catch(function error(err) {
-			Messages.error("Failure", err, "Unable to push image tag");
+			Notifications.error('Failure', err, 'Unable to push image tag');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
 		});
 	};
 
-	$scope.pullImage = function(tag) {
+	$scope.pullTag = function(tag) {
 		$('#loadingViewSpinner').show();
-		var image = $scope.config.Image;
-		var registry = $scope.config.Registry;
 
-		ImageService.pullImage(image, registry)
+		ImageService.pullTag(tag)
 		.then(function success(data) {
-			Messages.send('Image successfully pulled', image);
+			Notifications.success('Image successfully pulled', tag);
 		})
 		.catch(function error(err){
-			Messages.error("Failure", err, "Unable to pull image");
+			Notifications.error('Failure', err, 'Unable to pull image');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
@@ -60,15 +58,15 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 		ImageService.deleteImage(id, false)
 		.then(function success() {
 			if ($scope.image.RepoTags.length === 1) {
-				Messages.send('Image successfully deleted', id);
+				Notifications.success('Image successfully deleted', id);
 				$state.go('images', {}, {reload: true});
 			} else {
-				Messages.send('Tag successfully deleted', id);
+				Notifications.success('Tag successfully deleted', id);
 				$state.go('image', {id: $stateParams.id}, {reload: true});
 			}
 		})
 		.catch(function error(err) {
-			Messages.error("Failure", err, 'Unable to remove image');
+			Notifications.error('Failure', err, 'Unable to remove image');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
@@ -79,11 +77,11 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 		$('#loadingViewSpinner').show();
 		ImageService.deleteImage(id, false)
 		.then(function success() {
-			Messages.send('Image successfully deleted', id);
+			Notifications.success('Image successfully deleted', id);
 			$state.go('images', {}, {reload: true});
 		})
 		.catch(function error(err) {
-			Messages.error("Failure", err, 'Unable to remove image');
+			Notifications.error('Failure', err, 'Unable to remove image');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
@@ -97,7 +95,7 @@ function ($scope, $stateParams, $state, ImageService, Messages) {
 			$scope.image = data;
 		})
 		.catch(function error(err) {
-			Messages.error("Failure", err, "Unable to retrieve image details");
+			Notifications.error('Failure', err, 'Unable to retrieve image details');
 			$state.go('images');
 		})
 		.finally(function final() {

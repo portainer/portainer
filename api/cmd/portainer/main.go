@@ -124,12 +124,14 @@ func main() {
 		}
 		if len(endpoints) == 0 {
 			endpoint := &portainer.Endpoint{
-				Name:          "primary",
-				URL:           *flags.Endpoint,
-				TLS:           *flags.TLSVerify,
-				TLSCACertPath: *flags.TLSCacert,
-				TLSCertPath:   *flags.TLSCert,
-				TLSKeyPath:    *flags.TLSKey,
+				Name:            "primary",
+				URL:             *flags.Endpoint,
+				TLS:             *flags.TLSVerify,
+				TLSCACertPath:   *flags.TLSCacert,
+				TLSCertPath:     *flags.TLSCert,
+				TLSKeyPath:      *flags.TLSKey,
+				AuthorizedUsers: []portainer.UserID{},
+				AuthorizedTeams: []portainer.TeamID{},
 			}
 			err = store.EndpointService.CreateEndpoint(endpoint)
 			if err != nil {
@@ -137,6 +139,19 @@ func main() {
 			}
 		} else {
 			log.Println("Instance already has defined endpoints. Skipping the endpoint defined via CLI.")
+		}
+	}
+
+	if *flags.AdminPassword != "" {
+		log.Printf("Creating admin user with password hash %s", *flags.AdminPassword)
+		user := &portainer.User{
+			Username: "admin",
+			Role:     portainer.AdministratorRole,
+			Password: *flags.AdminPassword,
+		}
+		err := store.UserService.CreateUser(user)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 
@@ -148,11 +163,16 @@ func main() {
 		AuthDisabled:           *flags.NoAuth,
 		EndpointManagement:     authorizeEndpointMgmt,
 		UserService:            store.UserService,
+		TeamService:            store.TeamService,
+		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
 		ResourceControlService: store.ResourceControlService,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,
+		SSL:                    *flags.SSL,
+		SSLCert:                *flags.SSLCert,
+		SSLKey:                 *flags.SSLKey,
 	}
 
 	log.Printf("Starting Portainer on %s", *flags.Addr)

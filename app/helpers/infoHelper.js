@@ -8,21 +8,21 @@ angular.module('portainer.helpers')
         role: ''
       };
       if (_.startsWith(info.ServerVersion, 'swarm')) {
-        mode.provider = "DOCKER_SWARM";
+        mode.provider = 'DOCKER_SWARM';
         if (info.SystemStatus[0][1] === 'primary') {
-          mode.role = "PRIMARY";
+          mode.role = 'PRIMARY';
         } else {
-          mode.role = "REPLICA";
+          mode.role = 'REPLICA';
         }
       } else {
         if (!info.Swarm || _.isEmpty(info.Swarm.NodeID)) {
-          mode.provider = "DOCKER_STANDALONE";
+          mode.provider = 'DOCKER_STANDALONE';
         } else {
-          mode.provider = "DOCKER_SWARM_MODE";
+          mode.provider = 'DOCKER_SWARM_MODE';
           if (info.Swarm.ControlAvailable) {
-            mode.role = "MANAGER";
+            mode.role = 'MANAGER';
           } else {
-            mode.role = "WORKER";
+            mode.role = 'WORKER';
           }
         }
       }

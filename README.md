@@ -3,6 +3,7 @@
   <img title="portainer" src='http://portainer.io/images/logo_alt.png' />
 </p>
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/portainer/portainer.svg)](https://hub.docker.com/r/portainer/portainer/)
 [![Microbadger](https://images.microbadger.com/badges/image/portainer/portainer.svg)](http://microbadger.com/images/portainer/portainer "Image size")
 [![Documentation Status](https://readthedocs.org/projects/portainer/badge/?version=stable)](http://portainer.readthedocs.io/en/latest/?badge=stable)
 [![Gitter](https://badges.gitter.im/portainer/Lobby.svg)](https://gitter.im/portainer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -43,7 +44,7 @@ Please note that the public demo cluster is **reset every 15min**.
 
 **_Portainer_** has full support for the following Docker versions:
 
-* Docker 1.10 to Docker 17.03 (including `swarm-mode`)
+* Docker 1.10 to the latest version
 * Docker Swarm >= 1.2.3
 
 Partial support for the following Docker versions (some features may not be available):
