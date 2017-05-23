@@ -24,7 +24,7 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 		});
 	};
 
-	$scope.pushImage = function(tag) {
+	$scope.pushTag = function(tag) {
 		$('#loadingViewSpinner').show();
 		ImageService.pushImage(tag)
 		.then(function success() {
@@ -38,7 +38,7 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 		});
 	};
 
-	$scope.pullImage = function(tag) {
+	$scope.pullTag = function(tag) {
 		$('#loadingViewSpinner').show();
 
 		ImageService.pullTag(tag)
