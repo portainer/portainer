@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'ServiceService', 'Secret', 'SecretHelper', 'Service', 'ServiceHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
-function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceService, Secret, SecretHelper, Service, ServiceHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ControllerDataPipeline) {
+.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'Secret', 'SecretHelper', 'Service', 'ServiceHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
+function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, Secret, SecretHelper, Service, ServiceHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ControllerDataPipeline) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -37,7 +37,11 @@ function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceSer
   };
 
   $scope.goToItem = function(hash) {
-    $anchorScroll(hash);
+      if ($location.hash() !== hash) {
+        $location.hash(hash);
+      } else {
+        $anchorScroll();
+      }
   };
 
   $scope.addEnvironmentVariable = function addEnvironmentVariable(service) {
@@ -291,15 +295,22 @@ function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceSer
     .then(function success(data) {
       $scope.tasks = data.tasks;
       $scope.nodes = data.nodes;
+
       $scope.secrets = data.secrets.map(function (secret) {
         return new SecretViewModel(secret);
       });
+
+      $timeout(function() {
+        $anchorScroll();
+      });
+
     })
     .catch(function error(err) {
       $scope.secrets = [];
       Notifications.error('Failure', err, 'Unable to retrieve service details');
     })
     .finally(function final() {
+
       $('#loadingViewSpinner').hide();
     });
   }

@@ -1,4 +1,4 @@
-<div ng-if="tasks.length > 0 && nodes">
+<div ng-if="tasks.length > 0 && nodes" id="service-tasks">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title="Associated tasks">
       <div class="pull-right">
@@ -57,9 +57,10 @@
         </tr>
       </tbody>
       </table>
-      <div ng-if="tasks" class="pagination-controls">
+      <div ng-if="tasks" class="pagination-controls" >
       <dir-pagination-controls></dir-pagination-controls>
       </div>
     </rd-widget-body>
   </rd-widget>
 </div>
+
