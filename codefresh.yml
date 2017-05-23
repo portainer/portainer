@@ -1,5 +1,6 @@
 version: '1.0'
 steps:
+
   build_backend:
     image: portainer/golang-builder:ci
     working_directory: ${{main_clone}}
@@ -7,6 +8,7 @@ steps:
       - mkdir -p /go/src/github.com/${{CF_REPO_OWNER}}
       - ln -s /codefresh/volume/${{CF_REPO_NAME}}/api /go/src/github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
       - /build.sh api/cmd/portainer
+
   build_frontend:
     image: portainer/angular-builder:latest
     working_directory: ${{build_backend}}
@@ -15,3 +17,10 @@ steps:
       - npm install -g bower grunt grunt-cli && npm install
       - bower install --allow-root
       - grunt build-webapp
+
+  build_image:
+    type: build
+    working_directory: ${{build_frontend}}
+    dockerfile: build/linux/Dockerfile
+    image_name: portainer/portainer
+    tag: develop
