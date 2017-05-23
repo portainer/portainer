@@ -27,6 +27,7 @@
     "bower": "^1.5.2",
     "eslint": "^3.19.0",
     "grunt": "~0.4.0",
+    "grunt-cli": "^1.2.0",
     "grunt-config": "^1.0.0",
     "grunt-contrib-clean": "~0.4.0",
     "grunt-contrib-concat": "~0.1.3",

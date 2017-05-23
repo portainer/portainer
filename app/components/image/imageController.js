@@ -24,7 +24,7 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 		});
 	};
 
-	$scope.pushImage = function(tag) {
+	$scope.pushTag = function(tag) {
 		$('#loadingViewSpinner').show();
 		ImageService.pushImage(tag)
 		.then(function success() {
@@ -38,14 +38,12 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 		});
 	};
 
-	$scope.pullImage = function(tag) {
+	$scope.pullTag = function(tag) {
 		$('#loadingViewSpinner').show();
-		var image = $scope.config.Image;
-		var registry = $scope.config.Registry;
 
-		ImageService.pullImage(image, registry)
+		ImageService.pullTag(tag)
 		.then(function success(data) {
-			Notifications.success('Image successfully pulled', image);
+			Notifications.success('Image successfully pulled', tag);
 		})
 		.catch(function error(err){
 			Notifications.error('Failure', err, 'Unable to pull image');

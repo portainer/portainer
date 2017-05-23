@@ -11,7 +11,7 @@ function ImageDetailsViewModel(data) {
   this.Os = data.Os;
   this.Architecture = data.Architecture;
   this.Author = data.Author;
-  this.Command = data.ContainerConfig.Cmd;
+  this.Command = data.Config.Cmd;
   this.Entrypoint = data.ContainerConfig.Entrypoint ? data.ContainerConfig.Entrypoint : '';
   this.ExposedPorts = data.ContainerConfig.ExposedPorts ? Object.keys(data.ContainerConfig.ExposedPorts) : [];
   this.Volumes = data.ContainerConfig.Volumes ? Object.keys(data.ContainerConfig.Volumes) : [];

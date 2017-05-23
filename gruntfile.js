@@ -32,6 +32,22 @@ module.exports = function (grunt) {
     'usemin',
     'clean:tmp'
   ]);
+  grunt.registerTask('build-webapp', [
+    'config:prod',
+    'clean:all',
+    'html2js',
+    'useminPrepare:release',
+    'recess:build',
+    'concat',
+    'clean:tmpl',
+    'cssmin',
+    'replace',
+    'uglify',
+    'copy:assets',
+    'filerev',
+    'usemin',
+    'clean:tmp'
+  ]);
   grunt.registerTask('release-linux-386', [
     'config:prod',
     'clean:all',
