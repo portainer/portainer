@@ -17,7 +17,7 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 			$state.go('image', {id: $stateParams.id}, {reload: true});
 		})
 		.catch(function error(err) {
-			Notifications.error("Failure", err, "Unable to tag image");
+			Notifications.error('Failure', err, 'Unable to tag image');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
@@ -31,7 +31,7 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 			Notifications.success('Image successfully pushed');
 		})
 		.catch(function error(err) {
-			Notifications.error("Failure", err, "Unable to push image tag");
+			Notifications.error('Failure', err, 'Unable to push image tag');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
@@ -40,15 +40,13 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 
 	$scope.pullImage = function(tag) {
 		$('#loadingViewSpinner').show();
-		var image = $scope.config.Image;
-		var registry = $scope.config.Registry;
 
-		ImageService.pullImage(image, registry)
+		ImageService.pullTag(tag)
 		.then(function success(data) {
-			Notifications.success('Image successfully pulled', image);
+			Notifications.success('Image successfully pulled', tag);
 		})
 		.catch(function error(err){
-			Notifications.error("Failure", err, "Unable to pull image");
+			Notifications.error('Failure', err, 'Unable to pull image');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
@@ -68,7 +66,7 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 			}
 		})
 		.catch(function error(err) {
-			Notifications.error("Failure", err, 'Unable to remove image');
+			Notifications.error('Failure', err, 'Unable to remove image');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
@@ -83,7 +81,7 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 			$state.go('images', {}, {reload: true});
 		})
 		.catch(function error(err) {
-			Notifications.error("Failure", err, 'Unable to remove image');
+			Notifications.error('Failure', err, 'Unable to remove image');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
@@ -97,7 +95,7 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 			$scope.image = data;
 		})
 		.catch(function error(err) {
-			Notifications.error("Failure", err, "Unable to retrieve image details");
+			Notifications.error('Failure', err, 'Unable to retrieve image details');
 			$state.go('images');
 		})
 		.finally(function final() {
