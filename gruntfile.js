@@ -32,6 +32,22 @@ module.exports = function (grunt) {
     'usemin',
     'clean:tmp'
   ]);
+  grunt.registerTask('build-webapp', [
+    'config:prod',
+    'clean:all',
+    'html2js',
+    'useminPrepare:release',
+    'recess:build',
+    'concat',
+    'clean:tmpl',
+    'cssmin',
+    'replace',
+    'uglify',
+    'copy:assets',
+    'filerev',
+    'usemin',
+    'clean:tmp'
+  ]);
   grunt.registerTask('release-linux-386', [
     'config:prod',
     'clean:all',
@@ -152,11 +168,7 @@ module.exports = function (grunt) {
     'clean:tmp'
   ]);
   grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('run', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
-  grunt.registerTask('run-swarm', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
-  grunt.registerTask('run-swarm-local', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarmLocal', 'watch:buildSwarm']);
   grunt.registerTask('run-dev', ['if:linuxAmd64BinaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
-  grunt.registerTask('run-ssl', ['if:linuxAmd64BinaryNotExist', 'shell:buildImage', 'shell:runSsl', 'watch:buildSsl']);
   grunt.registerTask('clear', ['clean:app']);
 
   // Print a timestamp (useful for when watching)
