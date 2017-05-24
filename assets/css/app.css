@@ -74,11 +74,6 @@ input[type="checkbox"] {
   vertical-align: middle;
 }
 
-input[type="radio"] {
-  margin-top: 1px;
-  vertical-align: middle;
-}
-
 a[ng-click]{
   cursor: pointer;
 }
@@ -115,6 +110,10 @@ a[ng-click]{
   color: #ae2323;
 }
 
+.fa.orange-icon {
+  color: #f0ad4e;
+}
+
 .fa.white-icon {
   color: white;
 }
@@ -126,6 +125,71 @@ a[ng-click]{
 
 .widget .widget-body table tbody .fit-text-size {
   font-size: 90% !important;
+}
+
+.template-widget {
+  height: 100%;
+}
+
+.template-widget-body {
+  max-height: 86%;
+  overflow-y: auto;
+}
+
+.template-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.template-logo {
+  width: 100%;
+  max-width: 60px;
+  height: 100%;
+  max-height: 60px;
+}
+
+.template-container {
+  padding: 0.7rem;
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  border: 1px solid #333333;
+  border-radius: 2px;
+  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+}
+
+.template-container--selected {
+  border: 2px solid #333333;
+  background-color: #ececec;
+  color: #2d3e63;
+}
+
+.template-container:hover {
+  background-color: #ececec;
+  color: #2d3e63;
+}
+
+.template-main {
+  display: flex;
+}
+
+.template-note {
+  padding: 0.5em;
+  font-size: 0.9em;
+}
+
+.template-title {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.template-description {
+  font-size: 0.9em;
+  padding-right: 1em;
+}
+
+.template-line {
+  display: flex;
+  justify-content: space-between;
 }
 
 .nopadding {
@@ -143,11 +207,6 @@ a[ng-click]{
 
 .interactive {
   cursor: pointer;
-}
-
-.template-list {
-  display: flex;
-  flex-wrap: wrap;
 }
 
 .custom-header-ico {
@@ -170,81 +229,6 @@ a[ng-click]{
     line-height: 1.42857143;
     border-radius: 4px;
   }
-}
-
-/* Underline From Center */
-.hvr-underline-from-center {
-  display: inline-block;
-  vertical-align: middle;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -moz-osx-font-smoothing: grayscale;
-  position: relative;
-  overflow: hidden;
-}
-.hvr-underline-from-center:before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: 50%;
-  right: 50%;
-  bottom: 0;
-  background: #85898b;
-  height: 2px;
-  -webkit-transition-property: left, right;
-  transition-property: left, right;
-  -webkit-transition-duration: 0.3s;
-  transition-duration: 0.3s;
-  -webkit-transition-timing-function: ease-out;
-  transition-timing-function: ease-out;
-}
-.hvr-underline-from-center:hover:before, .hvr-underline-from-center:focus:before, .hvr-underline-from-center:active:before {
-  left: 0;
-  right: 0;
-}
-
-.container-template {
-  font-size: 1em;
-  width: 256px;
-  height: 128px;
-  margin: 15px;
-  padding: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-  cursor: pointer;
-  border: 2px solid #f6f6f6;
-  color: #30426a;
-}
-
-.container-template--selected {
-  background-color: #ececec;
-  color: #2d3e63;
-}
-
-.container-template:hover {
-  background-color: #ececec;
-  color: #2d3e63;
-}
-
-.container-template .logo {
-  max-width: 48px;
-  max-height: 48px;
-}
-
-.container-template .title {
-  text-align: center;
-}
-
-.container-template .description {
-  text-align: center;
-  font-size: 0.8em;
-  margin-bottom: 5px;
 }
 
 .page-wrapper {
@@ -367,11 +351,23 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   float: none !important;
 }
 
+.bootbox-form .bootbox-input-checkbox {
+  display: none
+}
+
+.bootbox-form label {
+  padding-left: 0;
+}
+
 .switch input {
   display: none;
 }
 
-.switch i {
+.bootbox-form .checkbox i {
+  margin-left: 21px;
+}
+
+.switch i, .bootbox-form .checkbox i {
   display: inline-block;
   vertical-align: middle;
   cursor: pointer;
@@ -382,7 +378,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   box-shadow: inset 0 0 1px 1px rgba(0,0,0,.5);
 }
 
-.switch i:before {
+.switch i:before, .bootbox-form .checkbox i:before {
   display: block;
   content: '';
   width: 24px;
@@ -392,13 +388,120 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   box-shadow: 0 0 1px 1px rgba(0,0,0,.5);
 }
 
-.switch :checked + i {
+.switch :checked + i, .bootbox-form .checkbox :checked ~ i {
   padding-right: 0;
   padding-left: 24px;
   -webkit-box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
   box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
 }
 
+.ownership_wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0.5rem;
+}
+
+.ownership_wrapper > div {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.ownership_wrapper .ownership_header {
+  font-size: 14px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.ownership_wrapper input[type="radio"] {
+  display: none;
+}
+
+.ownership_wrapper input[type="radio"]:not(:disabled) ~ label {
+  cursor: pointer;
+}
+
+.ownership_wrapper label {
+  font-weight: normal;
+  font-size: 12px;
+  display: block;
+  background: white;
+  border: 1px solid #333333;
+  border-radius: 2px;
+  padding: 10px 10px 0 10px;
+  text-align: center;
+  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+  position: relative;
+}
+
+.ownership_wrapper input[type="radio"]:checked + label {
+  background: #337ab7;
+  color: white;
+  padding-top: 2rem;
+  border-color: #337ab7;
+}
+
+.ownership_wrapper input[type="radio"]:checked + label::after {
+  color: #337ab7;
+  font-family: FontAwesome;
+  border: 2px solid #337ab7;
+  content: "\f00c";
+  font-size: 16px;
+  font-weight: bold;
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 30px;
+  width: 30px;
+  line-height: 26px;
+  text-align: center;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 5px -2px rgba(0, 0, 0, 0.25);
+}
+
+@media only screen and (max-width: 700px) {
+  .ownership_wrapper {
+    flex-direction: column;
+  }
+}
+
+/*bootbox override*/
+.modal-open {
+  padding-right: 0 !important;
+}
+/*!bootbox override*/
+
+/*angular-multi-select override*/
+.multiSelect > button {
+  min-height: 30px !important;
+  background-color: unset;
+  background-image: unset;
+}
+
+.multiSelect .multiSelectItem:not(.multiSelectGroup).selected
+{
+  background-image: linear-gradient( #337ab7, #337ab7 );
+  color: #fff;
+  border: none;
+}
+
+.multiSelect .multiSelectItem:hover,
+.multiSelect .multiSelectGroup:hover {
+  background-image: linear-gradient( #337ab7 , #337ab7 ) !important;
+  color: #fff !important;
+}
+
+.multiSelect .tickMark,
+.widget .widget-body table tbody .multiSelect .tickMark {
+  top: 2px;
+  right: 12px;
+  font-size: 20px !important;
+}
+/*!angular-multi-select override*/
+
+/*toaster override*/
 #toast-container > div {
   opacity: 0.9;
 }
+/*!toaster override*/

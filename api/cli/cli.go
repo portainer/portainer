@@ -15,11 +15,12 @@ import (
 type Service struct{}
 
 const (
-	errInvalidEnpointProtocol  = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
-	errSocketNotFound          = portainer.Error("Unable to locate Unix socket")
-	errEndpointsFileNotFound   = portainer.Error("Unable to locate external endpoints file")
-	errInvalidSyncInterval     = portainer.Error("Invalid synchronization interval")
-	errEndpointExcludeExternal = portainer.Error("Cannot use the -H flag mutually with --external-endpoints")
+	errInvalidEndpointProtocol    = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
+	errSocketNotFound             = portainer.Error("Unable to locate Unix socket")
+	errEndpointsFileNotFound      = portainer.Error("Unable to locate external endpoints file")
+	errInvalidSyncInterval        = portainer.Error("Invalid synchronization interval")
+	errEndpointExcludeExternal    = portainer.Error("Cannot use the -H flag mutually with --external-endpoints")
+	errNoAuthExcludeAdminPassword = portainer.Error("Cannot use --no-auth with --admin-password")
 )
 
 // ParseFlags parse the CLI flags and return a portainer.Flags struct
@@ -42,6 +43,10 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		TLSCacert:         kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String(),
 		TLSCert:           kingpin.Flag("tlscert", "Path to the TLS certificate file").Default(defaultTLSCertPath).String(),
 		TLSKey:            kingpin.Flag("tlskey", "Path to the TLS key").Default(defaultTLSKeyPath).String(),
+		SSL:               kingpin.Flag("ssl", "Secure Portainer instance using SSL").Default(defaultSSL).Bool(),
+		SSLCert:           kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").Default(defaultSSLCertPath).String(),
+		SSLKey:            kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").Default(defaultSSLKeyPath).String(),
+		AdminPassword:     kingpin.Flag("admin-password", "Hashed admin password").String(),
 	}
 
 	kingpin.Parse()
@@ -70,13 +75,17 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 		return err
 	}
 
+	if *flags.NoAuth && (*flags.AdminPassword != "") {
+		return errNoAuthExcludeAdminPassword
+	}
+
 	return nil
 }
 
 func validateEndpoint(endpoint string) error {
 	if endpoint != "" {
 		if !strings.HasPrefix(endpoint, "unix://") && !strings.HasPrefix(endpoint, "tcp://") {
-			return errInvalidEnpointProtocol
+			return errInvalidEndpointProtocol
 		}
 
 		if strings.HasPrefix(endpoint, "unix://") {

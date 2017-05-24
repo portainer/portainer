@@ -19,7 +19,7 @@
           <button class="btn btn-primary" ng-click="restart()" ng-disabled="!container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
           <button class="btn btn-primary" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
           <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
-          <button class="btn btn-danger" ng-click="remove()" ng-disabled="container.State.Running"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+          <button class="btn btn-danger" ng-click="confirmRemove()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
         </div>
       </rd-widget-body>
     </rd-widget>
@@ -54,15 +54,20 @@
             <tr>
               <td>Status</td>
               <td>
-                <i ng-class="{true: 'fa fa-heartbeat space-right green-icon', false: 'fa fa-heartbeat space-right red-icon'}[container.State.Running]"></i>
-                {{ container.State|getstatetext }} since {{ activityTime }}<span ng-if="!container.State.Running"> with exit code {{ container.State.ExitCode }}</span>
+                <i class="fa fa-heartbeat space-right green-icon" ng-if="container.State.Running"></i>
+                <i class="fa fa-heartbeat space-right red-icon" ng-if="!container.State.Running && container.State.Status !== 'created'"></i>
+                {{ container.State|getstatetext }} since {{ activityTime }}<span ng-if="!container.State.Running && container.State.Status !== 'created'"> with exit code {{ container.State.ExitCode }}</span>
               </td>
+            </tr>
+            <tr>
+              <td>Created</td>
+              <td>{{ container.Created|getisodate }}</td>
             </tr>
             <tr ng-if="container.State.Running">
               <td>Start time</td>
               <td>{{ container.State.StartedAt|getisodate }}</td>
             </tr>
-            <tr ng-if="!container.State.Running">
+            <tr ng-if="!container.State.Running && container.State.Status !== 'created'">
               <td>Finished</td>
               <td>{{ container.State.FinishedAt|getisodate }}</td>
             </tr>
@@ -79,6 +84,37 @@
         </table>
       </rd-widget-body>
     </rd-widget>
+  </div>
+</div>
+
+<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="container && applicationState.application.authentication"></div>
+
+<div ng-if="container.State.Health" class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-server" title="Container health"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Status</td>
+              <td>
+                <i ng-class="{'healthy': 'fa fa-heartbeat space-right green-icon', 'unhealthy': 'fa fa-heartbeat space-right red-icon', 'starting': 'fa fa-heartbeat space-right orange-icon'}[container.State.Health.Status]"></i>
+                {{ container.State.Health.Status }}
+              </td>
+            </tr>
+            <tr>
+              <td>Failure count</td>
+              <td>{{ container.State.Health.FailingStreak }}</td>
+            </tr>
+            <tr>
+              <td>Last output</td>
+              <td>{{ container.State.Health.Log[container.State.Health.Log.length - 1].Output }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widge>
   </div>
 </div>
 
@@ -159,7 +195,7 @@
               <td>ENV</td>
               <td>
                 <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="var in container.Config.Env">
+                  <tr ng-repeat="var in container.Config.Env track by $index">
                     <td>{{ var|key: '=' }}</td>
                     <td>{{ var|value: '=' }}</td>
                   </tr>

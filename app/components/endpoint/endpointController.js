@@ -22,6 +22,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
     var endpointParams = {
       name: $scope.endpoint.Name,
       URL: $scope.endpoint.URL,
+      PublicURL: $scope.endpoint.PublicURL,
       TLS: $scope.endpoint.TLS,
       TLSCACert: $scope.formValues.TLSCACert !== $scope.endpoint.TLSCACert ? $scope.formValues.TLSCACert : null,
       TLSCert: $scope.formValues.TLSCert !== $scope.endpoint.TLSCert ? $scope.formValues.TLSCert : null,
@@ -31,7 +32,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
 
     EndpointService.updateEndpoint(ID, endpointParams)
     .then(function success(data) {
-      Notifications.success("Endpoint updated", $scope.endpoint.Name);
+      Notifications.success('Endpoint updated', $scope.endpoint.Name);
       $state.go('endpoints');
     }, function error(err) {
       $scope.state.error = err.msg;
@@ -47,7 +48,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
     EndpointService.endpoint($stateParams.id).then(function success(data) {
       $('#loadingViewSpinner').hide();
       $scope.endpoint = data;
-      if (data.URL.indexOf("unix://") === 0) {
+      if (data.URL.indexOf('unix://') === 0) {
         $scope.endpointType = 'local';
       } else {
         $scope.endpointType = 'remote';
@@ -58,7 +59,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
       $scope.formValues.TLSKey = data.TLSKey;
     }, function error(err) {
       $('#loadingViewSpinner').hide();
-      Notifications.error("Failure", err, "Unable to retrieve endpoint details");
+      Notifications.error('Failure', err, 'Unable to retrieve endpoint details');
     });
   }
 
