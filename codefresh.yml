@@ -28,6 +28,5 @@ steps:
   push_image:
     type: push
     candidate: ${{build_image}}
-    credentials:
-      username: '${{dockerhub_user}}'
-      password: '${{dockerhub_password}}'
+    registry: dockerhub
+    
