@@ -17,10 +17,11 @@ steps:
       - npm install -g bower grunt grunt-cli && npm install
       - bower install --allow-root
       - grunt build-webapp
+      - cp build/linux/Dockerfile .
 
   build_image:
     type: build
     working_directory: ${{build_frontend}}
-    dockerfile: ./build/linux/Dockerfile
+    # dockerfile: ./build/linux/Dockerfile
     image_name: portainer/portainer
     tag: develop
