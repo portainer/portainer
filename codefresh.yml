@@ -17,11 +17,17 @@ steps:
       - npm install -g bower grunt grunt-cli && npm install
       - bower install --allow-root
       - grunt build-webapp
-      # - cp build/linux/Dockerfile . # work-around the dockerfile not located in the build_image step
 
   build_image:
     type: build
     working_directory: ${{build_frontend}}
-    dockerfile: ./build/linux/Dockerfile # see last command of build_frontend step
+    dockerfile: ./build/linux/Dockerfile
     image_name: portainer/portainer
     tag: ${{CF_BRANCH}}
+
+  push_image:
+    type: push
+    candidate: ${{build_image}}
+    credentials:
+      username: '${{dockerhub_user}}'
+      password: '${{dockerhub_password}}'
