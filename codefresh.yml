@@ -13,20 +13,22 @@ steps:
     image: portainer/angular-builder:latest
     working_directory: ${{build_backend}}
     commands:
-      - mv api/cmd/portainer/portainer dist/
-      - npm install -g bower grunt grunt-cli && npm install
-      - bower install --allow-root
-      - grunt build-webapp
+      - ls -lah .
+      - ls -lah api/cmd/portainer
+      # - mv api/cmd/portainer/portainer dist/
+      # - npm install -g bower grunt grunt-cli && npm install
+      # - bower install --allow-root
+      # - grunt build-webapp
 
-  build_image:
-    type: build
-    working_directory: ${{build_frontend}}
-    dockerfile: ./build/linux/Dockerfile
-    image_name: portainer/portainer
-    tag: ${{CF_BRANCH}}
-
-  push_image:
-    type: push
-    candidate: '${{build_image}}'
-    tag: '${{CF_BRANCH}}'
-    registry: dockerhub
+  # build_image:
+  #   type: build
+  #   working_directory: ${{build_frontend}}
+  #   dockerfile: ./build/linux/Dockerfile
+  #   image_name: portainer/portainer
+  #   tag: ${{CF_BRANCH}}
+  #
+  # push_image:
+  #   type: push
+  #   candidate: '${{build_image}}'
+  #   tag: '${{CF_BRANCH}}'
+  #   registry: dockerhub
