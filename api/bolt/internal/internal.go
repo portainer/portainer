@@ -17,6 +17,26 @@ func UnmarshalUser(data []byte, user *portainer.User) error {
 	return json.Unmarshal(data, user)
 }
 
+// MarshalTeam encodes a team to binary format.
+func MarshalTeam(team *portainer.Team) ([]byte, error) {
+	return json.Marshal(team)
+}
+
+// UnmarshalTeam decodes a team from a binary data.
+func UnmarshalTeam(data []byte, team *portainer.Team) error {
+	return json.Unmarshal(data, team)
+}
+
+// MarshalTeamMembership encodes a team membership to binary format.
+func MarshalTeamMembership(membership *portainer.TeamMembership) ([]byte, error) {
+	return json.Marshal(membership)
+}
+
+// UnmarshalTeamMembership decodes a team membership from a binary data.
+func UnmarshalTeamMembership(data []byte, membership *portainer.TeamMembership) error {
+	return json.Unmarshal(data, membership)
+}
+
 // MarshalEndpoint encodes an endpoint to binary format.
 func MarshalEndpoint(endpoint *portainer.Endpoint) ([]byte, error) {
 	return json.Marshal(endpoint)

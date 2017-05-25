@@ -2,7 +2,7 @@
 
 Thanks for opening an issue on Portainer !
 
-Do you need help or have a question? Come chat with us on gitter: https://gitter.im/portainer/Lobby.
+Do you need help or have a question? Come chat with us on Slack http://portainer.io/slack/ or gitter https://gitter.im/portainer/Lobby.
 
 If you are reporting a new issue, make sure that we do not have any duplicates
 already open. You can ensure this by searching the issue list for this
@@ -37,8 +37,8 @@ Any other info e.g. Why do you consider this to be a bug? What did you expect to
 **Technical details:**
 
 * Portainer version:
-* Portainer Docker image tag (latest/arm/windows...):
 * Target Docker version (the host/cluster you manage):
-* Target Swarm version (if applicable):
 * Platform (windows/linux):
+* Command used to start Portainer (`docker run -p 9000:9000 portainer/portainer`):
+* Target Swarm version (if applicable):
 * Browser:

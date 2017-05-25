@@ -1,4 +1,4 @@
-<rd-header>
+<rd-header id="view-top">
   <rd-header-title title="Application templates list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="templates" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
@@ -7,34 +7,52 @@
   </rd-header-title>
   <rd-header-content>Templates</rd-header-content>
 </rd-header>
-<div id="selectedTemplate" class="row" ng-if="state.selectedTemplate">
-  <div class="col-lg-12 col-md-12 col-xs-12">
+
+<div class="row" style="height: 90%">
+
+  <div class="col-sm-12" ng-if="state.selectedTemplate">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Image">
+        <div class="pull-right">
+          <button type="button" class="btn btn-sm btn-primary" ng-click="unselectTemplate()">Hide</button>
+        </div>
       </rd-widget-custom-header>
       <rd-widget-body classes="padding">
+
         <form class="form-horizontal">
           <!-- description -->
-          <div class="form-group" ng-if="state.selectedTemplate.Note">
-            <div class="col-sm-12">
-              <span class="small" style="margin-left: 5px;" ng-bind-html="state.selectedTemplate.Note"></span>
+          <div ng-if="state.selectedTemplate.Note">
+            <div class="col-sm-12 form-section-title">
+              Information
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="template-note" ng-bind-html="state.selectedTemplate.Note"></span>
+              </div>
             </div>
           </div>
           <!-- !description -->
-          <!-- name-and-network-inputs -->
+          <div class="col-sm-12 form-section-title">
+            Configuration
+          </div>
+          <!-- name-input -->
           <div class="form-group">
-            <label for="container_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-5">
+            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
+            <div class="col-sm-10">
               <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)">
             </div>
-            <label for="container_network" class="col-sm-2 col-lg-1 control-label text-right">Network</label>
-            <div class="col-sm-4 col-lg-5">
+          </div>
+          <!-- !name-input -->
+          <!-- network-input -->
+          <div class="form-group">
+            <label for="container_network" class="col-sm-2 control-label text-left">Network</label>
+            <div class="col-sm-10">
               <select class="form-control" ng-options="net.Name for net in availableNetworks" ng-model="formValues.network">
                 <option disabled hidden value="">Select a network</option>
               </select>
             </div>
           </div>
-          <!-- !name-and-network-inputs -->
+          <!-- !network-input -->
           <!-- env -->
           <div ng-repeat="var in state.selectedTemplate.Env" ng-if="!var.set" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
@@ -49,20 +67,9 @@
             </div>
           </div>
           <!-- !env -->
-          <!-- ownership -->
-          <div class="form-group" ng-if="applicationState.application.authentication">
-            <div class="col-sm-12">
-              <label for="ownership" class="control-label text-left">
-                Ownership
-                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing public, everybody will be able to access it."></portainer-tooltip>
-              </label>
-              <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'private'">Private</label>
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'public'">Public</label>
-              </div>
-            </div>
-          </div>
-          <!-- !ownership -->
+          <!-- access-control -->
+          <div ng-include="'app/components/common/accessControlForm/accessControlForm.html'" ng-if="applicationState.application.authentication"></div>
+          <!-- !access-control -->
           <div class="form-group">
             <div class="col-sm-12">
               <a class="small interactive" ng-if="!state.showAdvancedOptions" ng-click="state.showAdvancedOptions = true;">
@@ -73,7 +80,6 @@
               </a>
             </div>
           </div>
-          <!-- advanced-options -->
           <div ng-if="state.showAdvancedOptions">
             <!-- port-mapping -->
             <div class="form-group" >
@@ -120,7 +126,6 @@
                   </div>
                 </div>
               </div>
-
             </div>
             <!-- !port-mapping-input-list -->
             <!-- volume-mapping -->
@@ -192,6 +197,7 @@
             <!-- !volume-mapping -->
           </div>
           <!-- !advanced-options -->
+          <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
@@ -205,45 +211,90 @@
               </span>
             </div>
           </div>
+          <!-- !actions -->
         </form>
+
       </rd-widget-body>
     </rd-widget>
   </div>
-</div>
 
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-rocket" title="Available templates">
-        <div class="pull-right">
-          Items per page:
-          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-            <option value="0">All</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
+  <div class="col-sm-12" style="height: 100%">
+    <rd-template-widget>
+      <rd-widget-header icon="fa-rocket" title="Templates">
+        <div ng-if="availableCategories.length > 0" class="pull-right">
+          Category
+          <select ng-model="state.filters.Categories">
+            <option value="!">All</option>
+            <option ng-repeat="category in availableCategories" value="{{ category }}">{{ category }}</option>
           </select>
         </div>
       </rd-widget-header>
-      <rd-widget-body classes="padding">
+      <rd-widget-taskbar>
+        <div>
+          <!-- Platform -->
+          <span class="btn-group btn-group-sm" style="margin-right: 15px;">
+            <label class="btn btn-primary" ng-model="state.filters.Platform" uib-btn-radio="'!'">
+              All
+            </label>
+            <label class="btn btn-primary" ng-model="state.filters.Platform" uib-btn-radio="'windows'">
+              <i class="fa fa-windows" aria-hidden="true"></i>
+              Windows
+            </label>
+            <label class="btn btn-primary" ng-model="state.filters.Platform" uib-btn-radio="'linux'">
+              <i class="fa fa-linux" aria-hidden="true"></i>
+              Linux
+            </label>
+          </span>
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="padding template-widget-body">
         <div class="template-list">
-          <div dir-paginate="tpl in templates | itemsPerPage: state.pagination_count" class="container-template hvr-underline-from-center" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index)">
-            <img class="logo" ng-src="{{ tpl.Logo }}" />
-            <div class="title">{{ tpl.Title }}</div>
-            <div class="description" ng-if="tpl.Description && !state.hideDescriptions">{{ tpl.Description }}</div>
+          <!-- template -->
+          <div ng-repeat="tpl in templates | filter:state.filters:true" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
+            <div class="template-main">
+              <!-- template-image -->
+              <span class="">
+                <img class="template-logo" ng-src="{{ tpl.Logo }}" />
+              </span>
+              <!-- !template-image -->
+              <!-- template-details -->
+              <span class="col-sm-12">
+                <!-- template-line1 -->
+                <div class="template-line">
+                  <span class="template-title">
+                    {{ tpl.Title }}
+                  </span>
+                  <span>
+                    <i class="fa fa-windows" aria-hidden="true" ng-if="tpl.Platform === 'windows'"></i>
+                    <i class="fa fa-linux" aria-hidden="true" ng-if="tpl.Platform === 'linux'"></i>
+                    <!-- Arch / Platform -->
+                  </span>
+                </div>
+                <!-- !template-line1 -->
+                <!-- template-line2 -->
+                <div class="template-line">
+                  <span class="template-description">
+                    {{ tpl.Description }}
+                  </span>
+                  <span class="small text-muted" ng-if="tpl.Categories.length > 0">
+                    {{ tpl.Categories.join(', ') }}
+                  </span>
+                </div>
+                <!-- !template-line2 -->
+              </span>
+              <!-- !template-details -->
+            </div>
+            <!-- !template -->
           </div>
           <div ng-if="!templates" class="text-center text-muted">
             Loading...
           </div>
-          <div ng-if="templates.length == 0" class="text-center text-muted">
+          <div ng-if="(templates | filter:state.filters:true).length == 0" class="text-center text-muted">
             No templates available.
           </div>
         </div>
-        <div ng-if="templates">
-          <dir-pagination-controls></dir-pagination-controls>
-        </div>
       </rd-widget-body>
-    </rd-widget>
+    </rd-template-widget>
   </div>
+
 </div>

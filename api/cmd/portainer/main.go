@@ -124,12 +124,14 @@ func main() {
 		}
 		if len(endpoints) == 0 {
 			endpoint := &portainer.Endpoint{
-				Name:          "primary",
-				URL:           *flags.Endpoint,
-				TLS:           *flags.TLSVerify,
-				TLSCACertPath: *flags.TLSCacert,
-				TLSCertPath:   *flags.TLSCert,
-				TLSKeyPath:    *flags.TLSKey,
+				Name:            "primary",
+				URL:             *flags.Endpoint,
+				TLS:             *flags.TLSVerify,
+				TLSCACertPath:   *flags.TLSCacert,
+				TLSCertPath:     *flags.TLSCert,
+				TLSKeyPath:      *flags.TLSKey,
+				AuthorizedUsers: []portainer.UserID{},
+				AuthorizedTeams: []portainer.TeamID{},
 			}
 			err = store.EndpointService.CreateEndpoint(endpoint)
 			if err != nil {
@@ -161,6 +163,8 @@ func main() {
 		AuthDisabled:           *flags.NoAuth,
 		EndpointManagement:     authorizeEndpointMgmt,
 		UserService:            store.UserService,
+		TeamService:            store.TeamService,
+		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
 		ResourceControlService: store.ResourceControlService,
 		CryptoService:          cryptoService,
