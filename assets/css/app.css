@@ -64,24 +64,12 @@ html, body, #content-wrapper, .page-content, #view {
   color: #777;
 }
 
-.form-section-title {
-  border-bottom: 1px solid #777;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  color: #777;
-}
-
 .form-horizontal .control-label.text-left{
   text-align: left;
   font-size: 0.9em;
 }
 
 input[type="checkbox"] {
-  margin-top: 1px;
-  vertical-align: middle;
-}
-
-input[type="radio"] {
   margin-top: 1px;
   vertical-align: middle;
 }
@@ -137,6 +125,71 @@ a[ng-click]{
 
 .widget .widget-body table tbody .fit-text-size {
   font-size: 90% !important;
+}
+
+.template-widget {
+  height: 100%;
+}
+
+.template-widget-body {
+  max-height: 86%;
+  overflow-y: auto;
+}
+
+.template-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.template-logo {
+  width: 100%;
+  max-width: 60px;
+  height: 100%;
+  max-height: 60px;
+}
+
+.template-container {
+  padding: 0.7rem;
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  border: 1px solid #333333;
+  border-radius: 2px;
+  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+}
+
+.template-container--selected {
+  border: 2px solid #333333;
+  background-color: #ececec;
+  color: #2d3e63;
+}
+
+.template-container:hover {
+  background-color: #ececec;
+  color: #2d3e63;
+}
+
+.template-main {
+  display: flex;
+}
+
+.template-note {
+  padding: 0.5em;
+  font-size: 0.9em;
+}
+
+.template-title {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.template-description {
+  font-size: 0.9em;
+  padding-right: 1em;
+}
+
+.template-line {
+  display: flex;
+  justify-content: space-between;
 }
 
 .nopadding {
@@ -342,71 +395,113 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
 }
 
-#toast-container > div {
-  opacity: 0.9;
-}
-
-.template-widget {
-  height: 100%;
-}
-
-.template-widget-body {
-  max-height: 86%;
-  overflow-y: auto;
-}
-
-.template-list {
+.ownership_wrapper {
   display: flex;
-  flex-direction: column;
+  flex-flow: row wrap;
+  margin: 0.5rem;
 }
 
-.template-logo {
-  width: 100%;
-  max-width: 60px;
-  height: 100%;
-  max-height: 60px;
+.ownership_wrapper > div {
+  flex: 1;
+  padding: 0.5rem;
 }
 
-.template-container {
-  padding: 0.7rem;
-  margin-bottom: 0.7rem;
-  cursor: pointer;
-  border: 1px solid #333333;
-  border-radius: 2px;
-  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
-}
-
-.template-container--selected {
-  border: 2px solid #333333;
-  background-color: #ececec;
-  color: #2d3e63;
-}
-
-.template-container:hover {
-  background-color: #ececec;
-  color: #2d3e63;
-}
-
-.template-main {
-  display: flex;
-}
-
-.template-note {
-  padding: 0.5em;
-  font-size: 0.9em;
-}
-
-.template-title {
-  font-size: 1.8em;
+.ownership_wrapper .ownership_header {
+  font-size: 14px;
+  margin-bottom: 5px;
   font-weight: bold;
 }
 
-.template-description {
-  font-size: 0.9em;
-  padding-right: 1em;
+.ownership_wrapper input[type="radio"] {
+  display: none;
 }
 
-.template-line {
-  display: flex;
-  justify-content: space-between;
+.ownership_wrapper input[type="radio"]:not(:disabled) ~ label {
+  cursor: pointer;
 }
+
+.ownership_wrapper label {
+  font-weight: normal;
+  font-size: 12px;
+  display: block;
+  background: white;
+  border: 1px solid #333333;
+  border-radius: 2px;
+  padding: 10px 10px 0 10px;
+  text-align: center;
+  box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
+  position: relative;
+}
+
+.ownership_wrapper input[type="radio"]:checked + label {
+  background: #337ab7;
+  color: white;
+  padding-top: 2rem;
+  border-color: #337ab7;
+}
+
+.ownership_wrapper input[type="radio"]:checked + label::after {
+  color: #337ab7;
+  font-family: FontAwesome;
+  border: 2px solid #337ab7;
+  content: "\f00c";
+  font-size: 16px;
+  font-weight: bold;
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 30px;
+  width: 30px;
+  line-height: 26px;
+  text-align: center;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 5px -2px rgba(0, 0, 0, 0.25);
+}
+
+@media only screen and (max-width: 700px) {
+  .ownership_wrapper {
+    flex-direction: column;
+  }
+}
+
+/*bootbox override*/
+.modal-open {
+  padding-right: 0 !important;
+}
+/*!bootbox override*/
+
+/*angular-multi-select override*/
+.multiSelect > button {
+  min-height: 30px !important;
+  background-color: unset;
+  background-image: unset;
+}
+
+.multiSelect .multiSelectItem:not(.multiSelectGroup).selected
+{
+  background-image: linear-gradient( #337ab7, #337ab7 );
+  color: #fff;
+  border: none;
+}
+
+.multiSelect .multiSelectItem:hover,
+.multiSelect .multiSelectGroup:hover {
+  background-image: linear-gradient( #337ab7 , #337ab7 ) !important;
+  color: #fff !important;
+}
+
+.multiSelect .tickMark,
+.widget .widget-body table tbody .multiSelect .tickMark {
+  top: 2px;
+  right: 12px;
+  font-size: 20px !important;
+}
+/*!angular-multi-select override*/
+
+/*toaster override*/
+#toast-container > div {
+  opacity: 0.9;
+}
+/*!toaster override*/

@@ -246,4 +246,29 @@ angular.module('portainer.filters', [])
     }
     return '';
   };
+})
+.filter('ownershipicon', function () {
+  'use strict';
+  return function (ownership) {
+    switch (ownership) {
+      case 'private':
+        return 'fa fa-eye-slash';
+      case 'administrators':
+        return 'fa fa-eye-slash';
+      case 'restricted':
+        return 'fa fa-users';
+      default:
+        return 'fa fa-eye';
+    }
+  };
+})
+.filter('tasknodename', function () {
+  'use strict';
+  return function (nodeId, nodes) {
+    var node = _.find(nodes, { Id: nodeId });
+    if (node) {
+      return node.Hostname;
+    }
+    return '';
+  };
 });

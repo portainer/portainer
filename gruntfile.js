@@ -168,6 +168,7 @@ module.exports = function (grunt) {
     'clean:tmp'
   ]);
   grunt.registerTask('lint', ['eslint']);
+  grunt.registerTask('run', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
   grunt.registerTask('run-dev', ['if:linuxAmd64BinaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
 
@@ -209,6 +210,7 @@ module.exports = function (grunt) {
         'bower_components/moment/min/moment.min.js',
         'bower_components/xterm.js/dist/xterm.js',
         'bower_components/bootbox.js/bootbox.js',
+        'bower_components/angular-multi-select/isteven-multi-select.js',
         'bower_components/toastr/toastr.min.js',
         'assets/js/legend.js' // Not a bower package
       ],
@@ -221,6 +223,7 @@ module.exports = function (grunt) {
         'bower_components/rdash-ui/dist/css/rdash.min.css',
         'bower_components/angular-ui-select/dist/select.min.css',
         'bower_components/xterm.js/dist/xterm.css',
+        'bower_components/angular-multi-select/isteven-multi-select.css',
         'bower_components/toastr/toastr.min.css'
       ]
     },
@@ -473,27 +476,6 @@ module.exports = function (grunt) {
           'docker stop portainer',
           'docker rm portainer',
           'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
-        ].join(';')
-      },
-      runSwarm: {
-        command: [
-          'docker stop portainer',
-          'docker rm portainer',
-          'docker run -d -p 9000:9000 --name portainer portainer -H tcp://10.0.7.10:2375 --no-analytics'
-        ].join(';')
-      },
-      runSwarmLocal: {
-        command: [
-          'docker stop portainer',
-          'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
-        ].join(';')
-      },
-      runSsl: {
-        command: [
-          'docker stop portainer',
-          'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /tmp/portainer:/data -v /tmp/docker-ssl:/certs --name portainer portainer -H tcp://10.0.7.10:2376 --tlsverify --no-analytics'
         ].join(';')
       },
       cleanImages: {

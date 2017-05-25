@@ -239,10 +239,10 @@
                 </a>
               </th>
               <th>
-                <a ui-sref="node" ng-click="order('Image')">
+                <a ui-sref="node" ng-click="order('Spec.ContainerSpec.Image')">
                   Image
-                  <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'Spec.ContainerSpec.Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Spec.ContainerSpec.Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
@@ -257,10 +257,10 @@
           <tbody>
             <tr dir-paginate="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
-              <td><span class="label label-{{ task.Status|taskstatusbadge }}">{{ task.Status }}</span></td>
-              <td>{{ task.Slot }}</td>
-              <td>{{ task.Image }}</td>
-              <td>{{ task.Updated|getisodate }}</td>
+              <td><span class="label label-{{ task.Status.State|taskstatusbadge }}">{{ task.Status.State }}</span></td>
+              <td>{{ task.Slot ? task.Slot : '-' }}</td>
+              <td>{{ task.Spec.ContainerSpec.Image | hideshasum }}</td>
+              <td>{{ task.Updated | getisodate }}</td>
             </tr>
           </tbody>
         </table>

@@ -1,10 +1,61 @@
 angular.module('portainer.services')
-.factory('VolumeService', ['$q', 'Volume', 'VolumeHelper', function VolumeServiceFactory($q, Volume, VolumeHelper) {
+.factory('VolumeService', ['$q', 'Volume', 'VolumeHelper', 'ResourceControlService', 'UserService', 'TeamService', function VolumeServiceFactory($q, Volume, VolumeHelper, ResourceControlService, UserService, TeamService) {
   'use strict';
   var service = {};
 
+  service.volumes = function() {
+    var deferred = $q.defer();
+    Volume.query().$promise
+    .then(function success(data) {
+      var volumes = data.Volumes || [];
+      volumes = volumes.map(function (item) {
+        return new VolumeViewModel(item);
+      });
+      deferred.resolve(volumes);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve volumes', err: err});
+    });
+    return deferred.promise;
+  };
+
+  service.volume = function(id) {
+    var deferred = $q.defer();
+    Volume.get({id: id}).$promise
+    .then(function success(data) {
+      var volume = new VolumeViewModel(data);
+      deferred.resolve(volume);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve volume details', err: err});
+    });
+    return deferred.promise;
+  };
+
   service.getVolumes = function() {
     return Volume.query({}).$promise;
+  };
+
+  service.remove = function(volume) {
+    var deferred = $q.defer();
+
+    Volume.remove({id: volume.Id}).$promise
+    .then(function success(data) {
+      if (data.message) {
+        deferred.reject({ msg: data.message, err: data.message });
+      }
+      if (volume.ResourceControl && volume.ResourceControl.Type === 3) {
+        return ResourceControlService.deleteResourceControl(volume.ResourceControl.Id);
+      }
+    })
+    .then(function success() {
+      deferred.resolve();
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to remove volume', err: err });
+    });
+
+    return deferred.promise;
   };
 
   service.createVolumeConfiguration = function(name, driver, driverOptions) {
@@ -23,7 +74,8 @@ angular.module('portainer.services')
       if (data.message) {
         deferred.reject({ msg: data.message });
       } else {
-        deferred.resolve(data);
+        var volume = new VolumeViewModel(data);
+        deferred.resolve(volume);
       }
     })
     .catch(function error(err) {

@@ -67,21 +67,9 @@
             </div>
           </div>
           <!-- !env -->
-          <!-- ownership -->
-          <div class="form-group" ng-if="applicationState.application.authentication">
-            <div class="col-sm-12">
-              <label for="ownership" class="control-label text-left">
-                Ownership
-                <portainer-tooltip position="bottom" message="When setting the ownership value to private, only you and the administrators will be able to see and manage this object. When choosing public, everybody will be able to access it."></portainer-tooltip>
-              </label>
-              <div class="btn-group btn-group-sm" style="margin-left: 20px;">
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'private'">Private</label>
-                <label class="btn btn-primary" ng-model="formValues.Ownership" uib-btn-radio="'public'">Public</label>
-              </div>
-            </div>
-          </div>
-          <!-- !ownership -->
-          <!-- advanced-options -->
+          <!-- access-control -->
+          <div ng-include="'app/components/common/accessControlForm/accessControlForm.html'" ng-if="applicationState.application.authentication"></div>
+          <!-- !access-control -->
           <div class="form-group">
             <div class="col-sm-12">
               <a class="small interactive" ng-if="!state.showAdvancedOptions" ng-click="state.showAdvancedOptions = true;">
@@ -262,7 +250,7 @@
       <rd-widget-body classes="padding template-widget-body">
         <div class="template-list">
           <!-- template -->
-          <div dir-paginate="tpl in templates | filter:state.filters:true | itemsPerPage: state.pagination_count" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
+          <div ng-repeat="tpl in templates | filter:state.filters:true" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
             <div class="template-main">
               <!-- template-image -->
               <span class="">
@@ -301,7 +289,7 @@
           <div ng-if="!templates" class="text-center text-muted">
             Loading...
           </div>
-          <div ng-if="(templates | filter:state.filters:true | itemsPerPage: state.pagination_count).length == 0" class="text-center text-muted">
+          <div ng-if="(templates | filter:state.filters:true).length == 0" class="text-center text-muted">
             No templates available.
           </div>
         </div>
