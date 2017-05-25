@@ -173,12 +173,7 @@ function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, 
   function prepareVolumes(config, input) {
     input.Volumes.forEach(function (volume) {
       if (volume.Source && volume.Target) {
-        var mount = {};
-        mount.Type = volume.Bind ? 'bind' : 'volume';
-        mount.ReadOnly = volume.ReadOnly ? true : false;
-        mount.Source = volume.Source;
-        mount.Target = volume.Target;
-        config.TaskTemplate.ContainerSpec.Mounts.push(mount);
+        config.TaskTemplate.ContainerSpec.Mounts.push(volume);
       }
     });
   }
