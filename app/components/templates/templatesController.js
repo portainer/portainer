@@ -5,7 +5,6 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
     selectedTemplate: null,
     showAdvancedOptions: false,
     hideDescriptions: $stateParams.hide_descriptions,
-    pagination_count: Pagination.getPaginationCount('templates'),
     formValidationError: '',
     filters: {
       Categories: '!',
@@ -16,10 +15,6 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
   $scope.formValues = {
     network: '',
     name: ''
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('templates', $scope.state.pagination_count);
   };
 
   $scope.addVolume = function () {
