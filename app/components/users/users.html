@@ -157,8 +157,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="user in (state.filteredUsers = (users | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td ng-if="isAdmin"><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(user)" /></td>
+              <tr ng-click="user.Checked = !user.Checked; selectItem(user);" ng-class="{active: user.Checked}" dir-paginate="user in (state.filteredUsers = (users | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+                <td ng-if="isAdmin"><input type="checkbox" ng-model="user.Checked" ng-click="$event.stopPropagation();selectItem(user)" /></td>
                 <td>{{ user.Username }}</td>
                 <td>
                   <i ng-if="user.Role === 1" class="fa fa-user-circle-o" aria-hidden="true" style="margin-right: 2px;"></i>

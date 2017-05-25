@@ -81,8 +81,8 @@
               </th>
             </thead>
             <tbody>
-              <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td><input type="checkbox" ng-model="service.Checked" ng-change="selectItem(service)"/></td>
+              <tr ng-click="service.Checked = !service.Checked; selectItem(service);" ng-class="{active: service.Checked}" dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+                <td><input type="checkbox" ng-model="service.Checked" ng-click="$event.stopPropagation();selectItem(service)"/></td>
                 <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
                 <td>{{ service.Image | hideshasum }}</td>
                 <td>

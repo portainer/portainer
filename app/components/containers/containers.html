@@ -100,8 +100,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-              <td><input type="checkbox" ng-model="container.Checked" ng-change="selectItem(container)"/></td>
+            <tr ng-click="container.Checked = !container.Checked; selectItem(container);" ng-class="{active: container.Checked}" dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <td><input type="checkbox" ng-model="container.Checked" ng-click="$event.stopPropagation();selectItem(container)"/></td>
               <td>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ container.Status }}</span>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) === -1" class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span>
