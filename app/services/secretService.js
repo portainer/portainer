@@ -39,5 +39,9 @@ angular.module('portainer.services')
     return Secret.remove({ id: secretId }).$promise;
   };
 
+  service.create = function(secretConfig) {
+    return Secret.create(secretConfig).$promise;
+  };
+
   return service;
 }]);

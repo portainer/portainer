@@ -1,6 +1,6 @@
 angular.module('createSecret', [])
-.controller('CreateSecretController', ['$scope', '$state', 'Notifications', 'Secret',
-function ($scope, $state, Notifications, Secret) {
+.controller('CreateSecretController', ['$scope', '$state', 'Notifications', 'SecretService',
+function ($scope, $state, Notifications, SecretService) {
   $scope.formValues = {
     Name: '',
     Data: '',
@@ -15,23 +15,6 @@ function ($scope, $state, Notifications, Secret) {
   $scope.removeLabel = function(index) {
     $scope.formValues.Labels.splice(index, 1);
   };
-
-  function createSecret(config) {
-    $('#createSecretSpinner').show();
-    Secret.create(config, function (d) {
-      if (d.message) {
-        $('#createSecretSpinner').hide();
-        Notifications.error('Unable to create secret', {}, d.message);
-      } else {
-        Notifications.success('Secret created', d.Id);
-        $('#createSecretSpinner').hide();
-        $state.go('secrets', {}, {reload: true});
-      }
-    }, function (e) {
-      $('#createSecretSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to create secret');
-    });
-  }
 
   function prepareLabelsConfig(config) {
     var labels = {};
@@ -57,6 +40,21 @@ function ($scope, $state, Notifications, Secret) {
     prepareSecretData(config);
     prepareLabelsConfig(config);
     return config;
+  }
+
+  function createSecret(config) {
+    $('#createSecretSpinner').show();
+    SecretService.create(config)
+    .then(function success(data) {
+      Notifications.success('Secret successfully created');
+      $state.go('secrets', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to create secret');
+    })
+    .finally(function final() {
+      $('#createSecretSpinner').hide();
+    });
   }
 
   $scope.create = function () {
