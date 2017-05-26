@@ -1,15 +1,24 @@
 angular.module('secrets', [])
-.controller('SecretsController', ['$scope', '$stateParams', '$state', 'Secret', 'Notifications', 'Settings',
-function ($scope, $stateParams, $state, Secret, Messages, Settings) {
+.controller('SecretsController', ['$scope', '$stateParams', '$state', 'SecretService', 'Notifications', 'Pagination',
+function ($scope, $stateParams, $state, SecretService, Notifications, Pagination) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
+  $scope.state.pagination_count = Pagination.getPaginationCount('secrets');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
-  $scope.pagination_count = Settings.pagination_count;
 
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
+  };
+
+  $scope.selectItems = function (allSelected) {
+    angular.forEach($scope.state.filteredSecrets, function (secret) {
+      if (secret.Checked !== allSelected) {
+        secret.Checked = allSelected;
+        $scope.selectItem(secret);
+      }
+    });
   };
 
   $scope.selectItem = function (item) {
@@ -21,48 +30,47 @@ function ($scope, $stateParams, $state, Secret, Messages, Settings) {
   };
 
   $scope.removeAction = function () {
-    $('#loadSecretsSpinner').show();
+    $('#loadingViewSpinner').show();
     var counter = 0;
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        $('#loadSecretsSpinner').hide();
+        $('#loadingViewSpinner').hide();
       }
     };
     angular.forEach($scope.secrets, function (secret) {
       if (secret.Checked) {
         counter = counter + 1;
-        Secret.remove({id: secret.Id}, function (d) {
-          if (d.message) {
-            $('#loadSecretsSpinner').hide();
-            Notifications.error('Unable to remove secret', {}, d[0].message);
-          } else {
-            Notifications.success('Secret deleted', secret.Id);
-            var index = $scope.secrets.indexOf(secret);
-            $scope.secrets.splice(index, 1);
-          }
-          complete();
-        }, function (e) {
-          Notifications.error('Failure', e, 'Unable to remove secret');
+        SecretService.remove(secret.Id)
+        .then(function success() {
+          Notifications.success('Secret deleted', secret.Id);
+          var index = $scope.secrets.indexOf(secret);
+          $scope.secrets.splice(index, 1);
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to remove secret');
+        })
+        .finally(function final() {
           complete();
         });
       }
     });
   };
 
-  function fetchSecrets() {
-    $('#loadSecretsSpinner').show();
-    Secret.query({}, function (d) {
-      $scope.secrets = d.map(function (secret) {
-        return new SecretViewModel(secret);
-      });
-      $('#loadSecretsSpinner').hide();
-    }, function(e) {
-      $('#loadSecretsSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to retrieve secrets');
+  function initView() {
+    $('#loadingViewSpinner').show();
+    SecretService.secrets()
+    .then(function success(data) {
+      $scope.secrets = data;
+    })
+    .catch(function error(err) {
       $scope.secrets = [];
+      Notifications.error('Failure', err, 'Unable to retrieve secrets');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
     });
   }
 
-  fetchSecrets();
+  initView();
 }]);
