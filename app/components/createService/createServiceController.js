@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'Secret', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'ControllerDataPipeline', 'FormValidator',
-function ($scope, $state, Service, ServiceHelper, SecretHelper, Secret, Volume, Network, ImageHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'ControllerDataPipeline', 'FormValidator',
+function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator) {
 
   $scope.formValues = {
     Name: '',
@@ -56,6 +56,14 @@ function ($scope, $state, Service, ServiceHelper, SecretHelper, Secret, Volume, 
     $scope.formValues.Volumes.splice(index, 1);
   };
 
+  $scope.addSecret = function() {
+    $scope.formValues.Secrets.push({});
+  };
+
+  $scope.removeSecret = function(index) {
+    $scope.formValues.Secrets.splice(index, 1);
+  };
+
   $scope.addEnvironmentVariable = function() {
     $scope.formValues.Env.push({ name: '', value: ''});
   };
@@ -63,18 +71,23 @@ function ($scope, $state, Service, ServiceHelper, SecretHelper, Secret, Volume, 
   $scope.removeEnvironmentVariable = function(index) {
     $scope.formValues.Env.splice(index, 1);
   };
+
   $scope.addPlacementConstraint = function() {
     $scope.formValues.PlacementConstraints.push({ key: '', operator: '==', value: '' });
   };
+
   $scope.removePlacementConstraint = function(index) {
     $scope.formValues.PlacementConstraints.splice(index, 1);
   };
+
   $scope.addPlacementPreference = function() {
     $scope.formValues.PlacementPreferences.push({ key: '', operator: '==', value: '' });
   };
+
   $scope.removePlacementPreference = function(index) {
     $scope.formValues.PlacementPreferences.splice(index, 1);
   };
+
   $scope.addLabel = function() {
     $scope.formValues.Labels.push({ name: '', value: ''});
   };
@@ -89,14 +102,6 @@ function ($scope, $state, Service, ServiceHelper, SecretHelper, Secret, Volume, 
 
   $scope.removeContainerLabel = function(index) {
     $scope.formValues.ContainerLabels.splice(index, 1);
-  };
-  $scope.addSecret = function(secret) {
-    if (secret && $scope.formValues.Secrets.filter(function(serviceSecret) { return serviceSecret.Id === secret.Id;}).length === 0) {
-      $scope.formValues.Secrets.push({ Id: secret.Id, Name: secret.Name, FileName: secret.Name, Uid: '0', Gid: '0', Mode: 444 });
-    }
-  };
-  $scope.removeSecret = function(index) {
-    $scope.formValues.Secrets.splice(index, 1);
   };
 
   function prepareImageConfig(config, input) {
@@ -214,7 +219,13 @@ function ($scope, $state, Service, ServiceHelper, SecretHelper, Secret, Volume, 
 
   function prepareSecretConfig(config, input) {
     if (input.Secrets) {
-      config.TaskTemplate.ContainerSpec.Secrets = input.Secrets.map(SecretHelper.secretConfig);
+      var secrets = [];
+      angular.forEach(input.Secrets, function(secret) {
+        if (secret.model) {
+          secrets.push(SecretHelper.secretConfig(secret.model));
+        }
+      });
+      config.TaskTemplate.ContainerSpec.Secrets = secrets;
     }
   }
 
@@ -293,28 +304,22 @@ function ($scope, $state, Service, ServiceHelper, SecretHelper, Secret, Volume, 
   };
 
   function initView() {
-    Volume.query({}, function (d) {
-      $scope.availableVolumes = d.Volumes;
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to retrieve volumes');
-    });
-
-    Network.query({}, function (d) {
-      $scope.availableNetworks = d.filter(function (network) {
-        if (network.Scope === 'swarm') {
-          return network;
-        }
-      });
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to retrieve networks');
-    });
-    
-    Secret.query({}, function (d) {
-      $scope.secrets = d.map(function (secret) {
-        return new SecretViewModel(secret);
-      });
-    }, function(e) {
-      Notifications.error('Failure', e, 'Unable to retrieve secrets');
+    $('#loadingViewSpinner').show();
+    $q.all({
+      volumes: VolumeService.volumes(),
+      networks: NetworkService.retrieveSwarmNetworks(),
+      secrets: SecretService.secrets()
+    })
+    .then(function success(data) {
+      $scope.availableVolumes = data.volumes;
+      $scope.availableNetworks = data.networks;
+      $scope.availableSecrets = data.secrets;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to initialize view');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
     });
   }
 

@@ -163,7 +163,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
       $q.all({
         templates: TemplateService.getTemplates(templatesKey),
         containers: ContainerService.getContainers(0, c.hiddenLabels),
-        networks: NetworkService.getNetworks(),
+        networks: NetworkService.networks(),
         volumes: VolumeService.getVolumes()
       })
       .then(function success(data) {

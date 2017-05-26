@@ -1,5 +1,7 @@
 <rd-header>
-  <rd-header-title title="Create service"></rd-header-title>
+  <rd-header-title title="Create service">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+  </rd-header-title>
   <rd-header-content>
     <a ui-sref="services">Services</a> > Add service
   </rd-header-content>
@@ -424,52 +426,7 @@
           </div>
           <!-- !tab-update-config -->
           <!-- tab-secrets -->
-          <div class="tab-pane" id="secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25">
-            <form class="form-horizontal" style="margin-top: 15px;">
-              <div class="form-group">
-                <div class="col-sm-3">
-                  <select ng-options="secret.Name for secret in secrets" ng-model="newSecret">
-                    <option selected disabled hidden value="">Select a secret</option>
-                  </select>
-                  <span class="label label-default interactive" ng-click="addSecret(newSecret)">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> secret
-                  </span>
-                </div>
-                <div class="col-sm-9">
-                  <p class="small text-muted" style="margin-top: 10px;">
-                    Select secrets that are available for this service. Secrets are available under <span>/run/secrets/$FILENAME</span> in the service taks
-                  </p>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <!-- secrets-input-list -->
-                <div class="col-sm-12" style="margin-top: 10px;">
-                  <table class="table" >
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>File name</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr ng-repeat="secret in formValues.Secrets">
-                        <td>{{ secret.Name }}</td>
-                        <td>{{ secret.FileName }}</td>
-                        <td>
-                          <button class="btn btn-xs btn-danger pull-right" type="button" ng-click="removeSecret($index)">
-                            <i class="fa fa-trash" aria-hidden="true"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <!-- !secrets-input-list -->
-              </div>
-            </form>
-          </div>
+          <div class="tab-pane" id="secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25" ng-include="'app/components/createService/includes/secret.html'"></div>
           <!-- !tab-secrets -->
           <!-- tab-placement -->
           <div class="tab-pane" id="placement" ng-include="'app/components/createService/includes/placement.html'"></div>

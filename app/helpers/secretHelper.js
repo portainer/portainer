@@ -21,10 +21,10 @@ angular.module('portainer.helpers')
           SecretID: secret.Id,
           SecretName: secret.Name,
           File: {
-            Name: secret.FileName,
-            UID: secret.Uid,
-            GID: secret.Gid,
-            Mode: secret.Mode
+            Name: secret.Name,
+            UID: '0',
+            GID: '0',
+            Mode: 444
           }
         };
       }
