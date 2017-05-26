@@ -1,35 +1,35 @@
 angular.module('secret', [])
-.controller('SecretController', ['$scope', '$stateParams', '$state', 'Secret', 'Notifications', 'Settings',
-function ($scope, $stateParams, $state, Secret, Notifications, Settings) {
-
-  function fetchSecret() {
-    $('#loadingViewSpinner').show();
-    Secret.get({id: $stateParams.id}, function (d) {
-      $scope.secret = new SecretViewModel(d);
-      $('#loadingViewSpinner').hide();
-    }, function(e) {
-      $('#loadingViewSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to retrieve secret');
-    });
-  }
+.controller('SecretController', ['$scope', '$stateParams', '$state', 'SecretService', 'Notifications',
+function ($scope, $stateParams, $state, SecretService, Notifications) {
 
   $scope.removeSecret = function removeSecret(secretId) {
     $('#loadingViewSpinner').show();
-    Secret.remove({id: $stateParams.id}, function (d) {
-      if (d.message) {
-        $('#loadingViewSpinner').hide();
-        Notifications.send('Error', {}, d.message);
-      } else {
-        $('#loadingViewSpinner').hide();
-        Notifications.send('Secret removed', $stateParams.id);
-        $state.go('secrets', {});
-      }
-    }, function (e) {
+    SecretService.remove(secretId)
+    .then(function success(data) {
+      Notifications.success('Secret successfully removed');
+      $state.go('secrets', {});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to remove secret');
+    })
+    .finally(function final() {
       $('#loadingViewSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to remove secret');
     });
   };
 
-  fetchSecret();
+  function initView() {
+    $('#loadingViewSpinner').show();
+    SecretService.secret($stateParams.id)
+    .then(function success(data) {
+      $scope.secret = data;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve secret details');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
+  }
 
+  initView();
 }]);
