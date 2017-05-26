@@ -1,5 +1,5 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'Secret', 'SecretHelper', 'ServiceService', 'Service', 'ServiceHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
+.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'ServiceService', 'Secret', 'SecretHelper', 'Service', 'ServiceHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
 function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceService, Secret, SecretHelper, Service, ServiceHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ControllerDataPipeline) {
 
   $scope.state = {};
@@ -313,7 +313,7 @@ function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceSer
       $('#loadSecretsSpinner').hide();
     }, function(e) {
       $('#loadSecretsSpinner').hide();
-      Notifications.error("Failure", e, "Unable to retrieve secrets");
+      Notifications.error('Failure', e, 'Unable to retrieve secrets');
       $scope.secrets = [];
     });
   }

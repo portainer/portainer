@@ -35,15 +35,15 @@ function ($scope, $stateParams, $state, Secret, Messages, Settings) {
         Secret.remove({id: secret.Id}, function (d) {
           if (d.message) {
             $('#loadSecretsSpinner').hide();
-            Notifications.error("Unable to remove secret", {}, d[0].message);
+            Notifications.error('Unable to remove secret', {}, d[0].message);
           } else {
-            Messages.send("Secret deleted", secret.Id);
+            Notifications.success('Secret deleted', secret.Id);
             var index = $scope.secrets.indexOf(secret);
             $scope.secrets.splice(index, 1);
           }
           complete();
         }, function (e) {
-          Notifications.error("Failure", e, 'Unable to remove secret');
+          Notifications.error('Failure', e, 'Unable to remove secret');
           complete();
         });
       }
@@ -59,7 +59,7 @@ function ($scope, $stateParams, $state, Secret, Messages, Settings) {
       $('#loadSecretsSpinner').hide();
     }, function(e) {
       $('#loadSecretsSpinner').hide();
-      Notifications.error("Failure", e, "Unable to retrieve secrets");
+      Notifications.error('Failure', e, 'Unable to retrieve secrets');
       $scope.secrets = [];
     });
   }

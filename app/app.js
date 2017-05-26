@@ -253,13 +253,13 @@ angular.module('portainer', [
       }
     })
     .state('actions.create.secret', {
-      url: "/secret",
+      url: '/secret',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/createSecret/createsecret.html',
           controller: 'CreateSecretController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -433,11 +433,11 @@ angular.module('portainer', [
     .state('secrets', {
       url: '^/secrets/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/secrets/secrets.html',
           controller: 'SecretsController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
@@ -446,11 +446,11 @@ angular.module('portainer', [
     .state('secret', {
       url: '^/secret/:id/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/secret/secret.html',
           controller: 'SecretController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }

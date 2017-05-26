@@ -9,7 +9,7 @@ function ($scope, $stateParams, $state, Secret, Notifications, Settings) {
       $('#loadingViewSpinner').hide();
     }, function(e) {
       $('#loadingViewSpinner').hide();
-      Notifications.error("Failure", e, "Unable to retrieve secret");
+      Notifications.error('Failure', e, 'Unable to retrieve secret');
     });
   }
 
@@ -18,15 +18,15 @@ function ($scope, $stateParams, $state, Secret, Notifications, Settings) {
     Secret.remove({id: $stateParams.id}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
-        Notifications.send("Error", {}, d.message);
+        Notifications.send('Error', {}, d.message);
       } else {
         $('#loadingViewSpinner').hide();
-        Notifications.send("Secret removed", $stateParams.id);
+        Notifications.send('Secret removed', $stateParams.id);
         $state.go('secrets', {});
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
-      Notifications.error("Failure", e, "Unable to remove secret");
+      Notifications.error('Failure', e, 'Unable to remove secret');
     });
   };
 

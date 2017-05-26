@@ -23,13 +23,13 @@ function ($scope, $state, Notifications, Secret) {
         $('#createSecretSpinner').hide();
         Notifications.error('Unable to create secret', {}, d.message);
       } else {
-        Notifications.success("Secret created", d.Id);
+        Notifications.success('Secret created', d.Id);
         $('#createSecretSpinner').hide();
         $state.go('secrets', {}, {reload: true});
       }
     }, function (e) {
       $('#createSecretSpinner').hide();
-      Notifications.error("Failure", e, 'Unable to create secret');
+      Notifications.error('Failure', e, 'Unable to create secret');
     });
   }
 
