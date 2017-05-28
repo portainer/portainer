@@ -32,8 +32,17 @@ type (
 		AdminPassword     *string
 	}
 
-	// Settings represents Portainer settings.
+	// Settings represents the application settings.
 	Settings struct {
+		TemplatesURL   string   `json:"TemplatesURL"`
+		LogoURL        string   `json:"LogoURL"`
+		FilteredLabels []string `json:"FilteredLabels"`
+		RegistryURLs   []string `json:"RegistryURLs"`
+	}
+
+	// OldSettings represents Portainer OldSettings.
+	// Deprecated
+	OldSettings struct {
 		HiddenLabels       []Pair `json:"hiddenLabels"`
 		Logo               string `json:"logo"`
 		Authentication     bool   `json:"authentication"`
@@ -207,6 +216,12 @@ type (
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
+	}
+
+	// SettingsService represents a service for managing application settings.
+	SettingsService interface {
+		Settings() (*Settings, error)
+		StoreSettings(settings *Settings) error
 	}
 
 	// VersionService represents a service for managing version data.

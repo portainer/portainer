@@ -20,10 +20,11 @@ type Server struct {
 	TeamMembershipService  portainer.TeamMembershipService
 	EndpointService        portainer.EndpointService
 	ResourceControlService portainer.ResourceControlService
+	SettingsService        portainer.SettingsService
 	CryptoService          portainer.CryptoService
 	JWTService             portainer.JWTService
 	FileService            portainer.FileService
-	Settings               *portainer.Settings
+	OldSettings            *portainer.OldSettings
 	TemplatesURL           string
 	Handler                *handler.Handler
 	SSL                    bool
@@ -51,7 +52,7 @@ func (server *Server) Start() error {
 	teamHandler.TeamMembershipService = server.TeamMembershipService
 	var teamMembershipHandler = handler.NewTeamMembershipHandler(requestBouncer)
 	teamMembershipHandler.TeamMembershipService = server.TeamMembershipService
-	var settingsHandler = handler.NewSettingsHandler(requestBouncer, server.Settings)
+	var OldSettingsHandler = handler.NewOldSettingsHandler(requestBouncer, server.OldSettings)
 	var templatesHandler = handler.NewTemplatesHandler(requestBouncer, server.TemplatesURL)
 	var dockerHandler = handler.NewDockerHandler(requestBouncer)
 	dockerHandler.EndpointService = server.EndpointService
@@ -76,7 +77,7 @@ func (server *Server) Start() error {
 		TeamMembershipHandler: teamMembershipHandler,
 		EndpointHandler:       endpointHandler,
 		ResourceHandler:       resourceHandler,
-		SettingsHandler:       settingsHandler,
+		OldSettingsHandler:    OldSettingsHandler,
 		TemplatesHandler:      templatesHandler,
 		DockerHandler:         dockerHandler,
 		WebSocketHandler:      websocketHandler,

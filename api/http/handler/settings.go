@@ -12,32 +12,34 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// SettingsHandler represents an HTTP API handler for managing settings.
+// SettingsHandler represents an HTTP API handler for managing Settings.
 type SettingsHandler struct {
 	*mux.Router
-	Logger   *log.Logger
-	settings *portainer.Settings
+	Logger          *log.Logger
+	SettingsService portainer.SettingsService
 }
 
-// NewSettingsHandler returns a new instance of SettingsHandler.
-func NewSettingsHandler(bouncer *security.RequestBouncer, settings *portainer.Settings) *SettingsHandler {
+// NewSettingsHandler returns a new instance of OldSettingsHandler.
+func NewSettingsHandler(bouncer *security.RequestBouncer) *SettingsHandler {
 	h := &SettingsHandler{
-		Router:   mux.NewRouter(),
-		Logger:   log.New(os.Stderr, "", log.LstdFlags),
-		settings: settings,
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/settings",
-		bouncer.PublicAccess(http.HandlerFunc(h.handleGetSettings)))
+		bouncer.PublicAccess(http.HandlerFunc(h.handleGetSettings))).Methods(http.MethodGet)
 
 	return h
 }
 
 // handleGetSettings handles GET requests on /settings
 func (handler *SettingsHandler) handleGetSettings(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		httperror.WriteMethodNotAllowedResponse(w, []string{http.MethodGet})
+
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	encodeJSON(w, handler.settings, handler.Logger)
+	encodeJSON(w, settings, handler.Logger)
+	return
 }

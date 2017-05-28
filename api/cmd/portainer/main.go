@@ -82,8 +82,8 @@ func initEndpointWatcher(endpointService portainer.EndpointService, externalEnpo
 	return authorizeEndpointMgmt
 }
 
-func initSettings(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portainer.Settings {
-	return &portainer.Settings{
+func initOldSettings(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portainer.OldSettings {
+	return &portainer.OldSettings{
 		HiddenLabels:       *flags.Labels,
 		Logo:               *flags.Logo,
 		Analytics:          !*flags.NoAnalytics,
@@ -91,6 +91,10 @@ func initSettings(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portai
 		EndpointManagement: authorizeEndpointMgmt,
 	}
 }
+
+// func initSettings(settingsService portainer.SettingsService) error {
+//
+// }
 
 func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService) *portainer.Endpoint {
 	endpoints, err := endpointService.Endpoints()
@@ -114,7 +118,9 @@ func main() {
 
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
-	settings := initSettings(authorizeEndpointMgmt, flags)
+	// initSettings(store.SettingServcice, flags)
+
+	OldSettings := initOldSettings(authorizeEndpointMgmt, flags)
 
 	if *flags.Endpoint != "" {
 		var endpoints []portainer.Endpoint
@@ -158,7 +164,7 @@ func main() {
 	var server portainer.Server = &http.Server{
 		BindAddress:            *flags.Addr,
 		AssetsPath:             *flags.Assets,
-		Settings:               settings,
+		OldSettings:            OldSettings,
 		TemplatesURL:           *flags.Templates,
 		AuthDisabled:           *flags.NoAuth,
 		EndpointManagement:     authorizeEndpointMgmt,
