@@ -15,6 +15,7 @@ type Server struct {
 	AssetsPath             string
 	AuthDisabled           bool
 	EndpointManagement     bool
+	Status                 *portainer.Status
 	UserService            portainer.UserService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
@@ -52,7 +53,12 @@ func (server *Server) Start() error {
 	teamHandler.TeamMembershipService = server.TeamMembershipService
 	var teamMembershipHandler = handler.NewTeamMembershipHandler(requestBouncer)
 	teamMembershipHandler.TeamMembershipService = server.TeamMembershipService
+
 	var OldSettingsHandler = handler.NewOldSettingsHandler(requestBouncer, server.OldSettings)
+	var statusHandler = handler.NewStatusHandler(requestBouncer, server.Status)
+	var settingsHandler = handler.NewSettingsHandler(requestBouncer)
+	settingsHandler.SettingsService = server.SettingsService
+
 	var templatesHandler = handler.NewTemplatesHandler(requestBouncer, server.TemplatesURL)
 	var dockerHandler = handler.NewDockerHandler(requestBouncer)
 	dockerHandler.EndpointService = server.EndpointService
@@ -78,6 +84,8 @@ func (server *Server) Start() error {
 		EndpointHandler:       endpointHandler,
 		ResourceHandler:       resourceHandler,
 		OldSettingsHandler:    OldSettingsHandler,
+		SettingsHandler:       settingsHandler,
+		StatusHandler:         statusHandler,
 		TemplatesHandler:      templatesHandler,
 		DockerHandler:         dockerHandler,
 		WebSocketHandler:      websocketHandler,

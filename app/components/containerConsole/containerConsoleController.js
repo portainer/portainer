@@ -1,6 +1,6 @@
 angular.module('containerConsole', [])
-.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Settings', 'Container', 'Image', 'Exec', '$timeout', 'EndpointProvider', 'Notifications',
-function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, EndpointProvider, Notifications) {
+.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'Exec', '$timeout', 'EndpointProvider', 'Notifications',
+function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvider, Notifications) {
   $scope.state = {};
   $scope.state.loaded = false;
   $scope.state.connected = false;

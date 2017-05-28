@@ -664,7 +664,9 @@ angular.module('portainer', [
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
   .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is required.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('DOCKER_ENDPOINT', 'api/docker')
-  .constant('CONFIG_ENDPOINT', 'api/settings')
+  .constant('CONFIG_ENDPOINT', 'api/old_settings')
+  .constant('SETTINGS_ENDPOINT', 'api/settings')
+  .constant('STATUS_ENDPOINT', 'api/status')
   .constant('AUTH_ENDPOINT', 'api/auth')
   .constant('USERS_ENDPOINT', 'api/users')
   .constant('TEAMS_ENDPOINT', 'api/teams')

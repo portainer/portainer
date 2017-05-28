@@ -32,12 +32,19 @@ type (
 		AdminPassword     *string
 	}
 
+	// Status represents the application status.
+	Status struct {
+		Authentication     bool `json:"authentication"`
+		EndpointManagement bool `json:"endpointManagement"`
+		Analytics          bool `json:"analytics"`
+	}
+
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL   string   `json:"TemplatesURL"`
-		LogoURL        string   `json:"LogoURL"`
-		FilteredLabels []string `json:"FilteredLabels"`
-		RegistryURLs   []string `json:"RegistryURLs"`
+		TemplatesURL string `json:"TemplatesURL"`
+		LogoURL      string `json:"LogoURL"`
+		// FilteredLabels []string `json:"FilteredLabels"`
+		// RegistryURLs   []string `json:"RegistryURLs"`
 	}
 
 	// OldSettings represents Portainer OldSettings.

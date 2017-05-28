@@ -92,9 +92,21 @@ func initOldSettings(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *por
 	}
 }
 
-// func initSettings(settingsService portainer.SettingsService) error {
-//
-// }
+func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portainer.Status {
+	return &portainer.Status{
+		Analytics:          !*flags.NoAnalytics,
+		Authentication:     !*flags.NoAuth,
+		EndpointManagement: authorizeEndpointMgmt,
+	}
+}
+
+func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
+	settings := &portainer.Settings{
+		LogoURL: *flags.Logo,
+	}
+
+	return settingsService.StoreSettings(settings)
+}
 
 func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService) *portainer.Endpoint {
 	endpoints, err := endpointService.Endpoints()
@@ -118,7 +130,12 @@ func main() {
 
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
-	// initSettings(store.SettingServcice, flags)
+	err := initSettings(store.SettingsService, flags)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	applicationStatus := initStatus(authorizeEndpointMgmt, flags)
 
 	OldSettings := initOldSettings(authorizeEndpointMgmt, flags)
 
@@ -162,6 +179,7 @@ func main() {
 	}
 
 	var server portainer.Server = &http.Server{
+		Status:                 applicationStatus,
 		BindAddress:            *flags.Addr,
 		AssetsPath:             *flags.Assets,
 		OldSettings:            OldSettings,
@@ -173,6 +191,7 @@ func main() {
 		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
 		ResourceControlService: store.ResourceControlService,
+		SettingsService:        store.SettingsService,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,
@@ -182,7 +201,7 @@ func main() {
 	}
 
 	log.Printf("Starting Portainer on %s", *flags.Addr)
-	err := server.Start()
+	err = server.Start()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -33,7 +33,6 @@ func NewSettingsHandler(bouncer *security.RequestBouncer) *SettingsHandler {
 
 // handleGetSettings handles GET requests on /settings
 func (handler *SettingsHandler) handleGetSettings(w http.ResponseWriter, r *http.Request) {
-
 	settings, err := handler.SettingsService.Settings()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
