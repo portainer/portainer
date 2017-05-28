@@ -1,7 +1,7 @@
 module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('gruntify-eslint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
@@ -14,108 +14,162 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-usemin');
   grunt.loadNpmTasks('grunt-replace');
+  grunt.loadNpmTasks('grunt-config');
 
-  // Default task.
-  grunt.registerTask('default', ['jshint', 'build']);
+  grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('build', [
+    'config:dev',
     'clean:app',
-    'if:unixBinaryNotExist',
+    'if:linuxAmd64BinaryNotExist',
     'html2js',
     'useminPrepare:dev',
     'recess:build',
     'concat',
     'clean:tmpl',
+    'replace',
     'copy',
     'filerev',
     'usemin',
     'clean:tmp'
   ]);
-  grunt.registerTask('release', [
+  grunt.registerTask('build-webapp', [
+    'config:prod',
     'clean:all',
-    'if:unixBinaryNotExist',
     'html2js',
     'useminPrepare:release',
     'recess:build',
     'concat',
     'clean:tmpl',
     'cssmin',
+    'replace',
     'uglify',
     'copy:assets',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
-  grunt.registerTask('release-win', [
+  grunt.registerTask('release-linux-386', [
+    'config:prod',
     'clean:all',
-    'if:windowsBinaryNotExist',
+    'if:linux386BinaryNotExist',
     'html2js',
-    'useminPrepare',
+    'useminPrepare:release',
     'recess:build',
     'concat',
     'clean:tmpl',
     'cssmin',
+    'replace',
     'uglify',
-    'copy',
+    'copy:assets',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
-  grunt.registerTask('release-arm', [
+  grunt.registerTask('release-linux-amd64', [
+    'config:prod',
     'clean:all',
-    'if:unixArmBinaryNotExist',
+    'if:linuxAmd64BinaryNotExist',
     'html2js',
-    'useminPrepare',
+    'useminPrepare:release',
     'recess:build',
     'concat',
     'clean:tmpl',
     'cssmin',
+    'replace',
     'uglify',
-    'copy',
+    'copy:assets',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
-  grunt.registerTask('release-arm64', [
+  grunt.registerTask('release-linux-arm', [
+    'config:prod',
     'clean:all',
-    'if:unixArm64BinaryNotExist',
+    'if:linuxArmBinaryNotExist',
     'html2js',
-    'useminPrepare',
+    'useminPrepare:release',
     'recess:build',
     'concat',
     'clean:tmpl',
     'cssmin',
+    'replace',
     'uglify',
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
-  grunt.registerTask('release-macos', [
+  grunt.registerTask('release-linux-arm64', [
+    'config:prod',
     'clean:all',
-    'if:darwinBinaryNotExist',
+    'if:linuxArm64BinaryNotExist',
     'html2js',
-    'useminPrepare',
+    'useminPrepare:release',
     'recess:build',
     'concat',
     'clean:tmpl',
     'cssmin',
+    'replace',
     'uglify',
     'copy',
     'filerev',
     'usemin',
-    'clean:tmp',
-    'replace'
+    'clean:tmp'
   ]);
-  grunt.registerTask('lint', ['jshint']);
-  grunt.registerTask('run', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
-  grunt.registerTask('run-swarm', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarm', 'watch:buildSwarm']);
-  grunt.registerTask('run-swarm-local', ['if:unixBinaryNotExist', 'build', 'shell:buildImage', 'shell:runSwarmLocal', 'watch:buildSwarm']);
-  grunt.registerTask('run-dev', ['if:unixBinaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
-  grunt.registerTask('run-ssl', ['if:unixBinaryNotExist', 'shell:buildImage', 'shell:runSsl', 'watch:buildSsl']);
+  grunt.registerTask('release-linux-ppc64le', [
+    'config:prod',
+    'clean:all',
+    'if:linuxPpc64leBinaryNotExist',
+    'html2js',
+    'useminPrepare:release',
+    'recess:build',
+    'concat',
+    'clean:tmpl',
+    'cssmin',
+    'replace',
+    'uglify',
+    'copy',
+    'filerev',
+    'usemin',
+    'clean:tmp'
+  ]);
+  grunt.registerTask('release-windows-amd64', [
+    'config:prod',
+    'clean:all',
+    'if:windowsAmd64BinaryNotExist',
+    'html2js',
+    'useminPrepare:release',
+    'recess:build',
+    'concat',
+    'clean:tmpl',
+    'cssmin',
+    'replace',
+    'uglify',
+    'copy',
+    'filerev',
+    'usemin',
+    'clean:tmp'
+  ]);
+  grunt.registerTask('release-darwin-amd64', [
+    'config:prod',
+    'clean:all',
+    'if:darwinAmd64BinaryNotExist',
+    'html2js',
+    'useminPrepare:release',
+    'recess:build',
+    'concat',
+    'clean:tmpl',
+    'cssmin',
+    'replace',
+    'uglify',
+    'copy',
+    'filerev',
+    'usemin',
+    'clean:tmp'
+  ]);
+  grunt.registerTask('lint', ['eslint']);
+  grunt.registerTask('run', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
+  grunt.registerTask('run-dev', ['if:linuxAmd64BinaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
 
   // Print a timestamp (useful for when watching)
@@ -127,6 +181,22 @@ module.exports = function (grunt) {
   grunt.initConfig({
     distdir: 'dist',
     pkg: grunt.file.readJSON('package.json'),
+    config: {
+      dev: {
+        options: {
+          variables: {
+            'environment': 'development'
+          }
+        }
+      },
+      prod: {
+        options: {
+          variables: {
+            'environment': 'production'
+          }
+        }
+      }
+    },
     src: {
       js: ['app/**/*.js', '!app/**/*.spec.js'],
       jsTpl: ['<%= distdir %>/templates/**/*.js'],
@@ -140,7 +210,8 @@ module.exports = function (grunt) {
         'bower_components/moment/min/moment.min.js',
         'bower_components/xterm.js/dist/xterm.js',
         'bower_components/bootbox.js/bootbox.js',
-        'assets/js/jquery.gritter.js', // Using custom version to fix error in minified build due to "use strict"
+        'bower_components/angular-multi-select/isteven-multi-select.js',
+        'bower_components/toastr/toastr.min.js',
         'assets/js/legend.js' // Not a bower package
       ],
       html: ['index.html'],
@@ -148,11 +219,12 @@ module.exports = function (grunt) {
       css: ['assets/css/app.css'],
       cssVendor: [
         'bower_components/bootstrap/dist/css/bootstrap.css',
-        'bower_components/jquery.gritter/css/jquery.gritter.css',
         'bower_components/font-awesome/css/font-awesome.min.css',
         'bower_components/rdash-ui/dist/css/rdash.min.css',
         'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/xterm.js/dist/xterm.css'
+        'bower_components/xterm.js/dist/xterm.css',
+        'bower_components/angular-multi-select/isteven-multi-select.css',
+        'bower_components/toastr/toastr.min.css'
       ]
     },
     clean: {
@@ -213,12 +285,6 @@ module.exports = function (grunt) {
           {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
           {
             dest: '<%= distdir %>/images/',
-            src: ['**', '!trees.jpg'],
-            expand: true,
-            cwd: 'bower_components/jquery.gritter/images/'
-          },
-          {
-            dest: '<%= distdir %>/images/',
             src: ['**'],
             expand: true,
             cwd: 'assets/images/'
@@ -274,8 +340,6 @@ module.exports = function (grunt) {
     },
     uglify: {
       dist: {
-        // options: {
-        // },
         src: ['<%= src.js %>', '<%= src.jsTpl %>'],
         dest: '<%= distdir %>/js/<%= pkg.name %>.js'
       },
@@ -341,30 +405,17 @@ module.exports = function (grunt) {
         tasks: ['build', 'shell:buildImage', 'shell:runSsl', 'shell:cleanImages']
       }
     },
-    jshint: {
-      files: ['gruntfile.js', '<%= src.js %>'],
+    eslint: {
+      src: ['gruntfile.js', '<%= src.js %>'],
       options: {
-        curly: true,
-        eqeqeq: true,
-        immed: true,
-        indent: 2,
-        latedef: 'nofunc',
-        newcap: true,
-        noarg: true,
-        sub: true,
-        boss: true,
-        eqnull: true,
-        globals: {
-          angular: false,
-          '$': false
-        }
-      }
+			  configFile: '.eslintrc.yml'
+		  }
     },
     shell: {
       buildImage: {
         command: 'docker build --rm -t portainer -f build/linux/Dockerfile .'
       },
-      buildBinary: {
+      buildLinuxAmd64Binary: {
         command: [
           'docker run --rm -v $(pwd)/api:/src portainer/golang-builder /src/cmd/portainer',
           'shasum api/cmd/portainer/portainer > portainer-checksum.txt',
@@ -372,7 +423,15 @@ module.exports = function (grunt) {
           'mv api/cmd/portainer/portainer dist/'
         ].join(' && ')
       },
-      buildUnixArmBinary: {
+      buildLinux386Binary: {
+        command: [
+          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="386" portainer/golang-builder:cross-platform /src/cmd/portainer',
+          'shasum api/cmd/portainer/portainer-linux-386 > portainer-checksum.txt',
+          'mkdir -p dist',
+          'mv api/cmd/portainer/portainer-linux-386 dist/portainer'
+        ].join(' && ')
+      },
+      buildLinuxArmBinary: {
         command: [
           'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm" portainer/golang-builder:cross-platform /src/cmd/portainer',
           'shasum api/cmd/portainer/portainer-linux-arm > portainer-checksum.txt',
@@ -380,15 +439,23 @@ module.exports = function (grunt) {
           'mv api/cmd/portainer/portainer-linux-arm dist/portainer'
         ].join(' && ')
       },
-        buildUnixArm64Binary: {
-            command: [
-                'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm64" portainer/golang-builder:cross-platform /src/cmd/portainer',
-                'shasum api/cmd/portainer/portainer-linux-arm64 > portainer-checksum.txt',
-                'mkdir -p dist',
-                'mv api/cmd/portainer/portainer-linux-arm64 dist/portainer'
-            ].join(' && ')
-        },
-      buildDarwinBinary: {
+      buildLinuxArm64Binary: {
+        command: [
+          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm64" portainer/golang-builder:cross-platform /src/cmd/portainer',
+          'shasum api/cmd/portainer/portainer-linux-arm64 > portainer-checksum.txt',
+          'mkdir -p dist',
+          'mv api/cmd/portainer/portainer-linux-arm64 dist/portainer'
+        ].join(' && ')
+      },
+      buildLinuxPpc64leBinary: {
+        command: [
+          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="ppc64le" portainer/golang-builder:cross-platform /src/cmd/portainer',
+          'shasum api/cmd/portainer/portainer-linux-ppc64le > portainer-checksum.txt',
+          'mkdir -p dist',
+          'mv api/cmd/portainer/portainer-linux-ppc64le dist/portainer'
+        ].join(' && ')
+      },
+      buildDarwinAmd64Binary: {
         command: [
           'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="darwin" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform /src/cmd/portainer',
           'shasum api/cmd/portainer/portainer-darwin-amd64 > portainer-checksum.txt',
@@ -396,7 +463,7 @@ module.exports = function (grunt) {
           'mv api/cmd/portainer/portainer-darwin-amd64 dist/portainer'
         ].join(' && ')
       },
-      buildWindowsBinary: {
+      buildWindowsAmd64Binary: {
         command: [
           'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="windows" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform /src/cmd/portainer',
           'shasum api/cmd/portainer/portainer-windows-amd64 > portainer-checksum.txt',
@@ -408,28 +475,7 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics --templates http://192.168.1.47:8080/templates.json'
-        ].join(';')
-      },
-      runSwarm: {
-        command: [
-          'docker stop portainer',
-          'docker rm portainer',
-          'docker run -d -p 9000:9000 --name portainer portainer -H tcp://10.0.7.10:2375 --no-analytics'
-        ].join(';')
-      },
-      runSwarmLocal: {
-        command: [
-          'docker stop portainer',
-          'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
-        ].join(';')
-      },
-      runSsl: {
-        command: [
-          'docker stop portainer',
-          'docker rm portainer',
-          'docker run -d -p 9000:9000 -v /tmp/portainer:/data -v /tmp/docker-ssl:/certs --name portainer portainer -H tcp://10.0.7.10:2376 --tlsverify --no-analytics'
+          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
         ].join(';')
       },
       cleanImages: {
@@ -437,41 +483,57 @@ module.exports = function (grunt) {
       }
     },
     'if': {
-      unixBinaryNotExist: {
+      linuxAmd64BinaryNotExist: {
         options: {
           executable: 'dist/portainer'
         },
-        ifFalse: ['shell:buildBinary']
+        ifFalse: ['shell:buildLinuxAmd64Binary']
       },
-      unixArmBinaryNotExist: {
+      linux386BinaryNotExist: {
         options: {
           executable: 'dist/portainer'
         },
-        ifFalse: ['shell:buildUnixArmBinary']
+        ifFalse: ['shell:buildLinux386Binary']
       },
-      unixArm64BinaryNotExist: {
+      linuxArmBinaryNotExist: {
         options: {
           executable: 'dist/portainer'
         },
-        ifFalse: ['shell:buildUnixArm64Binary']
+        ifFalse: ['shell:buildLinuxArmBinary']
       },
-      darwinBinaryNotExist: {
+      linuxArm64BinaryNotExist: {
         options: {
           executable: 'dist/portainer'
         },
-        ifFalse: ['shell:buildDarwinBinary']
+        ifFalse: ['shell:buildLinuxArm64Binary']
       },
-      windowsBinaryNotExist: {
+      linuxPpc64leBinaryNotExist: {
+        options: {
+          executable: 'dist/portainer'
+        },
+        ifFalse: ['shell:buildLinuxPpc64leBinary']
+      },
+      darwinAmd64BinaryNotExist: {
+        options: {
+          executable: 'dist/portainer'
+        },
+        ifFalse: ['shell:buildDarwinAmd64Binary']
+      },
+      windowsAmd64BinaryNotExist: {
         options: {
           executable: 'dist/portainer.exe'
         },
-        ifFalse: ['shell:buildWindowsBinary']
+        ifFalse: ['shell:buildWindowsAmd64Binary']
       }
     },
     replace: {
-      dist: {
+      concat: {
         options: {
           patterns: [
+            {
+              match: 'ENVIRONMENT',
+              replacement: '<%= grunt.config.get("environment") %>'
+            },
             {
               match: 'CONFIG_GA_ID',
               replacement: '<%= pkg.config.GA_ID %>'
@@ -482,8 +544,8 @@ module.exports = function (grunt) {
           {
             expand: true,
             flatten: true,
-            src: ['dist/js/**.js'],
-            dest: 'dist/js/'
+            src: ['.tmp/concat/js/app.js'],
+            dest: '.tmp/concat/js'
           }
         ]
       }

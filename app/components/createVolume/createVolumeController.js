@@ -1,12 +1,16 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$scope', '$state', 'VolumeService', 'InfoService', 'ResourceControlService', 'Authentication', 'Messages',
-function ($scope, $state, VolumeService, InfoService, ResourceControlService, Authentication, Messages) {
+.controller('CreateVolumeController', ['$scope', '$state', 'VolumeService', 'InfoService', 'ResourceControlService', 'Authentication', 'Notifications', 'ControllerDataPipeline', 'FormValidator',
+function ($scope, $state, VolumeService, InfoService, ResourceControlService, Authentication, Notifications, ControllerDataPipeline, FormValidator) {
 
   $scope.formValues = {
-    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     Driver: 'local',
     DriverOptions: []
   };
+
+  $scope.state = {
+    formValidationError: ''
+  };
+
   $scope.availableVolumeDrivers = [];
 
   $scope.addDriverOption = function() {
@@ -17,6 +21,18 @@ function ($scope, $state, VolumeService, InfoService, ResourceControlService, Au
     $scope.formValues.DriverOptions.splice(index, 1);
   };
 
+  function validateForm(accessControlData, isAdmin) {
+    $scope.state.formValidationError = '';
+    var error = '';
+    error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+
+    if (error) {
+      $scope.state.formValidationError = error;
+      return false;
+    }
+    return true;
+  }
+
   $scope.create = function () {
     $('#createVolumeSpinner').show();
 
@@ -24,25 +40,27 @@ function ($scope, $state, VolumeService, InfoService, ResourceControlService, Au
     var driver = $scope.formValues.Driver;
     var driverOptions = $scope.formValues.DriverOptions;
     var volumeConfiguration = VolumeService.createVolumeConfiguration(name, driver, driverOptions);
+    var userDetails = Authentication.getUserDetails();
+    var accessControlData = ControllerDataPipeline.getAccessControlFormData();
+    var isAdmin = userDetails.role === 1 ? true : false;
+
+    if (!validateForm(accessControlData, isAdmin)) {
+      $('#createVolumeSpinner').hide();
+      return;
+    }
 
     VolumeService.createVolume(volumeConfiguration)
     .then(function success(data) {
-      if ($scope.formValues.Ownership === 'private') {
-        ResourceControlService.setVolumeResourceControl(Authentication.getUserDetails().ID, data.Name)
-        .then(function success() {
-          Messages.send("Volume created", data.Name);
-          $state.go('volumes', {}, {reload: true});
-        })
-        .catch(function error(err) {
-          Messages.error("Failure", err, 'Unable to apply resource control on volume');
-        });
-      } else {
-        Messages.send("Volume created", data.Name);
-        $state.go('volumes', {}, {reload: true});
-      }
+      var volumeIdentifier = data.Id;
+      var userId = userDetails.ID;
+      return ResourceControlService.applyResourceControl('volume', volumeIdentifier, userId, accessControlData, []);
+    })
+    .then(function success(data) {
+      Notifications.success('Volume successfully created');
+      $state.go('volumes', {}, {reload: true});
     })
     .catch(function error(err) {
-      Messages.error('Failure', err, 'Unable to create volume');
+      Notifications.error('Failure', err, 'An error occured during volume creation');
     })
     .finally(function final() {
       $('#createVolumeSpinner').hide();
@@ -56,7 +74,7 @@ function ($scope, $state, VolumeService, InfoService, ResourceControlService, Au
       $scope.availableVolumeDrivers = data;
     })
     .catch(function error(err) {
-      Messages.error("Failure", err, 'Unable to retrieve volume plugin information');
+      Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
