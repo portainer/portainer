@@ -24,6 +24,36 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
       $scope.container.edit = false;
       $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
 
+
+      //> Process all available names and aliases and save the summary to $scope.container.aux
+      var aux = {};
+      aux.shortid = container.Id.slice(0,12);
+      var rnames = [ $scope.container.newContainerName , aux.shortid , undefined ];
+
+      var bnames = [ container.Config.Hostname , container.Config.Labels['com.docker.compose.service'] ];
+      aux.names = rnames;
+      for (var i = 0; i < bnames.length; i++) {
+        var x = true;
+        for (var j = 0; j < aux.names.length; j++) { if (bnames[i] === aux.names[j]) { x = false; break; } }
+        if (x) { aux.names.push(bnames[i]); }
+      }
+      aux.names = aux.names.slice(3);
+
+      aux.aliases = [];
+      Object.keys(container.NetworkSettings.Networks).forEach(function(key) {
+        var aliases = container.NetworkSettings.Networks[key].Aliases;
+        aux.aliases[key] = [];
+        for (var i = 0; i < aliases.length; i++) {
+          var x = true;
+          for (var j = 0; j < rnames.length; j++) { if (aliases[i] === rnames[j]) { x = false; break; } }
+          if (x) { aux.aliases[key].push(aliases[i]); }
+        }
+        if (aux.aliases[key].length === 0) { aux.aliases[key] = undefined; }
+      }, rnames);
+
+      $scope.container.aux = aux;
+      //<
+
       if (container.State.Running) {
         $scope.activityTime = moment.duration(moment(container.State.StartedAt).utc().diff(moment().utc())).humanize();
       } else if (container.State.Status === 'created') {

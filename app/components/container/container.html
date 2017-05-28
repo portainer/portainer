@@ -41,10 +41,11 @@
                 <td>{{ container.Id }}</td>
               </tr>
               <tr>
-                <td>Name</td>
+                <td>Name(s)</td>
                 <td ng-if="!container.edit">
                   {{ container.Name|trimcontainername }}
                   <a href="" data-toggle="tooltip" title="Edit container name" ng-click="container.edit = true;"><i class="fa fa-edit"></i></a>
+                  <i ng-if="container.aux.names.length > 0">{{ '[' + container.aux.names + ']' }}</i>
                 </td>
                 <td ng-if="container.edit">
                   <form ng-submit="renameContainer()">
@@ -285,6 +286,7 @@
           <table class="table">
             <thead>
               <th>Network Name</th>
+              <th>Aliases</th>
               <th>IP Address</th>
               <th>Gateway</th>
               <th>MacAddress</th>
@@ -293,6 +295,7 @@
             <tbody>
               <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: state.pagination_count">
                 <td><a ui-sref="network({id: value.NetworkID})">{{ key }}</a></td>
+                <td>{{ container.aux.aliases[key] || '-' }}</td>
                 <td>{{ value.IPAddress || '-' }}</td>
                 <td>{{ value.Gateway || '-' }}</td>
                 <td>{{ value.MacAddress || '-' }}</td>
