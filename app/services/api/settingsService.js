@@ -3,19 +3,23 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.status = function() {
+  service.settings = function() {
     var deferred = $q.defer();
 
-    Status.get()
+    Settings.get().$promise
     .then(function success(data) {
-      var status = new StatusViewModel(data);
+      var status = new SettingsViewModel(data);
       deferred.resolve(status);
     })
     .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve application status', err: err });
+      deferred.reject({ msg: 'Unable to retrieve application settings', err: err });
     });
 
     return deferred.promise;
+  };
+
+  service.update = function(settings) {
+    return Settings.update({}, settings).$promise;
   };
 
   return service;

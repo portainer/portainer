@@ -6,7 +6,7 @@ angular.module('portainer.services')
   service.status = function() {
     var deferred = $q.defer();
 
-    Status.get()
+    Status.get().$promise
     .then(function success(data) {
       var status = new StatusViewModel(data);
       deferred.resolve(status);

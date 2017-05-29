@@ -26,7 +26,6 @@ type Server struct {
 	JWTService             portainer.JWTService
 	FileService            portainer.FileService
 	OldSettings            *portainer.OldSettings
-	TemplatesURL           string
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
@@ -59,7 +58,8 @@ func (server *Server) Start() error {
 	var settingsHandler = handler.NewSettingsHandler(requestBouncer)
 	settingsHandler.SettingsService = server.SettingsService
 
-	var templatesHandler = handler.NewTemplatesHandler(requestBouncer, server.TemplatesURL)
+	var templatesHandler = handler.NewTemplatesHandler(requestBouncer)
+	templatesHandler.SettingsService = server.SettingsService
 	var dockerHandler = handler.NewDockerHandler(requestBouncer)
 	dockerHandler.EndpointService = server.EndpointService
 	dockerHandler.TeamMembershipService = server.TeamMembershipService

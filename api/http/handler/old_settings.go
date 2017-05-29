@@ -26,7 +26,7 @@ func NewOldSettingsHandler(bouncer *security.RequestBouncer, OldSettings *portai
 		Logger:      log.New(os.Stderr, "", log.LstdFlags),
 		OldSettings: OldSettings,
 	}
-	h.Handle("/OldSettings",
+	h.Handle("/old_settings",
 		bouncer.PublicAccess(http.HandlerFunc(h.handleGetOldSettings)))
 
 	return h

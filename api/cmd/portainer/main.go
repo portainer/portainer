@@ -97,15 +97,24 @@ func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portaine
 		Analytics:          !*flags.NoAnalytics,
 		Authentication:     !*flags.NoAuth,
 		EndpointManagement: authorizeEndpointMgmt,
+		Version:            portainer.APIVersion,
 	}
 }
 
 func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
-	settings := &portainer.Settings{
-		LogoURL: *flags.Logo,
+	_, err := settingsService.Settings()
+	if err == portainer.ErrSettingsNotFound {
+		settings := &portainer.Settings{
+			LogoURL:      *flags.Logo,
+			TemplatesURL: *flags.Templates,
+			Registries:   make([]portainer.RegistryDetails, 0),
+		}
+		return settingsService.StoreSettings(settings)
+	} else if err != nil {
+		return err
 	}
 
-	return settingsService.StoreSettings(settings)
+	return nil
 }
 
 func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService) *portainer.Endpoint {
@@ -183,7 +192,6 @@ func main() {
 		BindAddress:            *flags.Addr,
 		AssetsPath:             *flags.Assets,
 		OldSettings:            OldSettings,
-		TemplatesURL:           *flags.Templates,
 		AuthDisabled:           *flags.NoAuth,
 		EndpointManagement:     authorizeEndpointMgmt,
 		UserService:            store.UserService,

@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('StateManager', ['$q', 'Config', 'Info', 'InfoHelper', 'Version', 'LocalStorage', function StateManagerFactory($q, Config, Info, InfoHelper, Version, LocalStorage) {
+.factory('StateManager', ['$q', 'Info', 'InfoHelper', 'Version', 'LocalStorage', 'SettingsService', 'StatusService', function StateManagerFactory($q, Info, InfoHelper, Version, LocalStorage, SettingsService, StatusService) {
   'use strict';
 
   var manager = {};
@@ -7,7 +7,8 @@ angular.module('portainer.services')
   var state = {
     loading: true,
     application: {},
-    endpoint: {}
+    endpoint: {},
+    UI: {}
   };
 
   manager.getState = function() {
@@ -19,35 +20,46 @@ angular.module('portainer.services')
   };
 
   manager.initialize = function () {
+    var deferred = $q.defer();
+
     var endpointState = LocalStorage.getEndpointState();
     if (endpointState) {
       state.endpoint = endpointState;
     }
 
-    var deferred = $q.defer();
     var applicationState = LocalStorage.getApplicationState();
     if (applicationState) {
       state.application = applicationState;
       state.loading = false;
       deferred.resolve(state);
     } else {
-      Config.$promise.then(function success(data) {
-        state.application.authentication = data.authentication;
-        state.application.analytics = data.analytics;
-        state.application.endpointManagement = data.endpointManagement;
-        state.application.logo = data.logo;
+      $q.all({
+        settings: SettingsService.settings(),
+        status: StatusService.status()
+      })
+      .then(function success(data) {
+        var status = data.status;
+        var settings = data.settings;
+        state.application.authentication = status.Authentication;
+        state.application.analytics = status.Analytics;
+        state.application.endpointManagement = status.EndpointManagement;
+        state.application.version = status.Version;
+        state.application.logo = settings.LogoURL;
         LocalStorage.storeApplicationState(state.application);
-        state.loading = false;
         deferred.resolve(state);
-      }, function error(err) {
+      })
+      .catch(function error(err) {
+        deferred.reject({msg: 'Unable to retrieve server settings and status', err: err});
+      })
+      .finally(function final() {
         state.loading = false;
-        deferred.reject({msg: 'Unable to retrieve server configuration', err: err});
       });
     }
+
     return deferred.promise;
   };
 
-  manager.updateEndpointState = function() {
+  manager.updateEndpointState = function(loading) {
     var deferred = $q.defer();
     if (loading) {
       state.loading = true;

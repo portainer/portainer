@@ -1,29 +1,57 @@
 angular.module('settings', [])
-.controller('SettingsController', ['$scope', '$state', '$sanitize', 'Authentication', 'UserService', 'Notifications',
-function ($scope, $state, $sanitize, Authentication, UserService, Notifications) {
+.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'DEFAULT_TEMPLATES_URL',
+function ($scope, $state, Notifications, SettingsService, DEFAULT_TEMPLATES_URL) {
+
   $scope.formValues = {
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    customLogo: false,
+    customTemplates: false
   };
 
-  $scope.updatePassword = function() {
-    $scope.invalidPassword = false;
-    var userID = Authentication.getUserDetails().ID;
-    var currentPassword = $sanitize($scope.formValues.currentPassword);
-    var newPassword = $sanitize($scope.formValues.newPassword);
+  $scope.updateSettings = function() {
+    $('#loadingViewSpinner').show();
+    var settings = $scope.settings;
 
-    UserService.updateUserPassword(userID, currentPassword, newPassword)
-    .then(function success() {
-      Notifications.success('Success', 'Password successfully updated');
+    if (!$scope.formValues.customLogo) {
+      settings.LogoURL = '';
+    }
+
+    if (!$scope.formValues.customTemplates) {
+      settings.TemplatesURL = DEFAULT_TEMPLATES_URL;
+    }
+
+    SettingsService.update(settings)
+    .then(function success(data) {
+      Notifications.success('Settings updated');
       $state.reload();
     })
     .catch(function error(err) {
-      if (err.invalidPassword) {
-        $scope.invalidPassword = true;
-      } else {
-        Notifications.error('Failure', err, err.msg);
-      }
+      Notifications.error('Failure', err, 'Unable to update settings');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
     });
   };
+
+  function initView() {
+    $('#loadingViewSpinner').show();
+    SettingsService.settings()
+    .then(function success(data) {
+      var settings = data;
+      if (settings.LogoURL !== '') {
+        $scope.formValues.customLogo = true;
+      }
+      if (settings.TemplatesURL !== DEFAULT_TEMPLATES_URL) {
+        $scope.formValues.customTemplates = true;
+      }
+      $scope.settings = settings;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve application settings');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
+  }
+
+  initView();
 }]);

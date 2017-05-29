@@ -2,11 +2,13 @@ angular.module('sidebar', [])
 .controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'Config', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService',
 function ($q, $scope, $state, Settings, Config, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService) {
 
-  Config.$promise.then(function (c) {
-    $scope.logo = c.logo;
-  });
+  // Config.$promise.then(function (c) {
+  //   $scope.logo = c.logo;
+  // });
 
-  $scope.uiVersion = Settings.uiVersion;
+  // $scope.uiVersion = Settings.uiVersion;
+  $scope.uiVersion = StateManager.getState().application.version;
+  $scope.logo = StateManager.getState().application.logo;
   $scope.endpoints = [];
 
   $scope.switchEndpoint = function(endpoint) {

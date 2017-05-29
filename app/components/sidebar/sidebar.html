@@ -64,6 +64,9 @@
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug"></span></a>
     </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <a ui-sref="settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs"></span></a>
+    </li>
   </ul>
   <div class="sidebar-footer">
     <div class="col-xs-12">

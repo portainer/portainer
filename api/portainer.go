@@ -34,17 +34,27 @@ type (
 
 	// Status represents the application status.
 	Status struct {
-		Authentication     bool `json:"authentication"`
-		EndpointManagement bool `json:"endpointManagement"`
-		Analytics          bool `json:"analytics"`
+		Authentication     bool   `json:"Authentication"`
+		EndpointManagement bool   `json:"EndpointManagement"`
+		Analytics          bool   `json:"Analytics"`
+		Version            string `json:"Version"`
 	}
 
 	// Settings represents the application settings.
 	Settings struct {
 		TemplatesURL string `json:"TemplatesURL"`
 		LogoURL      string `json:"LogoURL"`
+		Registries   []RegistryDetails
 		// FilteredLabels []string `json:"FilteredLabels"`
 		// RegistryURLs   []string `json:"RegistryURLs"`
+	}
+
+	// RegistryDetails represents information about a registry.
+	RegistryDetails struct {
+		URL            string `json:"URL"`
+		Authentication bool   `json:"Authentication"`
+		Username       string `json:"Username"`
+		Password       string `json:"Password"`
 	}
 
 	// OldSettings represents Portainer OldSettings.
