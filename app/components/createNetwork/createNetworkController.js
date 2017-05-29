@@ -44,13 +44,13 @@ function ($scope, $state, Notifications, Network) {
         $('#createNetworkSpinner').hide();
         Notifications.error('Unable to create network', {}, d.message);
       } else {
-        Notifications.success("Network created", d.Id);
+        Notifications.success('Network created', d.Id);
         $('#createNetworkSpinner').hide();
         $state.go('networks', {}, {reload: true});
       }
     }, function (e) {
       $('#createNetworkSpinner').hide();
-      Notifications.error("Failure", e, 'Unable to create network');
+      Notifications.error('Failure', e, 'Unable to create network');
     });
   }
 

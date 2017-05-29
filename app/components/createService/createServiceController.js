@@ -1,11 +1,10 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$scope', '$state', 'Service', 'ServiceHelper', 'Volume', 'Network', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications',
-function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, Authentication, ResourceControlService, Notifications) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'ControllerDataPipeline', 'FormValidator',
+function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator) {
 
   $scope.formValues = {
-    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     Name: '',
     Image: '',
     Registry: '',
@@ -25,7 +24,12 @@ function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, 
     Parallelism: 1,
     PlacementConstraints: [],
     UpdateDelay: 0,
-    FailureAction: 'pause'
+    FailureAction: 'pause',
+    Secrets: []
+  };
+
+  $scope.state = {
+    formValidationError: ''
   };
 
   $scope.addPortBinding = function() {
@@ -52,6 +56,14 @@ function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, 
     $scope.formValues.Volumes.splice(index, 1);
   };
 
+  $scope.addSecret = function() {
+    $scope.formValues.Secrets.push({});
+  };
+
+  $scope.removeSecret = function(index) {
+    $scope.formValues.Secrets.splice(index, 1);
+  };
+
   $scope.addEnvironmentVariable = function() {
     $scope.formValues.Env.push({ name: '', value: ''});
   };
@@ -59,18 +71,23 @@ function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, 
   $scope.removeEnvironmentVariable = function(index) {
     $scope.formValues.Env.splice(index, 1);
   };
+
   $scope.addPlacementConstraint = function() {
     $scope.formValues.PlacementConstraints.push({ key: '', operator: '==', value: '' });
   };
+
   $scope.removePlacementConstraint = function(index) {
     $scope.formValues.PlacementConstraints.splice(index, 1);
   };
+
   $scope.addPlacementPreference = function() {
     $scope.formValues.PlacementPreferences.push({ key: '', operator: '==', value: '' });
   };
+
   $scope.removePlacementPreference = function(index) {
     $scope.formValues.PlacementPreferences.splice(index, 1);
   };
+
   $scope.addLabel = function() {
     $scope.formValues.Labels.push({ name: '', value: ''});
   };
@@ -121,7 +138,7 @@ function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, 
   }
 
   function commandToArray(cmd) {
-    var tokens = [].concat.apply([], cmd.split('"').map(function(v,i) {
+    var tokens = [].concat.apply([], cmd.split('\'').map(function(v,i) {
        return i%2 ? v : v.split(' ');
     })).filter(Boolean);
     return tokens;
@@ -146,7 +163,7 @@ function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, 
     var env = [];
     input.Env.forEach(function (v) {
       if (v.name) {
-        env.push(v.name + "=" + v.value);
+        env.push(v.name + '=' + v.value);
       }
     });
     config.TaskTemplate.ContainerSpec.Env = env;
@@ -173,12 +190,7 @@ function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, 
   function prepareVolumes(config, input) {
     input.Volumes.forEach(function (volume) {
       if (volume.Source && volume.Target) {
-        var mount = {};
-        mount.Type = volume.Bind ? 'bind' : 'volume';
-        mount.ReadOnly = volume.ReadOnly ? true : false;
-        mount.Source = volume.Source;
-        mount.Target = volume.Target;
-        config.TaskTemplate.ContainerSpec.Mounts.push(mount);
+        config.TaskTemplate.ContainerSpec.Mounts.push(volume);
       }
     });
   }
@@ -205,6 +217,18 @@ function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, 
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(input.PlacementConstraints);
   }
 
+  function prepareSecretConfig(config, input) {
+    if (input.Secrets) {
+      var secrets = [];
+      angular.forEach(input.Secrets, function(secret) {
+        if (secret.model) {
+          secrets.push(SecretHelper.secretConfig(secret.model));
+        }
+      });
+      config.TaskTemplate.ContainerSpec.Secrets = secrets;
+    }
+  }
+
   function prepareConfiguration() {
     var input = $scope.formValues;
     var config = {
@@ -227,53 +251,77 @@ function ($scope, $state, Service, ServiceHelper, Volume, Network, ImageHelper, 
     prepareVolumes(config, input);
     prepareNetworks(config, input);
     prepareUpdateConfig(config, input);
+    prepareSecretConfig(config, input);
     preparePlacementConfig(config, input);
     return config;
   }
 
-  function createNewService(config) {
-    Service.create(config, function (d) {
-      if ($scope.formValues.Ownership === 'private') {
-        ResourceControlService.setServiceResourceControl(Authentication.getUserDetails().ID, d.ID)
-        .then(function success() {
-          $('#createServiceSpinner').hide();
-          Notifications.success('Service created', d.ID);
-          $state.go('services', {}, {reload: true});
-        })
-        .catch(function error(err) {
-          $('#createContainerSpinner').hide();
-          Notifications.error("Failure", err, 'Unable to apply resource control on service');
-        });
-      } else {
-        $('#createServiceSpinner').hide();
-        Notifications.success('Service created', d.ID);
-        $state.go('services', {}, {reload: true});
-      }
-    }, function (e) {
+  function createNewService(config, accessControlData) {
+    Service.create(config).$promise
+    .then(function success(data) {
+      var serviceIdentifier = data.ID;
+      var userId = Authentication.getUserDetails().ID;
+      return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData, []);
+    })
+    .then(function success() {
+      Notifications.success('Service successfully created');
+      $state.go('services', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to create service');
+    })
+    .finally(function final() {
       $('#createServiceSpinner').hide();
-      Notifications.error("Failure", e, 'Unable to create service');
     });
+  }
+
+  function validateForm(accessControlData, isAdmin) {
+    $scope.state.formValidationError = '';
+    var error = '';
+    error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+
+    if (error) {
+      $scope.state.formValidationError = error;
+      return false;
+    }
+    return true;
   }
 
   $scope.create = function createService() {
     $('#createServiceSpinner').show();
+
+    var accessControlData = ControllerDataPipeline.getAccessControlFormData();
+    var userDetails = Authentication.getUserDetails();
+    var isAdmin = userDetails.role === 1 ? true : false;
+
+    if (!validateForm(accessControlData, isAdmin)) {
+      $('#createServiceSpinner').hide();
+      return;
+    }
+
     var config = prepareConfiguration();
-    createNewService(config);
+    createNewService(config, accessControlData);
   };
 
-  Volume.query({}, function (d) {
-    $scope.availableVolumes = d.Volumes;
-  }, function (e) {
-    Notifications.error("Failure", e, "Unable to retrieve volumes");
-  });
-
-  Network.query({}, function (d) {
-    $scope.availableNetworks = d.filter(function (network) {
-      if (network.Scope === 'swarm') {
-        return network;
-      }
+  function initView() {
+    $('#loadingViewSpinner').show();
+    $q.all({
+      volumes: VolumeService.volumes(),
+      networks: NetworkService.retrieveSwarmNetworks(),
+      secrets: SecretService.secrets()
+    })
+    .then(function success(data) {
+      $scope.availableVolumes = data.volumes;
+      $scope.availableNetworks = data.networks;
+      $scope.availableSecrets = data.secrets;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to initialize view');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
     });
-  }, function (e) {
-    Notifications.error("Failure", e, "Unable to retrieve networks");
-  });
+  }
+
+  initView();
 }]);

@@ -42,33 +42,33 @@ function (Pagination, $scope, Notifications, $timeout, Container, ContainerTop, 
       networkRxData.push(0);
     }
     var cpuDataset = { // CPU Usage
-      fillColor: "rgba(151,187,205,0.5)",
-      strokeColor: "rgba(151,187,205,1)",
-      pointColor: "rgba(151,187,205,1)",
-      pointStrokeColor: "#fff",
+      fillColor: 'rgba(151,187,205,0.5)',
+      strokeColor: 'rgba(151,187,205,1)',
+      pointColor: 'rgba(151,187,205,1)',
+      pointStrokeColor: '#fff',
       data: cpuData
     };
     var memoryDataset = {
-      fillColor: "rgba(151,187,205,0.5)",
-      strokeColor: "rgba(151,187,205,1)",
-      pointColor: "rgba(151,187,205,1)",
-      pointStrokeColor: "#fff",
+      fillColor: 'rgba(151,187,205,0.5)',
+      strokeColor: 'rgba(151,187,205,1)',
+      pointColor: 'rgba(151,187,205,1)',
+      pointStrokeColor: '#fff',
       data: memoryData
     };
     var networkRxDataset = {
-      label: "Rx Bytes",
-      fillColor: "rgba(151,187,205,0.5)",
-      strokeColor: "rgba(151,187,205,1)",
-      pointColor: "rgba(151,187,205,1)",
-      pointStrokeColor: "#fff",
+      label: 'Rx Bytes',
+      fillColor: 'rgba(151,187,205,0.5)',
+      strokeColor: 'rgba(151,187,205,1)',
+      pointColor: 'rgba(151,187,205,1)',
+      pointStrokeColor: '#fff',
       data: networkRxData
     };
     var networkTxDataset = {
-      label: "Tx Bytes",
-      fillColor: "rgba(255,180,174,0.5)",
-      strokeColor: "rgba(255,180,174,1)",
-      pointColor: "rgba(255,180,174,1)",
-      pointStrokeColor: "#fff",
+      label: 'Tx Bytes',
+      fillColor: 'rgba(255,180,174,0.5)',
+      strokeColor: 'rgba(255,180,174,1)',
+      pointColor: 'rgba(255,180,174,1)',
+      pointStrokeColor: '#fff',
       data: networkTxData
     };
     var networkLegendData = [
@@ -87,7 +87,7 @@ function (Pagination, $scope, Notifications, $timeout, Container, ContainerTop, 
     legend($('#network-legend').get(0), networkLegendData);
 
     Chart.defaults.global.animationSteps = 30; // Lower from 60 to ease CPU load.
-    var cpuChart = new Chart($('#cpu-stats-chart').get(0).getContext("2d")).Line({
+    var cpuChart = new Chart($('#cpu-stats-chart').get(0).getContext('2d')).Line({
       labels: cpuLabels,
       datasets: [cpuDataset]
     }, {
@@ -108,7 +108,7 @@ function (Pagination, $scope, Notifications, $timeout, Container, ContainerTop, 
       //scaleStepWidth: Math.ceil(initialStats.memory_stats.limit / 10),
       //scaleStartValue: 0
     });
-    var networkChart = new Chart($('#network-stats-chart').get(0).getContext("2d")).Line({
+    var networkChart = new Chart($('#network-stats-chart').get(0).getContext('2d')).Line({
       labels: networkLabels,
       datasets: [networkRxDataset, networkTxDataset]
     }, {
@@ -211,7 +211,7 @@ function (Pagination, $scope, Notifications, $timeout, Container, ContainerTop, 
   Container.get({id: $stateParams.id}, function (d) {
     $scope.container = d;
   }, function (e) {
-    Notifications.error("Failure", e, "Unable to retrieve container info");
+    Notifications.error('Failure', e, 'Unable to retrieve container info');
   });
   $scope.getTop();
 }]);

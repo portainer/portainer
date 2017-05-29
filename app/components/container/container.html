@@ -89,6 +89,8 @@
   </div>
 </div>
 
+<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="container && applicationState.application.authentication"></div>
+
 <div ng-if="container.State.Health" class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
@@ -195,7 +197,7 @@
               <td>ENV</td>
               <td>
                 <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="var in container.Config.Env">
+                  <tr ng-repeat="var in container.Config.Env track by $index">
                     <td>{{ var|key: '=' }}</td>
                     <td>{{ var|value: '=' }}</td>
                   </tr>

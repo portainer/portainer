@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('ContainerService', ['$q', 'Container', 'ContainerHelper', function ContainerServiceFactory($q, Container, ContainerHelper) {
+.factory('ContainerService', ['$q', 'Container', 'ContainerHelper', 'ResourceControlService', function ContainerServiceFactory($q, Container, ContainerHelper, ResourceControlService) {
   'use strict';
   var service = {};
 
@@ -67,5 +67,28 @@ angular.module('portainer.services')
     });
     return deferred.promise;
   };
+
+  service.remove = function(container, removeVolumes) {
+    var deferred = $q.defer();
+
+    Container.remove({id: container.Id, v: (removeVolumes) ? 1 : 0, force: true}).$promise
+    .then(function success(data) {
+      if (data.message) {
+        deferred.reject({ msg: data.message, err: data.message });
+      }
+      if (container.ResourceControl && container.ResourceControl.Type === 1) {
+        return ResourceControlService.deleteResourceControl(container.ResourceControl.Id);
+      }
+    })
+    .then(function success() {
+      deferred.resolve();
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to remove container', err: err });
+    });
+
+    return deferred.promise;
+  };
+
   return service;
 }]);

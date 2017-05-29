@@ -1,11 +1,10 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ModalService',
-function ($scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ModalService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator', 'ModalService',
+function ($q, $scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator, ModalService) {
 
   $scope.formValues = {
-    Ownership: $scope.applicationState.application.authentication ? 'private' : '',
     alwaysPull: true,
     Console: 'none',
     Volumes: [],
@@ -17,7 +16,9 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     IPv6: ''
   };
 
-  $scope.imageConfig = {};
+  $scope.state = {
+    formValidationError: ''
+  };
 
   $scope.config = {
     Image: '',
@@ -81,7 +82,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
   $scope.removeExtraHost = function(index) {
     $scope.formValues.ExtraHosts.splice(index, 1);
   };
-  
+
   $scope.addDevice = function() {
     $scope.config.HostConfig.Devices.push({ pathOnHost: '', pathInContainer: '' });
   };
@@ -90,7 +91,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     $scope.config.HostConfig.Devices.splice(index, 1);
   };
 
-  Config.$promise.then(function (c) {
+  /*Config.$promise.then(function (c) {
     var containersToHideLabels = c.hiddenLabels;
 
     Volume.query({}, function (d) {
@@ -137,9 +138,9 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     }, function(e) {
       Notifications.error("Failure", e, "Unable to retrieve running containers");
     });
-  });
+  });*/
 
-  function startContainer(containerID) {
+  /*function startContainer(containerID) {
     Container.start({id: containerID}, {}, function (cd) {
       if (cd.message) {
         $('#createContainerSpinner').hide();
@@ -153,9 +154,9 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       $('#createContainerSpinner').hide();
       Notifications.error("Failure", e, 'Unable to start container');
     });
-  }
+  }*/
 
-  function createContainer(config) {
+  /*function createContainer(config) {
     console.log(config);
     Container.create(config, function (d) {
       if (d.message) {
@@ -179,16 +180,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       $('#createContainerSpinner').hide();
       Notifications.error("Failure", e, 'Unable to create container');
     });
-  }
-
-  function pullImageAndCreateContainer(config) {
-    Image.create($scope.imageConfig, function (data) {
-      createContainer(config);
-    }, function (e) {
-      $('#createContainerSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to pull image');
-    });
-  }
+  }*/
 
   function prepareImageConfig(config) {
     var image = config.Image;
@@ -202,7 +194,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var bindings = {};
     config.HostConfig.PortBindings.forEach(function (portBinding) {
       if (portBinding.containerPort) {
-        var key = portBinding.containerPort + "/" + portBinding.protocol;
+        var key = portBinding.containerPort + '/' + portBinding.protocol;
         var binding = {};
         if (portBinding.hostPort && portBinding.hostPort.indexOf(':') > -1) {
           var hostAndPort = portBinding.hostPort.split(':');
@@ -238,7 +230,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     var env = [];
     config.Env.forEach(function (v) {
       if (v.name && v.value) {
-        env.push(v.name + "=" + v.value);
+        env.push(v.name + '=' + v.value);
       }
     });
     config.Env = env;
@@ -304,7 +296,7 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     });
     config.Labels = labels;
   }
-  
+
   function prepareDevices(config) {
     var path = [];
     config.HostConfig.Devices.forEach(function (p) {
@@ -312,10 +304,10 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
         if(p.pathInContainer === '') {
           p.pathInContainer = p.pathOnHost;
         }
-        path.push({PathOnHost:p.pathOnHost,PathInContainer:p.pathInContainer,CgroupPermissions:'rwm'});  
+        path.push({PathOnHost:p.pathOnHost,PathInContainer:p.pathInContainer,CgroupPermissions:'rwm'});
       }
     });
-    config.HostConfig.Devices = path; 
+    config.HostConfig.Devices = path;
   }
 
   function prepareConfiguration() {
@@ -388,22 +380,9 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
     });
   }
 
-  $scope.create = function () {
-    confirmCreateContainer(function(doIt) {
-      if (doIt) {
-        var config = prepareConfiguration();
-        $('#createContainerSpinner').show();
-        if ($scope.formValues.alwaysPull) {
-          pullImageAndCreateContainer(config);
-        } else {
-          createContainer(config);
-        }
-      }
-    });
-  };
-
+  function loadFromContainerSpec() {
 	// If we got a template, we prefill fields
-  if ($stateParams.from !== '') {
+  //if ($stateParams.from !== '') {
     // Get container
     Container.get({id: $stateParams.from}, function(d) {
 			// Add Config
@@ -502,5 +481,116 @@ function ($scope, $state, $stateParams, $filter, Config, Info, Container, Contai
       $scope.config.name = d.Name.replace(/^\//g, '');
     });
   }
+
+  function initView() {
+	  // If we got a template, we prefill fields
+    if ($stateParams.from !== '') {
+      loadFromContainerSpec();
+    }
+    Config.$promise.then(function (c) {
+      var containersToHideLabels = c.hiddenLabels;
+
+      Volume.query({}, function (d) {
+        $scope.availableVolumes = d.Volumes;
+      }, function (e) {
+        Notifications.error('Failure', e, 'Unable to retrieve volumes');
+      });
+
+      Network.query({}, function (d) {
+        var networks = d;
+        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
+          if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
+            networks = d.filter(function (network) {
+              if (network.Scope === 'global') {
+                return network;
+              }
+            });
+          }
+          if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
+            networks = d.filter(function (network) {
+              return network.Driver !== 'overlay' || network.Attachable;
+            });
+          }
+          $scope.globalNetworkCount = networks.length;
+          networks.push({Name: 'bridge'});
+          networks.push({Name: 'host'});
+          networks.push({Name: 'none'});
+        }
+        networks.push({Name: 'container'});
+        $scope.availableNetworks = networks;
+        if (!_.find(networks, {'Name': 'bridge'})) {
+          $scope.config.HostConfig.NetworkMode = 'nat';
+        }
+      }, function (e) {
+        Notifications.error('Failure', e, 'Unable to retrieve networks');
+      });
+
+      Container.query({}, function (d) {
+        var containers = d;
+        if (containersToHideLabels) {
+          containers = ContainerHelper.hideContainers(d, containersToHideLabels);
+        }
+        $scope.runningContainers = containers;
+      }, function(e) {
+        Notifications.error('Failure', e, 'Unable to retrieve running containers');
+      });
+    });
+  }
+
+  function validateForm(accessControlData, isAdmin) {
+    $scope.state.formValidationError = '';
+    var error = '';
+    error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+
+    if (error) {
+      $scope.state.formValidationError = error;
+      return false;
+    }
+    return true;
+  }
+
+  $scope.create = function () {
+    confirmCreateContainer(function(doIt) {
+      if (doIt) {
+        $('#createContainerSpinner').show();
+
+        var accessControlData = ControllerDataPipeline.getAccessControlFormData();
+        var userDetails = Authentication.getUserDetails();
+        var isAdmin = userDetails.role === 1 ? true : false;
+
+        if (!validateForm(accessControlData, isAdmin)) {
+          $('#createContainerSpinner').hide();
+          return;
+        }
+
+        var config = prepareConfiguration();
+        createContainer(config, accessControlData);
+      }
+    });
+  };
+
+  function createContainer(config, accessControlData) {
+    $q.when($scope.formValues.alwaysPull ? ImageService.pullImage($scope.config.Image, $scope.formValues.Registry) : null)
+    .then(function success() {
+      return ContainerService.createAndStartContainer(config);
+    })
+    .then(function success(data) {
+      var containerIdentifier = data.Id;
+      var userId = Authentication.getUserDetails().ID;
+      return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData, []);
+    })
+    .then(function success() {
+      Notifications.success('Container successfully created');
+      $state.go('containers', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to create container');
+    })
+    .finally(function final() {
+      $('#createContainerSpinner').hide();
+    });
+  }
+
+  initView();
 
 }]);

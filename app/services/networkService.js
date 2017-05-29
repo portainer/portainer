@@ -3,8 +3,27 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.getNetworks = function() {
+  service.networks = function() {
     return Network.query({}).$promise;
+  };
+
+  service.retrieveSwarmNetworks = function() {
+    var deferred = $q.defer();
+
+    service.networks()
+    .then(function success(data) {
+      var networks = data.filter(function (network) {
+        if (network.Scope === 'swarm') {
+          return network;
+        }
+      });
+      deferred.resolve(networks);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve networks', err: err});
+    });
+
+    return deferred.promise;
   };
 
   service.filterGlobalNetworks = function(networks) {
@@ -24,9 +43,9 @@ angular.module('portainer.services')
   };
 
   service.addPredefinedLocalNetworks = function(networks) {
-    networks.push({Scope: "local", Name: "bridge"});
-    networks.push({Scope: "local", Name: "host"});
-    networks.push({Scope: "local", Name: "none"});
+    networks.push({Scope: 'local', Name: 'bridge'});
+    networks.push({Scope: 'local', Name: 'host'});
+    networks.push({Scope: 'local', Name: 'none'});
   };
 
   return service;

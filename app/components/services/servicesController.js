@@ -1,39 +1,11 @@
 angular.module('services', [])
-.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, Authentication, UserService, ModalService, ResourceControlService) {
+.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $stateParams, $state, Service, ServiceService, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
-
-  function removeServiceResourceControl(service) {
-    volumeResourceControlQueries = [];
-    angular.forEach(service.Mounts, function (mount) {
-      if (mount.Type === 'volume') {
-        volumeResourceControlQueries.push(ResourceControlService.removeVolumeResourceControl(service.Metadata.ResourceControl.OwnerId, mount.Source));
-      }
-    });
-
-    $q.all(volumeResourceControlQueries)
-    .then(function success() {
-      return ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id);
-    })
-    .then(function success() {
-      delete service.Metadata.ResourceControl;
-      Notifications.success('Ownership changed to public', service.Id);
-    })
-    .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to change service ownership");
-    });
-  }
-
-  $scope.switchOwnership = function(volume) {
-    ModalService.confirmServiceOwnershipChange(function (confirmed) {
-      if(!confirmed) { return; }
-      removeServiceResourceControl(volume);
-    });
-  };
 
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('services', $scope.state.pagination_count);
@@ -58,13 +30,13 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notification
     config.Mode.Replicated.Replicas = service.Replicas;
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadServicesSpinner').hide();
-      Notifications.success("Service successfully scaled", "New replica count: " + service.Replicas);
+      Notifications.success('Service successfully scaled', 'New replica count: ' + service.Replicas);
       $state.reload();
     }, function (e) {
       $('#loadServicesSpinner').hide();
       service.Scale = false;
       service.Replicas = service.ReplicaCount;
-      Notifications.error("Failure", e, "Unable to scale service");
+      Notifications.error('Failure', e, 'Unable to scale service');
     });
   };
 
@@ -90,39 +62,21 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notification
     angular.forEach($scope.services, function (service) {
       if (service.Checked) {
         counter = counter + 1;
-        Service.remove({id: service.Id}, function (d) {
-          if (d.message) {
-            $('#loadServicesSpinner').hide();
-            Notifications.error("Unable to remove service", {}, d[0].message);
-          } else {
-            if (service.Metadata && service.Metadata.ResourceControl) {
-              ResourceControlService.removeServiceResourceControl(service.Metadata.ResourceControl.OwnerId, service.Id)
-              .then(function success() {
-                Notifications.success("Service deleted", service.Id);
-                var index = $scope.services.indexOf(service);
-                $scope.services.splice(index, 1);
-              })
-              .catch(function error(err) {
-                Notifications.error("Failure", err, "Unable to remove service ownership");
-              });
-            } else {
-              Notifications.success("Service deleted", service.Id);
-              var index = $scope.services.indexOf(service);
-              $scope.services.splice(index, 1);
-            }
-          }
-          complete();
-        }, function (e) {
-          Notifications.error("Failure", e, 'Unable to remove service');
+        ServiceService.remove(service)
+        .then(function success(data) {
+          Notifications.success('Service successfully deleted');
+          var index = $scope.services.indexOf(service);
+          $scope.services.splice(index, 1);
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to remove service');
+        })
+        .finally(function final() {
           complete();
         });
       }
     });
   }
-
-  // $scope.removeAction = function () {
-  //
-  // };
 
   function mapUsersToServices(users) {
     angular.forEach($scope.services, function (service) {
@@ -139,46 +93,33 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Notification
     });
   }
 
-  function fetchServices() {
+  function initView() {
     $('#loadServicesSpinner').show();
-
-    var userDetails = Authentication.getUserDetails();
-    $scope.user = userDetails;
-
     $q.all({
       services: Service.query({}).$promise,
       tasks: Task.query({filters: {'desired-state': ['running']}}).$promise,
-      nodes: Node.query({}).$promise,
+      nodes: Node.query({}).$promise
     })
     .then(function success(data) {
       $scope.swarmManagerIP = NodeHelper.getManagerIP(data.nodes);
       $scope.services = data.services.map(function (service) {
         var serviceTasks = data.tasks.filter(function (task) {
-          return task.ServiceID === service.ID && task.Status.State === "running";
+          return task.ServiceID === service.ID && task.Status.State === 'running';
         });
         var taskNodes = data.nodes.filter(function (node) {
           return node.Spec.Availability === 'active' && node.Status.State === 'ready';
         });
         return new ServiceViewModel(service, serviceTasks, taskNodes);
       });
-      if (userDetails.role === 1) {
-        UserService.users()
-        .then(function success(data) {
-          mapUsersToServices(data);
-        })
-        .finally(function final() {
-          $('#loadServicesSpinner').hide();
-        });
-      }
     })
     .catch(function error(err) {
       $scope.services = [];
-      Notifications.error("Failure", err, "Unable to retrieve services");
+      Notifications.error('Failure', err, 'Unable to retrieve services');
     })
     .finally(function final() {
       $('#loadServicesSpinner').hide();
     });
   }
 
-  fetchServices();
+  initView();
 }]);

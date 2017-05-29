@@ -91,10 +91,10 @@
                 </a>
               </th>
               <th ng-if="applicationState.application.authentication">
-                <a ui-sref="containers" ng-click="order('Metadata.ResourceControl.OwnerId')">
+                <a ui-sref="containers" ng-click="order('ResourceControl.Ownership')">
                   Ownership
-                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Metadata.ResourceControl.OwnerId' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <span ng-show="sortType == 'ResourceControl.Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'ResourceControl.Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </tr>
@@ -118,34 +118,9 @@
                 <span ng-if="container.Ports.length == 0" >-</span>
               </td>
               <td ng-if="applicationState.application.authentication">
-                <span ng-if="!container.Metadata.ResourceControl">
-                  <i class="fa fa-eye" aria-hidden="true"></i>
-                  <span ng-if="container.Labels['com.docker.swarm.service.id']">
-                    Public service
-                  </span>
-                  <span ng-if="!container.Labels['com.docker.swarm.service.id']">
-                    Public
-                  </span>
-                </span>
-                <span ng-if="container.Metadata.ResourceControl.OwnerId === user.ID">
-                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                  <span ng-if="container.Labels['com.docker.swarm.service.id']">
-                    Private service
-                  </span>
-                  <span ng-if="!container.Labels['com.docker.swarm.service.id']">
-                    Private
-                    <a ng-click="switchOwnership(container)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
-                  </span>
-                </span>
-                <span ng-if="container.Metadata.ResourceControl && container.Metadata.ResourceControl.OwnerId !== user.ID">
-                  <i class="fa fa-eye-slash" aria-hidden="true"></i>
-                  <span ng-if="container.Labels['com.docker.swarm.service.id']">
-                    Private service <span ng-if="container.Owner">(owner: {{ container.Owner }})</span>
-                  </span>
-                  <span ng-if="!container.Labels['com.docker.swarm.service.id']">
-                    Private <span ng-if="container.Owner">(owner: {{ container.Owner }})</span>
-                    <a ng-click="switchOwnership(container)" class="interactive"><i class="fa fa-eye" aria-hidden="true" style="margin-left: 7px;"></i> Switch to public</a>
-                  </span>
+                <span>
+                  <i ng-class="container.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
+                  {{ container.ResourceControl.Ownership ? container.ResourceControl.Ownership : container.ResourceControl.Ownership = 'public' }}
                 </span>
               </td>
             </tr>

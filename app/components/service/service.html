@@ -109,12 +109,15 @@
           <li><a href ng-click="goToItem('service-restart-policy')">Restart policy</a></li>
           <li><a href ng-click="goToItem('service-update-config')">Update configuration</a></li>
           <li><a href ng-click="goToItem('service-labels')">Service labels</a></li>
+          <li><a href ng-click="goToItem('service-secrets')">Secrets</a></li>
           <li><a href ng-click="goToItem('service-tasks')">Tasks</a></li>
         <ul>
       </rd-widget-body>
     </rd-widget>
   </div>
 </div>
+
+<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="service && applicationState.application.authentication"></div>
 
 <div class="row">
   <hr>
@@ -145,6 +148,7 @@
     <div id="service-restart-policy" class="padding-top" ng-include="'app/components/service/includes/restart.html'"></div>
     <div id="service-update-config" class="padding-top" ng-include="'app/components/service/includes/updateconfig.html'"></div>
     <div id="service-labels" class="padding-top" ng-include="'app/components/service/includes/servicelabels.html'"></div>
+    <div id="service-secrets" class="padding-top" ng-include="'app/components/service/includes/secrets.html'"></div>
     <div id="service-tasks" class="padding-top" ng-include="'app/components/service/includes/tasks.html'"></div>
   </div>
 </div>
