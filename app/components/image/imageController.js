@@ -7,10 +7,10 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 	};
 
 	$scope.toggleLayerCommand = function(layerId) {
-		console.log("layerId: "+layerId);
-		jQuery("#layer-command-expander"+layerId+" span").toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
-		jQuery("#layer-command-"+layerId+"-short").toggle();
-		jQuery("#layer-command-"+layerId+"-full").toggle();
+		console.log('layerId: '+layerId);
+		jQuery('#layer-command-expander'+layerId+' span').toggleClass('glyphicon-plus-sign glyphicon-minus-sign');
+		jQuery('#layer-command-'+layerId+'-short').toggle();
+		jQuery('#layer-command-'+layerId+'-full').toggle();
 	};
 
 	$scope.tagImage = function() {
@@ -115,7 +115,7 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 			$scope.history = data;
 		})
 		.catch(function error(err) {
-			Messages.error("Failure", err, "Unable to retrieve image history");
+			Messages.error('Failure', err, 'Unable to retrieve image history');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
