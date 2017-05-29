@@ -104,7 +104,7 @@ function ($q, $scope, $stateParams, $state, Service, ServiceService, ServiceHelp
       $scope.swarmManagerIP = NodeHelper.getManagerIP(data.nodes);
       $scope.services = data.services.map(function (service) {
         var serviceTasks = data.tasks.filter(function (task) {
-          return task.ServiceID === service.ID && task.Status.State === 'running';
+          return task.ServiceID === service.ID;
         });
         var taskNodes = data.nodes.filter(function (node) {
           return node.Spec.Availability === 'active' && node.Status.State === 'ready';

@@ -1,4 +1,4 @@
-function ServiceViewModel(data, runningTasks, nodes) {
+function ServiceViewModel(data, allTasks, nodes) {
   this.Model = data;
   this.Id = data.ID;
   this.Name = data.Spec.Name;
@@ -15,30 +15,31 @@ function ServiceViewModel(data, runningTasks, nodes) {
       this.Replicas = nodes.length;
     }
   }
-  if (runningTasks) {
+  if (allTasks) {
+    var runningTasks = allTasks.filter(function (task) {
+      return task.Status.State === "running";
+    });
     this.Running = runningTasks.length;
     // Find service status
     var globalStatus = {};
-    for (var t in runningTasks) {
-      if (globalStatus[runningTasks[t].Status.State]) {
-        globalStatus[runningTasks[t].Status.State]++;
+    for (var t in allTasks) {
+      if (globalStatus[allTasks[t].Status.State]) {
+        globalStatus[allTasks[t].Status.State]++;
       } else {
-        globalStatus[runningTasks[t].Status.State] = 1;
+        globalStatus[allTasks[t].Status.State] = 1;
       }
     }
-    // If runningTasks.length === 0, service is down
-    // If runningTasks.length != Replicas, we are preparing or in a loop of start/fail
+    // If allTasks.length === 0, service is down
+    // If allTasks.length != Replicas, we are preparing or in a loop of start/fail
     // If all running => running
     // If some running but not all => Partially running
     // If some starting and no running => starting
     // If no running, no starting, but some preparing => preparing
     // Else unknown
     this.Status = "unknown";
-    if (runningTasks.length === 0) {
+    if (allTasks.length === 0) {
       this.Status = "down";
-    } else if (runningTasks.length !== this.Replicas) {
-      this.Status = "preparing";
-    } else if (globalStatus["running"] && globalStatus["running"] === runningTasks.length) {
+    } else if (globalStatus["running"] && globalStatus["running"] === allTasks.length) {
       this.Status = "running";
     } else if (globalStatus["running"]) {
       this.Status = "partially running";
