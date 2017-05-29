@@ -22,6 +22,11 @@ type claims struct {
 	jwt.StandardClaims
 }
 
+const (
+	// Represents the number of hours before a JWT token expires.
+	tokenExpiryTime = 48
+)
+
 // NewService initializes a new service. It will generate a random key that will be used to sign JWT tokens.
 func NewService() (*Service, error) {
 	secret := securecookie.GenerateRandomKey(32)
@@ -36,7 +41,7 @@ func NewService() (*Service, error) {
 
 // GenerateToken generates a new JWT token.
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
-	expireToken := time.Now().Add(time.Hour * 8).Unix()
+	expireToken := time.Now().Add(time.Hour * tokenExpiryTime).Unix()
 	cl := claims{
 		int(data.ID),
 		data.Username,
