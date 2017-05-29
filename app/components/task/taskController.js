@@ -1,29 +1,26 @@
 angular.module('task', [])
-.controller('TaskController', ['$scope', '$stateParams', '$state', 'Task', 'Service', 'Notifications',
-function ($scope, $stateParams, $state, Task, Service, Notifications) {
+.controller('TaskController', ['$scope', '$stateParams', 'TaskService', 'Service', 'Notifications',
+function ($scope, $stateParams, TaskService, Service, Notifications) {
 
-  $scope.task = {};
-  $scope.serviceName = 'service';
-  $scope.isTaskRunning = false;
-
-  function fetchTaskDetails() {
+  function initView() {
     $('#loadingViewSpinner').show();
-    Task.get({id: $stateParams.id}, function (d) {
-      $scope.task = d;
-      fetchAssociatedServiceDetails(d.ServiceID);
+    TaskService.task($stateParams.id)
+    .then(function success(data) {
+      var task = data;
+      $scope.task = task;
+      return Service.get({ id: task.ServiceId }).$promise;
+    })
+    .then(function success(data) {
+      var service = new ServiceViewModel(data);
+      $scope.service = service;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve task details');
+    })
+    .finally(function final() {
       $('#loadingViewSpinner').hide();
-    }, function (e) {
-      Notifications.error("Failure", e, "Unable to retrieve task details");
     });
   }
 
-  function fetchAssociatedServiceDetails(serviceId) {
-    Service.get({id: serviceId}, function (d) {
-      $scope.serviceName = d.Spec.Name;
-    }, function (e) {
-      Notifications.error("Failure", e, "Unable to retrieve associated service details");
-    });
-  }
-
-  fetchTaskDetails();
+  initView();
 }]);

@@ -11,18 +11,19 @@ angular.module('portainer.services')
     return Endpoints.query({}).$promise;
   };
 
-  service.updateAuthorizedUsers = function(id, authorizedUserIDs) {
-    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs}).$promise;
+  service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
+    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
   };
 
   service.updateEndpoint = function(id, endpointParams) {
     var query = {
       name: endpointParams.name,
+      PublicURL: endpointParams.PublicURL,
       TLS: endpointParams.TLS,
       authorizedUsers: endpointParams.authorizedUsers
     };
     if (endpointParams.type && endpointParams.URL) {
-      query.URL = endpointParams.type === 'local' ? ("unix://" + endpointParams.URL) : ("tcp://" + endpointParams.URL);
+      query.URL = endpointParams.type === 'local' ? ('unix://' + endpointParams.URL) : ('tcp://' + endpointParams.URL);
     }
 
     var deferred = $q.defer();
@@ -47,17 +48,18 @@ angular.module('portainer.services')
 
   service.createLocalEndpoint = function(name, URL, TLS, active) {
     var endpoint = {
-      Name: "local",
-      URL: "unix:///var/run/docker.sock",
+      Name: 'local',
+      URL: 'unix:///var/run/docker.sock',
       TLS: false
     };
     return Endpoints.create({}, endpoint).$promise;
   };
 
-  service.createRemoteEndpoint = function(name, URL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  service.createRemoteEndpoint = function(name, URL, PublicURL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var endpoint = {
       Name: name,
       URL: 'tcp://' + URL,
+      PublicURL: PublicURL,
       TLS: TLS
     };
     var deferred = $q.defer();

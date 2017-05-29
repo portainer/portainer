@@ -82,7 +82,7 @@ function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume
       $('#loadingViewSpinner').hide();
     }, function(e) {
       $('#loadingViewSpinner').hide();
-      Notifications.error("Failure", e, "Unable to load dashboard data");
+      Notifications.error('Failure', e, 'Unable to load dashboard data');
     });
   }
 

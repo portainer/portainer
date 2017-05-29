@@ -3,21 +3,7 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.confirm = function(options){
-    var box = bootbox.confirm({
-      title: options.title,
-      message: options.message,
-      buttons: {
-        confirm: {
-          label: options.buttons.confirm.label,
-          className: options.buttons.confirm.className
-        },
-        cancel: {
-          label: options.buttons.cancel && options.buttons.cancel.label ? options.buttons.cancel.label : 'Cancel'
-        }
-      },
-      callback: options.callback
-    });
+  var applyBoxCSS = function(box) {
     box.css({
       'top': '50%',
       'margin-top': function () {
@@ -26,46 +12,65 @@ angular.module('portainer.services')
     });
   };
 
-  service.confirmOwnershipChange = function(callback, msg) {
+  var confirmButtons = function(options) {
+    var buttons = {
+      confirm: {
+        label: options.buttons.confirm.label,
+        className: options.buttons.confirm.className
+      },
+      cancel: {
+        label: options.buttons.cancel && options.buttons.cancel.label ? options.buttons.cancel.label : 'Cancel'
+      }
+    };
+    return buttons;
+  };
+
+  service.confirm = function(options){
+    var box = bootbox.confirm({
+      title: options.title,
+      message: options.message,
+      buttons: confirmButtons(options),
+      callback: options.callback
+    });
+    applyBoxCSS(box);
+  };
+
+  service.prompt = function(options){
+    var box = bootbox.prompt({
+      title: options.title,
+      inputType: options.inputType,
+      inputOptions: options.inputOptions,
+      buttons: confirmButtons(options),
+      callback: options.callback
+    });
+    applyBoxCSS(box);
+  };
+
+  service.confirmAccessControlUpdate = function(callback, msg) {
     service.confirm({
       title: 'Are you sure ?',
-      message: msg,
+      message: 'Changing the ownership of this resource will potentially restrict its management to some users.',
       buttons: {
         confirm: {
           label: 'Change ownership',
           className: 'btn-primary'
         }
       },
-      callback: callback,
+      callback: callback
     });
-  };
-
-  service.confirmContainerOwnershipChange = function(callback) {
-    var msg = 'You can change the ownership of a container one way only. You will not be able to make this container private again. <b>Changing ownership on this container will also change the ownership on any attached volume.</b>';
-    service.confirmOwnershipChange(callback, msg);
-  };
-
-  service.confirmServiceOwnershipChange = function(callback) {
-    var msg = 'You can change the ownership of a service one way only. You will not be able to make this service private again. <b>Changing ownership on this service will also change the ownership on any attached volume.</b>';
-    service.confirmOwnershipChange(callback, msg);
-  };
-
-  service.confirmVolumeOwnershipChange = function(callback) {
-    var msg = 'You can change the ownership of a volume one way only. You will not be able to make this volume private again.';
-    service.confirmOwnershipChange(callback, msg);
   };
 
   service.confirmImageForceRemoval = function(callback) {
     service.confirm({
-      title: "Are you sure?",
-      message: "Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.",
+      title: 'Are you sure?',
+      message: 'Forcing the removal of the image will remove the image even if it has multiple tags or if it is used by stopped containers.',
       buttons: {
         confirm: {
           label: 'Remove the image',
           className: 'btn-danger'
         }
       },
-      callback: callback,
+      callback: callback
     });
   };
 
@@ -75,12 +80,33 @@ angular.module('portainer.services')
       message: message,
       buttons: {
         confirm: {
-          label: 'Delete',
+          label: 'Remove',
           className: 'btn-danger'
         }
       },
-      callback: callback,
+      callback: callback
     });
   };
+
+  service.confirmContainerDeletion = function(title, callback) {
+    service.prompt({
+      title: title,
+      inputType: 'checkbox',
+      inputOptions: [
+        {
+          text: 'Automatically remove non-persistent volumes<i></i>',
+          value: '1'
+        }
+      ],
+      buttons: {
+        confirm: {
+          label: 'Remove',
+          className: 'btn-danger'
+        }
+      },
+      callback: callback
+    });
+  };
+
   return service;
 }]);

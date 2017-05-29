@@ -6,6 +6,8 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/portainer/portainer.svg)](https://hub.docker.com/r/portainer/portainer/)
 [![Microbadger](https://images.microbadger.com/badges/image/portainer/portainer.svg)](http://microbadger.com/images/portainer/portainer "Image size")
 [![Documentation Status](https://readthedocs.org/projects/portainer/badge/?version=stable)](http://portainer.readthedocs.io/en/latest/?badge=stable)
+[![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=portainer&repoName=portainer&branch=develop&pipelineName=portainer-ci&accountName=deviantony&type=cf-1)]( https://g.codefresh.io/repositories/portainer/portainer/builds?filter=trigger:build;branch:develop;service:5922a08a3a1aab000116fcc6~portainer-ci)
+[![Slack](http://portainer.io/slack/badge.svg)](http://portainer.io/slack/)
 [![Gitter](https://badges.gitter.im/portainer/Lobby.svg)](https://gitter.im/portainer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YHXZJQNJQ36H6)
 
@@ -44,7 +46,7 @@ Please note that the public demo cluster is **reset every 15min**.
 
 **_Portainer_** has full support for the following Docker versions:
 
-* Docker 1.10 to Docker 17.03 (including `swarm-mode`)
+* Docker 1.10 to the latest version
 * Docker Swarm >= 1.2.3
 
 Partial support for the following Docker versions (some features may not be available):

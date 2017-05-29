@@ -27,6 +27,6 @@ function ($scope, Notifications, Events, Pagination) {
   },
   function (e) {
     $('#loadEventsSpinner').hide();
-    Notifications.error("Failure", e, "Unable to load events");
+    Notifications.error('Failure', e, 'Unable to load events');
   });
 }]);

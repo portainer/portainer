@@ -56,11 +56,11 @@ angular.module('portainer.filters', [])
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (status.indexOf('paused') !== -1) {
+    if (status.indexOf('paused') !== -1 || status.indexOf('starting') !== -1) {
       return 'warning';
     } else if (status.indexOf('created') !== -1) {
       return 'info';
-    } else if (status.indexOf('stopped') !== -1) {
+    } else if (status.indexOf('stopped') !== -1 || status.indexOf('unhealthy') !== -1) {
       return 'danger';
     }
     return 'success';
@@ -76,6 +76,12 @@ angular.module('portainer.filters', [])
       return 'created';
     } else if (status.indexOf('exited') !== -1) {
       return 'stopped';
+    } else if (status.indexOf('(healthy)') !== -1) {
+      return 'healthy';
+    } else if (status.indexOf('(unhealthy)') !== -1) {
+      return 'unhealthy';
+    } else if (status.indexOf('(health: starting)') !== -1) {
+      return 'starting';
     }
     return 'running';
   };
@@ -118,6 +124,9 @@ angular.module('portainer.filters', [])
     }
     if (state.Running) {
       return 'Running';
+    }
+    if (state.Status === 'created') {
+      return 'Created';
     }
     return 'Stopped';
   };
@@ -250,6 +259,31 @@ angular.module('portainer.filters', [])
   return function (imageName) {
     if (imageName) {
       return imageName.split('@sha')[0];
+    }
+    return '';
+  };
+})
+.filter('ownershipicon', function () {
+  'use strict';
+  return function (ownership) {
+    switch (ownership) {
+      case 'private':
+        return 'fa fa-eye-slash';
+      case 'administrators':
+        return 'fa fa-eye-slash';
+      case 'restricted':
+        return 'fa fa-users';
+      default:
+        return 'fa fa-eye';
+    }
+  };
+})
+.filter('tasknodename', function () {
+  'use strict';
+  return function (nodeId, nodes) {
+    var node = _.find(nodes, { Id: nodeId });
+    if (node) {
+      return node.Hostname;
     }
     return '';
   };

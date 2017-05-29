@@ -49,8 +49,8 @@
             </div>
           </div>
           <!-- !confirm-password-input -->
-          <!-- role-checkbox -->
-          <div class="form-group">
+          <!-- admin-checkbox -->
+          <div class="form-group" ng-if="isAdmin">
             <div class="col-sm-12">
               <label for="permissions" class="control-label text-left">
                 Administrator
@@ -61,10 +61,36 @@
               </label>
             </div>
           </div>
-          <!-- !role-checkbox -->
-          <div class="form-group">
+          <!-- !admin-checkbox -->
+          <!-- teams -->
+          <div class="form-group" ng-if="!formValues.Administrator">
             <div class="col-sm-12">
-              <span class="small text-muted">Note: non-administrator users do not have access to any endpoint by default. Head over the <a ui-sref="endpoints">endpoints view</a> to manage their accesses.</span>
+              <label class="control-label text-left">
+                Add to team(s)
+              </label>
+              <span class="small text-muted" style="margin-left: 20px;" ng-if="teams.length === 0">
+                You have not yet created any team. Head over the <a ui-sref="teams">teams view</a> to manage user teams.</span>
+              </span>
+              <span isteven-multi-select
+               ng-if="teams.length > 0"
+               input-model="teams"
+               output-model="formValues.Teams"
+               button-label="Name"
+               item-label="Name"
+               tick-property="ticked"
+               helper-elements="filter"
+               search-property="Name"
+               translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
+               style="margin-left: 20px;"
+             </span>
+            </div>
+          </div>
+          <!-- !teams -->
+          <div class="form-group" ng-if="isAdmin && !formValues.Administrator && formValues.Teams.length === 0">
+            <div class="col-sm-12">
+              <span class="small text-muted">
+                Note: non-administrator users with no team do not have access to any endpoint by default. Head over the <a ui-sref="endpoints">endpoints view</a> to manage their accesses.
+              </span>
             </div>
           </div>
           <div class="form-group">
@@ -98,7 +124,7 @@
         </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12">
-        <div class="pull-left">
+        <div class="pull-left" ng-if="isAdmin">
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
         </div>
         <div class="pull-right">
@@ -110,7 +136,7 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th>
+                <th ng-if="isAdmin">
                   <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
                 </th>
                 <th>
@@ -127,18 +153,20 @@
                     <span ng-show="sortType == 'RoleName' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
-                <th></th>
+                <th ng-if="isAdmin"></th>
               </tr>
             </thead>
             <tbody>
               <tr dir-paginate="user in (state.filteredUsers = (users | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(user)" /></td>
+                <td ng-if="isAdmin"><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(user)" /></td>
                 <td>{{ user.Username }}</td>
                 <td>
+                  <i ng-if="user.Role === 1" class="fa fa-user-circle-o" aria-hidden="true" style="margin-right: 2px;"></i>
+                  <i ng-if="user.Role !== 1 && !user.isTeamLeader" class="fa fa-user" aria-hidden="true" style="margin-right: 2px;"></i>
+                  <i ng-if="user.isTeamLeader" class="fa fa-user-plus" aria-hidden="true" style="margin-right: 2px;"></i>
                   {{ user.RoleName }}
-                  <i class="fa" ng-class="user.RoleId === 1 ? 'fa-user-circle-o' : 'fa-user'" aria-hidden="true" style="margin-left: 2px;"></i>
                 </td>
-                <td>
+                <td ng-if="isAdmin">
                   <a ui-sref="user({id: user.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
                 </td>
               </tr>

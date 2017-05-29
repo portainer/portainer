@@ -7,6 +7,6 @@ angular.module('portainer.rest')
     get: { method: 'GET', params: { id: '@id' } },
     update: { method: 'PUT', params: { id: '@id' } },
     updateAccess: { method: 'PUT', params: { id: '@id', action: 'access' } },
-    remove: { method: 'DELETE', params: { id: '@id'} },
+    remove: { method: 'DELETE', params: { id: '@id'} }
   });
 }]);

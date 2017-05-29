@@ -36,13 +36,13 @@ function ($scope, $state, Network, Config, Notifications, Pagination) {
         $('#createNetworkSpinner').hide();
         Notifications.error('Unable to create network', {}, d.message);
       } else {
-        Notifications.success("Network created", d.Id);
+        Notifications.success('Network created', d.Id);
         $('#createNetworkSpinner').hide();
         $state.reload();
       }
     }, function (e) {
       $('#createNetworkSpinner').hide();
-      Notifications.error("Failure", e, 'Unable to create network');
+      Notifications.error('Failure', e, 'Unable to create network');
     });
   };
 
@@ -82,15 +82,15 @@ function ($scope, $state, Network, Config, Notifications, Pagination) {
         counter = counter + 1;
         Network.remove({id: network.Id}, function (d) {
           if (d.message) {
-            Notifications.error("Error", d, "Unable to remove network");
+            Notifications.error('Error', d, 'Unable to remove network');
           } else {
-            Notifications.success("Network removed", network.Id);
+            Notifications.success('Network removed', network.Id);
             var index = $scope.networks.indexOf(network);
             $scope.networks.splice(index, 1);
           }
           complete();
         }, function (e) {
-          Notifications.error("Failure", e, 'Unable to remove network');
+          Notifications.error('Failure', e, 'Unable to remove network');
           complete();
         });
       }
@@ -104,7 +104,7 @@ function ($scope, $state, Network, Config, Notifications, Pagination) {
       $('#loadNetworksSpinner').hide();
     }, function (e) {
       $('#loadNetworksSpinner').hide();
-      Notifications.error("Failure", e, "Unable to retrieve networks");
+      Notifications.error('Failure', e, 'Unable to retrieve networks');
       $scope.networks = [];
     });
   }

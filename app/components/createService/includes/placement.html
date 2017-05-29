@@ -1,0 +1,31 @@
+<form class="form-horizontal" style="margin-top: 15px;">
+  <div class="form-group">
+    <div class="col-sm-12" style="margin-top: 5px;">
+      <label class="control-label text-left">Placement constraints</label>
+      <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPlacementConstraint()">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> placement constraint
+      </span>
+    </div>
+    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+      <div ng-repeat="constraint in formValues.PlacementConstraints" style="margin-top: 2px;">
+        <div class="input-group col-sm-4 input-group-sm">
+          <span class="input-group-addon">name</span>
+          <input type="text" class="form-control" ng-model="constraint.key" placeholder="e.g. node.role">
+        </div>
+        <div class="input-group col-sm-1 input-group-sm">
+          <select name="constraintOperator" class="form-control" ng-model="constraint.operator">
+            <option value="==">==</option>
+            <option value="!=">!=</option>
+          </select>
+        </div>
+        <div class="input-group col-sm-5 input-group-sm">
+          <span class="input-group-addon">value</span>
+          <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager">
+        </div>
+        <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementConstraint($index)">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
