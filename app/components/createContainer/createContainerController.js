@@ -91,97 +91,6 @@ function ($q, $scope, $state, $stateParams, $filter, Config, Info, Container, Co
     $scope.config.HostConfig.Devices.splice(index, 1);
   };
 
-  /*Config.$promise.then(function (c) {
-    var containersToHideLabels = c.hiddenLabels;
-
-    Volume.query({}, function (d) {
-      $scope.availableVolumes = d.Volumes;
-    }, function (e) {
-      Notifications.error("Failure", e, "Unable to retrieve volumes");
-    });
-
-    Network.query({}, function (d) {
-      var networks = d;
-      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
-          networks = d.filter(function (network) {
-            if (network.Scope === 'global') {
-              return network;
-            }
-          });
-        }
-        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-          networks = d.filter(function (network) {
-            return network.Driver !== 'overlay' || network.Attachable;
-          });
-        }
-        $scope.globalNetworkCount = networks.length;
-        networks.push({Name: "bridge"});
-        networks.push({Name: "host"});
-        networks.push({Name: "none"});
-      }
-      networks.push({Name: "container"});
-      $scope.availableNetworks = networks;
-      if (!_.find(networks, {'Name': 'bridge'})) {
-        $scope.config.HostConfig.NetworkMode = 'nat';
-      }
-    }, function (e) {
-      Notifications.error("Failure", e, "Unable to retrieve networks");
-    });
-
-    Container.query({}, function (d) {
-      var containers = d;
-      if (containersToHideLabels) {
-        containers = ContainerHelper.hideContainers(d, containersToHideLabels);
-      }
-      $scope.runningContainers = containers;
-    }, function(e) {
-      Notifications.error("Failure", e, "Unable to retrieve running containers");
-    });
-  });*/
-
-  /*function startContainer(containerID) {
-    Container.start({id: containerID}, {}, function (cd) {
-      if (cd.message) {
-        $('#createContainerSpinner').hide();
-        Notifications.error('Error', {}, cd.message);
-      } else {
-        $('#createContainerSpinner').hide();
-        Notifications.success('Container Started', containerID);
-        $state.go('containers', {}, {reload: true});
-      }
-    }, function (e) {
-      $('#createContainerSpinner').hide();
-      Notifications.error("Failure", e, 'Unable to start container');
-    });
-  }*/
-
-  /*function createContainer(config) {
-    console.log(config);
-    Container.create(config, function (d) {
-      if (d.message) {
-        $('#createContainerSpinner').hide();
-        Notifications.error('Error', {}, d.message);
-      } else {
-        if ($scope.formValues.Ownership === 'private') {
-          ResourceControlService.setContainerResourceControl(Authentication.getUserDetails().ID, d.Id)
-          .then(function success() {
-            startContainer(d.Id);
-          })
-          .catch(function error(err) {
-            $('#createContainerSpinner').hide();
-            Notifications.error("Failure", err, 'Unable to apply resource control on container');
-          });
-        } else {
-          startContainer(d.Id);
-        }
-      }
-    }, function (e) {
-      $('#createContainerSpinner').hide();
-      Notifications.error("Failure", e, 'Unable to create container');
-    });
-  }*/
-
   function prepareImageConfig(config) {
     var image = config.Image;
     var registry = $scope.formValues.Registry;
@@ -381,8 +290,6 @@ function ($q, $scope, $state, $stateParams, $filter, Config, Info, Container, Co
   }
 
   function loadFromContainerSpec() {
-	// If we got a template, we prefill fields
-  //if ($stateParams.from !== '') {
     // Get container
     Container.get({id: $stateParams.from}, function(d) {
 			// Add Config
