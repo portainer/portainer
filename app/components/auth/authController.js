@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
-function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, EndpointService, StateManager, EndpointProvider, Notifications) {
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
+function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Authentication, Users, EndpointService, StateManager, EndpointProvider, Notifications) {
 
   $scope.authData = {
     username: 'admin',

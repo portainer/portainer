@@ -19,6 +19,11 @@ angular.module('portainer.services')
     state.endpoint = {};
   };
 
+  manager.updateLogo = function(logoURL) {
+    state.application.logo = logoURL;
+    LocalStorage.storeApplicationState(state.application);
+  };
+
   manager.initialize = function () {
     var deferred = $q.defer();
 

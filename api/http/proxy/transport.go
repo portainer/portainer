@@ -15,6 +15,7 @@ type (
 		dockerTransport        *http.Transport
 		ResourceControlService portainer.ResourceControlService
 		TeamMembershipService  portainer.TeamMembershipService
+		SettingsService        portainer.SettingsService
 	}
 	restrictedOperationContext struct {
 		isAdmin          bool
@@ -22,7 +23,11 @@ type (
 		userTeamIDs      []portainer.TeamID
 		resourceControls []portainer.ResourceControl
 	}
-	restrictedOperationRequest func(*http.Request, *http.Response, *restrictedOperationContext) error
+	operationExecutor struct {
+		operationContext *restrictedOperationContext
+		labelBlackList   []portainer.Pair
+	}
+	restrictedOperationRequest func(*http.Request, *http.Response, *operationExecutor) error
 )
 
 func newSocketTransport(socketPath string) *http.Transport {
@@ -60,7 +65,6 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 }
 
 func (p *proxyTransport) proxyContainerRequest(request *http.Request) (*http.Response, error) {
-	// return p.executeDockerRequest(request)
 	switch requestPath := request.URL.Path; requestPath {
 	case "/containers/create":
 		return p.executeDockerRequest(request)
@@ -69,7 +73,7 @@ func (p *proxyTransport) proxyContainerRequest(request *http.Request) (*http.Res
 		return p.administratorOperation(request)
 
 	case "/containers/json":
-		return p.rewriteOperation(request, containerListOperation)
+		return p.rewriteOperationWithLabelFiltering(request, containerListOperation)
 
 	default:
 		// This section assumes /containers/**
@@ -95,9 +99,6 @@ func (p *proxyTransport) proxyServiceRequest(request *http.Request) (*http.Respo
 	switch requestPath := request.URL.Path; requestPath {
 	case "/services/create":
 		return p.executeDockerRequest(request)
-
-	case "/volumes/prune":
-		return p.administratorOperation(request)
 
 	case "/services":
 		return p.rewriteOperation(request, serviceListOperation)
@@ -177,9 +178,7 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 	return p.executeDockerRequest(request)
 }
 
-// rewriteOperation will create a new operation context with data that will be used
-// to decorate the original request's response.
-func (p *proxyTransport) rewriteOperation(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
+func (p *proxyTransport) createOperationContext(request *http.Request) (*restrictedOperationContext, error) {
 	var err error
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
@@ -212,12 +211,50 @@ func (p *proxyTransport) rewriteOperation(request *http.Request, operation restr
 		operationContext.userTeamIDs = userTeamIDs
 	}
 
+	return operationContext, nil
+}
+
+func (p *proxyTransport) rewriteOperationWithLabelFiltering(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
+	operationContext, err := p.createOperationContext(request)
+	if err != nil {
+		return nil, err
+	}
+
+	settings, err := p.SettingsService.Settings()
+	if err != nil {
+		return nil, err
+	}
+
+	executor := &operationExecutor{
+		operationContext: operationContext,
+		labelBlackList:   settings.BlackListedLabels,
+	}
+
+	return p.executeRequestAndRewriteResponse(request, operation, executor)
+}
+
+// rewriteOperation will create a new operation context with data that will be used
+// to decorate the original request's response.
+func (p *proxyTransport) rewriteOperation(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
+	operationContext, err := p.createOperationContext(request)
+	if err != nil {
+		return nil, err
+	}
+
+	executor := &operationExecutor{
+		operationContext: operationContext,
+	}
+
+	return p.executeRequestAndRewriteResponse(request, operation, executor)
+}
+
+func (p *proxyTransport) executeRequestAndRewriteResponse(request *http.Request, operation restrictedOperationRequest, executor *operationExecutor) (*http.Response, error) {
 	response, err := p.executeDockerRequest(request)
 	if err != nil {
 		return response, err
 	}
 
-	err = operation(request, response, operationContext)
+	err = operation(request, response, executor)
 	return response, err
 }
 

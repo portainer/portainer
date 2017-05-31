@@ -82,16 +82,6 @@ func initEndpointWatcher(endpointService portainer.EndpointService, externalEnpo
 	return authorizeEndpointMgmt
 }
 
-func initOldSettings(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portainer.OldSettings {
-	return &portainer.OldSettings{
-		HiddenLabels:       *flags.Labels,
-		Logo:               *flags.Logo,
-		Analytics:          !*flags.NoAnalytics,
-		Authentication:     !*flags.NoAuth,
-		EndpointManagement: authorizeEndpointMgmt,
-	}
-}
-
 func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
 		Analytics:          !*flags.NoAnalytics,
@@ -110,9 +100,9 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		}
 
 		if *flags.Labels != nil {
-			settings.FilteredContainersLabels = *flags.Labels
+			settings.BlackListedLabels = *flags.Labels
 		} else {
-			settings.FilteredContainersLabels = make([]portainer.Pair, 0)
+			settings.BlackListedLabels = make([]portainer.Pair, 0)
 		}
 
 		return settingsService.StoreSettings(settings)
@@ -151,8 +141,6 @@ func main() {
 	}
 
 	applicationStatus := initStatus(authorizeEndpointMgmt, flags)
-
-	OldSettings := initOldSettings(authorizeEndpointMgmt, flags)
 
 	if *flags.Endpoint != "" {
 		var endpoints []portainer.Endpoint
@@ -197,7 +185,6 @@ func main() {
 		Status:                 applicationStatus,
 		BindAddress:            *flags.Addr,
 		AssetsPath:             *flags.Assets,
-		OldSettings:            OldSettings,
 		AuthDisabled:           *flags.NoAuth,
 		EndpointManagement:     authorizeEndpointMgmt,
 		UserService:            store.UserService,

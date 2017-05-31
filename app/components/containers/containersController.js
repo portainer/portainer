@@ -1,6 +1,6 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'Info', 'Notifications', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider',
-  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, Info, Notifications, Config, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'Info', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider',
+  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, Info, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = true;
@@ -25,9 +25,6 @@ angular.module('containers', [])
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
-      if ($scope.containersToHideLabels) {
-        containers = ContainerHelper.hideContainers(d, $scope.containersToHideLabels);
-      }
       $scope.containers = containers.map(function (container) {
         var model = new ContainerViewModel(container);
         model.Status = $filter('containerstatus')(model.Status);
@@ -205,8 +202,7 @@ angular.module('containers', [])
     return swarm_hosts;
   }
 
-  Config.$promise.then(function (c) {
-    $scope.containersToHideLabels = c.hiddenLabels;
+  function initView(){
     if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
       Info.get({}, function (d) {
         $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
@@ -215,5 +211,7 @@ angular.module('containers', [])
     } else {
       update({all: $scope.state.displayAll ? 1 : 0});
     }
-  });
+  }
+
+  initView();
 }]);

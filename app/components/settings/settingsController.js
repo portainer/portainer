@@ -1,6 +1,6 @@
 angular.module('settings', [])
-.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'DEFAULT_TEMPLATES_URL',
-function ($scope, $state, Notifications, SettingsService, DEFAULT_TEMPLATES_URL) {
+.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_TEMPLATES_URL',
+function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_TEMPLATES_URL) {
 
   $scope.formValues = {
     customLogo: false,
@@ -11,7 +11,7 @@ function ($scope, $state, Notifications, SettingsService, DEFAULT_TEMPLATES_URL)
 
   $scope.removeFilteredContainerLabel = function(index) {
     var settings = $scope.settings;
-    settings.FilteredContainersLabels.splice(index, 1);
+    settings.BlackListedLabels.splice(index, 1);
 
     updateSettings(settings, false);
   };
@@ -22,7 +22,7 @@ function ($scope, $state, Notifications, SettingsService, DEFAULT_TEMPLATES_URL)
       name: $scope.formValues.labelName,
       value: $scope.formValues.labelValue
     };
-    settings.FilteredContainersLabels.push(label);
+    settings.BlackListedLabels.push(label);
 
     updateSettings(settings, true);
   };
@@ -52,6 +52,7 @@ function ($scope, $state, Notifications, SettingsService, DEFAULT_TEMPLATES_URL)
     SettingsService.update(settings)
     .then(function success(data) {
       Notifications.success('Settings updated');
+      StateManager.updateLogo(settings.LogoURL);
       if (resetForm) {
         resetFormValues();
       }

@@ -1,6 +1,6 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Config', 'ImageService', 'Notifications', 'Pagination', 'ModalService',
-function ($scope, $state, Config, ImageService, Notifications, Pagination, ModalService) {
+.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'Pagination', 'ModalService',
+function ($scope, $state, ImageService, Notifications, Pagination, ModalService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('images');
   $scope.sortType = 'RepoTags';

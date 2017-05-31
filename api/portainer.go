@@ -43,19 +43,9 @@ type (
 
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL             string `json:"TemplatesURL"`
-		LogoURL                  string `json:"LogoURL"`
-		FilteredContainersLabels []Pair `json:"FilteredContainersLabels"`
-	}
-
-	// OldSettings represents Portainer OldSettings.
-	// Deprecated
-	OldSettings struct {
-		HiddenLabels       []Pair `json:"hiddenLabels"`
-		Logo               string `json:"logo"`
-		Authentication     bool   `json:"authentication"`
-		Analytics          bool   `json:"analytics"`
-		EndpointManagement bool   `json:"endpointManagement"`
+		TemplatesURL      string `json:"TemplatesURL"`
+		LogoURL           string `json:"LogoURL"`
+		BlackListedLabels []Pair `json:"BlackListedLabels"`
 	}
 
 	// User represents a user account.
