@@ -107,8 +107,14 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		settings := &portainer.Settings{
 			LogoURL:      *flags.Logo,
 			TemplatesURL: *flags.Templates,
-			Registries:   make([]portainer.RegistryDetails, 0),
 		}
+
+		if *flags.Labels != nil {
+			settings.FilteredContainersLabels = *flags.Labels
+		} else {
+			settings.FilteredContainersLabels = make([]portainer.Pair, 0)
+		}
+
 		return settingsService.StoreSettings(settings)
 	} else if err != nil {
 		return err

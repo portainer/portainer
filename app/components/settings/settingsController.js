@@ -4,11 +4,30 @@ function ($scope, $state, Notifications, SettingsService, DEFAULT_TEMPLATES_URL)
 
   $scope.formValues = {
     customLogo: false,
-    customTemplates: false
+    customTemplates: false,
+    labelName: '',
+    labelValue: ''
   };
 
-  $scope.updateSettings = function() {
-    $('#loadingViewSpinner').show();
+  $scope.removeFilteredContainerLabel = function(index) {
+    var settings = $scope.settings;
+    settings.FilteredContainersLabels.splice(index, 1);
+
+    updateSettings(settings, false);
+  };
+
+  $scope.addFilteredContainerLabel = function() {
+    var settings = $scope.settings;
+    var label = {
+      name: $scope.formValues.labelName,
+      value: $scope.formValues.labelValue
+    };
+    settings.FilteredContainersLabels.push(label);
+
+    updateSettings(settings, true);
+  };
+
+  $scope.saveApplicationSettings = function() {
     var settings = $scope.settings;
 
     if (!$scope.formValues.customLogo) {
@@ -19,10 +38,23 @@ function ($scope, $state, Notifications, SettingsService, DEFAULT_TEMPLATES_URL)
       settings.TemplatesURL = DEFAULT_TEMPLATES_URL;
     }
 
+    updateSettings(settings, false);
+  };
+
+  function resetFormValues() {
+    $scope.formValues.labelName = '';
+    $scope.formValues.labelValue = '';
+  }
+
+  function updateSettings(settings, resetForm) {
+    $('#loadingViewSpinner').show();
+
     SettingsService.update(settings)
     .then(function success(data) {
       Notifications.success('Settings updated');
-      $state.reload();
+      if (resetForm) {
+        resetFormValues();
+      }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update settings');
@@ -30,7 +62,7 @@ function ($scope, $state, Notifications, SettingsService, DEFAULT_TEMPLATES_URL)
     .finally(function final() {
       $('#loadingViewSpinner').hide();
     });
-  };
+  }
 
   function initView() {
     $('#loadingViewSpinner').show();

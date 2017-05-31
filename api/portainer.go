@@ -17,9 +17,6 @@ type (
 		ExternalEndpoints *string
 		SyncInterval      *string
 		Endpoint          *string
-		Labels            *[]Pair
-		Logo              *string
-		Templates         *string
 		NoAuth            *bool
 		NoAnalytics       *bool
 		TLSVerify         *bool
@@ -30,6 +27,10 @@ type (
 		SSLCert           *string
 		SSLKey            *string
 		AdminPassword     *string
+		// Deprecated fields
+		Logo      *string
+		Templates *string
+		Labels    *[]Pair
 	}
 
 	// Status represents the application status.
@@ -42,19 +43,9 @@ type (
 
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL string `json:"TemplatesURL"`
-		LogoURL      string `json:"LogoURL"`
-		Registries   []RegistryDetails
-		// FilteredLabels []string `json:"FilteredLabels"`
-		// RegistryURLs   []string `json:"RegistryURLs"`
-	}
-
-	// RegistryDetails represents information about a registry.
-	RegistryDetails struct {
-		URL            string `json:"URL"`
-		Authentication bool   `json:"Authentication"`
-		Username       string `json:"Username"`
-		Password       string `json:"Password"`
+		TemplatesURL             string `json:"TemplatesURL"`
+		LogoURL                  string `json:"LogoURL"`
+		FilteredContainersLabels []Pair `json:"FilteredContainersLabels"`
 	}
 
 	// OldSettings represents Portainer OldSettings.

@@ -30,7 +30,6 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 
 	flags := &portainer.CLIFlags{
 		Endpoint:          kingpin.Flag("host", "Dockerd endpoint").Short('H').String(),
-		Labels:            pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
 		ExternalEndpoints: kingpin.Flag("external-endpoints", "Path to a file defining available endpoints").String(),
 		SyncInterval:      kingpin.Flag("sync-interval", "Duration between each synchronization via the external endpoints source").Default(defaultSyncInterval).String(),
 		Addr:              kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
@@ -47,6 +46,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		SSLKey:            kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").Default(defaultSSLKeyPath).String(),
 		AdminPassword:     kingpin.Flag("admin-password", "Hashed admin password").String(),
 		// Deprecated flags
+		Labels:    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
 		Logo:      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
 		Templates: kingpin.Flag("templates", "URL to the templates (apps) definitions").Default(defaultTemplatesURL).Short('t').String(),
 	}
@@ -81,7 +81,7 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 		return errNoAuthExcludeAdminPassword
 	}
 
-	displayDeprecationWarnings(*flags.Templates, *flags.Logo)
+	displayDeprecationWarnings(*flags.Templates, *flags.Logo, *flags.Labels)
 
 	return nil
 }
@@ -127,11 +127,14 @@ func validateSyncInterval(syncInterval string) error {
 	return nil
 }
 
-func displayDeprecationWarnings(templates, logo string) {
+func displayDeprecationWarnings(templates, logo string, labels []portainer.Pair) {
 	if templates != "" {
-		log.Println("Warning: the --templates flag is deprecated and will be removed in future versions.")
+		log.Println("Warning: the --templates / -t flag is deprecated and will be removed in future versions.")
 	}
 	if logo != "" {
 		log.Println("Warning: the --logo flag is deprecated and will be removed in future versions.")
+	}
+	if labels != nil {
+		log.Println("Warning: the --hide-label / -l flag is deprecated and will be removed in future versions.")
 	}
 }

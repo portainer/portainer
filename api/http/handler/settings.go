@@ -63,8 +63,9 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 	}
 
 	settings := &portainer.Settings{
-		TemplatesURL: req.TemplatesURL,
-		LogoURL:      req.LogoURL,
+		TemplatesURL:             req.TemplatesURL,
+		LogoURL:                  req.LogoURL,
+		FilteredContainersLabels: req.FilteredContainersLabels,
 	}
 
 	err = handler.SettingsService.StoreSettings(settings)
@@ -74,6 +75,7 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 }
 
 type putSettingsRequest struct {
-	TemplatesURL string `valid:"required"`
-	LogoURL      string `valid:""`
+	TemplatesURL             string           `valid:"required"`
+	LogoURL                  string           `valid:""`
+	FilteredContainersLabels []portainer.Pair `valid:""`
 }
