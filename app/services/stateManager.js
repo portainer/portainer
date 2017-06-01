@@ -24,6 +24,11 @@ angular.module('portainer.services')
     LocalStorage.storeApplicationState(state.application);
   };
 
+  manager.updateExternalContributions = function(displayExternalContributors) {
+    state.application.displayExternalContributors = displayExternalContributors;
+    LocalStorage.storeApplicationState(state.application);
+  };
+
   manager.initialize = function () {
     var deferred = $q.defer();
 
@@ -50,6 +55,7 @@ angular.module('portainer.services')
         state.application.endpointManagement = status.EndpointManagement;
         state.application.version = status.Version;
         state.application.logo = settings.LogoURL;
+        state.application.displayExternalContributors = settings.DisplayExternalContributors;
         LocalStorage.storeApplicationState(state.application);
         deferred.resolve(state);
       })

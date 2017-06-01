@@ -3,6 +3,7 @@ angular.module('sidebar', [])
 function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService) {
 
   $scope.uiVersion = StateManager.getState().application.version;
+  $scope.displayExternalContributors = StateManager.getState().application.displayExternalContributors;
   $scope.logo = StateManager.getState().application.logo;
   $scope.endpoints = [];
 

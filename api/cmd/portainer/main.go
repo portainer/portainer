@@ -95,8 +95,9 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 	_, err := settingsService.Settings()
 	if err == portainer.ErrSettingsNotFound {
 		settings := &portainer.Settings{
-			LogoURL:      *flags.Logo,
-			TemplatesURL: *flags.Templates,
+			LogoURL:                     *flags.Logo,
+			TemplatesURL:                *flags.Templates,
+			DisplayExternalContributors: true,
 		}
 
 		if *flags.Labels != nil {

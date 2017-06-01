@@ -5,6 +5,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
   $scope.formValues = {
     customLogo: false,
     customTemplates: false,
+    externalContributions: false,
     labelName: '',
     labelValue: ''
   };
@@ -37,6 +38,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     if (!$scope.formValues.customTemplates) {
       settings.TemplatesURL = DEFAULT_TEMPLATES_URL;
     }
+    settings.DisplayExternalContributors = !$scope.formValues.externalContributions;
 
     updateSettings(settings, false);
   };
@@ -53,6 +55,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     .then(function success(data) {
       Notifications.success('Settings updated');
       StateManager.updateLogo(settings.LogoURL);
+      StateManager.updateExternalContributions(settings.DisplayExternalContributors);
       if (resetForm) {
         resetFormValues();
       }
@@ -70,13 +73,14 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     SettingsService.settings()
     .then(function success(data) {
       var settings = data;
+      $scope.settings = settings;
       if (settings.LogoURL !== '') {
         $scope.formValues.customLogo = true;
       }
       if (settings.TemplatesURL !== DEFAULT_TEMPLATES_URL) {
         $scope.formValues.customTemplates = true;
       }
-      $scope.settings = settings;
+      $scope.formValues.externalContributions = !settings.DisplayExternalContributors;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');

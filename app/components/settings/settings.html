@@ -28,7 +28,7 @@
           <div ng-if="formValues.customLogo">
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                You can specify the URL to your logo here.
+                You can specify the URL to your logo here. For an optimal display, logo dimensions should be 155px by 55px.
               </span>
             </div>
             <div class="form-group">
@@ -68,6 +68,17 @@
               <div class="col-sm-11">
                 <input type="text" class="form-control" ng-model="settings.TemplatesURL" id="templates_url" placeholder="https://myserver.mydomain/templates.json">
               </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_external_contrib" class="control-label text-left">
+                Hide external contributions
+                <portainer-tooltip position="bottom" message="When enabled, external contributions such as LinuxServer.io will not be displayed in the sidebar."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_external_contrib" ng-model="formValues.externalContributions"><i></i>
+              </label>
             </div>
           </div>
           <!-- !app-templates -->

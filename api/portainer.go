@@ -43,9 +43,10 @@ type (
 
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL      string `json:"TemplatesURL"`
-		LogoURL           string `json:"LogoURL"`
-		BlackListedLabels []Pair `json:"BlackListedLabels"`
+		TemplatesURL                string `json:"TemplatesURL"`
+		LogoURL                     string `json:"LogoURL"`
+		BlackListedLabels           []Pair `json:"BlackListedLabels"`
+		DisplayExternalContributors bool   `json:"DisplayExternalContributors"`
 	}
 
 	// User represents a user account.
