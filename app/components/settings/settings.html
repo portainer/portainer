@@ -100,7 +100,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tags" title="Filtered containers"></rd-widget-header>
+      <rd-widget-header icon="fa-tags" title="Hidden containers"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -118,7 +118,7 @@
               <input type="text" class="form-control" id="header_value" ng-model="formValues.labelValue" placeholder="e.g. bar">
             </div>
             <div class="col-sm-12 col-md-2 margin-sm-top">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="addFilteredContainerLabel()"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add label</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="addFilteredContainerLabel()" ng-disabled="!formValues.labelValue || !formValues.labelName"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add filter</button>
             </div>
           </div>
           <div class="form-group">
@@ -138,7 +138,7 @@
                     <td><button type="button" class="btn btn-danger btn-xs" ng-click="removeFilteredContainerLabel($index)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button></td>
                   </tr>
                   <tr ng-if="settings.BlackListedLabels.length === 0">
-                    <td colspan="2" class="text-center text-muted">No filtered containers labels.</td>
+                    <td colspan="2" class="text-center text-muted">No filter available.</td>
                   </tr>
                   <tr ng-if="!settings.BlackListedLabels">
                     <td colspan="2" class="text-center text-muted">Loading...</td>
