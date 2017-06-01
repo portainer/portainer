@@ -48,7 +48,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		// Deprecated flags
 		Labels:    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
 		Logo:      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
-		Templates: kingpin.Flag("templates", "URL to the templates (apps) definitions").Default(defaultTemplatesURL).Short('t').String(),
+		Templates: kingpin.Flag("templates", "URL to the templates (apps) definitions").Short('t').String(),
 	}
 
 	kingpin.Parse()
