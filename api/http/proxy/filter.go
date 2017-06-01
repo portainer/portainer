@@ -65,21 +65,6 @@ func filterContainerList(containerData []interface{}, resourceControls []portain
 	return filteredContainerData, nil
 }
 
-func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelBlackList []portainer.Pair) bool {
-	for key, value := range containerLabels {
-		labelName := key
-		labelValue := value.(string)
-
-		for _, blackListedLabel := range labelBlackList {
-			if blackListedLabel.Name == labelName && blackListedLabel.Value == labelValue {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 // filterContainersWithLabels loops through a list of containers, and filters containers that do not contains
 // any labels in the labels black list.
 func filterContainersWithBlackListedLabels(containerData []interface{}, labelBlackList []portainer.Pair) ([]interface{}, error) {

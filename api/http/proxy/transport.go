@@ -178,42 +178,9 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 	return p.executeDockerRequest(request)
 }
 
-func (p *proxyTransport) createOperationContext(request *http.Request) (*restrictedOperationContext, error) {
-	var err error
-	tokenData, err := security.RetrieveTokenData(request)
-	if err != nil {
-		return nil, err
-	}
-
-	resourceControls, err := p.ResourceControlService.ResourceControls()
-	if err != nil {
-		return nil, err
-	}
-
-	operationContext := &restrictedOperationContext{
-		isAdmin:          true,
-		userID:           tokenData.ID,
-		resourceControls: resourceControls,
-	}
-
-	if tokenData.Role != portainer.AdministratorRole {
-		operationContext.isAdmin = false
-
-		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		userTeamIDs := make([]portainer.TeamID, 0)
-		for _, membership := range teamMemberships {
-			userTeamIDs = append(userTeamIDs, membership.TeamID)
-		}
-		operationContext.userTeamIDs = userTeamIDs
-	}
-
-	return operationContext, nil
-}
-
+// rewriteOperation will create a new operation context with data that will be used
+// to decorate the original request's response as well as retrieve all the black listed labels
+// to filter the resources.
 func (p *proxyTransport) rewriteOperationWithLabelFiltering(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
 	operationContext, err := p.createOperationContext(request)
 	if err != nil {
@@ -271,4 +238,40 @@ func (p *proxyTransport) administratorOperation(request *http.Request) (*http.Re
 	}
 
 	return p.executeDockerRequest(request)
+}
+
+func (p *proxyTransport) createOperationContext(request *http.Request) (*restrictedOperationContext, error) {
+	var err error
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	resourceControls, err := p.ResourceControlService.ResourceControls()
+	if err != nil {
+		return nil, err
+	}
+
+	operationContext := &restrictedOperationContext{
+		isAdmin:          true,
+		userID:           tokenData.ID,
+		resourceControls: resourceControls,
+	}
+
+	if tokenData.Role != portainer.AdministratorRole {
+		operationContext.isAdmin = false
+
+		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		userTeamIDs := make([]portainer.TeamID, 0)
+		for _, membership := range teamMemberships {
+			userTeamIDs = append(userTeamIDs, membership.TeamID)
+		}
+		operationContext.userTeamIDs = userTeamIDs
+	}
+
+	return operationContext, nil
 }
