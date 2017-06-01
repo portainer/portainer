@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator',
-function ($q, $scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator',
+function ($q, $scope, $state, $stateParams, $filter, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -233,47 +233,41 @@ function ($q, $scope, $state, $stateParams, $filter, Config, Info, Container, Co
   }
 
   function initView() {
-    Config.$promise.then(function (c) {
-      var containersToHideLabels = c.hiddenLabels;
-
-      Volume.query({}, function (d) {
-        $scope.availableVolumes = d.Volumes;
-      }, function (e) {
-        Notifications.error('Failure', e, 'Unable to retrieve volumes');
-      });
-
-      Network.query({}, function (d) {
-        var networks = d;
-        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-          networks = d.filter(function (network) {
-            if (network.Scope === 'global') {
-              return network;
-            }
-          });
-          $scope.globalNetworkCount = networks.length;
-          networks.push({Name: 'bridge'});
-          networks.push({Name: 'host'});
-          networks.push({Name: 'none'});
-        }
-        networks.push({Name: 'container'});
-        $scope.availableNetworks = networks;
-        if (!_.find(networks, {'Name': 'bridge'})) {
-          $scope.config.HostConfig.NetworkMode = 'nat';
-        }
-      }, function (e) {
-        Notifications.error('Failure', e, 'Unable to retrieve networks');
-      });
-
-      Container.query({}, function (d) {
-        var containers = d;
-        if (containersToHideLabels) {
-          containers = ContainerHelper.hideContainers(d, containersToHideLabels);
-        }
-        $scope.runningContainers = containers;
-      }, function(e) {
-        Notifications.error('Failure', e, 'Unable to retrieve running containers');
-      });
+    Volume.query({}, function (d) {
+      $scope.availableVolumes = d.Volumes;
+    }, function (e) {
+      Notifications.error('Failure', e, 'Unable to retrieve volumes');
     });
+
+    Network.query({}, function (d) {
+      var networks = d;
+      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
+        networks = d.filter(function (network) {
+          if (network.Scope === 'global') {
+            return network;
+          }
+        });
+        $scope.globalNetworkCount = networks.length;
+        networks.push({Name: 'bridge'});
+        networks.push({Name: 'host'});
+        networks.push({Name: 'none'});
+      }
+      networks.push({Name: 'container'});
+      $scope.availableNetworks = networks;
+      if (!_.find(networks, {'Name': 'bridge'})) {
+        $scope.config.HostConfig.NetworkMode = 'nat';
+      }
+    }, function (e) {
+      Notifications.error('Failure', e, 'Unable to retrieve networks');
+    });
+
+    Container.query({}, function (d) {
+      var containers = d;
+      $scope.runningContainers = containers;
+    }, function(e) {
+      Notifications.error('Failure', e, 'Unable to retrieve running containers');
+    });
+
   }
 
   function validateForm(accessControlData, isAdmin) {
@@ -327,5 +321,4 @@ function ($q, $scope, $state, $stateParams, $filter, Config, Info, Container, Co
   }
 
   initView();
-
 }]);

@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Image', ['$resource', 'Settings', 'EndpointProvider', function ImageFactory($resource, Settings, EndpointProvider) {
+.factory('Image', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function ImageFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
   'use strict';
-  return $resource(Settings.url + '/:endpointId/images/:id/:action', {
+  return $resource(DOCKER_ENDPOINT + '/:endpointId/images/:id/:action', {
     endpointId: EndpointProvider.endpointID
   },
   {

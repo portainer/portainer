@@ -47,6 +47,11 @@ const (
 	ErrDBVersionNotFound = Error("DB version not found")
 )
 
+// Settings errors.
+const (
+	ErrSettingsNotFound = Error("Settings not found")
+)
+
 // Crypto errors.
 const (
 	ErrCryptoHashFailure = Error("Unable to hash data")

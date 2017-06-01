@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Events', ['$resource', 'Settings', 'EndpointProvider', function EventFactory($resource, Settings, EndpointProvider) {
+.factory('Events', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function EventFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
   'use strict';
-  return $resource(Settings.url + '/:endpointId/events', {
+  return $resource(DOCKER_ENDPOINT + '/:endpointId/events', {
     endpointId: EndpointProvider.endpointID
   },
   {

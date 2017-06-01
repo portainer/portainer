@@ -57,6 +57,7 @@ angular.module('portainer', [
   'templates',
   'user',
   'users',
+  'userSettings',
   'volume',
   'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider) {
@@ -594,6 +595,19 @@ angular.module('portainer', [
         }
       }
     })
+    .state('userSettings', {
+      url: '/userSettings/',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/userSettings/userSettings.html',
+          controller: 'UserSettingsController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('teams', {
       url: '/teams/',
       views: {
@@ -662,9 +676,11 @@ angular.module('portainer', [
   }])
   // This is your docker url that the api will use to make requests
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
-  .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is required.  If you have a port, prefix it with a ':' i.e. :4243
+  // .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is required.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('DOCKER_ENDPOINT', 'api/docker')
-  .constant('CONFIG_ENDPOINT', 'api/settings')
+  .constant('CONFIG_ENDPOINT', 'api/old_settings')
+  .constant('SETTINGS_ENDPOINT', 'api/settings')
+  .constant('STATUS_ENDPOINT', 'api/status')
   .constant('AUTH_ENDPOINT', 'api/auth')
   .constant('USERS_ENDPOINT', 'api/users')
   .constant('TEAMS_ENDPOINT', 'api/teams')
@@ -672,5 +688,6 @@ angular.module('portainer', [
   .constant('RESOURCE_CONTROL_ENDPOINT', 'api/resource_controls')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
-  .constant('PAGINATION_MAX_ITEMS', 10)
-  .constant('UI_VERSION', 'v1.13.1');
+  .constant('DEFAULT_TEMPLATES_URL', 'https://raw.githubusercontent.com/portainer/templates/master/templates.json')
+  .constant('PAGINATION_MAX_ITEMS', 10);
+  // .constant('UI_VERSION', 'v1.13.1');

@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Task', ['$resource', 'Settings', 'EndpointProvider', function TaskFactory($resource, Settings, EndpointProvider) {
+.factory('Task', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function TaskFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
   'use strict';
-  return $resource(Settings.url + '/:endpointId/tasks/:id', {
+  return $resource(DOCKER_ENDPOINT + '/:endpointId/tasks/:id', {
     endpointId: EndpointProvider.endpointID
   },
   {

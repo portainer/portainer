@@ -1,9 +1,9 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'Info', 'Settings', 'Notifications', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider',
-  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, Info, Settings, Notifications, Config, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'Info', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider',
+  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, Info, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
-  $scope.state.displayAll = Settings.displayAll;
+  $scope.state.displayAll = true;
   $scope.state.displayIP = false;
   $scope.sortType = 'State';
   $scope.sortReverse = false;
@@ -25,9 +25,6 @@ angular.module('containers', [])
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
-      if ($scope.containersToHideLabels) {
-        containers = ContainerHelper.hideContainers(d, $scope.containersToHideLabels);
-      }
       $scope.containers = containers.map(function (container) {
         var model = new ContainerViewModel(container);
         model.Status = $filter('containerstatus')(model.Status);
@@ -59,7 +56,7 @@ angular.module('containers', [])
       counter = counter - 1;
       if (counter === 0) {
         $('#loadContainersSpinner').hide();
-        update({all: Settings.displayAll ? 1 : 0});
+        update({all: $scope.state.displayAll ? 1 : 0});
       }
     };
     angular.forEach(items, function (c) {
@@ -134,8 +131,7 @@ angular.module('containers', [])
   };
 
   $scope.toggleGetAll = function () {
-    Settings.displayAll = $scope.state.displayAll;
-    update({all: Settings.displayAll ? 1 : 0});
+    update({all: $scope.state.displayAll ? 1 : 0});
   };
 
   $scope.startAction = function () {
@@ -206,15 +202,16 @@ angular.module('containers', [])
     return swarm_hosts;
   }
 
-  Config.$promise.then(function (c) {
-    $scope.containersToHideLabels = c.hiddenLabels;
+  function initView(){
     if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
       Info.get({}, function (d) {
         $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
-        update({all: Settings.displayAll ? 1 : 0});
+        update({all: $scope.state.displayAll ? 1 : 0});
       });
     } else {
-      update({all: Settings.displayAll ? 1 : 0});
+      update({all: $scope.state.displayAll ? 1 : 0});
     }
-  });
+  }
+
+  initView();
 }]);

@@ -22,6 +22,7 @@ type Store struct {
 	EndpointService        *EndpointService
 	ResourceControlService *ResourceControlService
 	VersionService         *VersionService
+	SettingsService        *SettingsService
 
 	db                    *bolt.DB
 	checkForDataMigration bool
@@ -35,6 +36,7 @@ const (
 	teamMembershipBucketName  = "team_membership"
 	endpointBucketName        = "endpoints"
 	resourceControlBucketName = "resource_control"
+	settingsBucketName        = "settings"
 )
 
 // NewStore initializes a new Store and the associated services
@@ -47,6 +49,7 @@ func NewStore(storePath string) (*Store, error) {
 		EndpointService:        &EndpointService{},
 		ResourceControlService: &ResourceControlService{},
 		VersionService:         &VersionService{},
+		SettingsService:        &SettingsService{},
 	}
 	store.UserService.store = store
 	store.TeamService.store = store
@@ -54,6 +57,7 @@ func NewStore(storePath string) (*Store, error) {
 	store.EndpointService.store = store
 	store.ResourceControlService.store = store
 	store.VersionService.store = store
+	store.SettingsService.store = store
 
 	_, err := os.Stat(storePath + "/" + databaseFileName)
 	if err != nil && os.IsNotExist(err) {
@@ -97,6 +101,10 @@ func (store *Store) Open() error {
 			return err
 		}
 		_, err = tx.CreateBucketIfNotExists([]byte(teamMembershipBucketName))
+		if err != nil {
+			return err
+		}
+		_, err = tx.CreateBucketIfNotExists([]byte(settingsBucketName))
 		if err != nil {
 			return err
 		}

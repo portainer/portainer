@@ -1,17 +1,14 @@
 angular.module('portainer.services')
-.factory('ContainerService', ['$q', 'Container', 'ContainerHelper', 'ResourceControlService', function ContainerServiceFactory($q, Container, ContainerHelper, ResourceControlService) {
+.factory('ContainerService', ['$q', 'Container', 'ResourceControlService', function ContainerServiceFactory($q, Container, ResourceControlService) {
   'use strict';
   var service = {};
 
-  service.getContainers = function (all, hiddenLabels) {
+  service.getContainers = function (all) {
     var deferred = $q.defer();
     Container.query({ all: all }).$promise
     .then(function success(data) {
       var containers = data;
-      if (hiddenLabels) {
-        containers = ContainerHelper.hideContainers(data, hiddenLabels);
-      }
-      deferred.resolve(data);
+      deferred.resolve(containers);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retriever containers', err: err });

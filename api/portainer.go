@@ -17,9 +17,6 @@ type (
 		ExternalEndpoints *string
 		SyncInterval      *string
 		Endpoint          *string
-		Labels            *[]Pair
-		Logo              *string
-		Templates         *string
 		NoAuth            *bool
 		NoAnalytics       *bool
 		TLSVerify         *bool
@@ -30,15 +27,26 @@ type (
 		SSLCert           *string
 		SSLKey            *string
 		AdminPassword     *string
+		// Deprecated fields
+		Logo      *string
+		Templates *string
+		Labels    *[]Pair
 	}
 
-	// Settings represents Portainer settings.
+	// Status represents the application status.
+	Status struct {
+		Authentication     bool   `json:"Authentication"`
+		EndpointManagement bool   `json:"EndpointManagement"`
+		Analytics          bool   `json:"Analytics"`
+		Version            string `json:"Version"`
+	}
+
+	// Settings represents the application settings.
 	Settings struct {
-		HiddenLabels       []Pair `json:"hiddenLabels"`
-		Logo               string `json:"logo"`
-		Authentication     bool   `json:"authentication"`
-		Analytics          bool   `json:"analytics"`
-		EndpointManagement bool   `json:"endpointManagement"`
+		TemplatesURL                string `json:"TemplatesURL"`
+		LogoURL                     string `json:"LogoURL"`
+		BlackListedLabels           []Pair `json:"BlackListedLabels"`
+		DisplayExternalContributors bool   `json:"DisplayExternalContributors"`
 	}
 
 	// User represents a user account.
@@ -209,6 +217,12 @@ type (
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
 	}
 
+	// SettingsService represents a service for managing application settings.
+	SettingsService interface {
+		Settings() (*Settings, error)
+		StoreSettings(settings *Settings) error
+	}
+
 	// VersionService represents a service for managing version data.
 	VersionService interface {
 		DBVersion() (int, error)
@@ -255,6 +269,8 @@ const (
 	APIVersion = "1.13.1"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 2
+	// DefaultTemplatesURL represents the default URL for the templates definitions.
+	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 )
 
 const (
