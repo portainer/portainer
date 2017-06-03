@@ -40,13 +40,7 @@ angular.module('portainer.services')
     var imageConfiguration = ImageHelper.createImageConfigForContainer(image, registry);
     Image.create(imageConfiguration).$promise
     .then(function success(data) {
-      var err = data.length > 0 && data[data.length - 1].hasOwnProperty('message');
-      if (err) {
-        var detail = data[data.length - 1];
-        deferred.reject({ msg: detail.message });
-      } else {
-        deferred.resolve(data);
-      }
+      deferred.resolve(data);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to pull image', err: err });
