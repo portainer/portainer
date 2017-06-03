@@ -43,6 +43,7 @@ angular.module('portainer', [
   'network',
   'networks',
   'node',
+  'registries',
   'secrets',
   'secret',
   'service',
@@ -424,6 +425,19 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/node/node.html',
           controller: 'NodeController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('registries', {
+      url: '/registries/',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/registries/registries.html',
+          controller: 'RegistriesController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',

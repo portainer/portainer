@@ -1,0 +1,160 @@
+<rd-header>
+  <rd-header-title title="Registries">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="registries" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+  </rd-header-title>
+  <rd-header-content>Registry management</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plus" title="Add a new registry">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="registry_name" ng-model="formValues.Name" placeholder="e.g. my-registry">
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- registry-url-input -->
+          <div class="form-group">
+            <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Registry URL
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="registry_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:5000 or myregistry.domain.tld:5000">
+            </div>
+          </div>
+          <!-- !registry-url-input -->
+          <!-- authentication-checkbox -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="registry_auth" class="control-label text-left">
+                Authentication
+                <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.Authentication"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- !authentication-checkbox -->
+          <!-- authentication-credentials -->
+          <div ng-if="formValues.Authentication">
+            <!-- credentials-user -->
+            <div class="form-group">
+              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="credentials_username" ng-model="formValues.Username">
+              </div>
+            </div>
+            <!-- !credentials-user -->
+            <!-- credentials-password -->
+            <div class="form-group">
+              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="password" class="form-control" id="credentials_password" ng-model="formValues.Password">
+              </div>
+            </div>
+            <!-- !credentials-password -->
+          </div>
+          <!-- !authentication-credentials -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.Authentication && (!formValues.Username || !formValues.Password))" ng-click="addRegistry()">Add registry</button>
+              <i id="createEndpointSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <span class="text-danger" ng-if="state.error" style="margin: 5px;">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
+              </span>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-database" title="Registries">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-lg-12">
+        <div class="pull-left">
+          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+        </div>
+        <div class="pull-right">
+          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+                </th>
+                <th>
+                  <a ui-sref="registries" ng-click="order('Name')">
+                    Name
+                    <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ui-sref="registries" ng-click="order('URL')">
+                    URL
+                    <span ng-show="sortType == 'URL' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'URL' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ui-sref="registries" ng-click="order('Authentication')">
+                    Authentication
+                    <span ng-show="sortType == 'Authentication' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Authentication' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr dir-paginate="registry in (state.filteredRegistries = (registries | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+                <td><input type="checkbox" ng-model="registry.Checked" ng-change="selectItem(registry)" /></td>
+                <td>Name</td>
+                <td>URL</td>
+                <td>v</td>
+              </tr>
+              <tr ng-if="!registries">
+                <td colspan="4" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="registries.length == 0">
+                <td colspan="4" class="text-center text-muted">No registries available.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="registries" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    <rd-widget>
+  </div>
+</div>

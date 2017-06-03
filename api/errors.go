@@ -42,6 +42,11 @@ const (
 	ErrEndpointAccessDenied = Error("Access denied to endpoint")
 )
 
+// Registry errors.
+const (
+	ErrRegistryNotFound = Error("Registry not found")
+)
+
 // Version errors.
 const (
 	ErrDBVersionNotFound = Error("DB version not found")

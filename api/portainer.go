@@ -94,6 +94,25 @@ type (
 		Role     UserRole
 	}
 
+	// RegistryID represents a registry identifier.
+	RegistryID int
+
+	// RegistryCredentials represents the credentials used to connect to a registry.
+	RegistryCredentials struct {
+		Username string `json:"Username"`
+		Password string `json:"Password"`
+	}
+
+	// Registry represents a Docker registry with all the info required
+	// to connect to it.
+	Registry struct {
+		ID             RegistryID          `json:"Id"`
+		Name           string              `json:"Name"`
+		URL            string              `json:"URL"`
+		Authentication bool                `json:"Authentication"`
+		Credentials    RegistryCredentials `json:"Credentials"`
+	}
+
 	// EndpointID represents an endpoint identifier.
 	EndpointID int
 
@@ -215,6 +234,15 @@ type (
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
+	}
+
+	// RegistryService represents a service for managing registry data.
+	RegistryService interface {
+		Registry(ID RegistryID) (*Registry, error)
+		Registries() ([]Registry, error)
+		CreateRegistry(registry *Registry) error
+		UpdateRegistry(ID RegistryID, registry *Registry) error
+		DeleteRegistry(ID RegistryID) error
 	}
 
 	// SettingsService represents a service for managing application settings.
