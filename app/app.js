@@ -45,6 +45,7 @@ angular.module('portainer', [
   'node',
   'registries',
   'registry',
+  'registryAccess',
   'secrets',
   'secret',
   'service',
@@ -452,6 +453,19 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/registry/registry.html',
           controller: 'RegistryController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('registry.access', {
+      url: '^/registries/:id/access',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/registryAccess/registryAccess.html',
+          controller: 'RegistryAccessController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
