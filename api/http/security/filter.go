@@ -60,6 +60,24 @@ func FilterUsers(users []portainer.User, context *RestrictedRequestContext) []po
 	return filteredUsers
 }
 
+// FilterRegistries filters registries based on user role and team memberships.
+// Non administrator users only have access to authorized endpoints.
+func FilterRegistries(registries []portainer.Registry, context *RestrictedRequestContext) ([]portainer.Registry, error) {
+	filteredRegistries := registries
+
+	// if !context.IsAdmin {
+	// 	filteredEndpoints = make([]portainer.Endpoint, 0)
+	//
+	// 	for _, endpoint := range endpoints {
+	// 		if isEndpointAccessAuthorized(&endpoint, context.UserID, context.UserMemberships) {
+	// 			filteredEndpoints = append(filteredEndpoints, endpoint)
+	// 		}
+	// 	}
+	// }
+
+	return filteredRegistries, nil
+}
+
 // FilterEndpoints filters endpoints based on user role and team memberships.
 // Non administrator users only have access to authorized endpoints.
 func FilterEndpoints(endpoints []portainer.Endpoint, context *RestrictedRequestContext) ([]portainer.Endpoint, error) {

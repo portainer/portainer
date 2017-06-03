@@ -199,6 +199,7 @@ func main() {
 		EndpointService:        store.EndpointService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
+		RegistryService:        store.RegistryService,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,

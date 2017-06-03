@@ -701,6 +701,7 @@ angular.module('portainer', [
   .constant('TEAM_MEMBERSHIPS_ENDPOINT', 'api/team_memberships')
   .constant('RESOURCE_CONTROL_ENDPOINT', 'api/resource_controls')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
+  .constant('REGISTRIES_ENDPOINT', 'api/registries')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('DEFAULT_TEMPLATES_URL', 'https://raw.githubusercontent.com/portainer/templates/master/templates.json')
   .constant('PAGINATION_MAX_ITEMS', 10);
