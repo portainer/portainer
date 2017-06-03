@@ -40,7 +40,6 @@ angular.module('portainer.services')
     var imageConfiguration = ImageHelper.createImageConfigForContainer(image, registry);
     Image.create(imageConfiguration).$promise
     .then(function success(data) {
-      deferred.resolve(data);
       var err = data.length > 0 && data[data.length - 1].hasOwnProperty('message');
       if (err) {
         var detail = data[data.length - 1];
