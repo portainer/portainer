@@ -317,7 +317,6 @@ function ($q, $scope, $state, $stateParams, $filter, Info, Container, ContainerH
       .finally(function final() {
         $('#createContainerSpinner').hide();
       });
-      // $('#createContainerSpinner').hide();
     });
   }
 
