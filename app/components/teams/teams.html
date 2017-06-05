@@ -105,8 +105,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="team in (state.filteredTeams = (teams | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td ng-if="isAdmin"><input type="checkbox" ng-model="team.Checked" ng-change="selectItem(team)" /></td>
+              <tr ng-click="team.Checked = !team.Checked; selectItem(team);" ng-class="{active: team.Checked}" dir-paginate="team in (state.filteredTeams = (teams | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+                <td ng-if="isAdmin"><input type="checkbox" ng-model="team.Checked" ng-click="$event.stopPropagation();selectItem(team)" /></td>
                 <td>{{ team.Name }}</td>
                 <td>
                   <a ui-sref="team({id: team.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>

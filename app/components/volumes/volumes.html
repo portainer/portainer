@@ -63,8 +63,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-              <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
+            <tr ng-click="volume.Checked = !volume.Checked; selectItem(volume);" ng-class="{active: volume.Checked}" dir-paginate="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <td><input type="checkbox" ng-model="volume.Checked" ng-click="$event.stopPropagation();selectItem(volume)"/></td>
               <td><a ui-sref="volume({id: volume.Id})">{{ volume.Id|truncate:50 }}</a></td>
               <td>{{ volume.Driver }}</td>
               <td ng-if="applicationState.application.authentication">
