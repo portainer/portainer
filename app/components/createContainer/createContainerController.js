@@ -299,24 +299,24 @@ function ($q, $scope, $state, $stateParams, $filter, Info, Container, ContainerH
   };
 
   function createContainer(config, accessControlData) {
-    $q.when($scope.formValues.alwaysPull ? ImageService.pullImage($scope.config.Image, $scope.formValues.Registry) : null)
-    .then(function success() {
-      return ContainerService.createAndStartContainer(config);
-    })
-    .then(function success(data) {
-      var containerIdentifier = data.Id;
-      var userId = Authentication.getUserDetails().ID;
-      return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData, []);
-    })
-    .then(function success() {
-      Notifications.success('Container successfully created');
-      $state.go('containers', {}, {reload: true});
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to create container');
-    })
+    $q.when(!$scope.formValues.alwaysPull || ImageService.pullImage($scope.config.Image, $scope.formValues.Registry))
     .finally(function final() {
-      $('#createContainerSpinner').hide();
+      ContainerService.createAndStartContainer(config)
+      .then(function success(data) {
+        var containerIdentifier = data.Id;
+        var userId = Authentication.getUserDetails().ID;
+        return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData, []);
+      })
+      .then(function success() {
+        Notifications.success('Container successfully created');
+        $state.go('containers', {}, {reload: true});
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to create container');
+      })
+      .finally(function final() {
+        $('#createContainerSpinner').hide();
+      });
     });
   }
 

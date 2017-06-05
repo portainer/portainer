@@ -733,4 +733,4 @@ angular.module('portainer', [
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('DEFAULT_TEMPLATES_URL', 'https://raw.githubusercontent.com/portainer/templates/master/templates.json')
   .constant('PAGINATION_MAX_ITEMS', 10);
-  // .constant('UI_VERSION', 'v1.13.1');
+  // .constant('UI_VERSION', 'v1.13.2');
