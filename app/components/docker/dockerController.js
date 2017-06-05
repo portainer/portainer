@@ -1,24 +1,26 @@
 angular.module('docker', [])
-.controller('DockerController', ['$scope', 'Info', 'Version', 'Notifications',
-function ($scope, Info, Version, Notifications) {
-  $scope.state = {
-    loaded: false
-  };
+.controller('DockerController', ['$q', '$scope', 'SystemService', 'Notifications',
+function ($q, $scope, SystemService, Notifications) {
   $scope.info = {};
   $scope.version = {};
 
-  Info.get({}, function (infoData) {
-    $scope.info = infoData;
-    Version.get({}, function (versionData) {
-      $scope.version = versionData;
-      $scope.state.loaded = true;
-      $('#loadingViewSpinner').hide();
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to retrieve engine details');
+  function initView() {
+    $('#loadingViewSpinner').show();
+    $q.all({
+      version: SystemService.version(),
+      info: SystemService.info()
+    })
+    .then(function success(data) {
+      $scope.version = data.version;
+      $scope.info = data.info;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve engine details');
+    })
+    .finally(function final() {
       $('#loadingViewSpinner').hide();
     });
-  }, function (e) {
-    Notifications.error('Failure', e, 'Unable to retrieve engine information');
-    $('#loadingViewSpinner').hide();
-  });
+  }
+
+  initView();
 }]);

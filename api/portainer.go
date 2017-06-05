@@ -106,11 +106,12 @@ type (
 	// Registry represents a Docker registry with all the info required
 	// to connect to it.
 	Registry struct {
-		ID             RegistryID          `json:"Id"`
-		Name           string              `json:"Name"`
-		URL            string              `json:"URL"`
-		Authentication bool                `json:"Authentication"`
-		Credentials    RegistryCredentials `json:"Credentials"`
+		ID             RegistryID `json:"Id"`
+		Name           string     `json:"Name"`
+		URL            string     `json:"URL"`
+		Authentication bool       `json:"Authentication"`
+		// Credentials    RegistryCredentials `json:"Credentials"`
+		IdentityToken string `json:"IdentityToken"`
 	}
 
 	// EndpointID represents an endpoint identifier.

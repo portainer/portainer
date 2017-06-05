@@ -85,6 +85,7 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 		Name:           req.Name,
 		URL:            req.URL,
 		Authentication: req.Authentication,
+		IdentityToken:  req.IdentityToken,
 	}
 
 	err = handler.RegistryService.CreateRegistry(registry)
@@ -99,7 +100,8 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 type postRegistriesRequest struct {
 	Name           string `valid:"required"`
 	URL            string `valid:"required"`
-	Authentication bool
+	Authentication bool   `valid:""`
+	IdentityToken  string `valid:""`
 }
 
 type postRegistriesResponse struct {

@@ -17,5 +17,7 @@ function ($scope, $state, RegistryService, Notifications, Pagination) {
     });
   }
 
+  
+
   initView();
 }]);
