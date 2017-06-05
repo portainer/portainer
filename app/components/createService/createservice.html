@@ -1,5 +1,7 @@
 <rd-header>
-  <rd-header-title title="Create service"></rd-header-title>
+  <rd-header-title title="Create service">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+  </rd-header-title>
   <rd-header-content>
     <a ui-sref="services">Services</a> > Add service
   </rd-header-content>
@@ -140,6 +142,7 @@
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
+          <li class="interactive"><a data-target="#secrets" data-toggle="tab" ng-if="applicationState.endpoint.apiVersion >= 1.25">Secrets</a></li>
           <li class="interactive"><a data-target="#placement" data-toggle="tab">Placement</a></li>
         </ul>
         <!-- tab-content -->
@@ -422,7 +425,9 @@
             </form>
           </div>
           <!-- !tab-update-config -->
-
+          <!-- tab-secrets -->
+          <div class="tab-pane" id="secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25" ng-include="'app/components/createService/includes/secret.html'"></div>
+          <!-- !tab-secrets -->
           <!-- tab-placement -->
           <div class="tab-pane" id="placement" ng-include="'app/components/createService/includes/placement.html'"></div>
           <!-- !tab-placement -->

@@ -14,7 +14,7 @@ const (
 
 // serviceListOperation extracts the response as a JSON array, loop through the service array
 // decorate and/or filter the services based on resource controls before rewriting the response
-func serviceListOperation(request *http.Request, response *http.Response, operationContext *restrictedOperationContext) error {
+func serviceListOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
 	var err error
 	// ServiceList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
@@ -23,10 +23,10 @@ func serviceListOperation(request *http.Request, response *http.Response, operat
 		return err
 	}
 
-	if operationContext.isAdmin {
-		responseArray, err = decorateServiceList(responseArray, operationContext.resourceControls)
+	if executor.operationContext.isAdmin {
+		responseArray, err = decorateServiceList(responseArray, executor.operationContext.resourceControls)
 	} else {
-		responseArray, err = filterServiceList(responseArray, operationContext.resourceControls, operationContext.userID, operationContext.userTeamIDs)
+		responseArray, err = filterServiceList(responseArray, executor.operationContext.resourceControls, executor.operationContext.userID, executor.operationContext.userTeamIDs)
 	}
 	if err != nil {
 		return err
@@ -38,7 +38,7 @@ func serviceListOperation(request *http.Request, response *http.Response, operat
 // serviceInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the service based on resource control and either rewrite an access denied response
 // or a decorated service.
-func serviceInspectOperation(request *http.Request, response *http.Response, operationContext *restrictedOperationContext) error {
+func serviceInspectOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
 	// ServiceInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
 	responseObject, err := getResponseAsJSONOBject(response)
@@ -51,9 +51,9 @@ func serviceInspectOperation(request *http.Request, response *http.Response, ope
 	}
 	serviceID := responseObject[serviceIdentifier].(string)
 
-	resourceControl := getResourceControlByResourceID(serviceID, operationContext.resourceControls)
+	resourceControl := getResourceControlByResourceID(serviceID, executor.operationContext.resourceControls)
 	if resourceControl != nil {
-		if operationContext.isAdmin || canUserAccessResource(operationContext.userID, operationContext.userTeamIDs, resourceControl) {
+		if executor.operationContext.isAdmin || canUserAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl) {
 			responseObject = decorateObject(responseObject, resourceControl)
 		} else {
 			return rewriteAccessDeniedResponse(response)

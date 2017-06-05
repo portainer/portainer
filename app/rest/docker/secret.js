@@ -1,14 +1,12 @@
 angular.module('portainer.rest')
-.factory('Service', ['$resource', 'Settings', 'EndpointProvider', function ServiceFactory($resource, Settings, EndpointProvider) {
+.factory('Secret', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function SecretFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
   'use strict';
-  return $resource(Settings.url + '/:endpointId/services/:id/:action', {
+  return $resource(DOCKER_ENDPOINT + '/:endpointId/secrets/:id/:action', {
     endpointId: EndpointProvider.endpointID
-  },
-  {
+  }, {
     get: { method: 'GET', params: {id: '@id'} },
     query: { method: 'GET', isArray: true },
     create: { method: 'POST', params: {action: 'create'} },
-    update: { method: 'POST', params: {id: '@id', action: 'update', version: '@version'} },
     remove: { method: 'DELETE', params: {id: '@id'} }
   });
 }]);

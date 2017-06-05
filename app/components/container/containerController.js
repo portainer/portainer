@@ -165,13 +165,14 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
   };
 
   $scope.renameContainer = function () {
-    Container.rename({id: $stateParams.id, 'name': $scope.container.newContainerName}, function (d) {
-      if (container.message) {
-        $scope.container.newContainerName = $scope.container.Name;
-        Notifications.error('Unable to rename container', {}, container.message);
+    var container = $scope.container;
+    Container.rename({id: $stateParams.id, 'name': container.newContainerName}, function (d) {
+      if (d.message) {
+        container.newContainerName = container.Name;
+        Notifications.error('Unable to rename container', {}, d.message);
       } else {
-        $scope.container.Name = $scope.container.newContainerName;
-        Notifications.success('Container successfully renamed', container.name);
+        container.Name = container.newContainerName;
+        Notifications.success('Container successfully renamed', container.Name);
       }
     }, function (e) {
       Notifications.error('Failure', e, 'Unable to rename container');

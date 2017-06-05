@@ -1,6 +1,6 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Config', 'Notifications', 'Pagination',
-function ($scope, $state, Network, Config, Notifications, Pagination) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'Notifications', 'Pagination',
+function ($scope, $state, Network, Notifications, Pagination) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('networks');
   $scope.state.selectedItemCount = 0;
@@ -97,7 +97,7 @@ function ($scope, $state, Network, Config, Notifications, Pagination) {
     });
   };
 
-  function fetchNetworks() {
+  function initView() {
     $('#loadNetworksSpinner').show();
     Network.query({}, function (d) {
       $scope.networks = d;
@@ -109,7 +109,5 @@ function ($scope, $state, Network, Config, Notifications, Pagination) {
     });
   }
 
-  Config.$promise.then(function (c) {
-    fetchNetworks();
-  });
+  initView();
 }]);

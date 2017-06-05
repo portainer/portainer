@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/security"
 )
@@ -14,8 +15,8 @@ import (
 // TemplatesHandler represents an HTTP API handler for managing templates.
 type TemplatesHandler struct {
 	*mux.Router
-	Logger                *log.Logger
-	containerTemplatesURL string
+	Logger          *log.Logger
+	SettingsService portainer.SettingsService
 }
 
 const (
@@ -23,11 +24,10 @@ const (
 )
 
 // NewTemplatesHandler returns a new instance of TemplatesHandler.
-func NewTemplatesHandler(bouncer *security.RequestBouncer, containerTemplatesURL string) *TemplatesHandler {
+func NewTemplatesHandler(bouncer *security.RequestBouncer) *TemplatesHandler {
 	h := &TemplatesHandler{
-		Router:                mux.NewRouter(),
-		Logger:                log.New(os.Stderr, "", log.LstdFlags),
-		containerTemplatesURL: containerTemplatesURL,
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/templates",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTemplates)))
@@ -49,7 +49,12 @@ func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *ht
 
 	var templatesURL string
 	if key == "containers" {
-		templatesURL = handler.containerTemplatesURL
+		settings, err := handler.SettingsService.Settings()
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
+		templatesURL = settings.TemplatesURL
 	} else if key == "linuxserver.io" {
 		templatesURL = containerTemplatesURLLinuxServerIo
 	} else {

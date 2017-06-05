@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
-function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, EndpointService, StateManager, EndpointProvider, Notifications) {
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
+function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Authentication, Users, EndpointService, StateManager, EndpointProvider, Notifications) {
 
   $scope.authData = {
     username: 'admin',
@@ -12,6 +12,8 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
     password_confirmation: '',
     error: false
   };
+
+  $scope.logo = StateManager.getState().application.logo;
 
   if (!$scope.applicationState.application.authentication) {
     EndpointService.endpoints()
@@ -58,10 +60,6 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
   if (Authentication.isAuthenticated()) {
     $state.go('dashboard');
   }
-
-  Config.$promise.then(function (c) {
-    $scope.logo = c.logo;
-  });
 
   $scope.createAdminUser = function() {
     var password = $sanitize($scope.initPasswordData.password);
