@@ -112,14 +112,41 @@ func initEndpointWatcher(endpointService portainer.EndpointService, externalEnpo
 	return authorizeEndpointMgmt
 }
 
-func initSettings(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portainer.Settings {
-	return &portainer.Settings{
-		HiddenLabels:       *flags.Labels,
-		Logo:               *flags.Logo,
+func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portainer.Status {
+	return &portainer.Status{
 		Analytics:          !*flags.NoAnalytics,
 		Authentication:     !*flags.NoAuth,
 		EndpointManagement: authorizeEndpointMgmt,
+		Version:            portainer.APIVersion,
 	}
+}
+
+func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
+	_, err := settingsService.Settings()
+	if err == portainer.ErrSettingsNotFound {
+		settings := &portainer.Settings{
+			LogoURL:                     *flags.Logo,
+			DisplayExternalContributors: true,
+		}
+
+		if *flags.Templates != "" {
+			settings.TemplatesURL = *flags.Templates
+		} else {
+			settings.TemplatesURL = portainer.DefaultTemplatesURL
+		}
+
+		if *flags.Labels != nil {
+			settings.BlackListedLabels = *flags.Labels
+		} else {
+			settings.BlackListedLabels = make([]portainer.Pair, 0)
+		}
+
+		return settingsService.StoreSettings(settings)
+	} else if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService) *portainer.Endpoint {
@@ -146,7 +173,12 @@ func main() {
 
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
-	settings := initSettings(authorizeEndpointMgmt, flags)
+	err := initSettings(store.SettingsService, flags)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	applicationStatus := initStatus(authorizeEndpointMgmt, flags)
 
 	if *flags.Endpoint != "" {
 		var endpoints []portainer.Endpoint
@@ -188,10 +220,9 @@ func main() {
 	}
 
 	var server portainer.Server = &http.Server{
+		Status:                 applicationStatus,
 		BindAddress:            *flags.Addr,
 		AssetsPath:             *flags.Assets,
-		Settings:               settings,
-		TemplatesURL:           *flags.Templates,
 		AuthDisabled:           *flags.NoAuth,
 		EndpointManagement:     authorizeEndpointMgmt,
 		UserService:            store.UserService,
@@ -199,6 +230,7 @@ func main() {
 		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
 		ResourceControlService: store.ResourceControlService,
+		SettingsService:        store.SettingsService,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,
@@ -208,7 +240,7 @@ func main() {
 	}
 
 	log.Printf("Starting Portainer on %s", *flags.Addr)
-	err := server.Start()
+	err = server.Start()
 	if err != nil {
 		log.Fatal(err)
 	}

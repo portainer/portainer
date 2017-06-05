@@ -1,31 +1,94 @@
 angular.module('settings', [])
-.controller('SettingsController', ['$scope', '$state', '$sanitize', 'Authentication', 'UserService', 'Notifications',
-function ($scope, $state, $sanitize, Authentication, UserService, Notifications) {
+.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_TEMPLATES_URL',
+function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_TEMPLATES_URL) {
+
   $scope.formValues = {
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    customLogo: false,
+    customTemplates: false,
+    externalContributions: false,
+    labelName: '',
+    labelValue: ''
   };
 
-  $scope.UserId = Authentication.getUserDetails().ID;
+  $scope.removeFilteredContainerLabel = function(index) {
+    var settings = $scope.settings;
+    settings.BlackListedLabels.splice(index, 1);
 
-  $scope.updatePassword = function() {
-    $scope.invalidPassword = false;
-    var userID = Authentication.getUserDetails().ID;
-    var currentPassword = $sanitize($scope.formValues.currentPassword);
-    var newPassword = $sanitize($scope.formValues.newPassword);
+    updateSettings(settings, false);
+  };
 
-    UserService.updateUserPassword(userID, currentPassword, newPassword)
-    .then(function success() {
-      Notifications.success('Success', 'Password successfully updated');
-      $state.reload();
+  $scope.addFilteredContainerLabel = function() {
+    var settings = $scope.settings;
+    var label = {
+      name: $scope.formValues.labelName,
+      value: $scope.formValues.labelValue
+    };
+    settings.BlackListedLabels.push(label);
+
+    updateSettings(settings, true);
+  };
+
+  $scope.saveApplicationSettings = function() {
+    var settings = $scope.settings;
+
+    if (!$scope.formValues.customLogo) {
+      settings.LogoURL = '';
+    }
+
+    if (!$scope.formValues.customTemplates) {
+      settings.TemplatesURL = DEFAULT_TEMPLATES_URL;
+    }
+    settings.DisplayExternalContributors = !$scope.formValues.externalContributions;
+
+    updateSettings(settings, false);
+  };
+
+  function resetFormValues() {
+    $scope.formValues.labelName = '';
+    $scope.formValues.labelValue = '';
+  }
+
+  function updateSettings(settings, resetForm) {
+    $('#loadingViewSpinner').show();
+
+    SettingsService.update(settings)
+    .then(function success(data) {
+      Notifications.success('Settings updated');
+      StateManager.updateLogo(settings.LogoURL);
+      StateManager.updateExternalContributions(settings.DisplayExternalContributors);
+      if (resetForm) {
+        resetFormValues();
+      }
     })
     .catch(function error(err) {
-      if (err.invalidPassword) {
-        $scope.invalidPassword = true;
-      } else {
-        Notifications.error('Failure', err, err.msg);
-      }
+      Notifications.error('Failure', err, 'Unable to update settings');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
     });
-  };
+  }
+
+  function initView() {
+    $('#loadingViewSpinner').show();
+    SettingsService.settings()
+    .then(function success(data) {
+      var settings = data;
+      $scope.settings = settings;
+      if (settings.LogoURL !== '') {
+        $scope.formValues.customLogo = true;
+      }
+      if (settings.TemplatesURL !== DEFAULT_TEMPLATES_URL) {
+        $scope.formValues.customTemplates = true;
+      }
+      $scope.formValues.externalContributions = !settings.DisplayExternalContributors;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve application settings');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
+  }
+
+  initView();
 }]);

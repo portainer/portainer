@@ -11,8 +11,9 @@ function TemplateViewModel(data) {
   this.Network = data.network ? data.network : '';
   this.Env = data.env ? data.env : [];
   this.Privileged = data.privileged ? data.privileged : false;
-  this.Volumes = [];
   this.Interactive = data.interactive ? data.interactive : false;
+  this.RestartPolicy = data.restart_policy ? data.restart_policy : 'always';
+  this.Volumes = [];
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
       return {

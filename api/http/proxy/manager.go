@@ -15,12 +15,13 @@ type Manager struct {
 }
 
 // NewManager initializes a new proxy Service
-func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService) *Manager {
+func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService, settingsService portainer.SettingsService) *Manager {
 	return &Manager{
 		proxies: cmap.New(),
 		proxyFactory: &proxyFactory{
 			ResourceControlService: resourceControlService,
 			TeamMembershipService:  teamMembershipService,
+			SettingsService:        settingsService,
 		},
 	}
 }

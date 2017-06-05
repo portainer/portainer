@@ -1,10 +1,10 @@
 angular.module('portainer.services')
-.factory('Pagination', ['LocalStorage', 'Settings', function PaginationFactory(LocalStorage, Settings) {
+.factory('Pagination', ['LocalStorage', 'PAGINATION_MAX_ITEMS', function PaginationFactory(LocalStorage, PAGINATION_MAX_ITEMS) {
   'use strict';
   return {
     getPaginationCount: function(key) {
       var storedCount = LocalStorage.getPaginationCount(key);
-      var paginationCount = Settings.pagination_count;
+      var paginationCount = PAGINATION_MAX_ITEMS;
       if (storedCount !== null) {
         paginationCount = storedCount;
       }

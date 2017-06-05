@@ -18,6 +18,7 @@ type Handler struct {
 	TeamMembershipHandler *TeamMembershipHandler
 	EndpointHandler       *EndpointHandler
 	ResourceHandler       *ResourceHandler
+	StatusHandler         *StatusHandler
 	SettingsHandler       *SettingsHandler
 	TemplatesHandler      *TemplatesHandler
 	DockerHandler         *DockerHandler
@@ -53,6 +54,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.ResourceHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/settings") {
 		http.StripPrefix("/api", h.SettingsHandler).ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/api/status") {
+		http.StripPrefix("/api", h.StatusHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/templates") {
 		http.StripPrefix("/api", h.TemplatesHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/upload") {

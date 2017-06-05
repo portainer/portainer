@@ -15,16 +15,16 @@ type Server struct {
 	AssetsPath             string
 	AuthDisabled           bool
 	EndpointManagement     bool
+	Status                 *portainer.Status
 	UserService            portainer.UserService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
 	EndpointService        portainer.EndpointService
 	ResourceControlService portainer.ResourceControlService
+	SettingsService        portainer.SettingsService
 	CryptoService          portainer.CryptoService
 	JWTService             portainer.JWTService
 	FileService            portainer.FileService
-	Settings               *portainer.Settings
-	TemplatesURL           string
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
@@ -34,7 +34,7 @@ type Server struct {
 // Start starts the HTTP server
 func (server *Server) Start() error {
 	requestBouncer := security.NewRequestBouncer(server.JWTService, server.TeamMembershipService, server.AuthDisabled)
-	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamMembershipService)
+	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamMembershipService, server.SettingsService)
 
 	var authHandler = handler.NewAuthHandler(requestBouncer, server.AuthDisabled)
 	authHandler.UserService = server.UserService
@@ -51,8 +51,11 @@ func (server *Server) Start() error {
 	teamHandler.TeamMembershipService = server.TeamMembershipService
 	var teamMembershipHandler = handler.NewTeamMembershipHandler(requestBouncer)
 	teamMembershipHandler.TeamMembershipService = server.TeamMembershipService
-	var settingsHandler = handler.NewSettingsHandler(requestBouncer, server.Settings)
-	var templatesHandler = handler.NewTemplatesHandler(requestBouncer, server.TemplatesURL)
+	var statusHandler = handler.NewStatusHandler(requestBouncer, server.Status)
+	var settingsHandler = handler.NewSettingsHandler(requestBouncer)
+	settingsHandler.SettingsService = server.SettingsService
+	var templatesHandler = handler.NewTemplatesHandler(requestBouncer)
+	templatesHandler.SettingsService = server.SettingsService
 	var dockerHandler = handler.NewDockerHandler(requestBouncer)
 	dockerHandler.EndpointService = server.EndpointService
 	dockerHandler.TeamMembershipService = server.TeamMembershipService
@@ -77,6 +80,7 @@ func (server *Server) Start() error {
 		EndpointHandler:       endpointHandler,
 		ResourceHandler:       resourceHandler,
 		SettingsHandler:       settingsHandler,
+		StatusHandler:         statusHandler,
 		TemplatesHandler:      templatesHandler,
 		DockerHandler:         dockerHandler,
 		WebSocketHandler:      websocketHandler,
