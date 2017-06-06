@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Network', ['$resource', 'Settings', 'EndpointProvider', function NetworkFactory($resource, Settings, EndpointProvider) {
+.factory('Network', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function NetworkFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
   'use strict';
-  return $resource(Settings.url + '/:endpointId/networks/:id/:action', {
+  return $resource(DOCKER_ENDPOINT + '/:endpointId/networks/:id/:action', {
     id: '@id',
     endpointId: EndpointProvider.endpointID
   },

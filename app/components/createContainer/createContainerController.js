@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Config', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator', 'ModalService',
-function ($q, $scope, $state, $stateParams, $filter, Config, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator, ModalService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator', 'ModalService',
+function ($q, $scope, $state, $stateParams, $filter, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator, ModalService) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -394,54 +394,49 @@ function ($q, $scope, $state, $stateParams, $filter, Config, Info, Container, Co
     if ($stateParams.from !== '') {
       loadFromContainerSpec();
     }
-    Config.$promise.then(function (c) {
-      var containersToHideLabels = c.hiddenLabels;
 
-      Volume.query({}, function (d) {
-        $scope.availableVolumes = d.Volumes;
-      }, function (e) {
-        Notifications.error('Failure', e, 'Unable to retrieve volumes');
-      });
-
-      Network.query({}, function (d) {
-        var networks = d;
-        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-          if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
-            networks = d.filter(function (network) {
-              if (network.Scope === 'global') {
-                return network;
-              }
-            });
-          }
-          if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-            networks = d.filter(function (network) {
-              return network.Driver !== 'overlay' || network.Attachable;
-            });
-          }
-          $scope.globalNetworkCount = networks.length;
-          networks.push({Name: 'bridge'});
-          networks.push({Name: 'host'});
-          networks.push({Name: 'none'});
-        }
-        networks.push({Name: 'container'});
-        $scope.availableNetworks = networks;
-        if (!_.find(networks, {'Name': 'bridge'})) {
-          $scope.config.HostConfig.NetworkMode = 'nat';
-        }
-      }, function (e) {
-        Notifications.error('Failure', e, 'Unable to retrieve networks');
-      });
-
-      Container.query({}, function (d) {
-        var containers = d;
-        if (containersToHideLabels) {
-          containers = ContainerHelper.hideContainers(d, containersToHideLabels);
-        }
-        $scope.runningContainers = containers;
-      }, function(e) {
-        Notifications.error('Failure', e, 'Unable to retrieve running containers');
-      });
+    Volume.query({}, function (d) {
+      $scope.availableVolumes = d.Volumes;
+    }, function (e) {
+      Notifications.error('Failure', e, 'Unable to retrieve volumes');
     });
+
+    Network.query({}, function (d) {
+      var networks = d;
+      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
+        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
+          networks = d.filter(function (network) {
+            if (network.Scope === 'global') {
+              return network;
+            }
+          });
+        }
+        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
+          networks = d.filter(function (network) {
+            return network.Driver !== 'overlay' || network.Attachable;
+          });
+        }
+        $scope.globalNetworkCount = networks.length;
+        networks.push({Name: 'bridge'});
+        networks.push({Name: 'host'});
+        networks.push({Name: 'none'});
+      }
+      networks.push({Name: 'container'});
+      $scope.availableNetworks = networks;
+      if (!_.find(networks, {'Name': 'bridge'})) {
+        $scope.config.HostConfig.NetworkMode = 'nat';
+      }
+    }, function (e) {
+      Notifications.error('Failure', e, 'Unable to retrieve networks');
+    });
+
+    Container.query({}, function (d) {
+      var containers = d;
+      $scope.runningContainers = containers;
+    }, function(e) {
+      Notifications.error('Failure', e, 'Unable to retrieve running containers');
+    });
+
   }
 
   function validateForm(accessControlData, isAdmin) {
@@ -477,27 +472,26 @@ function ($q, $scope, $state, $stateParams, $filter, Config, Info, Container, Co
   };
 
   function createContainer(config, accessControlData) {
-    $q.when($scope.formValues.alwaysPull ? ImageService.pullImage($scope.config.Image, $scope.formValues.Registry) : null)
-    .then(function success() {
-      return ContainerService.createAndStartContainer(config);
-    })
-    .then(function success(data) {
-      var containerIdentifier = data.Id;
-      var userId = Authentication.getUserDetails().ID;
-      return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData, []);
-    })
-    .then(function success() {
-      Notifications.success('Container successfully created');
-      $state.go('containers', {}, {reload: true});
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to create container');
-    })
+    $q.when(!$scope.formValues.alwaysPull || ImageService.pullImage($scope.config.Image, $scope.formValues.Registry))
     .finally(function final() {
-      $('#createContainerSpinner').hide();
+      ContainerService.createAndStartContainer(config)
+      .then(function success(data) {
+        var containerIdentifier = data.Id;
+        var userId = Authentication.getUserDetails().ID;
+        return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData, []);
+      })
+      .then(function success() {
+        Notifications.success('Container successfully created');
+        $state.go('containers', {}, {reload: true});
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to create container');
+      })
+      .finally(function final() {
+        $('#createContainerSpinner').hide();
+      });
     });
   }
 
   initView();
-
 }]);
