@@ -53,6 +53,7 @@ function ($scope, $stateParams, $state, Service, ServiceHelper, Task, Node, Noti
           return new ServiceViewModel(service, serviceTasks);
         });
         Node.query({}, function (nodes) {
+          $scope.nodes = nodes;
           $scope.displayNode = true;
           $scope.tasks = tasks.map(function (task) {
             return new TaskViewModel(task, nodes);
