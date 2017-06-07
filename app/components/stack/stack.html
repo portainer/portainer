@@ -51,18 +51,7 @@
 <div class="row" ng-if="services.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tasks" title="Associated services">
-        <div class="pull-right">
-          Items per page:
-          <select ng-model="state.pagination_count_services" ng-change="changePaginationCountServices()">
-            <option value="0">All</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </rd-widget-header>
+      <rd-widget-header icon="fa-tasks" title="Associated services"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
@@ -91,7 +80,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="service in (filteredServices = ( services | orderBy:sortServicesType:sortServicesReverse | itemsPerPage: state.pagination_count_services))">
+            <tr ng-repeat="service in (filteredServices = ( services | orderBy:sortServicesType:sortServicesReverse ))">
               <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
               <td>{{ service.Image | hideshasum }}</td>
               <td>
@@ -111,9 +100,6 @@
             </tr>
           </tbody>
         </table>
-        <div ng-if="services" class="pagination-controls">
-          <dir-pagination-controls></dir-pagination-controls>
-        </div>
       </rd-widget-body>
     </rd-widget>
   </div>
