@@ -97,12 +97,6 @@ type (
 	// RegistryID represents a registry identifier.
 	RegistryID int
 
-	// RegistryCredentials represents the credentials used to connect to a registry.
-	RegistryCredentials struct {
-		Username string `json:"Username"`
-		Password string `json:"Password"`
-	}
-
 	// Registry represents a Docker registry with all the info required
 	// to connect to it.
 	Registry struct {
@@ -110,8 +104,9 @@ type (
 		Name           string     `json:"Name"`
 		URL            string     `json:"URL"`
 		Authentication bool       `json:"Authentication"`
-		// Credentials    RegistryCredentials `json:"Credentials"`
-		IdentityToken string `json:"IdentityToken"`
+		// AuthenticationString string     `json:"AuthenticationString"`
+		Username string `json:"Username"`
+		Password string `json:"Password"`
 	}
 
 	// EndpointID represents an endpoint identifier.

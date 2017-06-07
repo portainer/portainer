@@ -85,7 +85,9 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 		Name:           req.Name,
 		URL:            req.URL,
 		Authentication: req.Authentication,
-		IdentityToken:  req.IdentityToken,
+		// AuthenticationString: req.AuthenticationString,
+		Username: req.Username,
+		Password: req.Password,
 	}
 
 	err = handler.RegistryService.CreateRegistry(registry)
@@ -101,7 +103,9 @@ type postRegistriesRequest struct {
 	Name           string `valid:"required"`
 	URL            string `valid:"required"`
 	Authentication bool   `valid:""`
-	IdentityToken  string `valid:""`
+	// AuthenticationString string `valid:""`
+	Username string `valid:""`
+	Password string `valid:""`
 }
 
 type postRegistriesResponse struct {
@@ -193,86 +197,67 @@ type putRegistryAccessRequest struct {
 
 // handlePutRegistry handles PUT requests on /registries/:id
 func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http.Request) {
-	// vars := mux.Vars(r)
-	// id := vars["id"]
-	//
-	// registryID, err := strconv.Atoi(id)
-	// if err != nil {
-	// 	httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-	// 	return
-	// }
-	//
-	// var req putRegistriesRequest
-	// if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-	// 	httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
-	// 	return
-	// }
-	//
-	// _, err = govalidator.ValidateStruct(req)
-	// if err != nil {
-	// 	httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
-	// 	return
-	// }
-	//
-	// registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
-	// if err == portainer.ErrRegistryNotFound {
-	// 	httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-	// 	return
-	// } else if err != nil {
-	// 	httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-	// 	return
-	// }
-	//
-	// if req.Name != "" {
-	// 	registry.Name = req.Name
-	// }
-	//
-	// if req.URL != "" {
-	// 	registry.URL = req.URL
-	// }
-	//
-	// if req.PublicURL != "" {
-	// 	registry.PublicURL = req.PublicURL
-	// }
-	//
-	// if req.TLS {
-	// 	registry.TLS = true
-	// 	caCertPath, _ := handler.FileService.GetPathForTLSFile(registry.ID, portainer.TLSFileCA)
-	// 	registry.TLSCACertPath = caCertPath
-	// 	certPath, _ := handler.FileService.GetPathForTLSFile(registry.ID, portainer.TLSFileCert)
-	// 	registry.TLSCertPath = certPath
-	// 	keyPath, _ := handler.FileService.GetPathForTLSFile(registry.ID, portainer.TLSFileKey)
-	// 	registry.TLSKeyPath = keyPath
-	// } else {
-	// 	registry.TLS = false
-	// 	registry.TLSCACertPath = ""
-	// 	registry.TLSCertPath = ""
-	// 	registry.TLSKeyPath = ""
-	// 	err = handler.FileService.DeleteTLSFiles(registry.ID)
-	// 	if err != nil {
-	// 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-	// 		return
-	// 	}
-	// }
-	//
-	// _, err = handler.ProxyManager.CreateAndRegisterProxy(registry)
-	// if err != nil {
-	// 	httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-	// 	return
-	// }
-	//
-	// err = handler.RegistryService.UpdateRegistry(registry.ID, registry)
-	// if err != nil {
-	// 	httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-	// 	return
-	// }
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	registryID, err := strconv.Atoi(id)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	var req putRegistriesRequest
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = govalidator.ValidateStruct(req)
+	if err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
+	if err == portainer.ErrRegistryNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if req.Name != "" {
+		registry.Name = req.Name
+	}
+
+	if req.URL != "" {
+		registry.URL = req.URL
+	}
+
+	if req.Authentication {
+		registry.Authentication = true
+		registry.Username = req.Username
+		registry.Password = req.Password
+	} else {
+		registry.Authentication = false
+		registry.Username = ""
+		registry.Password = ""
+	}
+
+	err = handler.RegistryService.UpdateRegistry(registry.ID, registry)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
 }
 
 type putRegistriesRequest struct {
-	Name      string `valid:"-"`
-	URL       string `valid:"-"`
-	PublicURL string `valid:"-"`
-	TLS       bool   `valid:"-"`
+	Name           string `valid:"required"`
+	URL            string `valid:"required"`
+	Authentication bool   `valid:""`
+	Username       string `valid:""`
+	Password       string `valid:""`
 }
 
 // handleDeleteRegistry handles DELETE requests on /registries/:id

@@ -35,27 +35,34 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.encodedCredentials = function(username, password, serveraddress) {
+    var credentials = {
+      username: username,
+      password: password,
+      serveraddress: serveraddress
+    };
+    return btoa(JSON.stringify(credentials));
+  };
+
   service.deleteRegistry = function(id) {
     return Registries.remove({id: id}).$promise;
   };
 
-  service.createRegistry = function(name, URL) {
-    var payload = {
-      Name: name,
-      URL: URL
-    };
-    return Registries.create({}, payload).$promise;
+  service.updateRegistry = function(registry) {
+    return Registries.update({ id: registry.Id }, registry).$promise;
   };
 
-  service.createRegistryWithAuthentication = function(name, URL, username, password) {
-    var deferred = $q.defer();
-
-    
-    // success
-    deferred.resolve();
-    // error
-    deferred.reject({ msg: '', err: err });
-    return deferred.promise;
+  service.createRegistry = function(name, URL, authentication, username, password) {
+    var payload = {
+      Name: name,
+      URL: URL,
+      Authentication: authentication
+    };
+    if (authentication) {
+      payload.Username = username;
+      payload.Password = password;
+    }
+    return Registries.create({}, payload).$promise;
   };
 
   return service;

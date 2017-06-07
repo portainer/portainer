@@ -69,10 +69,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.Authentication && (!formValues.Username || !formValues.Password))" ng-click="addRegistry()">Add registry</button>
-              <i id="createEndpointSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
-              <span class="text-danger" ng-if="state.error" style="margin: 5px;">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
-              </span>
+              <i id="createRegistrySpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
         </form>
@@ -138,9 +135,13 @@
             <tbody>
               <tr dir-paginate="registry in (state.filteredRegistries = (registries | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="registry.Checked" ng-change="selectItem(registry)" /></td>
-                <td>Name</td>
-                <td>URL</td>
-                <td>v</td>
+                <td><a ui-sref="registry({id: registry.Id})">{{ registry.Name }}</a></td>
+                <td>{{ registry.URL }}</td>
+                <td>
+                  <span ng-if="registry.Authentication">
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                  </span>
+                </td>
               </tr>
               <tr ng-if="!registries">
                 <td colspan="4" class="text-center text-muted">Loading...</td>

@@ -43,14 +43,31 @@
             </div>
           </div>
           <!-- !authentication-checkbox -->
+          <!-- authentication-credentials -->
+          <div ng-if="registry.Authentication">
+            <!-- credentials-user -->
+            <div class="form-group">
+              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="credentials_username" ng-model="registry.Username">
+              </div>
+            </div>
+            <!-- !credentials-user -->
+            <!-- credentials-password -->
+            <div class="form-group">
+              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="password" class="form-control" id="credentials_password" ng-model="registry.Password">
+              </div>
+            </div>
+            <!-- !credentials-password -->
+          </div>
+          <!-- !authentication-credentials -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!registry.Name || !registry.URL" ng-click="updateRegistry()">Update registry</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!registry.Name || !registry.URL || (registry.Authentication && (!registry.Username || !registry.Password))" ng-click="updateRegistry()">Update registry</button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="registries">Cancel</a>
               <i id="updateRegistrySpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
-              <span class="text-danger" ng-if="state.error" style="margin: 5px;">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
-              </span>
             </div>
           </div>
         </form>

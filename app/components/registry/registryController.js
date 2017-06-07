@@ -3,6 +3,19 @@ angular.module('registry', [])
 function ($scope, $state, $stateParams, $filter, RegistryService, Notifications) {
 
   $scope.updateRegistry = function() {
+    $('#updateRegistrySpinner').show();
+    var registry = $scope.registry;
+    RegistryService.updateRegistry(registry)
+    .then(function success(data) {
+      Notifications.success('Registry successfully updated');
+      $state.go('registries');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to update registry');
+    })
+    .finally(function final() {
+      $('#updateRegistrySpinner').hide();
+    });
   };
 
   function initView() {
