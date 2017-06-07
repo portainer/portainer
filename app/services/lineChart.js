@@ -1,9 +1,9 @@
 angular.module('portainer.services')
-.factory('LineChart', ['Settings', function LineChartFactory(Settings) {
+.factory('LineChart', [function LineChartFactory() {
   'use strict';
   return {
     build: function (id, data, getkey) {
-      var chart = new Chart($(id).get(0).getContext("2d"));
+      var chart = new Chart($(id).get(0).getContext('2d'));
       var map = {};
 
       for (var i = 0; i < data.length; i++) {
@@ -33,10 +33,10 @@ angular.module('portainer.services')
       }
       var steps = Math.min(max, 10);
       var dataset = {
-        fillColor: "rgba(151,187,205,0.5)",
-        strokeColor: "rgba(151,187,205,1)",
-        pointColor: "rgba(151,187,205,1)",
-        pointStrokeColor: "#fff",
+        fillColor: 'rgba(151,187,205,0.5)',
+        strokeColor: 'rgba(151,187,205,1)',
+        pointColor: 'rgba(151,187,205,1)',
+        pointStrokeColor: '#fff',
         data: data
       };
       chart.Line({

@@ -1,9 +1,9 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerHelper', 'Info', 'Settings', 'Notifications', 'Config', 'Pagination', 'EntityListService', 'ModalService', 'Authentication', 'ResourceControlService', 'UserService',
-  function ($q, $scope, $filter, Container, ContainerHelper, Info, Settings, Notifications, Config, Pagination, EntityListService, ModalService, Authentication, ResourceControlService, UserService) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'Info', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider',
+  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, Info, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
-  $scope.state.displayAll = Settings.displayAll;
+  $scope.state.displayAll = true;
   $scope.state.displayIP = false;
   $scope.sortType = 'State';
   $scope.sortReverse = false;
@@ -12,62 +12,19 @@ angular.module('containers', [])
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
   };
+  $scope.PublicURL = EndpointProvider.endpointPublicURL();
 
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('containers', $scope.state.pagination_count);
   };
 
-  function removeContainerResourceControl(container) {
-    volumeResourceControlQueries = [];
-    angular.forEach(container.Mounts, function (volume) {
-      volumeResourceControlQueries.push(ResourceControlService.removeVolumeResourceControl(container.Metadata.ResourceControl.OwnerId, volume.Name));
-    });
-
-    $q.all(volumeResourceControlQueries)
-    .then(function success() {
-      return ResourceControlService.removeContainerResourceControl(container.Metadata.ResourceControl.OwnerId, container.Id);
-    })
-    .then(function success() {
-      delete container.Metadata.ResourceControl;
-      Notifications.success('Ownership changed to public', container.Id);
-    })
-    .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to change container ownership");
-    });
-  }
-
-  $scope.switchOwnership = function(container) {
-    ModalService.confirmContainerOwnershipChange(function (confirmed) {
-      if(!confirmed) { return; }
-      removeContainerResourceControl(container);
-    });
-  };
-
-  function mapUsersToContainers(users) {
-    angular.forEach($scope.containers, function (container) {
-      if (container.Metadata) {
-        var containerRC = container.Metadata.ResourceControl;
-        if (containerRC && containerRC.OwnerId !== $scope.user.ID) {
-          angular.forEach(users, function (user) {
-            if (containerRC.OwnerId === user.Id) {
-              container.Owner = user.Username;
-            }
-          });
-        }
-      }
-    });
-  }
+  $scope.cleanAssociatedVolumes = false;
 
   var update = function (data) {
     $('#loadContainersSpinner').show();
-    var userDetails = Authentication.getUserDetails();
-    $scope.user = userDetails;
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
-      if ($scope.containersToHideLabels) {
-        containers = ContainerHelper.hideContainers(d, $scope.containersToHideLabels);
-      }
       $scope.containers = containers.map(function (container) {
         var model = new ContainerViewModel(container);
         model.Status = $filter('containerstatus')(model.Status);
@@ -84,23 +41,10 @@ angular.module('containers', [])
         }
         return model;
       });
-      if (userDetails.role === 1) {
-        UserService.users()
-        .then(function success(data) {
-          mapUsersToContainers(data);
-        })
-        .catch(function error(err) {
-          Notifications.error("Failure", err, "Unable to retrieve users");
-        })
-        .finally(function final() {
-          $('#loadContainersSpinner').hide();
-        });
-      } else {
-        $('#loadContainersSpinner').hide();
-      }
+      $('#loadContainersSpinner').hide();
     }, function (e) {
       $('#loadContainersSpinner').hide();
-      Notifications.error("Failure", e, "Unable to retrieve containers");
+      Notifications.error('Failure', e, 'Unable to retrieve containers');
       $scope.containers = [];
     });
   };
@@ -112,7 +56,7 @@ angular.module('containers', [])
       counter = counter - 1;
       if (counter === 0) {
         $('#loadContainersSpinner').hide();
-        update({all: Settings.displayAll ? 1 : 0});
+        update({all: $scope.state.displayAll ? 1 : 0});
       }
     };
     angular.forEach(items, function (c) {
@@ -120,56 +64,44 @@ angular.module('containers', [])
         counter = counter + 1;
         if (action === Container.start) {
           action({id: c.Id}, {}, function (d) {
-            Notifications.success("Container " + msg, c.Id);
+            Notifications.success('Container ' + msg, c.Id);
             complete();
           }, function (e) {
-            Notifications.error("Failure", e, "Unable to start container");
+            Notifications.error('Failure', e, 'Unable to start container');
             complete();
           });
         }
         else if (action === Container.remove) {
-          action({id: c.Id}, function (d) {
-            if (d.message) {
-              Notifications.error("Error", d, "Unable to remove container");
-            }
-            else {
-              if (c.Metadata && c.Metadata.ResourceControl) {
-                ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, c.Id)
-                .then(function success() {
-                  Notifications.success("Container " + msg, c.Id);
-                })
-                .catch(function error(err) {
-                  Notifications.error("Failure", err, "Unable to remove container ownership");
-                });
-              } else {
-                Notifications.success("Container " + msg, c.Id);
-              }
-            }
-            complete();
-          }, function (e) {
-            Notifications.error("Failure", e, 'Unable to remove container');
+          ContainerService.remove(c, $scope.cleanAssociatedVolumes)
+          .then(function success() {
+            Notifications.success('Container successfully removed');
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to remove container');
+          })
+          .finally(function final() {
             complete();
           });
         }
         else if (action === Container.pause) {
           action({id: c.Id}, function (d) {
             if (d.message) {
-              Notifications.success("Container is already paused", c.Id);
+              Notifications.success('Container is already paused', c.Id);
             } else {
-              Notifications.success("Container " + msg, c.Id);
+              Notifications.success('Container ' + msg, c.Id);
             }
             complete();
           }, function (e) {
-            Notifications.error("Failure", e, 'Unable to pause container');
+            Notifications.error('Failure', e, 'Unable to pause container');
             complete();
           });
         }
         else {
           action({id: c.Id}, function (d) {
-            Notifications.success("Container " + msg, c.Id);
+            Notifications.success('Container ' + msg, c.Id);
             complete();
           }, function (e) {
-            Notifications.error("Failure", e, 'An error occured');
+            Notifications.error('Failure', e, 'An error occured');
             complete();
           });
 
@@ -199,36 +131,60 @@ angular.module('containers', [])
   };
 
   $scope.toggleGetAll = function () {
-    Settings.displayAll = $scope.state.displayAll;
-    update({all: Settings.displayAll ? 1 : 0});
+    update({all: $scope.state.displayAll ? 1 : 0});
   };
 
   $scope.startAction = function () {
-    batch($scope.containers, Container.start, "Started");
+    batch($scope.containers, Container.start, 'Started');
   };
 
   $scope.stopAction = function () {
-    batch($scope.containers, Container.stop, "Stopped");
+    batch($scope.containers, Container.stop, 'Stopped');
   };
 
   $scope.restartAction = function () {
-    batch($scope.containers, Container.restart, "Restarted");
+    batch($scope.containers, Container.restart, 'Restarted');
   };
 
   $scope.killAction = function () {
-    batch($scope.containers, Container.kill, "Killed");
+    batch($scope.containers, Container.kill, 'Killed');
   };
 
   $scope.pauseAction = function () {
-    batch($scope.containers, Container.pause, "Paused");
+    batch($scope.containers, Container.pause, 'Paused');
   };
 
   $scope.unpauseAction = function () {
-    batch($scope.containers, Container.unpause, "Unpaused");
+    batch($scope.containers, Container.unpause, 'Unpaused');
   };
 
   $scope.removeAction = function () {
-    batch($scope.containers, Container.remove, "Removed");
+    batch($scope.containers, Container.remove, 'Removed');
+  };
+
+  $scope.confirmRemoveAction = function () {
+    var isOneContainerRunning = false;
+    angular.forEach($scope.containers, function (c) {
+      if (c.Checked && c.State === 'running') {
+        isOneContainerRunning = true;
+        return;
+      }
+    });
+    var title = 'You are about to remove one or more container.';
+    if (isOneContainerRunning) {
+      title = 'You are about to remove one or more running containers.';
+    }
+    ModalService.confirmContainerDeletion(
+      title,
+      function (result) {
+        if(!result) { return; }
+        $scope.cleanAssociatedVolumes = false;
+        if (result[0]) {
+          $scope.cleanAssociatedVolumes = true;
+        }
+        $scope.removeAction();
+      }
+    );
   };
 
   function retrieveSwarmHostsInfo(data) {
@@ -246,15 +202,16 @@ angular.module('containers', [])
     return swarm_hosts;
   }
 
-  Config.$promise.then(function (c) {
-    $scope.containersToHideLabels = c.hiddenLabels;
+  function initView(){
     if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
       Info.get({}, function (d) {
         $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
-        update({all: Settings.displayAll ? 1 : 0});
+        update({all: $scope.state.displayAll ? 1 : 0});
       });
     } else {
-      update({all: Settings.displayAll ? 1 : 0});
+      update({all: $scope.state.displayAll ? 1 : 0});
     }
-  });
+  }
+
+  initView();
 }]);

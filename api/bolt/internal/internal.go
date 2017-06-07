@@ -17,6 +17,26 @@ func UnmarshalUser(data []byte, user *portainer.User) error {
 	return json.Unmarshal(data, user)
 }
 
+// MarshalTeam encodes a team to binary format.
+func MarshalTeam(team *portainer.Team) ([]byte, error) {
+	return json.Marshal(team)
+}
+
+// UnmarshalTeam decodes a team from a binary data.
+func UnmarshalTeam(data []byte, team *portainer.Team) error {
+	return json.Unmarshal(data, team)
+}
+
+// MarshalTeamMembership encodes a team membership to binary format.
+func MarshalTeamMembership(membership *portainer.TeamMembership) ([]byte, error) {
+	return json.Marshal(membership)
+}
+
+// UnmarshalTeamMembership decodes a team membership from a binary data.
+func UnmarshalTeamMembership(data []byte, membership *portainer.TeamMembership) error {
+	return json.Unmarshal(data, membership)
+}
+
 // MarshalEndpoint encodes an endpoint to binary format.
 func MarshalEndpoint(endpoint *portainer.Endpoint) ([]byte, error) {
 	return json.Marshal(endpoint)
@@ -35,6 +55,16 @@ func MarshalResourceControl(rc *portainer.ResourceControl) ([]byte, error) {
 // UnmarshalResourceControl decodes a resource control object from a binary data.
 func UnmarshalResourceControl(data []byte, rc *portainer.ResourceControl) error {
 	return json.Unmarshal(data, rc)
+}
+
+// MarshalSettings encodes a settings object to binary format.
+func MarshalSettings(settings *portainer.Settings) ([]byte, error) {
+	return json.Marshal(settings)
+}
+
+// UnmarshalSettings decodes a settings object from a binary data.
+func UnmarshalSettings(data []byte, settings *portainer.Settings) error {
+	return json.Unmarshal(data, settings)
 }
 
 // Itob returns an 8-byte big endian representation of v.

@@ -1,65 +1,153 @@
 <rd-header>
   <rd-header-title title="Settings">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Settings</rd-header-content>
 </rd-header>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
+  <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-lock" title="Change user password"></rd-widget-header>
+      <rd-widget-header icon="fa-cogs" title="Application settings"></rd-widget-header>
       <rd-widget-body>
-        <form class="form-horizontal" style="margin-top: 15px;">
-          <!-- current-password-input -->
+        <form class="form-horizontal">
+          <!-- logo -->
+          <div class="col-sm-12 form-section-title">
+            Logo
+          </div>
           <div class="form-group">
-            <label for="current_password" class="col-sm-2 control-label text-left">Current password</label>
-            <div class="col-sm-8">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.currentPassword" id="current_password">
+            <div class="col-sm-12">
+              <label for="toggle_logo" class="control-label text-left">
+                Use custom logo
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_logo" ng-model="formValues.customLogo"><i></i>
+              </label>
+            </div>
+          </div>
+          <div ng-if="formValues.customLogo">
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                You can specify the URL to your logo here. For an optimal display, logo dimensions should be 155px by 55px.
+              </span>
+            </div>
+            <div class="form-group">
+              <label for="logo_url" class="col-sm-1 control-label text-left">
+                URL
+              </label>
+              <div class="col-sm-11">
+                <input type="text" class="form-control" ng-model="settings.LogoURL" id="logo_url" placeholder="https://mycompany.com/logo.png">
               </div>
             </div>
           </div>
-          <!-- !current-password-input -->
-          <div class="form-group" style="margin-left: 5px;">
-            <p>
-              <i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[formValues.newPassword.length >= 8]" aria-hidden="true"></i>
-              Your new password must be at least 8 characters long
-            </p>
+          <!-- !logo -->
+          <!-- app-templates -->
+          <div class="col-sm-12 form-section-title">
+            App Templates
           </div>
-          <!-- new-password-input -->
           <div class="form-group">
-            <label for="new_password" class="col-sm-2 control-label text-left">New password</label>
-            <div class="col-sm-8">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.newPassword" id="new_password">
+            <div class="col-sm-12">
+              <label for="toggle_templates" class="control-label text-left">
+                Use custom templates
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_templates" ng-model="formValues.customTemplates"><i></i>
+              </label>
+            </div>
+          </div>
+          <div ng-if="formValues.customTemplates">
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                You can specify the URL to your own template definitions file here. See <a href="https://portainer.readthedocs.io/en/stable/templates.html" target="_blank">Portainer documentation</a> for more details.
+              </span>
+            </div>
+            <div class="form-group" >
+              <label for="templates_url" class="col-sm-1 control-label text-left">
+                URL
+              </label>
+              <div class="col-sm-11">
+                <input type="text" class="form-control" ng-model="settings.TemplatesURL" id="templates_url" placeholder="https://myserver.mydomain/templates.json">
               </div>
             </div>
           </div>
-          <!-- !new-password-input -->
-          <!-- confirm-password-input -->
           <div class="form-group">
-            <label for="confirm_password" class="col-sm-2 control-label text-left">Confirm password</label>
-            <div class="col-sm-8">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password">
-                <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[formValues.newPassword !== '' && formValues.newPassword === formValues.confirmPassword]" aria-hidden="true"></i></span>
-              </div>
+            <div class="col-sm-12">
+              <label for="toggle_external_contrib" class="control-label text-left">
+                Hide external contributions
+                <portainer-tooltip position="bottom" message="When enabled, external contributions such as LinuxServer.io will not be displayed in the sidebar."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_external_contrib" ng-model="formValues.externalContributions"><i></i>
+              </label>
             </div>
           </div>
-          <!-- !confirm-password-input -->
+          <!-- !app-templates -->
+          <!-- actions -->
           <div class="form-group">
-            <div class="col-sm-2">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.currentPassword || formValues.newPassword.length < 8 || formValues.newPassword !== formValues.confirmPassword" ng-click="updatePassword()">Update password</button>
-            </div>
-            <div class="col-sm-10">
-              <p class="pull-left text-danger" ng-if="invalidPassword" style="margin: 5px;">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Current password is not valid
-              </p>
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="saveApplicationSettings()">Save</button>
+              <i id="updateSettingsSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <!-- <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span> -->
             </div>
           </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tags" title="Hidden containers"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              You can hide containers with specific labels from Portainer UI. You need to specify the label name and value.
+            </span>
+          </div>
+          <div class="form-group">
+            <label for="header_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11 col-md-4">
+              <input type="text" class="form-control" id="header_name" ng-model="formValues.labelName" placeholder="e.g. com.example.foo">
+            </div>
+            <label for="header_value" class="col-sm-1 margin-sm-top control-label text-left">Value</label>
+            <div class="col-sm-11 col-md-4 margin-sm-top">
+              <input type="text" class="form-control" id="header_value" ng-model="formValues.labelValue" placeholder="e.g. bar">
+            </div>
+            <div class="col-sm-12 col-md-2 margin-sm-top">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="addFilteredContainerLabel()" ng-disabled="!formValues.labelValue || !formValues.labelName"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add filter</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12 table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="label in settings.BlackListedLabels">
+                    <td>{{ label.name }}</td>
+                    <td>{{ label.value }}</td>
+                    <td><button type="button" class="btn btn-danger btn-xs" ng-click="removeFilteredContainerLabel($index)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button></td>
+                  </tr>
+                  <tr ng-if="settings.BlackListedLabels.length === 0">
+                    <td colspan="3" class="text-center text-muted">No filter available.</td>
+                  </tr>
+                  <tr ng-if="!settings.BlackListedLabels">
+                    <td colspan="3" class="text-center text-muted">Loading...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- !filtered-labels -->
         </form>
       </rd-widget-body>
     </rd-widget>

@@ -1,6 +1,6 @@
 angular.module('containerConsole', [])
-.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Settings', 'Container', 'Image', 'Exec', '$timeout', 'EndpointProvider', 'Notifications',
-function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, EndpointProvider, Notifications) {
+.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'Exec', '$timeout', 'EndpointProvider', 'Notifications',
+function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvider, Notifications) {
   $scope.state = {};
   $scope.state.loaded = false;
   $scope.state.connected = false;
@@ -17,7 +17,7 @@ function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, Endp
   Container.get({id: $stateParams.id}, function(d) {
     $scope.container = d;
     if (d.message) {
-      Notifications.error("Error", d, 'Unable to retrieve container details');
+      Notifications.error('Error', d, 'Unable to retrieve container details');
       $('#loadingViewSpinner').hide();
     } else {
       Image.get({id: d.Image}, function(imgData) {
@@ -26,12 +26,12 @@ function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, Endp
         $scope.state.loaded = true;
         $('#loadingViewSpinner').hide();
       }, function (e) {
-        Notifications.error("Failure", e, 'Unable to retrieve image details');
+        Notifications.error('Failure', e, 'Unable to retrieve image details');
         $('#loadingViewSpinner').hide();
       });
     }
   }, function (e) {
-    Notifications.error("Failure", e, 'Unable to retrieve container details');
+    Notifications.error('Failure', e, 'Unable to retrieve container details');
     $('#loadingViewSpinner').hide();
   });
 
@@ -45,13 +45,13 @@ function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, Endp
       AttachStdout: true,
       AttachStderr: true,
       Tty: true,
-      Cmd: $scope.state.command.replace(" ", ",").split(",")
+      Cmd: $scope.state.command.replace(' ', ',').split(',')
     };
 
     Container.exec(execConfig, function(d) {
       if (d.message) {
         $('#loadConsoleSpinner').hide();
-        Notifications.error("Error", {}, d.message);
+        Notifications.error('Error', {}, d.message);
       } else {
         var execId = d.Id;
         resizeTTY(execId, termHeight, termWidth);
@@ -65,7 +65,7 @@ function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, Endp
       }
     }, function (e) {
       $('#loadConsoleSpinner').hide();
-      Notifications.error("Failure", e, 'Unable to start an exec instance');
+      Notifications.error('Failure', e, 'Unable to start an exec instance');
     });
   };
 
@@ -86,7 +86,7 @@ function ($scope, $stateParams, Settings, Container, Image, Exec, $timeout, Endp
           Notifications.error('Error', {}, 'Unable to resize TTY');
         }
       }, function (e) {
-        Notifications.error("Failure", {}, 'Unable to resize TTY');
+        Notifications.error('Failure', {}, 'Unable to resize TTY');
       });
     }, 2000);
 

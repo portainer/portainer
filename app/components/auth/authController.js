@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Config', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
-function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Authentication, Users, EndpointService, StateManager, EndpointProvider, Notifications) {
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
+function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Authentication, Users, EndpointService, StateManager, EndpointProvider, Notifications) {
 
   $scope.authData = {
     username: 'admin',
@@ -12,6 +12,8 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
     password_confirmation: '',
     error: false
   };
+
+  $scope.logo = StateManager.getState().application.logo;
 
   if (!$scope.applicationState.application.authentication) {
     EndpointService.endpoints()
@@ -26,14 +28,14 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
         .then(function success() {
           $state.go('dashboard');
         }, function error(err) {
-          Notifications.error("Failure", err, 'Unable to connect to the Docker endpoint');
+          Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
         });
       }
       else {
         $state.go('endpointInit');
       }
     }, function error(err) {
-      Notifications.error("Failure", err, 'Unable to retrieve endpoints');
+      Notifications.error('Failure', err, 'Unable to retrieve endpoints');
     });
   } else {
     Users.checkAdminUser({}, function () {},
@@ -41,7 +43,7 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
       if (e.status === 404) {
         $scope.initPassword = true;
       } else {
-        Notifications.error("Failure", e, 'Unable to verify administrator account existence');
+        Notifications.error('Failure', e, 'Unable to verify administrator account existence');
       }
     });
   }
@@ -58,10 +60,6 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
   if (Authentication.isAuthenticated()) {
     $state.go('dashboard');
   }
-
-  Config.$promise.then(function (c) {
-    $scope.logo = c.logo;
-  });
 
   $scope.createAdminUser = function() {
     var password = $sanitize($scope.initPasswordData.password);
@@ -98,7 +96,7 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Config, Au
         .then(function success() {
           $state.go('dashboard');
         }, function error(err) {
-          Notifications.error("Failure", err, 'Unable to connect to the Docker endpoint');
+          Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
         });
       }
       else if (data.length === 0 && userDetails.role === 1) {

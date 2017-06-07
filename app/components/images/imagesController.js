@@ -1,6 +1,6 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Config', 'ImageService', 'Notifications', 'Pagination', 'ModalService',
-function ($scope, $state, Config, ImageService, Notifications, Pagination, ModalService) {
+.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'Pagination', 'ModalService',
+function ($scope, $state, ImageService, Notifications, Pagination, ModalService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('images');
   $scope.sortType = 'RepoTags';
@@ -47,7 +47,7 @@ function ($scope, $state, Config, ImageService, Notifications, Pagination, Modal
       $state.reload();
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to pull image");
+      Notifications.error('Failure', err, 'Unable to pull image');
     })
     .finally(function final() {
       $('#pullImageSpinner').hide();
@@ -76,12 +76,12 @@ function ($scope, $state, Config, ImageService, Notifications, Pagination, Modal
         counter = counter + 1;
         ImageService.deleteImage(i.Id, force)
         .then(function success(data) {
-          Notifications.success("Image deleted", i.Id);
+          Notifications.success('Image deleted', i.Id);
           var index = $scope.images.indexOf(i);
           $scope.images.splice(index, 1);
         })
         .catch(function error(err) {
-          Notifications.error("Failure", err, 'Unable to remove image');
+          Notifications.error('Failure', err, 'Unable to remove image');
         })
         .finally(function final() {
           complete();
@@ -97,7 +97,7 @@ function ($scope, $state, Config, ImageService, Notifications, Pagination, Modal
       $scope.images = data;
     })
     .catch(function error(err) {
-      Notifications.error("Failure", err, "Unable to retrieve images");
+      Notifications.error('Failure', err, 'Unable to retrieve images');
       $scope.images = [];
     })
     .finally(function final() {
