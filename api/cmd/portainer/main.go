@@ -91,6 +91,22 @@ func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portaine
 	}
 }
 
+func initRegistries(registryService portainer.RegistryService) error {
+	registries, err := registryService.Registries()
+	if err != nil {
+		return err
+	}
+	if len(registries) == 0 {
+		defaultRegistry := &portainer.Registry{
+			Name:           "DockerHub",
+			URL:            "https://registry-1.docker.io/v2/",
+			Authentication: false,
+		}
+		return registryService.CreateRegistry(defaultRegistry)
+	}
+	return nil
+}
+
 func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
 	_, err := settingsService.Settings()
 	if err == portainer.ErrSettingsNotFound {
@@ -142,6 +158,11 @@ func main() {
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
 	err := initSettings(store.SettingsService, flags)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = initRegistries(store.RegistryService)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -271,6 +271,11 @@ func (handler *RegistryHandler) handleDeleteRegistry(w http.ResponseWriter, r *h
 		return
 	}
 
+	if registryID == 1 {
+		httperror.WriteErrorResponse(w, portainer.ErrCannotDeleteDefaultRegistry, http.StatusForbidden, handler.Logger)
+		return
+	}
+
 	_, err = handler.RegistryService.Registry(portainer.RegistryID(registryID))
 	if err == portainer.ErrRegistryNotFound {
 		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)

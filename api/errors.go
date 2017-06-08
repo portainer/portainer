@@ -44,7 +44,8 @@ const (
 
 // Registry errors.
 const (
-	ErrRegistryNotFound = Error("Registry not found")
+	ErrRegistryNotFound            = Error("Registry not found")
+	ErrCannotDeleteDefaultRegistry = Error("Cannot delete default registry")
 )
 
 // Version errors.
