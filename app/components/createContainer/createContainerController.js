@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator',
-function ($q, $scope, $state, $stateParams, $filter, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator',
+function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator) {
 
   $scope.formValues = {
     alwaysPull: true,

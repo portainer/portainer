@@ -15,21 +15,11 @@
       </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
-          <!-- name-and-registry-inputs -->
+          <!-- image-and-registry -->
           <div class="form-group">
-            <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11 col-md-6">
-              <input type="text" class="form-control" ng-model="config.Image" id="image_name" placeholder="e.g. ubuntu:trusty">
-            </div>
-            <label for="image_registry" class="col-sm-2 margin-sm-top control-label text-left">
-              Registry
-              <portainer-tooltip position="bottom" message="A registry to pull the image from. Leave empty to use the official Docker registry."></portainer-tooltip>
-            </label>
-            <div class="col-sm-10 col-md-3 margin-sm-top">
-              <input type="text" class="form-control" ng-model="config.Registry" id="image_registry" placeholder="e.g. myregistry.mydomain">
-            </div>
+            <por-image-registry image="config.Image" registry="config.Registry"></por-image-registry>
           </div>
-          <!-- !name-and-registry-inputs -->
+          <!-- !image-and-registry -->
           <!-- tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
