@@ -86,8 +86,10 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 		URL:            req.URL,
 		Authentication: req.Authentication,
 		// AuthenticationString: req.AuthenticationString,
-		Username: req.Username,
-		Password: req.Password,
+		Username:        req.Username,
+		Password:        req.Password,
+		AuthorizedUsers: []portainer.UserID{},
+		AuthorizedTeams: []portainer.TeamID{},
 	}
 
 	err = handler.RegistryService.CreateRegistry(registry)

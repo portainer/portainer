@@ -7,6 +7,6 @@
     Registry
   </label>
   <div class="col-sm-10 col-md-4 margin-sm-top">
-    <select ng-options="registry.Name as registry.Name for registry in $ctrl.availableRegistries" ng-model="$ctrl.registry" id="image_registry" class="form-control"></select>
+    <select ng-options="registry.URL as registry.Name for registry in $ctrl.availableRegistries" ng-model="$ctrl.registry" id="image_registry" class="form-control"></select>
   </div>
 </div>

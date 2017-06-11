@@ -105,8 +105,10 @@ type (
 		URL            string     `json:"URL"`
 		Authentication bool       `json:"Authentication"`
 		// AuthenticationString string     `json:"AuthenticationString"`
-		Username string `json:"Username"`
-		Password string `json:"Password"`
+		Username        string   `json:"Username"`
+		Password        string   `json:"Password"`
+		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
 	}
 
 	// EndpointID represents an endpoint identifier.

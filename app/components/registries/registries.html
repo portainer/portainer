@@ -130,6 +130,7 @@
                     <span ng-show="sortType == 'Authentication' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -140,6 +141,11 @@
                 <td>
                   <span ng-if="registry.Authentication">
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
+                  </span>
+                </td>
+                <td>
+                  <span ng-if="applicationState.application.authentication">
+                    <a ui-sref="registry.access({id: registry.Id})"><i class="fa fa-users" aria-hidden="true" style="margin-left: 7px;"></i> Manage access</a>
                   </span>
                 </td>
               </tr>

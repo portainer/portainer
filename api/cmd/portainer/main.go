@@ -98,9 +98,11 @@ func initRegistries(registryService portainer.RegistryService) error {
 	}
 	if len(registries) == 0 {
 		defaultRegistry := &portainer.Registry{
-			Name:           "DockerHub",
-			URL:            "https://registry-1.docker.io/v2/",
-			Authentication: false,
+			Name:            "DockerHub",
+			URL:             "docker.io",
+			Authentication:  false,
+			AuthorizedUsers: []portainer.UserID{},
+			AuthorizedTeams: []portainer.TeamID{},
 		}
 		return registryService.CreateRegistry(defaultRegistry)
 	}
