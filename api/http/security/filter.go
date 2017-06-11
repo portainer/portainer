@@ -63,17 +63,17 @@ func FilterUsers(users []portainer.User, context *RestrictedRequestContext) []po
 // FilterRegistries filters registries based on user role and team memberships.
 // Non administrator users only have access to authorized endpoints.
 func FilterRegistries(registries []portainer.Registry, context *RestrictedRequestContext) ([]portainer.Registry, error) {
-	filteredRegistries := registries
 
-	// if !context.IsAdmin {
-	// 	filteredEndpoints = make([]portainer.Endpoint, 0)
-	//
-	// 	for _, endpoint := range endpoints {
-	// 		if isEndpointAccessAuthorized(&endpoint, context.UserID, context.UserMemberships) {
-	// 			filteredEndpoints = append(filteredEndpoints, endpoint)
-	// 		}
-	// 	}
-	// }
+	filteredRegistries := registries
+	if !context.IsAdmin {
+		filteredRegistries = make([]portainer.Registry, 0)
+
+		for _, registry := range registries {
+			if isRegistryAccessAuthorized(&registry, context.UserID, context.UserMemberships) {
+				filteredRegistries = append(filteredRegistries, registry)
+			}
+		}
+	}
 
 	return filteredRegistries, nil
 }
@@ -94,6 +94,22 @@ func FilterEndpoints(endpoints []portainer.Endpoint, context *RestrictedRequestC
 	}
 
 	return filteredEndpoints, nil
+}
+
+func isRegistryAccessAuthorized(registry *portainer.Registry, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+	for _, authorizedUserID := range registry.AuthorizedUsers {
+		if authorizedUserID == userID {
+			return true
+		}
+	}
+	for _, membership := range memberships {
+		for _, authorizedTeamID := range registry.AuthorizedTeams {
+			if membership.TeamID == authorizedTeamID {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func isEndpointAccessAuthorized(endpoint *portainer.Endpoint, userID portainer.UserID, memberships []portainer.TeamMembership) bool {

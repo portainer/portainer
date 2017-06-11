@@ -139,57 +139,57 @@ func (handler *RegistryHandler) handleGetRegistry(w http.ResponseWriter, r *http
 
 // handlePutRegistryAccess handles PUT requests on /registries/:id/access
 func (handler *RegistryHandler) handlePutRegistryAccess(w http.ResponseWriter, r *http.Request) {
-	// vars := mux.Vars(r)
-	// id := vars["id"]
-	//
-	// registryID, err := strconv.Atoi(id)
-	// if err != nil {
-	// 	httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-	// 	return
-	// }
-	//
-	// var req putRegistryAccessRequest
-	// if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-	// 	httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
-	// 	return
-	// }
-	//
-	// _, err = govalidator.ValidateStruct(req)
-	// if err != nil {
-	// 	httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
-	// 	return
-	// }
+	vars := mux.Vars(r)
+	id := vars["id"]
 
-	// registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
-	// if err == portainer.ErrRegistryNotFound {
-	// 	httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-	// 	return
-	// } else if err != nil {
-	// 	httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-	// 	return
-	// }
+	registryID, err := strconv.Atoi(id)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
 
-	// if req.AuthorizedUsers != nil {
-	// 	authorizedUserIDs := []portainer.UserID{}
-	// 	for _, value := range req.AuthorizedUsers {
-	// 		authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
-	// 	}
-	// 	registry.AuthorizedUsers = authorizedUserIDs
-	// }
-	//
-	// if req.AuthorizedTeams != nil {
-	// 	authorizedTeamIDs := []portainer.TeamID{}
-	// 	for _, value := range req.AuthorizedTeams {
-	// 		authorizedTeamIDs = append(authorizedTeamIDs, portainer.TeamID(value))
-	// 	}
-	// 	registry.AuthorizedTeams = authorizedTeamIDs
-	// }
-	//
-	// err = handler.RegistryService.UpdateRegistry(registry.ID, registry)
-	// if err != nil {
-	// 	httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-	// 	return
-	// }
+	var req putRegistryAccessRequest
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = govalidator.ValidateStruct(req)
+	if err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
+	if err == portainer.ErrRegistryNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if req.AuthorizedUsers != nil {
+		authorizedUserIDs := []portainer.UserID{}
+		for _, value := range req.AuthorizedUsers {
+			authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
+		}
+		registry.AuthorizedUsers = authorizedUserIDs
+	}
+
+	if req.AuthorizedTeams != nil {
+		authorizedTeamIDs := []portainer.TeamID{}
+		for _, value := range req.AuthorizedTeams {
+			authorizedTeamIDs = append(authorizedTeamIDs, portainer.TeamID(value))
+		}
+		registry.AuthorizedTeams = authorizedTeamIDs
+	}
+
+	err = handler.RegistryService.UpdateRegistry(registry.ID, registry)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
 }
 
 type putRegistryAccessRequest struct {
