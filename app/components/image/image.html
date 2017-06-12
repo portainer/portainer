@@ -56,7 +56,7 @@
         <form class="form-horizontal">
           <!-- image-and-registry -->
           <div class="form-group">
-            <por-image-registry image="config.Image" registry="config.Registry"></por-image-registry>
+            <por-image-registry image="formValues.Image" registry="formValues.Registry"></por-image-registry>
           </div>
           <!-- !image-and-registry -->
           <!-- tag-note -->
@@ -68,7 +68,7 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="tagImage()">Tag</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Image" ng-click="tagImage()">Tag</button>
               <i id="pullImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>

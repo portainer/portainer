@@ -1,6 +1,13 @@
 angular.module('portainer.rest')
 .factory('Image', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function ImageFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
   'use strict';
+
+  function setAuthenticationHeader(requestConfiguration) {
+    if (requestConfiguration.params.authenticationDetails !== '') {
+      return requestConfiguration.params.authenticationDetails;
+    }
+  }
+
   return $resource(DOCKER_ENDPOINT + '/:endpointId/images/:id/:action', {
     endpointId: EndpointProvider.endpointID
   },
@@ -18,7 +25,8 @@ angular.module('portainer.rest')
     },
     create: {
       method: 'POST', params: {action: 'create', fromImage: '@fromImage', tag: '@tag'},
-      isArray: true, transformResponse: jsonObjectsToArrayHandler
+      isArray: true, transformResponse: jsonObjectsToArrayHandler,
+      headers: { 'X-Registry-Auth': setAuthenticationHeader }
     },
     remove: {
       method: 'DELETE', params: {id: '@id', force: '@force'},

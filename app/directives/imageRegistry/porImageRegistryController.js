@@ -8,7 +8,7 @@ function (RegistryService, Notifications) {
     .then(function success(data) {
       var registries = data;
       ctrl.availableRegistries = registries;
-      ctrl.registry = registries[0].URL;
+      ctrl.registry = registries[0];
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve registries');

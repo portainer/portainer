@@ -35,14 +35,14 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  // service.encodedCredentials = function(username, password, serveraddress) {
-  //   var credentials = {
-  //     username: username,
-  //     password: password,
-  //     serveraddress: serveraddress
-  //   };
-  //   return btoa(JSON.stringify(credentials));
-  // };
+  service.encodedCredentials = function(registry) {
+    var credentials = {
+      username: registry.Username,
+      password: registry.Password,
+      serveraddress: registry.URL
+    };
+    return btoa(JSON.stringify(credentials));
+  };
 
   service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
     return Registries.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;

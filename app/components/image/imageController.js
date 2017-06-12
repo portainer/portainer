@@ -1,15 +1,15 @@
 angular.module('image', [])
 .controller('ImageController', ['$scope', '$stateParams', '$state', 'ImageService', 'Notifications',
 function ($scope, $stateParams, $state, ImageService, Notifications) {
-	$scope.config = {
+	$scope.formValues = {
 		Image: '',
 		Registry: ''
 	};
 
 	$scope.tagImage = function() {
 		$('#loadingViewSpinner').show();
-		var image = $scope.config.Image;
-		var registry = $scope.config.Registry;
+		var image = $scope.formValues.Image;
+		var registry = $scope.formValues.Registry;
 
 		ImageService.tagImage($stateParams.id, image, registry)
 		.then(function success(data) {

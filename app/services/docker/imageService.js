@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('ImageService', ['$q', 'Image', 'ImageHelper', function ImageServiceFactory($q, Image, ImageHelper) {
+.factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', function ImageServiceFactory($q, Image, ImageHelper, RegistryService) {
   'use strict';
   var service = {};
 
@@ -37,8 +37,10 @@ angular.module('portainer.services')
 
   service.pullImage = function(image, registry) {
     var deferred = $q.defer();
-    var imageConfiguration = ImageHelper.createImageConfigForContainer(image, registry);
-    Image.create(imageConfiguration).$promise
+
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(image, registry.URL);
+    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
+    Image.create({authenticationDetails: authenticationDetails}, imageConfiguration).$promise
     .then(function success(data) {
       var err = data.length > 0 && data[data.length - 1].hasOwnProperty('message');
       if (err) {
@@ -51,6 +53,7 @@ angular.module('portainer.services')
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to pull image', err: err });
     });
+
     return deferred.promise;
   };
 
