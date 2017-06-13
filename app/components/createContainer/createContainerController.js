@@ -94,7 +94,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   function prepareImageConfig(config) {
     var image = config.Image;
     var registry = $scope.formValues.Registry;
-    var imageConfig = ImageHelper.createImageConfigForContainer(image, registry);
+    var imageConfig = ImageHelper.createImageConfigForContainer(image, registry.URL);
     config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
     $scope.imageConfig = imageConfig;
   }
