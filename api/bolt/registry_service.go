@@ -38,7 +38,7 @@ func (service *RegistryService) Registry(ID portainer.RegistryID) (*portainer.Re
 	return &registry, nil
 }
 
-// Registrys return an array containing all the registrys.
+// Registries returns an array containing all the registries.
 func (service *RegistryService) Registries() ([]portainer.Registry, error) {
 	var registries = make([]portainer.Registry, 0)
 	err := service.store.db.View(func(tx *bolt.Tx) error {
@@ -63,7 +63,7 @@ func (service *RegistryService) Registries() ([]portainer.Registry, error) {
 	return registries, nil
 }
 
-// CreateUser creates a new registry.
+// CreateRegistry creates a new registry.
 func (service *RegistryService) CreateRegistry(registry *portainer.Registry) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(registryBucketName))

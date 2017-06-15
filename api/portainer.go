@@ -100,15 +100,14 @@ type (
 	// Registry represents a Docker registry with all the info required
 	// to connect to it.
 	Registry struct {
-		ID             RegistryID `json:"Id"`
-		Name           string     `json:"Name"`
-		URL            string     `json:"URL"`
-		Authentication bool       `json:"Authentication"`
-		// AuthenticationString string     `json:"AuthenticationString"`
-		Username        string   `json:"Username"`
-		Password        string   `json:"Password"`
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+		ID              RegistryID `json:"Id"`
+		Name            string     `json:"Name"`
+		URL             string     `json:"URL"`
+		Authentication  bool       `json:"Authentication"`
+		Username        string     `json:"Username"`
+		Password        string     `json:"Password"`
+		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
 	}
 
 	// DockerHub represents all the required information to connect and use the

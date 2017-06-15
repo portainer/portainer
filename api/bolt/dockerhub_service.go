@@ -42,7 +42,7 @@ func (service *DockerHubService) DockerHub() (*portainer.DockerHub, error) {
 	return &dockerhub, nil
 }
 
-// StoreSettings persists a Settings object.
+// StoreDockerHub persists a DockerHub object.
 func (service *DockerHubService) StoreDockerHub(dockerhub *portainer.DockerHub) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(dockerhubBucketName))

@@ -24,15 +24,6 @@ angular.module('portainer.services')
     return System.version({}).$promise;
   };
 
-  service.auth = function(username, password, URL) {
-    var payload = {
-      username: username,
-      password: password,
-      serveraddress: URL
-    };
-    return System.auth({}, payload).$promise;
-  };
-
   service.events = function(from, to) {
     var deferred = $q.defer();
 
