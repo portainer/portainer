@@ -60,16 +60,15 @@ function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService,
 		});
 	};
 
-	$scope.removeTag = function(tag) {
+	$scope.removeTag = function(repository) {
 		$('#loadingViewSpinner').show();
-		var imageId = tag.Name;
-		ImageService.deleteImage(imageId, false)
+		ImageService.deleteImage(repository, false)
 		.then(function success() {
 			if ($scope.image.RepoTags.length === 1) {
-				Notifications.success('Image successfully deleted', imageId);
+				Notifications.success('Image successfully deleted', repository);
 				$state.go('images', {}, {reload: true});
 			} else {
-				Notifications.success('Tag successfully deleted', imageId);
+				Notifications.success('Tag successfully deleted', repository);
 				$state.go('image', {id: $stateParams.id}, {reload: true});
 			}
 		})
