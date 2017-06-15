@@ -26,6 +26,7 @@ type Server struct {
 	JWTService             portainer.JWTService
 	FileService            portainer.FileService
 	RegistryService        portainer.RegistryService
+	DockerHubService       portainer.DockerHubService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
@@ -69,6 +70,8 @@ func (server *Server) Start() error {
 	endpointHandler.ProxyManager = proxyManager
 	var registryHandler = handler.NewRegistryHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
+	var dockerHubHandler = handler.NewDockerHubHandler(requestBouncer)
+	dockerHubHandler.DockerHubService = server.DockerHubService
 	var resourceHandler = handler.NewResourceHandler(requestBouncer)
 	resourceHandler.ResourceControlService = server.ResourceControlService
 	var uploadHandler = handler.NewUploadHandler(requestBouncer)
@@ -82,6 +85,7 @@ func (server *Server) Start() error {
 		TeamMembershipHandler: teamMembershipHandler,
 		EndpointHandler:       endpointHandler,
 		RegistryHandler:       registryHandler,
+		DockerHubHandler:      dockerHubHandler,
 		ResourceHandler:       resourceHandler,
 		SettingsHandler:       settingsHandler,
 		StatusHandler:         statusHandler,

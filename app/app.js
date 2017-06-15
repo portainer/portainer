@@ -28,6 +28,7 @@ angular.module('portainer', [
   'containers',
   'createContainer',
   'createNetwork',
+  'createRegistry',
   'createSecret',
   'createService',
   'createVolume',
@@ -249,6 +250,19 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/createNetwork/createnetwork.html',
           controller: 'CreateNetworkController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('actions.create.registry', {
+      url: '/registry',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/createRegistry/createregistry.html',
+          controller: 'CreateRegistryController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
@@ -729,6 +743,7 @@ angular.module('portainer', [
   .constant('TEAM_MEMBERSHIPS_ENDPOINT', 'api/team_memberships')
   .constant('RESOURCE_CONTROL_ENDPOINT', 'api/resource_controls')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
+  .constant('DOCKERHUB_ENDPOINT', 'api/dockerhub')
   .constant('REGISTRIES_ENDPOINT', 'api/registries')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('DEFAULT_TEMPLATES_URL', 'https://raw.githubusercontent.com/portainer/templates/master/templates.json')

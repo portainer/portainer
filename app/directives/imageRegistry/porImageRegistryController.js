@@ -1,14 +1,18 @@
 angular.module('portainer')
-.controller('porImageRegistryController', ['RegistryService', 'Notifications',
-function (RegistryService, Notifications) {
+.controller('porImageRegistryController', ['$q', 'RegistryService', 'DockerHubService', 'Notifications',
+function ($q, RegistryService, DockerHubService, Notifications) {
   var ctrl = this;
 
   function initComponent() {
-    RegistryService.registries()
+    $q.all({
+      registries: RegistryService.registries(),
+      dockerhub: DockerHubService.dockerhub()
+    })
     .then(function success(data) {
-      var registries = data;
-      ctrl.availableRegistries = registries;
-      ctrl.registry = registries[0];
+      var dockerhub = data.dockerhub;
+      var registries = data.registries;
+      ctrl.availableRegistries = [dockerhub].concat(registries);
+      ctrl.registry = dockerhub;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve registries');

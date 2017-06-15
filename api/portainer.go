@@ -111,6 +111,14 @@ type (
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
 	}
 
+	// DockerHub represents all the required information to connect and use the
+	// Docker Hub.
+	DockerHub struct {
+		Authentication bool   `json:"Authentication"`
+		Username       string `json:"Username"`
+		Password       string `json:"Password"`
+	}
+
 	// EndpointID represents an endpoint identifier.
 	EndpointID int
 
@@ -241,6 +249,12 @@ type (
 		CreateRegistry(registry *Registry) error
 		UpdateRegistry(ID RegistryID, registry *Registry) error
 		DeleteRegistry(ID RegistryID) error
+	}
+
+	// DockerHubService represents a service for managing the DockerHub object.
+	DockerHubService interface {
+		DockerHub() (*DockerHub, error)
+		StoreDockerHub(registry *DockerHub) error
 	}
 
 	// SettingsService represents a service for managing application settings.

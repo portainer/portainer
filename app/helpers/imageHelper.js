@@ -4,13 +4,13 @@ angular.module('portainer.helpers')
 
   var helper = {};
 
-  helper.extractImageAndRegistryFromTag = function(tag) {
-    var slashCount = _.countBy(tag)['/'];
+  helper.extractImageAndRegistryFromRepository = function(repository) {
+    var slashCount = _.countBy(repository)['/'];
     var registry = null;
-    var image = tag;
+    var image = repository;
     if (slashCount > 1) {
       // assume something/some/thing[/...]
-      var registryAndImage = _.split(tag, '/');
+      var registryAndImage = _.split(repository, '/');
       registry = registryAndImage[0];
       image = registryAndImage[1];
     }

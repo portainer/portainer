@@ -44,8 +44,7 @@ const (
 
 // Registry errors.
 const (
-	ErrRegistryNotFound            = Error("Registry not found")
-	ErrCannotDeleteDefaultRegistry = Error("Cannot delete default registry")
+	ErrRegistryNotFound = Error("Registry not found")
 )
 
 // Version errors.
@@ -56,6 +55,11 @@ const (
 // Settings errors.
 const (
 	ErrSettingsNotFound = Error("Settings not found")
+)
+
+// DockerHub errors.
+const (
+	ErrDockerHubNotFound = Error("Dockerhub not found")
 )
 
 // Crypto errors.

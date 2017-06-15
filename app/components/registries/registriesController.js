@@ -1,6 +1,6 @@
 angular.module('registries', [])
-.controller('RegistriesController', ['$scope', '$state', 'RegistryService', 'ModalService', 'Notifications', 'Pagination',
-function ($scope, $state, RegistryService, ModalService, Notifications, Pagination) {
+.controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications', 'Pagination',
+function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, Pagination) {
 
   $scope.state = {
     selectedItemCount: 0,
@@ -9,12 +9,19 @@ function ($scope, $state, RegistryService, ModalService, Notifications, Paginati
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
 
-  $scope.formValues = {
-    Name: '',
-    URL: '',
-    Authentication: false,
-    Username: '',
-    Password: ''
+  $scope.updateDockerHub = function() {
+    $('#updateDockerhubSpinner').show();
+    var dockerhub = $scope.dockerhub;
+    DockerHubService.update(dockerhub)
+    .then(function success(data) {
+      Notifications.success('DockerHub registry updated');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to update DockerHub details');
+    })
+    .finally(function final() {
+      $('#updateDockerhubSpinner').hide();
+    });
   };
 
   $scope.order = function(sortType) {
@@ -83,31 +90,15 @@ function ($scope, $state, RegistryService, ModalService, Notifications, Paginati
     });
   }
 
-  $scope.addRegistry = function() {
-    $('#createRegistrySpinner').show();
-    var registryName = $scope.formValues.Name;
-    var registryURL = $scope.formValues.URL;
-    var authentication = $scope.formValues.Authentication;
-    var username = $scope.formValues.Username;
-    var password = $scope.formValues.Password;
-    RegistryService.createRegistry(registryName, registryURL, authentication, username, password)
-    .then(function success(data) {
-      Notifications.success('Registry successfully created');
-      $state.reload();
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to create registry');
-    })
-    .finally(function final() {
-      $('#createRegistrySpinner').hide();
-    });
-  };
-
   function initView() {
     $('#loadingViewSpinner').show();
-    RegistryService.registries()
+    $q.all({
+      registries: RegistryService.registries(),
+      dockerhub: DockerHubService.dockerhub()
+    })
     .then(function success(data) {
-      $scope.registries = data;
+      $scope.registries = data.registries;
+      $scope.dockerhub = data.dockerhub;
     })
     .catch(function error(err) {
       $scope.registries = [];

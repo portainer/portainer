@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', function ImageServiceFactory($q, Image, ImageHelper, RegistryService) {
+.factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', 'HttpRequestHelper', function ImageServiceFactory($q, Image, ImageHelper, RegistryService, HttpRequestHelper) {
   'use strict';
   var service = {};
 
@@ -35,12 +35,34 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.pushImage = function(tag, registry) {
+    var deferred = $q.defer();
+
+    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
+    HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
+    Image.push({tag: tag}).$promise
+    .then(function success(data) {
+      if (data[data.length - 1].error) {
+        deferred.reject({ msg: data[data.length - 1].error });
+      } else {
+        deferred.resolve();
+      }
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to push image tag', err: err });
+    });
+    return deferred.promise;
+  };
+
+
   service.pullImage = function(image, registry) {
     var deferred = $q.defer();
 
     var imageConfiguration = ImageHelper.createImageConfigForContainer(image, registry.URL);
     var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
-    Image.create({authenticationDetails: authenticationDetails}, imageConfiguration).$promise
+    HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
+
+    Image.create({}, imageConfiguration).$promise
     .then(function success(data) {
       var err = data.length > 0 && data[data.length - 1].hasOwnProperty('message');
       if (err) {
@@ -55,11 +77,6 @@ angular.module('portainer.services')
     });
 
     return deferred.promise;
-  };
-
-  service.pullTag = function(tag) {
-    var imageAndRegistry = ImageHelper.extractImageAndRegistryFromTag(tag);
-    return service.pullImage(imageAndRegistry.image, imageAndRegistry.registry);
   };
 
   service.tagImage = function(id, image, registry) {
@@ -79,22 +96,6 @@ angular.module('portainer.services')
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to remove image', err: err });
-    });
-    return deferred.promise;
-  };
-
-  service.pushImage = function(tag) {
-    var deferred = $q.defer();
-    Image.push({tag: tag}).$promise
-    .then(function success(data) {
-      if (data[data.length - 1].error) {
-        deferred.reject({ msg: data[data.length - 1].error });
-      } else {
-        deferred.resolve();
-      }
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to push image tag', err: err });
     });
     return deferred.promise;
   };

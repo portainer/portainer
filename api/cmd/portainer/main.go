@@ -91,21 +91,19 @@ func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portaine
 	}
 }
 
-func initRegistries(registryService portainer.RegistryService) error {
-	registries, err := registryService.Registries()
-	if err != nil {
+func initDockerHub(dockerHubService portainer.DockerHubService) error {
+	_, err := dockerHubService.DockerHub()
+	if err == portainer.ErrDockerHubNotFound {
+		dockerhub := &portainer.DockerHub{
+			Authentication: false,
+			Username:       "",
+			Password:       "",
+		}
+		return dockerHubService.StoreDockerHub(dockerhub)
+	} else if err != nil {
 		return err
 	}
-	if len(registries) == 0 {
-		defaultRegistry := &portainer.Registry{
-			Name:            "DockerHub",
-			URL:             "docker.io",
-			Authentication:  false,
-			AuthorizedUsers: []portainer.UserID{},
-			AuthorizedTeams: []portainer.TeamID{},
-		}
-		return registryService.CreateRegistry(defaultRegistry)
-	}
+
 	return nil
 }
 
@@ -164,7 +162,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = initRegistries(store.RegistryService)
+	err = initDockerHub(store.DockerHubService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -223,6 +221,7 @@ func main() {
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,
+		DockerHubService:       store.DockerHubService,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,

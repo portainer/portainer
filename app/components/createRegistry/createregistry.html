@@ -1,9 +1,9 @@
 <rd-header>
-  <rd-header-title title="Registry details">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  <rd-header-title title="Create registry">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="display:none"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="registries">Registries</a> > <a ui-sref="registry({id: registry.Id})">{{ registry.Name }}</a>
+    <a ui-sref="registries">Registries</a> > Add registry
   </rd-header-content>
 </rd-header>
 
@@ -16,7 +16,7 @@
           <div class="form-group">
             <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="registry_name" ng-model="registry.Name" placeholder="e.g. my-registry">
+              <input type="text" class="form-control" id="registry_name" ng-model="formValues.Name" placeholder="e.g. my-registry">
             </div>
           </div>
           <!-- !name-input -->
@@ -27,7 +27,7 @@
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry."></portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="registry_url" ng-model="registry.URL" placeholder="e.g. 10.0.0.10:5000 or myregistry.domain.tld">
+              <input type="text" class="form-control" id="registry_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:5000 or myregistry.domain.tld">
             </div>
           </div>
           <!-- !registry-url-input -->
@@ -39,18 +39,18 @@
                 <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="registry.Authentication"><i></i>
+                <input type="checkbox" ng-model="formValues.Authentication"><i></i>
               </label>
             </div>
           </div>
           <!-- !authentication-checkbox -->
           <!-- authentication-credentials -->
-          <div ng-if="registry.Authentication">
+          <div ng-if="formValues.Authentication">
             <!-- credentials-user -->
             <div class="form-group">
               <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="credentials_username" ng-model="registry.Username">
+                <input type="text" class="form-control" id="credentials_username" ng-model="formValues.Username">
               </div>
             </div>
             <!-- !credentials-user -->
@@ -58,7 +58,7 @@
             <div class="form-group">
               <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="credentials_password" ng-model="registry.Password">
+                <input type="password" class="form-control" id="credentials_password" ng-model="formValues.Password">
               </div>
             </div>
             <!-- !credentials-password -->
@@ -66,9 +66,8 @@
           <!-- !authentication-credentials -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!registry.Name || !registry.URL || (registry.Authentication && (!registry.Username || !registry.Password))" ng-click="updateRegistry()">Update registry</button>
-              <a type="button" class="btn btn-default btn-sm" ui-sref="registries">Cancel</a>
-              <i id="updateRegistrySpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.Authentication && (!formValues.Username || !formValues.Password))" ng-click="addRegistry()">Add registry</button>
+              <i id="createRegistrySpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
         </form>

@@ -82,10 +82,9 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 	}
 
 	registry := &portainer.Registry{
-		Name:           req.Name,
-		URL:            req.URL,
-		Authentication: req.Authentication,
-		// AuthenticationString: req.AuthenticationString,
+		Name:            req.Name,
+		URL:             req.URL,
+		Authentication:  req.Authentication,
 		Username:        req.Username,
 		Password:        req.Password,
 		AuthorizedUsers: []portainer.UserID{},
@@ -105,9 +104,8 @@ type postRegistriesRequest struct {
 	Name           string `valid:"required"`
 	URL            string `valid:"required"`
 	Authentication bool   `valid:""`
-	// AuthenticationString string `valid:""`
-	Username string `valid:""`
-	Password string `valid:""`
+	Username       string `valid:""`
+	Password       string `valid:""`
 }
 
 type postRegistriesResponse struct {
@@ -270,11 +268,6 @@ func (handler *RegistryHandler) handleDeleteRegistry(w http.ResponseWriter, r *h
 	registryID, err := strconv.Atoi(id)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	if registryID == 1 {
-		httperror.WriteErrorResponse(w, portainer.ErrCannotDeleteDefaultRegistry, http.StatusForbidden, handler.Logger)
 		return
 	}
 

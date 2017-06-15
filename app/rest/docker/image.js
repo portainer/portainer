@@ -1,12 +1,6 @@
 angular.module('portainer.rest')
-.factory('Image', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function ImageFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
+.factory('Image', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', 'HttpRequestHelper', function ImageFactory($resource, DOCKER_ENDPOINT, EndpointProvider, HttpRequestHelper) {
   'use strict';
-
-  function setAuthenticationHeader(requestConfiguration) {
-    if (requestConfiguration.params.authenticationDetails !== '') {
-      return requestConfiguration.params.authenticationDetails;
-    }
-  }
 
   return $resource(DOCKER_ENDPOINT + '/:endpointId/images/:id/:action', {
     endpointId: EndpointProvider.endpointID
@@ -21,12 +15,13 @@ angular.module('portainer.rest')
     inspect: {method: 'GET', params: {id: '@id', action: 'json'}},
     push: {
       method: 'POST', params: {action: 'push', id: '@tag'},
-      isArray: true, transformResponse: jsonObjectsToArrayHandler
+      isArray: true, transformResponse: jsonObjectsToArrayHandler,
+      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader }
     },
     create: {
       method: 'POST', params: {action: 'create', fromImage: '@fromImage', tag: '@tag'},
       isArray: true, transformResponse: jsonObjectsToArrayHandler,
-      headers: { 'X-Registry-Auth': setAuthenticationHeader }
+      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader }
     },
     remove: {
       method: 'DELETE', params: {id: '@id', force: '@force'},

@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('RegistryService', ['$q', 'Registries', function RegistryServiceFactory($q, Registries) {
+.factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper) {
   'use strict';
   var service = {};
 
@@ -67,6 +67,25 @@ angular.module('portainer.services')
       payload.Password = password;
     }
     return Registries.create({}, payload).$promise;
+  };
+
+  service.retrieveRegistryFromRepository = function(repository) {
+    var deferred = $q.defer();
+
+    var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(repository);
+    $q.when(imageDetails.registry ? service.registries() : DockerHubService.dockerhub())
+    .then(function success(data) {
+      var registry = data;
+      if (imageDetails.registry) {
+        registry = RegistryHelper.getRegistryByURL(data, imageDetails.registry);
+      }
+      deferred.resolve(registry);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve the registry associated to the repository', err: err });
+    });
+
+    return deferred.promise;
   };
 
   return service;
