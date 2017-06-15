@@ -5,8 +5,8 @@ function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceSer
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
   $scope.tasks = [];
-  $scope.sortType = 'Status';
-  $scope.sortReverse = false;
+  $scope.sortType = 'Updated';
+  $scope.sortReverse = true;
 
   $scope.lastVersion = 0;
 
