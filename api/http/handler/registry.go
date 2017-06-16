@@ -81,6 +81,18 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 		return
 	}
 
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+	for _, r := range registries {
+		if r.URL == req.URL {
+			httperror.WriteErrorResponse(w, portainer.ErrRegistryAlreadyExists, http.StatusConflict, handler.Logger)
+			return
+		}
+	}
+
 	registry := &portainer.Registry{
 		Name:            req.Name,
 		URL:             req.URL,

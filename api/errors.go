@@ -44,7 +44,8 @@ const (
 
 // Registry errors.
 const (
-	ErrRegistryNotFound = Error("Registry not found")
+	ErrRegistryNotFound      = Error("Registry not found")
+	ErrRegistryAlreadyExists = Error("A registry with the same URL already exists")
 )
 
 // Version errors.

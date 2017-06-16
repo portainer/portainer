@@ -8,6 +8,7 @@ angular.module('portainer.services')
   };
 
   service.error = function(title, e, fallbackText) {
+    console.log(JSON.stringify(e, null, 4));
     var msg = fallbackText;
     if (e.data && e.data.message) {
       msg = e.data.message;
@@ -19,6 +20,8 @@ angular.module('portainer.services')
       msg = e.err.data[0].message;
     } else if (e.msg) {
       msg = e.msg;
+    } else if (e.data && e.data.err) {
+      msg = e.data.err;
     }
     toastr.error($sanitize(msg), $sanitize(title), {timeOut: 6000});
   };
