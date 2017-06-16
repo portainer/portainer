@@ -12,6 +12,18 @@
     <rd-widget>
       <rd-widget-body>
         <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title">
+            Important notice
+          </div>
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              Docker requires you to connect to a <a href="https://docs.docker.com/registry/deploying/#running-a-domain-registry" target="_blank">secure registry</a>.
+              You can find more information about how to connect to an insecure registry <a href="https://docs.docker.com/registry/insecure/" target="_blank">in the Docker documentation</a>.
+            </span>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Registry details
+          </div>
           <!-- name-input -->
           <div class="form-group">
             <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
@@ -24,7 +36,7 @@
           <div class="form-group">
             <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
               Registry URL
-              <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry."></portainer-tooltip>
+              <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry. Any protocol will be stripped."></portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="registry_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:5000 or myregistry.domain.tld">
