@@ -13,7 +13,7 @@ function ($scope, $state, RegistryService, Notifications) {
   $scope.addRegistry = function() {
     $('#createRegistrySpinner').show();
     var registryName = $scope.formValues.Name;
-    var registryURL = $scope.formValues.URL;
+    var registryURL = $scope.formValues.URL.replace(/^https?\:\/\//i, '');
     var authentication = $scope.formValues.Authentication;
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
