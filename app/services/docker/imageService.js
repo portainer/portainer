@@ -58,7 +58,8 @@ angular.module('portainer.services')
   service.pullImage = function(image, registry) {
     var deferred = $q.defer();
 
-    var imageConfiguration = ImageHelper.createImageConfigForContainer(image, registry.URL);
+    var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(image);
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(imageDetails.image, registry.URL);
     var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
 

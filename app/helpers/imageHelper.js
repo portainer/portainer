@@ -10,9 +10,8 @@ angular.module('portainer.helpers')
     var image = repository;
     if (slashCount > 1) {
       // assume something/some/thing[/...]
-      var registryAndImage = _.split(repository, '/');
-      registry = registryAndImage[0];
-      image = registryAndImage[1];
+      registry = repository.substr(0, repository.indexOf('/'));
+      image = repository.substr(repository.indexOf('/') + 1);
     }
 
     return {
