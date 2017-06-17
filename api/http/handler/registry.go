@@ -239,6 +239,18 @@ func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http
 		return
 	}
 
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+	for _, r := range registries {
+		if r.URL == req.URL && r.ID != registry.ID {
+			httperror.WriteErrorResponse(w, portainer.ErrRegistryAlreadyExists, http.StatusConflict, handler.Logger)
+			return
+		}
+	}
+
 	if req.Name != "" {
 		registry.Name = req.Name
 	}

@@ -8,7 +8,6 @@ angular.module('portainer.services')
   };
 
   service.error = function(title, e, fallbackText) {
-    console.log(JSON.stringify(e, null, 4));
     var msg = fallbackText;
     if (e.data && e.data.message) {
       msg = e.data.message;

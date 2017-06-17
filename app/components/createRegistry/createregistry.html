@@ -13,9 +13,37 @@
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="col-sm-12 form-section-title">
+            Registry provider
+          </div>
+          <div class="form-group"></div>
+          <div class="form-group" style="margin-bottom: 0">
+            <div class="boxselector_wrapper">
+              <div ng-click="selectQuayRegistry()">
+                <input type="radio" id="registry_quay" ng-model="state.RegistryType" value="quay">
+                <label for="registry_quay">
+                  <div class="boxselector_header">
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Quay.io
+                  </div>
+                  <p>Quay container registry</p>
+                </label>
+              </div>
+              <div ng-click="selectCustomRegistry()">
+                <input type="radio" id="registry_custom" ng-model="state.RegistryType" value="custom">
+                <label for="registry_custom">
+                  <div class="boxselector_header">
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Custom registry
+                  </div>
+                  <p>Define your own registry</p>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 form-section-title" ng-if="state.RegistryType === 'custom'">
             Important notice
           </div>
-          <div class="form-group">
+          <div class="form-group" ng-if="state.RegistryType === 'custom'">
             <span class="col-sm-12 text-muted small">
               Docker requires you to connect to a <a href="https://docs.docker.com/registry/deploying/#running-a-domain-registry" target="_blank">secure registry</a>.
               You can find more information about how to connect to an insecure registry <a href="https://docs.docker.com/registry/insecure/" target="_blank">in the Docker documentation</a>.
@@ -25,7 +53,7 @@
             Registry details
           </div>
           <!-- name-input -->
-          <div class="form-group">
+          <div class="form-group" ng-if="state.RegistryType === 'custom'">
             <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="registry_name" ng-model="formValues.Name" placeholder="e.g. my-registry">
@@ -33,7 +61,7 @@
           </div>
           <!-- !name-input -->
           <!-- registry-url-input -->
-          <div class="form-group">
+          <div class="form-group" ng-if="state.RegistryType === 'custom'">
             <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
               Registry URL
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry. Any protocol will be stripped."></portainer-tooltip>
@@ -44,7 +72,7 @@
           </div>
           <!-- !registry-url-input -->
           <!-- authentication-checkbox -->
-          <div class="form-group">
+          <div class="form-group" ng-if="state.RegistryType === 'custom'">
             <div class="col-sm-12">
               <label for="registry_auth" class="control-label text-left">
                 Authentication
@@ -57,7 +85,7 @@
           </div>
           <!-- !authentication-checkbox -->
           <!-- authentication-credentials -->
-          <div ng-if="formValues.Authentication">
+          <div ng-if="formValues.Authentication || state.RegistryType === 'quay'">
             <!-- credentials-user -->
             <div class="form-group">
               <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>

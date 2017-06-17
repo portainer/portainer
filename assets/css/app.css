@@ -395,32 +395,32 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
 }
 
-.ownership_wrapper {
+.boxselector_wrapper {
   display: flex;
   flex-flow: row wrap;
   margin: 0.5rem;
 }
 
-.ownership_wrapper > div {
+.boxselector_wrapper > div {
   flex: 1;
   padding: 0.5rem;
 }
 
-.ownership_wrapper .ownership_header {
+.boxselector_wrapper .boxselector_header {
   font-size: 14px;
   margin-bottom: 5px;
   font-weight: bold;
 }
 
-.ownership_wrapper input[type="radio"] {
+.boxselector_wrapper input[type="radio"] {
   display: none;
 }
 
-.ownership_wrapper input[type="radio"]:not(:disabled) ~ label {
+.boxselector_wrapper input[type="radio"]:not(:disabled) ~ label {
   cursor: pointer;
 }
 
-.ownership_wrapper label {
+.boxselector_wrapper label {
   font-weight: normal;
   font-size: 12px;
   display: block;
@@ -433,14 +433,14 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   position: relative;
 }
 
-.ownership_wrapper input[type="radio"]:checked + label {
+.boxselector_wrapper input[type="radio"]:checked + label {
   background: #337ab7;
   color: white;
   padding-top: 2rem;
   border-color: #337ab7;
 }
 
-.ownership_wrapper input[type="radio"]:checked + label::after {
+.boxselector_wrapper input[type="radio"]:checked + label::after {
   color: #337ab7;
   font-family: FontAwesome;
   border: 2px solid #337ab7;
@@ -461,7 +461,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 }
 
 @media only screen and (max-width: 700px) {
-  .ownership_wrapper {
+  .boxselector_wrapper {
     flex-direction: column;
   }
 }
