@@ -44,6 +44,7 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
     var registry = $scope.formValues.Registry;
     ImageService.pullImage(image, registry)
     .then(function success(data) {
+      Notifications.success('Image successfully pulled', image);
       $state.reload();
     })
     .catch(function error(err) {
