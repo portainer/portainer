@@ -11,155 +11,50 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-shell');
-  grunt.loadNpmTasks('grunt-if');
   grunt.loadNpmTasks('grunt-filerev');
   grunt.loadNpmTasks('grunt-usemin');
   grunt.loadNpmTasks('grunt-replace');
   grunt.loadNpmTasks('grunt-config');
   grunt.loadNpmTasks('grunt-postcss');
-
   grunt.registerTask('default', ['eslint', 'build']);
+  grunt.registerTask('build-webapp', [
+    'config:prod',
+    'clean:all',
+    'before-copy',
+    'copy:assets',
+    'after-copy'
+  ]);  
   grunt.registerTask('build', [
     'config:dev',
     'clean:app',
-    'if:linuxAmd64BinaryNotExist',
+    'shell:buildBinary:linux:amd64',
     'html2js',
     'useminPrepare:dev',
     'concat',
     'clean:tmpl',
     'replace',
     'copy',
-    'filerev',
-    'usemin',
-    'clean:tmp'
+    'after-copy'
   ]);
-  grunt.registerTask('build-webapp', [
-    'config:prod',
-    'clean:all',
+  grunt.registerTask('before-copy', [
     'html2js',
     'useminPrepare:release',
     'concat',
     'postcss:build',
     'clean:tmpl',
     'replace',
-    'uglify',
-    'copy:assets',
+    'uglify'
+  ]);
+  grunt.registerTask('after-copy', [
     'filerev',
     'usemin',
-    'clean:tmp'
+    'clean:tmp' 
   ]);
-  grunt.registerTask('release-linux-386', [
-    'config:prod',
-    'clean:all',
-    'if:linux386BinaryNotExist',
-    'html2js',
-    'useminPrepare:release',
-    'concat',
-    'postcss:build',
-    'clean:tmpl',
-    'replace',
-    'uglify',
-    'copy:assets',
-    'filerev',
-    'usemin',
-    'clean:tmp'
-  ]);
-  grunt.registerTask('release-linux-amd64', [
-    'config:prod',
-    'clean:all',
-    'if:linuxAmd64BinaryNotExist',
-    'html2js',
-    'useminPrepare:release',
-    'concat',
-    'postcss:build',
-    'clean:tmpl',
-    'replace',
-    'uglify',
-    'copy:assets',
-    'filerev',
-    'usemin',
-    'clean:tmp'
-  ]);
-  grunt.registerTask('release-linux-arm', [
-    'config:prod',
-    'clean:all',
-    'if:linuxArmBinaryNotExist',
-    'html2js',
-    'useminPrepare:release',
-    'concat',
-    'postcss:build',
-    'clean:tmpl',
-    'replace',
-    'uglify',
-    'copy',
-    'filerev',
-    'usemin',
-    'clean:tmp'
-  ]);
-  grunt.registerTask('release-linux-arm64', [
-    'config:prod',
-    'clean:all',
-    'if:linuxArm64BinaryNotExist',
-    'html2js',
-    'useminPrepare:release',
-    'concat',
-    'postcss:build',
-    'clean:tmpl',
-    'replace',
-    'uglify',
-    'copy',
-    'filerev',
-    'usemin',
-    'clean:tmp'
-  ]);
-  grunt.registerTask('release-linux-ppc64le', [
-    'config:prod',
-    'clean:all',
-    'if:linuxPpc64leBinaryNotExist',
-    'html2js',
-    'useminPrepare:release',
-    'concat',
-    'postcss:build',
-    'clean:tmpl',
-    'replace',
-    'uglify',
-    'copy',
-    'filerev',
-    'usemin',
-    'clean:tmp'
-  ]);
-  grunt.registerTask('release-windows-amd64', [
-    'config:prod',
-    'clean:all',
-    'if:windowsAmd64BinaryNotExist',
-    'html2js',
-    'useminPrepare:release',
-    'concat',
-    'postcss:build',
-    'clean:tmpl',
-    'replace',
-    'uglify',
-    'copy',
-    'filerev',
-    'usemin',
-    'clean:tmp'
-  ]);
-  grunt.registerTask('release-darwin-amd64', [
-    'config:prod',
-    'clean:all',
-    'if:darwinAmd64BinaryNotExist',
-    'html2js',
-    'useminPrepare:release',
-    'concat',
-    'postcss:build',
-    'clean:tmpl',
-    'replace',
-    'uglify',
-    'copy',
-    'filerev',
-    'usemin',
-    'clean:tmp'
-  ]);
+  grunt.task.registerTask('release', 'release:platform:arch', function(p, a) {
+	var cp = 'copy';
+	if ( p === 'linux' && ( a === '386' || a === 'amd64' ) ) { cp = 'copy:assets'; }
+	grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'before-copy', cp, 'after-copy' ]);
+  });  
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
   grunt.registerTask('run-dev', ['if:linuxAmd64BinaryNotExist', 'shell:run', 'watch:build']);
@@ -394,63 +289,20 @@ module.exports = function (grunt) {
     shell: {
       buildImage: {
         command: 'docker build --rm -t portainer -f build/linux/Dockerfile .'
-      },
-      buildLinuxAmd64Binary: {
-        command: [
-          'docker run --rm -v $(pwd)/api:/src portainer/golang-builder /src/cmd/portainer',
-          'shasum api/cmd/portainer/portainer > portainer-checksum.txt',
-          'mkdir -p dist',
-          'mv api/cmd/portainer/portainer dist/'
-        ].join(' && ')
-      },
-      buildLinux386Binary: {
-        command: [
-          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="386" portainer/golang-builder:cross-platform /src/cmd/portainer',
-          'shasum api/cmd/portainer/portainer-linux-386 > portainer-checksum.txt',
-          'mkdir -p dist',
-          'mv api/cmd/portainer/portainer-linux-386 dist/portainer'
-        ].join(' && ')
-      },
-      buildLinuxArmBinary: {
-        command: [
-          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm" portainer/golang-builder:cross-platform /src/cmd/portainer',
-          'shasum api/cmd/portainer/portainer-linux-arm > portainer-checksum.txt',
-          'mkdir -p dist',
-          'mv api/cmd/portainer/portainer-linux-arm dist/portainer'
-        ].join(' && ')
-      },
-      buildLinuxArm64Binary: {
-        command: [
-          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="arm64" portainer/golang-builder:cross-platform /src/cmd/portainer',
-          'shasum api/cmd/portainer/portainer-linux-arm64 > portainer-checksum.txt',
-          'mkdir -p dist',
-          'mv api/cmd/portainer/portainer-linux-arm64 dist/portainer'
-        ].join(' && ')
-      },
-      buildLinuxPpc64leBinary: {
-        command: [
-          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="linux" -e BUILD_GOARCH="ppc64le" portainer/golang-builder:cross-platform /src/cmd/portainer',
-          'shasum api/cmd/portainer/portainer-linux-ppc64le > portainer-checksum.txt',
-          'mkdir -p dist',
-          'mv api/cmd/portainer/portainer-linux-ppc64le dist/portainer'
-        ].join(' && ')
-      },
-      buildDarwinAmd64Binary: {
-        command: [
-          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="darwin" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform /src/cmd/portainer',
-          'shasum api/cmd/portainer/portainer-darwin-amd64 > portainer-checksum.txt',
-          'mkdir -p dist',
-          'mv api/cmd/portainer/portainer-darwin-amd64 dist/portainer'
-        ].join(' && ')
-      },
-      buildWindowsAmd64Binary: {
-        command: [
-          'docker run --rm -v $(pwd)/api:/src -e BUILD_GOOS="windows" -e BUILD_GOARCH="amd64" portainer/golang-builder:cross-platform /src/cmd/portainer',
-          'shasum api/cmd/portainer/portainer-windows-amd64 > portainer-checksum.txt',
-          'mkdir -p dist',
-          'mv api/cmd/portainer/portainer-windows-amd64 dist/portainer.exe'
-        ].join(' && ')
-      },
+      },	  
+	  buildBinary: {
+		command: function (p, a) {
+			       var file = 'dist/portainer';
+				   
+                   if ( p === 'windows' ) { file = 'dist/portainer.exe'; }
+				   
+                   if (grunt.file.isFile(file)) {
+                     return 'echo \'BinaryExists\'';
+                   } else {
+                     return 'build/build_cross-platform.sh ' + p + ' ' + a;
+                   }
+			     }
+	  },  
       run: {
         command: [
           'docker stop portainer',
@@ -460,50 +312,6 @@ module.exports = function (grunt) {
       },
       cleanImages: {
         command: 'docker rmi $(docker images -q -f dangling=true)'
-      }
-    },
-    'if': {
-      linuxAmd64BinaryNotExist: {
-        options: {
-          executable: 'dist/portainer'
-        },
-        ifFalse: ['shell:buildLinuxAmd64Binary']
-      },
-      linux386BinaryNotExist: {
-        options: {
-          executable: 'dist/portainer'
-        },
-        ifFalse: ['shell:buildLinux386Binary']
-      },
-      linuxArmBinaryNotExist: {
-        options: {
-          executable: 'dist/portainer'
-        },
-        ifFalse: ['shell:buildLinuxArmBinary']
-      },
-      linuxArm64BinaryNotExist: {
-        options: {
-          executable: 'dist/portainer'
-        },
-        ifFalse: ['shell:buildLinuxArm64Binary']
-      },
-      linuxPpc64leBinaryNotExist: {
-        options: {
-          executable: 'dist/portainer'
-        },
-        ifFalse: ['shell:buildLinuxPpc64leBinary']
-      },
-      darwinAmd64BinaryNotExist: {
-        options: {
-          executable: 'dist/portainer'
-        },
-        ifFalse: ['shell:buildDarwinAmd64Binary']
-      },
-      windowsAmd64BinaryNotExist: {
-        options: {
-          executable: 'dist/portainer.exe'
-        },
-        ifFalse: ['shell:buildWindowsAmd64Binary']
       }
     },
     replace: {

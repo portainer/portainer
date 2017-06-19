@@ -1,79 +1,47 @@
 #!/usr/bin/env bash
 
 ARCHIVE_BUILD_FOLDER="/tmp/portainer-builds"
-VERSION=$1
 
-if [[ $# -ne 1 ]] ; then
-  echo "Usage: $(basename $0) <VERSION>"
-  exit 1
-fi
-
-# parameters platform, architecture
+# parameter: "platform-architecture"
 function build_and_push_images() {
-  PLATFORM=$1
-  ARCH=$2
-
-  docker build -t portainer/portainer:${PLATFORM}-${ARCH}-${VERSION} -f build/linux/Dockerfile .
-  docker push portainer/portainer:${PLATFORM}-${ARCH}-${VERSION}
-  docker build -t portainer/portainer:${PLATFORM}-${ARCH} -f build/linux/Dockerfile .
-  docker push portainer/portainer:${PLATFORM}-${ARCH}
+  docker build -t "portainer/portainer:$1-${VERSION}" -f build/linux/Dockerfile .
+  docker tag  "portainer/portainer:$1-${VERSION}" "portainer/portainer:$1"
+  docker push "portainer/portainer:$1-${VERSION}"
+  docker push "portainer/portainer:$1"
 }
 
-# parameters: platform, architecture
+# parameter: "platform-architecture"
 function build_archive() {
-  PLATFORM=$1
-  ARCH=$2
-
-  BUILD_FOLDER=${ARCHIVE_BUILD_FOLDER}/${PLATFORM}-${ARCH}
+  BUILD_FOLDER="${ARCHIVE_BUILD_FOLDER}/$1"
 
   rm -rf ${BUILD_FOLDER} && mkdir -pv ${BUILD_FOLDER}/portainer
   mv dist/* ${BUILD_FOLDER}/portainer/
   cd ${BUILD_FOLDER}
-  tar cvpfz portainer-${VERSION}-${PLATFORM}-${ARCH}.tar.gz portainer
-  mv portainer-${VERSION}-${PLATFORM}-${ARCH}.tar.gz ${ARCHIVE_BUILD_FOLDER}/
+  tar cvpfz "portainer-${VERSION}-$1.tar.gz" portainer
+  mv "portainer-${VERSION}-$1.tar.gz" ${ARCHIVE_BUILD_FOLDER}/
   cd -
 }
 
-mkdir -pv /tmp/portainer-builds
+function build_all() {
+  mkdir -pv /tmp/portainer-builds
+  for tag in $@; do
+    grunt "release:`echo "$tag" | tr '-' ':'`"
+    if [ `echo $tag | cut -d \- -f 1` == 'linux' ]; then build_and_push_images "$tag"; fi
+    build_archive "$tag"
+  done
+}
 
-PLATFORM="linux"
-ARCH="amd64"
-grunt release-${PLATFORM}-${ARCH}
-build_and_push_images ${PLATFORM} ${ARCH}
-build_archive ${PLATFORM} ${ARCH}
+if [[ $# -ne 1 ]] ; then
+  echo "Usage: $(basename $0) <VERSION>"
+  echo "       $(basename $0) \"echo 'Custom' && <BASH COMMANDS>\""
+  exit 1
+else
+  VERSION="$1"
+  if [ `echo "$@" | cut -c1-4` == 'echo' ]; then
+    bash -c "$@";
+  else  
+    build_all 'linux-amd64 linux-386 linux-arm linux-arm64 linux-ppc64le darwin-amd64 windows-amd64'
+	exit 0
+  fi
+fi
 
-PLATFORM="linux"
-ARCH="386"
-grunt release-${PLATFORM}-${ARCH}
-build_and_push_images ${PLATFORM} ${ARCH}
-build_archive ${PLATFORM} ${ARCH}
-
-PLATFORM="linux"
-ARCH="arm"
-grunt release-${PLATFORM}-${ARCH}
-build_and_push_images ${PLATFORM} ${ARCH}
-build_archive ${PLATFORM} ${ARCH}
-
-PLATFORM="linux"
-ARCH="arm64"
-grunt release-${PLATFORM}-${ARCH}
-build_and_push_images ${PLATFORM} ${ARCH}
-build_archive ${PLATFORM} ${ARCH}
-
-PLATFORM="linux"
-ARCH="ppc64le"
-grunt release-${PLATFORM}-${ARCH}
-build_and_push_images ${PLATFORM} ${ARCH}
-build_archive ${PLATFORM} ${ARCH}
-
-PLATFORM="darwin"
-ARCH="amd64"
-grunt release-${PLATFORM}-${ARCH}
-build_archive ${PLATFORM} ${ARCH}
-
-PLATFORM="windows"
-ARCH="amd64"
-grunt release-${PLATFORM}-${ARCH}
-build_archive ${PLATFORM} ${ARCH}
-
-exit 0

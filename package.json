@@ -38,7 +38,6 @@
     "grunt-contrib-watch": "~0.3.1",
     "grunt-filerev": "^2.3.1",
     "grunt-html2js": "~0.1.0",
-    "grunt-if": "^0.1.5",
     "grunt-karma": "~0.4.4",
     "grunt-postcss": "^0.8.0",
     "grunt-replace": "^1.0.1",
