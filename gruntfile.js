@@ -50,14 +50,17 @@ module.exports = function (grunt) {
     'usemin',
     'clean:tmp' 
   ]);
-  grunt.task.registerTask('release', 'release:platform:arch', function(p, a) {
-	var cp = 'copy';
-	if ( p === 'linux' && ( a === '386' || a === 'amd64' ) ) { cp = 'copy:assets'; }
+  grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
+	var cp = ( p === 'linux' && ( a === '386' || a === 'amd64' ) ) ? 'copy:assets' : 'copy';
 	grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'before-copy', cp, 'after-copy' ]);
   });  
   grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('run', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
-  grunt.registerTask('run-dev', ['if:linuxAmd64BinaryNotExist', 'shell:run', 'watch:build']);
+  grunt.task.registerTask('watchBuild', 'watchBuild:<arg>', function(a) {
+	var b = a === '' ? 'run' : a;
+	grunt.task.run(['build', 'shell:buildImage', 'shell:'+b, 'shell:cleanImages']);
+  });
+  grunt.registerTask('run', ['shell:buildBinary:linux:amd64', 'build', 'shell:buildImage', 'shell:run']);
+  grunt.registerTask('run-dev', ['shell:buildBinary:linux:amd64', 'shell:run', 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
 
   // Print a timestamp (useful for when watching)
@@ -269,15 +272,22 @@ module.exports = function (grunt) {
       },
       build: {
         files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-        tasks: ['build']
+        tasks: ['watchBuild:']
+		//'build'
+        /*
+        * Why don't we just use a host volume
+        * http.FileServer uses sendFile which virtualbox hates
+        * Tried using a host volume with -v, copying files with `docker cp`, restating container, none worked
+        * Rebuilding image on each change was only method that worked, takes ~4s per change to update
+        */
       },
       buildSwarm: {
         files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-        tasks: ['build', 'shell:buildImage', 'shell:runSwarm', 'shell:cleanImages']
+        tasks: ['watchBuild:runSwarm']
       },
       buildSsl: {
         files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-        tasks: ['build', 'shell:buildImage', 'shell:runSsl', 'shell:cleanImages']
+        tasks: ['watchBuild:runSsl']
       }
     },
     eslint: {
@@ -292,11 +302,7 @@ module.exports = function (grunt) {
       },	  
 	  buildBinary: {
 		command: function (p, a) {
-			       var file = 'dist/portainer';
-				   
-                   if ( p === 'windows' ) { file = 'dist/portainer.exe'; }
-				   
-                   if (grunt.file.isFile(file)) {
+                   if (grunt.file.isFile( ( p === 'windows' ) ? 'dist/portainer.exe' : 'dist/portainer' )) {
                      return 'echo \'BinaryExists\'';
                    } else {
                      return 'build/build_cross-platform.sh ' + p + ' ' + a;
