@@ -1,10 +1,10 @@
-function EndpointAccessUserViewModel(data) {
+function UserAccessViewModel(data) {
   this.Id = data.Id;
   this.Name = data.Username;
   this.Type = 'user';
 }
 
-function EndpointAccessTeamViewModel(data) {
+function TeamAccessViewModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
   this.Type = 'team';

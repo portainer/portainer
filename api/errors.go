@@ -42,6 +42,12 @@ const (
 	ErrEndpointAccessDenied = Error("Access denied to endpoint")
 )
 
+// Registry errors.
+const (
+	ErrRegistryNotFound      = Error("Registry not found")
+	ErrRegistryAlreadyExists = Error("A registry is already defined for this URL")
+)
+
 // Version errors.
 const (
 	ErrDBVersionNotFound = Error("DB version not found")
@@ -50,6 +56,11 @@ const (
 // Settings errors.
 const (
 	ErrSettingsNotFound = Error("Settings not found")
+)
+
+// DockerHub errors.
+const (
+	ErrDockerHubNotFound = Error("Dockerhub not found")
 )
 
 // Crypto errors.

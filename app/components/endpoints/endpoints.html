@@ -183,14 +183,11 @@
                 <td>{{ endpoint.URL | stripprotocol }}</td>
                 <td>
                   <span ng-if="applicationState.application.endpointManagement">
-                    <span ng-if="endpoint.Id !== activeEndpointID || endpoint.Id !== 1">
-                      <a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
-                    </span>
-                    <span class="small text-muted" ng-if="endpoint.Id === activeEndpointID && endpoint.Id !== 1">
-                      <i class="fa fa-lock" aria-hidden="true"></i> You cannot edit the active endpoint
-                    </span>
                     <span class="small text-muted" ng-if="endpoint.Id === 1">
                       <i class="fa fa-lock" aria-hidden="true"></i> You cannot edit this endpoint in the demo version
+                    </span>
+                    <span class="small text-muted" ng-if="endpoint.Id !== 1">
+                      <a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
                     </span>
                   </span>
                   <span ng-if="applicationState.application.authentication">

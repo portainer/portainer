@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('StateManager', ['$q', 'Info', 'InfoHelper', 'Version', 'LocalStorage', 'SettingsService', 'StatusService', function StateManagerFactory($q, Info, InfoHelper, Version, LocalStorage, SettingsService, StatusService) {
+.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService) {
   'use strict';
 
   var manager = {};
@@ -75,19 +75,25 @@ angular.module('portainer.services')
     if (loading) {
       state.loading = true;
     }
-    $q.all([Info.get({}).$promise, Version.get({}).$promise])
+    $q.all({
+      info: SystemService.info(),
+      version: SystemService.version()
+    })
     .then(function success(data) {
-      var endpointMode = InfoHelper.determineEndpointMode(data[0]);
-      var endpointAPIVersion = parseFloat(data[1].ApiVersion);
+      var endpointMode = InfoHelper.determineEndpointMode(data.info);
+      var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
       state.endpoint.apiVersion = endpointAPIVersion;
       LocalStorage.storeEndpointState(state.endpoint);
-      state.loading = false;
       deferred.resolve();
-    }, function error(err) {
-      state.loading = false;
+    })
+    .catch(function error(err) {
       deferred.reject({msg: 'Unable to connect to the Docker endpoint', err: err});
+    })
+    .finally(function final() {
+      state.loading = false;
     });
+
     return deferred.promise;
   };
 
