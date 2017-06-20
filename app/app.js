@@ -73,7 +73,7 @@ angular.module('portainer', [
     }
 
     localStorageServiceProvider
-    .setStorageType('sessionStorage')
+    // .setStorageType('sessionStorage')
     .setPrefix('portainer');
 
     jwtOptionsProvider.config({
