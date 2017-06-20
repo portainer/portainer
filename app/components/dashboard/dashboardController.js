@@ -1,6 +1,6 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$scope', '$q', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'Info', 'Notifications',
-function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, Info, Notifications) {
+.controller('DashboardController', ['$scope', '$q', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'Notifications',
+function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, SystemService, Notifications) {
 
   $scope.containerData = {
     total: 0
@@ -68,7 +68,7 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, Info, 
       Image.query({}).$promise,
       Volume.query({}).$promise,
       Network.query({}).$promise,
-      Info.get({}).$promise
+      SystemService.info()
     ]).then(function (d) {
       prepareContainerData(d[0]);
       prepareImageData(d[1]);

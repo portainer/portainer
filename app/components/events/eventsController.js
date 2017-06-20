@@ -1,6 +1,6 @@
 angular.module('events', [])
-.controller('EventsController', ['$scope', 'Notifications', 'Events', 'Pagination',
-function ($scope, Notifications, Events, Pagination) {
+.controller('EventsController', ['$scope', 'Notifications', 'SystemService', 'Pagination',
+function ($scope, Notifications, SystemService, Pagination) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('events');
   $scope.sortType = 'Time';
@@ -15,18 +15,22 @@ function ($scope, Notifications, Events, Pagination) {
     Pagination.setPaginationCount('events', $scope.state.pagination_count);
   };
 
-  var from = moment().subtract(24, 'hour').unix();
-  var to = moment().unix();
+  function initView() {
+    var from = moment().subtract(24, 'hour').unix();
+    var to = moment().unix();
 
-  Events.query({since: from, until: to},
-  function(d) {
-    $scope.events = d.map(function (item) {
-      return new EventViewModel(item);
+    $('#loadEventsSpinner').show();
+    SystemService.events(from, to)
+    .then(function success(data) {
+      $scope.events = data;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to load events');
+    })
+    .finally(function final() {
+      $('#loadEventsSpinner').hide();
     });
-    $('#loadEventsSpinner').hide();
-  },
-  function (e) {
-    $('#loadEventsSpinner').hide();
-    Notifications.error('Failure', e, 'Unable to load events');
-  });
+  }
+
+  initView();
 }]);

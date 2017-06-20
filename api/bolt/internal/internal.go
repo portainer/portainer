@@ -47,6 +47,16 @@ func UnmarshalEndpoint(data []byte, endpoint *portainer.Endpoint) error {
 	return json.Unmarshal(data, endpoint)
 }
 
+// MarshalRegistry encodes a registry to binary format.
+func MarshalRegistry(registry *portainer.Registry) ([]byte, error) {
+	return json.Marshal(registry)
+}
+
+// UnmarshalRegistry decodes a registry from a binary data.
+func UnmarshalRegistry(data []byte, registry *portainer.Registry) error {
+	return json.Unmarshal(data, registry)
+}
+
 // MarshalResourceControl encodes a resource control object to binary format.
 func MarshalResourceControl(rc *portainer.ResourceControl) ([]byte, error) {
 	return json.Marshal(rc)
@@ -64,6 +74,16 @@ func MarshalSettings(settings *portainer.Settings) ([]byte, error) {
 
 // UnmarshalSettings decodes a settings object from a binary data.
 func UnmarshalSettings(data []byte, settings *portainer.Settings) error {
+	return json.Unmarshal(data, settings)
+}
+
+// MarshalDockerHub encodes a Dockerhub object to binary format.
+func MarshalDockerHub(settings *portainer.DockerHub) ([]byte, error) {
+	return json.Marshal(settings)
+}
+
+// UnmarshalDockerHub decodes a Dockerhub object from a binary data.
+func UnmarshalDockerHub(data []byte, settings *portainer.DockerHub) error {
 	return json.Unmarshal(data, settings)
 }
 

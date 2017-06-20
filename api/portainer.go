@@ -94,6 +94,30 @@ type (
 		Role     UserRole
 	}
 
+	// RegistryID represents a registry identifier.
+	RegistryID int
+
+	// Registry represents a Docker registry with all the info required
+	// to connect to it.
+	Registry struct {
+		ID              RegistryID `json:"Id"`
+		Name            string     `json:"Name"`
+		URL             string     `json:"URL"`
+		Authentication  bool       `json:"Authentication"`
+		Username        string     `json:"Username"`
+		Password        string     `json:"Password"`
+		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
+	}
+
+	// DockerHub represents all the required information to connect and use the
+	// Docker Hub.
+	DockerHub struct {
+		Authentication bool   `json:"Authentication"`
+		Username       string `json:"Username"`
+		Password       string `json:"Password"`
+	}
+
 	// EndpointID represents an endpoint identifier.
 	EndpointID int
 
@@ -215,6 +239,21 @@ type (
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
+	}
+
+	// RegistryService represents a service for managing registry data.
+	RegistryService interface {
+		Registry(ID RegistryID) (*Registry, error)
+		Registries() ([]Registry, error)
+		CreateRegistry(registry *Registry) error
+		UpdateRegistry(ID RegistryID, registry *Registry) error
+		DeleteRegistry(ID RegistryID) error
+	}
+
+	// DockerHubService represents a service for managing the DockerHub object.
+	DockerHubService interface {
+		DockerHub() (*DockerHub, error)
+		StoreDockerHub(registry *DockerHub) error
 	}
 
 	// SettingsService represents a service for managing application settings.

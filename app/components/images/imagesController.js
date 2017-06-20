@@ -7,7 +7,7 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
   $scope.sortReverse = true;
   $scope.state.selectedItemCount = 0;
 
-  $scope.config = {
+  $scope.formValues = {
     Image: '',
     Registry: ''
   };
@@ -40,10 +40,11 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
 
   $scope.pullImage = function() {
     $('#pullImageSpinner').show();
-    var image = $scope.config.Image;
-    var registry = $scope.config.Registry;
+    var image = $scope.formValues.Image;
+    var registry = $scope.formValues.Registry;
     ImageService.pullImage(image, registry)
     .then(function success(data) {
+      Notifications.success('Image successfully pulled', image);
       $state.reload();
     })
     .catch(function error(err) {
