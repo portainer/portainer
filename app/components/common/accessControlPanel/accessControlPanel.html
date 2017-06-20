@@ -63,11 +63,11 @@
             <!-- edit-ownership-choices -->
             <tr ng-if="state.editOwnership">
               <td colspan="2">
-                <div class="ownership_wrapper">
+                <div class="boxselector_wrapper">
                   <div ng-if="isAdmin">
                     <input type="radio" id="access_administrators" ng-model="formValues.Ownership" value="administrators">
                     <label for="access_administrators">
-                      <div class="ownership_header">
+                      <div class="boxselector_header">
                         <i ng-class="'administrators' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
                         Administrators
                       </div>
@@ -77,7 +77,7 @@
                   <div ng-if="isAdmin">
                     <input type="radio" id="access_restricted" ng-model="formValues.Ownership" value="restricted">
                     <label for="access_restricted">
-                      <div class="ownership_header">
+                      <div class="boxselector_header">
                         <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
                         Restricted
                       </div>
@@ -89,7 +89,7 @@
                   <div ng-if="!isAdmin && state.canChangeOwnershipToTeam && availableTeams.length > 0">
                     <input type="radio" id="access_restricted" ng-model="formValues.Ownership" value="restricted">
                     <label for="access_restricted">
-                      <div class="ownership_header">
+                      <div class="boxselector_header">
                         <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
                         Restricted
                       </div>
@@ -104,7 +104,7 @@
                   <div>
                     <input type="radio" id="access_public" ng-model="formValues.Ownership" value="public">
                     <label for="access_public">
-                      <div class="ownership_header">
+                      <div class="boxselector_header">
                         <i ng-class="'public' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
                         Public
                       </div>

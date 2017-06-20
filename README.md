@@ -1,13 +1,13 @@
 
 <p align="center">
-  <img title="portainer" src='http://portainer.io/images/logo_alt.png' />
+  <img title="portainer" src='https://portainer.io/images/logo_alt.png' />
 </p>
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/portainer/portainer.svg)](https://hub.docker.com/r/portainer/portainer/)
 [![Microbadger](https://images.microbadger.com/badges/image/portainer/portainer.svg)](http://microbadger.com/images/portainer/portainer "Image size")
 [![Documentation Status](https://readthedocs.org/projects/portainer/badge/?version=stable)](http://portainer.readthedocs.io/en/stable/?badge=stable)
 [![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=portainer&repoName=portainer&branch=develop&pipelineName=portainer-ci&accountName=deviantony&type=cf-1)]( https://g.codefresh.io/repositories/portainer/portainer/builds?filter=trigger:build;branch:develop;service:5922a08a3a1aab000116fcc6~portainer-ci)
-[![Slack](http://portainer.io/slack/badge.svg)](http://portainer.io/slack/)
+[![Slack](https://portainer.io/slack/badge.svg)](https://portainer.io/slack/)
 [![Gitter](https://badges.gitter.im/portainer/Lobby.svg)](https://gitter.im/portainer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YHXZJQNJQ36H6)
 
@@ -19,7 +19,7 @@
 
 ## Demo
 
-<img src="http://portainer.io/images/screenshots/portainer.gif" width="77%"/>
+<img src="https://portainer.io/images/screenshots/portainer.gif" width="77%"/>
 
 You can try out the public demo instance: http://demo.portainer.io/ (login with the username **admin** and the password **tryportainer**).
 
@@ -35,7 +35,7 @@ Please note that the public demo cluster is **reset every 15min**.
 * Issues: https://github.com/portainer/portainer/issues
 * FAQ: https://portainer.readthedocs.io/en/latest/faq.html
 * Gitter (chat): https://gitter.im/portainer/Lobby
-* Slack: http://portainer.io/slack/
+* Slack: https://portainer.io/slack/
 
 ## Reporting bugs and contributing
 

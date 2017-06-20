@@ -183,12 +183,7 @@
                 <td>{{ endpoint.URL | stripprotocol }}</td>
                 <td>
                   <span ng-if="applicationState.application.endpointManagement">
-                    <span ng-if="endpoint.Id !== activeEndpointID">
-                      <a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
-                    </span>
-                    <span class="small text-muted" ng-if="endpoint.Id === activeEndpointID">
-                      <i class="fa fa-lock" aria-hidden="true"></i> You cannot edit the active endpoint
-                    </span>
+                    <a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
                   </span>
                   <span ng-if="applicationState.application.authentication">
                     <a ui-sref="endpoint.access({id: endpoint.Id})"><i class="fa fa-users" aria-hidden="true" style="margin-left: 7px;"></i> Manage access</a>

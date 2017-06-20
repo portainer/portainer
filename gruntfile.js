@@ -215,7 +215,7 @@ module.exports = function (grunt) {
         'assets/js/legend.js' // Not a bower package
       ],
       html: ['index.html'],
-      tpl: ['app/components/**/*.html'],
+      tpl: ['app/components/**/*.html', 'app/directives/**/*.html'],
       css: ['assets/css/app.css'],
       cssVendor: [
         'bower_components/bootstrap/dist/css/bootstrap.css',

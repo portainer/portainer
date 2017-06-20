@@ -1,6 +1,6 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$scope', '$state', 'VolumeService', 'InfoService', 'ResourceControlService', 'Authentication', 'Notifications', 'ControllerDataPipeline', 'FormValidator',
-function ($scope, $state, VolumeService, InfoService, ResourceControlService, Authentication, Notifications, ControllerDataPipeline, FormValidator) {
+.controller('CreateVolumeController', ['$scope', '$state', 'VolumeService', 'SystemService', 'ResourceControlService', 'Authentication', 'Notifications', 'ControllerDataPipeline', 'FormValidator',
+function ($scope, $state, VolumeService, SystemService, ResourceControlService, Authentication, Notifications, ControllerDataPipeline, FormValidator) {
 
   $scope.formValues = {
     Driver: 'local',
@@ -69,7 +69,7 @@ function ($scope, $state, VolumeService, InfoService, ResourceControlService, Au
 
   function initView() {
     $('#loadingViewSpinner').show();
-    InfoService.getVolumePlugins()
+    SystemService.getVolumePlugins()
     .then(function success(data) {
       $scope.availableVolumeDrivers = data;
     })
