@@ -17,11 +17,11 @@
   <!-- !access-control-switch -->
   <!-- restricted-access -->
   <div class="form-group" ng-if="formValues.enableAccessControl" style="margin-bottom: 0">
-    <div class="ownership_wrapper">
+    <div class="boxselector_wrapper">
       <div ng-if="isAdmin">
         <input type="radio" id="access_administrators" ng-model="formValues.Ownership" ng-click="synchronizeFormData()" value="administrators">
         <label for="access_administrators">
-          <div class="ownership_header">
+          <div class="boxselector_header">
             <i ng-class="'administrators' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
             Administrators
           </div>
@@ -31,7 +31,7 @@
       <div ng-if="isAdmin">
         <input type="radio" id="access_restricted" ng-model="formValues.Ownership" ng-click="synchronizeFormData()" value="restricted">
         <label for="access_restricted">
-          <div class="ownership_header">
+          <div class="boxselector_header">
             <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
             Restricted
           </div>
@@ -43,7 +43,7 @@
       <div ng-if="!isAdmin">
         <input type="radio" id="access_private" ng-model="formValues.Ownership" ng-click="synchronizeFormData()" value="private">
         <label for="access_private">
-          <div class="ownership_header">
+          <div class="boxselector_header">
             <i ng-class="'private' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
             Private
           </div>
@@ -55,7 +55,7 @@
       <div ng-if="!isAdmin && availableTeams.length > 0">
         <input type="radio" id="access_restricted" ng-model="formValues.Ownership" ng-click="synchronizeFormData()" value="restricted">
         <label for="access_restricted">
-          <div class="ownership_header">
+          <div class="boxselector_header">
             <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
             Restricted
           </div>

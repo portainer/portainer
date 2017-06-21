@@ -101,7 +101,6 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
     EndpointService.endpoints()
     .then(function success(data) {
       $scope.endpoints = data;
-      $scope.activeEndpointID = EndpointProvider.endpointID();
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoints');

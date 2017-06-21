@@ -68,6 +68,9 @@
       <a ui-sref="endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug"></span></a>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <a ui-sref="registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database"></span></a>
+    </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs"></span></a>
     </li>
   </ul>
