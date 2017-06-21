@@ -29,7 +29,7 @@
             </tr>
             <tr>
               <td>Containers</td>
-              <td>{{ stack.Containers.length }}</td>
+              <td>{{ stack.ContainerCount }}</td>
             </tr>
           </tbody>
         </table>
@@ -37,3 +37,6 @@
     </rd-widget>
   </div>
 </div>
+
+<por-stack-service-details stack="stack"></por-stack-service-details>
+<por-container-list containers="stack.Containers"></por-container-list>

@@ -3,7 +3,7 @@ angular.module('portainer.helpers')
   'use strict';
   var helper = {};
 
-  function stackMapToArray(stackMap) {
+  function mapValuesToArray(stackMap) {
     var stacks = [];
     for (var key in stackMap) {
       if (stackMap.hasOwnProperty(key)) {
@@ -28,7 +28,25 @@ angular.module('portainer.helpers')
       }
     }
 
-    return stackMapToArray(stackMap);
+    return mapValuesToArray(stackMap);
+  };
+
+  helper.getComposeV2ServicesFromContainers = function(containers) {
+    var serviceMap = {};
+
+    for (var i = 0; i < containers.length; i++) {
+      var container = containers[i];
+      if (!container.Labels || !container.Labels['com.docker.compose.service']) continue;
+
+      var serviceName = container.Labels['com.docker.compose.service'];
+      if (!serviceMap[serviceName]) {
+        serviceMap[serviceName] = { Name: serviceName, 'ContainerCount': 1 };
+      } else {
+        serviceMap[serviceName].ContainerCount++;
+      }
+    }
+
+    return mapValuesToArray(serviceMap);
   };
 
   helper.getComposeV3StacksFromServices = function(services) {
@@ -46,7 +64,7 @@ angular.module('portainer.helpers')
       }
     }
 
-    return stackMapToArray(stackMap);
+    return mapValuesToArray(stackMap);
   };
 
   return helper;

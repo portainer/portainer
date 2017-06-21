@@ -26,5 +26,26 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.stackV2 = function(name) {
+    var deferred = $q.defer();
+
+    var filters = {
+      label: ['com.docker.compose.project=' + name]
+    };
+
+    ContainerService.containers(1, filters)
+    .then(function success(data) {
+      var containers = data;
+      var services = StackHelper.getComposeV2ServicesFromContainers(containers);
+      var stack = new StackV2ViewModel(name, containers, services);
+      deferred.resolve(stack);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve stack details', err: err });
+    });
+
+    return deferred.promise;
+  };
+
   return service;
 }]);
