@@ -3,16 +3,20 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.getContainers = function (all) {
+  service.containers = function (all, filters) {
     var deferred = $q.defer();
-    Container.query({ all: all }).$promise
+
+    Container.query({ all: all, filters: filters ? filters : {} }).$promise
     .then(function success(data) {
-      var containers = data;
+      var containers = data.map(function (item) {
+        return new ContainerViewModel(item);
+      });
       deferred.resolve(containers);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retriever containers', err: err });
     });
+
     return deferred.promise;
   };
 

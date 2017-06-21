@@ -22,12 +22,12 @@ function ($scope, $filter, $stateParams, $state, Container, ServiceHelper, Task,
   function fetchComposeStackDetails() {
     $('#loadingViewSpinner').show();
 
-    var label_filter = ["com.docker.compose.project=" + $stateParams.name];
+    var label_filter = ['com.docker.compose.project=' + $stateParams.name];
     Container.query({all: 1, filters: {label: label_filter}}, function (containers) {
       $scope.stack = new StackViewModel({
-        "Name": $stateParams.name,
-        "Items": containers.length,
-        "Type": "Compose"
+        'Name': $stateParams.name,
+        'Items': containers.length,
+        'Type': 'Compose'
       });
 		
       $scope.containers = containers.map(function (container) {
@@ -47,7 +47,7 @@ function ($scope, $filter, $stateParams, $state, Container, ServiceHelper, Task,
 
     }, function(e) {
       $('#loadingViewSpinner').hide();
-      Notifications.error("Failure", e, "Unable to retrieve containers associated to the stack");
+      Notifications.error('Failure', e, 'Unable to retrieve containers associated to the stack');
     });
   }
 

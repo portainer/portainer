@@ -18,6 +18,23 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.services = function() {
+    var deferred = $q.defer();
+
+    Service.query({}).$promise
+    .then(function success(data) {
+      var services = data.map(function (item) {
+        return new ServiceViewModel(item);
+      });
+      deferred.resolve(services);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve services', err: err });
+    });
+
+    return deferred.promise;
+  };
+
   service.remove = function(service) {
     var deferred = $q.defer();
 

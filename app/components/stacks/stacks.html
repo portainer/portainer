@@ -3,7 +3,7 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="stacks" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
-    <i id="loadStacksSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Stacks</rd-header-content>
 </rd-header>
@@ -11,7 +11,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-list-alt" title="Stacks">
+      <rd-widget-header icon="fa-th-list" title="Stacks">
         <div class="pull-right">
           Items per page:
           <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
@@ -24,10 +24,6 @@
         </div>
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12 col-md-12 col-xs-12">
-        <div class="pull-left">
-          <!--<button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-          <a class="btn btn-default btn-responsive" type="button" ui-sref="actions.create.service">Add service</a>-->
-        </div>
         <div class="pull-right">
           <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
         </div>
@@ -45,10 +41,10 @@
                 </a>
               </th>
               <th>
-                <a ui-sref="stacks" ng-click="order('Items')">
-                  Items
-                  <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                <a ui-sref="stacks" ng-click="order('ServiceCount')">
+                  Service count
+                  <span ng-show="sortType == 'ServiceCount' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'ServiceCount' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
@@ -62,16 +58,16 @@
             <tbody>
               <tr dir-paginate="stack in (state.filteredStack = ( stacks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="stack.Checked" ng-change="selectItem(stack)"/></td>
-                <td ng-if="stack.Type === 'Compose'"><a ui-sref="composeStack({name: stack.Name})">{{ stack.Name }}</a></td>
-                <td ng-if="stack.Type === 'SwarmMode'"><a ui-sref="stack({name: stack.Name})">{{ stack.Name }}</a></td>
-                <td>{{ stack.Items }}<span ng-if="stack.Type === 'Compose'"> container(s)</span><span ng-if="stack.Type === 'SwarmMode'"> service(s)</span></td>
-                <td>{{ stack.Type }}</td>
+                <td ng-if="stack.Type === 'v2'"><a ui-sref="stack.v2({name: stack.Name})">{{ stack.Name }}</a></td>
+                <td ng-if="stack.Type === 'v3'"><a ui-sref="stack.v3({name: stack.Name})">{{ stack.Name }}</a></td>
+                <td>{{ stack.ServiceCount }}
+                <td>Compose {{ stack.Type }}</td>
               </tr>
               <tr ng-if="!stacks">
-                <td colspan="5" class="text-center text-muted">Loading...</td>
+                <td colspan="3" class="text-center text-muted">Loading...</td>
               </tr>
               <tr ng-if="stacks.length == 0">
-                <td colspan="5" class="text-center text-muted">No stacks available.</td>
+                <td colspan="3" class="text-center text-muted">No stacks available.</td>
               </tr>
             </tbody>
           </table>

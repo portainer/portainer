@@ -51,9 +51,9 @@ angular.module('portainer', [
   'secret',
   'service',
   'services',
-  'stack',
+  'stackv2',
   'stacks',
-  'composeStack',
+  // 'composeStack',
   'settings',
   'sidebar',
   'stats',
@@ -544,42 +544,80 @@ angular.module('portainer', [
     .state('stacks', {
       url: '/stacks/',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/stacks/stacks.html',
           controller: 'StacksController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
       }
     })
+    // .state('stack', {
+    //   url: '^/stacks/:name/',
+    //   views: {
+    //     'content@': {
+    //       templateUrl: 'app/components/stack/stack.html',
+    //       controller: 'StackController'
+    //     },
+    //     'sidebar@': {
+    //       templateUrl: 'app/components/sidebar/sidebar.html',
+    //       controller: 'SidebarController'
+    //     }
+    //   }
+    // })
     .state('stack', {
-      url: '^/stack/:name/',
+      abstract: true,
+      url: '/stacks',
       views: {
-        "content@": {
-          templateUrl: 'app/components/stack/stack.html',
-          controller: 'StackController'
+        'content@': {
+          template: '<div ui-view="content@"></div>'
         },
-        "sidebar@": {
+        'sidebar@': {
+          template: '<div ui-view="sidebar@"></div>'
+        }
+      }
+    })
+    .state('stack.v2', {
+      url: '^/stacks/v2/:name/',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/stack/v2/stack.html',
+          controller: 'StackV2Controller'
+        },
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
       }
     })
-    .state('composeStack', {
-      url: '^/composestack/:name/',
+    .state('stack.v3', {
+      url: '^/stacks/v3/:name/',
       views: {
-        "content@": {
-          templateUrl: 'app/components/composeStack/composeStack.html',
-          controller: 'ComposeStackController'
+        'content@': {
+          templateUrl: 'app/components/stack/v3/stack.html',
+          controller: 'StackV3Controller'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }
       }
     })
+    // .state('composeStack', {
+    //   url: '^/composestack/:name/',
+    //   views: {
+    //     'content@': {
+    //       templateUrl: 'app/components/composeStack/composeStack.html',
+    //       controller: 'ComposeStackController'
+    //     },
+    //     'sidebar@': {
+    //       templateUrl: 'app/components/sidebar/sidebar.html',
+    //       controller: 'SidebarController'
+    //     }
+    //   }
+    // })
     .state('settings', {
       url: '/settings/',
       views: {

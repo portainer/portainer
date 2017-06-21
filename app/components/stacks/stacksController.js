@@ -1,18 +1,11 @@
 angular.module('stacks', [])
-.controller('StacksController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Container', 'Notifications', 'Pagination', 'Task', 'Node', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Container, Notifications, Pagination, Task, Node, Authentication, UserService, ModalService, ResourceControlService) {
+.controller('StacksController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Container', 'Notifications', 'Pagination', 'Task', 'Node', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService', 'StackService',
+function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Container, Notifications, Pagination, Task, Node, Authentication, UserService, ModalService, ResourceControlService, StackService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('stacks');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
-
-  $scope.switchOwnership = function(volume) {
-    ModalService.confirmServiceOwnershipChange(function (confirmed) {
-      if(!confirmed) { return; }
-      removeServiceResourceControl(volume);
-    });
-  };
 
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('stacks', $scope.state.pagination_count);
@@ -31,56 +24,23 @@ function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Container, N
     }
   };
 
-  function fetchStacks() {
-    $('#loadStacksSpinner').show();
+  function initView() {
+    $('#loadingViewSpinner').show();
 
-    var userDetails = Authentication.getUserDetails();
-    $scope.user = userDetails;
+    var includeServices = $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE';
 
-    var stacks = {};
-    var composeStacks = {};
-
-    $q.all({
-      containers: Container.query({all: 1}).$promise,
-      services: Service.query({}).$promise,
-      tasks: Task.query({filters: {'desired-state': ['running']}}).$promise,
-      nodes: Node.query({}).$promise
-    })
+    StackService.stacks(includeServices)
     .then(function success(data) {
-      for (var k in data.services) {
-        var service = data.services[k];
-        if (!service.Spec || !service.Spec.Labels || !service.Spec.Labels["com.docker.stack.namespace"]) continue;
-        var stackLabel = service.Spec.Labels["com.docker.stack.namespace"];
-
-        if (stacks[stackLabel]) stacks[stackLabel]++;
-        else stacks[stackLabel] = 1;
-      }
-      for (var k in data.containers) {
-        var container = data.containers[k];
-        if (!container.Labels || !container.Labels["com.docker.compose.project"]) continue;
-        var stackLabel = container.Labels["com.docker.compose.project"];
-        if (composeStacks[stackLabel]) composeStacks[stackLabel]++;
-        else composeStacks[stackLabel] = 1;
-      }
-      var arr = [];
-      for (var k in stacks) {
-        arr.push(new StackViewModel({"Name": k, "Items": stacks[k], "Type": "SwarmMode"}));
-      }
-      for (var k in composeStacks) {
-        arr.push(new StackViewModel({"Name": k, "Items": composeStacks[k], "Type": "Compose"}));
-      }
-      $scope.stacks = arr;
-
-      $('#loadStacksSpinner').hide();
+      $scope.stacks = data;
     })
     .catch(function error(err) {
-      $scope.services = [];
-      Notifications.error("Failure", err, "Unable to retrieve services");
+      $scope.stacks = [];
+      Notifications.error('Failure', err, 'Unable to retrieve stacks');
     })
     .finally(function final() {
-      $('#loadStacksSpinner').hide();
+      $('#loadingViewSpinner').hide();
     });
   }
 
-  fetchStacks();
+  initView();
 }]);
