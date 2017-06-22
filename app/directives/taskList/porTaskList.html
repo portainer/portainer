@@ -13,6 +13,11 @@
           </select>
         </div>
       </rd-widget-header>
+      <rd-widget-taskbar classes="col-sm-12">
+        <div class="pull-right">
+          <input type="text" id="filter" ng-model="$ctrl.state.filter" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
@@ -49,7 +54,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr pagination-id="tasks_list" dir-paginate="task in $ctrl.tasks | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count">
+            <tr pagination-id="tasks_list" dir-paginate="task in $ctrl.tasks | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count">
               <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
               <td><span class="label label-{{ task.Status.State | taskstatusbadge }}">{{ task.Status.State }}</span></td>
               <td>{{ task.Slot ? task.Slot : '-' }}</td>
