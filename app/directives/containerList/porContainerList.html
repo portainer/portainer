@@ -61,7 +61,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="container in ($ctrl.state.filteredContainers = ( $ctrl.containers | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count))">
+              <tr pagination-id="containers_list" dir-paginate="container in $ctrl.containers | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count">
                 <td>
                   <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ container.Status | containerstatus }}</span>
                   <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) === -1" class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status | containerstatus }}</span>
@@ -79,13 +79,13 @@
               <tr ng-if="!$ctrl.containers">
                 <td colspan="5" class="text-center text-muted">Loading...</td>
               </tr>
-              <tr ng-if="$ctrl.state.filteredContainers.length == 0">
+              <tr ng-if="($ctrl.containers | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count).length === 0">
                 <td colspan="5" class="text-center text-muted">No containers available.</td>
               </tr>
             </tbody>
           </table>
           <div ng-if="$ctrl.containers" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
+            <dir-pagination-controls pagination-id="containers_list"></dir-pagination-controls>
           </div>
         </div>
       </rd-widget-body>

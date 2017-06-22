@@ -61,7 +61,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="service in ($ctrl.state.filteredServices = ( $ctrl.services | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count))">
+              <tr pagination-id="services_list" dir-paginate="service in $ctrl.services | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count">
                 <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
                 <td>{{ service.Image | hideshasum }}</td>
                 <td>
@@ -83,13 +83,13 @@
               <tr ng-if="!$ctrl.services">
                 <td colspan="5" class="text-center text-muted">Loading...</td>
               </tr>
-              <tr ng-if="$ctrl.state.filteredServices.length == 0">
+              <tr ng-if="($ctrl.services | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count).length === 0">
                 <td colspan="5" class="text-center text-muted">No services available.</td>
               </tr>
             </tbody>
           </table>
           <div ng-if="$ctrl.containers" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
+            <dir-pagination-controls pagination-id="services_list"></dir-pagination-controls >
           </div>
         </div>
       </rd-widget-body>
