@@ -44,7 +44,7 @@ angular.module('portainer.filters', [])
       return 'warning';
     } else if (status.indexOf('created') !== -1) {
       return 'info';
-    } else if (status.indexOf('stopped') !== -1 || status.indexOf('unhealthy') !== -1) {
+    } else if (status.indexOf('exited') !== -1 || status.indexOf('unhealthy') !== -1) {
       return 'danger';
     }
     return 'success';
@@ -260,6 +260,32 @@ angular.module('portainer.filters', [])
       default:
         return 'fa fa-eye';
     }
+  };
+})
+.filter('availablenodecount', function () {
+  'use strict';
+  return function (nodes) {
+    var availableNodes = 0;
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
+      if (node.Availability === 'active' && node.Status === 'ready') {
+        availableNodes++;
+      }
+    }
+    return availableNodes;
+  };
+})
+.filter('runningtaskscount', function () {
+  'use strict';
+  return function (tasks) {
+    var runningTasks = 0;
+    for (var i = 0; i < tasks.length; i++) {
+      var task = tasks[i];
+      if (task.Status.State === 'running') {
+        runningTasks++;
+      }
+    }
+    return runningTasks;
   };
 })
 .filter('tasknodename', function () {

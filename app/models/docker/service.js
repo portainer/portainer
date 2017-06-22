@@ -1,6 +1,7 @@
 function ServiceViewModel(data, runningTasks, nodes) {
   this.Model = data;
   this.Id = data.ID;
+  this.Tasks = [];
   this.Name = data.Spec.Name;
   this.CreatedAt = data.CreatedAt;
   this.UpdatedAt = data.UpdatedAt;

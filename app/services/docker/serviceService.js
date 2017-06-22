@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('ServiceService', ['$q', 'Service', 'ResourceControlService', function ServiceServiceFactory($q, Service, ResourceControlService) {
+.factory('ServiceService', ['$q', 'Service', 'ServiceHelper', 'TaskService', 'ResourceControlService', function ServiceServiceFactory($q, Service, ServiceHelper, TaskService, ResourceControlService) {
   'use strict';
   var service = {};
 
@@ -18,13 +18,19 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.services = function() {
+  service.services = function(filters) {
     var deferred = $q.defer();
 
-    Service.query({}).$promise
+    $q.all({
+      services: Service.query({ filters: filters ? filters : {} }).$promise,
+      tasks: TaskService.tasks(filters)
+    })
     .then(function success(data) {
-      var services = data.map(function (item) {
-        return new ServiceViewModel(item);
+      var tasks = data.tasks;
+      var services = data.services.map(function (item) {
+        var service = new ServiceViewModel(item);
+        ServiceHelper.associateTasksToService(service, tasks);
+        return service;
       });
       deferred.resolve(services);
     })

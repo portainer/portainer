@@ -52,11 +52,11 @@ angular.module('portainer.helpers')
   helper.getComposeV3StacksFromServices = function(services) {
     var stackMap = {};
 
-    for (var j = 0; j < services.length; j++) {
+    for (var i = 0; i < services.length; i++) {
       var service = services[i];
       if (!service.Labels || !service.Labels['com.docker.stack.namespace']) continue;
 
-      var stackName = container.Labels['com.docker.compose.project'];
+      var stackName = service.Labels['com.docker.stack.namespace'];
       if (!stackMap[stackName]) {
         stackMap[stackName] = new StackViewModel({ Name: stackName, Type: 'v3', ServiceCount: 1 });
       } else {

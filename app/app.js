@@ -52,8 +52,8 @@ angular.module('portainer', [
   'service',
   'services',
   'stackv2',
+  'stackv3',
   'stacks',
-  // 'composeStack',
   'settings',
   'sidebar',
   'stats',
@@ -605,19 +605,6 @@ angular.module('portainer', [
         }
       }
     })
-    // .state('composeStack', {
-    //   url: '^/composestack/:name/',
-    //   views: {
-    //     'content@': {
-    //       templateUrl: 'app/components/composeStack/composeStack.html',
-    //       controller: 'ComposeStackController'
-    //     },
-    //     'sidebar@': {
-    //       templateUrl: 'app/components/sidebar/sidebar.html',
-    //       controller: 'SidebarController'
-    //     }
-    //   }
-    // })
     .state('settings', {
       url: '/settings/',
       views: {

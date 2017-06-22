@@ -63,7 +63,7 @@
             <tbody>
               <tr dir-paginate="container in ($ctrl.state.filteredContainers = ( $ctrl.containers | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count))">
                 <td>
-                  <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ container.State | containerstatus }}</span>
+                  <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ container.Status | containerstatus }}</span>
                   <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) === -1" class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status | containerstatus }}</span>
                 </td>
                 <td><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: 40}}</a></td>

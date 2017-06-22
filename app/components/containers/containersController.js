@@ -27,7 +27,6 @@ angular.module('containers', [])
       var containers = d;
       $scope.containers = containers.map(function (container) {
         var model = new ContainerViewModel(container);
-        model.Status = $filter('containerstatus')(model.Status);
 
         EntityListService.rememberPreviousSelection($scope.containers, model, function onSelect(model){
           $scope.selectItem(model);

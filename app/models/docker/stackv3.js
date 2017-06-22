@@ -1,6 +1,5 @@
-function StackV2ViewModel(name, services, containers) {
+function StackV3ViewModel(name, services) {
   this.Name = name;
   this.Services = services;
   this.ServiceCount = services.length;
-  this.Containers = containers;
 }

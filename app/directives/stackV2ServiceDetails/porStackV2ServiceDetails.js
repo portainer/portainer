@@ -1,5 +1,5 @@
 angular.module('portainer')
-.controller('porStackServiceDetails', ['Pagination', function (Pagination) {
+.controller('porStackV2ServiceDetails', ['Pagination', function (Pagination) {
   var ctrl = this;
 
   ctrl.state = {
