@@ -15,15 +15,7 @@ function ($scope, Notifications, Pagination, StackService) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
   };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
-  };
-
+  
   function initView() {
     $('#loadingViewSpinner').show();
 

@@ -32,7 +32,6 @@
         <div class="table-responsive">
           <table class="table table-hover">
             <thead>
-              <th></th>
               <th>
                 <a ui-sref="stacks" ng-click="order('Name')">
                   Name
@@ -57,17 +56,16 @@
             </thead>
             <tbody>
               <tr dir-paginate="stack in (state.filteredStack = ( stacks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td><input type="checkbox" ng-model="stack.Checked" ng-change="selectItem(stack)"/></td>
                 <td ng-if="stack.Type === 'v2'"><a ui-sref="stack.v2({name: stack.Name})">{{ stack.Name }}</a></td>
                 <td ng-if="stack.Type === 'v3'"><a ui-sref="stack.v3({name: stack.Name})">{{ stack.Name }}</a></td>
                 <td>{{ stack.ServiceCount }}
                 <td>Compose {{ stack.Type }}</td>
               </tr>
               <tr ng-if="!stacks">
-                <td colspan="4" class="text-center text-muted">Loading...</td>
+                <td colspan="3" class="text-center text-muted">Loading...</td>
               </tr>
               <tr ng-if="stacks.length == 0">
-                <td colspan="4" class="text-center text-muted">No stacks available.</td>
+                <td colspan="3" class="text-center text-muted">No stacks available.</td>
               </tr>
             </tbody>
           </table>
