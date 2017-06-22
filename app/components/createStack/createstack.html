@@ -1,0 +1,52 @@
+<rd-header>
+  <rd-header-title title="Create stack">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="display: none;"></i>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="stacks">Stacks</a> > Add stack
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="formValues.Name" id="stack_name" placeholder="e.g. myStack">
+            </div>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Compose
+          </div>
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              Paste the content of your Docker-compose file here.
+              You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>
+            </span>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <textarea class="form-control" rows="25" ng-model="formValues.ComposeFile" id="stack_file" placeholder='version: "3"'></textarea>
+            </div>
+          </div>
+          <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="create()">Create stack</button>
+              <a type="button" class="btn btn-default btn-sm" ui-sref="stacks">Cancel</a>
+              <i id="createStackSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

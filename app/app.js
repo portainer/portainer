@@ -31,6 +31,7 @@ angular.module('portainer', [
   'createRegistry',
   'createSecret',
   'createService',
+  'createStack',
   'createVolume',
   'docker',
   'endpoint',
@@ -291,6 +292,19 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/createService/createservice.html',
           controller: 'CreateServiceController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('actions.create.stack', {
+      url: '/stack',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/createStack/createstack.html',
+          controller: 'CreateStackController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
