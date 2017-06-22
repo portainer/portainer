@@ -16,5 +16,4 @@ function (Pagination) {
   ctrl.changePaginationCount = function() {
     Pagination.setPaginationCount('tasks_list', ctrl.state.pagination_count);
   };
-
 }]);
