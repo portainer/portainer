@@ -1,6 +1,6 @@
 angular.module('stackv3', [])
-.controller('StackV3Controller', ['$q', '$scope', '$stateParams', '$state', 'StackService', 'NodeService', 'Notifications',
-function ($q, $scope, $stateParams, $state, StackService, NodeService, Notifications) {
+.controller('StackV3Controller', ['$q', '$scope', '$stateParams', 'StackService', 'NodeService', 'Notifications',
+function ($q, $scope, $stateParams, StackService, NodeService, Notifications) {
 
   function initView() {
     $('#loadingViewSpinner').show();

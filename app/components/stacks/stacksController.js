@@ -1,6 +1,6 @@
 angular.module('stacks', [])
-.controller('StacksController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceHelper', 'Container', 'Notifications', 'Pagination', 'Task', 'Node', 'Authentication', 'UserService', 'ModalService', 'ResourceControlService', 'StackService',
-function ($q, $scope, $stateParams, $state, Service, ServiceHelper, Container, Notifications, Pagination, Task, Node, Authentication, UserService, ModalService, ResourceControlService, StackService) {
+.controller('StacksController', ['$scope', 'Notifications', 'Pagination', 'StackService',
+function ($scope, Notifications, Pagination, StackService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('stacks');

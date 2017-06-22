@@ -1,6 +1,6 @@
 angular.module('stackv2', [])
-.controller('StackV2Controller', ['$scope', '$stateParams', '$state', 'StackService', 'Notifications',
-function ($scope, $stateParams, $state, StackService, Notifications) {
+.controller('StackV2Controller', ['$scope', '$stateParams', 'StackService', 'Notifications',
+function ($scope, $stateParams, StackService, Notifications) {
 
   function initView() {
     $('#loadingViewSpinner').show();
