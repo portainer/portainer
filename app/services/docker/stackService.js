@@ -1,7 +1,11 @@
 angular.module('portainer.services')
-.factory('StackService', ['$q', 'ContainerService', 'ServiceService', 'TaskService', 'StackHelper', function StackServiceFactory($q, ContainerService, ServiceService, TaskService, StackHelper) {
+.factory('StackService', ['$q', 'Stack', 'ContainerService', 'ServiceService', 'TaskService', 'StackHelper', function StackServiceFactory($q, Stack, ContainerService, ServiceService, TaskService, StackHelper) {
   'use strict';
   var service = {};
+
+  service.createStack = function(name, composeFile) {
+    return Stack.create({Name: name, ComposeFileContent: composeFile}).$promise;
+  };
 
   service.stacks = function(includeServices) {
     var deferred = $q.defer();

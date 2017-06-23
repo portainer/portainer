@@ -20,26 +20,143 @@
             </div>
           </div>
           <div class="col-sm-12 form-section-title">
-            Compose
+            Build method
           </div>
-          <div class="form-group">
-            <span class="col-sm-12 text-muted small">
-              Paste the content of your Docker-compose file here.
-              You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>
-            </span>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <textarea class="form-control" rows="25" ng-model="formValues.ComposeFile" id="stack_file" placeholder='version: "3"'></textarea>
+          <div class="form-group"></div>
+          <!-- build-method -->
+          <div class="form-group" style="margin-bottom: 0">
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="method_editor" ng-model="state.Method" value="editor">
+                <label for="method_editor">
+                  <div class="boxselector_header">
+                    <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Web editor
+                  </div>
+                  <p>Use our Web editor</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="method_upload" ng-model="state.Method" value="upload" disabled>
+                <label for="method_upload">
+                  <div class="boxselector_header">
+                    <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Upload
+                  </div>
+                  <p>Upload existing files (not available yet)</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="method_repository" ng-model="state.Method" value="repository" disabled>
+                <label for="method_repository">
+                  <div class="boxselector_header">
+                    <i class="fa fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Repository
+                  </div>
+                  <p>Use a git repository (not available yet)</p>
+                </label>
+              </div>
             </div>
           </div>
+          <!-- !build-method -->
+          <!-- web-editor -->
+          <div ng-if="state.Method === 'editor'">
+            <div class="col-sm-12 form-section-title">
+              Compose
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Define or paste the content of your Docker-compose file here.
+                You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <textarea class="form-control" rows="25" ng-model="formValues.ComposeFile" id="stack_file" placeholder='version: "3"'></textarea>
+              </div>
+            </div>
+            <div class="col-sm-12 form-section-title">
+              Env
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Define or paste the content of your environment file here (optional).
+                You can get more information about environment support in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">CHANGEURL_official documentation</a>.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <textarea class="form-control" rows="10" ng-model="formValues.Env" id="env_file" placeholder='foo=bar'></textarea>
+              </div>
+            </div>
+          </div>
+          <!-- !web-editor -->
+          <!-- upload -->
+          <div ng-if="state.Method === 'upload'">
+            <div class="col-sm-12 form-section-title">
+              Compose
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Upload your Compose file.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.ComposeFileUpload">Select file</button>
+                <span style="margin-left: 5px;">
+                  {{ formValues.ComposeFileUpload.name }}
+                  <i class="fa fa-times red-icon" ng-if="!formValues.ComposeFileUpload" aria-hidden="true"></i>
+                  <i class="fa fa-circle-o-notch fa-spin" ng-if="state.UploadInProgress"></i>
+                </span>
+              </div>
+            </div>
+            <div class="col-sm-12 form-section-title">
+              Env
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Upload your environment file (optional).
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.EnvFileUpload">Select file</button>
+                <span style="margin-left: 5px;">
+                  {{ formValues.EnvFileUpload.name }}
+                  <i class="fa fa-times red-icon" ng-if="!formValues.EnvFileUpload" aria-hidden="true"></i>
+                  <i class="fa fa-circle-o-notch fa-spin" ng-if="state.UploadInProgress"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- !upload -->
+          <!-- repository -->
+          <div ng-if="state.Method === 'repository'">
+            <div class="col-sm-12 form-section-title">
+              Repository
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Specify the URL of a valid git repository. A <b>docker-compose.yml</b> file must be present in the root of the repository.
+                Any env file will be loaded as well.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <input type="text" class="form-control" ng-model="formValues.RepositoryURL" placeholder="https://github.com/portainer/compose.git">
+              </div>
+            </div>
+          </div>
+          <!-- !repository -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="create()">Create stack</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="create()">Create the stack</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="createAndStart()">Create and start the stack</button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="stacks">Cancel</a>
               <i id="createStackSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>

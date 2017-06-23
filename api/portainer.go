@@ -295,6 +295,7 @@ type (
 		StoreTLSFile(endpointID EndpointID, fileType TLSFileType, r io.Reader) error
 		GetPathForTLSFile(endpointID EndpointID, fileType TLSFileType) (string, error)
 		DeleteTLSFiles(endpointID EndpointID) error
+		StoreComposeFile(name, composeFile string) (string, error)
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.

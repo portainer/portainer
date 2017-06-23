@@ -20,6 +20,7 @@ type Handler struct {
 	RegistryHandler       *RegistryHandler
 	DockerHubHandler      *DockerHubHandler
 	ResourceHandler       *ResourceHandler
+	StackHandler          *StackHandler
 	StatusHandler         *StatusHandler
 	SettingsHandler       *SettingsHandler
 	TemplatesHandler      *TemplatesHandler
@@ -62,6 +63,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.SettingsHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/status") {
 		http.StripPrefix("/api", h.StatusHandler).ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/api/stack") {
+		http.StripPrefix("/api", h.StackHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/templates") {
 		http.StripPrefix("/api", h.TemplatesHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/upload") {

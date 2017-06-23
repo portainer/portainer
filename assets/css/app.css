@@ -420,6 +420,13 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   cursor: pointer;
 }
 
+.boxselector_wrapper input[type="radio"]:disabled ~ label {
+  cursor: default;
+  background: #337ab7;
+  border-color: #2e6da4;
+  opacity: .70;
+}
+
 .boxselector_wrapper label {
   font-weight: normal;
   font-size: 12px;

@@ -817,6 +817,7 @@ angular.module('portainer', [
   .constant('CONFIG_ENDPOINT', 'api/old_settings')
   .constant('SETTINGS_ENDPOINT', 'api/settings')
   .constant('STATUS_ENDPOINT', 'api/status')
+  .constant('STACK_ENDPOINT', 'api/stack')
   .constant('AUTH_ENDPOINT', 'api/auth')
   .constant('USERS_ENDPOINT', 'api/users')
   .constant('TEAMS_ENDPOINT', 'api/teams')

@@ -1,6 +1,8 @@
 package file
 
 import (
+	"bytes"
+
 	"github.com/portainer/portainer"
 
 	"io"
@@ -18,6 +20,8 @@ const (
 	TLSCertFile = "cert.pem"
 	// TLSKeyFile represents the name on disk for a TLS key file.
 	TLSKeyFile = "key.pem"
+	// ComposeStorePath represents the subfolder where compose files are stored in the file store folder.
+	ComposeStorePath = "compose"
 )
 
 // Service represents a service for managing files and directories.
@@ -47,7 +51,33 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 		return nil, err
 	}
 
+	err = service.createDirectoryInStoreIfNotExist(ComposeStorePath)
+	if err != nil {
+		return nil, err
+	}
+
 	return service, nil
+}
+
+// StoreComposeFile creates a subfolder in the ComposeStorePath and stores a new file using the content from composeFile.
+// It returns the path to the newly stored file.
+func (service *Service) StoreComposeFile(name, composeFile string) (string, error) {
+	composeStorePath := path.Join(ComposeStorePath, name)
+	err := service.createDirectoryInStoreIfNotExist(composeStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := path.Join(composeStorePath, name+".yml")
+	data := []byte(composeFile)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, composeFilePath), nil
 }
 
 // StoreTLSFile creates a subfolder in the TLSStorePath and stores a new file with the content from r.

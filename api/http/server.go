@@ -56,6 +56,8 @@ func (server *Server) Start() error {
 	var statusHandler = handler.NewStatusHandler(requestBouncer, server.Status)
 	var settingsHandler = handler.NewSettingsHandler(requestBouncer)
 	settingsHandler.SettingsService = server.SettingsService
+	var stackHandler = handler.NewStackHandler(requestBouncer)
+	stackHandler.FileService = server.FileService
 	var templatesHandler = handler.NewTemplatesHandler(requestBouncer)
 	templatesHandler.SettingsService = server.SettingsService
 	var dockerHandler = handler.NewDockerHandler(requestBouncer)
@@ -89,6 +91,7 @@ func (server *Server) Start() error {
 		ResourceHandler:       resourceHandler,
 		SettingsHandler:       settingsHandler,
 		StatusHandler:         statusHandler,
+		StackHandler:          stackHandler,
 		TemplatesHandler:      templatesHandler,
 		DockerHandler:         dockerHandler,
 		WebSocketHandler:      websocketHandler,
