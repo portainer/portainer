@@ -8,8 +8,8 @@ angular.module('portainer.services')
 
     Settings.get().$promise
     .then(function success(data) {
-      var status = new SettingsViewModel(data);
-      deferred.resolve(status);
+      var settings = new SettingsViewModel(data);
+      deferred.resolve(settings);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve application settings', err: err });

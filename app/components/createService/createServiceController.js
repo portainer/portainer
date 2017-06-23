@@ -1,13 +1,13 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'ControllerDataPipeline', 'FormValidator',
-function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'ControllerDataPipeline', 'FormValidator', 'RegistryService', 'HttpRequestHelper',
+function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator, RegistryService, HttpRequestHelper) {
 
   $scope.formValues = {
     Name: '',
     Image: '',
-    Registry: '',
+    Registry: {},
     Mode: 'replicated',
     Replicas: 1,
     Command: '',
@@ -105,7 +105,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   };
 
   function prepareImageConfig(config, input) {
-    var imageConfig = ImageHelper.createImageConfigForContainer(input.Image, input.Registry);
+    var imageConfig = ImageHelper.createImageConfigForContainer(input.Image, input.Registry.URL);
     config.TaskTemplate.ContainerSpec.Image = imageConfig.fromImage + ':' + imageConfig.tag;
   }
 
@@ -257,6 +257,10 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   }
 
   function createNewService(config, accessControlData) {
+
+    var registry = $scope.formValues.Registry;
+    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
+    HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
     Service.create(config).$promise
     .then(function success(data) {
       var serviceIdentifier = data.ID;

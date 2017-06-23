@@ -91,6 +91,22 @@ func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portaine
 	}
 }
 
+func initDockerHub(dockerHubService portainer.DockerHubService) error {
+	_, err := dockerHubService.DockerHub()
+	if err == portainer.ErrDockerHubNotFound {
+		dockerhub := &portainer.DockerHub{
+			Authentication: false,
+			Username:       "",
+			Password:       "",
+		}
+		return dockerHubService.StoreDockerHub(dockerhub)
+	} else if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
 	_, err := settingsService.Settings()
 	if err == portainer.ErrSettingsNotFound {
@@ -142,6 +158,11 @@ func main() {
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
 	err := initSettings(store.SettingsService, flags)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = initDockerHub(store.DockerHubService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -199,6 +220,8 @@ func main() {
 		EndpointService:        store.EndpointService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
+		RegistryService:        store.RegistryService,
+		DockerHubService:       store.DockerHubService,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,

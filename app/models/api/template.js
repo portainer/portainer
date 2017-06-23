@@ -3,7 +3,7 @@ function TemplateViewModel(data) {
   this.Description = data.description;
   this.Note = data.note;
   this.Categories = data.categories ? data.categories : [];
-  this.Platform = data.platform ? data.platform : '';
+  this.Platform = data.platform ? data.platform : 'undefined';
   this.Logo = data.logo;
   this.Image = data.image;
   this.Registry = data.registry ? data.registry : '';

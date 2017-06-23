@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Info', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator', 'ModalService',
-function ($q, $scope, $state, $stateParams, $filter, Info, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator, ModalService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator', 'ModalService',
+function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator, ModalService) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -94,7 +94,7 @@ function ($q, $scope, $state, $stateParams, $filter, Info, Container, ContainerH
   function prepareImageConfig(config) {
     var image = config.Image;
     var registry = $scope.formValues.Registry;
-    var imageConfig = ImageHelper.createImageConfigForContainer(image, registry);
+    var imageConfig = ImageHelper.createImageConfigForContainer(image, registry.URL);
     config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
     $scope.imageConfig = imageConfig;
   }

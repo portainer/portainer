@@ -1,0 +1,150 @@
+<rd-header>
+  <rd-header-title title="Registries">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="registries" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+  </rd-header-title>
+  <rd-header-content>Registry management</rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="dockerhub">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-database" title="DockerHub">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- note -->
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              The DockerHub registry can be used by any user. You can specify the credentials that will be used to push &amp; pull images here.
+            </span>
+          </div>
+          <!-- !note -->
+          <!-- authentication-checkbox -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="registry_auth" class="control-label text-left">
+                Authentication
+                <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to push/pull private images."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="dockerhub.Authentication"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- !authentication-checkbox -->
+          <!-- authentication-credentials -->
+          <div ng-if="dockerhub.Authentication">
+            <!-- credentials-user -->
+            <div class="form-group">
+              <label for="hub_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="hub_username" ng-model="dockerhub.Username">
+              </div>
+            </div>
+            <!-- !credentials-user -->
+            <!-- credentials-password -->
+            <div class="form-group">
+              <label for="hub_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="password" class="form-control" id="hub_password" ng-model="dockerhub.Password">
+              </div>
+            </div>
+            <!-- !credentials-password -->
+          </div>
+          <!-- !authentication-credentials -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="dockerhub.Authentication && (!dockerhub.Username || !dockerhub.Password)" ng-click="updateDockerHub()">Update</button>
+              <i id="updateDockerhubSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-database" title="Available registries">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-lg-12">
+        <div class="pull-left">
+          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+          <a class="btn btn-primary" type="button" ui-sref="actions.create.registry"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add registry</a>
+        </div>
+        <div class="pull-right">
+          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+                </th>
+                <th>
+                  <a ui-sref="registries" ng-click="order('Name')">
+                    Name
+                    <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ui-sref="registries" ng-click="order('URL')">
+                    URL
+                    <span ng-show="sortType == 'URL' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'URL' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr dir-paginate="registry in (state.filteredRegistries = (registries | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+                <td><input type="checkbox" ng-model="registry.Checked" ng-change="selectItem(registry)" /></td>
+                <td>
+                  <a ui-sref="registry({id: registry.Id})">{{ registry.Name }}</a>
+                  <span ng-if="registry.Authentication" style="margin-left: 5px;">
+                    <i class="fa fa-shield" aria-hidden="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Authentication is enabled for this registry."></i>
+                  </span>
+                </td>
+                <td>{{ registry.URL }}</td>
+                <td>
+                  <span ng-if="applicationState.application.authentication">
+                    <a ui-sref="registry.access({id: registry.Id})"><i class="fa fa-users" aria-hidden="true" style="margin-left: 7px;"></i> Manage access</a>
+                  </span>
+                </td>
+              </tr>
+              <tr ng-if="!registries">
+                <td colspan="3" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="registries.length == 0">
+                <td colspan="3" class="text-center text-muted">No registries available.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="registries" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    <rd-widget>
+  </div>
+</div>

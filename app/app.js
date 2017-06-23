@@ -28,6 +28,7 @@ angular.module('portainer', [
   'containers',
   'createContainer',
   'createNetwork',
+  'createRegistry',
   'createSecret',
   'createService',
   'createVolume',
@@ -43,6 +44,9 @@ angular.module('portainer', [
   'network',
   'networks',
   'node',
+  'registries',
+  'registry',
+  'registryAccess',
   'secrets',
   'secret',
   'service',
@@ -69,7 +73,6 @@ angular.module('portainer', [
     }
 
     localStorageServiceProvider
-    .setStorageType('sessionStorage')
     .setPrefix('portainer');
 
     jwtOptionsProvider.config({
@@ -253,6 +256,19 @@ angular.module('portainer', [
         }
       }
     })
+    .state('actions.create.registry', {
+      url: '/registry',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/createRegistry/createregistry.html',
+          controller: 'CreateRegistryController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('actions.create.secret', {
       url: '/secret',
       views: {
@@ -424,6 +440,45 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/node/node.html',
           controller: 'NodeController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('registries', {
+      url: '/registries/',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/registries/registries.html',
+          controller: 'RegistriesController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('registry', {
+      url: '^/registries/:id',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/registry/registry.html',
+          controller: 'RegistryController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('registry.access', {
+      url: '^/registries/:id/access',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/registryAccess/registryAccess.html',
+          controller: 'RegistryAccessController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
@@ -687,7 +742,8 @@ angular.module('portainer', [
   .constant('TEAM_MEMBERSHIPS_ENDPOINT', 'api/team_memberships')
   .constant('RESOURCE_CONTROL_ENDPOINT', 'api/resource_controls')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
+  .constant('DOCKERHUB_ENDPOINT', 'api/dockerhub')
+  .constant('REGISTRIES_ENDPOINT', 'api/registries')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
   .constant('DEFAULT_TEMPLATES_URL', 'https://raw.githubusercontent.com/portainer/templates/master/templates.json')
   .constant('PAGINATION_MAX_ITEMS', 10);
-  // .constant('UI_VERSION', 'v1.13.2');

@@ -1,6 +1,6 @@
 angular.module('users', [])
-.controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication',
-function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication) {
+.controller('UsersController', ['$q', '$scope', '$state', '$sanitize', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication',
+function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication) {
   $scope.state = {
     userCreationError: '',
     selectedItemCount: 0,
@@ -59,8 +59,8 @@ function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, M
   $scope.addUser = function() {
     $('#createUserSpinner').show();
     $scope.state.userCreationError = '';
-    var username = $scope.formValues.Username;
-    var password = $scope.formValues.Password;
+    var username = $sanitize($scope.formValues.Username);
+    var password = $sanitize($scope.formValues.Password);
     var role = $scope.formValues.Administrator ? 1 : 2;
     var teamIds = [];
     angular.forEach($scope.formValues.Teams, function(team) {

@@ -7,7 +7,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-// EndpointService represents a service for managing users.
+// EndpointService represents a service for managing endpoints.
 type EndpointService struct {
 	store *Store
 }
