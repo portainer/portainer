@@ -107,6 +107,29 @@ func (service *Service) DeleteTLSFiles(endpointID portainer.EndpointID) error {
 	return nil
 }
 
+func (service *Service) DeleteTLSFile(endpointID portainer.EndpointID, fileType portainer.TLSFileType) error {
+	var fileName string
+	switch fileType {
+	case portainer.TLSFileCA:
+		fileName = TLSCACertFile
+	case portainer.TLSFileCert:
+		fileName = TLSCertFile
+	case portainer.TLSFileKey:
+		fileName = TLSKeyFile
+	default:
+		return portainer.ErrUndefinedTLSFileType
+	}
+
+	ID := strconv.Itoa(int(endpointID))
+	filePath := path.Join(service.fileStorePath, TLSStorePath, ID, fileName)
+
+	err := os.Remove(filePath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // createDirectoryInStoreIfNotExist creates a new directory in the file store if it doesn't exists on the file system.
 func (service *Service) createDirectoryInStoreIfNotExist(name string) error {
 	path := path.Join(service.fileStorePath, name)

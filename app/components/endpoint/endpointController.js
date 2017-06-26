@@ -19,14 +19,18 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
 
   $scope.updateEndpoint = function() {
     var ID = $scope.endpoint.Id;
+    var TLSVerify = $scope.endpoint.TLS && $scope.endpoint.TLSVerify;
+    var TLSClientCert = $scope.endpoint.TLS && $scope.endpoint.TLSClientCert;
     var endpointParams = {
       name: $scope.endpoint.Name,
       URL: $scope.endpoint.URL,
       PublicURL: $scope.endpoint.PublicURL,
       TLS: $scope.endpoint.TLS,
-      TLSCACert: $scope.formValues.TLSCACert !== $scope.endpoint.TLSCACert ? $scope.formValues.TLSCACert : null,
-      TLSCert: $scope.formValues.TLSCert !== $scope.endpoint.TLSCert ? $scope.formValues.TLSCert : null,
-      TLSKey: $scope.formValues.TLSKey !== $scope.endpoint.TLSKey ? $scope.formValues.TLSKey : null,
+      TLSVerify: TLSVerify,
+      TLSClientCert: TLSClientCert,
+      TLSCACert: (TLSVerify && ($scope.formValues.TLSCACert !== $scope.endpoint.TLSCACert)) ? $scope.formValues.TLSCACert : null,
+      TLSCert: (TLSClientCert && ($scope.formValues.TLSCert !== $scope.endpoint.TLSCert)) ? $scope.formValues.TLSCert : null,
+      TLSKey: (TLSClientCert && ($scope.formValues.TLSKey !== $scope.endpoint.TLSKey)) ? $scope.formValues.TLSKey : null,
       type: $scope.endpointType
     };
 
@@ -57,6 +61,9 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
       $scope.formValues.TLSCACert = data.TLSCACert;
       $scope.formValues.TLSCert = data.TLSCert;
       $scope.formValues.TLSKey = data.TLSKey;
+      $scope.formValues.UseTLSCACert = Boolean(data.TLSCACert);
+      $scope.formValues.UseTLSCert = Boolean(data.TLSCert);
+      $scope.formValues.UseTLSKey = Boolean(data.TLSKey);
     }, function error(err) {
       $('#loadingViewSpinner').hide();
       Notifications.error('Failure', err, 'Unable to retrieve endpoint details');

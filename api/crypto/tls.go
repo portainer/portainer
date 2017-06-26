@@ -7,20 +7,32 @@ import (
 )
 
 // CreateTLSConfiguration initializes a tls.Config using a CA certificate, a certificate and a key
-func CreateTLSConfiguration(caCertPath, certPath, keyPath string) (*tls.Config, error) {
-	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
-	if err != nil {
-		return nil, err
+func CreateTLSConfiguration(tlsVerify, tlsClientCert bool, caCertPath, certPath, keyPath string) (*tls.Config, error) {
+	config := &tls.Config{}
+
+	if tlsClientCert {
+		cert, err := tls.LoadX509KeyPair(certPath, keyPath)
+		if err != nil {
+			return nil, err
+		}
+
+		config.Certificates = []tls.Certificate{cert}
 	}
-	caCert, err := ioutil.ReadFile(caCertPath)
-	if err != nil {
-		return nil, err
+
+	if tlsVerify {
+		caCert, err := ioutil.ReadFile(caCertPath)
+		if err != nil {
+			return nil, err
+		}
+
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCert)
+
+		config.RootCAs = caCertPool
+		config.InsecureSkipVerify = false
+	} else {
+		config.InsecureSkipVerify = true
 	}
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCert)
-	config := &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		RootCAs:      caCertPool,
-	}
+
 	return config, nil
 }

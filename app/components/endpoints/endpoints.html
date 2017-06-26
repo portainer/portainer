@@ -62,7 +62,7 @@
             <div class="col-sm-12">
               <label for="tls" class="control-label text-left">
                 TLS
-                <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the Docker endpoint."></portainer-tooltip>
+                <portainer-tooltip position="bottom" message="Enable this option if you need to connect to the Docker endpoint with TLS."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
                 <input type="checkbox" ng-model="formValues.TLS"><i></i>
@@ -72,8 +72,19 @@
           <!-- !tls-checkbox -->
           <!-- tls-certs -->
           <div ng-if="formValues.TLS">
-            <!-- ca-input -->
             <div class="form-group">
+              <div class="col-sm-10">
+                <label for="tls_verify" class="control-label text-left">
+                  TLS Verify
+                  <portainer-tooltip position="bottom" message="Enable this option if you need to authenticate server based on given CA."></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="formValues.TLSVerify"><i></i>
+                </label>
+              </div>
+            </div>
+            <!-- ca-input -->
+            <div class="form-group" ng-if="formValues.TLSVerify">
               <label class="col-sm-2 control-label text-left">TLS CA certificate</label>
               <div class="col-sm-10">
                 <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
@@ -85,37 +96,50 @@
               </div>
             </div>
             <!-- !ca-input -->
-            <!-- cert-input -->
             <div class="form-group">
-              <label for="tls_cert" class="col-sm-2 control-label text-left">TLS certificate</label>
               <div class="col-sm-10">
-                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
-                <span style="margin-left: 5px;">
-                  {{ formValues.TLSCert.name }}
-                  <i class="fa fa-times red-icon" ng-if="!formValues.TLSCert" aria-hidden="true"></i>
-                  <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
-                </span>
+                <label for="tls_client_cert" class="control-label text-left">
+                  TLS Client Certificate
+                  <portainer-tooltip position="bottom" message="Enable this option if you need to authenticate with client certificate."></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="formValues.TLSClientCert"><i></i>
+                </label>
               </div>
             </div>
-            <!-- !cert-input -->
-            <!-- key-input -->
-            <div class="form-group">
-              <label class="col-sm-2 control-label text-left">TLS key</label>
-              <div class="col-sm-10">
-                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
-                <span style="margin-left: 5px;">
-                  {{ formValues.TLSKey.name }}
-                  <i class="fa fa-times red-icon" ng-if="!formValues.TLSKey" aria-hidden="true"></i>
-                  <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
-                </span>
+            <div ng-if="formValues.TLSClientCert">
+              <!-- cert-input -->
+              <div class="form-group">
+                <label for="tls_cert" class="col-sm-2 control-label text-left">TLS certificate</label>
+                <div class="col-sm-10">
+                  <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
+                  <span style="margin-left: 5px;">
+                    {{ formValues.TLSCert.name }}
+                    <i class="fa fa-times red-icon" ng-if="!formValues.TLSCert" aria-hidden="true"></i>
+                    <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+                  </span>
+                </div>
               </div>
+              <!-- !cert-input -->
+              <!-- key-input -->
+              <div class="form-group">
+                <label class="col-sm-2 control-label text-left">TLS key</label>
+                <div class="col-sm-10">
+                  <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
+                  <span style="margin-left: 5px;">
+                    {{ formValues.TLSKey.name }}
+                    <i class="fa fa-times red-icon" ng-if="!formValues.TLSKey" aria-hidden="true"></i>
+                    <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+                  </span>
+                </div>
+              </div>
+              <!-- !key-input -->
             </div>
-            <!-- !key-input -->
           </div>
           <!-- !tls-certs -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && (!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey))" ng-click="addEndpoint()">Add endpoint</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addEndpoint()">Add endpoint</button>
               <i id="createEndpointSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               <span class="text-danger" ng-if="state.error" style="margin: 5px;">
                 <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
