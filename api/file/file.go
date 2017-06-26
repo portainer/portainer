@@ -59,17 +59,37 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 	return service, nil
 }
 
-// StoreComposeFile creates a subfolder in the ComposeStorePath and stores a new file using the content from composeFile.
-// It returns the path to the newly stored file.
-func (service *Service) StoreComposeFile(name, composeFile string) (string, error) {
-	composeStorePath := path.Join(ComposeStorePath, name)
-	err := service.createDirectoryInStoreIfNotExist(composeStorePath)
+// StoreComposeEnvFile stores a new .env file in the stack store path using the content of envFileContent.
+func (service *Service) StoreComposeEnvFile(name, envFileContent string) error {
+	stackStorePath := path.Join(ComposeStorePath, name)
+	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
+	if err != nil {
+		return err
+	}
+
+	envFilePath := path.Join(stackStorePath, ".env")
+	data := []byte(envFileContent)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(envFilePath, r)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// StoreComposeFile creates a subfolder in the ComposeStorePath and stores a new file using the content from composeFileContent.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreComposeFile(name, composeFileContent string) (string, error) {
+	stackStorePath := path.Join(ComposeStorePath, name)
+	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	composeFilePath := path.Join(composeStorePath, name+".yml")
-	data := []byte(composeFile)
+	composeFilePath := path.Join(stackStorePath, "docker-compose.yml")
+	data := []byte(composeFileContent)
 	r := bytes.NewReader(data)
 
 	err = service.createFileInStore(composeFilePath, r)
@@ -77,7 +97,7 @@ func (service *Service) StoreComposeFile(name, composeFile string) (string, erro
 		return "", err
 	}
 
-	return path.Join(service.fileStorePath, composeFilePath), nil
+	return path.Join(service.fileStorePath, stackStorePath), nil
 }
 
 // StoreTLSFile creates a subfolder in the TLSStorePath and stores a new file with the content from r.

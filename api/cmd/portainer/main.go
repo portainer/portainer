@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/file"
 	"github.com/portainer/portainer/http"
 	"github.com/portainer/portainer/jwt"
+	"github.com/portainer/portainer/libcompose"
 
 	"log"
 )
@@ -51,6 +52,10 @@ func initStore(dataStorePath string) *bolt.Store {
 		log.Fatal(err)
 	}
 	return store
+}
+
+func initStackManager() portainer.StackManager {
+	return libcompose.NewStackManager()
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -151,6 +156,8 @@ func main() {
 	store := initStore(*flags.Data)
 	defer store.Close()
 
+	stackManager := initStackManager()
+
 	jwtService := initJWTService(!*flags.NoAuth)
 
 	cryptoService := initCryptoService()
@@ -222,6 +229,8 @@ func main() {
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,
 		DockerHubService:       store.DockerHubService,
+		StackService:           store.StackService,
+		StackManager:           stackManager,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,

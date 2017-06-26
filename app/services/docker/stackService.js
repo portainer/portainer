@@ -3,8 +3,8 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.createStack = function(name, composeFile) {
-    return Stack.create({Name: name, ComposeFileContent: composeFile}).$promise;
+  service.createStack = function(name, composeFile, envFile) {
+    return Stack.create({Name: name, ComposeFileContent: composeFile, EnvFileContent: envFile}).$promise;
   };
 
   service.stacks = function(includeServices) {
@@ -71,6 +71,10 @@ angular.module('portainer.services')
     });
 
     return deferred.promise;
+  };
+
+  service.stackOperationUp = function(id) {
+    return Stack.up({id: id}).$promise;
   };
 
   return service;

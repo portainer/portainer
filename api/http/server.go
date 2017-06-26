@@ -27,6 +27,8 @@ type Server struct {
 	FileService            portainer.FileService
 	RegistryService        portainer.RegistryService
 	DockerHubService       portainer.DockerHubService
+	StackService           portainer.StackService
+	StackManager           portainer.StackManager
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
@@ -38,6 +40,7 @@ func (server *Server) Start() error {
 	requestBouncer := security.NewRequestBouncer(server.JWTService, server.TeamMembershipService, server.AuthDisabled)
 	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamMembershipService, server.SettingsService)
 
+	var fileHandler = handler.NewFileHandler(server.AssetsPath)
 	var authHandler = handler.NewAuthHandler(requestBouncer, server.AuthDisabled)
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
@@ -56,8 +59,6 @@ func (server *Server) Start() error {
 	var statusHandler = handler.NewStatusHandler(requestBouncer, server.Status)
 	var settingsHandler = handler.NewSettingsHandler(requestBouncer)
 	settingsHandler.SettingsService = server.SettingsService
-	var stackHandler = handler.NewStackHandler(requestBouncer)
-	stackHandler.FileService = server.FileService
 	var templatesHandler = handler.NewTemplatesHandler(requestBouncer)
 	templatesHandler.SettingsService = server.SettingsService
 	var dockerHandler = handler.NewDockerHandler(requestBouncer)
@@ -78,7 +79,11 @@ func (server *Server) Start() error {
 	resourceHandler.ResourceControlService = server.ResourceControlService
 	var uploadHandler = handler.NewUploadHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
-	var fileHandler = handler.NewFileHandler(server.AssetsPath)
+	var stackHandler = handler.NewStackHandler(requestBouncer)
+	stackHandler.FileService = server.FileService
+	stackHandler.StackService = server.StackService
+	stackHandler.EndpointService = server.EndpointService
+	stackHandler.StackManager = server.StackManager
 
 	server.Handler = &handler.Handler{
 		AuthHandler:           authHandler,

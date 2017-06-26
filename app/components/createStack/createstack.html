@@ -37,7 +37,7 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="method_upload" ng-model="state.Method" value="upload" disabled>
+                <input type="radio" id="method_upload" ng-model="state.Method" value="upload">
                 <label for="method_upload">
                   <div class="boxselector_header">
                     <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -47,7 +47,7 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="method_repository" ng-model="state.Method" value="repository" disabled>
+                <input type="radio" id="method_repository" ng-model="state.Method" value="repository">
                 <label for="method_repository">
                   <div class="boxselector_header">
                     <i class="fa fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -76,7 +76,7 @@
               </div>
             </div>
             <div class="col-sm-12 form-section-title">
-              Env
+              Environment
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
@@ -86,7 +86,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <textarea class="form-control" rows="10" ng-model="formValues.Env" id="env_file" placeholder='foo=bar'></textarea>
+                <textarea class="form-control" rows="10" ng-model="formValues.EnvFile" id="env_file" placeholder='foo=bar'></textarea>
               </div>
             </div>
           </div>
@@ -155,9 +155,12 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="create()">Create the stack</button>
-              <button type="button" class="btn btn-primary btn-sm" ng-click="createAndStart()">Create and start the stack</button>
+              <button type="button" ng-disabled="state.Method !== 'editor'" class="btn btn-primary btn-sm" ng-click="create()">Create the stack</button>
+              <button type="button" ng-disabled="state.Method !== 'editor'" class="btn btn-primary btn-sm" ng-click="createAndStart()">Create and start the stack</button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="stacks">Cancel</a>
+              <span class="text-danger" ng-if="state.Method !== 'editor'" style="margin: 5px;">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> This feature is not available yet.
+              </span>
               <i id="createStackSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>

@@ -1,7 +1,11 @@
 angular.module('portainer.rest')
-.factory('Stack', ['$resource', 'STACK_ENDPOINT', function StackFactory($resource, STACK_ENDPOINT) {
+.factory('Stack', ['$resource', 'EndpointProvider', 'ENDPOINTS_ENDPOINT', function StackFactory($resource, EndpointProvider, ENDPOINTS_ENDPOINT) {
   'use strict';
-  return $resource(STACK_ENDPOINT, {}, {
-    create: { method: 'POST' }
+  return $resource(ENDPOINTS_ENDPOINT + '/:endpointId/stacks/:id/:action', {
+    endpointId: EndpointProvider.endpointID
+  },
+  {
+    create: { method: 'POST' },
+    up: { method: 'POST', params: { id: '@id', action: 'up' } }
   });
 }]);

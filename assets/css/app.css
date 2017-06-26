@@ -422,8 +422,6 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 
 .boxselector_wrapper input[type="radio"]:disabled ~ label {
   cursor: default;
-  background: #337ab7;
-  border-color: #2e6da4;
   opacity: .70;
 }
 
