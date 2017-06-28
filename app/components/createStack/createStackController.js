@@ -10,6 +10,7 @@ function ($scope, $state, StackService, Notifications) {
   $scope.formValues = {
     Name: '',
     ComposeFile: 'version: "2"\nservices:\n  myservice:\n    image: nginx',
+    ClusterDeployment: false,
     EnvFile: '',
     ComposeFileUpload: null,
     EnvFileUpload: null,

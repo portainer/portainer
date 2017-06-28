@@ -153,10 +153,24 @@
           <div class="col-sm-12 form-section-title">
             Actions
           </div>
+          <div class="form-group" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+            <div class="col-sm-12">
+              <label for="ownership" class="control-label text-left">
+                Deploy inside the cluster
+                <portainer-tooltip position="top" message="If enabled, the stack will be deployed inside the Swarm cluster (equivalent of docker stack deploy). Otherwise, it will be deployed on the host."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.ClusterDeployment"><i></i>
+              </label>
+              <span class="text-danger" ng-if="formValues.ClusterDeployment" style="margin: 5px;">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> This feature is not available yet.
+              </span>
+            </div>
+          </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" ng-disabled="state.Method !== 'editor'" class="btn btn-primary btn-sm" ng-click="create()">Create the stack</button>
-              <button type="button" ng-disabled="state.Method !== 'editor'" class="btn btn-primary btn-sm" ng-click="createAndStart()">Create and start the stack</button>
+              <button type="button" ng-disabled="state.Method !== 'editor' || formValues.ClusterDeployment" class="btn btn-primary btn-sm" ng-click="create()">Create the stack</button>
+              <button type="button" ng-disabled="state.Method !== 'editor' || formValues.ClusterDeployment" class="btn btn-primary btn-sm" ng-click="createAndStart()">Create and start the stack</button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="stacks">Cancel</a>
               <span class="text-danger" ng-if="state.Method !== 'editor'" style="margin: 5px;">
                 <i class="fa fa-exclamation-circle" aria-hidden="true"></i> This feature is not available yet.
