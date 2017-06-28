@@ -1,14 +1,29 @@
 <rd-header>
   <rd-header-title title="Stack details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="stack.v2({name: stack.Name})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="stack.v2({id: stack.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="stacks">Stacks</a> > <a ui-sref="stack.v2({name: stack.Name})">{{ stack.Name }}</a>
+    <a ui-sref="stacks">Stacks</a> > <a ui-sref="stack.v2({id: stack.Id})">{{ stack.Name }}</a>
   </rd-header-content>
 </rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-cogs" title="Actions"></rd-widget-header>
+      <rd-widget-body classes="padding">
+        <div class="btn-group" role="group" aria-label="...">
+          <button class="btn btn-success" ng-click="up()" ng-disabled="status === 'up'"><i class="fa fa-play space-right" aria-hidden="true"></i>Up</button>
+          <button class="btn btn-danger" ng-click="down()" ng-disabled="status === 'down'"><i class="fa fa-stop space-right" aria-hidden="true"></i>Down</button>
+          <button class="btn btn-danger" ng-click="remove()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
 
 <div class="row">
   <div class="col-sm-12">
@@ -24,12 +39,18 @@
               </td>
             </tr>
             <tr>
-              <td>Services</td>
-              <td>{{ stack.Services.length }}</td>
+              <td>Status</td>
+              <td>
+                {{ services.length > 0 ? 'up' : 'down' }}
+              </td>
             </tr>
-            <tr>
+            <tr ng-if="services.length > 0">
+              <td>Services</td>
+              <td>{{ services.length }}</td>
+            </tr>
+            <tr ng-if="containers.length > 0">
               <td>Containers</td>
-              <td>{{ stack.Containers.length }}</td>
+              <td>{{ containers.length }}</td>
             </tr>
           </tbody>
         </table>
@@ -38,5 +59,5 @@
   </div>
 </div>
 
-<por-stackv2-service-details stack="stack"></por-stackv2-service-details>
-<por-container-list containers="stack.Containers"></por-container-list>
+<por-stackv2-service-details services="services" ng-if="services.length > 0"></por-stackv2-service-details>
+<por-container-list containers="containers" ng-if="containers.length > 0"></por-container-list>

@@ -15,15 +15,15 @@ function ($scope, Notifications, Pagination, StackService) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
   };
-  
+
   function initView() {
     $('#loadingViewSpinner').show();
 
     var includeServices = $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE';
 
-    StackService.stacks(includeServices)
+    StackService.retrieveStacksAndAnonymousStacks(includeServices)
     .then(function success(data) {
-      $scope.stacks = data;
+      $scope.stacks = data.stacks.concat(data.anonymousStacks);
     })
     .catch(function error(err) {
       $scope.stacks = [];

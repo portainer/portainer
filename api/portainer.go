@@ -265,6 +265,7 @@ type (
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
 		Stacks() ([]Stack, error)
+		StacksByEndpointID(ID EndpointID) ([]Stack, error)
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
@@ -326,7 +327,8 @@ type (
 
 	// StackManager represents a service to manage stacks.
 	StackManager interface {
-		Start(stack *Stack, endpoint *Endpoint) error
+		Up(stack *Stack, endpoint *Endpoint) error
+		Down(stack *Stack, endpoint *Endpoint) error
 	}
 )
 

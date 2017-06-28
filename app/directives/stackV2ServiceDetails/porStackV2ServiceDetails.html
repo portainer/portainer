@@ -40,19 +40,19 @@
               </tr>
             </thead>
             <tbody>
-              <tr pagination-id="services_list" dir-paginate="service in $ctrl.stack.Services | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count">
+              <tr pagination-id="services_list" dir-paginate="service in $ctrl.services | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count">
                 <td>{{ service.Name }}</td>
                 <td>{{ service.ContainerCount }}</td>
               </tr>
-            <tr ng-if="!$ctrl.stack.Services">
+            <tr ng-if="!$ctrl.services">
               <td colspan="2" class="text-center text-muted">Loading...</td>
             </tr>
-            <tr ng-if="($ctrl.stack.Services | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count).length === 0">
+            <tr ng-if="($ctrl.services | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count).length === 0">
               <td colspan="2" class="text-center text-muted">No services available.</td>
             </tr>
             </tbody>
           </table>
-          <div ng-if="$ctrl.stack.Services" class="pull-left pagination-controls">
+          <div ng-if="$ctrl.services" class="pull-left pagination-controls">
             <dir-pagination-controls pagination-id="services_list"></dir-pagination-controls>
           </div>
         </div>

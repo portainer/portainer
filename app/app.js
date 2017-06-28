@@ -581,7 +581,7 @@ angular.module('portainer', [
       }
     })
     .state('stack.v2', {
-      url: '^/stacks/v2/:name/',
+      url: '^/stacks/v2/:id/',
       views: {
         'content@': {
           templateUrl: 'app/components/stack/v2/stack.html',
@@ -594,7 +594,7 @@ angular.module('portainer', [
       }
     })
     .state('stack.v3', {
-      url: '^/stacks/v3/:name/',
+      url: '^/stacks/v3/:id/',
       views: {
         'content@': {
           templateUrl: 'app/components/stack/v3/stack.html',

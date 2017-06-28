@@ -3,6 +3,34 @@ angular.module('portainer.helpers')
   'use strict';
   var helper = {};
 
+  function mergeStack(stack, discoveredStack) {
+    stack.ServiceCount = discoveredStack.ServiceCount;
+    stack.Status = discoveredStack.Status;
+  }
+
+  helper.mergeStacksAndDiscoveredStacks = function(stacks, discoveredStacks) {
+    var remainingStacks = [];
+
+    for (var i = 0; i < discoveredStacks.length; i++) {
+      var discoveredStack = discoveredStacks[i];
+      var merge = false;
+      for (var j = 0; j < stacks.length; j++) {
+        var stack = stacks[j];
+        if (stack.Name === discoveredStack.Name) {
+          mergeStack(stack, discoveredStack);
+          merge = true;
+          break;
+        }
+      }
+
+      if (!merge) {
+        remainingStacks.push(discoveredStack);
+      }
+    }
+
+    return remainingStacks;
+  };
+
   function mapValuesToArray(stackMap) {
     var stacks = [];
     for (var key in stackMap) {
@@ -22,7 +50,7 @@ angular.module('portainer.helpers')
 
       var projectName = container.Labels['com.docker.compose.project'];
       if (!stackMap[projectName]) {
-        stackMap[projectName] = new StackViewModel({ Name: projectName, Type: 'v2', ServiceCount: 1 });
+        stackMap[projectName] = new AnonymousStackViewModel({ Name: projectName, Type: 'v2', ServiceCount: 1 });
       } else {
         stackMap[projectName].ServiceCount++;
       }
@@ -58,7 +86,7 @@ angular.module('portainer.helpers')
 
       var stackName = service.Labels['com.docker.stack.namespace'];
       if (!stackMap[stackName]) {
-        stackMap[stackName] = new StackViewModel({ Name: stackName, Type: 'v3', ServiceCount: 1 });
+        stackMap[stackName] = new AnonymousStackViewModel({ Name: stackName, Type: 'v3', ServiceCount: 1 });
       } else {
         stackMap[stackName].ServiceCount++;
       }

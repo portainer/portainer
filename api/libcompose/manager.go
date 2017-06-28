@@ -24,8 +24,8 @@ func NewStackManager() *StackManager {
 	return &StackManager{}
 }
 
-// Start will start a stack inside the specified endpoint.
-func (manager *StackManager) Start(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+// Up will execute the Up operation against a stack inside the specified endpoint.
+func (manager *StackManager) Up(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 
 	//TODO: clientFactory should be stored once created for an endpoint
 	clientFactory, err := client.NewDefaultFactory(client.Options{
@@ -62,4 +62,44 @@ func (manager *StackManager) Start(stack *portainer.Stack, endpoint *portainer.E
 	}
 
 	return project.Up(context.Background(), options.Up{})
+}
+
+// Down will execute the Down operation against a stack inside the specified endpoint.
+func (manager *StackManager) Down(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+
+	//TODO: clientFactory should be stored once created for an endpoint
+	clientFactory, err := client.NewDefaultFactory(client.Options{
+		TLS:         endpoint.TLS,
+		TLSVerify:   endpoint.TLS,
+		Host:        endpoint.URL,
+		TLSCAFile:   endpoint.TLSCACertPath,
+		TLSCertFile: endpoint.TLSCertPath,
+		TLSKeyFile:  endpoint.TLSKeyPath,
+	})
+	if err != nil {
+		return err
+	}
+
+	composeFilePath := path.Join(stack.ProjectPath, "docker-compose.yml")
+	project, err := docker.NewProject(&ctx.Context{
+		Context: project.Context{
+			ComposeFiles: []string{composeFilePath},
+			EnvironmentLookup: &lookup.ComposableEnvLookup{
+				Lookups: []config.EnvironmentLookup{
+					&lookup.EnvfileLookup{
+						Path: filepath.Join(stack.ProjectPath, ".env"),
+					},
+					&lookup.OsEnvLookup{},
+				},
+			},
+			ProjectName: stack.Name,
+		},
+		ClientFactory: clientFactory,
+	}, nil)
+
+	if err != nil {
+		return err
+	}
+
+	return project.Down(context.Background(), options.Down{})
 }
