@@ -6,6 +6,7 @@ angular.module('portainer.helpers')
   function mergeStack(stack, discoveredStack) {
     stack.ServiceCount = discoveredStack.ServiceCount;
     stack.Status = discoveredStack.Status;
+    stack.Deployment = discoveredStack.Deployment;
   }
 
   helper.mergeStacksAndDiscoveredStacks = function(stacks, discoveredStacks) {
@@ -50,7 +51,7 @@ angular.module('portainer.helpers')
 
       var projectName = container.Labels['com.docker.compose.project'];
       if (!stackMap[projectName]) {
-        stackMap[projectName] = new AnonymousStackViewModel({ Name: projectName, Type: 'v2', ServiceCount: 1 });
+        stackMap[projectName] = new AnonymousStackViewModel({ Name: projectName, Deployment: 'host', ServiceCount: 1 });
       } else {
         stackMap[projectName].ServiceCount++;
       }
@@ -86,7 +87,7 @@ angular.module('portainer.helpers')
 
       var stackName = service.Labels['com.docker.stack.namespace'];
       if (!stackMap[stackName]) {
-        stackMap[stackName] = new AnonymousStackViewModel({ Name: stackName, Type: 'v3', ServiceCount: 1 });
+        stackMap[stackName] = new AnonymousStackViewModel({ Name: stackName, Deployment: 'cluster', ServiceCount: 1 });
       } else {
         stackMap[stackName].ServiceCount++;
       }

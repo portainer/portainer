@@ -6,4 +6,5 @@ function StackViewModel(data) {
   // This data is merged from the stack discovery
   this.ServiceCount = 0;
   this.Status = 'down';
+  this.Deployment = '';
 }

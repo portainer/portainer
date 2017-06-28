@@ -57,10 +57,10 @@
                 </a>
               </th>
               <th>
-                <a ui-sref="stacks" ng-click="order('Type')">
-                  Type
-                  <span ng-show="sortType == 'Type' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Type' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                <a ui-sref="stacks" ng-click="order('Deployment')">
+                  Deployment
+                  <span ng-show="sortType == 'Deployment' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Deployment' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
             </thead>
@@ -77,13 +77,13 @@
                 </td>
                 <td>{{ stack.ServiceCount }}</td>
                 <!-- <td>Compose {{ stack.Type }}</td> -->
-                <td>Compose v2</td>
+                <td>Host</td>
               </tr>
               <tr ng-if="!stacks">
-                <td colspan="3" class="text-center text-muted">Loading...</td>
+                <td colspan="4" class="text-center text-muted">Loading...</td>
               </tr>
               <tr ng-if="stacks.length == 0">
-                <td colspan="3" class="text-center text-muted">No stacks available.</td>
+                <td colspan="4" class="text-center text-muted">No stacks available.</td>
               </tr>
             </tbody>
           </table>
