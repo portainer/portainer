@@ -47,7 +47,7 @@ function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService,
 		RegistryService.retrieveRegistryFromRepository(repository)
 		.then(function success(data) {
 			var registry = data;
-			return ImageService.pullImage(repository, registry);
+			return ImageService.pullImage(repository, registry, false);
 		})
 		.then(function success(data) {
 			Notifications.success('Image successfully pulled', repository);
