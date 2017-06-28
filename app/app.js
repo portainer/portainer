@@ -52,6 +52,7 @@ angular.module('portainer', [
   'secret',
   'service',
   'services',
+  'unregisteredstackv2',
   'stackv2',
   'stackv3',
   'stacks',
@@ -599,6 +600,19 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/stack/v3/stack.html',
           controller: 'StackV3Controller'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('stack.v2.unregistered', {
+      url: '^/stacks/v2/unregistered/:name/',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/stack/unregisteredv2/stack.html',
+          controller: 'UnregisteredStackV2Controller'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',

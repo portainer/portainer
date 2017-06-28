@@ -9,7 +9,7 @@
 </rd-header>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
+  <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-th-list" title="Stacks">
         <div class="pull-right">
@@ -36,28 +36,28 @@
           <table class="table table-hover">
             <thead>
               <th>
-                <a ui-sref="stacks" ng-click="order('Name')">
+                <a ng-click="order('Name')">
                   Name
                   <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="stacks" ng-click="order('Status')">
+                <a ng-click="order('Status')">
                   Status
                   <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="stacks" ng-click="order('ServiceCount')">
+                <a ng-click="order('ServiceCount')">
                   Service count
                   <span ng-show="sortType == 'ServiceCount' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'ServiceCount' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="stacks" ng-click="order('Deployment')">
+                <a ng-click="order('Deployment')">
                   Deployment
                   <span ng-show="sortType == 'Deployment' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Deployment' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
@@ -66,12 +66,18 @@
             </thead>
             <tbody>
               <tr dir-paginate="stack in (state.filteredStack = ( stacks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td ng-if="stack.Id"><a ui-sref="stack.v2({id: stack.Id})">{{ stack.Name }}</a></td>
-                <!-- <td ng-if="stack.Type === 'v2'"><a ui-sref="stack.v2({name: stack.Name})">{{ stack.Name }}</a></td> -->
-                <!-- <td ng-if="stack.Type === 'v3'"><a ui-sref="stack.v3({name: stack.Name})">{{ stack.Name }}</a></td> --><td ng-if="!stack.Id">
-                  {{ stack.Name }}
-                  <i class="fa fa-exclamation-circle" aria-hidden="true" style="margin-left: 5px;"></i>
+                <td ng-if="stack.Id">
+                  <a ui-sref="stack.v2({ id: stack.Id })">{{ stack.Name }}</a>
                 </td>
+                <td ng-if="!stack.Id">
+                  <a ui-sref="stack.v2.unregistered({ name: stack.Name })">{{ stack.Name }}</a>
+                  <span class="text-muted small" style="margin-left: 5px;" ng-if="!stack.Id">
+                    unregistered
+                    <portainer-tooltip position="bottom" message="This stack was not created using Portainer."></portainer-tooltip>
+                  </span>
+                </td>
+                <!-- <td ng-if="stack.Type === 'v2'"><a ui-sref="stack.v2({name: stack.Name})">{{ stack.Name }}</a></td> -->
+                <!-- <td ng-if="stack.Type === 'v3'"><a ui-sref="stack.v3({name: stack.Name})">{{ stack.Name }}</a></td> -->
                 <td>
                   <span class="label label-{{ stack.Status|stackstatusbadge }}">{{ stack.Status }}</span>
                 </td>
