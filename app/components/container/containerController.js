@@ -197,5 +197,44 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     });
   };
 
+  $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
+    $('#joinNetworkSpinner').show();
+    Network.connect({id: networkId}, { Container: $stateParams.id }, function (d) {
+      if (container.message) {
+        $('#joinNetworkSpinner').hide();
+        Notifications.error('Error', d, 'Unable to connect container to network');
+      } else {
+        $('#joinNetworkSpinner').hide();
+        Notifications.success('Container joined network', $stateParams.id);
+        $state.go('container', {id: $stateParams.id}, {reload: true});
+      }
+    }, function (e) {
+      $('#joinNetworkSpinner').hide();
+      Notifications.error('Failure', e, 'Unable to connect container to network');
+    });
+  };
+
+  Network.query({}, function (d) {
+      var networks = d;
+      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
+        networks = d.filter(function (network) {
+          if (network.Scope === 'global') {
+            return network;
+          }
+        });
+        $scope.globalNetworkCount = networks.length;
+        networks.push({Name: 'bridge'});
+        networks.push({Name: 'host'});
+        networks.push({Name: 'none'});
+      }
+      networks.push({Name: 'container'});
+      $scope.availableNetworks = networks;
+      if (!_.find(networks, {'Name': 'bridge'})) {
+        $scope.config.HostConfig.NetworkMode = 'nat';
+      }
+    }, function (e) {
+      Notifications.error('Failure', e, 'Unable to retrieve networks');
+    });
+
   update();
 }]);
