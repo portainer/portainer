@@ -148,12 +148,16 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.deleteStack = function(id) {
+    return Stack.remove({ id: id }).$promise;
+  };
+
   service.stackOperationUp = function(id) {
-    return Stack.up({id: id}).$promise;
+    return Stack.up({ id: id }).$promise;
   };
 
   service.stackOperationDown = function(id) {
-    return Stack.down({id: id}).$promise;
+    return Stack.down({ id: id }).$promise;
   };
 
   return service;

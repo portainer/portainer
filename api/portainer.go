@@ -318,6 +318,7 @@ type (
 		DeleteTLSFiles(endpointID EndpointID) error
 		StoreComposeFile(name, composeFileContent string) (string, error)
 		StoreComposeEnvFile(name, envFileContent string) error
+		DeleteStackFiles(projectPath string) error
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.

@@ -146,6 +146,15 @@ func (service *Service) GetPathForTLSFile(endpointID portainer.EndpointID, fileT
 	return path.Join(service.fileStorePath, TLSStorePath, ID, fileName), nil
 }
 
+// DeleteStackFiles deletes a folder containing all the files associated to a stack.
+func (service *Service) DeleteStackFiles(projectPath string) error {
+	err := os.RemoveAll(projectPath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // DeleteTLSFiles deletes a folder containing the TLS files for an endpoint.
 func (service *Service) DeleteTLSFiles(endpointID portainer.EndpointID) error {
 	ID := strconv.Itoa(int(endpointID))

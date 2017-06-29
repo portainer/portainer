@@ -37,7 +37,23 @@ function ($q, $scope, $state, $stateParams, StackService, Notifications) {
   };
 
   $scope.remove = function() {
+    $('#loadingViewSpinner').show();
+    var stackId = $stateParams.id;
 
+    StackService.stackOperationDown(stackId)
+    .finally(function success(data) {
+      StackService.deleteStack(stackId)
+      .then(function success(data) {
+        Notifications.success('Success', 'Stack successfully removed');
+        $state.go('stacks');
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to remove stack');
+      })
+      .finally(function final() {
+        $('#loadingViewSpinner').hide();
+      });
+    });
   };
 
   function initView() {

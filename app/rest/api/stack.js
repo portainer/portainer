@@ -8,6 +8,7 @@ angular.module('portainer.rest')
     create: { method: 'POST' },
     get: { method: 'GET', params: { id: '@id' } },
     query: { method: 'GET', isArray: true },
+    remove: { method: 'DELETE', params: { id: '@id'} },
     up: { method: 'POST', params: { id: '@id', action: 'up' } },
     down: { method: 'POST', params: { id: '@id', action: 'down' } }
   });
