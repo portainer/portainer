@@ -299,7 +299,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   };
 
   function createContainer(config, accessControlData) {
-    $q.when(!$scope.formValues.alwaysPull || ImageService.pullImage($scope.config.Image, $scope.formValues.Registry))
+    $q.when(!$scope.formValues.alwaysPull || ImageService.pullImage($scope.config.Image, $scope.formValues.Registry, true))
     .finally(function final() {
       ContainerService.createAndStartContainer(config)
       .then(function success(data) {
