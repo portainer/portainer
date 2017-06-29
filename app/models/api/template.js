@@ -17,9 +17,10 @@ function TemplateViewModel(data) {
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
       return {
-        readOnly: false,
-        containerPath: v,
-        type: 'auto'
+        readOnly: v.readOnly,
+        containerPath: v.containerPath,
+        name: v.name,
+        type: v.type
       };
     });
   }
