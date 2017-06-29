@@ -222,7 +222,9 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
       var secrets = [];
       angular.forEach(input.Secrets, function(secret) {
         if (secret.model) {
-          secrets.push(SecretHelper.secretConfig(secret.model));
+          var s = SecretHelper.secretConfig(secret.model);
+          s.File.Name = s.SecretName;
+          secrets.push(s);
         }
       });
       config.TaskTemplate.ContainerSpec.Secrets = secrets;
