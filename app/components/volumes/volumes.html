@@ -53,6 +53,13 @@
                   <span ng-show="sortType == 'Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th>
+                <a ui-sref="volumes" ng-click="order('Mountpoint')">
+                  Mount point
+                  <span ng-show="sortType == 'Mountpoint' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Mountpoint' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
               <th ng-if="applicationState.application.authentication">
                 <a ui-sref="volumes" ng-click="order('ResourceControl.Ownership')">
                   Ownership
@@ -65,8 +72,9 @@
           <tbody>
             <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
-              <td><a ui-sref="volume({id: volume.Id})">{{ volume.Id|truncate:50 }}</a></td>
+              <td><a ui-sref="volume({id: volume.Id})">{{ volume.Id|truncate:25 }}</a></td>
               <td>{{ volume.Driver }}</td>
+              <td>{{ volume.Mountpoint | truncate:52 }}</td>
               <td ng-if="applicationState.application.authentication">
                 <span>
                   <i ng-class="volume.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
@@ -75,10 +83,10 @@
               </td>
             </tr>
             <tr ng-if="!volumes">
-              <td colspan="6" class="text-center text-muted">Loading...</td>
+              <td colspan="5" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="volumes.length == 0">
-              <td colspan="6" class="text-center text-muted">No volumes available.</td>
+              <td colspan="5" class="text-center text-muted">No volumes available.</td>
             </tr>
           </tbody>
         </table>
