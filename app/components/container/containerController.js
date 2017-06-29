@@ -222,15 +222,13 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
             return network;
           }
         });
-        $scope.globalNetworkCount = networks.length;
         networks.push({Name: 'bridge'});
         networks.push({Name: 'host'});
         networks.push({Name: 'none'});
       }
-      networks.push({Name: 'container'});
       $scope.availableNetworks = networks;
       if (!_.find(networks, {'Name': 'bridge'})) {
-        $scope.config.HostConfig.NetworkMode = 'nat';
+        networks.push({Name: 'nat'});
       }
     }, function (e) {
       Notifications.error('Failure', e, 'Unable to retrieve networks');

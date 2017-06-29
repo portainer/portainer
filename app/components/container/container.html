@@ -294,14 +294,14 @@
         <form class="form-horizontal">
           <!-- network-input -->
           <div class="row">
-            <label for="container_network" class="col-sm-3 col-lg-3 control-label text-left">Join a Network</label>
-            <div class="col-sm-5 col-lg-5">
+            <label for="container_network" class="col-sm-3 col-lg-2 control-label text-left">Join a Network</label>
+            <div class="col-sm-5 col-lg-4">
               <select class="form-control" ng-model="selectedNetwork" id="container_network">
                 <option selected disabled hidden value="">Select a network</option>
                 <option ng-repeat="net in availableNetworks" ng-value="net.Id">{{ net.Name }}</option>
               </select>
             </div>
-            <div class="col-sm-4 col-lg-4">
+            <div class="col-sm-1">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!selectedNetwork" ng-click="containerJoinNetwork(container, selectedNetwork)">Join Network</button>
             </div>
           </div>
