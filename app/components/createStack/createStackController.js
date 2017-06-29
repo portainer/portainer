@@ -10,7 +10,7 @@ function ($scope, $state, StackService, Notifications) {
   $scope.formValues = {
     Name: '',
     ComposeFile: 'version: "2"\nservices:\n  myservice:\n    image: nginx',
-    ClusterDeployment: false,
+    ClusterDeployment: $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' ? true : false,
     EnvFile: '',
     ComposeFileUpload: null,
     EnvFileUpload: null,
