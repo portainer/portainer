@@ -42,7 +42,7 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
     $('#pullImageSpinner').show();
     var image = $scope.formValues.Image;
     var registry = $scope.formValues.Registry;
-    ImageService.pullImage(image, registry)
+    ImageService.pullImage(image, registry, false)
     .then(function success(data) {
       Notifications.success('Image successfully pulled', image);
       $state.reload();

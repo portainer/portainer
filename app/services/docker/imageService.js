@@ -54,14 +54,19 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-
-  service.pullImage = function(image, registry) {
+  function pullImageAndIgnoreErrors(imageConfiguration) {
     var deferred = $q.defer();
 
-    var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(image);
-    var imageConfiguration = ImageHelper.createImageConfigForContainer(imageDetails.image, registry.URL);
-    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
-    HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
+    Image.create({}, imageConfiguration).$promise
+    .finally(function final() {
+      deferred.resolve();
+    });
+
+    return deferred.promise;
+  }
+
+  function pullImageAndAcknowledgeErrors(imageConfiguration) {
+    var deferred = $q.defer();
 
     Image.create({}, imageConfiguration).$promise
     .then(function success(data) {
@@ -78,6 +83,18 @@ angular.module('portainer.services')
     });
 
     return deferred.promise;
+  }
+
+  service.pullImage = function(image, registry, ignoreErrors) {
+    var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(image);
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(imageDetails.image, registry.URL);
+    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
+    HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
+
+    if (ignoreErrors) {
+      return pullImageAndIgnoreErrors(imageConfiguration);
+    }
+    return pullImageAndAcknowledgeErrors(imageConfiguration);
   };
 
   service.tagImage = function(id, image, registry) {
