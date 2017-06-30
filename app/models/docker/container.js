@@ -13,6 +13,8 @@ function ContainerViewModel(data) {
   this.Labels = data.Labels;
   if (this.Labels && this.Labels['com.docker.compose.project']) {
     this.StackName = this.Labels['com.docker.compose.project'];
+  } else if (this.Labels && this.Labels['com.docker.stack.namespace']) {
+    this.StackName = this.Labels['com.docker.stack.namespace'];
   }
   this.Ports = [];
   this.Mounts = data.Mounts;
