@@ -4,7 +4,20 @@ angular.module('portainer.services')
   var service = {};
 
   service.networks = function() {
-    return Network.query({}).$promise;
+    var deferred = $q.defer();
+
+    Network.query({}).$promise
+    .then(function success(data) {
+      var networks = data.map(function (item) {
+        return new NetworkViewModel(item);
+      });
+      deferred.resolve(networks);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve networks', err: err });
+    });
+
+    return deferred.promise;
   };
 
   service.retrieveSwarmNetworks = function() {

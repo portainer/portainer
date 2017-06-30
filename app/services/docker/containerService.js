@@ -14,7 +14,7 @@ angular.module('portainer.services')
       deferred.resolve(containers);
     })
     .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retriever containers', err: err });
+      deferred.reject({ msg: 'Unable to retrieve containers', err: err });
     });
 
     return deferred.promise;

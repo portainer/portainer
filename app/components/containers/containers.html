@@ -49,49 +49,56 @@
                 <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
               </th>
               <th>
-                <a ui-sref="containers" ng-click="order('Status')">
+                <a ng-click="order('Status')">
                   State
                   <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="containers" ng-click="order('Names')">
+                <a ng-click="order('Names')">
                   Name
                   <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="containers" ng-click="order('Image')">
+                <a ng-click="order('StackName')">
+                  Stack
+                  <span ng-show="sortType == 'StackName' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'StackName' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ng-click="order('Image')">
                   Image
                   <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th ng-if="state.displayIP">
-                <a ui-sref="containers" ng-click="order('IP')">
+                <a ng-click="order('IP')">
                   IP Address
                   <span ng-show="sortType == 'IP' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'IP' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
-                <a ui-sref="containers" ng-click="order('Host')">
+                <a ng-click="order('Host')">
                   Host IP
                   <span ng-show="sortType == 'Host' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Host' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="containers" ng-click="order('Ports')">
+                <a ng-click="order('Ports')">
                   Published Ports
                   <span ng-show="sortType == 'Ports' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th ng-if="applicationState.application.authentication">
-                <a ui-sref="containers" ng-click="order('ResourceControl.Ownership')">
+                <a ng-click="order('ResourceControl.Ownership')">
                   Ownership
                   <span ng-show="sortType == 'ResourceControl.Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'ResourceControl.Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
@@ -108,6 +115,7 @@
               </td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: 40}}</a></td>
               <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: 40}}</a></td>
+              <td>{{ container.StackName ? container.StackName : '-' }}</td>
               <td><a ui-sref="image({id: container.Image})">{{ container.Image | hideshasum }}</a></td>
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">{{ container.hostIP }}</td>

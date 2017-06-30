@@ -11,6 +11,9 @@ function ContainerViewModel(data) {
   this.Command = data.Command;
   this.Checked = false;
   this.Labels = data.Labels;
+  if (this.Labels && this.Labels['com.docker.compose.project']) {
+    this.StackName = this.Labels['com.docker.compose.project'];
+  }
   this.Ports = [];
   this.Mounts = data.Mounts;
   for (var i = 0; i < data.Ports.length; ++i) {

@@ -43,6 +43,9 @@ function ServiceViewModel(data, runningTasks, nodes) {
   }
   this.Constraints = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Constraints || [] : [];
   this.Labels = data.Spec.Labels;
+  if (this.Labels && this.Labels['com.docker.stack.namespace']) {
+    this.StackName = this.Labels['com.docker.stack.namespace'];
+  }
 
   var containerSpec = data.Spec.TaskTemplate.ContainerSpec;
   if (containerSpec) {
