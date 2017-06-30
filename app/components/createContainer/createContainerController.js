@@ -292,24 +292,24 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   function loadFromContainerSpec() {
     // Get container
     Container.get({id: $stateParams.from}, function(d) {
-			// Add Config
-			$scope.config = d.Config;
-			if ($scope.config.Cmd) {
-				$scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
+      // Add Config
+      $scope.config = d.Config;
+      if ($scope.config.Cmd) {
+        $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
       }
-			// Add HostConfig
-			$scope.config.HostConfig = d.HostConfig;
+      // Add HostConfig
+      $scope.config.HostConfig = d.HostConfig;
       // Add Ports
       var bindings = [];
-			for (var p in $scope.config.HostConfig.PortBindings) {
+      for (var p in $scope.config.HostConfig.PortBindings) {
         var b = {
-				  "hostPort": $scope.config.HostConfig.PortBindings[p][0].HostPort,
-				  "containerPort": p.split('/')[0],
-				  "protocol": p.split('/')[1]
+          "hostPort": $scope.config.HostConfig.PortBindings[p][0].HostPort,
+          "containerPort": p.split('/')[0],
+          "protocol": p.split('/')[1]
         };
         bindings.push(b);
-			}
-		  $scope.config.HostConfig.PortBindings = bindings;
+      }
+      $scope.config.HostConfig.PortBindings = bindings;
       // Add volumes
       for (var v in d.Mounts) {
         var mount = d.Mounts[v];
@@ -332,9 +332,9 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         EndpointsConfig: {}
       };
       if ($scope.config.HostConfig.NetworkMode.indexOf('container:') === 0) {
-				$scope.config.HostConfig.NetworkMode = 'container';
-				$scope.formValues.NetworkContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
-			}
+        $scope.config.HostConfig.NetworkMode = 'container';
+        $scope.formValues.NetworkContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
+      }
       if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]) {
         console.log(d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]);
         if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address) {
@@ -349,7 +349,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       // Add Env
       var envArr = [];
       for (var e in $scope.config.Env) {
-				var arr = $scope.config.Env[e].split(/=(.+)/);
+        var arr = $scope.config.Env[e].split(/=(.+)/);
         envArr.push({"name": arr[0], "value": arr[1]});
       }
       $scope.config.Env = envArr;
@@ -384,7 +384,13 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       }
       $scope.config.HostConfig.Devices = path;
 
-			// Add name
+      // Add Ownership
+      /*if (d.Portainer && d.Portainer.ResourceControl) {
+        ControllerDataPipeline.setAccessControlFormData(....);
+      }*/
+  };
+
+      // Add name
       $scope.config.name = d.Name.replace(/^\//g, '');
     });
   }
