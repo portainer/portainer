@@ -69,7 +69,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
         generatedVolumeIds.push(volumeId);
       });
       TemplateService.updateContainerConfigurationWithVolumes(templateConfiguration, template, data);
-      return ImageService.pullImage(template.Image, template.Registry);
+      return ImageService.pullImage(template.Image, { URL: template.Registry }, true);
     })
     .then(function success(data) {
       return ContainerService.createAndStartContainer(templateConfiguration);

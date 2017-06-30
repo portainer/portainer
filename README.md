@@ -11,11 +11,11 @@
 [![Gitter](https://badges.gitter.im/portainer/Lobby.svg)](https://gitter.im/portainer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YHXZJQNJQ36H6)
 
-**_Portainer_** is a lightweight management UI which allows you to **easily** manage your Docker host or Swarm cluster.
+**_Portainer_** is a lightweight management UI which allows you to **easily** manage your different Docker environments (Docker hosts or Swarm clusters).
 
-**_Portainer_** is meant to be as **simple** to deploy as it is to use. It consists of a single container that can run on any Docker engine (Docker for Linux and Docker for Windows are supported).
+**_Portainer_** is meant to be as **simple** to deploy as it is to use. It consists of a single container that can run on any Docker engine (can be deployed as Linux container or a Windows native container).
 
-**_Portainer_** allows you to manage your Docker containers, images, volumes, networks and more ! It is compatible with the *standalone Docker* engine and with *Docker Swarm*.
+**_Portainer_** allows you to manage your Docker containers, images, volumes, networks and more ! It is compatible with the *standalone Docker* engine and with *Docker Swarm mode*.
 
 ## Demo
 
@@ -34,8 +34,8 @@ Please note that the public demo cluster is **reset every 15min**.
 
 * Issues: https://github.com/portainer/portainer/issues
 * FAQ: https://portainer.readthedocs.io/en/latest/faq.html
+* Slack (chat): https://portainer.io/slack/
 * Gitter (chat): https://gitter.im/portainer/Lobby
-* Slack: https://portainer.io/slack/
 
 ## Reporting bugs and contributing
 
