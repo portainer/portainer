@@ -26,6 +26,9 @@
       </div>
     </li>
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+      <a ui-sref="stacks" ui-sref-active="active">Stacks <span class="menu-icon fa fa-list-alt"></span></a>
+    </li>
+    <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
       <a ui-sref="services" ui-sref-active="active">Services <span class="menu-icon fa fa-list-alt"></span></a>
     </li>
     <li class="sidebar-list">
