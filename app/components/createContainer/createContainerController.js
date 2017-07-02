@@ -284,8 +284,8 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         return cb(true);
       }
     }, function error(err) {
-      return cb(false);
       Notifications.error('Failure', err, 'Unable to retrieve containers');
+      return cb(false);
     });
   }
 
@@ -348,7 +348,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       // Add Env
       var envArr = [];
       for (var e in $scope.config.Env) {
-        var arr = $scope.config.Env[e].split(/=(.+)/);
+        var arr = $scope.config.Env[e].split(/\=(.+)/);
         envArr.push({'name': arr[0], 'value': arr[1]});
       }
       $scope.config.Env = envArr;
