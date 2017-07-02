@@ -17,6 +17,20 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-config');
   grunt.loadNpmTasks('grunt-postcss');
   grunt.registerTask('default', ['eslint', 'build']);
+  grunt.registerTask('before-copy', [
+    'html2js',
+    'useminPrepare:release',
+    'concat',
+    'postcss:build',
+    'clean:tmpl',
+    'replace',
+    'uglify'
+  ]);
+  grunt.registerTask('after-copy', [
+    'filerev',
+    'usemin',
+    'clean:tmp' 
+  ]);
   grunt.registerTask('build-webapp', [
     'config:prod',
     'clean:all',
@@ -36,91 +50,54 @@ module.exports = function (grunt) {
     'copy',
     'after-copy'
   ]);
-  grunt.registerTask('before-copy', [
-    'html2js',
-    'useminPrepare:release',
-    'concat',
-    'postcss:build',
-    'clean:tmpl',
-    'replace',
-    'uglify'
-  ]);
-  grunt.registerTask('after-copy', [
-    'filerev',
-    'usemin',
-    'clean:tmp' 
-  ]);
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
-	var cp = ( p === 'linux' && ( a === '386' || a === 'amd64' ) ) ? 'copy:assets' : 'copy';
-	grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'before-copy', cp, 'after-copy' ]);
+    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy' ]);
   });  
   grunt.registerTask('lint', ['eslint']);
-  grunt.task.registerTask('watchBuild', 'watchBuild:<arg>', function(a) {
-	var b = a === '' ? 'run' : a;
-	grunt.task.run(['build', 'shell:buildImage', 'shell:'+b, 'shell:cleanImages']);
-  });
-  grunt.registerTask('run', ['shell:buildBinary:linux:amd64', 'build', 'shell:buildImage', 'shell:run']);
-  grunt.registerTask('run-dev', ['shell:buildBinary:linux:amd64', 'shell:run', 'watch:build']);
+  grunt.registerTask('run-dev', ['build', 'shell:run', 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
-
-  // Print a timestamp (useful for when watching)
-  grunt.registerTask('timestamp', function () {
-    grunt.log.subhead(Date());
-  });
 
   // Project configuration.
   grunt.initConfig({
     distdir: 'dist',
     pkg: grunt.file.readJSON('package.json'),
     config: {
-      dev: {
-        options: {
-          variables: {
-            'environment': 'development'
-          }
-        }
-      },
-      prod: {
-        options: {
-          variables: {
-            'environment': 'production'
-          }
-        }
-      }
+      dev:  { options: { variables: { 'environment': 'development' }}},
+      prod: { options: { variables: { 'environment': 'production'  }}}
     },
     src: {
       js: ['app/**/*.js', '!app/**/*.spec.js'],
       jsTpl: ['<%= distdir %>/templates/**/*.js'],
       jsVendor: [
+        'bower_components/angular-multi-select/isteven-multi-select.js',
+        'bower_components/bootbox.js/bootbox.js',
         'bower_components/jquery/dist/jquery.min.js',
         'bower_components/bootstrap/dist/js/bootstrap.min.js',
         'bower_components/Chart.js/Chart.min.js',
-        'bower_components/lodash/dist/lodash.min.js',
-        'bower_components/splitargs/src/splitargs.js',
         'bower_components/filesize/lib/filesize.min.js',
+        'bower_components/lodash/dist/lodash.min.js',
         'bower_components/moment/min/moment.min.js',
-        'bower_components/xterm.js/dist/xterm.js',
-        'bower_components/bootbox.js/bootbox.js',
-        'bower_components/angular-multi-select/isteven-multi-select.js',
+        'bower_components/splitargs/src/splitargs.js',
         'bower_components/toastr/toastr.min.js',
+        'bower_components/xterm.js/dist/xterm.js',
         'assets/js/legend.js' // Not a bower package
       ],
       html: ['index.html'],
       tpl: ['app/components/**/*.html', 'app/directives/**/*.html'],
       css: ['assets/css/app.css'],
       cssVendor: [
+        'bower_components/angular-multi-select/isteven-multi-select.css',
+        'bower_components/angular-ui-select/dist/select.min.css',
         'bower_components/bootstrap/dist/css/bootstrap.css',
         'bower_components/font-awesome/css/font-awesome.min.css',
         'bower_components/rdash-ui/dist/css/rdash.min.css',
-        'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/xterm.js/dist/xterm.css',
-        'bower_components/angular-multi-select/isteven-multi-select.css',
-        'bower_components/toastr/toastr.min.css'
+        'bower_components/toastr/toastr.min.css',
+        'bower_components/xterm.js/dist/xterm.css'
       ]
     },
     clean: {
       all: ['<%= distdir %>/*'],
-      app: ['<%= distdir %>/*', '!<%= distdir %>/portainer'],
+      app: ['<%= distdir %>/*', '!<%= distdir %>/portainer*'],
       tmpl: ['<%= distdir %>/templates'],
       tmp: ['<%= distdir %>/js/*', '!<%= distdir %>/js/app.*.js', '<%= distdir %>/css/*', '!<%= distdir %>/css/app.*.css']
     },
@@ -171,24 +148,21 @@ module.exports = function (grunt) {
       },
       assets: {
         files: [
-          {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
-          {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
-          {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
-          {
-            dest: '<%= distdir %>/images/',
-            src: ['**'],
-            expand: true,
-            cwd: 'assets/images/'
-          },
-          {dest: '<%= distdir %>/ico', src: '**', expand: true, cwd: 'assets/ico'}
+          {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
+          {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
+          {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
+          {dest: '<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
+          {dest: '<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
         ]
       }
     },
+    eslint: {
+      src: ['gruntfile.js', '<%= src.js %>'],
+      options: { configFile: '.eslintrc.yml' }
+    },
     html2js: {
       app: {
-        options: {
-          base: '.'
-        },
+        options: { base: '.' },
         src: ['<%= src.tpl %>'],
         dest: '<%= distdir %>/templates/app.js',
         module: '<%= pkg.name %>.templates'
@@ -199,26 +173,23 @@ module.exports = function (grunt) {
         src: ['<%= src.cssVendor %>', '<%= src.css %>'],
         dest: '<%= distdir %>/css/<%= pkg.name %>.css'
       },
-      dist: {
-        options: {
-          process: true
-        },
-        src: ['<%= src.js %>', '<%= src.jsTpl %>'],
-        dest: '<%= distdir %>/js/<%= pkg.name %>.js'
-      },
       vendor: {
         src: ['<%= src.jsVendor %>'],
         dest: '<%= distdir %>/js/vendor.js'
       },
+      dist: {
+        options: { process: true },
+        src: ['<%= src.js %>', '<%= src.jsTpl %>'],
+        dest: '<%= distdir %>/js/<%= pkg.name %>.js'
+      },
       index: {
+        options: { process: true },
         src: ['index.html'],
-        dest: '<%= distdir %>/index.html',
-        options: {
-          process: true
-        }
+        dest: '<%= distdir %>/index.html'
       },
       angular: {
-        src: ['bower_components/angular/angular.min.js',
+        src: [
+        'bower_components/angular/angular.min.js',
         'bower_components/angular-sanitize/angular-sanitize.min.js',
         'bower_components/angular-cookies/angular-cookies.min.js',
         'bower_components/angular-local-storage/dist/angular-local-storage.min.js',
@@ -239,16 +210,12 @@ module.exports = function (grunt) {
         dest: '<%= distdir %>/js/<%= pkg.name %>.js'
       },
       vendor: {
-        options: {
-          preserveComments: 'some' // Preserve license comments
-        },
+        options: { preserveComments: 'some' }, // Preserve license comments
         src: ['<%= src.jsVendor %>'],
         dest: '<%= distdir %>/js/vendor.js'
       },
       angular: {
-        options: {
-          preserveComments: 'some' // Preserve license comments
-        },
+        options: { preserveComments: 'some' }, // Preserve license comments
         src: ['<%= concat.angular.src %>'],
         dest: '<%= distdir %>/js/angular.js'
       }
@@ -266,58 +233,27 @@ module.exports = function (grunt) {
       }
     },
     watch: {
-      all: {
-        files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-        tasks: ['default', 'timestamp']
-      },
       build: {
         files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-        tasks: ['watchBuild:']
-		//'build'
-        /*
-        * Why don't we just use a host volume
-        * http.FileServer uses sendFile which virtualbox hates
-        * Tried using a host volume with -v, copying files with `docker cp`, restating container, none worked
-        * Rebuilding image on each change was only method that worked, takes ~4s per change to update
-        */
-      },
-      buildSwarm: {
-        files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-        tasks: ['watchBuild:runSwarm']
-      },
-      buildSsl: {
-        files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-        tasks: ['watchBuild:runSsl']
+        tasks: ['build']
       }
     },
-    eslint: {
-      src: ['gruntfile.js', '<%= src.js %>'],
-      options: {
-			  configFile: '.eslintrc.yml'
-		  }
-    },
     shell: {
-      buildImage: {
-        command: 'docker build --rm -t portainer -f build/linux/Dockerfile .'
-      },	  
-	  buildBinary: {
-		command: function (p, a) {
-                   if (grunt.file.isFile( ( p === 'windows' ) ? 'dist/portainer.exe' : 'dist/portainer' )) {
+      buildBinary: {
+        command: function (p, a) {
+                   var binfile = 'dist/portainer-'+p+'-'+a;
+                   if (grunt.file.isFile( ( p === 'windows' ) ? binfile+'.exe' : binfile )) {
                      return 'echo \'BinaryExists\'';
                    } else {
-                     return 'build/build_cross-platform.sh ' + p + ' ' + a;
+                     return 'build/build_in_container.sh ' + p + ' ' + a;
                    }
-			     }
-	  },  
+                 }
+      },  
       run: {
         command: [
-          'docker stop portainer',
-          'docker rm portainer',
-          'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer centurylink/ca-certs /app/portainer --no-analytics -a /app'
+          'docker rm -f portainer',
+          'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer centurylink/ca-certs /app/portainer-linux-amd64 --no-analytics -a /app'
         ].join(';')
-      },
-      cleanImages: {
-        command: 'docker rmi $(docker images -q -f dangling=true)'
       }
     },
     replace: {

@@ -13,7 +13,6 @@ function build_and_push_images() {
 # parameter: "platform-architecture"
 function build_archive() {
   BUILD_FOLDER="${ARCHIVE_BUILD_FOLDER}/$1"
-
   rm -rf ${BUILD_FOLDER} && mkdir -pv ${BUILD_FOLDER}/portainer
   mv dist/* ${BUILD_FOLDER}/portainer/
   cd ${BUILD_FOLDER}
@@ -23,12 +22,15 @@ function build_archive() {
 }
 
 function build_all() {
-  mkdir -pv /tmp/portainer-builds
+  mkdir -pv "${ARCHIVE_BUILD_FOLDER}"
   for tag in $@; do
     grunt "release:`echo "$tag" | tr '-' ':'`"
+    name="portainer"; if [ "$(echo "$tag" | cut -c1)"  = "w" ]; then name="${name}.exe"; fi
+    mv dist/portainer-$tag* dist/$name
     if [ `echo $tag | cut -d \- -f 1` == 'linux' ]; then build_and_push_images "$tag"; fi
     build_archive "$tag"
   done
+  docker rmi $(docker images -q -f dangling=true)
 }
 
 if [[ $# -ne 1 ]] ; then
@@ -41,7 +43,7 @@ else
     bash -c "$@";
   else  
     build_all 'linux-amd64 linux-386 linux-arm linux-arm64 linux-ppc64le darwin-amd64 windows-amd64'
-	exit 0
+    exit 0
   fi
 fi
 
