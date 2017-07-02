@@ -241,26 +241,35 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     config.HostConfig.Binds = binds;
     config.Volumes = volumes;
 
-    Container.remove({id: $scope.container.Id, v: 0, force: true}, function(d) {
-      if (d.message) {
-        Notifications.error("Error", d, "Unable to remove container");
-      } else {
-        var c = $scope.container;
-        if (c.Metadata && c.Metadata.ResourceControl) {
-          ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, $scope.container.Id)
-          .then(function success() {
-            Notifications.success("Container Removed", $scope.container.Id);
-            createContainer(config);
-          })
-          .catch(function error(err) {
-            Notifications.error("Failure", err, "Unable to remove container ownership");
+
+    ModalService.confirmDeletion(
+      'You\'re about to re-create this container, any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        else {
+          Container.remove({id: $scope.container.Id, v: 0, force: true}, function(d) {
+            if (d.message) {
+              Notifications.error("Error", d, "Unable to remove container");
+            } else {
+              var c = $scope.container;
+              if (c.Metadata && c.Metadata.ResourceControl) {
+                ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, $scope.container.Id)
+                .then(function success() {
+                  Notifications.success("Container Removed", $scope.container.Id);
+                  createContainer(config);
+                })
+                .catch(function error(err) {
+                  Notifications.error("Failure", err, "Unable to remove container ownership");
+                });
+              } else {
+                Notifications.success("Container Removed", $scope.container.Id);
+                createContainer(config);
+              }
+            }
           });
-        } else {
-          Notifications.success("Container Removed", $scope.container.Id);
-          createContainer(config);
         }
       }
-    });
+    );
   };
 
   function createContainer(config) {
