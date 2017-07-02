@@ -205,7 +205,6 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     config.name = $scope.container.Name.replace(/^\//g, '');
     // Network
     var mode = config.HostConfig.NetworkMode;
-    // TODO get ip addrs
     config.NetworkingConfig = {
       "EndpointsConfig": {}
     };
