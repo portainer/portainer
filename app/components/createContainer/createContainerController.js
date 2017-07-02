@@ -335,8 +335,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         $scope.config.HostConfig.NetworkMode = 'container';
         $scope.formValues.NetworkContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
       }
-      if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]) {
-        console.log(d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]);
+      if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig) {
         if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address) {
           $scope.formValues.IPv4 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address;
         }
@@ -388,7 +387,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       /*if (d.Portainer && d.Portainer.ResourceControl) {
         ControllerDataPipeline.setAccessControlFormData(....);
       }*/
-  };
+  //};
 
       // Add name
       $scope.config.name = d.Name.replace(/^\//g, '');
