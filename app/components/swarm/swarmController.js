@@ -1,6 +1,6 @@
 angular.module('swarm', [])
-.controller('SwarmController', ['$scope', 'Info', 'Version', 'Node', 'Pagination',
-function ($scope, Info, Version, Node, Pagination) {
+.controller('SwarmController', ['$q', '$scope', 'SystemService', 'NodeService', 'Pagination', 'Notifications',
+function ($q, $scope, SystemService, NodeService, Pagination, Notifications) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('swarm_nodes');
   $scope.sortType = 'Spec.Role';
@@ -19,30 +19,6 @@ function ($scope, Info, Version, Node, Pagination) {
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('swarm_nodes', $scope.state.pagination_count);
   };
-
-  Version.get({}, function (d) {
-    $scope.docker = d;
-  });
-
-  Info.get({}, function (d) {
-    $scope.info = d;
-    if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-      Node.query({}, function(d) {
-        $scope.nodes = d.map(function (node) {
-          return new NodeViewModel(node);
-        });
-        var CPU = 0, memory = 0;
-        angular.forEach(d, function(node) {
-          CPU += node.Description.Resources.NanoCPUs;
-          memory += node.Description.Resources.MemoryBytes;
-        });
-        $scope.totalCPU = CPU / 1000000000;
-        $scope.totalMemory = memory;
-      });
-    } else {
-      extractSwarmInfo(d);
-    }
-  });
 
   function extractSwarmInfo(info) {
     // Swarm info is available in SystemStatus object
@@ -84,4 +60,43 @@ function ($scope, Info, Version, Node, Pagination) {
     node.version = info[offset + 8][1];
     $scope.swarm.Status.push(node);
   }
+
+  function processTotalCPUAndMemory(nodes) {
+    var CPU = 0, memory = 0;
+    angular.forEach(nodes, function(node) {
+      CPU += node.CPUs;
+      memory += node.Memory;
+    });
+    $scope.totalCPU = CPU / 1000000000;
+    $scope.totalMemory = memory;
+  }
+
+  function initView() {
+    $('#loadingViewSpinner').show();
+    var provider = $scope.applicationState.endpoint.mode.provider;
+    $q.all({
+      version: SystemService.version(),
+      info: SystemService.info(),
+      nodes: provider !== 'DOCKER_SWARM_MODE' || NodeService.nodes()
+    })
+    .then(function success(data) {
+      $scope.docker = data.version;
+      $scope.info = data.info;
+      if (provider === 'DOCKER_SWARM_MODE') {
+        var nodes = data.nodes;
+        processTotalCPUAndMemory(nodes);
+        $scope.nodes = nodes;
+      } else {
+        extractSwarmInfo(data.info);
+      }
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve cluster details');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
+  }
+
+  initView();
 }]);

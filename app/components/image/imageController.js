@@ -1,7 +1,7 @@
 angular.module('image', [])
-.controller('ImageController', ['$scope', '$stateParams', '$state', 'ImageService', 'Notifications',
-function ($scope, $stateParams, $state, ImageService, Notifications) {
-	$scope.config = {
+.controller('ImageController', ['$scope', '$stateParams', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications',
+function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService, Notifications) {
+	$scope.formValues = {
 		Image: '',
 		Registry: ''
 	};
@@ -15,10 +15,10 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 
 	$scope.tagImage = function() {
 		$('#loadingViewSpinner').show();
-		var image = $scope.config.Image;
-		var registry = $scope.config.Registry;
+		var image = $scope.formValues.Image;
+		var registry = $scope.formValues.Registry;
 
-		ImageService.tagImage($stateParams.id, image, registry)
+		ImageService.tagImage($stateParams.id, image, registry.URL)
 		.then(function success(data) {
 			Notifications.success('Image successfully tagged');
 			$state.go('image', {id: $stateParams.id}, {reload: true});
@@ -31,28 +31,35 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 		});
 	};
 
-	$scope.pushTag = function(tag) {
+	$scope.pushTag = function(repository) {
 		$('#loadingViewSpinner').show();
-		ImageService.pushImage(tag)
-		.then(function success() {
-			Notifications.success('Image successfully pushed');
+		RegistryService.retrieveRegistryFromRepository(repository)
+		.then(function success(data) {
+			var registry = data;
+			return ImageService.pushImage(repository, registry);
+		})
+		.then(function success(data) {
+			Notifications.success('Image successfully pushed', repository);
 		})
 		.catch(function error(err) {
-			Notifications.error('Failure', err, 'Unable to push image tag');
+			Notifications.error('Failure', err, 'Unable to push image to repository');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
 		});
 	};
 
-	$scope.pullTag = function(tag) {
+	$scope.pullTag = function(repository) {
 		$('#loadingViewSpinner').show();
-
-		ImageService.pullTag(tag)
+		RegistryService.retrieveRegistryFromRepository(repository)
 		.then(function success(data) {
-			Notifications.success('Image successfully pulled', tag);
+			var registry = data;
+			return ImageService.pullImage(repository, registry, false);
 		})
-		.catch(function error(err){
+		.then(function success(data) {
+			Notifications.success('Image successfully pulled', repository);
+		})
+		.catch(function error(err) {
 			Notifications.error('Failure', err, 'Unable to pull image');
 		})
 		.finally(function final() {
@@ -60,15 +67,15 @@ function ($scope, $stateParams, $state, ImageService, Notifications) {
 		});
 	};
 
-	$scope.removeTag = function(id) {
+	$scope.removeTag = function(repository) {
 		$('#loadingViewSpinner').show();
-		ImageService.deleteImage(id, false)
+		ImageService.deleteImage(repository, false)
 		.then(function success() {
 			if ($scope.image.RepoTags.length === 1) {
-				Notifications.success('Image successfully deleted', id);
+				Notifications.success('Image successfully deleted', repository);
 				$state.go('images', {}, {reload: true});
 			} else {
-				Notifications.success('Tag successfully deleted', id);
+				Notifications.success('Tag successfully deleted', repository);
 				$state.go('image', {id: $stateParams.id}, {reload: true});
 			}
 		})

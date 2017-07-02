@@ -28,6 +28,7 @@ angular.module('portainer', [
   'containers',
   'createContainer',
   'createNetwork',
+  'createRegistry',
   'createSecret',
   'createService',
   'createVolume',
@@ -43,6 +44,9 @@ angular.module('portainer', [
   'network',
   'networks',
   'node',
+  'registries',
+  'registry',
+  'registryAccess',
   'secrets',
   'secret',
   'service',
@@ -57,6 +61,7 @@ angular.module('portainer', [
   'templates',
   'user',
   'users',
+  'userSettings',
   'volume',
   'volumes'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider) {
@@ -68,7 +73,6 @@ angular.module('portainer', [
     }
 
     localStorageServiceProvider
-    .setStorageType('sessionStorage')
     .setPrefix('portainer');
 
     jwtOptionsProvider.config({
@@ -245,6 +249,19 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/createNetwork/createnetwork.html',
           controller: 'CreateNetworkController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('actions.create.registry', {
+      url: '/registry',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/createRegistry/createregistry.html',
+          controller: 'CreateRegistryController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
@@ -430,6 +447,45 @@ angular.module('portainer', [
         }
       }
     })
+    .state('registries', {
+      url: '/registries/',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/registries/registries.html',
+          controller: 'RegistriesController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('registry', {
+      url: '^/registries/:id',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/registry/registry.html',
+          controller: 'RegistryController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('registry.access', {
+      url: '^/registries/:id/access',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/registryAccess/registryAccess.html',
+          controller: 'RegistryAccessController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('secrets', {
       url: '^/secrets/',
       views: {
@@ -594,6 +650,19 @@ angular.module('portainer', [
         }
       }
     })
+    .state('userSettings', {
+      url: '/userSettings/',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/userSettings/userSettings.html',
+          controller: 'UserSettingsController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('teams', {
       url: '/teams/',
       views: {
@@ -662,15 +731,19 @@ angular.module('portainer', [
   }])
   // This is your docker url that the api will use to make requests
   // You need to set this to the api endpoint without the port i.e. http://192.168.1.9
-  .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is required.  If you have a port, prefix it with a ':' i.e. :4243
+  // .constant('DOCKER_PORT', '') // Docker port, leave as an empty string if no port is required.  If you have a port, prefix it with a ':' i.e. :4243
   .constant('DOCKER_ENDPOINT', 'api/docker')
-  .constant('CONFIG_ENDPOINT', 'api/settings')
+  .constant('CONFIG_ENDPOINT', 'api/old_settings')
+  .constant('SETTINGS_ENDPOINT', 'api/settings')
+  .constant('STATUS_ENDPOINT', 'api/status')
   .constant('AUTH_ENDPOINT', 'api/auth')
   .constant('USERS_ENDPOINT', 'api/users')
   .constant('TEAMS_ENDPOINT', 'api/teams')
   .constant('TEAM_MEMBERSHIPS_ENDPOINT', 'api/team_memberships')
   .constant('RESOURCE_CONTROL_ENDPOINT', 'api/resource_controls')
   .constant('ENDPOINTS_ENDPOINT', 'api/endpoints')
+  .constant('DOCKERHUB_ENDPOINT', 'api/dockerhub')
+  .constant('REGISTRIES_ENDPOINT', 'api/registries')
   .constant('TEMPLATES_ENDPOINT', 'api/templates')
-  .constant('PAGINATION_MAX_ITEMS', 10)
-  .constant('UI_VERSION', 'v1.13.1');
+  .constant('DEFAULT_TEMPLATES_URL', 'https://raw.githubusercontent.com/portainer/templates/master/templates.json')
+  .constant('PAGINATION_MAX_ITEMS', 10);

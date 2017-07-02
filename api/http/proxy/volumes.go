@@ -14,7 +14,7 @@ const (
 
 // volumeListOperation extracts the response as a JSON object, loop through the volume array
 // decorate and/or filter the volumes based on resource controls before rewriting the response
-func volumeListOperation(request *http.Request, response *http.Response, operationContext *restrictedOperationContext) error {
+func volumeListOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
 	var err error
 	// VolumeList response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
@@ -28,10 +28,10 @@ func volumeListOperation(request *http.Request, response *http.Response, operati
 	if responseObject["Volumes"] != nil {
 		volumeData := responseObject["Volumes"].([]interface{})
 
-		if operationContext.isAdmin {
-			volumeData, err = decorateVolumeList(volumeData, operationContext.resourceControls)
+		if executor.operationContext.isAdmin {
+			volumeData, err = decorateVolumeList(volumeData, executor.operationContext.resourceControls)
 		} else {
-			volumeData, err = filterVolumeList(volumeData, operationContext.resourceControls, operationContext.userID, operationContext.userTeamIDs)
+			volumeData, err = filterVolumeList(volumeData, executor.operationContext.resourceControls, executor.operationContext.userID, executor.operationContext.userTeamIDs)
 		}
 		if err != nil {
 			return err
@@ -47,7 +47,7 @@ func volumeListOperation(request *http.Request, response *http.Response, operati
 // volumeInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the volume based on resource control and either rewrite an access denied response
 // or a decorated volume.
-func volumeInspectOperation(request *http.Request, response *http.Response, operationContext *restrictedOperationContext) error {
+func volumeInspectOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
 	// VolumeInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
 	responseObject, err := getResponseAsJSONOBject(response)
@@ -60,9 +60,9 @@ func volumeInspectOperation(request *http.Request, response *http.Response, oper
 	}
 	volumeID := responseObject[volumeIdentifier].(string)
 
-	resourceControl := getResourceControlByResourceID(volumeID, operationContext.resourceControls)
+	resourceControl := getResourceControlByResourceID(volumeID, executor.operationContext.resourceControls)
 	if resourceControl != nil {
-		if operationContext.isAdmin || canUserAccessResource(operationContext.userID, operationContext.userTeamIDs, resourceControl) {
+		if executor.operationContext.isAdmin || canUserAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl) {
 			responseObject = decorateObject(responseObject, resourceControl)
 		} else {
 			return rewriteAccessDeniedResponse(response)

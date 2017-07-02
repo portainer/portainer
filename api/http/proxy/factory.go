@@ -13,6 +13,7 @@ import (
 type proxyFactory struct {
 	ResourceControlService portainer.ResourceControlService
 	TeamMembershipService  portainer.TeamMembershipService
+	SettingsService        portainer.SettingsService
 }
 
 func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
@@ -37,6 +38,7 @@ func (factory *proxyFactory) newSocketProxy(path string) http.Handler {
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
+		SettingsService:        factory.SettingsService,
 		dockerTransport:        newSocketTransport(path),
 	}
 	proxy.Transport = transport
@@ -48,6 +50,7 @@ func (factory *proxyFactory) createReverseProxy(u *url.URL) *httputil.ReversePro
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
+		SettingsService:        factory.SettingsService,
 		dockerTransport:        newHTTPTransport(),
 	}
 	proxy.Transport = transport

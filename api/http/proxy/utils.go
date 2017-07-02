@@ -15,3 +15,18 @@ func getResourceControlByResourceID(resourceID string, resourceControls []portai
 	}
 	return nil
 }
+
+func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelBlackList []portainer.Pair) bool {
+	for key, value := range containerLabels {
+		labelName := key
+		labelValue := value.(string)
+
+		for _, blackListedLabel := range labelBlackList {
+			if blackListedLabel.Name == labelName && blackListedLabel.Value == labelValue {
+				return true
+			}
+		}
+	}
+
+	return false
+}

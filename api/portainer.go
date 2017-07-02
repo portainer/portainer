@@ -17,9 +17,6 @@ type (
 		ExternalEndpoints *string
 		SyncInterval      *string
 		Endpoint          *string
-		Labels            *[]Pair
-		Logo              *string
-		Templates         *string
 		NoAuth            *bool
 		NoAnalytics       *bool
 		TLSVerify         *bool
@@ -30,15 +27,26 @@ type (
 		SSLCert           *string
 		SSLKey            *string
 		AdminPassword     *string
+		// Deprecated fields
+		Logo      *string
+		Templates *string
+		Labels    *[]Pair
 	}
 
-	// Settings represents Portainer settings.
+	// Status represents the application status.
+	Status struct {
+		Authentication     bool   `json:"Authentication"`
+		EndpointManagement bool   `json:"EndpointManagement"`
+		Analytics          bool   `json:"Analytics"`
+		Version            string `json:"Version"`
+	}
+
+	// Settings represents the application settings.
 	Settings struct {
-		HiddenLabels       []Pair `json:"hiddenLabels"`
-		Logo               string `json:"logo"`
-		Authentication     bool   `json:"authentication"`
-		Analytics          bool   `json:"analytics"`
-		EndpointManagement bool   `json:"endpointManagement"`
+		TemplatesURL                string `json:"TemplatesURL"`
+		LogoURL                     string `json:"LogoURL"`
+		BlackListedLabels           []Pair `json:"BlackListedLabels"`
+		DisplayExternalContributors bool   `json:"DisplayExternalContributors"`
 	}
 
 	// User represents a user account.
@@ -84,6 +92,30 @@ type (
 		ID       UserID
 		Username string
 		Role     UserRole
+	}
+
+	// RegistryID represents a registry identifier.
+	RegistryID int
+
+	// Registry represents a Docker registry with all the info required
+	// to connect to it.
+	Registry struct {
+		ID              RegistryID `json:"Id"`
+		Name            string     `json:"Name"`
+		URL             string     `json:"URL"`
+		Authentication  bool       `json:"Authentication"`
+		Username        string     `json:"Username"`
+		Password        string     `json:"Password"`
+		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
+	}
+
+	// DockerHub represents all the required information to connect and use the
+	// Docker Hub.
+	DockerHub struct {
+		Authentication bool   `json:"Authentication"`
+		Username       string `json:"Username"`
+		Password       string `json:"Password"`
 	}
 
 	// EndpointID represents an endpoint identifier.
@@ -209,6 +241,27 @@ type (
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
 	}
 
+	// RegistryService represents a service for managing registry data.
+	RegistryService interface {
+		Registry(ID RegistryID) (*Registry, error)
+		Registries() ([]Registry, error)
+		CreateRegistry(registry *Registry) error
+		UpdateRegistry(ID RegistryID, registry *Registry) error
+		DeleteRegistry(ID RegistryID) error
+	}
+
+	// DockerHubService represents a service for managing the DockerHub object.
+	DockerHubService interface {
+		DockerHub() (*DockerHub, error)
+		StoreDockerHub(registry *DockerHub) error
+	}
+
+	// SettingsService represents a service for managing application settings.
+	SettingsService interface {
+		Settings() (*Settings, error)
+		StoreSettings(settings *Settings) error
+	}
+
 	// VersionService represents a service for managing version data.
 	VersionService interface {
 		DBVersion() (int, error)
@@ -252,9 +305,11 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.13.1"
+	APIVersion = "1.13.4"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 2
+	// DefaultTemplatesURL represents the default URL for the templates definitions.
+	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 )
 
 const (

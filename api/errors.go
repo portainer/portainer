@@ -4,6 +4,7 @@ package portainer
 const (
 	ErrUnauthorized           = Error("Unauthorized")
 	ErrResourceAccessDenied   = Error("Access denied to resource")
+	ErrResourceNotFound       = Error("Unable to find resource")
 	ErrUnsupportedDockerAPI   = Error("Unsupported Docker API response")
 	ErrMissingSecurityContext = Error("Unable to find security details in request context")
 )
@@ -41,9 +42,25 @@ const (
 	ErrEndpointAccessDenied = Error("Access denied to endpoint")
 )
 
+// Registry errors.
+const (
+	ErrRegistryNotFound      = Error("Registry not found")
+	ErrRegistryAlreadyExists = Error("A registry is already defined for this URL")
+)
+
 // Version errors.
 const (
 	ErrDBVersionNotFound = Error("DB version not found")
+)
+
+// Settings errors.
+const (
+	ErrSettingsNotFound = Error("Settings not found")
+)
+
+// DockerHub errors.
+const (
+	ErrDockerHubNotFound = Error("Dockerhub not found")
 )
 
 // Crypto errors.

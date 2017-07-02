@@ -22,6 +22,9 @@ type Store struct {
 	EndpointService        *EndpointService
 	ResourceControlService *ResourceControlService
 	VersionService         *VersionService
+	SettingsService        *SettingsService
+	RegistryService        *RegistryService
+	DockerHubService       *DockerHubService
 
 	db                    *bolt.DB
 	checkForDataMigration bool
@@ -35,6 +38,9 @@ const (
 	teamMembershipBucketName  = "team_membership"
 	endpointBucketName        = "endpoints"
 	resourceControlBucketName = "resource_control"
+	settingsBucketName        = "settings"
+	registryBucketName        = "registries"
+	dockerhubBucketName       = "dockerhub"
 )
 
 // NewStore initializes a new Store and the associated services
@@ -47,6 +53,9 @@ func NewStore(storePath string) (*Store, error) {
 		EndpointService:        &EndpointService{},
 		ResourceControlService: &ResourceControlService{},
 		VersionService:         &VersionService{},
+		SettingsService:        &SettingsService{},
+		RegistryService:        &RegistryService{},
+		DockerHubService:       &DockerHubService{},
 	}
 	store.UserService.store = store
 	store.TeamService.store = store
@@ -54,6 +63,9 @@ func NewStore(storePath string) (*Store, error) {
 	store.EndpointService.store = store
 	store.ResourceControlService.store = store
 	store.VersionService.store = store
+	store.SettingsService.store = store
+	store.RegistryService.store = store
+	store.DockerHubService.store = store
 
 	_, err := os.Stat(storePath + "/" + databaseFileName)
 	if err != nil && os.IsNotExist(err) {
@@ -70,36 +82,26 @@ func NewStore(storePath string) (*Store, error) {
 // Open opens and initializes the BoltDB database.
 func (store *Store) Open() error {
 	path := store.Path + "/" + databaseFileName
+
 	db, err := bolt.Open(path, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return err
 	}
 	store.db = db
+
+	bucketsToCreate := []string{versionBucketName, userBucketName, teamBucketName, endpointBucketName,
+		resourceControlBucketName, teamMembershipBucketName, settingsBucketName,
+		registryBucketName, dockerhubBucketName}
+
 	return db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(versionBucketName))
-		if err != nil {
-			return err
+
+		for _, bucket := range bucketsToCreate {
+			_, err := tx.CreateBucketIfNotExists([]byte(bucket))
+			if err != nil {
+				return err
+			}
 		}
-		_, err = tx.CreateBucketIfNotExists([]byte(userBucketName))
-		if err != nil {
-			return err
-		}
-		_, err = tx.CreateBucketIfNotExists([]byte(teamBucketName))
-		if err != nil {
-			return err
-		}
-		_, err = tx.CreateBucketIfNotExists([]byte(endpointBucketName))
-		if err != nil {
-			return err
-		}
-		_, err = tx.CreateBucketIfNotExists([]byte(resourceControlBucketName))
-		if err != nil {
-			return err
-		}
-		_, err = tx.CreateBucketIfNotExists([]byte(teamMembershipBucketName))
-		if err != nil {
-			return err
-		}
+
 		return nil
 	})
 }

@@ -1,13 +1,13 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'Config', 'ImageService', 'Notifications', 'Pagination', 'ModalService',
-function ($scope, $state, Config, ImageService, Notifications, Pagination, ModalService) {
+.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'Pagination', 'ModalService',
+function ($scope, $state, ImageService, Notifications, Pagination, ModalService) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('images');
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
   $scope.state.selectedItemCount = 0;
 
-  $scope.config = {
+  $scope.formValues = {
     Image: '',
     Registry: ''
   };
@@ -40,10 +40,11 @@ function ($scope, $state, Config, ImageService, Notifications, Pagination, Modal
 
   $scope.pullImage = function() {
     $('#pullImageSpinner').show();
-    var image = $scope.config.Image;
-    var registry = $scope.config.Registry;
-    ImageService.pullImage(image, registry)
+    var image = $scope.formValues.Image;
+    var registry = $scope.formValues.Registry;
+    ImageService.pullImage(image, registry, false)
     .then(function success(data) {
+      Notifications.success('Image successfully pulled', image);
       $state.reload();
     })
     .catch(function error(err) {
