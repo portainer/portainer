@@ -206,7 +206,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     // Network
     var mode = config.HostConfig.NetworkMode;
     config.NetworkingConfig = {
-      "EndpointsConfig": {}
+      'EndpointsConfig': {}
     };
     config.NetworkingConfig.EndpointsConfig = $scope.container.NetworkSettings.Networks;
     if (mode.indexOf('container:') !== -1) {
@@ -217,13 +217,12 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     var binds = [];
     var volumes = {};
     for (var v in $scope.container.Mounts) {
-      console.log($scope.container.Mounts[v]);
       var mount = $scope.container.Mounts[v];
       var volume = {
-        "type": mount.Type,
-        "name": mount.Name || mount.Source,
-        "containerPath": mount.Destination,
-        "readOnly": mount.RW === false
+        'type': mount.Type,
+        'name': mount.Name || mount.Source,
+        'containerPath': mount.Destination,
+        'readOnly': mount.RW === false
       };
 
       var name = mount.Name || mount.Source;
@@ -248,20 +247,20 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
         else {
           Container.remove({id: $scope.container.Id, v: 0, force: true}, function(d) {
             if (d.message) {
-              Notifications.error("Error", d, "Unable to remove container");
+              Notifications.error('Error', d, 'Unable to remove container');
             } else {
               var c = $scope.container;
               if (c.Metadata && c.Metadata.ResourceControl) {
                 ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, $scope.container.Id)
                 .then(function success() {
-                  Notifications.success("Container Removed", $scope.container.Id);
+                  Notifications.success('Container Removed', $scope.container.Id);
                   createContainer(config);
                 })
                 .catch(function error(err) {
-                  Notifications.error("Failure", err, "Unable to remove container ownership");
+                  Notifications.error('Failure', err, 'Unable to remove container ownership');
                 });
               } else {
-                Notifications.success("Container Removed", $scope.container.Id);
+                Notifications.success('Container Removed', $scope.container.Id);
                 createContainer(config);
               }
             }
@@ -283,7 +282,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
           })
           .catch(function error(err) {
             $('#createContainerSpinner').hide();
-            Notifications.error("Failure", err, 'Unable to apply resource control on container');
+            Notifications.error('Failure', err, 'Unable to apply resource control on container');
           });
         } else {*/
         Container.start({id: d.Id}, {}, function (cd) {
@@ -294,12 +293,12 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
             $state.go('containers', {}, {reload: true});
           }
         }, function (e) {
-          Notifications.error("Failure", e, 'Unable to start container');
+          Notifications.error('Failure', e, 'Unable to start container');
         });
         //}
       }
     }, function (e) {
-      Notifications.error("Failure", e, 'Unable to create container');
+      Notifications.error('Failure', e, 'Unable to create container');
     });
   }
 

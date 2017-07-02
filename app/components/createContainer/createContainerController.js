@@ -253,27 +253,27 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         ModalService.confirmDeletion(
           'A container with the same name is already present on this host. Do you want to remove it?',
           function onConfirm(confirmed) {
-            if(!confirmed) { cb(false); }
+            if(!confirmed) { return cb(false); }
             else {
               // Remove old container
               Container.remove({id: containerId, v: 0, force: true}, function(d) {
                 if (d.message) {
-                  Notifications.error("Error", d, "Unable to remove container");
-                  cb(false);
+                  Notifications.error('Error', d, 'Unable to remove container');
+                  return cb(false);
                 } else {
                   if (c.Metadata && c.Metadata.ResourceControl) {
                     ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, containerId)
                     .then(function success() {
-                      Notifications.success("Container Removed", containerId);
-                      cb(true);
+                      Notifications.success('Container Removed', containerId);
+                      return cb(true);
                     })
                     .catch(function error(err) {
-                      Notifications.error("Failure", err, "Unable to remove container ownership");
-                      cb(false);
+                      Notifications.error('Failure', err, 'Unable to remove container ownership');
+                      return cb(false);
                     });
                   } else {
-                    Notifications.success("Container Removed", containerId);
-                    cb(true);
+                    Notifications.success('Container Removed', containerId);
+                    return cb(true);
                   }
                 }
               });
@@ -281,11 +281,11 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
           }
         );
       } else {
-        cb(true);
+        return cb(true);
       }
     }, function error(err) {
-      cb(false);
-      Notifications.error("Failure", err, "Unable to retrieve containers");
+      return cb(false);
+      Notifications.error('Failure', err, 'Unable to retrieve containers');
     });
   }
 
@@ -303,9 +303,9 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       var bindings = [];
       for (var p in $scope.config.HostConfig.PortBindings) {
         var b = {
-          "hostPort": $scope.config.HostConfig.PortBindings[p][0].HostPort,
-          "containerPort": p.split('/')[0],
-          "protocol": p.split('/')[1]
+          'hostPort': $scope.config.HostConfig.PortBindings[p][0].HostPort,
+          'containerPort': p.split('/')[0],
+          'protocol': p.split('/')[1]
         };
         bindings.push(b);
       }
@@ -314,13 +314,13 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       for (var v in d.Mounts) {
         var mount = d.Mounts[v];
         var volume = {
-          "type": mount.Type,
-          "name": mount.Name || mount.Source,
-          "containerPath": mount.Destination,
-          "readOnly": mount.RW === false
+          'type': mount.Type,
+          'name': mount.Name || mount.Source,
+          'containerPath': mount.Destination,
+          'readOnly': mount.RW === false
         };
         /*if (arr[0].indexOf('/') === 0) {
-          volume.type = "bind";
+          volume.type = 'bind';
         }
         if (arr[2] && arr[2] === 'ro') {
           volume.readOnly = true;
@@ -349,13 +349,13 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       var envArr = [];
       for (var e in $scope.config.Env) {
         var arr = $scope.config.Env[e].split(/=(.+)/);
-        envArr.push({"name": arr[0], "value": arr[1]});
+        envArr.push({'name': arr[0], 'value': arr[1]});
       }
       $scope.config.Env = envArr;
 
       // Add ExtraHost
       for (var h in $scope.config.HostConfig.ExtraHosts) {
-        $scope.formValues.ExtraHosts.push({"value": $scope.config.HostConfig.ExtraHosts[h]});
+        $scope.formValues.ExtraHosts.push({'value': $scope.config.HostConfig.ExtraHosts[h]});
         $scope.config.HostConfig.ExtraHosts = [];
       }
 
@@ -379,7 +379,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       var path = [];
       for (var dev in $scope.config.HostConfig.Devices) {
         var device = $scope.config.HostConfig.Devices[dev];
-        path.push({"pathOnHost": device.PathOnHost, "pathInContainer": device.PathInContainer});
+        path.push({'pathOnHost': device.PathOnHost, 'pathInContainer': device.PathInContainer});
       }
       $scope.config.HostConfig.Devices = path;
 
