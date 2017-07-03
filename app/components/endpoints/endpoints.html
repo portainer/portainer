@@ -14,7 +14,10 @@
       <rd-widget-header icon="fa-exclamation-triangle" title="Endpoint management is not available">
       </rd-widget-header>
       <rd-widget-body>
-        <span class="small text-muted">Portainer has been started using the <code>--external-endpoints</code> flag. Endpoint management via the UI is disabled. You can still manage endpoint access.</span>
+        <span class="small text-muted">Portainer has been started using the <code>--external-endpoints</code> flag.
+          Endpoint management via the UI is disabled.
+          <span ng-if="applicationState.application.authentication">You can still manage endpoint access.</span>
+        </span>
       </rd-wigdet-body>
     </rd-widget>
   </div>
