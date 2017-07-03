@@ -7,10 +7,9 @@ function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService,
 	};
 
 	$scope.toggleLayerCommand = function(layerId) {
-		console.log('layerId: '+layerId);
-		jQuery('#layer-command-expander'+layerId+' span').toggleClass('glyphicon-plus-sign glyphicon-minus-sign');
-		jQuery('#layer-command-'+layerId+'-short').toggle();
-		jQuery('#layer-command-'+layerId+'-full').toggle();
+		$('#layer-command-expander'+layerId+' span').toggleClass('glyphicon-plus-sign glyphicon-minus-sign');
+		$('#layer-command-'+layerId+'-short').toggle();
+		$('#layer-command-'+layerId+'-full').toggle();
 	};
 
 	$scope.tagImage = function() {
