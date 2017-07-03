@@ -239,10 +239,16 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     config.HostConfig.Binds = binds;
     config.Volumes = volumes;
 
-
-    ModalService.confirmDeletion(
-      'You\'re about to re-create this container, any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.',
-      function onConfirm(confirmed) {
+    ModalService.confirm({
+      title: 'Are you sure ?',
+      message: 'You\'re about to re-create this container, any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.',
+      buttons: {
+        confirm: {
+          label: 'Recreate',
+          className: 'btn-danger'
+        }
+      },
+      callback: function onConfirm(confirmed) {
         if(!confirmed) { return; }
         else {
           Container.remove({id: $scope.container.Id, v: 0, force: true}, function(d) {
@@ -267,7 +273,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
           });
         }
       }
-    );
+    });
   };
 
   function createContainer(config) {
