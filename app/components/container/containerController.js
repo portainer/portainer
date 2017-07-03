@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ControllerDataPipeline) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ControllerDataPipeline) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -198,47 +198,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
   };
 
   $scope.recreate = function() {
-    var config = $scope.container.Config;
-    // HostConfig
-    config.HostConfig = $scope.container.HostConfig;
-    // Name
-    config.name = $scope.container.Name.replace(/^\//g, '');
-    // Network
-    var mode = config.HostConfig.NetworkMode;
-    config.NetworkingConfig = {
-      'EndpointsConfig': {}
-    };
-    config.NetworkingConfig.EndpointsConfig = $scope.container.NetworkSettings.Networks;
-    if (mode.indexOf('container:') !== -1) {
-      delete config.Hostname;
-      delete config.ExposedPorts;
-    }
-    // Set volumes
-    var binds = [];
-    var volumes = {};
-    for (var v in $scope.container.Mounts) {
-      var mount = $scope.container.Mounts[v];
-      var volume = {
-        'type': mount.Type,
-        'name': mount.Name || mount.Source,
-        'containerPath': mount.Destination,
-        'readOnly': mount.RW === false
-      };
-
-      var name = mount.Name || mount.Source;
-      var containerPath = mount.Destination;
-      if (name && containerPath) {
-        var bind = name + ':' + containerPath;
-        volumes[containerPath] = {};
-        if (mount.RW === false) {
-          bind += ':ro';
-        }
-        binds.push(bind);
-      }
-    }
-    config.HostConfig.Binds = binds;
-    config.Volumes = volumes;
-
+    var config = ContainerHelper.configFromContainer($scope.container);
     ModalService.confirm({
       title: 'Are you sure ?',
       message: 'You\'re about to re-create this container, any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.',
