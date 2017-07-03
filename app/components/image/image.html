@@ -186,15 +186,15 @@
               <td class="expand">
                 <div ng-if="layer.CreatedBy.length > 100">
                   <span id="layer-command-{{$index}}-full" style="display: none">
-                    {{layer.CreatedBy}}
+                    {{layer.CreatedBy|createdby}}
                   </span>
                   <span id="layer-command-{{$index}}-short">
-                    {{layer.CreatedBy|limitTo:100}}{{layer.CreatedBy.length > 100 ? '...' : ''}}
+                    {{layer.CreatedBy|createdby|limitTo:100}}{{layer.CreatedBy.length > 100 ? '...' : ''}}
                   </span>
                 </div>
                 <div ng-if="layer.CreatedBy.length <= 100">
                   <span id="layer-command-{{$index}}-full">
-                    {{layer.CreatedBy}}
+                    {{layer.CreatedBy|createdby}}
                   </span>
                 </div>
                 <div ng-if="layer.CreatedBy.length > 100"><a id="layer-command-expander{{$index}}" class="btn" ng-click='toggleLayerCommand($index)'><span class="glyphicon glyphicon-plus-sign"></span></a></div>
