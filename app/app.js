@@ -168,7 +168,7 @@ angular.module('portainer', [
       }
     })
     .state('containerlogs', {
-      url: "^/containers/:id/logs",
+      url: '^/containers/:id/logs',
       views: {
         'content@': {
           templateUrl: 'app/components/containerLogs/containerlogs.html',
@@ -181,13 +181,13 @@ angular.module('portainer', [
       }
     })
     .state('servicelogs', {
-      url: "^/services/:id/logs",
+      url: '^/services/:id/logs',
       views: {
-        "content@": {
+        'content@': {
           templateUrl: 'app/components/serviceLogs/servicelogs.html',
           controller: 'ServiceLogsController'
         },
-        "sidebar@": {
+        'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
         }

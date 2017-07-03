@@ -14,7 +14,7 @@ function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
     $('#loadingViewSpinner').hide();
   }, function (e) {
     $('#loadingViewSpinner').hide();
-    Notifications.error("Failure", e, "Unable to retrieve service info");
+    Notifications.error('Failure', e, 'Unable to retrieve service info');
   });
 
   function getLogs() {
@@ -66,7 +66,7 @@ function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
   getLogs();
   var logIntervalId = window.setInterval(getLogs, 5000);
 
-  $scope.$on("$destroy", function () {
+  $scope.$on('$destroy', function () {
     // clearing interval when view changes
     clearInterval(logIntervalId);
   });
