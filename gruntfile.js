@@ -1,3 +1,6 @@
+var autoprefixer = require('autoprefixer');
+var cssnano = require('cssnano');
+
 module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -6,15 +9,14 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-recess');
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-if');
   grunt.loadNpmTasks('grunt-filerev');
-  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-usemin');
   grunt.loadNpmTasks('grunt-replace');
   grunt.loadNpmTasks('grunt-config');
+  grunt.loadNpmTasks('grunt-postcss');
 
   grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('build', [
@@ -23,8 +25,8 @@ module.exports = function (grunt) {
     'if:linuxAmd64BinaryNotExist',
     'html2js',
     'useminPrepare:dev',
-    'recess:build',
     'concat',
+    'postcss:build',
     'clean:tmpl',
     'replace',
     'copy',
@@ -37,10 +39,9 @@ module.exports = function (grunt) {
     'clean:all',
     'html2js',
     'useminPrepare:release',
-    'recess:build',
     'concat',
+    'postcss:build',
     'clean:tmpl',
-    'cssmin',
     'replace',
     'uglify',
     'copy:assets',
@@ -54,10 +55,9 @@ module.exports = function (grunt) {
     'if:linux386BinaryNotExist',
     'html2js',
     'useminPrepare:release',
-    'recess:build',
+    'postcss:build',
     'concat',
     'clean:tmpl',
-    'cssmin',
     'replace',
     'uglify',
     'copy:assets',
@@ -71,10 +71,9 @@ module.exports = function (grunt) {
     'if:linuxAmd64BinaryNotExist',
     'html2js',
     'useminPrepare:release',
-    'recess:build',
+    'postcss:build',
     'concat',
     'clean:tmpl',
-    'cssmin',
     'replace',
     'uglify',
     'copy:assets',
@@ -88,10 +87,9 @@ module.exports = function (grunt) {
     'if:linuxArmBinaryNotExist',
     'html2js',
     'useminPrepare:release',
-    'recess:build',
+    'postcss:build',
     'concat',
     'clean:tmpl',
-    'cssmin',
     'replace',
     'uglify',
     'copy',
@@ -105,10 +103,9 @@ module.exports = function (grunt) {
     'if:linuxArm64BinaryNotExist',
     'html2js',
     'useminPrepare:release',
-    'recess:build',
+    'postcss:build',
     'concat',
     'clean:tmpl',
-    'cssmin',
     'replace',
     'uglify',
     'copy',
@@ -122,10 +119,9 @@ module.exports = function (grunt) {
     'if:linuxPpc64leBinaryNotExist',
     'html2js',
     'useminPrepare:release',
-    'recess:build',
+    'postcss:build',
     'concat',
     'clean:tmpl',
-    'cssmin',
     'replace',
     'uglify',
     'copy',
@@ -139,10 +135,9 @@ module.exports = function (grunt) {
     'if:windowsAmd64BinaryNotExist',
     'html2js',
     'useminPrepare:release',
-    'recess:build',
+    'postcss:build',
     'concat',
     'clean:tmpl',
-    'cssmin',
     'replace',
     'uglify',
     'copy',
@@ -156,10 +151,9 @@ module.exports = function (grunt) {
     'if:darwinAmd64BinaryNotExist',
     'html2js',
     'useminPrepare:release',
-    'recess:build',
+    'postcss:build',
     'concat',
     'clean:tmpl',
-    'cssmin',
     'replace',
     'uglify',
     'copy',
@@ -304,6 +298,10 @@ module.exports = function (grunt) {
       }
     },
     concat: {
+      css: {
+        src: ['<%= src.cssVendor %>', '<%= src.css %>'],
+        dest: '<%= distdir %>/css/<%= pkg.name %>.css'
+      },
       dist: {
         options: {
           process: true
@@ -358,27 +356,16 @@ module.exports = function (grunt) {
         dest: '<%= distdir %>/js/angular.js'
       }
     },
-    recess: { // TODO: not maintained, unable to preserve license comments, switch out for something better.
+    postcss: {
       build: {
-        files: {
-          '<%= distdir %>/css/<%= pkg.name %>.css': ['<%= src.css %>'],
-          '<%= distdir %>/css/vendor.css': ['<%= src.cssVendor %>']
-        },
         options: {
-          compile: true,
-          noOverqualifying: false // TODO: Added because of .nav class, rename
-        }
-      },
-      min: {
-        files: {
-          '<%= distdir %>/css/<%= pkg.name %>.css': ['<%= src.css %>'],
-          '<%= distdir %>/css/vendor.css': ['<%= src.cssVendor %>']
+          processors: [
+            autoprefixer({browsers: 'last 2 versions'}), // add vendor prefixes
+            cssnano() // minify the result
+          ]
         },
-        options: {
-          compile: true,
-          compress: true,
-          noOverqualifying: false // TODO: Added because of .nav class, rename
-        }
+        src: '<%= distdir %>/css/<%= pkg.name %>.css',
+        dest: '<%= distdir %>/css/<%= pkg.name %>.css'
       }
     },
     watch: {
