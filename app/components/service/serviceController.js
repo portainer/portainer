@@ -1,12 +1,12 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$anchorScroll', 'ServiceService', 'Service', 'ServiceHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
-function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceService, Service, ServiceHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ControllerDataPipeline) {
+.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'Secret', 'SecretHelper', 'Service', 'ServiceHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
+function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, Secret, SecretHelper, Service, ServiceHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ControllerDataPipeline) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
   $scope.tasks = [];
-  $scope.sortType = 'Status';
-  $scope.sortReverse = false;
+  $scope.sortType = 'Updated';
+  $scope.sortReverse = true;
 
   $scope.lastVersion = 0;
 
@@ -37,7 +37,11 @@ function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceSer
   };
 
   $scope.goToItem = function(hash) {
-    $anchorScroll(hash);
+      if ($location.hash() !== hash) {
+        $location.hash(hash);
+      } else {
+        $anchorScroll();
+      }
   };
 
   $scope.addEnvironmentVariable = function addEnvironmentVariable(service) {
@@ -53,6 +57,18 @@ function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceSer
   $scope.updateEnvironmentVariable = function updateEnvironmentVariable(service, variable) {
     if (variable.value !== variable.originalValue || variable.key !== variable.originalKey) {
       updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
+    }
+  };
+  $scope.addSecret = function addSecret(service, secret) {
+    if (secret && service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === secret.Id;}).length === 0) {
+      service.ServiceSecrets.push({ Id: secret.Id, Name: secret.Name, FileName: secret.Name, Uid: '0', Gid: '0', Mode: 444 });
+      updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
+    }
+  };
+  $scope.removeSecret = function removeSecret(service, index) {
+    var removedElement = service.ServiceSecrets.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
     }
   };
   $scope.addLabel = function addLabel(service) {
@@ -162,7 +178,7 @@ function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceSer
     config.TaskTemplate.ContainerSpec.Env = translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
     config.TaskTemplate.ContainerSpec.Labels = translateServiceLabelsToLabels(service.ServiceContainerLabels);
     config.TaskTemplate.ContainerSpec.Image = service.Image;
-    config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets;
+    config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
 
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
@@ -246,7 +262,7 @@ function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceSer
   }
 
   function translateServiceArrays(service) {
-    service.ServiceSecrets = service.Secrets;
+    service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
     service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
     service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
     service.ServiceContainerLabels = translateLabelsToServiceLabels(service.ContainerLabels);
@@ -272,18 +288,44 @@ function ($q, $scope, $stateParams, $state, $location, $anchorScroll, ServiceSer
 
       return $q.all({
         tasks: TaskService.serviceTasks(service.Name),
-        nodes: NodeService.nodes()
+        nodes: NodeService.nodes(),
+        secrets: Secret.query({}).$promise
       });
     })
     .then(function success(data) {
       $scope.tasks = data.tasks;
       $scope.nodes = data.nodes;
+
+      $scope.secrets = data.secrets.map(function (secret) {
+        return new SecretViewModel(secret);
+      });
+
+      $timeout(function() {
+        $anchorScroll();
+      });
+
     })
     .catch(function error(err) {
+      $scope.secrets = [];
       Notifications.error('Failure', err, 'Unable to retrieve service details');
     })
     .finally(function final() {
+
       $('#loadingViewSpinner').hide();
+    });
+  }
+
+  function fetchSecrets() {
+    $('#loadSecretsSpinner').show();
+    Secret.query({}, function (d) {
+      $scope.secrets = d.map(function (secret) {
+        return new SecretViewModel(secret);
+      });
+      $('#loadSecretsSpinner').hide();
+    }, function(e) {
+      $('#loadSecretsSpinner').hide();
+      Notifications.error('Failure', e, 'Unable to retrieve secrets');
+      $scope.secrets = [];
     });
   }
 

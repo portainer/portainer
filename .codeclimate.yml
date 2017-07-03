@@ -12,7 +12,8 @@ engines:
     enabled: true
     config:
       languages:
-      - javascript
+        javascript:
+          mass_threshold: 80
   eslint:
     enabled: true
     config:

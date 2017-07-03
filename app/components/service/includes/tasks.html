@@ -1,4 +1,4 @@
-<div ng-if="tasks.length > 0 && nodes">
+<div ng-if="tasks.length > 0 && nodes" id="service-tasks">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title="Associated tasks">
       <div class="pull-right">
@@ -18,28 +18,28 @@
         <tr>
         <th>Id</th>
         <th>
-          <a ui-sref="service" ng-click="order('Status')">
+          <a ng-click="order('Status.State')">
           Status
-          <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-          <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+          <span ng-show="sortType == 'Status.State' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+          <span ng-show="sortType == 'Status.State' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
           </a>
         </th>
         <th ng-if="service.Mode !== 'global'">
-          <a ui-sref="service" ng-click="order('Slot')">
+          <a ng-click="order('Slot')">
           Slot
           <span ng-show="sortType == 'Slot' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
           <span ng-show="sortType == 'Slot' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
           </a>
         </th>
         <th>
-          <a ui-sref="service" ng-click="order('Node')">
+          <a ng-click="order('NodeId')">
           Node
-          <span ng-show="sortType == 'Node' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-          <span ng-show="sortType == 'Node' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+          <span ng-show="sortType == 'NodeId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+          <span ng-show="sortType == 'NodeId' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
           </a>
         </th>
         <th>
-          <a ui-sref="service" ng-click="order('Updated')">
+          <a ng-click="order('Updated')">
           Last update
           <span ng-show="sortType == 'Updated' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
           <span ng-show="sortType == 'Updated' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
@@ -57,9 +57,10 @@
         </tr>
       </tbody>
       </table>
-      <div ng-if="tasks" class="pagination-controls">
+      <div ng-if="tasks" class="pagination-controls" >
       <dir-pagination-controls></dir-pagination-controls>
       </div>
     </rd-widget-body>
   </rd-widget>
 </div>
+

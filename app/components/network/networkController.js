@@ -1,6 +1,6 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', '$state', '$stateParams', '$filter', 'Config', 'Network', 'Container', 'ContainerHelper', 'Notifications',
-function ($scope, $state, $stateParams, $filter, Config, Network, Container, ContainerHelper, Notifications) {
+.controller('NetworkController', ['$scope', '$state', '$stateParams', '$filter', 'Network', 'Container', 'ContainerHelper', 'Notifications',
+function ($scope, $state, $stateParams, $filter, Network, Container, ContainerHelper, Notifications) {
 
   $scope.removeNetwork = function removeNetwork(networkId) {
     $('#loadingViewSpinner').show();
@@ -36,21 +36,7 @@ function ($scope, $state, $stateParams, $filter, Config, Network, Container, Con
     });
   };
 
-  function getNetwork() {
-    $('#loadingViewSpinner').show();
-    Network.get({id: $stateParams.id}, function success(data) {
-      $scope.network = data;
-      getContainersInNetwork(data);
-    }, function error(err) {
-      $('#loadingViewSpinner').hide();
-      Notifications.error('Failure', err, 'Unable to retrieve network info');
-    });
-  }
-
   function filterContainersInNetwork(network, containers) {
-    if ($scope.containersToHideLabels) {
-      containers = ContainerHelper.hideContainers(containers, $scope.containersToHideLabels);
-    }
     var containersInNetwork = [];
     containers.forEach(function(container) {
       var containerInNetwork = network.Containers[container.Id];
@@ -93,8 +79,16 @@ function ($scope, $state, $stateParams, $filter, Config, Network, Container, Con
     }
   }
 
-  Config.$promise.then(function (c) {
-    $scope.containersToHideLabels = c.hiddenLabels;
-    getNetwork();
-  });
+  function initView() {
+    $('#loadingViewSpinner').show();
+    Network.get({id: $stateParams.id}, function success(data) {
+      $scope.network = data;
+      getContainersInNetwork(data);
+    }, function error(err) {
+      $('#loadingViewSpinner').hide();
+      Notifications.error('Failure', err, 'Unable to retrieve network info');
+    });
+  }
+
+  initView();
 }]);

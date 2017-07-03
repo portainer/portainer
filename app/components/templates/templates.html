@@ -250,7 +250,7 @@
       <rd-widget-body classes="padding template-widget-body">
         <div class="template-list">
           <!-- template -->
-          <div dir-paginate="tpl in templates | filter:state.filters:true | itemsPerPage: state.pagination_count" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
+          <div ng-repeat="tpl in templates | filter:state.filters:true" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
             <div class="template-main">
               <!-- template-image -->
               <span class="">
@@ -289,7 +289,7 @@
           <div ng-if="!templates" class="text-center text-muted">
             Loading...
           </div>
-          <div ng-if="(templates | filter:state.filters:true | itemsPerPage: state.pagination_count).length == 0" class="text-center text-muted">
+          <div ng-if="(templates | filter:state.filters:true).length == 0" class="text-center text-muted">
             No templates available.
           </div>
         </div>

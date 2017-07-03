@@ -21,7 +21,7 @@
     </li>
     <li class="sidebar-list">
       <a ui-sref="templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket"></span></a>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'templates' || $state.current.name === 'templates_linuxserver')">
+      <div class="sidebar-sublist" ng-if="toggle && displayExternalContributors && ($state.current.name === 'templates' || $state.current.name === 'templates_linuxserver')">
         <a ui-sref="templates_linuxserver" ui-sref-active="active">LinuxServer.io</a>
       </div>
     </li>
@@ -40,6 +40,9 @@
     <li class="sidebar-list">
       <a ui-sref="volumes" ui-sref-active="active">Volumes <span class="menu-icon fa fa-cubes"></span></a>
     </li>
+    <li class="sidebar-list" ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+      <a ui-sref="secrets" ui-sref-active="active">Secrets <span class="menu-icon fa fa-user-secret"></span></a>
+    </li>
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'">
       <a ui-sref="events" ui-sref-active="active">Events <span class="menu-icon fa fa-history"></span></a>
     </li>
@@ -49,7 +52,7 @@
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'">
       <a ui-sref="docker" ui-sref-active="active">Docker <span class="menu-icon fa fa-th"></span></a>
     </li>
-    <li class="sidebar-title" ng-if="isAdmin || isTeamLeader">
+    <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin || isTeamLeader">
       <span>Portainer settings</span>
     </li>
     <li class="sidebar-list" ng-if="applicationState.application.authentication && (isAdmin || isTeamLeader)">
@@ -60,6 +63,12 @@
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug"></span></a>
+    </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <a ui-sref="registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database"></span></a>
+    </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <a ui-sref="settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs"></span></a>
     </li>
   </ul>
   <div class="sidebar-footer">

@@ -3,7 +3,7 @@ function TemplateViewModel(data) {
   this.Description = data.description;
   this.Note = data.note;
   this.Categories = data.categories ? data.categories : [];
-  this.Platform = data.platform ? data.platform : '';
+  this.Platform = data.platform ? data.platform : 'undefined';
   this.Logo = data.logo;
   this.Image = data.image;
   this.Registry = data.registry ? data.registry : '';
@@ -11,8 +11,9 @@ function TemplateViewModel(data) {
   this.Network = data.network ? data.network : '';
   this.Env = data.env ? data.env : [];
   this.Privileged = data.privileged ? data.privileged : false;
-  this.Volumes = [];
   this.Interactive = data.interactive ? data.interactive : false;
+  this.RestartPolicy = data.restart_policy ? data.restart_policy : 'always';
+  this.Volumes = [];
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
       return {

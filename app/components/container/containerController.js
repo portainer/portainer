@@ -165,13 +165,14 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
   };
 
   $scope.renameContainer = function () {
-    Container.rename({id: $stateParams.id, 'name': $scope.container.newContainerName}, function (d) {
-      if (container.message) {
-        $scope.container.newContainerName = $scope.container.Name;
-        Notifications.error('Unable to rename container', {}, container.message);
+    var container = $scope.container;
+    Container.rename({id: $stateParams.id, 'name': container.newContainerName}, function (d) {
+      if (d.message) {
+        container.newContainerName = container.Name;
+        Notifications.error('Unable to rename container', {}, d.message);
       } else {
-        $scope.container.Name = $scope.container.newContainerName;
-        Notifications.success('Container successfully renamed', container.name);
+        container.Name = container.newContainerName;
+        Notifications.success('Container successfully renamed', container.Name);
       }
     }, function (e) {
       Notifications.error('Failure', e, 'Unable to rename container');
@@ -195,6 +196,43 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
       Notifications.error('Failure', e, 'Unable to disconnect container from network');
     });
   };
+
+  $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
+    $('#joinNetworkSpinner').show();
+    Network.connect({id: networkId}, { Container: $stateParams.id }, function (d) {
+      if (container.message) {
+        $('#joinNetworkSpinner').hide();
+        Notifications.error('Error', d, 'Unable to connect container to network');
+      } else {
+        $('#joinNetworkSpinner').hide();
+        Notifications.success('Container joined network', $stateParams.id);
+        $state.go('container', {id: $stateParams.id}, {reload: true});
+      }
+    }, function (e) {
+      $('#joinNetworkSpinner').hide();
+      Notifications.error('Failure', e, 'Unable to connect container to network');
+    });
+  };
+
+  Network.query({}, function (d) {
+      var networks = d;
+      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
+        networks = d.filter(function (network) {
+          if (network.Scope === 'global') {
+            return network;
+          }
+        });
+        networks.push({Name: 'bridge'});
+        networks.push({Name: 'host'});
+        networks.push({Name: 'none'});
+      }
+      $scope.availableNetworks = networks;
+      if (!_.find(networks, {'Name': 'bridge'})) {
+        networks.push({Name: 'nat'});
+      }
+    }, function (e) {
+      Notifications.error('Failure', e, 'Unable to retrieve networks');
+    });
 
   update();
 }]);

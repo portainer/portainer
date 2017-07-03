@@ -1,6 +1,6 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$scope', '$q', 'Config', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'Info', 'Notifications',
-function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume, Info, Notifications) {
+.controller('DashboardController', ['$scope', '$q', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'Notifications',
+function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, SystemService, Notifications) {
 
   $scope.containerData = {
     total: 0
@@ -15,14 +15,10 @@ function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume
     total: 0
   };
 
-  function prepareContainerData(d, containersToHideLabels) {
+  function prepareContainerData(d) {
     var running = 0;
     var stopped = 0;
-
     var containers = d;
-    if (containersToHideLabels) {
-      containers = ContainerHelper.hideContainers(d, containersToHideLabels);
-    }
 
     for (var i = 0; i < containers.length; i++) {
       var item = containers[i];
@@ -65,16 +61,16 @@ function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume
     $scope.infoData = info;
   }
 
-  function fetchDashboardData(containersToHideLabels) {
+  function initView() {
     $('#loadingViewSpinner').show();
     $q.all([
       Container.query({all: 1}).$promise,
       Image.query({}).$promise,
       Volume.query({}).$promise,
       Network.query({}).$promise,
-      Info.get({}).$promise
+      SystemService.info()
     ]).then(function (d) {
-      prepareContainerData(d[0], containersToHideLabels);
+      prepareContainerData(d[0]);
       prepareImageData(d[1]);
       prepareVolumeData(d[2]);
       prepareNetworkData(d[3]);
@@ -86,7 +82,5 @@ function ($scope, $q, Config, Container, ContainerHelper, Image, Network, Volume
     });
   }
 
-  Config.$promise.then(function (c) {
-    fetchDashboardData(c.hiddenLabels);
-  });
+  initView();
 }]);

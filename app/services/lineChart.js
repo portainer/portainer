@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('LineChart', ['Settings', function LineChartFactory(Settings) {
+.factory('LineChart', [function LineChartFactory() {
   'use strict';
   return {
     build: function (id, data, getkey) {

@@ -1,11 +1,10 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', '$filter', 'Config', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'ControllerDataPipeline', 'FormValidator',
-function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, ControllerDataPipeline, FormValidator) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'ControllerDataPipeline', 'FormValidator',
+function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, ControllerDataPipeline, FormValidator) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
     hideDescriptions: $stateParams.hide_descriptions,
-    pagination_count: Pagination.getPaginationCount('templates'),
     formValidationError: '',
     filters: {
       Categories: '!',
@@ -16,10 +15,6 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
   $scope.formValues = {
     network: '',
     name: ''
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('templates', $scope.state.pagination_count);
   };
 
   $scope.addVolume = function () {
@@ -74,7 +69,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
         generatedVolumeIds.push(volumeId);
       });
       TemplateService.updateContainerConfigurationWithVolumes(templateConfiguration, template, data);
-      return ImageService.pullImage(template.Image, template.Registry);
+      return ImageService.pullImage(template.Image, { URL: template.Registry }, true);
     })
     .then(function success(data) {
       return ContainerService.createAndStartContainer(templateConfiguration);
@@ -164,31 +159,29 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, Config, Cont
 
   function initTemplates() {
     var templatesKey = $stateParams.key;
-    Config.$promise.then(function (c) {
-      $q.all({
-        templates: TemplateService.getTemplates(templatesKey),
-        containers: ContainerService.getContainers(0, c.hiddenLabels),
-        networks: NetworkService.getNetworks(),
-        volumes: VolumeService.getVolumes()
-      })
-      .then(function success(data) {
-        $scope.templates = data.templates;
-        var availableCategories = [];
-        angular.forEach($scope.templates, function(template) {
-          availableCategories = availableCategories.concat(template.Categories);
-        });
-        $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
-        $scope.runningContainers = data.containers;
-        $scope.availableNetworks = filterNetworksBasedOnProvider(data.networks);
-        $scope.availableVolumes = data.volumes.Volumes;
-      })
-      .catch(function error(err) {
-        $scope.templates = [];
-        Notifications.error('Failure', err, 'An error occured during apps initialization.');
-      })
-      .finally(function final(){
-        $('#loadTemplatesSpinner').hide();
+    $q.all({
+      templates: TemplateService.getTemplates(templatesKey),
+      containers: ContainerService.getContainers(0),
+      networks: NetworkService.networks(),
+      volumes: VolumeService.getVolumes()
+    })
+    .then(function success(data) {
+      $scope.templates = data.templates;
+      var availableCategories = [];
+      angular.forEach($scope.templates, function(template) {
+        availableCategories = availableCategories.concat(template.Categories);
       });
+      $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
+      $scope.runningContainers = data.containers;
+      $scope.availableNetworks = filterNetworksBasedOnProvider(data.networks);
+      $scope.availableVolumes = data.volumes.Volumes;
+    })
+    .catch(function error(err) {
+      $scope.templates = [];
+      Notifications.error('Failure', err, 'An error occured during apps initialization.');
+    })
+    .finally(function final(){
+      $('#loadTemplatesSpinner').hide();
     });
   }
 
