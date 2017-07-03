@@ -33,8 +33,13 @@
                 </select>
               </div>
             </div>
+            <div class="col-sm-3">
+              <div class="input-group">
+                <input class="form-control" type="text" name="user" ng-model="state.user" placeholder="User">
+              </div>
+            </div>
             <!-- !command-list -->
-            <div class="col-sm-8">
+            <div class="col-sm-5">
               <button type="button" class="btn btn-primary" ng-click="connect()" ng-disabled="state.connected">Connect</button>
               <button type="button" class="btn btn-default" ng-click="disconnect()" ng-disabled="!state.connected">Disconnect</button>
             </div>
