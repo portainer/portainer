@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ControllerDataPipeline) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline', 'Authentication', 'ResourceControlService',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ControllerDataPipeline, Authentication, ResourceControlService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -211,7 +211,41 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
       callback: function onConfirm(confirmed) {
         if(!confirmed) { return; }
         else {
-          Container.remove({id: $scope.container.Id, v: 0, force: true}, function(d) {
+          $('#loadingViewSpinner').show();
+          var container = $scope.container;
+          ContainerService.remove(container, true)
+          .then(function success(data) {
+            return ContainerService.createAndStartContainer(config);
+          })
+          .then(function success(data) {
+            if (!container.ResourceControl) {
+              return true;
+            } else {
+              var containerIdentifier = data.Id;
+              var userId = Authentication.getUserDetails().ID;
+              var resourceControl = container.ResourceControl;
+              var users = resourceControl.UserAccesses.map(function(u) {
+                return u.UserId;
+              });
+              var teams = resourceControl.TeamAccesses.map(function(t) {
+                return t.TeamId;
+              });
+              return ResourceControlService.createResourceControl(resourceControl.AdministratorsOnly,
+                users, teams, containerIdentifier, 'container', []);
+            }
+          })
+          .then(function success(data) {
+            Notifications.success('Container successfully re-created');
+            $state.go('containers', {}, {reload: true});
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to re-create container');
+          })
+          .finally(function final() {
+            $('#loadingViewSpinner').hide();
+          });
+
+          /*Container.remove({id: $scope.container.Id, v: 0, force: true}, function(d) {
             if (d.message) {
               Notifications.error('Error', d, 'Unable to remove container');
             } else {
@@ -230,7 +264,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
                 createContainer(config);
               }
             }
-          });
+          });*/
         }
       }
     });
