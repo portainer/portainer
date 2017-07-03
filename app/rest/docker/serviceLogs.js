@@ -1,11 +1,11 @@
 angular.module('portainer.rest')
-.factory('ServiceLogs', ['$http', 'Settings', 'EndpointProvider', function ServiceLogsFactory($http, Settings, EndpointProvider) {
+.factory('ServiceLogs', ['$http', 'DOCKER_ENDPOINT', 'EndpointProvider', function ServiceLogsFactory($http, DOCKER_ENDPOINT, EndpointProvider) {
   'use strict';
   return {
     get: function (id, params, callback) {
       $http({
         method: 'GET',
-        url: Settings.url + '/' + EndpointProvider.endpointID() + '/services/' + id + '/logs',
+        url: DOCKER_ENDPOINT + '/' + EndpointProvider.endpointID() + '/services/' + id + '/logs',
         params: {
           'stdout': params.stdout || 0,
           'stderr': params.stderr || 0,

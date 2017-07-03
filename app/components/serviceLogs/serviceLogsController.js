@@ -14,7 +14,7 @@ function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
     $('#loadingViewSpinner').hide();
   }, function (e) {
     $('#loadingViewSpinner').hide();
-    Messages.error("Failure", e, "Unable to retrieve service info");
+    Notifications.error("Failure", e, "Unable to retrieve service info");
   });
 
   function getLogs() {
@@ -37,8 +37,8 @@ function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
       data = data.substring(8);
       data = data.replace(/\n(.{8})/g, '\n');
       // Delete 156 Chars // com.docker.swarm.node.id=sov730ei4f0s26940rdmcgeql,com.docker.swarm.service.id=bobi0ougfe8fg6ewxvmft7ph2,com.docker.swarm.task.id=vx1oxavbdz0654dbp8a70dxmx
-      data = data.substring(122);
-      data = data.replace(/\n(.{122})/g, '\n');
+      //data = data.substring(122);
+      //data = data.replace(/\n(.{122})/g, '\n');
       $scope.stderr = data;
     });
   }
@@ -56,8 +56,8 @@ function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
       data = data.substring(8);
       data = data.replace(/\n(.{8})/g, '\n');
       // Delete 156 Chars // com.docker.swarm.node.id=sov730ei4f0s26940rdmcgeql,com.docker.swarm.service.id=bobi0ougfe8fg6ewxvmft7ph2,com.docker.swarm.task.id=vx1oxavbdz0654dbp8a70dxmx
-      data = data.substring(122);
-      data = data.replace(/\n(.{122})/g, '\n');
+      //data = data.substring(122);
+      //data = data.replace(/\n(.{122})/g, '\n');
       $scope.stdout = data;
     });
   }
