@@ -239,13 +239,13 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       filters: {name: [$scope.config.name]}
     }, function (data) {
       var confirmDialog = false;
-      var containerId;
+      var container;
       // Prompt if we found name to confirm replacement
       for (var c in data) {
         for (var n in data[c].Names) {
           if (data[c].Names[n] === '/' + $scope.config.name) {
             confirmDialog = true;
-            containerId = data[c].Id;
+            container = data[c];
           }
         }
       }
@@ -256,26 +256,14 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
             if(!confirmed) { return cb(false); }
             else {
               // Remove old container
-              Container.remove({id: containerId, v: 0, force: true}, function(d) {
-                if (d.message) {
-                  Notifications.error('Error', d, 'Unable to remove container');
-                  return cb(false);
-                } else {
-                  if (c.Metadata && c.Metadata.ResourceControl) {
-                    ResourceControlService.removeContainerResourceControl(c.Metadata.ResourceControl.OwnerId, containerId)
-                    .then(function success() {
-                      Notifications.success('Container Removed', containerId);
-                      return cb(true);
-                    })
-                    .catch(function error(err) {
-                      Notifications.error('Failure', err, 'Unable to remove container ownership');
-                      return cb(false);
-                    });
-                  } else {
-                    Notifications.success('Container Removed', containerId);
-                    return cb(true);
-                  }
-                }
+              ContainerService.remove(container, true)
+              .then(function success(data) {
+                Notifications.success('Container Removed', container.Id);
+                return cb(true);
+              })
+              .catch(function error(err) {
+                Notifications.error('Failure', err, 'Unable to remove container');
+                return cb(false);
               });
             }
           }
@@ -395,7 +383,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   }
 
   function initView() {
-	  // If we got a template, we prefill fields
+    // If we got a template, we prefill fields
     if ($stateParams.from !== '') {
       loadFromContainerSpec();
     }
@@ -457,7 +445,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   }
 
   $scope.create = function () {
-    confirmCreateContainer(function(doIt) {
+    confirmCreateContainer(function (doIt) {
       if (doIt) {
         $('#createContainerSpinner').show();
 
