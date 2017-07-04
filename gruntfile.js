@@ -26,7 +26,6 @@ module.exports = function (grunt) {
     'html2js',
     'useminPrepare:dev',
     'concat',
-    'postcss:build',
     'clean:tmpl',
     'replace',
     'copy',
@@ -365,7 +364,7 @@ module.exports = function (grunt) {
           ]
         },
         src: '<%= distdir %>/css/<%= pkg.name %>.css',
-        dest: '<%= distdir %>/css/<%= pkg.name %>.css'
+        dest: '<%= distdir %>/css/app.css'
       }
     },
     watch: {
