@@ -466,6 +466,11 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   }
 }
 
+/* Override position: relative displaying tooltip in columns */
+.fullsize-tooltip {
+  position: inherit !important;
+}
+
 /*bootbox override*/
 .modal-open {
   padding-right: 0 !important;
