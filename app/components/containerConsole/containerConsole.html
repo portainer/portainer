@@ -17,6 +17,7 @@
       </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
+          <div ng-if="!state.connected">
             <!-- command-list -->
               <div class="form-group">
                 <label for="command" class="col-lg-1 text-left col-sm-2 control-label">Command</label>
@@ -47,10 +48,13 @@
             </div>
             <div class="form-group">
               <div class="col-lg-offset-1 col-sm-offset-2 col-lg-11 col-sm-10">
-                <button type="button" class="btn btn-primary" ng-click="connect()" ng-disabled="state.connected">Connect</button>
-                <button type="button" class="btn btn-default" ng-click="disconnect()" ng-disabled="!state.connected">Disconnect</button>
+                <button type="button" class="btn btn-primary" ng-click="connect()">Connect</button>
               </div>
             </div>
+          </div>
+          <div ng-if="state.connected">
+            <label>Connected as {{::state.user || 'root'}}</label>
+            <button type="button" class="btn btn-default" ng-click="disconnect()">Disconnect</button>
           </div>
         </form>
       </rd-widget-body>
