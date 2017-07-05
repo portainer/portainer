@@ -75,7 +75,7 @@
             <tr>
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="servicelogs({id: service.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="servicelogs({id: service.Id})" ng-if="applicationState.endpoint.apiVersion >= 1.30"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
                 </div>
               </td>
             </tr>
