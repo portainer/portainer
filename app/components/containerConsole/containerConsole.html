@@ -16,28 +16,45 @@
         </div>
       </rd-widget-header>
       <rd-widget-body>
-        <form>
-          <div class="row">
+        <form class="form-horizontal">
+          <div ng-if="!state.connected">
             <!-- command-list -->
-            <div class="col-sm-4">
-              <div class="input-group">
-                <span class="input-group-addon">
-                  <i class="fa fa-linux" aria-hidden="true" ng-if="imageOS == 'linux'"></i>
-                  <i class="fa fa-windows" aria-hidden="true" ng-if="imageOS == 'windows'"></i>
-                </span>
-                <select class="form-control" ng-model="state.command" id="command">
-                  <option value="bash" ng-if="imageOS == 'linux'">/bin/bash</option>
-                  <option value="sh" ng-if="imageOS == 'linux'">/bin/sh</option>
-                  <option value="powershell" ng-if="imageOS == 'windows'">powershell</option>
-                  <option value="cmd.exe" ng-if="imageOS == 'windows'">cmd.exe</option>
-                </select>
+              <div class="form-group">
+                <label for="command" class="col-lg-1 text-left col-sm-2 control-label">Command</label>
+                <div class="col-lg-11 col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">
+                      <i class="fa fa-linux" aria-hidden="true" ng-if="imageOS == 'linux'"></i>
+                      <i class="fa fa-windows" aria-hidden="true" ng-if="imageOS == 'windows'"></i>
+                    </span>
+                    <select class="form-control" ng-model="state.command" id="command">
+                      <option value="bash" ng-if="imageOS == 'linux'">/bin/bash</option>
+                      <option value="sh" ng-if="imageOS == 'linux'">/bin/sh</option>
+                      <option value="powershell" ng-if="imageOS == 'windows'">powershell</option>
+                      <option value="cmd.exe" ng-if="imageOS == 'windows'">cmd.exe</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            <!-- !command-list -->
+            <div class="form-group">
+              <label for="username" class="col-lg-1 text-left col-sm-2 control-label">
+                User
+                <portainer-tooltip position="bottom" message="Format is one of: user, user:group, uid or uid:gid"></portainer-tooltip>
+              </label>
+              <div class="col-lg-11 col-sm-10">
+                <input class="form-control" type="text" name="username" ng-model="state.user" placeholder="root">
               </div>
             </div>
-            <!-- !command-list -->
-            <div class="col-sm-8">
-              <button type="button" class="btn btn-primary" ng-click="connect()" ng-disabled="state.connected">Connect</button>
-              <button type="button" class="btn btn-default" ng-click="disconnect()" ng-disabled="!state.connected">Disconnect</button>
+            <div class="form-group">
+              <div class="col-lg-offset-1 col-sm-offset-2 col-lg-11 col-sm-10">
+                <button type="button" class="btn btn-primary" ng-click="connect()">Connect</button>
+              </div>
             </div>
+          </div>
+          <div ng-if="state.connected">
+            <label>Connected as {{::state.user || 'root'}}</label>
+            <button type="button" class="btn btn-default" ng-click="disconnect()">Disconnect</button>
           </div>
         </form>
       </rd-widget-body>

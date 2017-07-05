@@ -45,6 +45,7 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
       AttachStdout: true,
       AttachStderr: true,
       Tty: true,
+      User: $scope.state.user,
       Cmd: $scope.state.command.replace(' ', ',').split(',')
     };
 
