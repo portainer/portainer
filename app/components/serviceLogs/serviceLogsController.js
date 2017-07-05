@@ -8,15 +8,6 @@ function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
   $scope.stderr = '';
   $scope.tailLines = 2000;
 
-  $('#loadingViewSpinner').show();
-  Service.get({id: $stateParams.id}, function (d) {
-    $scope.service = d;
-    $('#loadingViewSpinner').hide();
-  }, function (e) {
-    $('#loadingViewSpinner').hide();
-    Notifications.error('Failure', e, 'Unable to retrieve service info');
-  });
-
   function getLogs() {
     $('#loadingViewSpinner').show();
     getLogsStdout();
@@ -36,9 +27,6 @@ function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
       // Strip 8 byte header from each line of output
       data = data.substring(8);
       data = data.replace(/\n(.{8})/g, '\n');
-      // Delete 156 Chars // com.docker.swarm.node.id=sov730ei4f0s26940rdmcgeql,com.docker.swarm.service.id=bobi0ougfe8fg6ewxvmft7ph2,com.docker.swarm.task.id=vx1oxavbdz0654dbp8a70dxmx
-      //data = data.substring(122);
-      //data = data.replace(/\n(.{122})/g, '\n');
       $scope.stderr = data;
     });
   }
@@ -55,27 +43,41 @@ function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
       // Strip 8 byte header from each line of output
       data = data.substring(8);
       data = data.replace(/\n(.{8})/g, '\n');
-      // Delete 156 Chars // com.docker.swarm.node.id=sov730ei4f0s26940rdmcgeql,com.docker.swarm.service.id=bobi0ougfe8fg6ewxvmft7ph2,com.docker.swarm.task.id=vx1oxavbdz0654dbp8a70dxmx
-      //data = data.substring(122);
-      //data = data.replace(/\n(.{122})/g, '\n');
       $scope.stdout = data;
     });
   }
 
-  // initial call
-  getLogs();
-  var logIntervalId = window.setInterval(getLogs, 5000);
+  function getService() {
+    $('#loadingViewSpinner').show();
+    Service.get({id: $stateParams.id}, function (d) {
+      $scope.service = d;
+      $('#loadingViewSpinner').hide();
+    }, function (e) {
+      Notifications.error('Failure', e, 'Unable to retrieve service info');
+      $('#loadingViewSpinner').hide();
+    });
+  }
 
-  $scope.$on('$destroy', function () {
-    // clearing interval when view changes
-    clearInterval(logIntervalId);
-  });
+  function initView() {
+    getService();
+    getLogs();
 
-  $scope.toggleTimestampsOut = function () {
-    getLogsStdout();
-  };
+    var logIntervalId = window.setInterval(getLogs, 5000);
 
-  $scope.toggleTimestampsErr = function () {
-    getLogsStderr();
-  };
+    $scope.$on('$destroy', function () {
+      // clearing interval when view changes
+      clearInterval(logIntervalId);
+    });
+
+    $scope.toggleTimestampsOut = function () {
+      getLogsStdout();
+    };
+
+    $scope.toggleTimestampsErr = function () {
+      getLogsStderr();
+    };
+  }
+
+  initView();
+
 }]);
