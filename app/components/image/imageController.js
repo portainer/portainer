@@ -121,7 +121,7 @@ function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService,
 			$scope.history = data;
 		})
 		.catch(function error(err) {
-			Messages.error('Failure', err, 'Unable to retrieve image history');
+			Notifications.error('Failure', err, 'Unable to retrieve image history');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
