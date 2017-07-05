@@ -8,9 +8,6 @@ angular.module('containers', [])
   $scope.sortType = 'State';
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
-  $scope.state.noStoppedItemsSelected = true;
-  $scope.state.noRunningItemsSelected = true;
-  $scope.state.noPausedItemsSelected = true;
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
@@ -121,7 +118,7 @@ angular.module('containers', [])
     angular.forEach($scope.state.filteredContainers, function (container) {
       if (container.Checked !== allSelected) {
         container.Checked = allSelected;
-        toggleItemSelection(item);
+        toggleItemSelection(container);
       }
     });
     updateSelectionFlags();
