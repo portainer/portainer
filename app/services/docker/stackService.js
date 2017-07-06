@@ -160,5 +160,13 @@ angular.module('portainer.services')
     return Stack.down({ id: id }).$promise;
   };
 
+  service.scaleService = function(id, serviceName, scale) {
+    var payload = {
+      ServiceName: serviceName,
+      Scale: scale
+    };
+    return Stack.scale({ id: id }, payload).$promise;
+  };
+
   return service;
 }]);

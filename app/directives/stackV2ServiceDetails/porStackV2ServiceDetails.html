@@ -42,7 +42,17 @@
             <tbody>
               <tr pagination-id="services_list" dir-paginate="service in $ctrl.services | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count">
                 <td>{{ service.Name }}</td>
-                <td>{{ service.ContainerCount }}</td>
+                <td>
+                  {{ service.ContainerCount }}
+                  <span ng-if="!service.Scale">
+                    <a class="interactive" ng-click="service.Scale = true; service.ScaleTo = service.ContainerCount;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Scale</a>
+                  </span>
+                  <span ng-if="service.Scale">
+                    <input class="input-sm" type="number" ng-model="service.ScaleTo" />
+                    <a class="interactive" ng-click="service.Scale = false;"><i class="fa fa-times"></i></a>
+                    <a class="interactive" ng-click="service.Scale = false; $ctrl.scaleService(service.Name, service.ScaleTo)"><i class="fa fa-check-square-o"></i></a>
+                  </span>
+                </td>
               </tr>
             <tr ng-if="!$ctrl.services">
               <td colspan="2" class="text-center text-muted">Loading...</td>

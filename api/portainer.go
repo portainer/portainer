@@ -330,6 +330,7 @@ type (
 	StackManager interface {
 		Up(stack *Stack, endpoint *Endpoint) error
 		Down(stack *Stack, endpoint *Endpoint) error
+		Scale(stack *Stack, endpoint *Endpoint, service string, scale int) error
 	}
 )
 

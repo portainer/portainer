@@ -44,7 +44,8 @@ func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleStackOperationUp))).Methods(http.MethodPost)
 	h.Handle("/{endpointId}/stacks/{id}/down",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleStackOperationDown))).Methods(http.MethodPost)
-
+	h.Handle("/{endpointId}/stacks/{id}/scale",
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleStackOperationScale))).Methods(http.MethodPost)
 	return h
 }
 
@@ -306,4 +307,62 @@ func (handler *StackHandler) handleStackOperationDown(w http.ResponseWriter, r *
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+}
+
+func (handler *StackHandler) handleStackOperationScale(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	var req postOperationScaleRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err := govalidator.ValidateStruct(req)
+	if err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	//TODO: common code between operationhandlers, centralize
+	endpointID, err := strconv.Atoi(vars["endpointId"])
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrEndpointNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	stackID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
+	if err == portainer.ErrStackNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.StackManager.Scale(stack, endpoint, req.ServiceName, req.Scale)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+}
+
+type postOperationScaleRequest struct {
+	ServiceName string `valid:"required"`
+	Scale       int    `valid:"required"`
 }
