@@ -1,0 +1,40 @@
+---
+js: 
+  bower_components/: 
+    - bootbox.js/bootbox
+    - bootstrap/dist/js/bootstrap
+    - Chart.js/Chart
+    - filesize/lib/filesize
+    - jquery/dist/jquery
+    - lodash/dist/lodash
+    - moment/min/moment
+    - splitargs/src/splitargs
+  '': 
+    - assets/js/legend
+css: 
+  bower_components/: 
+    - angular-ui-select/dist/select
+    - bootstrap/dist/css/bootstrap
+    - font-awesome/css/font-awesome
+    - rdash-ui/dist/css/rdash
+both: 
+  bower_components/: 
+    - angular-multi-select/isteven-multi-select
+    - toastr/toastr
+    - xterm.js/dist/xterm
+angular: 
+  bower_components/: 
+    '':
+      - angular/angular
+      - ng-file-upload/ng-file-upload
+    angular-: 
+      - sanitize/angular-sanitize
+      - cookies/angular-cookies
+      - local-storage/dist/angular-local-storage
+      - jwt/dist/angular-jwt
+      - ui-router/release/angular-ui-router
+      - resource/angular-resource
+      - bootstrap/ui-bootstrap-tpls
+      - utils-pagination/dirPagination
+      - google-analytics/dist/angular-google-analytics
+      - ui-select/dist/select

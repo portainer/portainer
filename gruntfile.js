@@ -3,26 +3,32 @@ var cssnano = require('cssnano');
 
 module.exports = function (grunt) {
 
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('gruntify-eslint');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-html2js');
-  grunt.loadNpmTasks('grunt-shell');
-  grunt.loadNpmTasks('grunt-filerev');
-  grunt.loadNpmTasks('grunt-usemin');
-  grunt.loadNpmTasks('grunt-replace');
-  grunt.loadNpmTasks('grunt-config');
-  grunt.loadNpmTasks('grunt-postcss');
+  var NpmTasks = [
+    'grunt-contrib-concat',
+    'gruntify-eslint',
+    'grunt-contrib-uglify',
+    'grunt-contrib-clean',
+    'grunt-contrib-copy',
+    'grunt-contrib-watch',
+    'grunt-html2js',
+    'grunt-shell',
+    'grunt-filerev',
+    'grunt-usemin',
+    'grunt-replace',
+    'grunt-config',
+    'grunt-postcss'
+  ];
+  for (var n in NpmTasks)  { if (NpmTasks.hasOwnProperty(n)) {
+    grunt.loadNpmTasks(NpmTasks[n]);
+  }}
+
   grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('before-copy', [
     'html2js',
     'useminPrepare:release',
     'concat',
-    'postcss:build',
-    'clean:tmpl',
+	'postcss:build',
+    'clean:tmpl',	
     'replace',
     'uglify'
   ]);
@@ -68,32 +74,9 @@ module.exports = function (grunt) {
     src: {
       js: ['app/**/*.js', '!app/**/*.spec.js'],
       jsTpl: ['<%= distdir %>/templates/**/*.js'],
-      jsVendor: [
-        'bower_components/jquery/dist/jquery.min.js',
-        'bower_components/bootstrap/dist/js/bootstrap.min.js',
-        'bower_components/angular-multi-select/isteven-multi-select.js',
-        'bower_components/bootbox.js/bootbox.js',
-        'bower_components/Chart.js/Chart.min.js',
-        'bower_components/filesize/lib/filesize.min.js',
-        'bower_components/lodash/dist/lodash.min.js',
-        'bower_components/moment/min/moment.min.js',
-        'bower_components/splitargs/src/splitargs.js',
-        'bower_components/toastr/toastr.min.js',
-        'bower_components/xterm.js/dist/xterm.js',
-        'assets/js/legend.js' // Not a bower package
-      ],
       html: ['index.html'],
       tpl: ['app/components/**/*.html', 'app/directives/**/*.html'],
-      css: ['assets/css/app.css'],
-      cssVendor: [
-        'bower_components/bootstrap/dist/css/bootstrap.css',
-        'bower_components/angular-multi-select/isteven-multi-select.css',
-        'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/font-awesome/css/font-awesome.min.css',
-        'bower_components/rdash-ui/dist/css/rdash.min.css',
-        'bower_components/toastr/toastr.min.css',
-        'bower_components/xterm.js/dist/xterm.css'
-      ]
+      css: ['assets/css/app.css']
     },
     clean: {
       all: ['<%= distdir %>/*'],
@@ -121,38 +104,22 @@ module.exports = function (grunt) {
         }
       }
     },
-    filerev: {
-      files: {
-        src: ['<%= distdir %>/js/*.js', '<%= distdir %>/css/*.css']
-      }
-    },
-    usemin: {
-      html: ['<%= distdir %>/index.html']
-    },
+    filerev: { files: { src: ['<%= distdir %>/js/*.js', '<%= distdir %>/css/*.css'] }},
+    usemin: { html: ['<%= distdir %>/index.html'] },
     copy: {
       bundle: {
         files: [
-          {
-            dest: '<%= distdir %>/js/',
-            src: ['app.js'],
-            expand: true,
-            cwd: '.tmp/concat/js/'
-          },
-          {
-            dest: '<%= distdir %>/css/',
-            src: ['app.css'],
-            expand: true,
-            cwd: '.tmp/concat/css/'
-          }
+          {dest:'<%= distdir %>/js/',  src: ['app.js'],  expand: true, cwd: '.tmp/concat/js/' },
+          {dest:'<%= distdir %>/css/', src: ['app.css'], expand: true, cwd: '.tmp/concat/css/' }
         ]
       },
       assets: {
         files: [
-          {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
-          {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
-          {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
-          {dest: '<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
-          {dest: '<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
+          {dest:'<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
+          {dest:'<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
+          {dest:'<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
+          {dest:'<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
+          {dest:'<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
         ]
       }
     },
@@ -169,55 +136,30 @@ module.exports = function (grunt) {
       }
     },
     concat: {
-      css: {
-        src: ['<%= src.cssVendor %>', '<%= src.css %>'],
-        dest: '<%= distdir %>/css/<%= pkg.name %>.css'
-      },
       vendor: {
-        src: ['<%= src.jsVendor %>'],
-        dest: '<%= distdir %>/js/vendor.js'
+        files: {
+          '<%= distdir %>/css/<%= pkg.name %>.css': ['<%= src.cssVendor %>', '<%= src.css %>'],
+          '<%= distdir %>/js/vendor.js': ['<%= src.jsVendor %>'],
+          '<%= distdir %>/js/angular.js': ['<%= src.angularVendor %>']
+        }
       },
       dist: {
         options: { process: true },
-        src: ['<%= src.js %>', '<%= src.jsTpl %>'],
-        dest: '<%= distdir %>/js/<%= pkg.name %>.js'
-      },
-      index: {
-        options: { process: true },
-        src: ['index.html'],
-        dest: '<%= distdir %>/index.html'
-      },
-      angular: {
-        src: [
-        'bower_components/angular/angular.min.js',
-        'bower_components/angular-sanitize/angular-sanitize.min.js',
-        'bower_components/angular-cookies/angular-cookies.min.js',
-        'bower_components/angular-local-storage/dist/angular-local-storage.min.js',
-        'bower_components/angular-jwt/dist/angular-jwt.min.js',
-        'bower_components/angular-ui-router/release/angular-ui-router.min.js',
-        'bower_components/angular-resource/angular-resource.min.js',
-        'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-        'bower_components/ng-file-upload/ng-file-upload.min.js',
-        'bower_components/angular-utils-pagination/dirPagination.js',
-        'bower_components/angular-google-analytics/dist/angular-google-analytics.min.js',
-        'bower_components/angular-ui-select/dist/select.min.js'],
-        dest: '<%= distdir %>/js/angular.js'
+        files: {
+          '<%= distdir %>/js/<%= pkg.name %>.js': ['<%= src.js %>', '<%= src.jsTpl %>'],
+          '<%= distdir %>/index.html': ['index.html']
+        }
       }
     },
     uglify: {
       dist: {
-        src: ['<%= src.js %>', '<%= src.jsTpl %>'],
-        dest: '<%= distdir %>/js/<%= pkg.name %>.js'
+        files: { '<%= distdir %>/js/<%= pkg.name %>.js': ['<%= src.js %>', '<%= src.jsTpl %>'] }
       },
       vendor: {
         options: { preserveComments: 'some' }, // Preserve license comments
-        src: ['<%= src.jsVendor %>'],
-        dest: '<%= distdir %>/js/vendor.js'
-      },
-      angular: {
-        options: { preserveComments: 'some' }, // Preserve license comments
-        src: ['<%= concat.angular.src %>'],
-        dest: '<%= distdir %>/js/angular.js'
+        files: { '<%= distdir %>/js/vendor.js': ['<%= src.jsVendor %>'] ,
+                 '<%= distdir %>/js/angular.js': ['<%= src.angularVendor %>']
+        }
       }
     },
     postcss: {
@@ -280,5 +222,58 @@ module.exports = function (grunt) {
         ]
       }
     }
+  });
+
+  grunt.registerTask('vendor', 'vendor:<.min>', function(min) {
+
+    function pre( v, type, obj ) { 
+      if (type === 'both') {
+        v.js.push(obj);
+        v.css.push(obj);
+        return v;
+      }
+      v[type].push(obj);
+      return v;
+    }
+
+    function rec( v, type, prefix, obj ) {
+      if ( 'object' === typeof obj ) {
+        for (var x in obj) { if (obj.hasOwnProperty(x)) {
+          v = rec( v, type, ((Array.isArray(obj)) ? prefix : prefix+x) , obj[x] );
+        }}
+        return v;
+      }
+      return pre( v, type, prefix+obj );
+    }
+    
+    //Recursively process yml file
+    var vendor = {};
+    var v = grunt.file.readYAML('vendor.yml');
+    for (var type in v) { if (v.hasOwnProperty(type)) {
+      if ( type !== 'both' ) { vendor[type]=[]; }
+      vendor = rec( vendor, type, '', v[type] );
+    }}
+
+    function addext( v, m, e ) {
+      if (grunt.file.isFile(v + m + e)) { v += m + e; return v; }
+      if (grunt.file.isFile(v + e)) { v += e; return v; }
+      grunt.fail.warn(v+'[.min]'+e+' not found!');
+      return v;
+    }
+    
+    function ext( v, e ) {
+      for(var x in v) { if (v.hasOwnProperty(x)) {
+        v[x] = addext( v[x], m, e);
+      }}
+      grunt.config('src.'+type+'Vendor',vendor[type]);
+      return v;
+    }
+    
+    //Check if files exists, add extensions, and add to config
+    var m = min;
+    for (type in vendor) { if (vendor.hasOwnProperty(type)) {
+      var e = '.'+((type === 'angular') ? 'js' : type);
+      vendor[type] = ext( vendor[type], e );
+    }}
   });
 };
