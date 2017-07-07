@@ -26,6 +26,32 @@ function configureRoutes($stateProvider) {
       requiresLogin: false
     }
   })
+  .state('configs', {
+     url: '^/configs/',
+     views: {
+       'content@': {
+         templateUrl: 'app/components/configs/configs.html',
+         controller: 'ConfigsController'
+       },
+       'sidebar@': {
+         templateUrl: 'app/components/sidebar/sidebar.html',
+         controller: 'SidebarController'
+       }
+     }
+   })
+   .state('config', {
+     url: '^/config/:id/',
+     views: {
+       'content@': {
+         templateUrl: 'app/components/config/config.html',
+         controller: 'ConfigController'
+       },
+       'sidebar@': {
+         templateUrl: 'app/components/sidebar/sidebar.html',
+         controller: 'SidebarController'
+       }
+     }
+   })
   .state('containers', {
     parent: 'root',
     url: '/containers/',
@@ -156,6 +182,19 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('actions.create.config', {
+     url: '/config',
+     views: {
+       'content@': {
+         templateUrl: 'app/components/createConfig/createConfig.html',
+         controller: 'CreateConfigController'
+       },
+       'sidebar@': {
+         templateUrl: 'app/components/sidebar/sidebar.html',
+         controller: 'SidebarController'
+       }
+     }
+   })
   .state('actions.create.container', {
     url: '/container/:from',
     views: {

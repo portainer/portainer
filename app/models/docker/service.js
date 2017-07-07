@@ -69,6 +69,7 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.Hosts = containerSpec.Hosts;
     this.DNSConfig = containerSpec.DNSConfig;
     this.Secrets = containerSpec.Secrets;
+    this.Configs = containerSpec.Configs;
   }
   if (data.Endpoint) {
     this.Ports = data.Endpoint.Ports;
