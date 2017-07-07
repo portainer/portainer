@@ -172,7 +172,7 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    distdir: 'dist',
+    distdir: 'dist/public',
     pkg: grunt.file.readJSON('package.json'),
     config: {
       dev: {
@@ -374,13 +374,7 @@ module.exports = function (grunt) {
       },
       build: {
         files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-        tasks: ['build', 'shell:buildImage', 'shell:run', 'shell:cleanImages']
-        /*
-        * Why don't we just use a host volume
-        * http.FileServer uses sendFile which virtualbox hates
-        * Tried using a host volume with -v, copying files with `docker cp`, restating container, none worked
-        * Rebuilding image on each change was only method that worked, takes ~4s per change to update
-        */
+        tasks: ['build']
       },
       buildSwarm: {
         files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
@@ -461,7 +455,7 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
+          'docker run --privileged -d -p 9000:9000 -v $(pwd)/dist/public:/public -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
         ].join(';')
       },
       cleanImages: {

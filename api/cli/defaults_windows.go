@@ -3,7 +3,7 @@ package cli
 const (
 	defaultBindAddress     = ":9000"
 	defaultDataDirectory   = "C:\\data"
-	defaultAssetsDirectory = "."
+	defaultAssetsDirectory = "C:\\public"
 	defaultNoAuth          = "false"
 	defaultNoAnalytics     = "false"
 	defaultTLSVerify       = "false"
