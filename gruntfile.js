@@ -1,34 +1,19 @@
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
+var loadGruntTasks = require('load-grunt-tasks');
 
 module.exports = function (grunt) {
 
-  var NpmTasks = [
-    'grunt-contrib-concat',
-    'gruntify-eslint',
-    'grunt-contrib-uglify',
-    'grunt-contrib-clean',
-    'grunt-contrib-copy',
-    'grunt-contrib-watch',
-    'grunt-html2js',
-    'grunt-shell',
-    'grunt-filerev',
-    'grunt-usemin',
-    'grunt-replace',
-    'grunt-config',
-    'grunt-postcss'
-  ];
-  for (var n in NpmTasks)  { if (NpmTasks.hasOwnProperty(n)) {
-    grunt.loadNpmTasks(NpmTasks[n]);
-  }}
+  loadGruntTasks(grunt);  
 
   grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('before-copy', [
+    'vendor:',
     'html2js',
     'useminPrepare:release',
     'concat',
-	'postcss:build',
-    'clean:tmpl',	
+    'postcss:build',
+    'clean:tmpl',
     'replace',
     'uglify'
   ]);
@@ -48,6 +33,7 @@ module.exports = function (grunt) {
     'config:dev',
     'clean:app',
     'shell:buildBinary:linux:amd64',
+    'vendor:regular',
     'html2js',
     'useminPrepare:dev',
     'concat',
@@ -115,11 +101,11 @@ module.exports = function (grunt) {
       },
       assets: {
         files: [
-          {dest:'<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
-          {dest:'<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
-          {dest:'<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
-          {dest:'<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
-          {dest:'<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
+          {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
+          {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
+          {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
+          {dest: '<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
+          {dest: '<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
         ]
       }
     },
@@ -224,56 +210,13 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('vendor', 'vendor:<.min>', function(min) {
-
-    function pre( v, type, obj ) { 
-      if (type === 'both') {
-        v.js.push(obj);
-        v.css.push(obj);
-        return v;
-      }
-      v[type].push(obj);
-      return v;
-    }
-
-    function rec( v, type, prefix, obj ) {
-      if ( 'object' === typeof obj ) {
-        for (var x in obj) { if (obj.hasOwnProperty(x)) {
-          v = rec( v, type, ((Array.isArray(obj)) ? prefix : prefix+x) , obj[x] );
-        }}
-        return v;
-      }
-      return pre( v, type, prefix+obj );
-    }
-    
-    //Recursively process yml file
-    var vendor = {};
+  grunt.registerTask('vendor', 'vendor:<min|reg>', function(min) {
+    // The content of `vendor.yml` is loaded to src.jsVendor, src.cssVendor and src.angularVendor
+    // Argument `min` selects between the 'regular' or 'minified' sets
+    var m = ( min === '' ) ? 'minified' : min;
     var v = grunt.file.readYAML('vendor.yml');
-    for (var type in v) { if (v.hasOwnProperty(type)) {
-      if ( type !== 'both' ) { vendor[type]=[]; }
-      vendor = rec( vendor, type, '', v[type] );
-    }}
-
-    function addext( v, m, e ) {
-      if (grunt.file.isFile(v + m + e)) { v += m + e; return v; }
-      if (grunt.file.isFile(v + e)) { v += e; return v; }
-      grunt.fail.warn(v+'[.min]'+e+' not found!');
-      return v;
-    }
-    
-    function ext( v, e ) {
-      for(var x in v) { if (v.hasOwnProperty(x)) {
-        v[x] = addext( v[x], m, e);
-      }}
-      grunt.config('src.'+type+'Vendor',vendor[type]);
-      return v;
-    }
-    
-    //Check if files exists, add extensions, and add to config
-    var m = min;
-    for (type in vendor) { if (vendor.hasOwnProperty(type)) {
-      var e = '.'+((type === 'angular') ? 'js' : type);
-      vendor[type] = ext( vendor[type], e );
+    for (type in v) { if (v.hasOwnProperty(type)) {
+      grunt.config('src.'+type+'Vendor',v[type][m]);
     }}
   });
 };
