@@ -162,7 +162,7 @@ module.exports = function (grunt) {
   ]);
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
-  grunt.registerTask('run-dev', ['if:linuxAmd64BinaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
+  grunt.registerTask('run-dev', ['if:linuxAmd64BinaryNotExist', 'shell:run', 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
 
   // Print a timestamp (useful for when watching)
@@ -374,13 +374,7 @@ module.exports = function (grunt) {
       },
       build: {
         files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-        tasks: ['build', 'shell:buildImage', 'shell:run', 'shell:cleanImages']
-        /*
-        * Why don't we just use a host volume
-        * http.FileServer uses sendFile which virtualbox hates
-        * Tried using a host volume with -v, copying files with `docker cp`, restating container, none worked
-        * Rebuilding image on each change was only method that worked, takes ~4s per change to update
-        */
+        tasks: ['build']
       },
       buildSwarm: {
         files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
@@ -461,7 +455,7 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run --privileged -d -p 9000:9000 -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
+          'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer centurylink/ca-certs /app/portainer --no-analytics -a /app'
         ].join(';')
       },
       cleanImages: {
