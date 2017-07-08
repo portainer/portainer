@@ -162,7 +162,7 @@ module.exports = function (grunt) {
   ]);
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run', ['if:linuxAmd64BinaryNotExist', 'build', 'shell:buildImage', 'shell:run']);
-  grunt.registerTask('run-dev', ['if:linuxAmd64BinaryNotExist', 'shell:buildImage', 'shell:run', 'watch:build']);
+  grunt.registerTask('run-dev', ['if:linuxAmd64BinaryNotExist', 'shell:run', 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
 
   // Print a timestamp (useful for when watching)
@@ -172,7 +172,7 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    distdir: 'dist/public',
+    distdir: 'dist',
     pkg: grunt.file.readJSON('package.json'),
     config: {
       dev: {
@@ -455,7 +455,7 @@ module.exports = function (grunt) {
         command: [
           'docker stop portainer',
           'docker rm portainer',
-          'docker run --privileged -d -p 9000:9000 -v $(pwd)/dist/public:/public -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer portainer --no-analytics'
+          'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock --name portainer centurylink/ca-certs /app/portainer --no-analytics -a /app'
         ].join(';')
       },
       cleanImages: {
