@@ -6,6 +6,14 @@ function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService,
 		Registry: ''
 	};
 
+	$scope.sortType = 'Size';
+  $scope.sortReverse = true;
+
+	$scope.order = function(sortType) {
+    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+    $scope.sortType = sortType;
+  };
+
 	$scope.toggleLayerCommand = function(layerId) {
 		$('#layer-command-expander'+layerId+' span').toggleClass('glyphicon-plus-sign glyphicon-minus-sign');
 		$('#layer-command-'+layerId+'-short').toggle();

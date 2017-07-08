@@ -175,29 +175,45 @@
       <rd-widget-body classes="no-padding">
         <table id="image-layers" class="table">
           <thead>
-            <tr>
-              <td>Size</td>
-              <td>Layer</td>
-            </tr>
+            <th>
+              <a ng-click="order('Size')">
+                Size
+                <span ng-show="sortType == 'Size' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'Size' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+              </a>
+            </th>
+            <th>
+              <a ng-click="order('CreatedBy')">
+                Layer
+                <span ng-show="sortType == 'CreatedBy' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'CreatedBy' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+              </a>
+            </th>
           </thead>
           <tbody>
-            <tr ng-repeat="layer in history">
-              <td style="white-space:nowrap;">{{layer.Size|humansize}}</td>
+            <tr ng-repeat="layer in history | orderBy:sortType:sortReverse">
+              <td style="white-space:nowrap;">
+                {{ layer.Size | humansize }}
+              </td>
               <td class="expand">
-                <div ng-if="layer.CreatedBy.length > 100">
+                <div ng-if="layer.CreatedBy.length > 130">
                   <span id="layer-command-{{$index}}-full" style="display: none">
-                    {{layer.CreatedBy|createdby}}
+                    {{ layer.CreatedBy | imagelayercommand }}
                   </span>
                   <span id="layer-command-{{$index}}-short">
-                    {{layer.CreatedBy|createdby|limitTo:100}}{{layer.CreatedBy.length > 100 ? '...' : ''}}
+                    {{ layer.CreatedBy | imagelayercommand | truncate:130 }}
+                    <span ng-if="layer.CreatedBy.length > 130" style="margin-left: 5px;">
+                      <a id="layer-command-expander{{$index}}" class="btn" ng-click='toggleLayerCommand($index)'>
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                      </a>
+                    </span>
                   </span>
                 </div>
-                <div ng-if="layer.CreatedBy.length <= 100">
+                <div ng-if="layer.CreatedBy.length <= 130">
                   <span id="layer-command-{{$index}}-full">
-                    {{layer.CreatedBy|createdby}}
+                    {{ layer.CreatedBy | imagelayercommand }}
                   </span>
                 </div>
-                <div ng-if="layer.CreatedBy.length > 100"><a id="layer-command-expander{{$index}}" class="btn" ng-click='toggleLayerCommand($index)'><span class="glyphicon glyphicon-plus-sign"></span></a></div>
               </td>
             </tr>
           </tbody>
