@@ -35,6 +35,26 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.history = function(imageId) {
+    var deferred = $q.defer();
+    Image.history({id: imageId}).$promise
+    .then(function success(data) {
+      if (data.message) {
+        deferred.reject({ msg: data.message });
+      } else {
+        var layers = [];
+        angular.forEach(data, function(imageLayer) {
+          layers.push(new ImageLayerViewModel(imageLayer));
+        });
+        deferred.resolve(layers);
+      }
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve image details', err: err });
+    });
+    return deferred.promise;
+  };
+
   service.pushImage = function(tag, registry) {
     var deferred = $q.defer();
 
