@@ -65,6 +65,7 @@ angular.module('portainer', [
   'swarm',
   'swarmVisualizer',
   'task',
+  'taskLogs',
   'team',
   'teams',
   'templates',

@@ -121,6 +121,19 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('tasklogs', {
+    url: '^/tasks/:id/logs',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/taskLogs/tasklogs.html',
+        controller: 'ServiceLogsController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('console', {
     url: '^/containers/:id/console',
     views: {
