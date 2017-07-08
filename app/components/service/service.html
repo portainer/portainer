@@ -72,6 +72,13 @@
                 <input type="text" class="form-control" ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" ng-disabled="isUpdating" />
               </td>
             </tr>
+            <tr ng-if="applicationState.endpoint.apiVersion >= 1.30">
+              <td colspan="2">
+                <div class="btn-group" role="group" aria-label="...">
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="servicelogs({id: service.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
