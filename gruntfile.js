@@ -172,8 +172,7 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    distdir: 'dist',
-    assetsdir: '<%= distdir %>/public',
+    distdir: 'dist/public',
     pkg: grunt.file.readJSON('package.json'),
     config: {
       dev: {
@@ -193,7 +192,7 @@ module.exports = function (grunt) {
     },
     src: {
       js: ['app/**/*.js', '!app/**/*.spec.js'],
-      jsTpl: ['<%= assetsdir %>/templates/**/*.js'],
+      jsTpl: ['<%= distdir %>/templates/**/*.js'],
       jsVendor: [
         'bower_components/jquery/dist/jquery.min.js',
         'bower_components/bootstrap/dist/js/bootstrap.min.js',
@@ -223,15 +222,15 @@ module.exports = function (grunt) {
     },
     clean: {
       all: ['<%= distdir %>/*'],
-      app: ['<%= assetsdir %>/*'],
-      tmpl: ['<%= assetsdir %>/templates'],
-      tmp: ['<%= assetsdir %>/js/*', '!<%= assetsdir %>/js/app.*.js', '<%= assetsdir %>/css/*', '!<%= assetsdir %>/css/app.*.css']
+      app: ['<%= distdir %>/*', '!<%= distdir %>/portainer'],
+      tmpl: ['<%= distdir %>/templates'],
+      tmp: ['<%= distdir %>/js/*', '!<%= distdir %>/js/app.*.js', '<%= distdir %>/css/*', '!<%= distdir %>/css/app.*.css']
     },
     useminPrepare: {
       dev: {
         src: '<%= src.html %>',
         options: {
-          root: '<%= assetsdir %>',
+          root: '<%= distdir %>',
           flow: {
             steps: {
               js: ['concat'],
@@ -243,29 +242,29 @@ module.exports = function (grunt) {
       release: {
         src: '<%= src.html %>',
         options: {
-          root: '<%= assetsdir %>'
+          root: '<%= distdir %>'
         }
       }
     },
     filerev: {
       files: {
-        src: ['<%= assetsdir %>/js/*.js', '<%= assetsdir %>/css/*.css']
+        src: ['<%= distdir %>/js/*.js', '<%= distdir %>/css/*.css']
       }
     },
     usemin: {
-      html: ['<%= assetsdir %>/index.html']
+      html: ['<%= distdir %>/index.html']
     },
     copy: {
       bundle: {
         files: [
           {
-            dest: '<%= assetsdir %>/js/',
+            dest: '<%= distdir %>/js/',
             src: ['app.js'],
             expand: true,
             cwd: '.tmp/concat/js/'
           },
           {
-            dest: '<%= assetsdir %>/css/',
+            dest: '<%= distdir %>/css/',
             src: ['app.css'],
             expand: true,
             cwd: '.tmp/concat/css/'
@@ -274,16 +273,16 @@ module.exports = function (grunt) {
       },
       assets: {
         files: [
-          {dest: '<%= assetsdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
-          {dest: '<%= assetsdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
-          {dest: '<%= assetsdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
+          {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/bootstrap/fonts/'},
+          {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/font-awesome/fonts/'},
+          {dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'bower_components/rdash-ui/dist/fonts/'},
           {
-            dest: '<%= assetsdir %>/images/',
+            dest: '<%= distdir %>/images/',
             src: ['**'],
             expand: true,
             cwd: 'assets/images/'
           },
-          {dest: '<%= assetsdir %>/ico', src: '**', expand: true, cwd: 'assets/ico'}
+          {dest: '<%= distdir %>/ico', src: '**', expand: true, cwd: 'assets/ico'}
         ]
       }
     },
@@ -293,29 +292,29 @@ module.exports = function (grunt) {
           base: '.'
         },
         src: ['<%= src.tpl %>'],
-        dest: '<%= assetsdir %>/templates/app.js',
+        dest: '<%= distdir %>/templates/app.js',
         module: '<%= pkg.name %>.templates'
       }
     },
     concat: {
       css: {
         src: ['<%= src.cssVendor %>', '<%= src.css %>'],
-        dest: '<%= assetsdir %>/css/<%= pkg.name %>.css'
+        dest: '<%= distdir %>/css/<%= pkg.name %>.css'
       },
       dist: {
         options: {
           process: true
         },
         src: ['<%= src.js %>', '<%= src.jsTpl %>'],
-        dest: '<%= assetsdir %>/js/<%= pkg.name %>.js'
+        dest: '<%= distdir %>/js/<%= pkg.name %>.js'
       },
       vendor: {
         src: ['<%= src.jsVendor %>'],
-        dest: '<%= assetsdir %>/js/vendor.js'
+        dest: '<%= distdir %>/js/vendor.js'
       },
       index: {
         src: ['index.html'],
-        dest: '<%= assetsdir %>/index.html',
+        dest: '<%= distdir %>/index.html',
         options: {
           process: true
         }
@@ -333,27 +332,27 @@ module.exports = function (grunt) {
         'bower_components/angular-utils-pagination/dirPagination.js',
         'bower_components/angular-google-analytics/dist/angular-google-analytics.min.js',
         'bower_components/angular-ui-select/dist/select.min.js'],
-        dest: '<%= assetsdir %>/js/angular.js'
+        dest: '<%= distdir %>/js/angular.js'
       }
     },
     uglify: {
       dist: {
         src: ['<%= src.js %>', '<%= src.jsTpl %>'],
-        dest: '<%= assetsdir %>/js/<%= pkg.name %>.js'
+        dest: '<%= distdir %>/js/<%= pkg.name %>.js'
       },
       vendor: {
         options: {
           preserveComments: 'some' // Preserve license comments
         },
         src: ['<%= src.jsVendor %>'],
-        dest: '<%= assetsdir %>/js/vendor.js'
+        dest: '<%= distdir %>/js/vendor.js'
       },
       angular: {
         options: {
           preserveComments: 'some' // Preserve license comments
         },
         src: ['<%= concat.angular.src %>'],
-        dest: '<%= assetsdir %>/js/angular.js'
+        dest: '<%= distdir %>/js/angular.js'
       }
     },
     postcss: {
@@ -364,8 +363,8 @@ module.exports = function (grunt) {
             cssnano() // minify the result
           ]
         },
-        src: '<%= assetsdir %>/css/<%= pkg.name %>.css',
-        dest: '<%= assetsdir %>/css/app.css'
+        src: '<%= distdir %>/css/<%= pkg.name %>.css',
+        dest: '<%= distdir %>/css/app.css'
       }
     },
     watch: {
