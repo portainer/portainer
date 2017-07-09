@@ -129,7 +129,7 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
   };
 
   $scope.addPlacementPreference = function(service) {
-    service.ServiceConstraints.push({ strategy: 'spread', value: '' });
+    service.ServicePreferences.push({ strategy: 'spread', value: '' });
     updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
   };
   $scope.removePlacementPreference = function(service, index) {
@@ -189,7 +189,7 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Name = service.Name;
     config.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceLabels);
-    config.TaskTemplate.ContainerSpec.Env = serviceHelper.translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
+    config.TaskTemplate.ContainerSpec.Env = ServiceHelper.translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
     config.TaskTemplate.ContainerSpec.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceContainerLabels);
     config.TaskTemplate.ContainerSpec.Image = service.Image;
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
@@ -278,12 +278,12 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
 
   function translateServiceArrays(service) {
     service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
-    service.EnvironmentVariables = serviceHelper.translateEnvironmentVariables(service.Env);
+    service.EnvironmentVariables = ServiceHelper.translateEnvironmentVariables(service.Env);
     service.ServiceLabels = LabelHelper.fromLabelHashToKeyValue(service.Labels);
     service.ServiceContainerLabels = LabelHelper.fromLabelHashToKeyValue(service.ContainerLabels);
     service.ServiceMounts = angular.copy(service.Mounts);
-    service.ServiceConstraints = serviceHelper.translateConstraintsToKeyValue(service.Constraints);
-    service.ServicePreferences = serviceHelper.translatePreferencesToKeyValue(service.Preferences);
+    service.ServiceConstraints = ServiceHelper.translateConstraintsToKeyValue(service.Constraints);
+    service.ServicePreferences = ServiceHelper.translatePreferencesToKeyValue(service.Preferences);
   }
 
   function initView() {

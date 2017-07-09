@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'ControllerDataPipeline', 'FormValidator', 'RegistryService', 'HttpRequestHelper',
-function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator, RegistryService, HttpRequestHelper) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'ControllerDataPipeline', 'FormValidator', 'RegistryService', 'HttpRequestHelper',
+function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator, RegistryService, HttpRequestHelper) {
 
   $scope.formValues = {
     Name: '',
