@@ -30,6 +30,17 @@
       <div class="pull-right">
         <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
       </div>
+      <span class="btn-group btn-group-sm pull-right" style="margin-right: 20px;">
+        <label class="btn btn-primary" ng-model="state.danglingVolumesOnly" uib-btn-radio="undefined">
+          All
+        </label>
+        <label class="btn btn-primary" ng-model="state.danglingVolumesOnly" uib-btn-radio="false">
+          Attached
+        </label>
+        <label class="btn btn-primary" ng-model="state.danglingVolumesOnly" uib-btn-radio="true">
+          Dangling
+        </label>
+      </span>
     </rd-widget-taskbar>
     <rd-widget-body classes="no-padding">
       <div class="table-responsive">
@@ -70,7 +81,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+            <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:{dangling: state.danglingVolumesOnly} | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
               <td><a ui-sref="volume({id: volume.Id})">{{ volume.Id|truncate:25 }}</a></td>
               <td>{{ volume.Driver }}</td>
@@ -85,7 +96,7 @@
             <tr ng-if="!volumes">
               <td colspan="5" class="text-center text-muted">Loading...</td>
             </tr>
-            <tr ng-if="volumes.length == 0">
+            <tr ng-if="volumes.length === 0 || state.filteredVolumes.length === 0">
               <td colspan="5" class="text-center text-muted">No volumes available.</td>
             </tr>
           </tbody>

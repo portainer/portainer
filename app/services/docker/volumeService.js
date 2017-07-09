@@ -3,9 +3,9 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.volumes = function() {
+  service.volumes = function(params) {
     var deferred = $q.defer();
-    Volume.query().$promise
+    Volume.query(params).$promise
     .then(function success(data) {
       var volumes = data.Volumes || [];
       volumes = volumes.map(function (item) {
