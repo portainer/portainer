@@ -372,10 +372,16 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       $scope.config.HostConfig.Devices = path;
 
       // Add Ownership
-      /*if (d.Portainer && d.Portainer.ResourceControl) {
-        ControllerDataPipeline.setAccessControlFormData(....);
-      }*/
-  //};
+      if (d.Portainer && d.Portainer.ResourceControl) {
+        var resourceControl = new ResourceControlViewModel(d.Portainer.ResourceControl);
+        console.log(resourceControl);
+        ControllerDataPipeline.setAccessControlFormData(
+          true,
+          resourceControl.Ownership,
+          resourceControl.UserAccesses,
+          resourceControl.TeamAccesses
+        );
+      }
 
       // Add name
       $scope.config.name = d.Name.replace(/^\//g, '');
