@@ -13,6 +13,18 @@ angular.module('portainer.helpers')
         EndpointSpec: service.Spec.EndpointSpec
       };
     },
+    translateKeyValueToPlacementPreferences: function(keyValuePreferences) {
+        if (keyValuePreferences) {
+          var preferences = [];
+          keyValuePreferences.forEach(function(preference) {
+            if (preference.strategy && preference.strategy !== '' && preference.value && preference.value !== '') {
+              constraints.push(preference.strategy + '=' + preference.value);
+            }
+          });
+          return preferences;
+        }
+        return [];
+    },
     translateKeyValueToPlacementConstraints: function(keyValueConstraints) {
       if (keyValueConstraints) {
         var constraints = [];
@@ -24,6 +36,6 @@ angular.module('portainer.helpers')
         return constraints;
       }
       return [];
-    }    
+    }
   };
 }]);

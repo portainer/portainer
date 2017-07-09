@@ -23,6 +23,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     Ports: [],
     Parallelism: 1,
     PlacementConstraints: [],
+    PlacementPreferences: [],
     UpdateDelay: 0,
     FailureAction: 'pause',
     Secrets: []
@@ -81,7 +82,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   };
 
   $scope.addPlacementPreference = function() {
-    $scope.formValues.PlacementPreferences.push({ key: '', operator: '==', value: '' });
+    $scope.formValues.PlacementPreferences.push({ strategy: '', value: '' });
   };
 
   $scope.removePlacementPreference = function(index) {
@@ -215,6 +216,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   }
   function preparePlacementConfig(config, input) {
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(input.PlacementConstraints);
+    config.TaskTemplate.Placement.Preferences = ServiceHelper.translateKeyValueToPlacementPreferences(input.PlacementPreferences);
   }
 
   function prepareSecretConfig(config, input) {

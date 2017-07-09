@@ -29,3 +29,29 @@
     </div>
   </div>
 </form>
+
+<form class="form-horizontal" style="margin-top: 15px;">
+  <div class="form-group">
+    <div class="col-sm-12" style="margin-top: 5px;">
+      <label class="control-label text-left">Placement preferences</label>
+      <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPlacementPreference()">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> placement preference
+      </span>
+    </div>
+    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+      <div ng-repeat="preference in formValues.PlacementPreferences" style="margin-top: 2px;">
+        <div class="input-group col-sm-4 input-group-sm">
+          <span class="input-group-addon">strategy</span>
+          <input type="text" class="form-control" ng-model="preference.strategy" placeholder="e.g. spread">
+        </div>
+        <div class="input-group col-sm-5 input-group-sm">
+          <span class="input-group-addon">value</span>
+          <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. node.labels.datacenter">
+        </div>
+        <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementPreference($index)">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
