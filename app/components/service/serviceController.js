@@ -129,7 +129,7 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
   };
 
   $scope.addPlacementPreference = function(service) {
-    service.ServiceConstraints.push({ strategy: '', value: '' });
+    service.ServiceConstraints.push({ strategy: 'spread', value: '' });
     updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
   };
   $scope.removePlacementPreference = function(service, index) {

@@ -82,7 +82,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   };
 
   $scope.addPlacementPreference = function() {
-    $scope.formValues.PlacementPreferences.push({ strategy: '', value: '' });
+    $scope.formValues.PlacementPreferences.push({ strategy: 'spread', value: '' });
   };
 
   $scope.removePlacementPreference = function(index) {
@@ -201,7 +201,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
       FailureAction: input.FailureAction
     };
   }
-  
+
   function preparePlacementConfig(config, input) {
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(input.PlacementConstraints);
     config.TaskTemplate.Placement.Preferences = ServiceHelper.translateKeyValueToPlacementPreferences(input.PlacementPreferences);
