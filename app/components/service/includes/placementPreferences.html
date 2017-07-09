@@ -1,4 +1,4 @@
-<div ng-if="service.ServicePreferences" id="service-placement-preferences">
+<div ng-if="service.ServicePreferences && applicationState.endpoint.apiVersion >= 1.30" id="service-placement-preferences">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title="Placement preferences">
       <div class="nopadding">
