@@ -1,6 +1,6 @@
 angular.module('createNetwork', [])
-.controller('CreateNetworkController', ['$scope', '$state', 'Notifications', 'Network',
-function ($scope, $state, Notifications, Network) {
+.controller('CreateNetworkController', ['$scope', '$state', 'Notifications', 'Network', 'LabelHelper',
+function ($scope, $state, Notifications, Network, LabelHelper) {
   $scope.formValues = {
     DriverOptions: [],
     Subnet: '',
@@ -30,7 +30,7 @@ function ($scope, $state, Notifications, Network) {
   };
 
   $scope.addLabel = function() {
-    $scope.formValues.Labels.push({ name: '', value: ''});
+    $scope.formValues.Labels.push({ key: '', value: ''});
   };
 
   $scope.removeLabel = function(index) {
@@ -74,13 +74,7 @@ function ($scope, $state, Notifications, Network) {
   }
 
   function prepareLabelsConfig(config) {
-    var labels = {};
-    $scope.formValues.Labels.forEach(function (label) {
-      if (label.name && label.value) {
-          labels[label.name] = label.value;
-      }
-    });
-    config.Labels = labels;
+    config.Labels = LabelHelper.fromKeyValueToLabelHash($scope.formValues.Labels);
   }
 
   function prepareConfiguration() {
