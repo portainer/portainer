@@ -124,8 +124,22 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
     }
   };
-  $scope.updatePlacementConstraint = function updatePlacementConstraint(service, constraint) {
+  $scope.updatePlacementConstraint = function(service, constraint) {
     updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
+  };
+
+  $scope.addPlacementPreference = function(service) {
+    service.ServiceConstraints.push({ strategy: '', value: '' });
+    updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
+  };
+  $scope.removePlacementPreference = function(service, index) {
+    var removedElement = service.ServicePreferences.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
+    }
+  };
+  $scope.updatePlacementPreference = function(service, constraint) {
+    updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
   };
 
   $scope.addPublishedPort = function addPublishedPort(service) {
@@ -188,6 +202,7 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
       config.TaskTemplate.Placement = {};
     }
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(service.ServiceConstraints);
+    config.TaskTemplate.Placement.Preferences = ServiceHelper.translateKeyValueToPlacementPreferences(service.ServicePreferences);
 
     config.TaskTemplate.Resources = {
       Limits: {
@@ -268,6 +283,7 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     service.ServiceContainerLabels = LabelHelper.fromLabelHashToKeyValue(service.ContainerLabels);
     service.ServiceMounts = angular.copy(service.Mounts);
     service.ServiceConstraints = serviceHelper.translateConstraintsToKeyValue(service.Constraints);
+    service.ServicePreferences = serviceHelper.translatePreferencesToKeyValue(service.Preferences);
   }
 
   function initView() {

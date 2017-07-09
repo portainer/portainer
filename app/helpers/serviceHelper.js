@@ -23,13 +23,13 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
               return preferences;
             }
             return [];
-        },        
+        },
         translateKeyValueToPlacementConstraints: function (keyValueConstraints) {
             if (keyValueConstraints) {
                 var constraints = [];
-                keyValueConstraints.forEach(function (keyValueConstraint) {
-                    if (keyValueConstraint.key && keyValueConstraint.key !== '' && keyValueConstraint.value && keyValueConstraint.value !== '') {
-                        constraints.push(keyValueConstraint.key + keyValueConstraint.operator + keyValueConstraint.value);
+                keyValueConstraints.forEach(function (constraint) {
+                    if (constraint.key && constraint.key !== '' && constraint.value && constraint.value !== '') {
+                        constraints.push(constraint.key + constraint.operator + constraint.value);
                     }
                 });
                 return constraints;
@@ -64,6 +64,24 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
                     }
                 });
                 return variables;
+            }
+            return [];
+        },
+        translatePreferencesToKeyValue: function (preferences) {
+            if (preferences) {
+                var keyValuePreferences = [];
+                preferences.forEach(function (preference) {
+                    var splitted = preference.split('=');
+                    if (splitted.length >= 2) {
+                        keyValuePreferences.push({
+                            strategy: splitted[0],
+                            value: splitted[1],
+                            originalStrategy: splitted[0],
+                            originalValue: splitted[1]
+                        });
+                    }
+                });
+                return keyValuePreferences;
             }
             return [];
         },
