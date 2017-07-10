@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'ControllerDataPipeline', 'FormValidator', 'RegistryService', 'HttpRequestHelper',
-function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator, RegistryService, HttpRequestHelper) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'ControllerDataPipeline', 'FormValidator', 'RegistryService', 'HttpRequestHelper',
+function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator, RegistryService, HttpRequestHelper) {
 
   $scope.formValues = {
     Name: '',
@@ -23,6 +23,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     Ports: [],
     Parallelism: 1,
     PlacementConstraints: [],
+    PlacementPreferences: [],
     UpdateDelay: 0,
     FailureAction: 'pause',
     Secrets: []
@@ -81,7 +82,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   };
 
   $scope.addPlacementPreference = function() {
-    $scope.formValues.PlacementPreferences.push({ key: '', operator: '==', value: '' });
+    $scope.formValues.PlacementPreferences.push({ strategy: 'spread', value: '' });
   };
 
   $scope.removePlacementPreference = function(index) {
@@ -89,7 +90,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   };
 
   $scope.addLabel = function() {
-    $scope.formValues.Labels.push({ name: '', value: ''});
+    $scope.formValues.Labels.push({ key: '', value: ''});
   };
 
   $scope.removeLabel = function(index) {
@@ -97,7 +98,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   };
 
   $scope.addContainerLabel = function() {
-    $scope.formValues.ContainerLabels.push({ name: '', value: ''});
+    $scope.formValues.ContainerLabels.push({ key: '', value: ''});
   };
 
   $scope.removeContainerLabel = function(index) {
@@ -170,21 +171,8 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   }
 
   function prepareLabelsConfig(config, input) {
-    var labels = {};
-    input.Labels.forEach(function (label) {
-      if (label.name && label.value) {
-          labels[label.name] = label.value;
-      }
-    });
-    config.Labels = labels;
-
-    var containerLabels = {};
-    input.ContainerLabels.forEach(function (label) {
-      if (label.name && label.value) {
-          containerLabels[label.name] = label.value;
-      }
-    });
-    config.TaskTemplate.ContainerSpec.Labels = containerLabels;
+    config.Labels = LabelHelper.fromKeyValueToLabelHash(input.Labels);
+    config.TaskTemplate.ContainerSpec.Labels = LabelHelper.fromKeyValueToLabelHash(input.ContainerLabels);
   }
 
   function prepareVolumes(config, input) {
@@ -213,8 +201,10 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
       FailureAction: input.FailureAction
     };
   }
+
   function preparePlacementConfig(config, input) {
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(input.PlacementConstraints);
+    config.TaskTemplate.Placement.Preferences = ServiceHelper.translateKeyValueToPlacementPreferences(input.PlacementPreferences);
   }
 
   function prepareSecretConfig(config, input) {

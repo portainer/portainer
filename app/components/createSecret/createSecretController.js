@@ -1,6 +1,6 @@
 angular.module('createSecret', [])
-.controller('CreateSecretController', ['$scope', '$state', 'Notifications', 'SecretService',
-function ($scope, $state, Notifications, SecretService) {
+.controller('CreateSecretController', ['$scope', '$state', 'Notifications', 'SecretService', 'LabelHelper',
+function ($scope, $state, Notifications, SecretService, LabelHelper) {
   $scope.formValues = {
     Name: '',
     Data: '',
@@ -9,7 +9,7 @@ function ($scope, $state, Notifications, SecretService) {
   };
 
   $scope.addLabel = function() {
-    $scope.formValues.Labels.push({ name: '', value: ''});
+    $scope.formValues.Labels.push({ key: '', value: ''});
   };
 
   $scope.removeLabel = function(index) {
@@ -17,13 +17,7 @@ function ($scope, $state, Notifications, SecretService) {
   };
 
   function prepareLabelsConfig(config) {
-    var labels = {};
-    $scope.formValues.Labels.forEach(function (label) {
-      if (label.name && label.value) {
-          labels[label.name] = label.value;
-      }
-    });
-    config.Labels = labels;
+    config.Labels = LabelHelper.fromKeyValueToLabelHash($scope.formValues.Labels);
   }
 
   function prepareSecretData(config) {
