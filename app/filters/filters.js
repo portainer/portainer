@@ -175,14 +175,17 @@ angular.module('portainer.filters', [])
 .filter('repotags', function () {
   'use strict';
   return function (image) {
+    var tags = [];
     if (image.RepoTags && image.RepoTags.length > 0) {
       var tag = image.RepoTags[0];
-      if (tag === '<none>:<none>') {
-        return [];
+      if (tag !== '<none>:<none>') {
+        tags = tags.concat(image.RepoTags);
       }
-      return image.RepoTags;
     }
-    return [];
+    if(image.Containers === 0) {
+      tags.push('Unused');
+    }
+    return tags;
   };
 })
 .filter('getisodatefromtimestamp', function () {
