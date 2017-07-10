@@ -39,6 +39,7 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
     $('#loadConsoleSpinner').show();
     var termWidth = Math.round($('#terminal-container').width() / 8.2);
     var termHeight = 30;
+    var command = $scope.state.isCustomCommand ? $scope.state.customCommand : $scope.state.command;
     var execConfig = {
       id: $stateParams.id,
       AttachStdin: true,
@@ -46,7 +47,7 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
       AttachStderr: true,
       Tty: true,
       User: $scope.state.user,
-      Cmd: $scope.state.command.replace(' ', ',').split(',')
+      Cmd: command.replace(' ', ',').split(',')
     };
 
     Container.exec(execConfig, function(d) {

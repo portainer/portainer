@@ -22,7 +22,7 @@
               <div class="form-group">
                 <label for="command" class="col-lg-1 text-left col-sm-2 control-label">Command</label>
                 <div class="col-lg-11 col-sm-10">
-                  <div class="input-group" ng-if="!isCustomCommand">
+                  <div class="input-group" ng-if="!state.isCustomCommand">
                     <span class="input-group-addon">
                       <i class="fa fa-linux" aria-hidden="true" ng-if="imageOS == 'linux'"></i>
                       <i class="fa fa-windows" aria-hidden="true" ng-if="imageOS == 'windows'"></i>
@@ -34,14 +34,14 @@
                       <option value="cmd.exe" ng-if="imageOS == 'windows'">cmd.exe</option>
                     </select>
                   </div>
-                  <input class="form-control" ng-if="isCustomCommand" type="text" name="custom-command" ng-model="state.command" placeholder="e.g. ps aux">
+                  <input class="form-control" ng-if="state.isCustomCommand" type="text" name="custom-command" ng-model="state.customCommand" placeholder="e.g. ps aux">
                 </div>
               </div>
             <!-- !command-list -->
             <div class="form-group col-lg-12">
               <label for="command" class="text-left control-label">Use custom command</label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="isCustomCommand"><i></i>
+                <input type="checkbox" ng-model="state.isCustomCommand"><i></i>
               </label>
             </div>
             <div class="form-group">
