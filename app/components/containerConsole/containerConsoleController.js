@@ -1,10 +1,11 @@
 angular.module('containerConsole', [])
-.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'Exec', '$timeout', 'EndpointProvider', 'Notifications',
-function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvider, Notifications) {
+.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'Exec', '$timeout', 'EndpointProvider', 'Notifications', 'ContainerHelper',
+function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvider, Notifications, ContainerHelper) {
   $scope.state = {};
   $scope.state.loaded = false;
   $scope.state.connected = false;
-
+  $scope.formValues = {};
+  
   var socket, term;
 
   // Ensure the socket is closed before leaving the view
@@ -22,7 +23,7 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
     } else {
       Image.get({id: d.Image}, function(imgData) {
         $scope.imageOS = imgData.Os;
-        $scope.state.command = imgData.Os === 'windows' ? 'powershell' : 'bash';
+        $scope.formValues.command = imgData.Os === 'windows' ? 'powershell' : 'bash';
         $scope.state.loaded = true;
         $('#loadingViewSpinner').hide();
       }, function (e) {
@@ -39,14 +40,16 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
     $('#loadConsoleSpinner').show();
     var termWidth = Math.round($('#terminal-container').width() / 8.2);
     var termHeight = 30;
+    var command = $scope.formValues.isCustomCommand ? 
+                    $scope.formValues.customCommand : $scope.formValues.command;
     var execConfig = {
       id: $stateParams.id,
       AttachStdin: true,
       AttachStdout: true,
       AttachStderr: true,
       Tty: true,
-      User: $scope.state.user,
-      Cmd: $scope.state.command.replace(' ', ',').split(',')
+      User: $scope.formValues.user,
+      Cmd: ContainerHelper.commandStringToArray(command)
     };
 
     Container.exec(execConfig, function(d) {

@@ -22,28 +22,35 @@
               <div class="form-group">
                 <label for="command" class="col-lg-1 text-left col-sm-2 control-label">Command</label>
                 <div class="col-lg-11 col-sm-10">
-                  <div class="input-group">
+                  <div class="input-group" ng-if="!formValues.isCustomCommand">
                     <span class="input-group-addon">
                       <i class="fa fa-linux" aria-hidden="true" ng-if="imageOS == 'linux'"></i>
                       <i class="fa fa-windows" aria-hidden="true" ng-if="imageOS == 'windows'"></i>
                     </span>
-                    <select class="form-control" ng-model="state.command" id="command">
+                    <select class="form-control" ng-model="formValues.command" id="command">
                       <option value="bash" ng-if="imageOS == 'linux'">/bin/bash</option>
                       <option value="sh" ng-if="imageOS == 'linux'">/bin/sh</option>
                       <option value="powershell" ng-if="imageOS == 'windows'">powershell</option>
                       <option value="cmd.exe" ng-if="imageOS == 'windows'">cmd.exe</option>
                     </select>
                   </div>
+                  <input class="form-control" ng-if="formValues.isCustomCommand" type="text" name="custom-command" ng-model="formValues.customCommand" placeholder="e.g. ps aux">
                 </div>
               </div>
             <!-- !command-list -->
+            <div class="form-group col-lg-12">
+              <label for="command" class="text-left control-label">Use custom command</label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.isCustomCommand"><i></i>
+              </label>
+            </div>
             <div class="form-group">
               <label for="username" class="col-lg-1 text-left col-sm-2 control-label">
                 User
                 <portainer-tooltip position="bottom" message="Format is one of: user, user:group, uid or uid:gid"></portainer-tooltip>
               </label>
               <div class="col-lg-11 col-sm-10">
-                <input class="form-control" type="text" name="username" ng-model="state.user" placeholder="root">
+                <input class="form-control" type="text" name="username" ng-model="formValues.user" placeholder="root">
               </div>
             </div>
             <div class="form-group">
