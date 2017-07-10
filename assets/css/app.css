@@ -513,3 +513,8 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   opacity: 0.9;
 }
 /*!toaster override*/
+
+.monospaced {
+  font-family: monospace;
+  font-weight: 600;
+}
