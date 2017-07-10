@@ -114,10 +114,7 @@
                 <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
                 <td><a ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a></td>
                 <td>
-                  <span class="label image-tag" ng-class="::{
-                    'label-default': tag === 'Unused',
-                    'label-primary': tag !== 'Unused'
-                  }" ng-repeat="tag in (image|repotags)">{{ tag }}</span>
+                  <span class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>
                 </td>
                 <td>{{ image.VirtualSize|humansize }}</td>
                 <td>{{ image.Created|getisodatefromtimestamp }}</td>
