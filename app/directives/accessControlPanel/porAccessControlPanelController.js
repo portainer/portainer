@@ -1,6 +1,6 @@
 angular.module('portainer')
-.controller('porAccessControlPanelController', ['$q', '$state', 'UserService', 'ResourceControlService', 'Notifications', 'Authentication', 'ModalService', 'ControllerDataPipeline', 'FormValidator',
-function ($q, $state, UserService, ResourceControlService, Notifications, Authentication, ModalService, ControllerDataPipeline, FormValidator) {
+.controller('porAccessControlPanelController', ['$q', '$state', 'UserService', 'ResourceControlService', 'Notifications', 'Authentication', 'ModalService', 'FormValidator',
+function ($q, $state, UserService, ResourceControlService, Notifications, Authentication, ModalService, FormValidator) {
 
   var ctrl = this;
 
