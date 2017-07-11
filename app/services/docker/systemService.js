@@ -40,6 +40,10 @@ angular.module('portainer.services')
 
     return deferred.promise;
   };
+  
+  service.dataUsage = function () {
+    return System.dataUsage().$promise;
+  };
 
   return service;
 }]);
