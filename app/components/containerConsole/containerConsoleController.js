@@ -5,7 +5,7 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
   $scope.state.loaded = false;
   $scope.state.connected = false;
   $scope.formValues = {};
-  
+
   var socket, term;
 
   // Ensure the socket is closed before leaving the view
@@ -40,7 +40,7 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
     $('#loadConsoleSpinner').show();
     var termWidth = Math.round($('#terminal-container').width() / 8.2);
     var termHeight = 30;
-    var command = $scope.formValues.isCustomCommand ? 
+    var command = $scope.formValues.isCustomCommand ?
                     $scope.formValues.customCommand : $scope.formValues.command;
     var execConfig = {
       id: $stateParams.id,
@@ -107,7 +107,7 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
       term.on('data', function (data) {
         socket.send(data);
       });
-      term.open(document.getElementById('terminal-container'));
+      term.open(document.getElementById('terminal-container'), true);
       term.resize(width, height);
       term.setOption('cursorBlink', true);
 
