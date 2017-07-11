@@ -64,6 +64,10 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
       $scope.formValues.UseTLSCACert = Boolean(data.TLSCACert);
       $scope.formValues.UseTLSCert = Boolean(data.TLSCert);
       $scope.formValues.UseTLSKey = Boolean(data.TLSKey);
+      if (!$scope.endpoint.TLS) {
+        $scope.endpoint.TLSVerify = true
+        $scope.endpoint.TLSClientCert = true
+      }
     }, function error(err) {
       $('#loadingViewSpinner').hide();
       Notifications.error('Failure', err, 'Unable to retrieve endpoint details');

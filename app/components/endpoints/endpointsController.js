@@ -15,8 +15,8 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
     URL: '',
     PublicURL: '',
     TLS: false,
-    TLSVerify: false,
-    TLSClientCert: false,
+    TLSVerify: true,
+    TLSClientCert: true,
     TLSCACert: null,
     TLSCert: null,
     TLSKey: null

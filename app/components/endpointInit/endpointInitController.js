@@ -11,8 +11,8 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     Name: '',
     URL: '',
     TLS: false,
-    TLSVerify: false,
-    TLSClientCert: false,
+    TLSVerify: true,
+    TLSClientCert: true,
     TLSCACert: null,
     TLSCert: null,
     TLSKey: null
