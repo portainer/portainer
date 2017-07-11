@@ -79,7 +79,7 @@
         <portainer-tooltip ng-if="!isAdmin && availableTeams.length > 1" position="bottom" message="As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource."></portainer-tooltip>
       </label>
       <span ng-if="isAdmin && availableTeams.length === 0" class="small text-muted" style="margin-left: 20px;">
-        You have not yet created any team. Head over the <a ui-sref="teams">teams view</a> to manage user teams.</span>
+        You have not yet created any team. Head over the <a ui-sref="teams">teams view</a> to manage user teams.
       </span>
       <span isteven-multi-select
       ng-if="(isAdmin && availableTeams.length > 0) || (!isAdmin && availableTeams.length > 1)"
@@ -92,7 +92,7 @@
       search-property="Name"
       on-item-click="synchronizeFormData()"
       translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
-      style="margin-left: 20px;"
+      style="margin-left: 20px;">
     </span>
   </div>
 </div>
@@ -105,7 +105,7 @@
       <portainer-tooltip ng-if="isAdmin && availableUsers.length > 0" position="bottom" message="You can select which user(s) will be able to manage this resource."></portainer-tooltip>
     </label>
     <span ng-if="availableUsers.length === 0" class="small text-muted" style="margin-left: 20px;">
-      You have not yet created any user. Head over the <a ui-sref="users">users view</a> to manage users.</span>
+      You have not yet created any user. Head over the <a ui-sref="users">users view</a> to manage users.
     </span>
     <span isteven-multi-select
     ng-if="availableUsers.length > 0"
@@ -118,7 +118,7 @@
     search-property="Username"
     on-item-click="synchronizeFormData()"
     translation="{nothingSelected: 'Select one or more users', search: 'Search...'}"
-    style="margin-left: 20px;"
+    style="margin-left: 20px;">
   </span>
 </div>
 </div>

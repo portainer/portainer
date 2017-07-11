@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'Secret', 'SecretHelper', 'Service', 'ServiceHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
-function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, Secret, SecretHelper, Service, ServiceHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ControllerDataPipeline) {
+.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'Secret', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
+function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, Secret, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ControllerDataPipeline) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -124,8 +124,22 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
     }
   };
-  $scope.updatePlacementConstraint = function updatePlacementConstraint(service, constraint) {
+  $scope.updatePlacementConstraint = function(service, constraint) {
     updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
+  };
+
+  $scope.addPlacementPreference = function(service) {
+    service.ServicePreferences.push({ strategy: 'spread', value: '' });
+    updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
+  };
+  $scope.removePlacementPreference = function(service, index) {
+    var removedElement = service.ServicePreferences.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
+    }
+  };
+  $scope.updatePlacementPreference = function(service, constraint) {
+    updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
   };
 
   $scope.addPublishedPort = function addPublishedPort(service) {
@@ -174,9 +188,9 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     $('#loadingViewSpinner').show();
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Name = service.Name;
-    config.Labels = translateServiceLabelsToLabels(service.ServiceLabels);
-    config.TaskTemplate.ContainerSpec.Env = translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
-    config.TaskTemplate.ContainerSpec.Labels = translateServiceLabelsToLabels(service.ServiceContainerLabels);
+    config.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceLabels);
+    config.TaskTemplate.ContainerSpec.Env = ServiceHelper.translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
+    config.TaskTemplate.ContainerSpec.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceContainerLabels);
     config.TaskTemplate.ContainerSpec.Image = service.Image;
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
 
@@ -188,6 +202,7 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
       config.TaskTemplate.Placement = {};
     }
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(service.ServiceConstraints);
+    config.TaskTemplate.Placement.Preferences = ServiceHelper.translateKeyValueToPlacementPreferences(service.ServicePreferences);
 
     config.TaskTemplate.Resources = {
       Limits: {
@@ -263,11 +278,12 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
 
   function translateServiceArrays(service) {
     service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
-    service.EnvironmentVariables = translateEnvironmentVariables(service.Env);
-    service.ServiceLabels = translateLabelsToServiceLabels(service.Labels);
-    service.ServiceContainerLabels = translateLabelsToServiceLabels(service.ContainerLabels);
+    service.EnvironmentVariables = ServiceHelper.translateEnvironmentVariables(service.Env);
+    service.ServiceLabels = LabelHelper.fromLabelHashToKeyValue(service.Labels);
+    service.ServiceContainerLabels = LabelHelper.fromLabelHashToKeyValue(service.ContainerLabels);
     service.ServiceMounts = angular.copy(service.Mounts);
-    service.ServiceConstraints = translateConstraintsToKeyValue(service.Constraints);
+    service.ServiceConstraints = ServiceHelper.translateConstraintsToKeyValue(service.Constraints);
+    service.ServicePreferences = ServiceHelper.translatePreferencesToKeyValue(service.Preferences);
   }
 
   function initView() {
@@ -310,7 +326,6 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
       Notifications.error('Failure', err, 'Unable to retrieve service details');
     })
     .finally(function final() {
-
       $('#loadingViewSpinner').hide();
     });
   }
@@ -339,81 +354,6 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
   function updateServiceArray(service, name) {
     previousServiceValues.push(name);
     service.hasChanges = true;
-  }
-
-  function translateEnvironmentVariables(env) {
-    if (env) {
-      var variables = [];
-      env.forEach(function(variable) {
-        var idx = variable.indexOf('=');
-        var keyValue = [variable.slice(0,idx), variable.slice(idx+1)];
-        var originalValue = (keyValue.length > 1) ? keyValue[1] : '';
-        variables.push({ key: keyValue[0], value: originalValue, originalKey: keyValue[0], originalValue: originalValue, added: true});
-      });
-      return variables;
-    }
-    return [];
-  }
-  function translateEnvironmentVariablesToEnv(env) {
-    if (env) {
-      var variables = [];
-      env.forEach(function(variable) {
-        if (variable.key && variable.key !== '') {
-          variables.push(variable.key + '=' + variable.value);
-        }
-      });
-      return variables;
-    }
-    return [];
-  }
-
-  function translateLabelsToServiceLabels(Labels) {
-    var labels = [];
-    if (Labels) {
-      Object.keys(Labels).forEach(function(key) {
-        labels.push({ key: key, value: Labels[key], originalKey: key, originalValue: Labels[key], added: true});
-      });
-    }
-    return labels;
-  }
-  function translateServiceLabelsToLabels(labels) {
-    var Labels = {};
-    if (labels) {
-      labels.forEach(function(label) {
-        Labels[label.key] = label.value;
-      });
-    }
-    return Labels;
-  }
-
-  function translateConstraintsToKeyValue(constraints) {
-    function getOperator(constraint) {
-      var indexEquals = constraint.indexOf('==');
-      if (indexEquals >= 0) {
-        return [indexEquals, '=='];
-      }
-      return [constraint.indexOf('!='), '!='];
-    }
-    if (constraints) {
-      var keyValueConstraints = [];
-      constraints.forEach(function(constraint) {
-        var operatorIndices = getOperator(constraint);
-
-        var key = constraint.slice(0, operatorIndices[0]);
-        var operator = operatorIndices[1];
-        var value = constraint.slice(operatorIndices[0] + 2);
-
-        keyValueConstraints.push({
-          key: key,
-          value: value,
-          operator: operator,
-          originalKey: key,
-          originalValue: value
-        });
-      });
-      return keyValueConstraints;
-    }
-    return [];
   }
 
   initView();

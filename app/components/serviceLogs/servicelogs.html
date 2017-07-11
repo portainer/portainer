@@ -1,9 +1,9 @@
 <rd-header>
-  <rd-header-title title="Container logs">
+  <rd-header-title title="Service logs">
       <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="containers">Containers</a> &gt; <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a> &gt; Logs
+    <a ui-sref="services">Services</a> > <a ui-sref="service({id: service.ID})">{{ service.Spec.Name }}</a> > Logs
   </rd-header-content>
 </rd-header>
 
@@ -12,9 +12,9 @@
     <rd-widget>
       <rd-widget-body>
         <div class="widget-icon grey pull-left">
-          <i class="fa fa-server"></i>
+          <i class="fa fa-list-alt"></i>
         </div>
-        <div class="title">{{ container.Name|trimcontainername }}</div>
+        <div class="title">{{ service.Spec.Name }}</div>
         <div class="comment">Name</div>
       </rd-widget-body>
     </rd-widget>

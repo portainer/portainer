@@ -307,4 +307,10 @@ angular.module('portainer.filters', [])
     }
     return '';
   };
+})
+.filter('imagelayercommand', function () {
+  'use strict';
+  return function (createdBy) {
+	  return createdBy.replace('/bin/sh -c #(nop) ', '').replace('/bin/sh -c ', 'RUN ');
+  };
 });

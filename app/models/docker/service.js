@@ -42,6 +42,8 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.RestartWindow = 0;
   }
   this.Constraints = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Constraints || [] : [];
+  this.Preferences = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Preferences || [] : [];
+  this.Platforms = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Platforms || [] : [];
   this.Labels = data.Spec.Labels;
   if (this.Labels && this.Labels['com.docker.stack.namespace']) {
     this.StackName = this.Labels['com.docker.stack.namespace'];
@@ -50,22 +52,30 @@ function ServiceViewModel(data, runningTasks, nodes) {
   var containerSpec = data.Spec.TaskTemplate.ContainerSpec;
   if (containerSpec) {
     this.ContainerLabels = containerSpec.Labels;
-    this.Env = containerSpec.Env;
-    this.Mounts = containerSpec.Mounts || [];
-    this.User = containerSpec.User;
-    this.Dir = containerSpec.Dir;
     this.Command = containerSpec.Command;
     this.Arguments = containerSpec.Args;
+    this.Hostname = containerSpec.Hostname;
+    this.Env = containerSpec.Env;
+    this.Dir = containerSpec.Dir;
+    this.User = containerSpec.User;
+    this.Groups = containerSpec.Groups;
+    this.TTY = containerSpec.TTY;
+    this.OpenStdin = containerSpec.OpenStdin;
+    this.ReadOnly = containerSpec.ReadOnly;
+    this.Mounts = containerSpec.Mounts || [];
+    this.StopSignal = containerSpec.StopSignal;
+    this.StopGracePeriod = containerSpec.StopGracePeriod;
+    this.HealthCheck = containerSpec.HealthCheck || {};
+    this.Hosts = containerSpec.Hosts;
+    this.DNSConfig = containerSpec.DNSConfig;
     this.Secrets = containerSpec.Secrets;
   }
   if (data.Endpoint) {
     this.Ports = data.Endpoint.Ports;
   }
 
-  this.Mounts = [];
-  if (data.Spec.TaskTemplate.ContainerSpec.Mounts) {
-    this.Mounts = data.Spec.TaskTemplate.ContainerSpec.Mounts;
-  }
+  this.LogDriver = data.Spec.TaskTemplate.LogDriver;
+  this.Runtime = data.Spec.TaskTemplate.Runtime;
 
   this.VirtualIPs = data.Endpoint ? data.Endpoint.VirtualIPs : [];
 
@@ -78,6 +88,8 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.UpdateDelay = 0;
     this.UpdateFailureAction = 'pause';
   }
+
+  this.RollbackConfig = data.Spec.RollbackConfig;
 
   this.Checked = false;
   this.Scale = false;

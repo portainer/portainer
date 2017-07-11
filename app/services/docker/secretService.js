@@ -36,7 +36,21 @@ angular.module('portainer.services')
   };
 
   service.remove = function(secretId) {
-    return Secret.remove({ id: secretId }).$promise;
+    var deferred = $q.defer();
+
+    Secret.remove({ id: secretId }).$promise
+    .then(function success(data) {
+      if (data.message) {
+        deferred.reject({ msg: data.message });
+      } else {
+        deferred.resolve();
+      }
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to remove secret', err: err });
+    });
+
+    return deferred.promise;
   };
 
   service.create = function(secretConfig) {

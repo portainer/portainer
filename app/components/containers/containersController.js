@@ -40,6 +40,7 @@ angular.module('containers', [])
         }
         return model;
       });
+      updateSelectionFlags();
       $('#loadContainersSpinner').hide();
     }, function (e) {
       $('#loadContainersSpinner').hide();
@@ -116,17 +117,15 @@ angular.module('containers', [])
     angular.forEach($scope.state.filteredContainers, function (container) {
       if (container.Checked !== allSelected) {
         container.Checked = allSelected;
-        $scope.selectItem(container);
+        toggleItemSelection(container);
       }
     });
+    updateSelectionFlags();
   };
 
   $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
+    toggleItemSelection(item);
+    updateSelectionFlags();
   };
 
   $scope.toggleGetAll = function () {
@@ -185,6 +184,33 @@ angular.module('containers', [])
       }
     );
   };
+  
+  function toggleItemSelection(item) {
+    if (item.Checked) {
+      $scope.state.selectedItemCount++;
+    } else {
+      $scope.state.selectedItemCount--;
+    }
+  }
+  
+  function updateSelectionFlags() {
+    $scope.state.noStoppedItemsSelected = true;
+    $scope.state.noRunningItemsSelected = true;
+    $scope.state.noPausedItemsSelected = true;
+    $scope.containers.forEach(function(container) {
+      if(!container.Checked) {
+        return;
+      }
+      
+      if(container.Status === 'paused') {
+        $scope.state.noPausedItemsSelected = false;
+      } else if(container.Status === 'stopped') {
+        $scope.state.noStoppedItemsSelected = false;
+      } else if(container.Status === 'running') {
+        $scope.state.noRunningItemsSelected = false;
+      }
+    } );
+  }
 
   function retrieveSwarmHostsInfo(data) {
     var swarm_hosts = {};

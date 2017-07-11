@@ -3,7 +3,7 @@
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="containers">Containers</a> > <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a>
+    <a ui-sref="containers">Containers</a> &gt; <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -75,7 +75,7 @@
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
                   <a class="btn btn-outline-secondary" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i>Stats</a>
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="logs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
                   <a class="btn btn-outline-secondary" type="button" ui-sref="console({id: container.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
                 </div>
               </td>
@@ -114,7 +114,7 @@
           </tbody>
         </table>
       </rd-widget-body>
-    </rd-widge>
+    </rd-widget>
   </div>
 </div>
 

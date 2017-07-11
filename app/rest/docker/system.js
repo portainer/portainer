@@ -12,6 +12,7 @@ angular.module('portainer.rest')
       method: 'GET', params: { action: 'events', since: '@since', until: '@until' },
       isArray: true, transformResponse: jsonObjectsToArrayHandler
     },
-    auth: { method: 'POST', params: { action: 'auth' } }
+    auth: { method: 'POST', params: { action: 'auth' } },
+    dataUsage: { method: 'GET', params: { action: 'system/df' } }
   });
 }]);

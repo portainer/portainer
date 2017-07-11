@@ -86,7 +86,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     $('#createImageSpinner').show();
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;
-    var imageConfig = ImageHelper.createImageConfigForCommit(image, registry);
+    var imageConfig = ImageHelper.createImageConfigForCommit(image, registry.URL);
     ContainerCommit.commit({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
       $('#createImageSpinner').hide();
       update();

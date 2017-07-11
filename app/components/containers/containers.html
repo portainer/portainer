@@ -25,12 +25,12 @@
     <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
         <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-success btn-responsive" ng-click="startAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
-          <button type="button" class="btn btn-danger btn-responsive" ng-click="stopAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
+          <button type="button" class="btn btn-success btn-responsive" ng-click="startAction()" ng-disabled="!state.selectedItemCount || state.noStoppedItemsSelected"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
+          <button type="button" class="btn btn-danger btn-responsive" ng-click="stopAction()" ng-disabled="!state.selectedItemCount || state.noRunningItemsSelected"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
           <button type="button" class="btn btn-danger btn-responsive" ng-click="killAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
           <button type="button" class="btn btn-primary btn-responsive" ng-click="restartAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
-          <button type="button" class="btn btn-primary btn-responsive" ng-click="pauseAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
-          <button type="button" class="btn btn-primary btn-responsive" ng-click="unpauseAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
+          <button type="button" class="btn btn-primary btn-responsive" ng-click="pauseAction()" ng-disabled="!state.selectedItemCount || state.noRunningItemsSelected"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
+          <button type="button" class="btn btn-primary btn-responsive" ng-click="unpauseAction()" ng-disabled="!state.selectedItemCount || state.noPausedItemsSelected"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
           <button type="button" class="btn btn-danger btn-responsive" ng-click="confirmRemoveAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
         </div>
         <a class="btn btn-primary" type="button" ui-sref="actions.create.container"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add container</a>
@@ -145,5 +145,5 @@
         </div>
       </div>
     </rd-widget-body>
-  <rd-widget>
+  </rd-widget>
 </div>
