@@ -20,8 +20,6 @@ angular.module('portainer', [
   'portainer.services',
   'auth',
   'dashboard',
-  'common.accesscontrol.panel',
-  'common.accesscontrol.form',
   'container',
   'containerConsole',
   'containerLogs',

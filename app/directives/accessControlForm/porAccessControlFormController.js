@@ -1,4 +1,4 @@
-angular.module('common.accesscontrol.form', [])
+angular.module('portainer')
 .controller('porAccessControlFormController', ['$q', 'UserService', 'Notifications', 'Authentication',
 function ($q, UserService, Notifications, Authentication) {
   var ctrl = this;

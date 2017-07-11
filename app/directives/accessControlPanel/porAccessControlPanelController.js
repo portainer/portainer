@@ -1,26 +1,28 @@
-angular.module('common.accesscontrol.panel', [])
-.controller('AccessControlPanelController', ['$q', '$scope', '$state', 'UserService', 'ResourceControlService', 'Notifications', 'Authentication', 'ModalService', 'ControllerDataPipeline', 'FormValidator',
-function ($q, $scope, $state, UserService, ResourceControlService, Notifications, Authentication, ModalService, ControllerDataPipeline, FormValidator) {
+angular.module('portainer')
+.controller('porAccessControlPanelController', ['$q', '$state', 'UserService', 'ResourceControlService', 'Notifications', 'Authentication', 'ModalService', 'ControllerDataPipeline', 'FormValidator',
+function ($q, $state, UserService, ResourceControlService, Notifications, Authentication, ModalService, ControllerDataPipeline, FormValidator) {
 
-  $scope.state = {
+  var ctrl = this;
+
+  ctrl.state = {
     displayAccessControlPanel: false,
     canEditOwnership: false,
     editOwnership: false,
     formValidationError: ''
   };
 
-  $scope.formValues = {
+  ctrl.formValues = {
     Ownership: 'public',
     Ownership_Users: [],
     Ownership_Teams: []
   };
 
-  $scope.authorizedUsers = [];
-  $scope.availableUsers = [];
-  $scope.authorizedTeams = [];
-  $scope.availableTeams = [];
+  ctrl.authorizedUsers = [];
+  ctrl.availableUsers = [];
+  ctrl.authorizedTeams = [];
+  ctrl.availableTeams = [];
 
-  $scope.confirmUpdateOwnership = function (force) {
+  ctrl.confirmUpdateOwnership = function (force) {
     if (!validateForm()) {
       return;
     }
@@ -30,52 +32,52 @@ function ($q, $scope, $state, UserService, ResourceControlService, Notifications
     });
   };
 
+  function validateForm() {
+    ctrl.state.formValidationError = '';
+    var error = '';
+
+    var accessControlData = {
+      AccessControlEnabled: ctrl.formValues.Ownership === 'public' ? false : true,
+      Ownership: ctrl.formValues.Ownership,
+      AuthorizedUsers: ctrl.formValues.Ownership_Users,
+      AuthorizedTeams: ctrl.formValues.Ownership_Teams
+    };
+    var isAdmin = ctrl.isAdmin;
+    error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+    if (error) {
+      ctrl.state.formValidationError = error;
+      return false;
+    }
+    return true;
+  }
+
   function processOwnershipFormValues() {
     var userIds = [];
-    angular.forEach($scope.formValues.Ownership_Users, function(user) {
+    angular.forEach(ctrl.formValues.Ownership_Users, function(user) {
       userIds.push(user.Id);
     });
     var teamIds = [];
-    angular.forEach($scope.formValues.Ownership_Teams, function(team) {
+    angular.forEach(ctrl.formValues.Ownership_Teams, function(team) {
       teamIds.push(team.Id);
     });
-    var administratorsOnly = $scope.formValues.Ownership === 'administrators' ? true : false;
+    var administratorsOnly = ctrl.formValues.Ownership === 'administrators' ? true : false;
 
     return {
-      ownership: $scope.formValues.Ownership,
+      ownership: ctrl.formValues.Ownership,
       authorizedUserIds: administratorsOnly ? [] : userIds,
       authorizedTeamIds: administratorsOnly ? [] : teamIds,
       administratorsOnly: administratorsOnly
     };
   }
 
-  function validateForm() {
-    $scope.state.formValidationError = '';
-    var error = '';
-
-    var accessControlData = {
-      ownership: $scope.formValues.Ownership,
-      authorizedUsers: $scope.formValues.Ownership_Users,
-      authorizedTeams: $scope.formValues.Ownership_Teams
-    };
-    var isAdmin = $scope.isAdmin;
-    error = FormValidator.validateAccessControl(accessControlData, isAdmin);
-    if (error) {
-      $scope.state.formValidationError = error;
-      return false;
-    }
-    return true;
-  }
-
   function updateOwnership() {
     $('#loadingViewSpinner').show();
 
-    var accessControlData = ControllerDataPipeline.getAccessControlData();
-    var resourceId = accessControlData.resourceId;
+    var resourceId = ctrl.resourceControl.ResourceId;
     var ownershipParameters = processOwnershipFormValues();
 
-    ResourceControlService.applyResourceControlChange(accessControlData.resourceType, resourceId,
-      $scope.resourceControl, ownershipParameters)
+    ResourceControlService.applyResourceControlChange(ctrl.resourceType, resourceId,
+      ctrl.resourceControl, ownershipParameters)
     .then(function success(data) {
       Notifications.success('Access control successfully updated');
       $state.reload();
@@ -88,38 +90,34 @@ function ($q, $scope, $state, UserService, ResourceControlService, Notifications
     });
   }
 
-  function initAccessControlPanel() {
+  function initComponent() {
     $('#loadingViewSpinner').show();
 
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true: false;
     var userId = userDetails.ID;
-    $scope.isAdmin = isAdmin;
-
-    var accessControlData = ControllerDataPipeline.getAccessControlData();
-    var resourceControl = accessControlData.resourceControl;
-    $scope.resourceType = accessControlData.resourceType;
-    $scope.resourceControl = resourceControl;
+    ctrl.isAdmin = isAdmin;
+    var resourceControl = ctrl.resourceControl;
 
     if (isAdmin) {
       if (resourceControl) {
-        $scope.formValues.Ownership = resourceControl.Ownership === 'private' ? 'restricted' : resourceControl.Ownership;
+        ctrl.formValues.Ownership = resourceControl.Ownership === 'private' ? 'restricted' : resourceControl.Ownership;
       } else {
-        $scope.formValues.Ownership = 'public';
+        ctrl.formValues.Ownership = 'public';
       }
     } else {
-      $scope.formValues.Ownership = 'public';
+      ctrl.formValues.Ownership = 'public';
     }
 
     ResourceControlService.retrieveOwnershipDetails(resourceControl)
     .then(function success(data) {
-      $scope.authorizedUsers = data.authorizedUsers;
-      $scope.authorizedTeams = data.authorizedTeams;
+      ctrl.authorizedUsers = data.authorizedUsers;
+      ctrl.authorizedTeams = data.authorizedTeams;
       return ResourceControlService.retrieveUserPermissionsOnResource(userId, isAdmin, resourceControl);
     })
     .then(function success(data) {
-      $scope.state.canEditOwnership = data.isPartOfRestrictedUsers || data.isLeaderOfAnyRestrictedTeams;
-      $scope.state.canChangeOwnershipToTeam = data.isPartOfRestrictedUsers;
+      ctrl.state.canEditOwnership = data.isPartOfRestrictedUsers || data.isLeaderOfAnyRestrictedTeams;
+      ctrl.state.canChangeOwnershipToTeam = data.isPartOfRestrictedUsers;
 
       return $q.all({
         availableUsers: isAdmin ? UserService.users(false) : [],
@@ -127,24 +125,24 @@ function ($q, $scope, $state, UserService, ResourceControlService, Notifications
       });
     })
     .then(function success(data) {
-      $scope.availableUsers = data.availableUsers;
-      angular.forEach($scope.availableUsers, function(user) {
-        var found = _.find($scope.authorizedUsers, { Id: user.Id });
+      ctrl.availableUsers = data.availableUsers;
+      angular.forEach(ctrl.availableUsers, function(user) {
+        var found = _.find(ctrl.authorizedUsers, { Id: user.Id });
         if (found) {
           user.selected = true;
         }
       });
-      $scope.availableTeams = data.availableTeams;
+      ctrl.availableTeams = data.availableTeams;
       angular.forEach(data.availableTeams, function(team) {
-        var found = _.find($scope.authorizedTeams, { Id: team.Id });
+        var found = _.find(ctrl.authorizedTeams, { Id: team.Id });
         if (found) {
           team.selected = true;
         }
       });
       if (data.availableTeams.length === 1) {
-        $scope.formValues.Ownership_Teams.push(data.availableTeams[0]);
+        ctrl.formValues.Ownership_Teams.push(data.availableTeams[0]);
       }
-      $scope.state.displayAccessControlPanel = true;
+      ctrl.state.displayAccessControlPanel = true;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve access control information');
@@ -154,5 +152,5 @@ function ($q, $scope, $state, UserService, ResourceControlService, Notifications
     });
   }
 
-  initAccessControlPanel();
+  initComponent();
 }]);

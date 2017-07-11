@@ -125,7 +125,13 @@
   </div>
 </div>
 
-<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="service && applicationState.application.authentication"></div>
+<!-- access-control-panel -->
+<por-access-control-panel
+  ng-if="service && applicationState.application.authentication"
+  resource-control="service.ResourceControl"
+  resource-type="'service'">
+</por-access-control-panel>
+<!-- !access-control-panel -->
 
 <div class="row">
   <hr>

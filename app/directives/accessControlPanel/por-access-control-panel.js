@@ -1,6 +1,8 @@
 angular.module('portainer').component('porAccessControlPanel', {
-  templateUrl: 'app/directives/accessControlForm/porAccessControlPanel.html',
+  templateUrl: 'app/directives/accessControlPanel/porAccessControlPanel.html',
   controller: 'porAccessControlPanelController',
   bindings: {
+    resourceControl: '=',
+    resourceType: '<'
   }
 });
