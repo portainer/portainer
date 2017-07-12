@@ -83,9 +83,9 @@ angular.module('portainer.services')
       teams: resourceControl.TeamAccesses.length > 0 ? TeamService.teams() : []
     })
     .then(function success(data) {
-      var authorizedUserNames = ResourceControlHelper.retrieveAuthorizedUsers(resourceControl, data.users);
-      var authorizedTeamNames = ResourceControlHelper.retrieveAuthorizedTeams(resourceControl, data.teams);
-      deferred.resolve({ authorizedUsers: authorizedUserNames, authorizedTeams: authorizedTeamNames });
+      var authorizedUsers = ResourceControlHelper.retrieveAuthorizedUsers(resourceControl, data.users);
+      var authorizedTeams = ResourceControlHelper.retrieveAuthorizedTeams(resourceControl, data.teams);
+      deferred.resolve({ authorizedUsers: authorizedUsers, authorizedTeams: authorizedTeams });
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve user and team information', err: err });
