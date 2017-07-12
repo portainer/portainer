@@ -309,12 +309,6 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
           'containerPath': mount.Destination,
           'readOnly': mount.RW === false
         };
-        /*if (arr[0].indexOf('/') === 0) {
-          volume.type = 'bind';
-        }
-        if (arr[2] && arr[2] === 'ro') {
-          volume.readOnly = true;
-        }*/
         $scope.formValues.Volumes.push(volume);
       }
       // Add network
@@ -322,15 +316,17 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         EndpointsConfig: {}
       };
       if ($scope.config.HostConfig.NetworkMode.indexOf('container:') === 0) {
-        $scope.config.HostConfig.NetworkMode = 'container';
         $scope.formValues.NetworkContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
+        $scope.config.HostConfig.NetworkMode = 'container';
       }
-      if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig) {
-        if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address) {
-          $scope.formValues.IPv4 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address;
-        }
-        if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address) {
-          $scope.formValues.IPv6 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address;
+      if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]) {
+        if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig) {
+          if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address) {
+            $scope.formValues.IPv4 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address;
+          }
+          if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address) {
+            $scope.formValues.IPv6 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address;
+          }
         }
       }
       $scope.config.NetworkingConfig.EndpointsConfig = d.NetworkSettings.Networks;
