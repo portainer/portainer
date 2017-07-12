@@ -34,6 +34,10 @@
         <table class="table">
           <tbody>
             <tr>
+              <td>ID</td>
+              <td>{{ container.Id }}</td>
+            </tr>
+            <tr>
               <td>Name</td>
               <td ng-if="!container.edit">
                 {{ container.Name|trimcontainername }}
