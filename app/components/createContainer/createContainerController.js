@@ -281,6 +281,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   function loadFromContainerSpec() {
     // Get container
     Container.get({id: $stateParams.from}, function(d) {
+      $scope.fromContainer = new ContainerViewModel(d);
       // Add Config
       $scope.config = d.Config;
       if ($scope.config.Cmd) {
