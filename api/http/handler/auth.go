@@ -75,7 +75,7 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 
 	u, err := handler.UserService.UserByUsername(username)
 	if err == portainer.ErrUserNotFound {
-		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
 		return
 	} else if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
