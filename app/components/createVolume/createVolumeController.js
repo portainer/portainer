@@ -70,16 +70,18 @@ function ($scope, $state, VolumeService, SystemService, ResourceControlService, 
 
   function initView() {
     $('#loadingViewSpinner').show();
-    SystemService.getVolumePlugins()
-    .then(function success(data) {
-      $scope.availableVolumeDrivers = data;
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
-    });
+    if ($scope.applicationState.endpoint.mode.provider !== 'DOCKER_SWARM') {
+      SystemService.getVolumePlugins()
+      .then(function success(data) {
+        $scope.availableVolumeDrivers = data;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
+      })
+      .finally(function final() {
+        $('#loadingViewSpinner').hide();
+      });
+    }
   }
 
   initView();

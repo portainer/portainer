@@ -3,7 +3,7 @@ function ImageViewModel(data) {
   this.Tag = data.Tag;
   this.Repository = data.Repository;
   this.Created = data.Created;
-  this.Containers = data.dataUsage.Containers;
+  this.Containers = data.dataUsage ? data.dataUsage.Containers : 0;
   this.Checked = false;
   this.RepoTags = data.RepoTags;
   this.VirtualSize = data.VirtualSize;
