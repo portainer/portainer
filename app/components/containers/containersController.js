@@ -185,7 +185,7 @@ angular.module('containers', [])
       }
     );
   };
-  
+
   function toggleItemSelection(item) {
     if (item.Checked) {
       $scope.state.selectedItemCount++;
@@ -193,7 +193,7 @@ angular.module('containers', [])
       $scope.state.selectedItemCount--;
     }
   }
-  
+
   function updateSelectionFlags() {
     $scope.state.noStoppedItemsSelected = true;
     $scope.state.noRunningItemsSelected = true;
@@ -202,7 +202,7 @@ angular.module('containers', [])
       if(!container.Checked) {
         return;
       }
-      
+
       if(container.Status === 'paused') {
         $scope.state.noPausedItemsSelected = false;
       } else if(container.Status === 'stopped') {
@@ -233,7 +233,7 @@ angular.module('containers', [])
     $q.when(provider !== 'DOCKER_SWARM' || SystemService.info())
     .then(function success(data) {
       if (provider === 'DOCKER_SWARM') {
-        $scope.swarm_hosts = retrieveSwarmHostsInfo(d);
+        $scope.swarm_hosts = retrieveSwarmHostsInfo(data);
       }
       update({all: $scope.state.displayAll ? 1 : 0});
     })
