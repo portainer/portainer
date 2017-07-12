@@ -85,6 +85,11 @@ func rewriteResponse(response *http.Response, newResponseData interface{}, statu
 	response.StatusCode = statusCode
 	response.Body = body
 	response.ContentLength = int64(len(jsonData))
+
+	if response.Header == nil {
+		response.Header = make(http.Header)
+	}
 	response.Header.Set("Content-Length", strconv.Itoa(len(jsonData)))
+
 	return nil
 }

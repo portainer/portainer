@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator', 'ModalService',
-function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator, ModalService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService',
+function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -13,7 +13,8 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     Labels: [],
     ExtraHosts: [],
     IPv4: '',
-    IPv6: ''
+    IPv6: '',
+    AccessControlData: new AccessControlFormData()
   };
 
   $scope.state = {
@@ -374,13 +375,6 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       // Add Ownership
       if (d.Portainer && d.Portainer.ResourceControl) {
         var resourceControl = new ResourceControlViewModel(d.Portainer.ResourceControl);
-        console.log(resourceControl);
-        ControllerDataPipeline.setAccessControlFormData(
-          true,
-          resourceControl.Ownership,
-          resourceControl.UserAccesses,
-          resourceControl.TeamAccesses
-        );
       }
 
       // Add name
@@ -455,7 +449,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       if (doIt) {
         $('#createContainerSpinner').show();
 
-        var accessControlData = ControllerDataPipeline.getAccessControlFormData();
+        var accessControlData = $scope.formValues.AccessControlData;
         var userDetails = Authentication.getUserDetails();
         var isAdmin = userDetails.role === 1 ? true : false;
 

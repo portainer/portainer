@@ -1,6 +1,6 @@
 angular.module('volume', [])
-.controller('VolumeController', ['$scope', '$state', '$stateParams', 'VolumeService', 'Notifications', 'ControllerDataPipeline',
-function ($scope, $state, $stateParams, VolumeService, Notifications, ControllerDataPipeline) {
+.controller('VolumeController', ['$scope', '$state', '$stateParams', 'VolumeService', 'Notifications',
+function ($scope, $state, $stateParams, VolumeService, Notifications) {
 
   $scope.removeVolume = function removeVolume() {
     $('#loadingViewSpinner').show();
@@ -22,7 +22,6 @@ function ($scope, $state, $stateParams, VolumeService, Notifications, Controller
     VolumeService.volume($stateParams.id)
     .then(function success(data) {
       var volume = data;
-      ControllerDataPipeline.setAccessControlData('volume', volume.Id, volume.ResourceControl);
       $scope.volume = volume;
     })
     .catch(function error(err) {

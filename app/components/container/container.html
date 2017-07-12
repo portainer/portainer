@@ -3,7 +3,7 @@
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="containers">Containers</a> > <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a>
+    <a ui-sref="containers">Containers</a> &gt; <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -35,6 +35,10 @@
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
+            <tr>
+              <td>ID</td>
+              <td>{{ container.Id }}</td>
+            </tr>
             <tr>
               <td>Name</td>
               <td ng-if="!container.edit">
@@ -77,7 +81,7 @@
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
                   <a class="btn btn-outline-secondary" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i>Stats</a>
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="logs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
                   <a class="btn btn-outline-secondary" type="button" ui-sref="console({id: container.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
                 </div>
               </td>
@@ -89,7 +93,13 @@
   </div>
 </div>
 
-<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="container && applicationState.application.authentication"></div>
+<!-- access-control-panel -->
+<por-access-control-panel
+  ng-if="container && applicationState.application.authentication"
+  resource-control="container.ResourceControl"
+  resource-type="'container'">
+</por-access-control-panel>
+<!-- !access-control-panel -->
 
 <div ng-if="container.State.Health" class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
@@ -116,7 +126,7 @@
           </tbody>
         </table>
       </rd-widget-body>
-    </rd-widge>
+    </rd-widget>
   </div>
 </div>
 

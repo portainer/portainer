@@ -6,6 +6,20 @@ function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService,
 		Registry: ''
 	};
 
+	$scope.sortType = 'Size';
+  $scope.sortReverse = true;
+
+	$scope.order = function(sortType) {
+    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+    $scope.sortType = sortType;
+  };
+
+	$scope.toggleLayerCommand = function(layerId) {
+		$('#layer-command-expander'+layerId+' span').toggleClass('glyphicon-plus-sign glyphicon-minus-sign');
+		$('#layer-command-'+layerId+'-short').toggle();
+		$('#layer-command-'+layerId+'-full').toggle();
+	};
+
 	$scope.tagImage = function() {
 		$('#loadingViewSpinner').show();
 		var image = $scope.formValues.Image;
@@ -104,6 +118,18 @@ function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService,
 		.catch(function error(err) {
 			Notifications.error('Failure', err, 'Unable to retrieve image details');
 			$state.go('images');
+		})
+		.finally(function final() {
+			$('#loadingViewSpinner').hide();
+		});
+
+		$('#loadingViewSpinner').show();
+		ImageService.history($stateParams.id)
+		.then(function success(data) {
+			$scope.history = data;
+		})
+		.catch(function error(err) {
+			Notifications.error('Failure', err, 'Unable to retrieve image history');
 		})
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();

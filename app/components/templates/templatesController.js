@@ -1,6 +1,6 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'ControllerDataPipeline', 'FormValidator',
-function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, ControllerDataPipeline, FormValidator) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'FormValidator',
+function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, FormValidator) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
@@ -14,7 +14,8 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
 
   $scope.formValues = {
     network: '',
-    name: ''
+    name: '',
+    AccessControlData: new AccessControlFormData()
   };
 
   $scope.addVolume = function () {
@@ -49,7 +50,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
     $('#createContainerSpinner').show();
 
     var userDetails = Authentication.getUserDetails();
-    var accessControlData = ControllerDataPipeline.getAccessControlFormData();
+    var accessControlData = $scope.formValues.AccessControlData;
     var isAdmin = userDetails.role === 1 ? true : false;
 
     if (!validateForm(accessControlData, isAdmin)) {

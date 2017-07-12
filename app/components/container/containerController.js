@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline', 'Authentication', 'ResourceControlService',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ControllerDataPipeline, Authentication, ResourceControlService) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ResourceControlService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -19,7 +19,6 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     Container.get({id: $stateParams.id}, function (d) {
       var container = new ContainerDetailsViewModel(d);
       $scope.container = container;
-      ControllerDataPipeline.setAccessControlData('container', $stateParams.id, container.ResourceControl);
       $scope.container.edit = false;
       $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
 
@@ -86,7 +85,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     $('#createImageSpinner').show();
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;
-    var imageConfig = ImageHelper.createImageConfigForCommit(image, registry);
+    var imageConfig = ImageHelper.createImageConfigForCommit(image, registry.URL);
     ContainerCommit.commit({id: $stateParams.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
       $('#createImageSpinner').hide();
       update();
@@ -222,7 +221,6 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
               return true;
             } else {
               var containerIdentifier = data.Id;
-              var userId = Authentication.getUserDetails().ID;
               var resourceControl = container.ResourceControl;
               var users = resourceControl.UserAccesses.map(function(u) {
                 return u.UserId;

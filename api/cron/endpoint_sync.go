@@ -117,7 +117,7 @@ func (job endpointSyncJob) prepareSyncData(storedEndpoints, fileEndpoints []port
 	}
 
 	for idx, endpoint := range fileEndpoints {
-		if endpoint.Name == "" || endpoint.URL == "" {
+		if !isValidEndpoint(&endpoint) {
 			job.logger.Printf("Invalid file endpoint definition, skipping. [name: %v] [url: %v]", endpoint.Name, endpoint.URL)
 			continue
 		}
