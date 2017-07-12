@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'ControllerDataPipeline', 'FormValidator',
-function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, ControllerDataPipeline, FormValidator) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator',
+function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -13,7 +13,8 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     Labels: [],
     ExtraHosts: [],
     IPv4: '',
-    IPv6: ''
+    IPv6: '',
+    AccessControlData: new AccessControlFormData()
   };
 
   $scope.state = {
@@ -285,7 +286,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   $scope.create = function () {
     $('#createContainerSpinner').show();
 
-    var accessControlData = ControllerDataPipeline.getAccessControlFormData();
+    var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true : false;
 

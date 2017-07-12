@@ -29,7 +29,7 @@ module.exports = function (grunt) {
   grunt.registerTask('after-copy', [
     'filerev',
     'usemin',
-    'clean:tmp' 
+    'clean:tmp'
   ]);
   grunt.registerTask('build-webapp', [
     'config:prod',
@@ -37,7 +37,7 @@ module.exports = function (grunt) {
     'before-copy',
     'copy:assets',
     'after-copy'
-  ]);  
+  ]);
   grunt.registerTask('build', [
     'config:dev',
     'clean:app',
@@ -52,7 +52,7 @@ module.exports = function (grunt) {
   ]);
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
     grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy' ]);
-  });  
+  });
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run-dev', ['build', 'shell:run', 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
@@ -69,10 +69,10 @@ module.exports = function (grunt) {
       js: ['app/**/*.js', '!app/**/*.spec.js'],
       jsTpl: ['<%= distdir %>/templates/**/*.js'],
       jsVendor: [
-        'bower_components/angular-multi-select/isteven-multi-select.js',
-        'bower_components/bootbox.js/bootbox.js',
         'bower_components/jquery/dist/jquery.min.js',
         'bower_components/bootstrap/dist/js/bootstrap.min.js',
+        'bower_components/angular-multi-select/isteven-multi-select.js',
+        'bower_components/bootbox.js/bootbox.js',
         'bower_components/Chart.js/Chart.min.js',
         'bower_components/filesize/lib/filesize.min.js',
         'bower_components/lodash/dist/lodash.min.js',
@@ -86,9 +86,9 @@ module.exports = function (grunt) {
       tpl: ['app/components/**/*.html', 'app/directives/**/*.html'],
       css: ['assets/css/app.css'],
       cssVendor: [
+        'bower_components/bootstrap/dist/css/bootstrap.css',
         'bower_components/angular-multi-select/isteven-multi-select.css',
         'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/bootstrap/dist/css/bootstrap.css',
         'bower_components/font-awesome/css/font-awesome.min.css',
         'bower_components/rdash-ui/dist/css/rdash.min.css',
         'bower_components/toastr/toastr.min.css',
@@ -248,7 +248,7 @@ module.exports = function (grunt) {
                      return 'build/build_in_container.sh ' + p + ' ' + a;
                    }
                  }
-      },  
+      },
       run: {
         command: [
           'docker rm -f portainer',

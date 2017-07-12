@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'Secret', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
-function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, Secret, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ControllerDataPipeline) {
+.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'Secret', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
+function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, Secret, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -299,7 +299,6 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
 
       translateServiceArrays(service);
       $scope.service = service;
-      ControllerDataPipeline.setAccessControlData('service', $stateParams.id, service.ResourceControl);
       originalService = angular.copy(service);
 
       return $q.all({
