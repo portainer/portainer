@@ -20,11 +20,11 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.images = function() {
+  service.images = function(withUsage) {
     var deferred = $q.defer();
-    
+
     $q.all({
-      dataUsage: SystemService.dataUsage(),
+      dataUsage: withUsage ? SystemService.dataUsage() : { Images: [] },
       images: Image.query({}).$promise
     })
     .then(function success(data) {
@@ -32,7 +32,7 @@ angular.module('portainer.services')
         item.dataUsage = data.dataUsage.Images.find(function(usage) {
            return item.Id === usage.Id;
         });
-        
+
         return new ImageViewModel(item);
       });
       deferred.resolve(images);
