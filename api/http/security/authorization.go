@@ -22,7 +22,7 @@ func AuthorizedResourceControlDeletion(resourceControl *portainer.ResourceContro
 	if teamAccessesCount > 0 {
 		for _, access := range resourceControl.TeamAccesses {
 			for _, membership := range context.UserMemberships {
-				if membership.TeamID == access.TeamID && membership.Role == portainer.TeamLeader {
+				if membership.TeamID == access.TeamID {
 					return true
 				}
 			}
