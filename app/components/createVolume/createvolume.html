@@ -3,7 +3,7 @@
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="volumes">Volumes</a> > Add volume
+    <a ui-sref="volumes">Volumes</a> &gt; Add volume
   </rd-header-content>
 </rd-header>
 
@@ -65,7 +65,7 @@
           </div>
           <!-- !driver-options -->
           <!-- access-control -->
-          <div ng-include="'app/components/common/accessControlForm/accessControlForm.html'" ng-if="applicationState.application.authentication"></div>
+          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">

@@ -59,6 +59,8 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxyServiceRequest(request)
 	} else if strings.HasPrefix(path, "/volumes") {
 		return p.proxyVolumeRequest(request)
+	} else if strings.HasPrefix(path, "/swarm") {
+		return p.proxySwarmRequest(request)
 	}
 
 	return p.executeDockerRequest(request)
@@ -141,6 +143,10 @@ func (p *proxyTransport) proxyVolumeRequest(request *http.Request) (*http.Respon
 		volumeID := path.Base(requestPath)
 		return p.restrictedOperation(request, volumeID)
 	}
+}
+
+func (p *proxyTransport) proxySwarmRequest(request *http.Request) (*http.Response, error) {
+	return p.administratorOperation(request)
 }
 
 // restrictedOperation ensures that the current user has the required authorizations

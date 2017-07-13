@@ -12,9 +12,22 @@ angular.module('portainer.filters', [])
 
     if (text.length <= length || text.length - end.length <= length) {
       return text;
-    }
-    else {
+    } else {
       return String(text).substring(0, length - end.length) + end;
+    }
+  };
+})
+.filter('truncatelr', function () {
+  'use strict';
+  return function (text, max, left, right) {
+    max = isNaN(max) ? 50 : max;
+    left = isNaN(left) ? 25 : left;
+    right = isNaN(right) ? 25 : right;
+
+    if (text.length <= max) {
+      return text;
+    } else {
+      return text.substring(0, left) + '[...]' + text.substring(text.length - right, text.length);
     }
   };
 })
@@ -270,5 +283,11 @@ angular.module('portainer.filters', [])
       return node.Hostname;
     }
     return '';
+  };
+})
+.filter('imagelayercommand', function () {
+  'use strict';
+  return function (createdBy) {
+	  return createdBy.replace('/bin/sh -c #(nop) ', '').replace('/bin/sh -c ', 'RUN ');
   };
 });

@@ -6,7 +6,7 @@
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="services">Services</a> > <a ui-sref="service({id: service.Id})">{{ service.Name }}</a>
+    <a ui-sref="services">Services</a> &gt; <a ui-sref="service({id: service.Id})">{{ service.Name }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -72,6 +72,13 @@
                 <input type="text" class="form-control" ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" ng-disabled="isUpdating" />
               </td>
             </tr>
+            <tr ng-if="applicationState.endpoint.apiVersion >= 1.30">
+              <td colspan="2">
+                <div class="btn-group" role="group" aria-label="...">
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="servicelogs({id: service.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
@@ -106,6 +113,7 @@
           <li><a href ng-click="goToItem('service-network-specs')">Network &amp; published ports</a></li>
           <li><a href ng-click="goToItem('service-resources')">Resource limits &amp; reservations</a></li>
           <li><a href ng-click="goToItem('service-placement-constraints')">Placement constraints</a></li>
+          <li><a href ng-click="goToItem('service-placement-preferences')" ng-if="applicationState.endpoint.apiVersion >= 1.30">Placement preferences</a></li>
           <li><a href ng-click="goToItem('service-restart-policy')">Restart policy</a></li>
           <li><a href ng-click="goToItem('service-update-config')">Update configuration</a></li>
           <li><a href ng-click="goToItem('service-labels')">Service labels</a></li>
@@ -117,7 +125,13 @@
   </div>
 </div>
 
-<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="service && applicationState.application.authentication"></div>
+<!-- access-control-panel -->
+<por-access-control-panel
+  ng-if="service && applicationState.application.authentication"
+  resource-control="service.ResourceControl"
+  resource-type="'service'">
+</por-access-control-panel>
+<!-- !access-control-panel -->
 
 <div class="row">
   <hr>
@@ -145,6 +159,7 @@
     <h3 id="service-specs">Service specification</h3>
     <div id="service-resources" class="padding-top" ng-include="'app/components/service/includes/resources.html'"></div>
     <div id="service-placement-constraints" class="padding-top" ng-include="'app/components/service/includes/constraints.html'"></div>
+    <div id="service-placement-preferences" class="padding-top" ng-include="'app/components/service/includes/placementPreferences.html'"></div>
     <div id="service-restart-policy" class="padding-top" ng-include="'app/components/service/includes/restart.html'"></div>
     <div id="service-update-config" class="padding-top" ng-include="'app/components/service/includes/updateconfig.html'"></div>
     <div id="service-labels" class="padding-top" ng-include="'app/components/service/includes/servicelabels.html'"></div>
