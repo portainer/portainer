@@ -60,7 +60,7 @@
             </div>
           </div>
           <div ng-if="state.connected">
-            <label>Connected as {{::state.user || 'root'}}</label>
+            <label>Exec into container as <code>{{ ::formValues.user || 'default user' }}</code> using command <code>{{ formValues.isCustomCommand ? formValues.customCommand : formValues.command }}</code></label>
             <button type="button" class="btn btn-default" ng-click="disconnect()">Disconnect</button>
           </div>
         </form>
