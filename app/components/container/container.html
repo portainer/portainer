@@ -35,7 +35,14 @@
           <tbody>
             <tr>
               <td>ID</td>
-              <td>{{ container.Id }}</td>
+              <td ng-if="!container.toggleId">
+                {{ container.Id|truncate:20 }}
+                <a href="" data-toggle="tooltip" title="Show full ID" ng-click="container.toggleId = true;"><i class="fa fa-eye"></i></a>
+              </td>
+              <td ng-if="container.toggleId">
+                {{ container.Id }}
+                <a href="" data-toggle="tooltip" title="Show short ID" ng-click="container.toggleId = false;"><i class="fa fa-eye-slash"></i></a>
+              </td>
             </tr>
             <tr>
               <td>Name</td>
