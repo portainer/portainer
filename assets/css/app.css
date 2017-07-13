@@ -296,6 +296,14 @@ ul.sidebar .sidebar-list a.active {
   background: #2d3e63;
 }
 
+#image-layers .btn{
+  padding: 0;
+}
+
+#image-layers .expand{
+  padding-right: 0;
+}
+
 ul.sidebar .sidebar-list .sidebar-sublist a {
   text-indent: 35px;
   font-size: 12px;
@@ -505,3 +513,8 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   opacity: 0.9;
 }
 /*!toaster override*/
+
+.monospaced {
+  font-family: monospace;
+  font-weight: 600;
+}

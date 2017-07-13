@@ -4,25 +4,25 @@ angular.module('portainer.helpers')
   var helper = {};
 
   helper.retrieveAuthorizedUsers = function(resourceControl, users) {
-    var authorizedUserNames = [];
+    var authorizedUsers = [];
     angular.forEach(resourceControl.UserAccesses, function(access) {
       var user = _.find(users, { Id: access.UserId });
       if (user) {
-        authorizedUserNames.push(user);
+        authorizedUsers.push(user);
       }
     });
-    return authorizedUserNames;
+    return authorizedUsers;
   };
 
   helper.retrieveAuthorizedTeams = function(resourceControl, teams) {
-    var authorizedTeamNames = [];
+    var authorizedTeams = [];
     angular.forEach(resourceControl.TeamAccesses, function(access) {
       var team = _.find(teams, { Id: access.TeamId });
       if (team) {
-        authorizedTeamNames.push(team);
+        authorizedTeams.push(team);
       }
     });
-    return authorizedTeamNames;
+    return authorizedTeams;
   };
 
   helper.isLeaderOfAnyRestrictedTeams = function(userMemberships, resourceControl) {

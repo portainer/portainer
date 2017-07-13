@@ -1,9 +1,10 @@
 angular.module('containerConsole', [])
-.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'Exec', '$timeout', 'EndpointProvider', 'Notifications',
-function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvider, Notifications) {
+.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ContainerService', 'ExecService',
+function ($scope, $stateParams, Container, Image, EndpointProvider, Notifications, ContainerHelper, ContainerService, ExecService) {
   $scope.state = {};
   $scope.state.loaded = false;
   $scope.state.connected = false;
+  $scope.formValues = {};
 
   var socket, term;
 
@@ -22,7 +23,7 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
     } else {
       Image.get({id: d.Image}, function(imgData) {
         $scope.imageOS = imgData.Os;
-        $scope.state.command = imgData.Os === 'windows' ? 'powershell' : 'bash';
+        $scope.formValues.command = imgData.Os === 'windows' ? 'powershell' : 'bash';
         $scope.state.loaded = true;
         $('#loadingViewSpinner').hide();
       }, function (e) {
@@ -39,33 +40,36 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
     $('#loadConsoleSpinner').show();
     var termWidth = Math.round($('#terminal-container').width() / 8.2);
     var termHeight = 30;
+    var command = $scope.formValues.isCustomCommand ?
+                    $scope.formValues.customCommand : $scope.formValues.command;
     var execConfig = {
       id: $stateParams.id,
       AttachStdin: true,
       AttachStdout: true,
       AttachStderr: true,
       Tty: true,
-      Cmd: $scope.state.command.replace(' ', ',').split(',')
+      User: $scope.formValues.user,
+      Cmd: ContainerHelper.commandStringToArray(command)
     };
 
-    Container.exec(execConfig, function(d) {
-      if (d.message) {
-        $('#loadConsoleSpinner').hide();
-        Notifications.error('Error', {}, d.message);
+    var execId;
+    ContainerService.createExec(execConfig)
+    .then(function success(data) {
+      execId = data.Id;
+      var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
+      if (url.indexOf('https') > -1) {
+        url = url.replace('https://', 'wss://');
       } else {
-        var execId = d.Id;
-        resizeTTY(execId, termHeight, termWidth);
-        var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
-        if (url.indexOf('https') > -1) {
-          url = url.replace('https://', 'wss://');
-        } else {
-          url = url.replace('http://', 'ws://');
-        }
-        initTerm(url, termHeight, termWidth);
+        url = url.replace('http://', 'ws://');
       }
-    }, function (e) {
+      initTerm(url, termHeight, termWidth);
+      return ExecService.resizeTTY(execId, termHeight, termWidth, 2000);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to exec into container');
+    })
+    .finally(function final() {
       $('#loadConsoleSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to start an exec instance');
     });
   };
 
@@ -79,19 +83,6 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
     }
   };
 
-  function resizeTTY(execId, height, width) {
-    $timeout(function() {
-      Exec.resize({id: execId, height: height, width: width}, function (d) {
-        if (d.message) {
-          Notifications.error('Error', {}, 'Unable to resize TTY');
-        }
-      }, function (e) {
-        Notifications.error('Failure', {}, 'Unable to resize TTY');
-      });
-    }, 2000);
-
-  }
-
   function initTerm(url, height, width) {
     socket = new WebSocket(url);
 
@@ -103,7 +94,7 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
       term.on('data', function (data) {
         socket.send(data);
       });
-      term.open(document.getElementById('terminal-container'));
+      term.open(document.getElementById('terminal-container'), true);
       term.resize(width, height);
       term.setOption('cursorBlink', true);
 

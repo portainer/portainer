@@ -65,13 +65,29 @@ function ($q, $scope, VolumeService, Notifications, Pagination) {
 
   function initView() {
     $('#loadVolumesSpinner').show();
-    VolumeService.volumes()
-    .then(function success(data) {
-      $scope.volumes = data;
+    
+    $q.all({
+      attached: VolumeService.volumes({
+        filters: { 
+          'dangling': ['false']
+        }
+      }),
+      dangling: VolumeService.volumes({
+        filters: { 
+          'dangling': ['true']
+        }
+      })
     })
-    .catch(function error(err) {
+    .then(function success(data) {
+      $scope.volumes = data.attached.map(function(volume) {
+        volume.dangling = false;
+        return volume;
+      }).concat(data.dangling.map(function(volume) {
+        volume.dangling = true;
+        return volume;
+      }));
+    }).catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve volumes');
-      $scope.volumes = [];
     })
     .finally(function final() {
       $('#loadVolumesSpinner').hide();

@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title="Create container"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="containers">Containers</a> > Add container
+    <a ui-sref="containers">Containers</a> &gt; Add container
   </rd-header-content>
 </rd-header>
 
@@ -98,7 +98,7 @@
           </div>
           <!-- !port-mapping -->
           <!-- access-control -->
-          <div ng-include="'app/components/common/accessControlForm/accessControlForm.html'" ng-if="applicationState.application.authentication"></div>
+          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
