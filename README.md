@@ -2,7 +2,6 @@
 <p align="center">
   <img title="portainer" src='https://portainer.io/images/logo_alt.png' />
 </p>
-Some update
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/portainer/portainer.svg)](https://hub.docker.com/r/portainer/portainer/)
 [![Microbadger](https://images.microbadger.com/badges/image/portainer/portainer.svg)](http://microbadger.com/images/portainer/portainer "Image size")
