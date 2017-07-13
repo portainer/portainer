@@ -85,7 +85,7 @@
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
               <td><a ui-sref="volume({id: volume.Id})" class="monospaced">{{ volume.Id|truncate:25 }}</a></td>
               <td>{{ volume.Driver }}</td>
-              <td>{{ volume.Mountpoint | truncate:52 }}</td>
+              <td>{{ volume.Mountpoint | truncatelr }}</td>
               <td ng-if="applicationState.application.authentication">
                 <span>
                   <i ng-class="volume.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
