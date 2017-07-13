@@ -83,7 +83,10 @@
           <tbody>
             <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:{dangling: state.danglingVolumesOnly} | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
-              <td><a ui-sref="volume({id: volume.Id})" class="monospaced">{{ volume.Id|truncate:25 }}</a></td>
+              <td>
+                <a ui-sref="volume({id: volume.Id})" class="monospaced">{{ volume.Id|truncate:25 }}</a>
+                <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="volume.dangling">Dangling</span></td>
+              </td>
               <td>{{ volume.Driver }}</td>
               <td>{{ volume.Mountpoint | truncatelr }}</td>
               <td ng-if="applicationState.application.authentication">
