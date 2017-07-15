@@ -423,7 +423,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     Container.query({}, function (d) {
       var containers = d;
       $scope.runningContainers = containers;
-      // If we got a template, we prefill fields, have to do it after conatiner query cause we need runningContainers
+      // If we got a template, we prefill fields, have to do it after container query cause we need runningContainers
       if ($stateParams.from !== '') {
         loadFromContainerSpec();
       }
