@@ -316,8 +316,13 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         EndpointsConfig: {}
       };
       if ($scope.config.HostConfig.NetworkMode.indexOf('container:') === 0) {
-        $scope.formValues.NetworkContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
+        var netContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
         $scope.config.HostConfig.NetworkMode = 'container';
+        for (var c in $scope.runningContainers) {
+          if ($scope.runningContainers[c].Names && $scope.runningContainers[c].Names[0] === '/' + netContainer) {
+            $scope.formValues.NetworkContainer = $scope.runningContainers[c];
+          }
+        }
       }
       if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]) {
         if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig) {
@@ -380,11 +385,6 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   }
 
   function initView() {
-    // If we got a template, we prefill fields
-    if ($stateParams.from !== '') {
-      loadFromContainerSpec();
-    }
-
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
     }, function (e) {
@@ -423,6 +423,10 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     Container.query({}, function (d) {
       var containers = d;
       $scope.runningContainers = containers;
+      // If we got a template, we prefill fields, have to do it after conatiner query cause we need runningContainers
+      if ($stateParams.from !== '') {
+        loadFromContainerSpec();
+      }
     }, function(e) {
       Notifications.error('Failure', e, 'Unable to retrieve running containers');
     });
