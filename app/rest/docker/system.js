@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
 .factory('System', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function SystemFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
   'use strict';
-  return $resource(DOCKER_ENDPOINT + '/:endpointId/:action/:systemAction', {
+  return $resource(DOCKER_ENDPOINT + '/:endpointId/:action/:subAction', {
     name: '@name',
     endpointId: EndpointProvider.endpointID
   },
@@ -13,6 +13,6 @@ angular.module('portainer.rest')
       isArray: true, transformResponse: jsonObjectsToArrayHandler
     },
     auth: { method: 'POST', params: { action: 'auth' } },
-    dataUsage: { method: 'GET', params: { action: 'system', systemAction: 'df' } }
+    dataUsage: { method: 'GET', params: { action: 'system', subAction: 'df' } }
   });
 }]);
