@@ -1,6 +1,6 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$scope', '$state', 'VolumeService', 'SystemService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator',
-function ($scope, $state, VolumeService, SystemService, ResourceControlService, Authentication, Notifications, FormValidator) {
+.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'SystemService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator',
+function ($q, $scope, $state, VolumeService, SystemService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator) {
 
   $scope.formValues = {
     Driver: 'local',
@@ -71,9 +71,19 @@ function ($scope, $state, VolumeService, SystemService, ResourceControlService, 
   function initView() {
     $('#loadingViewSpinner').show();
     if ($scope.applicationState.endpoint.mode.provider !== 'DOCKER_SWARM') {
-      SystemService.getVolumePlugins()
+      $q.all({
+        system: SystemService.getVolumePlugins(),
+        plugins: PluginService.volumePlugins()
+      })
       .then(function success(data) {
-        $scope.availableVolumeDrivers = data;
+        var systemPlugins = data.system;
+        $scope.availableVolumeDrivers = $scope.availableVolumeDrivers.concat(systemPlugins);
+        var plugins = data.plugins;
+        console.log(JSON.stringify(plugins, null, 4));
+        for (var i = 0; i < plugins.length; i++) {
+          var plugin = plugins[i];
+          $scope.availableVolumeDrivers.push(plugin.Name);
+        }
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
