@@ -1,6 +1,6 @@
 function includeString(text, values) {
   return values.some(function(val){
-    return text.includes(val);
+    return text.indexOf(val) !== -1;
   });
 }
 
@@ -73,6 +73,8 @@ angular.module('portainer.filters', [])
     var status = _.toLower(text);
     if (includeString(status, ['paused'])) {
       return 'paused';
+    } else if (includeString(status, ['dead'])) {
+      return 'dead';
     } else if (includeString(status, ['created'])) {
       return 'created';
     } else if (includeString(status, ['exited'])) {
@@ -116,6 +118,9 @@ angular.module('portainer.filters', [])
   return function (state) {
     if (state === undefined) {
       return '';
+    }
+    if (state.Dead) {
+      return 'Dead';
     }
     if (state.Ghost && state.Running) {
       return 'Ghost';
