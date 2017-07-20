@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Node', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function NodeFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
+.factory('Node', ['$resource', 'ENDPOINTS_ENDPOINT', 'EndpointProvider', function NodeFactory($resource, ENDPOINTS_ENDPOINT, EndpointProvider) {
   'use strict';
-  return $resource(DOCKER_ENDPOINT + '/:endpointId/nodes/:id/:action', {
+  return $resource(ENDPOINTS_ENDPOINT + '/:endpointId/docker/nodes/:id/:action', {
     endpointId: EndpointProvider.endpointID
   },
   {

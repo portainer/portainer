@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Secret', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function SecretFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
+.factory('Secret', ['$resource', 'ENDPOINTS_ENDPOINT', 'EndpointProvider', function SecretFactory($resource, ENDPOINTS_ENDPOINT, EndpointProvider) {
   'use strict';
-  return $resource(DOCKER_ENDPOINT + '/:endpointId/secrets/:id/:action', {
+  return $resource(ENDPOINTS_ENDPOINT + '/:endpointId/docker/secrets/:id/:action', {
     endpointId: EndpointProvider.endpointID
   }, {
     get: { method: 'GET', params: {id: '@id'} },

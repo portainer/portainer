@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Service', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', 'HttpRequestHelper' ,function ServiceFactory($resource, DOCKER_ENDPOINT, EndpointProvider, HttpRequestHelper) {
+.factory('Service', ['$resource', 'ENDPOINTS_ENDPOINT', 'EndpointProvider', 'HttpRequestHelper' ,function ServiceFactory($resource, ENDPOINTS_ENDPOINT, EndpointProvider, HttpRequestHelper) {
   'use strict';
-  return $resource(DOCKER_ENDPOINT + '/:endpointId/services/:id/:action', {
+  return $resource(ENDPOINTS_ENDPOINT + '/:endpointId/docker/services/:id/:action', {
     endpointId: EndpointProvider.endpointID
   },
   {

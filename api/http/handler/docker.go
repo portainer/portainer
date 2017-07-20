@@ -30,7 +30,7 @@ func NewDockerHandler(bouncer *security.RequestBouncer) *DockerHandler {
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.PathPrefix("/{id}/").Handler(
+	h.PathPrefix("/{id}/docker").Handler(
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.proxyRequestsToDockerAPI)))
 	return h
 }
@@ -90,5 +90,5 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 		}
 	}
 
-	http.StripPrefix("/"+id, proxy).ServeHTTP(w, r)
+	http.StripPrefix("/"+id+"/docker", proxy).ServeHTTP(w, r)
 }
