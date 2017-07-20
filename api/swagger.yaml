@@ -140,7 +140,9 @@ paths:
       tags:
       - "endpoints"
       summary: "List endpoints"
-      description: "List all endpoints registered inside this Portainer instance"
+      description: "List all endpoints based on the current user authorizations. Will\
+        \ return all endpoints if using an administrator account otherwise it will\
+        \ only return authorized endpoints"
       operationId: "EndpointList"
       produces:
       - "application/json"
