@@ -287,15 +287,16 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
 
   function loadFromContainerSpec() {
     // Get container
-    Container.get({id: $stateParams.from}, function(d) {
-      $scope.fromContainer = new ContainerViewModel(d);
-      // Add Config
-      $scope.config = d.Config;
+    Container.get({ id: $stateParams.from }).$promise
+    .then(function success(d) {
+      // Get config
+      $scope.config = ContainerHelper.configFromContainer(d);
+
+      // Add Cmd
       if ($scope.config.Cmd) {
         $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
       }
-      // Add HostConfig
-      $scope.config.HostConfig = d.HostConfig;
+
       // Add Ports
       var bindings = [];
       for (var p in $scope.config.HostConfig.PortBindings) {
@@ -307,6 +308,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         bindings.push(b);
       }
       $scope.config.HostConfig.PortBindings = bindings;
+
       // Add volumes
       for (var v in d.Mounts) {
         var mount = d.Mounts[v];
@@ -318,6 +320,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         };
         $scope.formValues.Volumes.push(volume);
       }
+
       // Add network
       $scope.config.NetworkingConfig = {
         EndpointsConfig: {}
@@ -380,14 +383,9 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         path.push({'pathOnHost': device.PathOnHost, 'pathInContainer': device.PathInContainer});
       }
       $scope.config.HostConfig.Devices = path;
-
-      // Add Ownership
-      if (d.Portainer && d.Portainer.ResourceControl) {
-        var resourceControl = new ResourceControlViewModel(d.Portainer.ResourceControl);
-      }
-
-      // Add name
-      $scope.config.name = d.Name.replace(/^\//g, '');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve container');
     });
   }
 
@@ -430,7 +428,6 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     Container.query({}, function (d) {
       var containers = d;
       $scope.runningContainers = containers;
-      // If we got a template, we prefill fields, have to do it after container query cause we need runningContainers
       if ($stateParams.from !== '') {
         loadFromContainerSpec();
       }
