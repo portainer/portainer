@@ -1,0 +1,122 @@
+swagger: "2.0"
+info:
+  description: "Portainer HTTP API allows you to manage your Docker environments by using Portainer as a gateway.  You can find out more about Portainer at [http://portainer.io](http://portainer.io) and get some support on [Slack](http://portainer.io/slack/)."
+  version: "1.13.6"
+  title: "Portainer API"
+  contact:
+    email: "info@portainer.io"
+host: "portainer.domain"
+basePath: "/api"
+
+tags:
+- name: "auth"
+  description: "Authenticate against Portainer HTTP API"
+- name: "docker"
+  description: "Execute docker queries"
+- name: "dockerhub"
+  description: "Manage Dockerhub"
+- name: "endpoints"
+  description: "Manage Docker environments"
+- name: "registries"
+  description: "Manage Docker registries"
+- name: "resource_controls"
+  description: "Manage access control on Docker resources"
+- name: "settings"
+  description: "Manage Portainer settings"
+- name: "status"
+  description: "Information about the Portainer instance"
+- name: "users"
+  description: "Manage users"
+- name: "teams"
+  description: "Manage teams"
+- name: "team_memberships"
+  description: "Manage team memberships"
+- name: "templates"
+  description: "Manage App Templates"
+- name: "upload"
+  description: "Upload files"
+- name: "websocket"
+  description: "Create exec sessions using websockets"
+
+schemes:
+- "http"
+- "https"
+
+paths:
+  /auth:
+    post:
+      tags:
+      - "auth"
+      summary: "Authenticate a user"
+      description: "Use this endpoint to authenticate against Portainer using a username and password."
+      operationId: "auth"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Credentials used for authentication."
+        required: true
+        schema:
+          $ref: "#/definitions/AuthRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/AuthResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid credentials"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        503:
+          description: "Authentication disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Authentication is disabled"
+
+securityDefinitions:
+  jwt:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+
+definitions:
+  GenericError:
+    type: "object"
+    properties:
+      err:
+        type: "string"
+        description: "Error message"
+        example: "Something bad happened"
+  AuthRequest:
+    type: "object"
+    required:
+    - "Username"
+    - "Password"
+    properties:
+      Username:
+        type: "string"
+        description: "Username"
+        example: "admin"
+      Password:
+        type: "string"
+        description: "Password"
+        example: "mypassword"
+  AuthResponse:
+    type: "object"
+    properties:
+      jwt:
+        type: "string"
+        description: "JWT token used to authenticate against the API."
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE"
