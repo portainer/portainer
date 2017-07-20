@@ -1,3 +1,9 @@
+function includeString(text, values) {
+  return values.some(function(val){
+    return text.indexOf(val) !== -1;
+  });
+}
+
 angular.module('portainer.filters', [])
 .filter('truncate', function () {
   'use strict';
@@ -12,9 +18,22 @@ angular.module('portainer.filters', [])
 
     if (text.length <= length || text.length - end.length <= length) {
       return text;
-    }
-    else {
+    } else {
       return String(text).substring(0, length - end.length) + end;
+    }
+  };
+})
+.filter('truncatelr', function () {
+  'use strict';
+  return function (text, max, left, right) {
+    max = isNaN(max) ? 50 : max;
+    left = isNaN(left) ? 25 : left;
+    right = isNaN(right) ? 25 : right;
+
+    if (text.length <= max) {
+      return text;
+    } else {
+      return text.substring(0, left) + '[...]' + text.substring(text.length - right, text.length);
     }
   };
 })
@@ -22,15 +41,13 @@ angular.module('portainer.filters', [])
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (status.indexOf('new') !== -1 || status.indexOf('allocated') !== -1 ||
-      status.indexOf('assigned') !== -1 || status.indexOf('accepted') !== -1) {
+    if (includeString(status, ['new', 'allocated', 'assigned', 'accepted'])) {
       return 'info';
-    } else if (status.indexOf('pending') !== -1) {
+    } else if (includeString(status, ['pending'])) {
       return 'warning';
-    } else if (status.indexOf('shutdown') !== -1 || status.indexOf('failed') !== -1 ||
-      status.indexOf('rejected') !== -1) {
+    } else if (includeString(status, ['shutdown', 'failed', 'rejected'])) {
       return 'danger';
-    } else if (status.indexOf('complete') !== -1) {
+    } else if (includeString(status, ['complete'])) {
       return 'primary';
     }
     return 'success';
@@ -40,11 +57,11 @@ angular.module('portainer.filters', [])
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (status.indexOf('paused') !== -1 || status.indexOf('starting') !== -1) {
+    if (includeString(status, ['paused', 'starting'])) {
       return 'warning';
-    } else if (status.indexOf('created') !== -1) {
+    } else if (includeString(status, ['created'])) {
       return 'info';
-    } else if (status.indexOf('stopped') !== -1 || status.indexOf('unhealthy') !== -1) {
+    } else if (includeString(status, ['stopped', 'unhealthy', 'dead'])) {
       return 'danger';
     }
     return 'success';
@@ -54,17 +71,19 @@ angular.module('portainer.filters', [])
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (status.indexOf('paused') !== -1) {
+    if (includeString(status, ['paused'])) {
       return 'paused';
-    } else if (status.indexOf('created') !== -1) {
+    } else if (includeString(status, ['dead'])) {
+      return 'dead';
+    } else if (includeString(status, ['created'])) {
       return 'created';
-    } else if (status.indexOf('exited') !== -1) {
+    } else if (includeString(status, ['exited'])) {
       return 'stopped';
-    } else if (status.indexOf('(healthy)') !== -1) {
+    } else if (includeString(status, ['(healthy)'])) {
       return 'healthy';
-    } else if (status.indexOf('(unhealthy)') !== -1) {
+    } else if (includeString(status, ['(unhealthy)'])) {
       return 'unhealthy';
-    } else if (status.indexOf('(health: starting)') !== -1) {
+    } else if (includeString(status, ['(health: starting)'])) {
       return 'starting';
     }
     return 'running';
@@ -99,6 +118,9 @@ angular.module('portainer.filters', [])
   return function (state) {
     if (state === undefined) {
       return '';
+    }
+    if (state.Dead) {
+      return 'Dead';
     }
     if (state.Ghost && state.Running) {
       return 'Ghost';

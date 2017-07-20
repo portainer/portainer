@@ -1,6 +1,6 @@
 angular.module('containerConsole', [])
-.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'Exec', '$timeout', 'EndpointProvider', 'Notifications', 'ContainerHelper',
-function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvider, Notifications, ContainerHelper) {
+.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ContainerService', 'ExecService',
+function ($scope, $stateParams, Container, Image, EndpointProvider, Notifications, ContainerHelper, ContainerService, ExecService) {
   $scope.state = {};
   $scope.state.loaded = false;
   $scope.state.connected = false;
@@ -52,24 +52,24 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
       Cmd: ContainerHelper.commandStringToArray(command)
     };
 
-    Container.exec(execConfig, function(d) {
-      if (d.message) {
-        $('#loadConsoleSpinner').hide();
-        Notifications.error('Error', {}, d.message);
+    var execId;
+    ContainerService.createExec(execConfig)
+    .then(function success(data) {
+      execId = data.Id;
+      var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
+      if (url.indexOf('https') > -1) {
+        url = url.replace('https://', 'wss://');
       } else {
-        var execId = d.Id;
-        resizeTTY(execId, termHeight, termWidth);
-        var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
-        if (url.indexOf('https') > -1) {
-          url = url.replace('https://', 'wss://');
-        } else {
-          url = url.replace('http://', 'ws://');
-        }
-        initTerm(url, termHeight, termWidth);
+        url = url.replace('http://', 'ws://');
       }
-    }, function (e) {
+      initTerm(url, termHeight, termWidth);
+      return ExecService.resizeTTY(execId, termHeight, termWidth, 2000);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to exec into container');
+    })
+    .finally(function final() {
       $('#loadConsoleSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to start an exec instance');
     });
   };
 
@@ -82,19 +82,6 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
       term.destroy();
     }
   };
-
-  function resizeTTY(execId, height, width) {
-    $timeout(function() {
-      Exec.resize({id: execId, height: height, width: width}, function (d) {
-        if (d.message) {
-          Notifications.error('Error', {}, 'Unable to resize TTY');
-        }
-      }, function (e) {
-        Notifications.error('Failure', {}, 'Unable to resize TTY');
-      });
-    }, 2000);
-
-  }
 
   function initTerm(url, height, width) {
     socket = new WebSocket(url);
