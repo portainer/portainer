@@ -248,10 +248,18 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
           }
         }
       }
+
       if (confirmDialog) {
-        ModalService.confirmDeletion(
-          'A container with the same name is already present on this host. Do you want to remove it?',
-          function onConfirm(confirmed) {
+        ModalService.confirm({
+          title: 'Are you sure ?',
+          message: 'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
+          buttons: {
+            confirm: {
+              label: 'Replace',
+              className: 'btn-danger'
+            }
+          },
+          callback: function onConfirm(confirmed) {
             if(!confirmed) { return cb(false); }
             else {
               // Remove old container
@@ -266,7 +274,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
               });
             }
           }
-        );
+        });
       } else {
         return cb(true);
       }
