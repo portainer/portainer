@@ -14,7 +14,7 @@ tags:
 - name: "auth"
   description: "Authenticate against Portainer HTTP API"
 - name: "dockerhub"
-  description: "Manage DockerHub"
+  description: "Manage how Portainer connects to the DockerHub"
 - name: "endpoints"
   description: "Manage Docker environments"
 - name: "registries"
