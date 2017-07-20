@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Volume', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function VolumeFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
+.factory('Volume', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function VolumeFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
-  return $resource(DOCKER_ENDPOINT + '/:endpointId/volumes/:id/:action',
+  return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/volumes/:id/:action',
   {
     endpointId: EndpointProvider.endpointID
   },

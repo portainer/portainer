@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Status', ['$resource', 'STATUS_ENDPOINT', function StatusFactory($resource, STATUS_ENDPOINT) {
+.factory('Status', ['$resource', 'API_ENDPOINT_STATUS', function StatusFactory($resource, API_ENDPOINT_STATUS) {
   'use strict';
-  return $resource(STATUS_ENDPOINT, {}, {
+  return $resource(API_ENDPOINT_STATUS, {}, {
     get: { method: 'GET' }
   });
 }]);
