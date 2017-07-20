@@ -13,10 +13,8 @@ basePath: "/api"
 tags:
 - name: "auth"
   description: "Authenticate against Portainer HTTP API"
-- name: "docker"
-  description: "Execute docker queries"
 - name: "dockerhub"
-  description: "Manage Dockerhub"
+  description: "Manage DockerHub"
 - name: "endpoints"
   description: "Manage Docker environments"
 - name: "registries"
@@ -49,8 +47,8 @@ paths:
       - "auth"
       summary: "Authenticate a user"
       description: "Use this endpoint to authenticate against Portainer using a username\
-        \ and password."
-      operationId: "auth"
+        \ and password"
+      operationId: "AuthenticateUser"
       consumes:
       - "application/json"
       produces:
@@ -58,15 +56,15 @@ paths:
       parameters:
       - in: "body"
         name: "body"
-        description: "Credentials used for authentication."
+        description: "Credentials used for authentication"
         required: true
         schema:
-          $ref: "#/definitions/AuthRequest"
+          $ref: "#/definitions/AuthenticateUserRequest"
       responses:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/AuthResponse"
+            $ref: "#/definitions/AuthenticateUserResponse"
         400:
           description: "Invalid request"
           schema:
@@ -85,12 +83,165 @@ paths:
           examples:
             application/json:
               err: "Authentication is disabled"
+  /dockerhub:
+    get:
+      tags:
+      - "dockerhub"
+      summary: "Retrieve DockerHub information"
+      description: "Use this endpoint to retrieve the information used to connect\
+        \ to the DockerHub"
+      operationId: "DockerHubInspect"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/DockerHubInspectResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "dockerhub"
+      summary: "Update DockerHub information"
+      description: "Use this endpoint to update the information used to connect to\
+        \ the DockerHub"
+      operationId: "DockerHubUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "DockerHub information"
+        required: true
+        schema:
+          $ref: "#/definitions/DockerHubUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /endpoints:
+    get:
+      tags:
+      - "endpoints"
+      summary: "List endpoints"
+      description: "List all endpoints registered inside this Portainer instance"
+      operationId: "EndpointList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/EndpointListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "endpoints"
+      summary: "Create a new endpoint"
+      description: "Create a new endpoint that will be used to manage a Docker environment"
+      operationId: "EndpointCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Endpoint details"
+        required: true
+        schema:
+          $ref: "#/definitions/EndpointCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/EndpointCreateResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        503:
+          description: "Endpoint management disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint management is disabled"
 securityDefinitions:
   jwt:
     type: "apiKey"
     name: "Authorization"
     in: "header"
 definitions:
+  Endpoint:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Endpoint identifier"
+      Name:
+        type: "string"
+        example: "my-endpoint"
+        description: "Endpoint name"
+      URL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address of the Docker host associated to this endpoint"
+      PublicURL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address where exposed containers will be reachable"
+      TLS:
+        type: "boolean"
+        example: true
+        description: "Whether TLS should be used to connect to this endpoint"
+      TLSCACert:
+        type: "string"
+        example: "/data/tls/1/ca.pem"
+        description: "Path to the TLS CA file used to connect to this endpoint"
+      TLSCert:
+        type: "string"
+        example: "/data/tls/1/cert.pem"
+        description: "Path to the TLS certificate file used to connect to this endpoint"
+      TLSKey:
+        type: "string"
+        example: "/data/tls/1/key.pem"
+        description: "Path to the TLS key file used to connect to this endpoint"
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
   GenericError:
     type: "object"
     properties:
@@ -98,7 +249,7 @@ definitions:
         type: "string"
         example: "Something bad happened"
         description: "Error message"
-  AuthRequest:
+  AuthenticateUserRequest:
     type: "object"
     required:
     - "Password"
@@ -112,10 +263,78 @@ definitions:
         type: "string"
         example: "mypassword"
         description: "Password"
-  AuthResponse:
+  AuthenticateUserResponse:
     type: "object"
     properties:
       jwt:
         type: "string"
         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE"
-        description: "JWT token used to authenticate against the API."
+        description: "JWT token used to authenticate against the API"
+  DockerHubInspectResponse:
+    type: "object"
+    properties:
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication against DockerHub enabled"
+      Username:
+        type: "string"
+        example: "hub_user"
+        description: "Username used to authenticate against the DockerHub"
+      Password:
+        type: "string"
+        example: "hub_password"
+        description: "Password used to authenticate against the DockerHub"
+  DockerHubUpdateRequest:
+    type: "object"
+    required:
+    - "Authentication"
+    - "Password"
+    - "Username"
+    properties:
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Enable authentication against DockerHub"
+      Username:
+        type: "string"
+        example: "hub_user"
+        description: "Username used to authenticate against the DockerHub"
+      Password:
+        type: "string"
+        example: "hub_password"
+        description: "Password used to authenticate against the DockerHub"
+  EndpointCreateRequest:
+    type: "object"
+    required:
+    - "Name"
+    - "URL"
+    properties:
+      Name:
+        type: "string"
+        example: "my-endpoint"
+        description: "Name that will be used to identify this endpoint"
+      URL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address of a Docker host"
+      PublicURL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address where exposed containers will be reachable.\
+          \ Defaults to URL if not specified"
+      TLS:
+        type: "boolean"
+        example: true
+        description: "Require TLS to connect against this endpoint"
+  EndpointCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Id of the endpoint"
+  EndpointListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Endpoint"
