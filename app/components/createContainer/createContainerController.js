@@ -235,10 +235,8 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   }
 
   function confirmCreateContainer(cb) {
-    Container.query({
-      all: 1,
-      filters: {name: [$scope.config.name]}
-    }, function (data) {
+    Container.query({ all: 1, filters: {name: [$scope.config.name] }}).$promise
+    .then(function success(data) {
       var confirmDialog = false;
       var container;
       // Prompt if we found name to confirm replacement
@@ -272,7 +270,8 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       } else {
         return cb(true);
       }
-    }, function error(err) {
+    })
+    .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve containers');
       return cb(false);
     });
