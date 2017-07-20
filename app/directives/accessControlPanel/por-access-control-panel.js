@@ -2,6 +2,8 @@ angular.module('portainer').component('porAccessControlPanel', {
   templateUrl: 'app/directives/accessControlPanel/porAccessControlPanel.html',
   controller: 'porAccessControlPanelController',
   bindings: {
+    // The component will use this identifier when updating the resource control object.
+    resourceId: '<',
     // The component will display information about this resource control object.
     resourceControl: '=',
     // This component is usually displayed inside a resource-details view.
