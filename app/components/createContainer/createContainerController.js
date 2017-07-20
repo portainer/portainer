@@ -289,6 +289,8 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     // Get container
     Container.get({ id: $stateParams.from }).$promise
     .then(function success(d) {
+      $scope.fromContainer = new ContainerViewModel(d);
+
       // Get config
       $scope.config = ContainerHelper.configFromContainer(d);
 
@@ -430,6 +432,8 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       $scope.runningContainers = containers;
       if ($stateParams.from !== '') {
         loadFromContainerSpec();
+      } else {
+        $scope.fromContainer = {};
       }
     }, function(e) {
       Notifications.error('Failure', e, 'Unable to retrieve running containers');
