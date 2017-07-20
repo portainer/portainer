@@ -51,7 +51,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else if strings.HasPrefix(r.URL.Path, "/api/team_memberships") {
 		http.StripPrefix("/api", h.TeamMembershipHandler).ServeHTTP(w, r)
 	} else if strings.HasPrefix(r.URL.Path, "/api/endpoints") {
-		if strings.Contains(r.URL.Path, "docker") {
+		if strings.Contains(r.URL.Path, "/docker") {
 			http.StripPrefix("/api/endpoints", h.DockerHandler).ServeHTTP(w, r)
 		} else {
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
@@ -75,10 +75,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else if strings.HasPrefix(r.URL.Path, "/") {
 		h.FileHandler.ServeHTTP(w, r)
 	}
-	// else if strings.HasPrefix(r.URL.Path, "/api/docker") {
-	// 	http.StripPrefix("/api/docker", h.DockerHandler).ServeHTTP(w, r)
-	// }
-
 }
 
 // encodeJSON encodes v to w in JSON format. Error() is called if encoding fails.
