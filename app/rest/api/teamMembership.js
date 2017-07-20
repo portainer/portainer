@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('TeamMemberships', ['$resource', 'TEAM_MEMBERSHIPS_ENDPOINT', function TeamMembershipsFactory($resource, TEAM_MEMBERSHIPS_ENDPOINT) {
+.factory('TeamMemberships', ['$resource', 'API_ENDPOINT_TEAM_MEMBERSHIPS', function TeamMembershipsFactory($resource, API_ENDPOINT_TEAM_MEMBERSHIPS) {
   'use strict';
-  return $resource(TEAM_MEMBERSHIPS_ENDPOINT + '/:id/:action', {}, {
+  return $resource(API_ENDPOINT_TEAM_MEMBERSHIPS + '/:id/:action', {}, {
     create: { method: 'POST' },
     query: { method: 'GET', isArray: true },
     update: { method: 'PUT', params: { id: '@id' } },

@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('ContainerCommit', ['$resource', 'ENDPOINTS_ENDPOINT', 'EndpointProvider', function ContainerCommitFactory($resource, ENDPOINTS_ENDPOINT, EndpointProvider) {
+.factory('ContainerCommit', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function ContainerCommitFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
-  return $resource(ENDPOINTS_ENDPOINT + '/:endpointId/docker/commit', {
+  return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/commit', {
     endpointId: EndpointProvider.endpointID
   },
   {
