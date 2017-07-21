@@ -659,7 +659,7 @@ paths:
         description: "Resource control details"
         required: true
         schema:
-          $ref: "#/definitions/RegistryUpdateRequest"
+          $ref: "#/definitions/ResourceControlUpdateRequest"
       responses:
         200:
           description: "Success"
@@ -670,40 +670,33 @@ paths:
           examples:
             application/json:
               err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
         404:
-          description: "Registry not found"
+          description: "Resource control not found"
           schema:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "Endpoint not found"
-        409:
-          description: "Registry already exists"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "A registry is already defined for this URL"
+              err: "Resource control not found"
         500:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
-        503:
-          description: "Endpoint management disabled"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Endpoint management is disabled"
     delete:
       tags:
-      - "registries"
-      summary: "Remove a registry"
-      operationId: "RegistryDelete"
+      - "resource_controls"
+      summary: "Remove a resource control"
+      operationId: "ResourceControlDelete"
       parameters:
       - name: "id"
         in: "path"
-        description: "Registry identifier"
+        description: "Resource control identifier"
         required: true
         type: "integer"
       responses:
@@ -716,13 +709,20 @@ paths:
           examples:
             application/json:
               err: "Invalid request"
-        404:
-          description: "Registry not found"
+        403:
+          description: "Unauthorized"
           schema:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "Endpoint not found"
+              err: "Access denied to resource"
+        404:
+          description: "Resource control not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Resource control not found"
         500:
           description: "Server error"
           schema:
@@ -1060,3 +1060,25 @@ definitions:
           type: "string"
           example: "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
           description: "Docker resource identifier"
+  ResourceControlUpdateRequest:
+    type: "object"
+    properties:
+      AdministratorsOnly:
+        type: "boolean"
+        example: false
+        description: "Restrict access to the associated resource to administrators\
+          \ only"
+      Users:
+        type: "array"
+        description: "List of user identifiers with access to the associated resource"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      Teams:
+        type: "array"
+        description: "List of team identifiers with access to the associated resource"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
