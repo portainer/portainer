@@ -282,12 +282,363 @@ paths:
           examples:
             application/json:
               err: "Endpoint management is disabled"
+    delete:
+      tags:
+      - "endpoints"
+      summary: "Remove an endpoint"
+      operationId: "EndpointDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Endpoint not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        503:
+          description: "Endpoint management disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint management is disabled"
+  /endpoints/{id}/access:
+    put:
+      tags:
+      - "endpoints"
+      summary: "Manage accesses to an endpoint"
+      operationId: "EndpointAccessUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Authorizations details"
+        required: true
+        schema:
+          $ref: "#/definitions/EndpointAccessUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Endpoint not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /registries:
+    get:
+      tags:
+      - "registries"
+      summary: "List registries"
+      description: "List all registries based on the current user authorizations.\
+        \ Will return all registries if using an administrator account otherwise it\
+        \ will only return authorized registries"
+      operationId: "RegistryList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/RegistryListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "registries"
+      summary: "Create a new registry"
+      operationId: "RegistryCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Registry details"
+        required: true
+        schema:
+          $ref: "#/definitions/RegistryCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/RegistryCreateResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        409:
+          description: "Registry already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A registry is already defined for this URL"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /registries/{id}:
+    get:
+      tags:
+      - "registries"
+      summary: "Inspect a registry"
+      operationId: "RegistryInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Registry identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Registry"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Registry not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "registries"
+      summary: "Update a registry"
+      operationId: "RegistryUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Registry identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Registry details"
+        required: true
+        schema:
+          $ref: "#/definitions/RegistryUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Registry not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        409:
+          description: "Registry already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A registry is already defined for this URL"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        503:
+          description: "Endpoint management disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint management is disabled"
+    delete:
+      tags:
+      - "registries"
+      summary: "Remove a registry"
+      operationId: "RegistryDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Registry identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Registry not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /registries/{id}/access:
+    put:
+      tags:
+      - "registries"
+      summary: "Manage accesses to a registry"
+      operationId: "RegistryAccessUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Registry identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Authorizations details"
+        required: true
+        schema:
+          $ref: "#/definitions/RegistryAccessUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Registry not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Registry not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 securityDefinitions:
   jwt:
     type: "apiKey"
     name: "Authorization"
     in: "header"
 definitions:
+  Registry:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Registry identifier"
+      Name:
+        type: "string"
+        example: "my-registry"
+        description: "Registry name"
+      URL:
+        type: "string"
+        example: "registry.mydomain.tld:2375"
+        description: "URL or IP address of the Docker registry"
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication against this registry enabled"
+      Username:
+        type: "string"
+        example: "registry_user"
+        description: "Username used to authenticate against this registry"
+      Password:
+        type: "string"
+        example: "registry_password"
+        description: "Password used to authenticate against this registry"
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to use this registry"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to use this registry"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
   Endpoint:
     type: "object"
     properties:
@@ -303,26 +654,6 @@ definitions:
         type: "string"
         example: "docker.mydomain.tld:2375"
         description: "URL or IP address of the Docker host associated to this endpoint"
-      PublicURL:
-        type: "string"
-        example: "docker.mydomain.tld:2375"
-        description: "URL or IP address where exposed containers will be reachable"
-      TLS:
-        type: "boolean"
-        example: true
-        description: "Whether TLS should be used to connect to this endpoint"
-      TLSCACert:
-        type: "string"
-        example: "/data/tls/1/ca.pem"
-        description: "Path to the TLS CA file used to connect to this endpoint"
-      TLSCert:
-        type: "string"
-        example: "/data/tls/1/cert.pem"
-        description: "Path to the TLS certificate file used to connect to this endpoint"
-      TLSKey:
-        type: "string"
-        example: "/data/tls/1/key.pem"
-        description: "Path to the TLS key file used to connect to this endpoint"
       AuthorizedUsers:
         type: "array"
         description: "List of user identifiers authorized to connect to this endpoint"
@@ -453,3 +784,103 @@ definitions:
         type: "boolean"
         example: true
         description: "Require TLS to connect against this endpoint"
+  EndpointAccessUpdateRequest:
+    type: "object"
+    properties:
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+  RegistryCreateRequest:
+    type: "object"
+    required:
+    - "Authentication"
+    - "Name"
+    - "Password"
+    - "URL"
+    - "Username"
+    properties:
+      Name:
+        type: "string"
+        example: "my-registry"
+        description: "Name that will be used to identify this registry"
+      URL:
+        type: "string"
+        example: "registry.mydomain.tld:2375"
+        description: "URL or IP address of the Docker registry"
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication against this registry enabled"
+      Username:
+        type: "string"
+        example: "registry_user"
+        description: "Username used to authenticate against this registry"
+      Password:
+        type: "string"
+        example: "registry_password"
+        description: "Password used to authenticate against this registry"
+  RegistryCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Id of the registry"
+  RegistryListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Registry"
+  RegistryUpdateRequest:
+    type: "object"
+    required:
+    - "Name"
+    - "URL"
+    properties:
+      Name:
+        type: "string"
+        example: "my-registry"
+        description: "Name that will be used to identify this registry"
+      URL:
+        type: "string"
+        example: "registry.mydomain.tld:2375"
+        description: "URL or IP address of the Docker registry"
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication against this registry enabled"
+      Username:
+        type: "string"
+        example: "registry_user"
+        description: "Username used to authenticate against this registry"
+      Password:
+        type: "string"
+        example: "registry_password"
+        description: "Password used to authenticate against this registry"
+  RegistryAccessUpdateRequest:
+    type: "object"
+    properties:
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to use thi registry"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to use thi registry"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
