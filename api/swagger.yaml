@@ -592,6 +592,52 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /resource_controls:
+    post:
+      tags:
+      - "resource_controls"
+      summary: "Create a new resource control"
+      description: "Create a new resource control to restrict access to a Docker resource"
+      operationId: "ResourceControlCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Resource control details"
+        required: true
+        schema:
+          $ref: "#/definitions/ResourceControlCreateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        409:
+          description: "Resource control already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A resource control is already applied on this resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 securityDefinitions:
   jwt:
     type: "apiKey"
@@ -884,3 +930,44 @@ definitions:
           type: "integer"
           example: 1
           description: "Team identifier"
+  ResourceControlCreateRequest:
+    type: "object"
+    required:
+    - "ResourceID"
+    - "Type"
+    properties:
+      ResourceID:
+        type: "string"
+        example: "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
+        description: "Docker resource identifier on which access control will be applied"
+      Type:
+        type: "string"
+        example: "container"
+        description: "Type of Docker resource. Valid values are: container, volume\
+          \ or service"
+      AdministratorsOnly:
+        type: "boolean"
+        example: true
+        description: "Restrict access to the associated resource to administrators\
+          \ only"
+      Users:
+        type: "array"
+        description: "List of user identifiers with access to the associated resource"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      Teams:
+        type: "array"
+        description: "List of team identifiers with access to the associated resource"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+      SubResourceIDs:
+        type: "array"
+        description: "List of Docker resources that will inherit this access control"
+        items:
+          type: "string"
+          example: "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
+          description: "Docker resource identifier"
