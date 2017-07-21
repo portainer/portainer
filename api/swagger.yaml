@@ -727,12 +727,85 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /settings:
+    get:
+      tags:
+      - "settings"
+      summary: "Retrieve Portainer settings"
+      operationId: "SettingsInspect"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Settings"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "settings"
+      summary: "Update Portainer settings"
+      operationId: "SettingsUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "New settings"
+        required: true
+        schema:
+          $ref: "#/definitions/SettingsUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 securityDefinitions:
   jwt:
     type: "apiKey"
     name: "Authorization"
     in: "header"
 definitions:
+  Settings:
+    type: "object"
+    properties:
+      TemplatesURL:
+        type: "string"
+        example: "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
+        description: "URL to the templates that will be displayed in the UI when navigating\
+          \ to App Templates"
+      LogoURL:
+        type: "string"
+        example: "https://mycompany.mydomain.tld/logo.png"
+        description: "URL to a logo that will be displayed on the login page as well\
+          \ as on top of the sidebar. Will use default Portainer logo when value is\
+          \ empty string"
+      BlackListedLabels:
+        type: "array"
+        description: "A list of label name & value that will be used to hide containers\
+          \ when querying containers"
+        items:
+          $ref: "#/definitions/Settings_BlackListedLabels"
+      DisplayExternalContributors:
+        type: "boolean"
+        example: false
+        description: "Whether to display or not external templates contributions as\
+          \ sub-menus in the UI."
   Registry:
     type: "object"
     properties:
@@ -1082,3 +1155,38 @@ definitions:
           type: "integer"
           example: 1
           description: "Team identifier"
+  SettingsUpdateRequest:
+    type: "object"
+    required:
+    - "TemplatesURL"
+    properties:
+      TemplatesURL:
+        type: "string"
+        example: "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
+        description: "URL to the templates that will be displayed in the UI when navigating\
+          \ to App Templates"
+      LogoURL:
+        type: "string"
+        example: "https://mycompany.mydomain.tld/logo.png"
+        description: "URL to a logo that will be displayed on the login page as well\
+          \ as on top of the sidebar. Will use default Portainer logo when value is\
+          \ empty string"
+      BlackListedLabels:
+        type: "array"
+        description: "A list of label name & value that will be used to hide containers\
+          \ when querying containers"
+        items:
+          $ref: "#/definitions/Settings_BlackListedLabels"
+      DisplayExternalContributors:
+        type: "boolean"
+        example: false
+        description: "Whether to display or not external templates contributions as\
+          \ sub-menus in the UI."
+  Settings_BlackListedLabels:
+    properties:
+      name:
+        type: "string"
+        example: "com.foo"
+      value:
+        type: "string"
+        example: "bar"
