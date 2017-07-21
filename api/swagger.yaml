@@ -638,6 +638,95 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /resource_controls/{id}:
+    put:
+      tags:
+      - "resource_controls"
+      summary: "Update a resource control"
+      operationId: "ResourceControlUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Resource control identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Resource control details"
+        required: true
+        schema:
+          $ref: "#/definitions/RegistryUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Registry not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        409:
+          description: "Registry already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A registry is already defined for this URL"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        503:
+          description: "Endpoint management disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint management is disabled"
+    delete:
+      tags:
+      - "registries"
+      summary: "Remove a registry"
+      operationId: "RegistryDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Registry identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Registry not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 securityDefinitions:
   jwt:
     type: "apiKey"
