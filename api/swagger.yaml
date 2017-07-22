@@ -775,12 +775,121 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /status:
+    get:
+      tags:
+      - "status"
+      summary: "Check Portainer status"
+      operationId: "StatusInspect"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Status"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users:
+    get:
+      tags:
+      - "users"
+      summary: "List users"
+      operationId: "UserList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "users"
+      summary: "Create a new user"
+      operationId: "UserCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User details"
+        required: true
+        schema:
+          $ref: "#/definitions/UserCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserCreateResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 securityDefinitions:
   jwt:
     type: "apiKey"
     name: "Authorization"
     in: "header"
 definitions:
+  User:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "User identifier"
+      Username:
+        type: "string"
+        example: "bob"
+        description: "Username"
+      Role:
+        type: "integer"
+        example: 1
+        description: "User role (0 for administrator account and 1 for regular account)"
+  Status:
+    type: "object"
+    properties:
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication enabled"
+      EndpointManagement:
+        type: "boolean"
+        example: true
+        description: "Is endpoint management enabled"
+      Analytics:
+        type: "boolean"
+        example: true
+        description: "Is analytics enabled"
+      Version:
+        type: "string"
+        example: "1.13.6"
+        description: "Portainer API version"
   Settings:
     type: "object"
     properties:
@@ -1182,6 +1291,36 @@ definitions:
         example: false
         description: "Whether to display or not external templates contributions as\
           \ sub-menus in the UI."
+  UserCreateRequest:
+    type: "object"
+    required:
+    - "Password"
+    - "Role"
+    - "Username"
+    properties:
+      Username:
+        type: "string"
+        example: "bob"
+        description: "Username"
+      Password:
+        type: "string"
+        example: "cg9Wgky3"
+        description: "Password"
+      Role:
+        type: "integer"
+        example: 1
+        description: "User role (0 for administrator account and 1 for regular account)"
+  UserCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Id of the user"
+  UserListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/User"
   Settings_BlackListedLabels:
     properties:
       name:
