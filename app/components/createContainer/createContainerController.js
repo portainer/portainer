@@ -234,22 +234,12 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     return config;
   }
 
-  function confirmCreateContainer(cb) {
+  function confirmCreateContainer() {
+    var deferred = $q.defer();
     Container.query({ all: 1, filters: {name: [$scope.config.name] }}).$promise
     .then(function success(data) {
-      var confirmDialog = false;
-      var container;
-      // Prompt if we found name to confirm replacement
-      for (var c in data) {
-        for (var n in data[c].Names) {
-          if (data[c].Names[n] === '/' + $scope.config.name) {
-            confirmDialog = true;
-            container = data[c];
-          }
-        }
-      }
-
-      if (confirmDialog) {
+      var existingContainer = data[0];
+      if (existingContainer) {
         ModalService.confirm({
           title: 'Are you sure ?',
           message: 'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
@@ -260,29 +250,29 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
             }
           },
           callback: function onConfirm(confirmed) {
-            if(!confirmed) { return cb(false); }
+            if(!confirmed) { deferred.resolve(false); }
             else {
               // Remove old container
-              ContainerService.remove(container, true)
+              ContainerService.remove(existingContainer, true)
               .then(function success(data) {
-                Notifications.success('Container Removed', container.Id);
-                return cb(true);
+                Notifications.success('Container Removed', existingContainer.Id);
+                deferred.resolve(true);
               })
               .catch(function error(err) {
-                Notifications.error('Failure', err, 'Unable to remove container');
-                return cb(false);
+                deferred.reject({ msg: 'Unable to remove container', err: err });
               });
             }
           }
         });
       } else {
-        return cb(true);
+        deferred.resolve(true);
       }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve containers');
-      return cb(false);
+      return undefined;
     });
+    return deferred.promise;
   }
 
   function loadFromContainerSpec() {
@@ -433,7 +423,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       if ($stateParams.from !== '') {
         loadFromContainerSpec();
       } else {
-        $scope.fromContainer = {};
+        $scope.fromContamner = {};
       }
     }, function(e) {
       Notifications.error('Failure', e, 'Unable to retrieve running containers');
@@ -454,22 +444,29 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   }
 
   $scope.create = function () {
-    confirmCreateContainer(function (doIt) {
-      if (doIt) {
-        $('#createContainerSpinner').show();
-
-        var accessControlData = $scope.formValues.AccessControlData;
-        var userDetails = Authentication.getUserDetails();
-        var isAdmin = userDetails.role === 1 ? true : false;
-
-        if (!validateForm(accessControlData, isAdmin)) {
-          $('#createContainerSpinner').hide();
-          return;
-        }
-
-        var config = prepareConfiguration();
-        createContainer(config, accessControlData);
+    confirmCreateContainer()
+    .then(function success(confirm) {
+      if (!confirm) {
+        return false;
       }
+      $('#createContainerSpinner').show();
+      var accessControlData = $scope.formValues.AccessControlData;
+      var userDetails = Authentication.getUserDetails();
+      var isAdmin = userDetails.role === 1 ? true : false;
+
+      if (!validateForm(accessControlData, isAdmin)) {
+        $('#createContainerSpinner').hide();
+        return;
+      }
+
+      var config = prepareConfiguration();
+      createContainer(config, accessControlData);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to create container');
+    })
+    .finally(function final() {
+      $('#createContainerSpinner').hide();
     });
   };
 
