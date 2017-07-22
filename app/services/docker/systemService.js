@@ -16,6 +16,19 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.getNetworkPlugins = function() {
+    var deferred = $q.defer();
+    System.info({}).$promise
+    .then(function success(data) {
+      var plugins = data.Plugins.Network;
+      deferred.resolve(plugins);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve network plugin information', err: err});
+    });
+    return deferred.promise;
+  };
+
   service.info = function() {
     return System.info({}).$promise;
   };

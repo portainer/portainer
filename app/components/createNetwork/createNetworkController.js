@@ -1,15 +1,18 @@
 angular.module('createNetwork', [])
-.controller('CreateNetworkController', ['$scope', '$state', 'Notifications', 'Network', 'LabelHelper',
-function ($scope, $state, Notifications, Network, LabelHelper) {
+.controller('CreateNetworkController', ['$scope', '$state', 'SystemService', 'Notifications', 'Network', 'LabelHelper',
+function ($scope, $state, SystemService, Notifications, Network, LabelHelper) {
+
   $scope.formValues = {
+    Driver: 'bridge',
     DriverOptions: [],
     Subnet: '',
     Gateway: '',
     Labels: []
   };
 
+  $scope.availableNetworkDrivers = [];
+
   $scope.config = {
-    Driver: 'bridge',
     CheckDuplicate: true,
     Internal: false,
     // Force IPAM Driver to 'default', should not be required.
@@ -39,6 +42,7 @@ function ($scope, $state, Notifications, Network, LabelHelper) {
 
   function createNetwork(config) {
     $('#createNetworkSpinner').show();
+    config.Driver = $scope.formValues.Driver;
     Network.create(config, function (d) {
       if (d.message) {
         $('#createNetworkSpinner').hide();
@@ -89,4 +93,22 @@ function ($scope, $state, Notifications, Network, LabelHelper) {
     var config = prepareConfiguration();
     createNetwork(config);
   };
+
+  function initView() {
+    $('#loadingViewSpinner').show();
+    if ($scope.applicationState.endpoint.mode.provider !== 'DOCKER_SWARM') {
+      SystemService.getNetworkPlugins()
+      .then(function success(data) {
+        $scope.availableNetworkDrivers = data;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve network drivers');
+      })
+      .finally(function final() {
+        $('#loadingViewSpinner').hide();
+      });
+    }
+  }
+
+  initView();
 }]);
