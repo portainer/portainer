@@ -275,106 +275,126 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     return deferred.promise;
   }
 
+  function loadFromContainerCmd(d) {
+    if ($scope.config.Cmd) {
+      $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
+    }
+  }
+
+  function loadFromContainerPortBindings(d) {
+    var bindings = [];
+    for (var p in $scope.config.HostConfig.PortBindings) {
+      var b = {
+        'hostPort': $scope.config.HostConfig.PortBindings[p][0].HostPort,
+        'containerPort': p.split('/')[0],
+        'protocol': p.split('/')[1]
+      };
+      bindings.push(b);
+    }
+    $scope.config.HostConfig.PortBindings = bindings;
+  }
+
+  function loadFromContainerVolumes(d) {
+    for (var v in d.Mounts) {
+      var mount = d.Mounts[v];
+      var volume = {
+        'type': mount.Type,
+        'name': mount.Name || mount.Source,
+        'containerPath': mount.Destination,
+        'readOnly': mount.RW === false
+      };
+      $scope.formValues.Volumes.push(volume);
+    }
+  }
+
+  function loadFromContainerNetworkConfig(d) {
+    $scope.config.NetworkingConfig = {
+      EndpointsConfig: {}
+    };
+    if ($scope.config.HostConfig.NetworkMode.indexOf('container:') === 0) {
+      var netContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
+      $scope.config.HostConfig.NetworkMode = 'container';
+      for (var c in $scope.runningContainers) {
+        if ($scope.runningContainers[c].Names && $scope.runningContainers[c].Names[0] === '/' + netContainer) {
+          $scope.formValues.NetworkContainer = $scope.runningContainers[c];
+        }
+      }
+    }
+    if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]) {
+      if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig) {
+        if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address) {
+          $scope.formValues.IPv4 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address;
+        }
+        if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address) {
+          $scope.formValues.IPv6 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address;
+        }
+      }
+    }
+    $scope.config.NetworkingConfig.EndpointsConfig = d.NetworkSettings.Networks;
+    // ExtraHosts
+    for (var h in $scope.config.HostConfig.ExtraHosts) {
+      $scope.formValues.ExtraHosts.push({'value': $scope.config.HostConfig.ExtraHosts[h]});
+      $scope.config.HostConfig.ExtraHosts = [];
+    }
+  }
+
+  function loadFromContainerEnvrionmentVariables(d) {
+    var envArr = [];
+    for (var e in $scope.config.Env) {
+      var arr = $scope.config.Env[e].split(/\=(.+)/);
+      envArr.push({'name': arr[0], 'value': arr[1]});
+    }
+    $scope.config.Env = envArr;
+  }
+
+  function loadFromContainerLabels(d) {
+    for (var l in $scope.config.Labels) {
+      $scope.formValues.Labels.push({ name: l, value: $scope.config.Labels[l]});
+    }
+  }
+
+  function loadFromContainerConsole(d) {
+    if ($scope.config.OpenStdin && $scope.config.Tty) {
+      $scope.formValues.Console = 'both';
+    } else if (!$scope.config.OpenStdin && $scope.config.Tty) {
+      $scope.formValues.Console = 'tty';
+    } else if ($scope.config.OpenStdin && !$scope.config.Tty) {
+      $scope.formValues.Console = 'interactive';
+    } else if (!$scope.config.OpenStdin && !$scope.config.Tty) {
+      $scope.formValues.Console = 'none';
+    }
+  }
+
+  function loadFromContainerDevices(d) {
+    var path = [];
+    for (var dev in $scope.config.HostConfig.Devices) {
+      var device = $scope.config.HostConfig.Devices[dev];
+      path.push({'pathOnHost': device.PathOnHost, 'pathInContainer': device.PathInContainer});
+    }
+    $scope.config.HostConfig.Devices = path;
+  }
+
+  function loadFromContainerImageConfig(d) {
+    var imageInfo = ImageHelper.extractImageAndRegistryFromRepository($scope.config.Image);
+    // Have to select dropdown registry here
+    // And remove registry part from image in config
+  }
+
   function loadFromContainerSpec() {
     // Get container
     Container.get({ id: $stateParams.from }).$promise
     .then(function success(d) {
       $scope.fromContainer = new ContainerViewModel(d);
-
-      // Get config
       $scope.config = ContainerHelper.configFromContainer(d);
-
-      // Add Cmd
-      if ($scope.config.Cmd) {
-        $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
-      }
-
-      // Add Ports
-      var bindings = [];
-      for (var p in $scope.config.HostConfig.PortBindings) {
-        var b = {
-          'hostPort': $scope.config.HostConfig.PortBindings[p][0].HostPort,
-          'containerPort': p.split('/')[0],
-          'protocol': p.split('/')[1]
-        };
-        bindings.push(b);
-      }
-      $scope.config.HostConfig.PortBindings = bindings;
-
-      // Add volumes
-      for (var v in d.Mounts) {
-        var mount = d.Mounts[v];
-        var volume = {
-          'type': mount.Type,
-          'name': mount.Name || mount.Source,
-          'containerPath': mount.Destination,
-          'readOnly': mount.RW === false
-        };
-        $scope.formValues.Volumes.push(volume);
-      }
-
-      // Add network
-      $scope.config.NetworkingConfig = {
-        EndpointsConfig: {}
-      };
-      if ($scope.config.HostConfig.NetworkMode.indexOf('container:') === 0) {
-        var netContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
-        $scope.config.HostConfig.NetworkMode = 'container';
-        for (var c in $scope.runningContainers) {
-          if ($scope.runningContainers[c].Names && $scope.runningContainers[c].Names[0] === '/' + netContainer) {
-            $scope.formValues.NetworkContainer = $scope.runningContainers[c];
-          }
-        }
-      }
-      if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]) {
-        if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig) {
-          if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address) {
-            $scope.formValues.IPv4 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address;
-          }
-          if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address) {
-            $scope.formValues.IPv6 = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv6Address;
-          }
-        }
-      }
-      $scope.config.NetworkingConfig.EndpointsConfig = d.NetworkSettings.Networks;
-
-      // Add Env
-      var envArr = [];
-      for (var e in $scope.config.Env) {
-        var arr = $scope.config.Env[e].split(/\=(.+)/);
-        envArr.push({'name': arr[0], 'value': arr[1]});
-      }
-      $scope.config.Env = envArr;
-
-      // Add ExtraHost
-      for (var h in $scope.config.HostConfig.ExtraHosts) {
-        $scope.formValues.ExtraHosts.push({'value': $scope.config.HostConfig.ExtraHosts[h]});
-        $scope.config.HostConfig.ExtraHosts = [];
-      }
-
-      // Add labels
-      for (var l in $scope.config.Labels) {
-        $scope.formValues.Labels.push({ name: l, value: $scope.config.Labels[l]});
-      }
-
-      // Add Console
-      if ($scope.config.OpenStdin && $scope.config.Tty) {
-        $scope.formValues.Console = 'both';
-      } else if (!$scope.config.OpenStdin && $scope.config.Tty) {
-        $scope.formValues.Console = 'tty';
-      } else if ($scope.config.OpenStdin && !$scope.config.Tty) {
-        $scope.formValues.Console = 'interactive';
-      } else if (!$scope.config.OpenStdin && !$scope.config.Tty) {
-        $scope.formValues.Console = 'none';
-      }
-
-      // Add Devices
-      var path = [];
-      for (var dev in $scope.config.HostConfig.Devices) {
-        var device = $scope.config.HostConfig.Devices[dev];
-        path.push({'pathOnHost': device.PathOnHost, 'pathInContainer': device.PathInContainer});
-      }
-      $scope.config.HostConfig.Devices = path;
+      loadFromContainerCmd(d);
+      loadFromContainerPortBindings(d);
+      loadFromContainerVolumes(d);
+      loadFromContainerNetworkConfig(d);
+      loadFromContainerEnvrionmentVariables(d);
+      loadFromContainerLabels(d);
+      loadFromContainerConsole(d);
+      loadFromContainerDevices(d);
+      loadFromContainerImageConfig(d);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve container');
