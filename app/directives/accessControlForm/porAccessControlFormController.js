@@ -58,10 +58,13 @@ function ($q, UserService, Notifications, Authentication, ResourceControlService
     })
     .then(function success(data) {
       if (data) {
+        ctrl.formData.AccessControlEnabled = true;
         var authorizedUsers = data.authorizedUsers;
         var authorizedTeams = data.authorizedTeams;
         setOwnership(ctrl.resourceControl, isAdmin);
         setAuthorizedUsersAndTeams(authorizedUsers, authorizedTeams);
+      } else {
+        ctrl.formData.AccessControlEnabled = false;
       }
     })
     .catch(function error(err) {
