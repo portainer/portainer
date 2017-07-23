@@ -284,26 +284,30 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   function loadFromContainerPortBindings(d) {
     var bindings = [];
     for (var p in $scope.config.HostConfig.PortBindings) {
-      var b = {
-        'hostPort': $scope.config.HostConfig.PortBindings[p][0].HostPort,
-        'containerPort': p.split('/')[0],
-        'protocol': p.split('/')[1]
-      };
-      bindings.push(b);
+      if ({}.hasOwnProperty.call($scope.config.HostConfig.PortBindings, p)) {
+        var b = {
+          'hostPort': $scope.config.HostConfig.PortBindings[p][0].HostPort,
+          'containerPort': p.split('/')[0],
+          'protocol': p.split('/')[1]
+        };
+        bindings.push(b);
+      }
     }
     $scope.config.HostConfig.PortBindings = bindings;
   }
 
   function loadFromContainerVolumes(d) {
     for (var v in d.Mounts) {
-      var mount = d.Mounts[v];
-      var volume = {
-        'type': mount.Type,
-        'name': mount.Name || mount.Source,
-        'containerPath': mount.Destination,
-        'readOnly': mount.RW === false
-      };
-      $scope.formValues.Volumes.push(volume);
+      if ({}.hasOwnProperty.call(d.Mounts, v)) {
+        var mount = d.Mounts[v];
+        var volume = {
+          'type': mount.Type,
+          'name': mount.Name || mount.Source,
+          'containerPath': mount.Destination,
+          'readOnly': mount.RW === false
+        };
+        $scope.formValues.Volumes.push(volume);
+      }
     }
   }
 
@@ -333,23 +337,29 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     $scope.config.NetworkingConfig.EndpointsConfig = d.NetworkSettings.Networks;
     // ExtraHosts
     for (var h in $scope.config.HostConfig.ExtraHosts) {
-      $scope.formValues.ExtraHosts.push({'value': $scope.config.HostConfig.ExtraHosts[h]});
-      $scope.config.HostConfig.ExtraHosts = [];
+      if ({}.hasOwnProperty.call($scope.config.HostConfig.ExtraHosts, h)) {
+        $scope.formValues.ExtraHosts.push({'value': $scope.config.HostConfig.ExtraHosts[h]});
+        $scope.config.HostConfig.ExtraHosts = [];
+      }
     }
   }
 
   function loadFromContainerEnvrionmentVariables(d) {
     var envArr = [];
     for (var e in $scope.config.Env) {
-      var arr = $scope.config.Env[e].split(/\=(.+)/);
-      envArr.push({'name': arr[0], 'value': arr[1]});
+      if ({}.hasOwnProperty.call($scope.config.Env, e)) {
+        var arr = $scope.config.Env[e].split(/\=(.+)/);
+        envArr.push({'name': arr[0], 'value': arr[1]});
+      }
     }
     $scope.config.Env = envArr;
   }
 
   function loadFromContainerLabels(d) {
     for (var l in $scope.config.Labels) {
-      $scope.formValues.Labels.push({ name: l, value: $scope.config.Labels[l]});
+      if ({}.hasOwnProperty.call($scope.config.Labels, l)) {
+        $scope.formValues.Labels.push({ name: l, value: $scope.config.Labels[l]});
+      }
     }
   }
 
@@ -368,8 +378,10 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   function loadFromContainerDevices(d) {
     var path = [];
     for (var dev in $scope.config.HostConfig.Devices) {
-      var device = $scope.config.HostConfig.Devices[dev];
-      path.push({'pathOnHost': device.PathOnHost, 'pathInContainer': device.PathInContainer});
+      if ({}.hasOwnProperty.call($scope.config.HostConfig.Devices, dev)) {
+        var device = $scope.config.HostConfig.Devices[dev];
+        path.push({'pathOnHost': device.PathOnHost, 'pathInContainer': device.PathInContainer});
+      }
     }
     $scope.config.HostConfig.Devices = path;
   }
@@ -443,7 +455,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       if ($stateParams.from !== '') {
         loadFromContainerSpec();
       } else {
-        $scope.fromContamner = {};
+        $scope.fromContainer = {};
       }
     }, function(e) {
       Notifications.error('Failure', e, 'Unable to retrieve running containers');

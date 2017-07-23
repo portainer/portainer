@@ -33,28 +33,30 @@ angular.module('portainer.helpers')
     var binds = [];
     var volumes = {};
     for (var v in container.Mounts) {
-      var mount = container.Mounts[v];
-      var volume = {
-        'type': mount.Type,
-        'name': mount.Name || mount.Source,
-        'containerPath': mount.Destination,
-        'readOnly': mount.RW === false
-      };
-      var name = mount.Name || mount.Source;
-      var containerPath = mount.Destination;
-      if (name && containerPath) {
-        var bind = name + ':' + containerPath;
-        volumes[containerPath] = {};
-        if (mount.RW === false) {
-          bind += ':ro';
+      if ({}.hasOwnProperty.call(container.Mounts, v)) {
+        var mount = container.Mounts[v];
+        var volume = {
+          'type': mount.Type,
+          'name': mount.Name || mount.Source,
+          'containerPath': mount.Destination,
+          'readOnly': mount.RW === false
+        };
+        var name = mount.Name || mount.Source;
+        var containerPath = mount.Destination;
+        if (name && containerPath) {
+          var bind = name + ':' + containerPath;
+          volumes[containerPath] = {};
+          if (mount.RW === false) {
+            bind += ':ro';
+          }
+          binds.push(bind);
         }
-        binds.push(bind);
       }
     }
     config.HostConfig.Binds = binds;
     config.Volumes = volumes;
     return config;
-  }
+  };
 
   return helper;
 }]);
