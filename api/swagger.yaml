@@ -544,7 +544,7 @@ paths:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "Endpoint not found"
+              err: "Registry not found"
         500:
           description: "Server error"
           schema:
@@ -846,6 +846,124 @@ paths:
           examples:
             application/json:
               err: "Access denied to resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users/{id}:
+    get:
+      tags:
+      - "users"
+      summary: "Inspect a user"
+      operationId: "UserInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "users"
+      summary: "Update a user"
+      operationId: "UserUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "User details"
+        required: true
+        schema:
+          $ref: "#/definitions/UserUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "users"
+      summary: "Remove a user"
+      operationId: "UserDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
         500:
           description: "Server error"
           schema:
@@ -1321,6 +1439,17 @@ definitions:
     type: "array"
     items:
       $ref: "#/definitions/User"
+  UserUpdateRequest:
+    type: "object"
+    properties:
+      Password:
+        type: "string"
+        example: "cg9Wgky3"
+        description: "Password"
+      Role:
+        type: "integer"
+        example: 1
+        description: "User role (0 for administrator account and 1 for regular account)"
   Settings_BlackListedLabels:
     properties:
       name:
