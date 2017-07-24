@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('UserService', ['$q', 'Users', 'UserHelper', 'TeamMembershipService', function UserServiceFactory($q, Users, UserHelper, TeamMembershipService) {
+.factory('UserService', ['$q', 'Users', 'UserHelper', 'TeamService', 'TeamMembershipService', function UserServiceFactory($q, Users, UserHelper, TeamService, TeamMembershipService) {
   'use strict';
   var service = {};
 
@@ -110,28 +110,11 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.userTeams = function(id) {
-    var deferred = $q.defer();
-
-    Users.queryTeams({id: id}).$promise
-    .then(function success(data) {
-      var teams = data.map(function (item) {
-        return new TeamViewModel(item);
-      });
-      deferred.resolve(teams);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve user teams', err: err });
-    });
-
-    return deferred.promise;
-  };
-
   service.userLeadingTeams = function(id) {
     var deferred = $q.defer();
 
     $q.all({
-      teams: service.userTeams(id),
+      teams: TeamService.teams(),
       memberships: service.userMemberships(id)
     })
     .then(function success(data) {

@@ -46,8 +46,6 @@ func NewUserHandler(bouncer *security.RequestBouncer) *UserHandler {
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteUser))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/memberships",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
-	h.Handle("/users/{id}/teams",
-		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
 	h.Handle("/users/{id}/passwd",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUserPasswd)))
 	h.Handle("/users/admin/check",
@@ -453,38 +451,4 @@ func (handler *UserHandler) handleGetMemberships(w http.ResponseWriter, r *http.
 	}
 
 	encodeJSON(w, memberships, handler.Logger)
-}
-
-// handleGetTeams handles GET requests on /users/:id/teams
-func (handler *UserHandler) handleGetTeams(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	uid, err := strconv.Atoi(id)
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-	userID := portainer.UserID(uid)
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
-	if !security.AuthorizedUserManagement(userID, securityContext) {
-		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
-		return
-	}
-
-	teams, err := handler.TeamService.Teams()
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
-	filteredTeams := security.FilterUserTeams(teams, securityContext)
-
-	encodeJSON(w, filteredTeams, handler.Logger)
 }

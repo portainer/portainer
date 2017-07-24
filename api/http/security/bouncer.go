@@ -50,7 +50,7 @@ func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler 
 	return h
 }
 
-// RestrictedAccess defines defines a security check for restricted endpoints.
+// RestrictedAccess defines a security check for restricted endpoints.
 // Authentication is required to access these endpoints.
 // The request context will be enhanced with a RestrictedRequestContext object
 // that might be used later to authorize/filter access to resources.

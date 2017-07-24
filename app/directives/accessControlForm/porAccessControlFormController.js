@@ -1,6 +1,6 @@
 angular.module('portainer')
-.controller('porAccessControlFormController', ['$q', 'UserService', 'Notifications', 'Authentication', 'ResourceControlService',
-function ($q, UserService, Notifications, Authentication, ResourceControlService) {
+.controller('porAccessControlFormController', ['$q', 'UserService', 'TeamService', 'Notifications', 'Authentication', 'ResourceControlService',
+function ($q, UserService, TeamService, Notifications, Authentication, ResourceControlService) {
   var ctrl = this;
 
   ctrl.availableTeams = [];
@@ -42,7 +42,7 @@ function ($q, UserService, Notifications, Authentication, ResourceControlService
     }
 
     $q.all({
-      availableTeams: UserService.userTeams(userDetails.ID),
+      availableTeams: TeamService.teams(),
       availableUsers: isAdmin ? UserService.users(false) : []
     })
     .then(function success(data) {

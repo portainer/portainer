@@ -1,6 +1,6 @@
 angular.module('portainer')
-.controller('porAccessControlPanelController', ['$q', '$state', 'UserService', 'ResourceControlService', 'Notifications', 'Authentication', 'ModalService', 'FormValidator',
-function ($q, $state, UserService, ResourceControlService, Notifications, Authentication, ModalService, FormValidator) {
+.controller('porAccessControlPanelController', ['$q', '$state', 'UserService', 'TeamService', 'ResourceControlService', 'Notifications', 'Authentication', 'ModalService', 'FormValidator',
+function ($q, $state, UserService, TeamService, ResourceControlService, Notifications, Authentication, ModalService, FormValidator) {
 
   var ctrl = this;
 
@@ -121,7 +121,7 @@ function ($q, $state, UserService, ResourceControlService, Notifications, Authen
 
       return $q.all({
         availableUsers: isAdmin ? UserService.users(false) : [],
-        availableTeams: isAdmin || data.isPartOfRestrictedUsers ? UserService.userTeams(userId) : []
+        availableTeams: isAdmin || data.isPartOfRestrictedUsers ? TeamService.teams() : []
       });
     })
     .then(function success(data) {
