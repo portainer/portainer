@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'Secret', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
-function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, Secret, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
+function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -288,7 +288,7 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
 
   function initView() {
     $('#loadingViewSpinner').show();
-
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
     ServiceService.service($stateParams.id)
     .then(function success(data) {
       var service = data;
@@ -304,21 +304,17 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
       return $q.all({
         tasks: TaskService.serviceTasks(service.Name),
         nodes: NodeService.nodes(),
-        secrets: Secret.query({}).$promise
+        secrets: apiVersion >= 1.25 ? SecretService.secrets() : []
       });
     })
     .then(function success(data) {
       $scope.tasks = data.tasks;
       $scope.nodes = data.nodes;
-
-      $scope.secrets = data.secrets.map(function (secret) {
-        return new SecretViewModel(secret);
-      });
+      $scope.secrets = data.secrets;
 
       $timeout(function() {
         $anchorScroll();
       });
-
     })
     .catch(function error(err) {
       $scope.secrets = [];
@@ -326,20 +322,6 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
-    });
-  }
-
-  function fetchSecrets() {
-    $('#loadSecretsSpinner').show();
-    Secret.query({}, function (d) {
-      $scope.secrets = d.map(function (secret) {
-        return new SecretViewModel(secret);
-      });
-      $('#loadSecretsSpinner').hide();
-    }, function(e) {
-      $('#loadSecretsSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to retrieve secrets');
-      $scope.secrets = [];
     });
   }
 
