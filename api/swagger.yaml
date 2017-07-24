@@ -1137,6 +1137,14 @@ definitions:
         example: false
         description: "Whether to display or not external templates contributions as\
           \ sub-menus in the UI."
+  Settings_BlackListedLabels:
+    properties:
+      name:
+        type: "string"
+        example: "com.foo"
+      value:
+        type: "string"
+        example: "bar"
   Registry:
     type: "object"
     properties:
@@ -1562,11 +1570,3 @@ definitions:
     type: "array"
     items:
       $ref: "#/definitions/Team"
-  Settings_BlackListedLabels:
-    properties:
-      name:
-        type: "string"
-        example: "com.foo"
-      value:
-        type: "string"
-        example: "bar"
