@@ -1005,43 +1005,6 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
-  /users/{id}/teams:
-    get:
-      tags:
-      - "users"
-      summary: "Inspect a user teams"
-      operationId: "UserTeamsInspect"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "User identifier"
-        required: true
-        type: "integer"
-      responses:
-        200:
-          description: "Success"
-          schema:
-            $ref: "#/definitions/UserTeamsResponse"
-        400:
-          description: "Invalid request"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Invalid request"
-        403:
-          description: "Unauthorized"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Access denied to resource"
-        500:
-          description: "Server error"
-          schema:
-            $ref: "#/definitions/GenericError"
 securityDefinitions:
   jwt:
     type: "apiKey"
@@ -1566,7 +1529,3 @@ definitions:
     type: "array"
     items:
       $ref: "#/definitions/TeamMembership"
-  UserTeamsResponse:
-    type: "array"
-    items:
-      $ref: "#/definitions/Team"
