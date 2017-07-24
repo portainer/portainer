@@ -13,7 +13,7 @@ angular.module('portainer.rest')
           'tail': params.tail || 'all'
         }
       }).success(callback).error(function (data, status, headers, config) {
-        console.log(error, data);
+        console.log(data);
       });
     }
   };
