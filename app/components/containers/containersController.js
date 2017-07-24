@@ -205,7 +205,8 @@ angular.module('containers', [])
 
       if(container.Status === 'paused') {
         $scope.state.noPausedItemsSelected = false;
-      } else if(container.Status === 'stopped') {
+      } else if(container.Status === 'stopped' || 
+                container.Status === 'created') {
         $scope.state.noStoppedItemsSelected = false;
       } else if(container.Status === 'running') {
         $scope.state.noRunningItemsSelected = false;
