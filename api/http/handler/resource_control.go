@@ -121,7 +121,7 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 
 	err = handler.ResourceControlService.CreateResourceControl(&resourceControl)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
