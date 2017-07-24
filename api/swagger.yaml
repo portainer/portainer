@@ -968,12 +968,68 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /users/{id}/memberships:
+    get:
+      tags:
+      - "users"
+      summary: "Inspect a user memberships"
+      operationId: "UserMembershipsInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserMembershipsResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 securityDefinitions:
   jwt:
     type: "apiKey"
     name: "Authorization"
     in: "header"
 definitions:
+  TeamMembership:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Membership identifier"
+      UserID:
+        type: "integer"
+        example: 1
+        description: "User identifier"
+      TeamID:
+        type: "integer"
+        example: 1
+        description: "Team identifier"
+      Role:
+        type: "integer"
+        example: 0
+        description: "Team role (0 for team leader and 1 for team member)"
   User:
     type: "object"
     properties:
@@ -1450,6 +1506,10 @@ definitions:
         type: "integer"
         example: 1
         description: "User role (0 for administrator account and 1 for regular account)"
+  UserMembershipsResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/TeamMembership"
   Settings_BlackListedLabels:
     properties:
       name:
