@@ -113,11 +113,11 @@
           <li><a href ng-click="goToItem('service-network-specs')">Network &amp; published ports</a></li>
           <li><a href ng-click="goToItem('service-resources')">Resource limits &amp; reservations</a></li>
           <li><a href ng-click="goToItem('service-placement-constraints')">Placement constraints</a></li>
-          <li><a href ng-click="goToItem('service-placement-preferences')" ng-if="applicationState.endpoint.apiVersion >= 1.30">Placement preferences</a></li>
+          <li ng-if="applicationState.endpoint.apiVersion >= 1.30"><a href ng-click="goToItem('service-placement-preferences')">Placement preferences</a></li>
           <li><a href ng-click="goToItem('service-restart-policy')">Restart policy</a></li>
           <li><a href ng-click="goToItem('service-update-config')">Update configuration</a></li>
           <li><a href ng-click="goToItem('service-labels')">Service labels</a></li>
-          <li><a href ng-click="goToItem('service-secrets')">Secrets</a></li>
+          <li ng-if="applicationState.endpoint.apiVersion >= 1.25"><a href ng-click="goToItem('service-secrets')">Secrets</a></li>
           <li><a href ng-click="goToItem('service-tasks')">Tasks</a></li>
         </ul>
       </rd-widget-body>
@@ -160,11 +160,11 @@
     <h3 id="service-specs">Service specification</h3>
     <div id="service-resources" class="padding-top" ng-include="'app/components/service/includes/resources.html'"></div>
     <div id="service-placement-constraints" class="padding-top" ng-include="'app/components/service/includes/constraints.html'"></div>
-    <div id="service-placement-preferences" class="padding-top" ng-include="'app/components/service/includes/placementPreferences.html'"></div>
+    <div id="service-placement-preferences" ng-if="applicationState.endpoint.apiVersion >= 1.30" class="padding-top" ng-include="'app/components/service/includes/placementPreferences.html'"></div>
     <div id="service-restart-policy" class="padding-top" ng-include="'app/components/service/includes/restart.html'"></div>
     <div id="service-update-config" class="padding-top" ng-include="'app/components/service/includes/updateconfig.html'"></div>
     <div id="service-labels" class="padding-top" ng-include="'app/components/service/includes/servicelabels.html'"></div>
-    <div id="service-secrets" class="padding-top" ng-include="'app/components/service/includes/secrets.html'"></div>
+    <div id="service-secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25" class="padding-top" ng-include="'app/components/service/includes/secrets.html'"></div>
     <div id="service-tasks" class="padding-top" ng-include="'app/components/service/includes/tasks.html'"></div>
   </div>
 </div>
