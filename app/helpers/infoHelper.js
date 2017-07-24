@@ -16,7 +16,11 @@ angular.module('portainer.helpers')
         }
       } else {
         if (!info.Swarm || _.isEmpty(info.Swarm.NodeID)) {
-          mode.provider = 'DOCKER_STANDALONE';
+          if (info.ID === 'vSphere Integrated Containers') {
+            mode.provider = 'VMWARE_VIC';
+          } else {
+            mode.provider = 'DOCKER_STANDALONE';
+          }
         } else {
           mode.provider = 'DOCKER_SWARM_MODE';
           if (info.Swarm.ControlAvailable) {
