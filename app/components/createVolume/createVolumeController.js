@@ -70,20 +70,13 @@ function ($q, $scope, $state, VolumeService, SystemService, PluginService, Resou
 
   function initView() {
     $('#loadingViewSpinner').show();
-    if ($scope.applicationState.endpoint.mode.provider !== 'DOCKER_SWARM') {
-      $q.all({
-        system: SystemService.getVolumePlugins(),
-        plugins: PluginService.volumePlugins()
-      })
+    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    if (endpointProvider !== 'DOCKER_SWARM') {
+
+      PluginService.volumePlugins(apiVersion < 1.25)
       .then(function success(data) {
-        var systemPlugins = data.system;
-        $scope.availableVolumeDrivers = $scope.availableVolumeDrivers.concat(systemPlugins);
-        var plugins = data.plugins;
-        console.log(JSON.stringify(plugins, null, 4));
-        for (var i = 0; i < plugins.length; i++) {
-          var plugin = plugins[i];
-          $scope.availableVolumeDrivers.push(plugin.Name);
-        }
+        $scope.availableVolumeDrivers = data;
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to retrieve volume drivers');

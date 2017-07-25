@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('PluginService', ['$q', 'Plugin', function PluginServiceFactory($q, Plugin) {
+.factory('PluginService', ['$q', 'Plugin', 'SystemService', function PluginServiceFactory($q, Plugin, SystemService) {
   'use strict';
   var service = {};
 
@@ -20,16 +20,29 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.volumePlugins = function() {
+  service.volumePlugins = function(systemOnly) {
     var deferred = $q.defer();
 
-    service.plugins()
+    $q.all({
+      system: SystemService.plugins(),
+      plugins: systemOnly ? [] : service.plugins()
+    })
     .then(function success(data) {
-      var volumePlugins = data.filter(function filter(plugin) {
+      var volumePlugins = [];
+      var systemPlugins = data.system;
+      var plugins = data.plugins;
+
+      if (systemPlugins.Volume) {
+        volumePlugins = volumePlugins.concat(systemPlugins.Volume);
+      }
+
+      for (var i = 0; i < plugins.length; i++) {
+        var plugin = plugins[i];
         if (plugin.Enabled && _.includes(plugin.Config.Interface.Types, 'docker.volumedriver/1.0')) {
-          return plugin;
+          volumePlugins.push(plugin.Name);
         }
-      });
+      }
+
       deferred.resolve(volumePlugins);
     })
     .catch(function error(err) {

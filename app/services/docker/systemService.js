@@ -3,15 +3,15 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.getVolumePlugins = function() {
+  service.plugins = function() {
     var deferred = $q.defer();
     System.info({}).$promise
     .then(function success(data) {
-      var plugins = data.Plugins.Volume;
+      var plugins = data.Plugins;
       deferred.resolve(plugins);
     })
     .catch(function error(err) {
-      deferred.reject({msg: 'Unable to retrieve volume plugin information', err: err});
+      deferred.reject({msg: 'Unable to retrieve plugins information from system', err: err});
     });
     return deferred.promise;
   };
@@ -40,7 +40,7 @@ angular.module('portainer.services')
 
     return deferred.promise;
   };
-  
+
   service.dataUsage = function () {
     return System.dataUsage().$promise;
   };

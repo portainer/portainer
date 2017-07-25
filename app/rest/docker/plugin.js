@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Plugin', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function PluginFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
+.factory('Plugin', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function PluginFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
-  return $resource(DOCKER_ENDPOINT + '/:endpointId/plugins/:id/:action', {
+  return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/plugins/:id/:action', {
     endpointId: EndpointProvider.endpointID
   }, {
     query: { method: 'GET', isArray: true }
