@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Swarm', ['$resource', 'DOCKER_ENDPOINT', 'EndpointProvider', function SwarmFactory($resource, DOCKER_ENDPOINT, EndpointProvider) {
+.factory('Swarm', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function SwarmFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
-  return $resource(DOCKER_ENDPOINT + '/:endpointId/swarm', {
+  return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/swarm', {
     endpointId: EndpointProvider.endpointID
   },
   {

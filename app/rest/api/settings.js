@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Settings', ['$resource', 'SETTINGS_ENDPOINT', function SettingsFactory($resource, SETTINGS_ENDPOINT) {
+.factory('Settings', ['$resource', 'API_ENDPOINT_SETTINGS', function SettingsFactory($resource, API_ENDPOINT_SETTINGS) {
   'use strict';
-  return $resource(SETTINGS_ENDPOINT, {}, {
+  return $resource(API_ENDPOINT_SETTINGS, {}, {
     get: { method: 'GET' },
     update: { method: 'PUT' }
   });
