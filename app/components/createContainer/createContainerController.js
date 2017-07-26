@@ -236,7 +236,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
 
   function confirmCreateContainer() {
     var deferred = $q.defer();
-    Container.query({ all: 1, filters: {name: [$scope.config.name] }}).$promise
+    Container.query({ all: 1, filters: {name: ['^/' + $scope.config.name + '$'] }}).$promise
     .then(function success(data) {
       var existingContainer = data[0];
       if (existingContainer) {
