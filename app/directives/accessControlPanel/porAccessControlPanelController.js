@@ -73,7 +73,7 @@ function ($q, $state, UserService, ResourceControlService, Notifications, Authen
   function updateOwnership() {
     $('#loadingViewSpinner').show();
 
-    var resourceId = ctrl.resourceControl.ResourceId;
+    var resourceId = ctrl.resourceId;
     var ownershipParameters = processOwnershipFormValues();
 
     ResourceControlService.applyResourceControlChange(ctrl.resourceType, resourceId,

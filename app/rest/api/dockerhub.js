@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('DockerHub', ['$resource', 'DOCKERHUB_ENDPOINT', function DockerHubFactory($resource, DOCKERHUB_ENDPOINT) {
+.factory('DockerHub', ['$resource', 'API_ENDPOINT_DOCKERHUB', function DockerHubFactory($resource, API_ENDPOINT_DOCKERHUB) {
   'use strict';
-  return $resource(DOCKERHUB_ENDPOINT, {}, {
+  return $resource(API_ENDPOINT_DOCKERHUB, {}, {
     get: { method: 'GET' },
     update: { method: 'PUT' }
   });

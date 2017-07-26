@@ -1,6 +1,6 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$scope', '$state', 'VolumeService', 'SystemService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator',
-function ($scope, $state, VolumeService, SystemService, ResourceControlService, Authentication, Notifications, FormValidator) {
+.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator',
+function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator) {
 
   $scope.formValues = {
     Driver: 'local',
@@ -70,8 +70,10 @@ function ($scope, $state, VolumeService, SystemService, ResourceControlService, 
 
   function initView() {
     $('#loadingViewSpinner').show();
-    if ($scope.applicationState.endpoint.mode.provider !== 'DOCKER_SWARM') {
-      SystemService.getVolumePlugins()
+    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    if (endpointProvider !== 'DOCKER_SWARM') {
+      PluginService.volumePlugins(apiVersion < 1.25)
       .then(function success(data) {
         $scope.availableVolumeDrivers = data;
       })

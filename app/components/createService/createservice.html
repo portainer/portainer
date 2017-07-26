@@ -132,7 +132,7 @@
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
-          <li class="interactive"><a data-target="#secrets" data-toggle="tab" ng-if="applicationState.endpoint.apiVersion >= 1.25">Secrets</a></li>
+          <li class="interactive" ng-if="applicationState.endpoint.apiVersion >= 1.25"><a data-target="#secrets" data-toggle="tab">Secrets</a></li>
           <li class="interactive"><a data-target="#placement" data-toggle="tab">Placement</a></li>
         </ul>
         <!-- tab-content -->

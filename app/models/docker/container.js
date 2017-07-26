@@ -11,8 +11,9 @@ function ContainerViewModel(data) {
   this.Command = data.Command;
   this.Checked = false;
   this.Labels = data.Labels;
-  this.Ports = [];
   this.Mounts = data.Mounts;
+
+  this.Ports = [];
   if (data.Ports) {
     for (var i = 0; i < data.Ports.length; ++i) {
       var p = data.Ports[i];
@@ -21,6 +22,7 @@ function ContainerViewModel(data) {
       }
     }
   }
+
   if (data.Portainer) {
     if (data.Portainer.ResourceControl) {
       this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
