@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService',
-function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService',
+function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -387,9 +387,20 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   }
 
   function loadFromContainerImageConfig(d) {
+    // TODO See how we can update the dropdown menu
+    // If no registry found, we let default DockerHub and let full image path
     var imageInfo = ImageHelper.extractImageAndRegistryFromRepository($scope.config.Image);
-    // Have to select dropdown registry here
-    // And remove registry part from image in config
+    RegistryService.retrieveRegistryFromRepository($scope.config.Image)
+    .then(function success(data) {
+      console.log(data);
+      if (data !== null) {
+        $scope.config.Image = imageInfo.image;
+        $scope.formValues.Registry = data;
+      }
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrive registry');
+    })
   }
 
   function loadFromContainerSpec() {
