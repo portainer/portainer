@@ -103,7 +103,7 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	tokenData := &portainer.TokenData{
 		ID:       portainer.UserID(1),
 		Username: username,
-		Role:     portainer.UserRole(0),
+		Role:     portainer.UserRole(1),
 	}
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
