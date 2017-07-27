@@ -27,6 +27,7 @@ type Server struct {
 	FileService            portainer.FileService
 	RegistryService        portainer.RegistryService
 	DockerHubService       portainer.DockerHubService
+	LDAPService            portainer.LDAPService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
@@ -42,6 +43,7 @@ func (server *Server) Start() error {
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
+	authHandler.LDAPService = server.LDAPService
 	var userHandler = handler.NewUserHandler(requestBouncer)
 	userHandler.UserService = server.UserService
 	userHandler.TeamService = server.TeamService

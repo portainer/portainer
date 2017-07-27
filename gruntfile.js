@@ -180,7 +180,7 @@ module.exports = function (grunt) {
       run: {
         command: [
           'docker rm -f portainer',
-          'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer-linux-amd64 --no-analytics -a /app'
+          'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer --net host portainer/base /app/portainer-linux-amd64 --no-analytics -a /app'
         ].join(';')
       }
     },

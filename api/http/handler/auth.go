@@ -22,6 +22,7 @@ type AuthHandler struct {
 	UserService   portainer.UserService
 	CryptoService portainer.CryptoService
 	JWTService    portainer.JWTService
+	LDAPService   portainer.LDAPService
 }
 
 const (
@@ -73,25 +74,36 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	var username = req.Username
 	var password = req.Password
 
-	u, err := handler.UserService.UserByUsername(username)
-	if err == portainer.ErrUserNotFound {
-		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
-		return
-	} else if err != nil {
+	err = handler.LDAPService.AuthenticateUser(username, password)
+	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	err = handler.CryptoService.CompareHashAndData(u.Password, password)
-	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
-		return
-	}
+	// u, err := handler.UserService.UserByUsername(username)
+	// if err == portainer.ErrUserNotFound {
+	// 	httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
+	// 	return
+	// } else if err != nil {
+	// 	httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+	// 	return
+	// }
+	//
+	// err = handler.CryptoService.CompareHashAndData(u.Password, password)
+	// if err != nil {
+	// 	httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
+	// 	return
+	// }
 
+	// tokenData := &portainer.TokenData{
+	// 	ID:       u.ID,
+	// 	Username: u.Username,
+	// 	Role:     u.Role,
+	// }
 	tokenData := &portainer.TokenData{
-		ID:       u.ID,
-		Username: u.Username,
-		Role:     u.Role,
+		ID:       portainer.UserID(1),
+		Username: username,
+		Role:     portainer.UserRole(0),
 	}
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {

@@ -301,6 +301,11 @@ type (
 	EndpointWatcher interface {
 		WatchEndpointFile(endpointFilePath string) error
 	}
+
+	// LDAPService represents a service used to authenticate users against a LDAP/AD.
+	LDAPService interface {
+		AuthenticateUser(username, password string) error
+	}
 )
 
 const (
