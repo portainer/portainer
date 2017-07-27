@@ -1,6 +1,6 @@
 {
   "name": "portainer",
-  "version": "1.13.4",
+  "version": "1.13.6",
   "homepage": "https://github.com/portainer/portainer",
   "authors": [
     "Anthony Lapenna <anthony.lapenna at gmail dot com>"
@@ -43,13 +43,13 @@
     "lodash": "4.12.0",
     "rdash-ui": "1.0.*",
     "moment": "~2.14.1",
-    "xterm.js": "~2.0.1",
     "font-awesome": "~4.7.0",
     "ng-file-upload": "~12.2.13",
     "splitargs": "~0.2.0",
     "bootbox.js": "bootbox#^4.4.0",
     "angular-multi-select": "~4.0.0",
-    "toastr": "~2.1.3"
+    "toastr": "~2.1.3",
+    "xterm.js": "~2.8.1"
   },
   "resolutions": {
     "angular": "1.5.11"

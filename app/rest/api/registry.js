@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Registries', ['$resource', 'REGISTRIES_ENDPOINT', function RegistriesFactory($resource, REGISTRIES_ENDPOINT) {
+.factory('Registries', ['$resource', 'API_ENDPOINT_REGISTRIES', function RegistriesFactory($resource, API_ENDPOINT_REGISTRIES) {
   'use strict';
-  return $resource(REGISTRIES_ENDPOINT + '/:id/:action', {}, {
+  return $resource(API_ENDPOINT_REGISTRIES + '/:id/:action', {}, {
     create: { method: 'POST' },
     query: { method: 'GET', isArray: true },
     get: { method: 'GET', params: { id: '@id' } },

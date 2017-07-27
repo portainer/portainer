@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.13.4",
+  "version": "1.13.6",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -43,7 +43,8 @@
     "grunt-replace": "^1.0.1",
     "grunt-shell": "^1.1.2",
     "grunt-usemin": "^3.1.1",
-    "gruntify-eslint": "^3.1.0"
+    "gruntify-eslint": "^3.1.0",
+    "load-grunt-tasks": "^3.5.2"
   },
   "scripts": {
     "postinstall": "bower install"

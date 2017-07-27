@@ -34,6 +34,10 @@
         <table class="table">
           <tbody>
             <tr>
+              <td>ID</td>
+              <td>{{ container.Id }}</td>
+            </tr>
+            <tr>
               <td>Name</td>
               <td ng-if="!container.edit">
                 {{ container.Name|trimcontainername }}
@@ -87,7 +91,14 @@
   </div>
 </div>
 
-<div ng-include="'app/components/common/accessControlPanel/accessControlPanel.html'" ng-if="container && applicationState.application.authentication"></div>
+<!-- access-control-panel -->
+<por-access-control-panel
+  ng-if="container && applicationState.application.authentication"
+  resource-id="container.Id"
+  resource-control="container.ResourceControl"
+  resource-type="'container'">
+</por-access-control-panel>
+<!-- !access-control-panel -->
 
 <div ng-if="container.State.Health" class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">

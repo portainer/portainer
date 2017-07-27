@@ -1,4 +1,4 @@
-FROM centurylink/ca-certs
+FROM portainer/base
 
 COPY dist /
 

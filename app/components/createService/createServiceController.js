@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'ControllerDataPipeline', 'FormValidator', 'RegistryService', 'HttpRequestHelper',
-function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, ControllerDataPipeline, FormValidator, RegistryService, HttpRequestHelper) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper',
+function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper) {
 
   $scope.formValues = {
     Name: '',
@@ -26,7 +26,8 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     PlacementPreferences: [],
     UpdateDelay: 0,
     FailureAction: 'pause',
-    Secrets: []
+    Secrets: [],
+    AccessControlData: new AccessControlFormData()
   };
 
   $scope.state = {
@@ -286,7 +287,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   $scope.create = function createService() {
     $('#createServiceSpinner').show();
 
-    var accessControlData = ControllerDataPipeline.getAccessControlFormData();
+    var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true : false;
 
@@ -301,10 +302,11 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
 
   function initView() {
     $('#loadingViewSpinner').show();
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
     $q.all({
       volumes: VolumeService.volumes(),
       networks: NetworkService.retrieveSwarmNetworks(),
-      secrets: SecretService.secrets()
+      secrets: apiVersion >= 1.25 ? SecretService.secrets() : []
     })
     .then(function success(data) {
       $scope.availableVolumes = data.volumes;

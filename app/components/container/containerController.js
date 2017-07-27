@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ControllerDataPipeline',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ControllerDataPipeline) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -19,7 +19,6 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     Container.get({id: $stateParams.id}, function (d) {
       var container = new ContainerDetailsViewModel(d);
       $scope.container = container;
-      ControllerDataPipeline.setAccessControlData('container', $stateParams.id, container.ResourceControl);
       $scope.container.edit = false;
       $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
 

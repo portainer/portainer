@@ -1,10 +1,11 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$scope', '$state', 'VolumeService', 'SystemService', 'ResourceControlService', 'Authentication', 'Notifications', 'ControllerDataPipeline', 'FormValidator',
-function ($scope, $state, VolumeService, SystemService, ResourceControlService, Authentication, Notifications, ControllerDataPipeline, FormValidator) {
+.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator',
+function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator) {
 
   $scope.formValues = {
     Driver: 'local',
-    DriverOptions: []
+    DriverOptions: [],
+    AccessControlData: new AccessControlFormData()
   };
 
   $scope.state = {
@@ -40,8 +41,8 @@ function ($scope, $state, VolumeService, SystemService, ResourceControlService, 
     var driver = $scope.formValues.Driver;
     var driverOptions = $scope.formValues.DriverOptions;
     var volumeConfiguration = VolumeService.createVolumeConfiguration(name, driver, driverOptions);
+    var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var accessControlData = ControllerDataPipeline.getAccessControlFormData();
     var isAdmin = userDetails.role === 1 ? true : false;
 
     if (!validateForm(accessControlData, isAdmin)) {
@@ -69,16 +70,20 @@ function ($scope, $state, VolumeService, SystemService, ResourceControlService, 
 
   function initView() {
     $('#loadingViewSpinner').show();
-    SystemService.getVolumePlugins()
-    .then(function success(data) {
-      $scope.availableVolumeDrivers = data;
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
-    });
+    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    if (endpointProvider !== 'DOCKER_SWARM') {
+      PluginService.volumePlugins(apiVersion < 1.25)
+      .then(function success(data) {
+        $scope.availableVolumeDrivers = data;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
+      })
+      .finally(function final() {
+        $('#loadingViewSpinner').hide();
+      });
+    }
   }
 
   initView();

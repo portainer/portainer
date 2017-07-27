@@ -49,7 +49,7 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     EndpointService.endpoints()
     .then(function success(data) {
       var endpoints = data;
-      $scope.endpoints = endpoints;
+      $scope.endpoints = _.sortBy(endpoints, ['Name']);
       setActiveEndpoint(endpoints);
 
       if (StateManager.getState().application.authentication) {
