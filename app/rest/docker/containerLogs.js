@@ -5,7 +5,7 @@ angular.module('portainer.rest')
     get: function (id, params, callback) {
       $http({
         method: 'GET',
-        url: API_ENDPOINT_ENDPOINTS + '/' + EndpointProvider.endpointID() + '/containers/' + id + '/logs',
+        url: API_ENDPOINT_ENDPOINTS + '/' + EndpointProvider.endpointID() + '/docker/containers/' + id + '/logs',
         params: {
           'stdout': params.stdout || 0,
           'stderr': params.stderr || 0,
@@ -13,7 +13,7 @@ angular.module('portainer.rest')
           'tail': params.tail || 'all'
         }
       }).success(callback).error(function (data, status, headers, config) {
-        console.log(error, data);
+        console.log(data);
       });
     }
   };

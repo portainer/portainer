@@ -5,11 +5,13 @@ angular.module('portainer.rest')
     get: function (id, params, callback, errorCallback) {
       $http({
         method: 'GET',
-        url: API_ENDPOINT_ENDPOINTS + '/' + EndpointProvider.endpointID() + '/containers/' + id + '/top',
+        url: API_ENDPOINT_ENDPOINTS + '/' + EndpointProvider.endpointID() + '/docker/containers/' + id + '/top',
         params: {
           ps_args: params.ps_args
         }
-      }).success(callback);
+      }).success(callback).error(function (data, status, headers, config) {
+        console.log(data);
+      });
     }
   };
 }]);
