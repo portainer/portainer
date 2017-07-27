@@ -1005,6 +1005,51 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /users/{id}/passwd:
+    post:
+      tags:
+      - "users"
+      summary: "Check password validity for a user"
+      operationId: "UserPasswordCheck"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "User details"
+        required: true
+        schema:
+          $ref: "#/definitions/UserPasswordCheckRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserPasswordCheckResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 securityDefinitions:
   jwt:
     type: "apiKey"
@@ -1529,3 +1574,19 @@ definitions:
     type: "array"
     items:
       $ref: "#/definitions/TeamMembership"
+  UserPasswordCheckRequest:
+    type: "object"
+    required:
+    - "Password"
+    properties:
+      Password:
+        type: "string"
+        example: "cg9Wgky3"
+        description: "Password"
+  UserPasswordCheckResponse:
+    type: "object"
+    properties:
+      valid:
+        type: "boolean"
+        example: true
+        description: "Is the password valid"
