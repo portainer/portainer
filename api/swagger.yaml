@@ -1436,6 +1436,34 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /templates:
+    get:
+      tags:
+      - "templates"
+      summary: "Retrieve App templates"
+      operationId: "TemplateList"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "key"
+        in: "query"
+        description: "Templates key. Valid values are 'container' or 'linuxserver.io'."
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid query format"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 securityDefinitions:
   jwt:
     type: "apiKey"
