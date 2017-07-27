@@ -846,6 +846,13 @@ paths:
           examples:
             application/json:
               err: "Access denied to resource"
+        409:
+          description: "User already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User already exists"
         500:
           description: "Server error"
           schema:
@@ -1046,6 +1053,225 @@ paths:
           examples:
             application/json:
               err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /teams:
+    get:
+      tags:
+      - "teams"
+      summary: "List teams"
+      operationId: "TeamList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TeamListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "teams"
+      summary: "Create a new team"
+      operationId: "TeamCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Team details"
+        required: true
+        schema:
+          $ref: "#/definitions/TeamCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TeamCreateResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        409:
+          description: "Team already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /teams/{id}:
+    get:
+      tags:
+      - "teams"
+      summary: "Inspect a team"
+      operationId: "TeamInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Team identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Team"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "Team not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "teams"
+      summary: "Update a team"
+      operationId: "TeamUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Team identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Team details"
+        required: true
+        schema:
+          $ref: "#/definitions/TeamUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Team not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "teams"
+      summary: "Remove a team"
+      operationId: "TeamDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Team identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Team not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /teams/{id}/memberships:
+    get:
+      tags:
+      - "teams"
+      summary: "Inspect a team memberships"
+      operationId: "TeamMembershipsInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Team identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TeamMembershipsResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
         500:
           description: "Server error"
           schema:
@@ -1590,3 +1816,36 @@ definitions:
         type: "boolean"
         example: true
         description: "Is the password valid"
+  TeamCreateRequest:
+    type: "object"
+    required:
+    - "Name"
+    properties:
+      Name:
+        type: "string"
+        example: "developers"
+        description: "Name"
+  TeamCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Id of the team"
+  TeamListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Team"
+  TeamUpdateRequest:
+    type: "object"
+    required:
+    - "Name"
+    properties:
+      Name:
+        type: "string"
+        example: "developers"
+        description: "Name"
+  TeamMembershipsResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/TeamMembership"
