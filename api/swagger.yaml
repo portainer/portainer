@@ -1276,6 +1276,166 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /team_memberships:
+    get:
+      tags:
+      - "team_memberships"
+      summary: "List team memberships"
+      operationId: "TeamMembershipList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TeamMembershipListResponse"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "team_memberships"
+      summary: "Create a new team membership"
+      operationId: "TeamMembershipCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Team membership details"
+        required: true
+        schema:
+          $ref: "#/definitions/TeamMembershipCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TeamMembershipCreateResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        409:
+          description: "Team membership already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team membership already exists for this user and team."
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /team_memberships/{id}:
+    put:
+      tags:
+      - "team_memberships"
+      summary: "Update a team membership"
+      operationId: "TeamMembershipUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Team membership identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Team membership details"
+        required: true
+        schema:
+          $ref: "#/definitions/TeamMembershipUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "Team membership not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team membership not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "team_memberships"
+      summary: "Remove a team membership"
+      operationId: "TeamMembershipDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "TeamMembership identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "Team membership not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team membership not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 securityDefinitions:
   jwt:
     type: "apiKey"
@@ -1849,3 +2009,54 @@ definitions:
     type: "array"
     items:
       $ref: "#/definitions/TeamMembership"
+  TeamMembershipCreateRequest:
+    type: "object"
+    required:
+    - "Role"
+    - "TeamID"
+    - "UserID"
+    properties:
+      UserID:
+        type: "integer"
+        example: 1
+        description: "User identifier"
+      TeamID:
+        type: "integer"
+        example: 1
+        description: "Team identifier"
+      Role:
+        type: "integer"
+        example: 1
+        description: "Role for the user inside the team (1 for leader and 2 for regular\
+          \ member)"
+  TeamMembershipCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Id of the team membership"
+  TeamMembershipListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/TeamMembership"
+  TeamMembershipUpdateRequest:
+    type: "object"
+    required:
+    - "Role"
+    - "TeamID"
+    - "UserID"
+    properties:
+      UserID:
+        type: "integer"
+        example: 1
+        description: "User identifier"
+      TeamID:
+        type: "integer"
+        example: 1
+        description: "Team identifier"
+      Role:
+        type: "integer"
+        example: 1
+        description: "Role for the user inside the team (1 for leader and 2 for regular\
+          \ member)"
