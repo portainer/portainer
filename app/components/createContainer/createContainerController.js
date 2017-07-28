@@ -8,7 +8,6 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     alwaysPull: true,
     Console: 'none',
     Volumes: [],
-    Registry: '',
     NetworkContainer: '',
     Labels: [],
     ExtraHosts: [],
@@ -387,27 +386,29 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   }
 
   function loadFromContainerImageConfig(d) {
-    // TODO See how we can update the dropdown menu
     // If no registry found, we let default DockerHub and let full image path
     var imageInfo = ImageHelper.extractImageAndRegistryFromRepository($scope.config.Image);
     RegistryService.retrieveRegistryFromRepository($scope.config.Image)
     .then(function success(data) {
-      console.log(data);
-      if (data !== null) {
+      if (data) {
         $scope.config.Image = imageInfo.image;
         $scope.formValues.Registry = data;
       }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrive registry');
-    })
+    });
   }
 
   function loadFromContainerSpec() {
     // Get container
     Container.get({ id: $stateParams.from }).$promise
     .then(function success(d) {
-      $scope.fromContainer = new ContainerViewModel(d);
+      var fromContainer = new ContainerViewModel(d);
+      if (!fromContainer.ResourceControl) {
+        $scope.formValues.AccessControlData.AccessControlEnabled = false;
+      }
+      $scope.fromContainer = fromContainer;
       $scope.config = ContainerHelper.configFromContainer(d);
       loadFromContainerCmd(d);
       loadFromContainerPortBindings(d);
@@ -467,6 +468,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         loadFromContainerSpec();
       } else {
         $scope.fromContainer = {};
+        $scope.formValues.Registry = {};
       }
     }, function(e) {
       Notifications.error('Failure', e, 'Unable to retrieve running containers');
