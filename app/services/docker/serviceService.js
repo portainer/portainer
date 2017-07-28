@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('ServiceService', ['$q', 'Service', 'ResourceControlService', function ServiceServiceFactory($q, Service, ResourceControlService) {
+.factory('ServiceService', ['$q', 'Service', 'ServiceHelper', 'TaskService', 'ResourceControlService', function ServiceServiceFactory($q, Service, ServiceHelper, TaskService, ResourceControlService) {
   'use strict';
   var service = {};
 
@@ -13,6 +13,29 @@ angular.module('portainer.services')
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve service details', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.services = function(filters) {
+    var deferred = $q.defer();
+
+    $q.all({
+      services: Service.query({ filters: filters ? filters : {} }).$promise,
+      tasks: TaskService.tasks(filters)
+    })
+    .then(function success(data) {
+      var tasks = data.tasks;
+      var services = data.services.map(function (item) {
+        var service = new ServiceViewModel(item);
+        ServiceHelper.associateTasksToService(service, tasks);
+        return service;
+      });
+      deferred.resolve(services);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve services', err: err });
     });
 
     return deferred.promise;

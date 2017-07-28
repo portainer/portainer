@@ -94,6 +94,17 @@ type (
 		Role     UserRole
 	}
 
+	// StackID represents a stack identifier.
+	StackID int
+
+	// Stack represents a Docker stack created via docker-compose.
+	Stack struct {
+		ID          StackID `json:"Id"`
+		Name        string  `json:"Name"`
+		EndpointID  EndpointID
+		ProjectPath string
+	}
+
 	// RegistryID represents a registry identifier.
 	RegistryID int
 
@@ -250,6 +261,16 @@ type (
 		DeleteRegistry(ID RegistryID) error
 	}
 
+	// StackService represents a service for managing stack data.
+	StackService interface {
+		Stack(ID StackID) (*Stack, error)
+		Stacks() ([]Stack, error)
+		StacksByEndpointID(ID EndpointID) ([]Stack, error)
+		CreateStack(stack *Stack) error
+		UpdateStack(ID StackID, stack *Stack) error
+		DeleteStack(ID StackID) error
+	}
+
 	// DockerHubService represents a service for managing the DockerHub object.
 	DockerHubService interface {
 		DockerHub() (*DockerHub, error)
@@ -295,11 +316,21 @@ type (
 		StoreTLSFile(endpointID EndpointID, fileType TLSFileType, r io.Reader) error
 		GetPathForTLSFile(endpointID EndpointID, fileType TLSFileType) (string, error)
 		DeleteTLSFiles(endpointID EndpointID) error
+		StoreComposeFile(name, composeFileContent string) (string, error)
+		StoreComposeEnvFile(name, envFileContent string) error
+		DeleteStackFiles(projectPath string) error
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.
 	EndpointWatcher interface {
 		WatchEndpointFile(endpointFilePath string) error
+	}
+
+	// StackManager represents a service to manage stacks.
+	StackManager interface {
+		Up(stack *Stack, endpoint *Endpoint) error
+		Down(stack *Stack, endpoint *Endpoint) error
+		Scale(stack *Stack, endpoint *Endpoint, service string, scale int) error
 	}
 )
 

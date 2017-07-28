@@ -162,7 +162,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
     var templatesKey = $stateParams.key;
     $q.all({
       templates: TemplateService.getTemplates(templatesKey),
-      containers: ContainerService.getContainers(0),
+      containers: ContainerService.containers(0),
       networks: NetworkService.networks(),
       volumes: VolumeService.getVolumes()
     })

@@ -80,49 +80,49 @@
                   <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
                 </th>
                 <th>
-                  <a ui-sref="networks" ng-click="order('Name')">
+                  <a ng-click="order('Name')">
                     Name
                     <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
                 <th>
-                  <a ui-sref="networks" ng-click="order('Id')">
-                    Id
-                    <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  <a ng-click="order('StackName')">
+                    Stack
+                    <span ng-show="sortType == 'StackName' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'StackName' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
                 <th>
-                  <a ui-sref="networks" ng-click="order('Scope')">
+                  <a ng-click="order('Scope')">
                     Scope
                     <span ng-show="sortType == 'Scope' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'Scope' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
                 <th>
-                  <a ui-sref="networks" ng-click="order('Driver')">
+                  <a ng-click="order('Driver')">
                     Driver
                     <span ng-show="sortType == 'Driver' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
                 <th>
-                  <a ui-sref="networks" ng-click="order('IPAM.Driver')">
+                  <a ng-click="order('IPAM.Driver')">
                     IPAM Driver
                     <span ng-show="sortType == 'IPAM.Driver' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'IPAM.Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
                 <th>
-                  <a ui-sref="networks" ng-click="order('IPAM.Config[0].Subnet')">
+                  <a ng-click="order('IPAM.Config[0].Subnet')">
                     IPAM Subnet
                     <span ng-show="sortType == 'IPAM.Config[0].Subnet' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'IPAM.Config[0].Subnet' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
                 <th>
-                  <a ui-sref="networks" ng-click="order('IPAM.Config[0].Gateway')">
+                  <a ng-click="order('IPAM.Config[0].Gateway')">
                     IPAM Gateway
                     <span ng-show="sortType == 'IPAM.Config[0].Gateway' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'IPAM.Config[0].Gateway' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
@@ -133,8 +133,8 @@
             <tbody>
               <tr dir-paginate="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="network.Checked" ng-change="selectItem(network)"/></td>
-                <td><a ui-sref="network({id: network.Id})">{{ network.Name|truncate:40}}</a></td>
-                <td class="monospaced">{{ network.Id|truncate:20 }}</td>
+                <td><a ui-sref="network({id: network.Id})">{{ network.Name | truncate:40 }}</a></td>
+                <td>{{ network.StackName ? network.StackName : '-' }}</td>
                 <td>{{ network.Scope }}</td>
                 <td>{{ network.Driver }}</td>
                 <td>{{ network.IPAM.Driver }}</td>

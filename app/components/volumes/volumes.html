@@ -58,6 +58,13 @@
                 </a>
               </th>
               <th>
+                <a ui-sref="volumes" ng-click="order('StackName')">
+                  Stack
+                  <span ng-show="sortType == 'StackName' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'StackName' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
                 <a ui-sref="volumes" ng-click="order('Driver')">
                   Driver
                   <span ng-show="sortType == 'Driver' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -83,10 +90,15 @@
           <tbody>
             <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:{dangling: state.danglingVolumesOnly} | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
+
+              <td><a ui-sref="volume({id: volume.Id})" class="monospaced">{{ volume.Id|truncate:25 }}</a></td>
+              <td>{{ volume.StackName ? volume.StackName : '-' }}</td>
+
               <td>
                 <a ui-sref="volume({id: volume.Id})" class="monospaced">{{ volume.Id|truncate:25 }}</a>
                 <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="volume.dangling">Unused</span></td>
               </td>
+
               <td>{{ volume.Driver }}</td>
               <td>{{ volume.Mountpoint | truncatelr }}</td>
               <td ng-if="applicationState.application.authentication">

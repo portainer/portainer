@@ -53,6 +53,16 @@ angular.module('portainer.filters', [])
     return 'success';
   };
 })
+.filter('stackstatusbadge', function () {
+  'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (status.indexOf('down') !== -1) {
+      return 'danger';
+    }
+    return 'success';
+  };
+})
 .filter('containerstatusbadge', function () {
   'use strict';
   return function (text) {
@@ -61,7 +71,11 @@ angular.module('portainer.filters', [])
       return 'warning';
     } else if (includeString(status, ['created'])) {
       return 'info';
+
+    } else if (status.indexOf('exited') !== -1 || status.indexOf('unhealthy') !== -1) {
+
     } else if (includeString(status, ['stopped', 'unhealthy', 'dead'])) {
+
       return 'danger';
     }
     return 'success';
@@ -282,6 +296,32 @@ angular.module('portainer.filters', [])
       default:
         return 'fa fa-eye';
     }
+  };
+})
+.filter('availablenodecount', function () {
+  'use strict';
+  return function (nodes) {
+    var availableNodes = 0;
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
+      if (node.Availability === 'active' && node.Status === 'ready') {
+        availableNodes++;
+      }
+    }
+    return availableNodes;
+  };
+})
+.filter('runningtaskscount', function () {
+  'use strict';
+  return function (tasks) {
+    var runningTasks = 0;
+    for (var i = 0; i < tasks.length; i++) {
+      var task = tasks[i];
+      if (task.Status.State === 'running') {
+        runningTasks++;
+      }
+    }
+    return runningTasks;
   };
 })
 .filter('tasknodename', function () {
