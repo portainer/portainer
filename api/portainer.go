@@ -41,12 +41,23 @@ type (
 		Version            string `json:"Version"`
 	}
 
+	// LDAPSettings represents the settings used to connect to a LDAP server.
+	LDAPSettings struct {
+		Username string `json:"Username"`
+		Password string `json:"Password"`
+		URL      string `json:"URL"`
+		BaseDN   string `json:"BaseDN"`
+		Filter   string `json:"Filter"`
+	}
+
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL                string `json:"TemplatesURL"`
-		LogoURL                     string `json:"LogoURL"`
-		BlackListedLabels           []Pair `json:"BlackListedLabels"`
-		DisplayExternalContributors bool   `json:"DisplayExternalContributors"`
+		TemplatesURL                string       `json:"TemplatesURL"`
+		LogoURL                     string       `json:"LogoURL"`
+		BlackListedLabels           []Pair       `json:"BlackListedLabels"`
+		DisplayExternalContributors bool         `json:"DisplayExternalContributors"`
+		UseLDAPAuthentication       bool         `json:"UseLDAPAuthentication"`
+		LDAPSettings                LDAPSettings `json:"LDAPSettings"`
 	}
 
 	// User represents a user account.
@@ -304,7 +315,7 @@ type (
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD.
 	LDAPService interface {
-		AuthenticateUser(username, password string) error
+		AuthenticateUser(username, password string, settings *LDAPSettings) error
 	}
 )
 

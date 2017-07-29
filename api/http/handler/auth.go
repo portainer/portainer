@@ -17,12 +17,13 @@ import (
 // AuthHandler represents an HTTP API handler for managing authentication.
 type AuthHandler struct {
 	*mux.Router
-	Logger        *log.Logger
-	authDisabled  bool
-	UserService   portainer.UserService
-	CryptoService portainer.CryptoService
-	JWTService    portainer.JWTService
-	LDAPService   portainer.LDAPService
+	Logger          *log.Logger
+	authDisabled    bool
+	UserService     portainer.UserService
+	CryptoService   portainer.CryptoService
+	JWTService      portainer.JWTService
+	LDAPService     portainer.LDAPService
+	SettingsService portainer.SettingsService
 }
 
 const (
@@ -74,37 +75,41 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	var username = req.Username
 	var password = req.Password
 
-	err = handler.LDAPService.AuthenticateUser(username, password)
+	u, err := handler.UserService.UserByUsername(username)
+	if err == portainer.ErrUserNotFound {
+		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	settings, err := handler.SettingsService.Settings()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	// u, err := handler.UserService.UserByUsername(username)
-	// if err == portainer.ErrUserNotFound {
-	// 	httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
-	// 	return
-	// } else if err != nil {
-	// 	httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-	// 	return
-	// }
-	//
-	// err = handler.CryptoService.CompareHashAndData(u.Password, password)
-	// if err != nil {
-	// 	httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
-	// 	return
-	// }
-
-	// tokenData := &portainer.TokenData{
-	// 	ID:       u.ID,
-	// 	Username: u.Username,
-	// 	Role:     u.Role,
-	// }
-	tokenData := &portainer.TokenData{
-		ID:       portainer.UserID(1),
-		Username: username,
-		Role:     portainer.UserRole(1),
+	if settings.UseLDAPAuthentication {
+		err = handler.LDAPService.AuthenticateUser(username, password, &settings.LDAPSettings)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
+	} else {
+		err = handler.CryptoService.CompareHashAndData(u.Password, password)
+		if err != nil {
+			httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
+			return
+		}
 	}
+
+	tokenData := &portainer.TokenData{
+		ID:       u.ID,
+		Username: u.Username,
+		Role:     u.Role,
+	}
+
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)

@@ -15,39 +15,31 @@ const (
 	ErrUserNotFound = portainer.Error("User not found or too many entries returned")
 )
 
-const (
-	bindusername = "admin"
-	bindpassword = "roucoups666"
-	baseDN       = "dc=ldap,dc=example,dc=com"
-	ldapserver   = "localhost"
-	ldapport     = 389
-)
-
 // Service represents a service used to authenticate users against a LDAP/AD.
 type Service struct{}
 
 // AuthenticateUser is used to authenticate a user against a LDAP/AD.
-func (*Service) AuthenticateUser(username, password string) error {
+func (*Service) AuthenticateUser(username, password string, settings *portainer.LDAPSettings) error {
 
 	log.Println("Step 1")
-	l, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", ldapserver, ldapport))
+	l, err := ldap.Dial("tcp", settings.URL)
 	if err != nil {
 		return err
 	}
 	defer l.Close()
 
 	log.Println("Step 2")
-	dn := fmt.Sprintf("cn=%s,%s", bindusername, baseDN)
-	err = l.Bind(dn, bindpassword)
+	dn := fmt.Sprintf("cn=%s,%s", settings.Username, settings.BaseDN)
+	err = l.Bind(dn, settings.Password)
 	if err != nil {
 		return err
 	}
 
 	log.Println("Step 3")
 	searchRequest := ldap.NewSearchRequest(
-		baseDN,
+		settings.BaseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf("(&(objectClass=account)(uid=%s))", username),
+		fmt.Sprintf(settings.Filter, username),
 		// fmt.Sprintf("(&(objectClass=organizationalPerson)&(uid=%s))", username),
 		[]string{"dn"},
 		nil,

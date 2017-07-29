@@ -118,7 +118,20 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		settings := &portainer.Settings{
 			LogoURL:                     *flags.Logo,
 			DisplayExternalContributors: true,
+			UseLDAPAuthentication:       false,
 		}
+		// settings := &portainer.Settings{
+		// 	LogoURL:                     *flags.Logo,
+		// 	DisplayExternalContributors: true,
+		// 	UseLDAPAuthentication:       true,
+		// 	LDAPSettings: portainer.LDAPSettings{
+		// 		Username: "admin",
+		// 		Password: "roucoups666",
+		// 		URL:      "localhost:389",
+		// 		BaseDN:   "dc=ldap,dc=example,dc=com",
+		// 		Filter:   "(&(objectClass=account)(uid=%s))",
+		// 	},
+		// }
 
 		if *flags.Templates != "" {
 			settings.TemplatesURL = *flags.Templates

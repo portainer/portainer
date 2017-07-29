@@ -51,6 +51,7 @@ angular.module('portainer', [
   'service',
   'services',
   'settings',
+  'settingsLDAP',
   'sidebar',
   'stats',
   'swarm',
@@ -556,6 +557,19 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/settings/settings.html',
           controller: 'SettingsController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('settings_ldap', {
+      url: '^/settings/ldap',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/settings/ldap/ldap.html',
+          controller: 'SettingsLDAPController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
