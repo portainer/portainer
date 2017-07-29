@@ -91,6 +91,8 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     $scope.config.HostConfig.Devices.splice(index, 1);
   };
 
+  $scope.fromContainerMultipleNetworks = false;
+
   function prepareImageConfig(config) {
     var image = config.Image;
     var registry = $scope.formValues.Registry;
@@ -323,6 +325,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         }
       }
     }
+    $scope.fromContainerMultipleNetworks = Object.keys(d.NetworkSettings.Networks).length >= 2;
     if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode]) {
       if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig) {
         if (d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].IPAMConfig.IPv4Address) {

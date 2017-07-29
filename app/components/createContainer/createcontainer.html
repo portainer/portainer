@@ -110,6 +110,10 @@
               <a type="button" class="btn btn-default btn-sm" ui-sref="containers">Cancel</a>
               <i id="createContainerSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+              <span ng-if="fromContainerMultipleNetworks" style="margin-left: 10px">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span class="small text-muted" style="margin-left: 5px;">This container is connected to multiple networks, only one network will be kept at creation time.</span>
+              </span>
             </div>
           </div>
           <!-- !actions -->
