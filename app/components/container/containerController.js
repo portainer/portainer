@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ResourceControlService) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ResourceControlService, RegistryService, ImageService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -213,7 +213,13 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
           $('#loadingViewSpinner').show();
           var container = $scope.container;
           ContainerService.remove(container, true)
+          .then(function success() {
+            return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
+          })
           .then(function success(data) {
+            return ImageService.pullImage(container.Config.Image, data, true);
+          })
+          .then(function success() {
             return ContainerService.createAndStartContainer(config);
           })
           .then(function success(data) {

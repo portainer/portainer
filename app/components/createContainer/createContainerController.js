@@ -316,6 +316,13 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     $scope.config.NetworkingConfig = {
       EndpointsConfig: {}
     };
+    var networkMode = d.HostConfig.NetworkMode;
+    if (networkMode === 'default') {
+      $scope.config.HostConfig.NetworkMode = 'bridge';
+      if (!_.find($scope.availableNetworks, {'Name': 'bridge'})) {
+        $scope.config.HostConfig.NetworkMode = 'nat';
+      }
+    }
     if ($scope.config.HostConfig.NetworkMode.indexOf('container:') === 0) {
       var netContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
       $scope.config.HostConfig.NetworkMode = 'container';
@@ -336,7 +343,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
         }
       }
     }
-    $scope.config.NetworkingConfig.EndpointsConfig = d.NetworkSettings.Networks;
+    $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode] = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode];
     // ExtraHosts
     for (var h in $scope.config.HostConfig.ExtraHosts) {
       if ({}.hasOwnProperty.call($scope.config.HostConfig.ExtraHosts, h)) {
@@ -512,9 +519,6 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to create container');
-    })
-    .finally(function final() {
-      $('#createContainerSpinner').hide();
     });
   };
 
