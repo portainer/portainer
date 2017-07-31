@@ -41,6 +41,7 @@ angular.module('portainer.services')
     configuration.HostConfig.Privileged = template.Privileged;
     configuration.HostConfig.RestartPolicy = { Name: template.RestartPolicy };
     configuration.name = containerName;
+    configuration.Hostname = template.Hostname;
     configuration.Image = template.Image;
     configuration.Env = TemplateHelper.EnvToStringArray(template.Env, containerMapping);
     configuration.Cmd = ContainerHelper.commandStringToArray(template.Command);
