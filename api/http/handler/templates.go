@@ -20,7 +20,7 @@ type TemplatesHandler struct {
 }
 
 const (
-	containerTemplatesURLLinuxServerIo = "http://tools.linuxserver.io/portainer.json"
+	containerTemplatesURLLinuxServerIo = "https://tools.linuxserver.io/portainer.json"
 )
 
 // NewTemplatesHandler returns a new instance of TemplatesHandler.
