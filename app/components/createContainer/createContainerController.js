@@ -279,6 +279,8 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   function loadFromContainerCmd(d) {
     if ($scope.config.Cmd) {
       $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
+    } else {
+      $scope.config.Cmd = '';
     }
   }
 
