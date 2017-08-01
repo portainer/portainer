@@ -3,23 +3,30 @@ angular.module('settingsLDAP', [])
 function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_TEMPLATES_URL) {
 
   $scope.formValues = {
-    useLDAPAuthentication: false,
-    TLS: false
+    // useLDAPAuthentication: true,
+    // TLS: false,
+    // searchConfigurations: [
+    //   {
+    //     BaseDN: '',
+    //     UsernameAttr: '',
+    //     Filter: ''
+    //   }
+    // ]
   };
 
-  $scope.saveApplicationSettings = function() {
+  $scope.addSearchConfiguration = function() {
+    $scope.LDAPSettings.SearchSettings.push({ BaseDN: '', UserNameAttribute: '', Filter: '' });
+  };
+
+  $scope.removeSearchConfiguration = function(index) {
+    $scope.LDAPSettings.SearchSettings.splice(index, 1);
+  };
+
+  $scope.saveSettings = function() {
     var settings = $scope.settings;
+    console.log(JSON.stringify(settings, null, 4));
 
-    if (!$scope.formValues.customLogo) {
-      settings.LogoURL = '';
-    }
-
-    if (!$scope.formValues.customTemplates) {
-      settings.TemplatesURL = DEFAULT_TEMPLATES_URL;
-    }
-    settings.DisplayExternalContributors = !$scope.formValues.externalContributions;
-
-    updateSettings(settings, false);
+    // updateSettings(settings, false);
   };
 
   function updateSettings(settings, resetForm) {
@@ -48,13 +55,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     .then(function success(data) {
       var settings = data;
       $scope.settings = settings;
-      if (settings.LogoURL !== '') {
-        $scope.formValues.customLogo = true;
-      }
-      if (settings.TemplatesURL !== DEFAULT_TEMPLATES_URL) {
-        $scope.formValues.customTemplates = true;
-      }
-      $scope.formValues.externalContributions = !settings.DisplayExternalContributors;
+      $scope.LDAPSettings = settings.LDAPSettings;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');

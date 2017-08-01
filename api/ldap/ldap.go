@@ -29,17 +29,18 @@ func (*Service) AuthenticateUser(username, password string, settings *portainer.
 	defer l.Close()
 
 	log.Println("Step 2")
-	dn := fmt.Sprintf("cn=%s,%s", settings.Username, settings.BaseDN)
-	err = l.Bind(dn, settings.Password)
+	// dn := fmt.Sprintf("cn=%s,%s", settings.ReaderDN, settings.BaseDN)
+	err = l.Bind(settings.ReaderDN, settings.Password)
 	if err != nil {
 		return err
 	}
 
+	searchSettings := settings.SearchSettings[0]
 	log.Println("Step 3")
 	searchRequest := ldap.NewSearchRequest(
-		settings.BaseDN,
+		searchSettings.BaseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf(settings.Filter, username),
+		fmt.Sprintf("(&%s(%s=%s))", searchSettings.Filter, searchSettings.UserNameAttribute, username),
 		// fmt.Sprintf("(&(objectClass=organizationalPerson)&(uid=%s))", username),
 		[]string{"dn"},
 		nil,

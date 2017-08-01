@@ -3,4 +3,6 @@ function SettingsViewModel(data) {
   this.LogoURL = data.LogoURL;
   this.BlackListedLabels = data.BlackListedLabels;
   this.DisplayExternalContributors = data.DisplayExternalContributors;
+  this.UseLDAPAuthentication = data.UseLDAPAuthentication;
+  this.LDAPSettings = data.LDAPSettings;
 }

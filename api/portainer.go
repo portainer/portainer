@@ -43,11 +43,18 @@ type (
 
 	// LDAPSettings represents the settings used to connect to a LDAP server.
 	LDAPSettings struct {
-		Username string `json:"Username"`
-		Password string `json:"Password"`
-		URL      string `json:"URL"`
-		BaseDN   string `json:"BaseDN"`
-		Filter   string `json:"Filter"`
+		ReaderDN       string               `json:"ReaderDN"`
+		Password       string               `json:"Password"`
+		URL            string               `json:"URL"`
+		TLS            boolean              `json:"TLS"`
+		SearchSettings []LDAPSearchSettings `json:"SearchSettings"`
+	}
+
+	// LDAPSearchSettings represents settings used to search for users in a LDAP server.
+	LDAPSearchSettings struct {
+		BaseDN            string `json:"BaseDN"`
+		Filter            string `json:"Filter"`
+		UserNameAttribute string `json:"UserNameAttribute"`
 	}
 
 	// Settings represents the application settings.

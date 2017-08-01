@@ -28,11 +28,11 @@
                 Use LDAP authentication
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_logo" ng-model="formValues.useLDAPAuthentication"><i></i>
+                <input type="checkbox" name="toggle_logo" ng-model="settings.UseLDAPAuthentication"><i></i>
               </label>
             </div>
           </div>
-          <div ng-if="formValues.useLDAPAuthentication">
+          <div ng-if="settings.UseLDAPAuthentication">
 
             <div class="col-sm-12 form-section-title">
               LDAP configuration
@@ -44,17 +44,17 @@
                 <portainer-tooltip position="bottom" message="URL or IP address of the LDAP server."></portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="ldap_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389">
+                <input type="text" class="form-control" id="ldap_url" ng-model="LDAPSettings.URL" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389">
               </div>
             </div>
 
             <div class="form-group">
               <label for="ldap_username" class="col-sm-3 col-lg-2 control-label text-left">
-                Username
-                <portainer-tooltip position="bottom" message="User that will be used to authenticate and perform search queries in LDAP."></portainer-tooltip>
+                Reader DN
+                <portainer-tooltip position="bottom" message="Account that will be used to search for users."></portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="ldap_username" ng-model="formValues.Username" placeholder="readonly">
+                <input type="text" class="form-control" id="ldap_username" ng-model="LDAPSettings.ReaderDN" placeholder="cn=readonly-account,dc=ldap,dc=domain,dc=tld">
               </div>
             </div>
 
@@ -63,16 +63,7 @@
                 Password
               </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="ldap_password" ng-model="formValues.Password" placeholder="password">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="ldap_basedn" class="col-sm-3 col-lg-2 control-label text-left">
-                Base DN
-              </label>
-              <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="ldap_basedn" ng-model="formValues.BaseDN" placeholder="dc=ldap,dc=domain,dc=tld">
+                <input type="password" class="form-control" id="ldap_password" ng-model="LDAPSettings.Password" placeholder="password">
               </div>
             </div>
 
@@ -88,7 +79,7 @@
                   <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the LDAP server."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="formValues.TLS"><i></i>
+                  <input type="checkbox" ng-model="LDAPSettings.TLS"><i></i>
                 </label>
               </div>
             </div>
@@ -138,32 +129,53 @@
             <!-- !tls-certs -->
 
             <div class="col-sm-12 form-section-title">
-              User search configuration
+              User search configurations
+            </div>
+
+            <div ng-repeat="config in LDAPSettings.SearchSettings | limitTo: (1 - LDAPSettings.SearchSettings)" style="margin-top: 5px;">
+
+              <div class="form-group" ng-if="$index > 0">
+                <span class="col-sm-12 text-muted small">
+                  Extra search configuration
+                </span>
+              </div>
+
+              <div class="form-group">
+                <label for="ldap_basedn_{{$index}}" class="col-sm-3 col-md-2 control-label text-left">
+                  Base DN
+                </label>
+                <div class="col-sm-9 col-md-4">
+                  <input type="text" class="form-control" id="ldap_basedn_{{$index}}" ng-model="config.BaseDN" placeholder="dc=ldap,dc=domain,dc=tld">
+                </div>
+
+                <label for="ldap_username_att_{{$index}}" class="col-sm-3 col-md-2 margin-sm-top control-label text-left">
+                  Username attribute
+                </label>
+                <div class="col-sm-9 col-md-4 margin-sm-top">
+                  <input type="text" class="form-control" id="ldap_username_att_{{$index}}" ng-model="config.UserNameAttribute" placeholder="uid">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="ldap_filter_{{$index}}" class="col-sm-3 col-lg-2 control-label text-left">
+                  Filter
+                </label>
+                <div class="col-sm-8 col-lg-9">
+                  <input type="text" class="form-control" id="ldap_filter_{{$index}}" ng-model="config.Filter" placeholder="(objectClass=account)">
+                </div>
+                <div class="col-sm-1" ng-if="$index > 0">
+                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeSearchConfiguration($index)">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+
             </div>
 
             <div class="form-group">
-              <label for="ldap_username_attr" class="col-sm-3 col-md-2 control-label text-left">
-                Username attribute
-              </label>
-              <div class="col-sm-9 col-md-4">
-                <input type="text" class="form-control" id="ldap_username_attr" ng-model="formValues.UsernameAttr" placeholder="uid">
-              </div>
-
-              <label for="ldap_fullname_attr" class="col-sm-3 col-md-2 margin-sm-top control-label text-left">
-                Full name attribute
-              </label>
-              <div class="col-sm-9 col-md-4 margin-sm-top">
-                <input type="text" class="form-control" id="ldap_fullname_attr" ng-model="formValues.FullnameAttr" placeholder="DN">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="ldap_filter" class="col-sm-3 col-lg-2 control-label text-left">
-                Filter
-              </label>
-              <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="ldap_filter" ng-model="formValues.Filter" placeholder="(objectClass=account)">
-              </div>
+              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addSearchConfiguration()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> add search configuration
+              </span>
             </div>
 
           </div>
@@ -172,7 +184,7 @@
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="saveApplicationSettings()">Save</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="saveSettings()">Save</button>
               <i id="updateSettingsSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               <!-- <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span> -->
             </div>

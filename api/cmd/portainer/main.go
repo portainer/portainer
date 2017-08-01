@@ -115,23 +115,28 @@ func initDockerHub(dockerHubService portainer.DockerHubService) error {
 func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
 	_, err := settingsService.Settings()
 	if err == portainer.ErrSettingsNotFound {
-		settings := &portainer.Settings{
-			LogoURL:                     *flags.Logo,
-			DisplayExternalContributors: true,
-			UseLDAPAuthentication:       false,
-		}
 		// settings := &portainer.Settings{
 		// 	LogoURL:                     *flags.Logo,
 		// 	DisplayExternalContributors: true,
-		// 	UseLDAPAuthentication:       true,
-		// 	LDAPSettings: portainer.LDAPSettings{
-		// 		Username: "admin",
-		// 		Password: "roucoups666",
-		// 		URL:      "localhost:389",
-		// 		BaseDN:   "dc=ldap,dc=example,dc=com",
-		// 		Filter:   "(&(objectClass=account)(uid=%s))",
-		// 	},
+		// 	UseLDAPAuthentication:       false,
 		// }
+		settings := &portainer.Settings{
+			LogoURL:                     *flags.Logo,
+			DisplayExternalContributors: true,
+			UseLDAPAuthentication:       true,
+			LDAPSettings: portainer.LDAPSettings{
+				ReaderDN: "cn=admin,dc=ldap,dc=example,dc=com",
+				Password: "roucoups666",
+				URL:      "localhost:389",
+				SearchSettings: []portainer.LDAPSearchSettings{
+					portainer.LDAPSearchSettings{
+						BaseDN:            "dc=ldap,dc=example,dc=com",
+						Filter:            "(objectClass=account)",
+						UserNameAttribute: "uid",
+					},
+				},
+			},
+		}
 
 		if *flags.Templates != "" {
 			settings.TemplatesURL = *flags.Templates
