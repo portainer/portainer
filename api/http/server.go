@@ -59,6 +59,7 @@ func (server *Server) Start() error {
 	var statusHandler = handler.NewStatusHandler(requestBouncer, server.Status)
 	var settingsHandler = handler.NewSettingsHandler(requestBouncer)
 	settingsHandler.SettingsService = server.SettingsService
+	settingsHandler.LDAPService = server.LDAPService
 	var templatesHandler = handler.NewTemplatesHandler(requestBouncer)
 	templatesHandler.SettingsService = server.SettingsService
 	var dockerHandler = handler.NewDockerHandler(requestBouncer)

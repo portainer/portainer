@@ -46,7 +46,7 @@ type (
 		ReaderDN       string               `json:"ReaderDN"`
 		Password       string               `json:"Password"`
 		URL            string               `json:"URL"`
-		TLS            boolean              `json:"TLS"`
+		TLS            bool                 `json:"TLS"`
 		SearchSettings []LDAPSearchSettings `json:"SearchSettings"`
 	}
 
@@ -323,6 +323,7 @@ type (
 	// LDAPService represents a service used to authenticate users against a LDAP/AD.
 	LDAPService interface {
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
+		TestConnectivity(settings *LDAPSettings) error
 	}
 )
 

@@ -22,5 +22,9 @@ angular.module('portainer.services')
     return Settings.update({}, settings).$promise;
   };
 
+  service.checkLDAPConnectivity = function(settings) {
+    return Settings.checkLDAPConnectivity({}, settings).$promise;
+  };
+
   return service;
 }]);

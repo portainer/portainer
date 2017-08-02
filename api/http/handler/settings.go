@@ -20,6 +20,7 @@ type SettingsHandler struct {
 	*mux.Router
 	Logger          *log.Logger
 	SettingsService portainer.SettingsService
+	LDAPService     portainer.LDAPService
 }
 
 // NewSettingsHandler returns a new instance of OldSettingsHandler.
@@ -32,6 +33,8 @@ func NewSettingsHandler(bouncer *security.RequestBouncer) *SettingsHandler {
 		bouncer.PublicAccess(http.HandlerFunc(h.handleGetSettings))).Methods(http.MethodGet)
 	h.Handle("/settings",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutSettings))).Methods(http.MethodPut)
+	h.Handle("/settings/ldap/check",
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutSettingsLDAPCheck))).Methods(http.MethodPut)
 
 	return h
 }
@@ -67,6 +70,8 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 		LogoURL:                     req.LogoURL,
 		BlackListedLabels:           req.BlackListedLabels,
 		DisplayExternalContributors: req.DisplayExternalContributors,
+		UseLDAPAuthentication:       req.UseLDAPAuthentication,
+		LDAPSettings:                req.LDAPSettings,
 	}
 
 	err = handler.SettingsService.StoreSettings(settings)
@@ -76,8 +81,35 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 }
 
 type putSettingsRequest struct {
-	TemplatesURL                string           `valid:"required"`
-	LogoURL                     string           `valid:""`
-	BlackListedLabels           []portainer.Pair `valid:""`
-	DisplayExternalContributors bool             `valid:""`
+	TemplatesURL                string                 `valid:"required"`
+	LogoURL                     string                 `valid:""`
+	BlackListedLabels           []portainer.Pair       `valid:""`
+	DisplayExternalContributors bool                   `valid:""`
+	UseLDAPAuthentication       bool                   `valid:""`
+	LDAPSettings                portainer.LDAPSettings `valid:""`
+}
+
+// handlePutSettingsLDAPCheck handles PUT requests on /settings/ldap/check
+func (handler *SettingsHandler) handlePutSettingsLDAPCheck(w http.ResponseWriter, r *http.Request) {
+	var req putSettingsLDAPCheckRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err := govalidator.ValidateStruct(req)
+	if err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	err = handler.LDAPService.TestConnectivity(&req.LDAPSettings)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+}
+
+type putSettingsLDAPCheckRequest struct {
+	LDAPSettings portainer.LDAPSettings `valid:""`
 }

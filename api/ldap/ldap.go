@@ -18,6 +18,25 @@ const (
 // Service represents a service used to authenticate users against a LDAP/AD.
 type Service struct{}
 
+// TestConnectivity is used to test a connection against the LDAP server using the credentials
+// specified in the LDAPSettings.
+func (*Service) TestConnectivity(settings *portainer.LDAPSettings) error {
+	log.Println("Step 1")
+	l, err := ldap.Dial("tcp", settings.URL)
+	if err != nil {
+		return err
+	}
+	defer l.Close()
+
+	log.Println("Step 2")
+	// dn := fmt.Sprintf("cn=%s,%s", settings.ReaderDN, settings.BaseDN)
+	err = l.Bind(settings.ReaderDN, settings.Password)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // AuthenticateUser is used to authenticate a user against a LDAP/AD.
 func (*Service) AuthenticateUser(username, password string, settings *portainer.LDAPSettings) error {
 
