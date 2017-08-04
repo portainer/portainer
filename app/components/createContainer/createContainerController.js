@@ -288,8 +288,13 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     var bindings = [];
     for (var p in $scope.config.HostConfig.PortBindings) {
       if ({}.hasOwnProperty.call($scope.config.HostConfig.PortBindings, p)) {
+	var hostPort = '';
+        if ($scope.config.HostConfig.PortBindings[p][0].HostIp) {
+          hostPort = $scope.config.HostConfig.PortBindings[p][0].HostIp + ':';
+        }
+        hostPort += $scope.config.HostConfig.PortBindings[p][0].HostPort;
         var b = {
-          'hostPort': $scope.config.HostConfig.PortBindings[p][0].HostPort,
+          'hostPort': hostPort,
           'containerPort': p.split('/')[0],
           'protocol': p.split('/')[1]
         };
