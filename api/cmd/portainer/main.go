@@ -120,6 +120,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			DisplayExternalContributors: true,
 			UseLDAPAuthentication:       false,
 			LDAPSettings: portainer.LDAPSettings{
+				TLSConfig: portainer.TLSConfiguration{},
 				SearchSettings: []portainer.LDAPSearchSettings{
 					portainer.LDAPSearchSettings{},
 				},

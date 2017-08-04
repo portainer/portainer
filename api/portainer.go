@@ -54,7 +54,7 @@ type (
 		ReaderDN       string               `json:"ReaderDN"`
 		Password       string               `json:"Password"`
 		URL            string               `json:"URL"`
-		TLS            TLSConfiguration     `json:"TLSConfiguration"`
+		TLSConfig      TLSConfiguration     `json:"TLSConfig"`
 		SearchSettings []LDAPSearchSettings `json:"SearchSettings"`
 	}
 
@@ -319,8 +319,8 @@ type (
 	// FileService represents a service for managing files.
 	FileService interface {
 		StoreTLSFile(folder string, fileType TLSFileType, r io.Reader) error
-		GetPathForTLSFile(endpointID EndpointID, fileType TLSFileType) (string, error)
-		DeleteTLSFiles(endpointID EndpointID) error
+		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)
+		DeleteTLSFiles(folder string) error
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.

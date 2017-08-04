@@ -113,11 +113,12 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 	}
 
 	if req.TLS {
-		caCertPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCA)
+		folder := strconv.Itoa(int(endpoint.ID))
+		caCertPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCA)
 		endpoint.TLSCACertPath = caCertPath
-		certPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCert)
+		certPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCert)
 		endpoint.TLSCertPath = certPath
-		keyPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileKey)
+		keyPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileKey)
 		endpoint.TLSKeyPath = keyPath
 		err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 		if err != nil {
@@ -272,20 +273,21 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		endpoint.PublicURL = req.PublicURL
 	}
 
+	folder := strconv.Itoa(int(endpoint.ID))
 	if req.TLS {
 		endpoint.TLS = true
-		caCertPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCA)
+		caCertPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCA)
 		endpoint.TLSCACertPath = caCertPath
-		certPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCert)
+		certPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCert)
 		endpoint.TLSCertPath = certPath
-		keyPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileKey)
+		keyPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileKey)
 		endpoint.TLSKeyPath = keyPath
 	} else {
 		endpoint.TLS = false
 		endpoint.TLSCACertPath = ""
 		endpoint.TLSCertPath = ""
 		endpoint.TLSKeyPath = ""
-		err = handler.FileService.DeleteTLSFiles(endpoint.ID)
+		err = handler.FileService.DeleteTLSFiles(folder)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return
@@ -347,7 +349,7 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 	}
 
 	if endpoint.TLS {
-		err = handler.FileService.DeleteTLSFiles(portainer.EndpointID(endpointID))
+		err = handler.FileService.DeleteTLSFiles(id)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return

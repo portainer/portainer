@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"path"
-	"strconv"
 )
 
 const (
@@ -81,7 +80,7 @@ func (service *Service) StoreTLSFile(folder string, fileType portainer.TLSFileTy
 }
 
 // GetPathForTLSFile returns the absolute path to a specific TLS file for an endpoint.
-func (service *Service) GetPathForTLSFile(endpointID portainer.EndpointID, fileType portainer.TLSFileType) (string, error) {
+func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSFileType) (string, error) {
 	var fileName string
 	switch fileType {
 	case portainer.TLSFileCA:
@@ -93,15 +92,13 @@ func (service *Service) GetPathForTLSFile(endpointID portainer.EndpointID, fileT
 	default:
 		return "", portainer.ErrUndefinedTLSFileType
 	}
-	ID := strconv.Itoa(int(endpointID))
-	return path.Join(service.fileStorePath, TLSStorePath, ID, fileName), nil
+	return path.Join(service.fileStorePath, TLSStorePath, folder, fileName), nil
 }
 
 // DeleteTLSFiles deletes a folder containing the TLS files for an endpoint.
-func (service *Service) DeleteTLSFiles(endpointID portainer.EndpointID) error {
-	ID := strconv.Itoa(int(endpointID))
-	endpointPath := path.Join(service.fileStorePath, TLSStorePath, ID)
-	err := os.RemoveAll(endpointPath)
+func (service *Service) DeleteTLSFiles(folder string) error {
+	storePath := path.Join(service.fileStorePath, TLSStorePath, folder)
+	err := os.RemoveAll(storePath)
 	if err != nil {
 		return err
 	}

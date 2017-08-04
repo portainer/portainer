@@ -68,7 +68,7 @@
               </div>
             </div>
 
-            <div class="form-group" ng-if="!LDAPSettings.TLS">
+            <div class="form-group" ng-if="!LDAPSettings.TLSConfig.TLS">
               <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
                 Connectivity check
                 <i class="fa fa-check green-icon" style="margin-left: 5px;" ng-if="state.successfulConnectivityCheck"></i>
@@ -92,13 +92,13 @@
                   <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the LDAP server."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="LDAPSettings.TLS"><i></i>
+                  <input type="checkbox" ng-model="LDAPSettings.TLSConfig.TLS"><i></i>
                 </label>
               </div>
             </div>
             <!-- !tls-checkbox -->
             <!-- tls-certs -->
-            <div ng-if="LDAPSettings.TLS">
+            <div ng-if="LDAPSettings.TLSConfig.TLS">
               <!-- ca-input -->
               <div class="form-group">
                 <label class="col-sm-2 control-label text-left">TLS CA certificate</label>
@@ -106,6 +106,7 @@
                   <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ formValues.TLSCACert.name }}
+                    <i class="fa fa-check green-icon" ng-if="formValues.TLSCACert && formValues.TLSCACert === LDAPSettings.TLSConfig.TLSCACert" aria-hidden="true"></i>
                     <i class="fa fa-times red-icon" ng-if="!formValues.TLSCACert" aria-hidden="true"></i>
                     <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
                   </span>
@@ -119,6 +120,7 @@
                   <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ formValues.TLSCert.name }}
+                    <i class="fa fa-check green-icon" ng-if="formValues.TLSCert && formValues.TLSCert === LDAPSettings.TLSConfig.TLSCert" aria-hidden="true"></i>
                     <i class="fa fa-times red-icon" ng-if="!formValues.TLSCert" aria-hidden="true"></i>
                     <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
                   </span>
@@ -132,6 +134,7 @@
                   <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ formValues.TLSKey.name }}
+                    <i class="fa fa-check green-icon" ng-if="formValues.TLSKey && formValues.TLSKey === LDAPSettings.TLSConfig.TLSKey" aria-hidden="true"></i>
                     <i class="fa fa-times red-icon" ng-if="!formValues.TLSKey" aria-hidden="true"></i>
                     <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
                   </span>
@@ -141,7 +144,7 @@
             </div>
             <!-- !tls-certs -->
 
-            <div class="form-group" ng-if="LDAPSettings.TLS">
+            <div class="form-group" ng-if="LDAPSettings.TLSConfig.TLS">
               <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
                 Connectivity check
                 <i class="fa fa-check green-icon" style="margin-left: 5px;" ng-if="state.successfulConnectivityCheck"></i>
