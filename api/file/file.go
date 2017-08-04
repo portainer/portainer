@@ -12,6 +12,8 @@ import (
 const (
 	// TLSStorePath represents the subfolder where TLS files are stored in the file store folder.
 	TLSStorePath = "tls"
+	// LDAPStorePath represents the subfolder where LDAP TLS files are stored in the TLSStorePath.
+	LDAPStorePath = "ldap"
 	// TLSCACertFile represents the name on disk for a TLS CA file.
 	TLSCACertFile = "ca.pem"
 	// TLSCertFile represents the name on disk for a TLS certificate file.
@@ -50,11 +52,10 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 	return service, nil
 }
 
-// StoreTLSFile creates a subfolder in the TLSStorePath and stores a new file with the content from r.
-func (service *Service) StoreTLSFile(endpointID portainer.EndpointID, fileType portainer.TLSFileType, r io.Reader) error {
-	ID := strconv.Itoa(int(endpointID))
-	endpointStorePath := path.Join(TLSStorePath, ID)
-	err := service.createDirectoryInStoreIfNotExist(endpointStorePath)
+// StoreTLSFile creates a folder in the TLSStorePath and stores a new file with the content from r.
+func (service *Service) StoreTLSFile(folder string, fileType portainer.TLSFileType, r io.Reader) error {
+	storePath := path.Join(TLSStorePath, folder)
+	err := service.createDirectoryInStoreIfNotExist(storePath)
 	if err != nil {
 		return err
 	}
@@ -71,7 +72,7 @@ func (service *Service) StoreTLSFile(endpointID portainer.EndpointID, fileType p
 		return portainer.ErrUndefinedTLSFileType
 	}
 
-	tlsFilePath := path.Join(endpointStorePath, fileName)
+	tlsFilePath := path.Join(storePath, fileName)
 	err = service.createFileInStore(tlsFilePath, r)
 	if err != nil {
 		return err

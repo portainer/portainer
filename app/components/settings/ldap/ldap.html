@@ -68,14 +68,14 @@
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" ng-if="!LDAPSettings.TLS">
               <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
                 Connectivity check
                 <i class="fa fa-check green-icon" style="margin-left: 5px;" ng-if="state.successfulConnectivityCheck"></i>
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="connectivityCheck()">Test connectivity</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="connectivityCheck(false)">Test connectivity</button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               </div>
             </div>
@@ -98,7 +98,7 @@
             </div>
             <!-- !tls-checkbox -->
             <!-- tls-certs -->
-            <div ng-if="formValues.TLS">
+            <div ng-if="LDAPSettings.TLS">
               <!-- ca-input -->
               <div class="form-group">
                 <label class="col-sm-2 control-label text-left">TLS CA certificate</label>
@@ -140,6 +140,18 @@
               <!-- !key-input -->
             </div>
             <!-- !tls-certs -->
+
+            <div class="form-group" ng-if="LDAPSettings.TLS">
+              <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
+                Connectivity check
+                <i class="fa fa-check green-icon" style="margin-left: 5px;" ng-if="state.successfulConnectivityCheck"></i>
+                <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <button type="button" class="btn btn-primary btn-sm" ng-click="connectivityCheck(true)" ng-disabled="!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey">Test connectivity</button>
+                <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              </div>
+            </div>
 
             <div class="col-sm-12 form-section-title">
               User search configurations

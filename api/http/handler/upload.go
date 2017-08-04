@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -26,11 +25,12 @@ func NewUploadHandler(bouncer *security.RequestBouncer) *UploadHandler {
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.Handle("/upload/tls/{endpointID}/{certificate:(?:ca|cert|key)}",
+	h.Handle("/upload/tls/{certificate:(?:ca|cert|key)}",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUploadTLS)))
 	return h
 }
 
+// handlePostUploadTLS handles POST requests on /upload/tls/{certificate:(?:ca|cert|key)}?folder=folder
 func (handler *UploadHandler) handlePostUploadTLS(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		httperror.WriteMethodNotAllowedResponse(w, []string{http.MethodPost})
@@ -38,11 +38,11 @@ func (handler *UploadHandler) handlePostUploadTLS(w http.ResponseWriter, r *http
 	}
 
 	vars := mux.Vars(r)
-	endpointID := vars["endpointID"]
 	certificate := vars["certificate"]
-	ID, err := strconv.Atoi(endpointID)
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+
+	folder := r.FormValue("folder")
+	if folder == "" {
+		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -66,7 +66,7 @@ func (handler *UploadHandler) handlePostUploadTLS(w http.ResponseWriter, r *http
 		return
 	}
 
-	err = handler.FileService.StoreTLSFile(portainer.EndpointID(ID), fileType, file)
+	err = handler.FileService.StoreTLSFile(folder, fileType, file)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return

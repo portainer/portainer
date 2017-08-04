@@ -1,23 +1,17 @@
 angular.module('settingsLDAP', [])
-.controller('SettingsLDAPController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_TEMPLATES_URL',
-function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_TEMPLATES_URL) {
+.controller('SettingsLDAPController', ['$q', '$scope', 'Notifications', 'SettingsService', 'FileUploadService',
+function ($q, $scope, Notifications, SettingsService, FileUploadService) {
 
   $scope.state = {
     successfulConnectivityCheck: false,
-    failedConnectivityCheck: false
+    failedConnectivityCheck: false,
+    uploadInProgress: false
   };
 
   $scope.formValues = {
-
-    // useLDAPAuthentication: true,
-    // TLS: false,
-    // searchConfigurations: [
-    //   {
-    //     BaseDN: '',
-    //     UsernameAttr: '',
-    //     Filter: ''
-    //   }
-    // ]
+    TLSCACert: '',
+    TLSCert: '',
+    TLSKey: ''
   };
 
   $scope.addSearchConfiguration = function() {
@@ -28,11 +22,19 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     $scope.LDAPSettings.SearchSettings.splice(index, 1);
   };
 
-  $scope.connectivityCheck = function() {
+  $scope.connectivityCheck = function(tls) {
     $('#connectivityCheckSpinner').show();
     var LDAPSettings = $scope.settings;
+    var TLSCAFile = $scope.formValues.TLSCACert;
+    var TLSCertFile = $scope.formValues.TLSCert;
+    var TLSKeyFile = $scope.formValues.TLSKey;
 
-    SettingsService.checkLDAPConnectivity(LDAPSettings)
+    $scope.state.uploadInProgress = tls;
+
+    $q.when(!tls || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, TLSCertFile, TLSKeyFile))
+    .then(function success(data) {
+      return SettingsService.checkLDAPConnectivity(LDAPSettings);
+    })
     .then(function success(data) {
       $scope.state.failedConnectivityCheck = false;
       $scope.state.successfulConnectivityCheck = true;
@@ -41,9 +43,10 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     .catch(function error(err) {
       $scope.state.failedConnectivityCheck = true;
       $scope.state.successfulConnectivityCheck = false;
-      Notifications.error('Failure', err, 'Unable to update LDAP settings');
+      Notifications.error('Failure', err, 'Connection to LDAP failed');
     })
     .finally(function final() {
+      $scope.state.uploadInProgress = false;
       $('#connectivityCheckSpinner').hide();
     });
   };
@@ -51,8 +54,17 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
   $scope.saveSettings = function() {
     $('#updateSettingsSpinner').show();
     var settings = $scope.settings;
+    var TLSCAFile = $scope.formValues.TLSCACert;
+    var TLSCertFile = $scope.formValues.TLSCert;
+    var TLSKeyFile = $scope.formValues.TLSKey;
 
-    SettingsService.update(settings)
+    var tls = $scope.LDAPSettings.TLS;
+    $scope.state.uploadInProgress = tls;
+
+    $q.when(!tls || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, TLSCertFile, TLSKeyFile))
+    .then(function success(data) {
+      return SettingsService.update(settings);
+    })
     .then(function success(data) {
       Notifications.success('LDAP settings updated');
     })
@@ -60,6 +72,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
       Notifications.error('Failure', err, 'Unable to update LDAP settings');
     })
     .finally(function final() {
+      $scope.state.uploadInProgress = false;
       $('#updateSettingsSpinner').hide();
     });
   };

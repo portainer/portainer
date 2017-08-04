@@ -41,12 +41,20 @@ type (
 		Version            string `json:"Version"`
 	}
 
+	// TLSConfiguration represents a TLS configuration.
+	TLSConfiguration struct {
+		TLS           bool   `json:"TLS"`
+		TLSCACertPath string `json:"TLSCACert,omitempty"`
+		TLSCertPath   string `json:"TLSCert,omitempty"`
+		TLSKeyPath    string `json:"TLSKey,omitempty"`
+	}
+
 	// LDAPSettings represents the settings used to connect to a LDAP server.
 	LDAPSettings struct {
 		ReaderDN       string               `json:"ReaderDN"`
 		Password       string               `json:"Password"`
 		URL            string               `json:"URL"`
-		TLS            bool                 `json:"TLS"`
+		TLS            TLSConfiguration     `json:"TLSConfiguration"`
 		SearchSettings []LDAPSearchSettings `json:"SearchSettings"`
 	}
 
@@ -310,7 +318,7 @@ type (
 
 	// FileService represents a service for managing files.
 	FileService interface {
-		StoreTLSFile(endpointID EndpointID, fileType TLSFileType, r io.Reader) error
+		StoreTLSFile(folder string, fileType TLSFileType, r io.Reader) error
 		GetPathForTLSFile(endpointID EndpointID, fileType TLSFileType) (string, error)
 		DeleteTLSFiles(endpointID EndpointID) error
 	}
