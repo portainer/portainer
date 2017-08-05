@@ -63,13 +63,20 @@ func (handler *SettingsHandler) handleGetPublicSettings(w http.ResponseWriter, r
 		return
 	}
 
-	publicSettings := &portainer.Settings{
+	publicSettings := &publicSettingsResponse{
 		LogoURL:                     settings.LogoURL,
 		DisplayExternalContributors: settings.DisplayExternalContributors,
+		AuthenticationMethod:        settings.AuthenticationMethod,
 	}
 
 	encodeJSON(w, publicSettings, handler.Logger)
 	return
+}
+
+type publicSettingsResponse struct {
+	LogoURL                     string                         `json:"LogoURL"`
+	DisplayExternalContributors bool                           `json:"DisplayExternalContributors"`
+	AuthenticationMethod        portainer.AuthenticationMethod `json:"AuthenticationMethod"`
 }
 
 // handlePutSettings handles PUT requests on /settings
