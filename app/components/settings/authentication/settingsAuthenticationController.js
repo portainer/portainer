@@ -1,5 +1,5 @@
-angular.module('settingsLDAP', [])
-.controller('SettingsLDAPController', ['$q', '$scope', 'Notifications', 'SettingsService', 'FileUploadService',
+angular.module('settingsAuthentication', [])
+.controller('SettingsAuthenticationController', ['$q', '$scope', 'Notifications', 'SettingsService', 'FileUploadService',
 function ($q, $scope, Notifications, SettingsService, FileUploadService) {
 
   $scope.state = {
@@ -22,7 +22,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     $scope.LDAPSettings.SearchSettings.splice(index, 1);
   };
 
-  $scope.connectivityCheck = function(tls) {
+  $scope.LDAPConnectivityCheck = function(tls) {
     $('#connectivityCheckSpinner').show();
     var settings = $scope.settings;
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
@@ -69,10 +69,10 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
       return SettingsService.update(settings);
     })
     .then(function success(data) {
-      Notifications.success('LDAP settings updated');
+      Notifications.success('Authentication settings updated');
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to update LDAP settings');
+      Notifications.error('Failure', err, 'Unable to update authentication settings');
     })
     .finally(function final() {
       $scope.state.uploadInProgress = false;

@@ -1,40 +1,62 @@
 <rd-header>
-  <rd-header-title title="LDAP Settings">
+  <rd-header-title title="Authentication settings">
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="settings">Settings</a> &gt; LDAP
+    <a ui-sref="settings">Settings</a> &gt; Authentication
   </rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-cogs" title="LDAP settings"></rd-widget-header>
+      <rd-widget-header icon="fa-users" title="Authentication"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
-
           <div class="col-sm-12 form-section-title">
-            LDAP authentication
+            Authentication method
           </div>
-          <div class="form-group">
+          <div class="form-group"></div>
+          <div class="form-group" style="margin-bottom: 0">
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="registry_quay" ng-model="settings.AuthenticationMethod" ng-value="1">
+                <label for="registry_quay">
+                  <div class="boxselector_header">
+                    <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Internal
+                  </div>
+                  <p>Internal authentication mechanism</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="registry_custom" ng-model="settings.AuthenticationMethod" ng-value="2">
+                <label for="registry_custom">
+                  <div class="boxselector_header">
+                    <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
+                    LDAP
+                  </div>
+                  <p>LDAP authentication</p>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Information
+          </div>
+          <div class="form-group" ng-if="settings.AuthenticationMethod === 1">
+            <span class="col-sm-12 text-muted small">
+              When using internal authentication, Portainer will encrypt user passwords and store credentials locally.
+            </span>
+          </div>
+          <div class="form-group" ng-if="settings.AuthenticationMethod === 2">
             <span class="col-sm-12 text-muted small">
               When using LDAP authentication, Portainer will delegate user authentication to a LDAP server (exception for the <b>admin</b> user that always use internal authentication).
               Users still need to be created in Portainer beforehand.
             </span>
           </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_logo" class="control-label text-left">
-                Use LDAP authentication
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_logo" ng-model="settings.UseLDAPAuthentication"><i></i>
-              </label>
-            </div>
-          </div>
-          <div ng-if="settings.UseLDAPAuthentication">
 
+          <div ng-if="settings.AuthenticationMethod === 2">
             <div class="col-sm-12 form-section-title">
               LDAP configuration
             </div>
@@ -75,7 +97,7 @@
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="connectivityCheck(false)">Test connectivity</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck(false)">Test connectivity</button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               </div>
             </div>
@@ -151,7 +173,7 @@
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="connectivityCheck(true)" ng-disabled="!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey">Test connectivity</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck(true)" ng-disabled="!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey">Test connectivity</button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               </div>
             </div>
@@ -160,6 +182,7 @@
               User search configurations
             </div>
 
+            <!-- search-settings -->
             <div ng-repeat="config in LDAPSettings.SearchSettings | limitTo: (1 - LDAPSettings.SearchSettings)" style="margin-top: 5px;">
 
               <div class="form-group" ng-if="$index > 0">
@@ -198,16 +221,15 @@
                 </div>
               </div>
 
-            </div>
+              <div class="form-group">
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addSearchConfiguration()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add search configuration
+                </span>
+              </div>
 
-            <div class="form-group">
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addSearchConfiguration()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add search configuration
-              </span>
             </div>
-
+            <!-- !search-settings -->
           </div>
-
 
           <!-- actions -->
           <div class="form-group">
@@ -218,6 +240,7 @@
             </div>
           </div>
           <!-- !actions -->
+
         </form>
       </rd-widget-body>
     </rd-widget>

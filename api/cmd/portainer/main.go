@@ -118,7 +118,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		settings := &portainer.Settings{
 			LogoURL:                     *flags.Logo,
 			DisplayExternalContributors: true,
-			UseLDAPAuthentication:       false,
+			AuthenticationMethod:        portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
 				TLSConfig: portainer.TLSConfiguration{},
 				SearchSettings: []portainer.LDAPSearchSettings{
@@ -126,23 +126,6 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 				},
 			},
 		}
-		// settings := &portainer.Settings{
-		// 	LogoURL:                     *flags.Logo,
-		// 	DisplayExternalContributors: true,
-		// 	UseLDAPAuthentication:       true,
-		// 	LDAPSettings: portainer.LDAPSettings{
-		// 		ReaderDN: "cn=admin,dc=ldap,dc=example,dc=com",
-		// 		Password: "roucoups666",
-		// 		URL:      "localhost:389",
-		// 		SearchSettings: []portainer.LDAPSearchSettings{
-		// 			portainer.LDAPSearchSettings{
-		// 				BaseDN:            "dc=ldap,dc=example,dc=com",
-		// 				Filter:            "(objectClass=account)",
-		// 				UserNameAttribute: "uid",
-		// 			},
-		// 		},
-		// 	},
-		// }
 
 		if *flags.Templates != "" {
 			settings.TemplatesURL = *flags.Templates

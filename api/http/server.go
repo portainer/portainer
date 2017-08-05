@@ -51,6 +51,7 @@ func (server *Server) Start() error {
 	userHandler.TeamMembershipService = server.TeamMembershipService
 	userHandler.CryptoService = server.CryptoService
 	userHandler.ResourceControlService = server.ResourceControlService
+	userHandler.SettingsService = server.SettingsService
 	var teamHandler = handler.NewTeamHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
 	teamHandler.TeamMembershipService = server.TeamMembershipService

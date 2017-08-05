@@ -67,12 +67,12 @@ type (
 
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL                string       `json:"TemplatesURL"`
-		LogoURL                     string       `json:"LogoURL"`
-		BlackListedLabels           []Pair       `json:"BlackListedLabels"`
-		DisplayExternalContributors bool         `json:"DisplayExternalContributors"`
-		UseLDAPAuthentication       bool         `json:"UseLDAPAuthentication"`
-		LDAPSettings                LDAPSettings `json:"LDAPSettings"`
+		TemplatesURL                string               `json:"TemplatesURL"`
+		LogoURL                     string               `json:"LogoURL"`
+		BlackListedLabels           []Pair               `json:"BlackListedLabels"`
+		DisplayExternalContributors bool                 `json:"DisplayExternalContributors"`
+		AuthenticationMethod        AuthenticationMethod `json:"AuthenticationMethod"`
+		LDAPSettings                LDAPSettings         `json:"LDAPSettings"`
 	}
 
 	// User represents a user account.
@@ -89,6 +89,9 @@ type (
 	// UserRole represents the role of a user. It can be either an administrator
 	// or a regular user
 	UserRole int
+
+	// AuthenticationMethod represents the authentication method used to authenticate a user.
+	AuthenticationMethod int
 
 	// Team represents a list of user accounts.
 	Team struct {
@@ -367,6 +370,14 @@ const (
 	AdministratorRole
 	// StandardUserRole represents a regular user role
 	StandardUserRole
+)
+
+const (
+	_ AuthenticationMethod = iota
+	// AuthenticationInternal represents the internal authentication method (authentication against Portainer API)
+	AuthenticationInternal
+	// AuthenticationLDAP represents the LDAP authentication method (authentication against a LDAP server)
+	AuthenticationLDAP
 )
 
 const (

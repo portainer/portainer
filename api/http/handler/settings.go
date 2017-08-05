@@ -32,10 +32,12 @@ func NewSettingsHandler(bouncer *security.RequestBouncer) *SettingsHandler {
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/settings",
-		bouncer.PublicAccess(http.HandlerFunc(h.handleGetSettings))).Methods(http.MethodGet)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handleGetSettings))).Methods(http.MethodGet)
 	h.Handle("/settings",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutSettings))).Methods(http.MethodPut)
-	h.Handle("/settings/ldap/check",
+	h.Handle("/settings/public",
+		bouncer.PublicAccess(http.HandlerFunc(h.handleGetPublicSettings))).Methods(http.MethodGet)
+	h.Handle("/settings/authentication/checkLDAP",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutSettingsLDAPCheck))).Methods(http.MethodPut)
 
 	return h
@@ -50,6 +52,23 @@ func (handler *SettingsHandler) handleGetSettings(w http.ResponseWriter, r *http
 	}
 
 	encodeJSON(w, settings, handler.Logger)
+	return
+}
+
+// handleGetPublicSettings handles GET requests on /settings/public
+func (handler *SettingsHandler) handleGetPublicSettings(w http.ResponseWriter, r *http.Request) {
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	publicSettings := &portainer.Settings{
+		LogoURL:                     settings.LogoURL,
+		DisplayExternalContributors: settings.DisplayExternalContributors,
+	}
+
+	encodeJSON(w, publicSettings, handler.Logger)
 	return
 }
 
@@ -72,8 +91,16 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 		LogoURL:                     req.LogoURL,
 		BlackListedLabels:           req.BlackListedLabels,
 		DisplayExternalContributors: req.DisplayExternalContributors,
-		UseLDAPAuthentication:       req.UseLDAPAuthentication,
 		LDAPSettings:                req.LDAPSettings,
+	}
+
+	if req.AuthenticationMethod == 1 {
+		settings.AuthenticationMethod = portainer.AuthenticationInternal
+	} else if req.AuthenticationMethod == 2 {
+		settings.AuthenticationMethod = portainer.AuthenticationLDAP
+	} else {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
 	}
 
 	if settings.LDAPSettings.TLSConfig.TLS {
@@ -104,7 +131,7 @@ type putSettingsRequest struct {
 	LogoURL                     string                 `valid:""`
 	BlackListedLabels           []portainer.Pair       `valid:""`
 	DisplayExternalContributors bool                   `valid:""`
-	UseLDAPAuthentication       bool                   `valid:""`
+	AuthenticationMethod        int                    `valid:"required"`
 	LDAPSettings                portainer.LDAPSettings `valid:""`
 }
 

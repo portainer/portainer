@@ -90,7 +90,7 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if settings.UseLDAPAuthentication && u.ID != 1 {
+	if settings.AuthenticationMethod == portainer.AuthenticationLDAP && u.ID != 1 {
 		err = handler.LDAPService.AuthenticateUser(username, password, &settings.LDAPSettings)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
