@@ -17,7 +17,10 @@
         <form class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
-            <label for="username" class="col-sm-2 control-label text-left">Username</label>
+            <label for="username" class="col-sm-2 control-label text-left">
+              Username
+              <portainer-tooltip ng-if="AuthenticationMethod === 2" position="bottom" message="Username must exactly match username defined in external LDAP source."></portainer-tooltip>
+            </label>
             <div class="col-sm-8">
               <div class="input-group">
                 <input type="text" class="form-control" id="username" ng-model="formValues.Username" ng-change="checkUsernameValidity()" placeholder="e.g. jdoe">
