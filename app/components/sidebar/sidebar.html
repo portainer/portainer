@@ -69,7 +69,7 @@
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs"></span></a>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'settings' || $state.current.name === 'settings_authentication')">
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'settings' || $state.current.name === 'settings_authentication') && applicationState.application.authentication && isAdmin">
         <a ui-sref="settings_authentication" ui-sref-active="active">Authentication</a>
       </div>
     </li>
