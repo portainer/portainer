@@ -568,7 +568,7 @@ angular.module('portainer', [
       url: '^/settings/authentication',
       views: {
         'content@': {
-          templateUrl: 'app/components/settings/authentication/authentication.html',
+          templateUrl: 'app/components/settingsAuthentication/settingsAuthentication.html',
           controller: 'SettingsAuthenticationController'
         },
         'sidebar@': {
