@@ -108,5 +108,19 @@ angular.module('portainer.services')
     });
   };
 
+  service.confirmExperimentalFeature = function(callback) {
+    service.confirm({
+      title: 'Experimental feature',
+      message: 'This feature is currently experimental, please use with caution.',
+      buttons: {
+        confirm: {
+          label: 'Continue',
+          className: 'btn-danger'
+        }
+      },
+      callback: callback
+    });
+  }
+
   return service;
 }]);
