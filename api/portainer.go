@@ -41,14 +41,6 @@ type (
 		Version            string `json:"Version"`
 	}
 
-	// TLSConfiguration represents a TLS configuration.
-	TLSConfiguration struct {
-		TLS           bool   `json:"TLS"`
-		TLSCACertPath string `json:"TLSCACert,omitempty"`
-		TLSCertPath   string `json:"TLSCert,omitempty"`
-		TLSKeyPath    string `json:"TLSKey,omitempty"`
-	}
-
 	// LDAPSettings represents the settings used to connect to a LDAP server.
 	LDAPSettings struct {
 		ReaderDN       string               `json:"ReaderDN"`
@@ -56,6 +48,14 @@ type (
 		URL            string               `json:"URL"`
 		TLSConfig      TLSConfiguration     `json:"TLSConfig"`
 		SearchSettings []LDAPSearchSettings `json:"SearchSettings"`
+	}
+
+	// TLSConfiguration represents a TLS configuration.
+	TLSConfiguration struct {
+		TLS           bool   `json:"TLS"`
+		TLSCACertPath string `json:"TLSCACert,omitempty"`
+		TLSCertPath   string `json:"TLSCert,omitempty"`
+		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
 	// LDAPSearchSettings represents settings used to search for users in a LDAP server.

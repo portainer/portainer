@@ -57,9 +57,6 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
     var TLSCertFile = $scope.formValues.TLSCert !== settings.LDAPSettings.TLSConfig.TLSCert ? $scope.formValues.TLSCert : null;
     var TLSKeyFile = $scope.formValues.TLSKey !== settings.LDAPSettings.TLSConfig.TLSKey ? $scope.formValues.TLSKey : null;
-    // var TLSCAFile = $scope.formValues.TLSCACert;
-    // var TLSCertFile = $scope.formValues.TLSCert;
-    // var TLSKeyFile = $scope.formValues.TLSKey;
 
     var tls = $scope.LDAPSettings.TLSConfig.TLS;
     $scope.state.uploadInProgress = tls;

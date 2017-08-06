@@ -194,6 +194,7 @@
               <div class="form-group">
                 <label for="ldap_basedn_{{$index}}" class="col-sm-4 col-md-2 control-label text-left">
                   Base DN
+                  <portainer-tooltip position="bottom" message="The distinguished name of the element from which the LDAP server will search for users."></portainer-tooltip>
                 </label>
                 <div class="col-sm-8 col-md-4">
                   <input type="text" class="form-control" id="ldap_basedn_{{$index}}" ng-model="config.BaseDN" placeholder="dc=ldap,dc=domain,dc=tld">
@@ -201,15 +202,16 @@
 
                 <label for="ldap_username_att_{{$index}}" class="col-sm-4 col-md-3 col-lg-2 margin-sm-top control-label text-left">
                   Username attribute
+                  <portainer-tooltip position="bottom" message="LDAP attribute which denotes the username."></portainer-tooltip>
                 </label>
                 <div class="col-sm-8 col-md-3 col-lg-4 margin-sm-top">
                   <input type="text" class="form-control" id="ldap_username_att_{{$index}}" ng-model="config.UserNameAttribute" placeholder="uid">
                 </div>
               </div>
-
               <div class="form-group">
                 <label for="ldap_filter_{{$index}}" class="col-sm-4 col-md-2 control-label text-left">
                   Filter
+                  <portainer-tooltip position="bottom" message="The LDAP search filter used to select user elements, optional."></portainer-tooltip>
                 </label>
                 <div class="col-sm-7 col-md-9">
                   <input type="text" class="form-control" id="ldap_filter_{{$index}}" ng-model="config.Filter" placeholder="(objectClass=account)">
