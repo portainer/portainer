@@ -218,8 +218,10 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     config.UpdateConfig = {
       Parallelism: service.UpdateParallelism,
       Delay: service.UpdateDelay,
-      FailureAction: service.UpdateFailureAction
+      FailureAction: service.UpdateFailureAction,
+      Order: service.UpdateOrder
     };
+
     config.TaskTemplate.RestartPolicy = {
       Condition: service.RestartCondition,
       Delay: service.RestartDelay,
