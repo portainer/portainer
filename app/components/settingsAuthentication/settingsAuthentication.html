@@ -100,7 +100,7 @@
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck(false)">Test connectivity</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="!LDAPSettings.URL || !LDAPSettings.ReaderDN || !LDAPSettings.Password" ng-click="LDAPConnectivityCheck(false)">Test connectivity</button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               </div>
             </div>
@@ -176,7 +176,7 @@
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck(true)" ng-disabled="!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey">Test connectivity</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck(true)" ng-disabled="!LDAPSettings.URL || !LDAPSettings.ReaderDN || !LDAPSettings.Password || !formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey">Test connectivity</button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               </div>
             </div>
