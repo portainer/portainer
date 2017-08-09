@@ -110,7 +110,7 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 		return
 	}
 
-	if (settings.LDAPSettings.TLSConfig.TLS || settings.LDAPSettings.StartTLS) && settings.LDAPSettings.TLSConfig.TLSSkipVerify {
+	if (settings.LDAPSettings.TLSConfig.TLS || settings.LDAPSettings.StartTLS) && !settings.LDAPSettings.TLSConfig.TLSSkipVerify {
 		caCertPath, _ := handler.FileService.GetPathForTLSFile(file.LDAPStorePath, portainer.TLSFileCA)
 		settings.LDAPSettings.TLSConfig.TLSCACertPath = caCertPath
 		settings.LDAPSettings.TLSConfig.TLSCertPath = ""
