@@ -24,7 +24,7 @@ func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
 func (factory *proxyFactory) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
 	u.Scheme = "https"
 	proxy := factory.createReverseProxy(u)
-	config, err := crypto.CreateTLSConfiguration(endpoint.TLSCACertPath, endpoint.TLSCertPath, endpoint.TLSKeyPath)
+	config, err := crypto.CreateTLSConfiguration(endpoint.TLSVerify, endpoint.TLSClientCert, endpoint.TLSCACertPath, endpoint.TLSCertPath, endpoint.TLSKeyPath)
 	if err != nil {
 		return nil, err
 	}

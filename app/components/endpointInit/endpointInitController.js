@@ -11,6 +11,8 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     Name: '',
     URL: '',
     TLS: false,
+    TLSVerify: true,
+    TLSClientCert: true,
     TLSCACert: null,
     TLSCert: null,
     TLSKey: null
@@ -69,11 +71,13 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var URL = $scope.formValues.URL;
     var PublicURL = URL.split(':')[0];
     var TLS = $scope.formValues.TLS;
-    var TLSCAFile = $scope.formValues.TLSCACert;
-    var TLSCertFile = $scope.formValues.TLSCert;
-    var TLSKeyFile = $scope.formValues.TLSKey;
+    var TLSVerify = TLS && $scope.formValues.TLSVerify;
+    var TLSClientCert = TLS && $scope.formValues.TLSClientCert;
+    var TLSCAFile = TLSVerify ? $scope.formValues.TLSCACert : null;
+    var TLSCertFile = TLSClientCert ? $scope.formValues.TLSCert : null;
+    var TLSKeyFile = TLSClientCert ? $scope.formValues.TLSKey: null;
 
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSVerify, TLSClientCert, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       var endpointID = data.Id;
       updateEndpointState(endpointID);

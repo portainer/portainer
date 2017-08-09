@@ -102,6 +102,8 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		URL:             req.URL,
 		PublicURL:       req.PublicURL,
 		TLS:             req.TLS,
+		TLSVerify:       req.TLSVerify,
+		TLSClientCert:   req.TLSClientCert,
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 	}
@@ -113,12 +115,21 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 	}
 
 	if req.TLS {
-		caCertPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCA)
-		endpoint.TLSCACertPath = caCertPath
-		certPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCert)
-		endpoint.TLSCertPath = certPath
-		keyPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileKey)
-		endpoint.TLSKeyPath = keyPath
+		if req.TLSVerify {
+			caCertPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCA)
+			endpoint.TLSCACertPath = caCertPath
+		}
+
+		if req.TLSClientCert {
+			certPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCert)
+			endpoint.TLSCertPath = certPath
+		}
+
+		if req.TLSClientCert {
+			keyPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileKey)
+			endpoint.TLSKeyPath = keyPath
+		}
+
 		err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -130,10 +141,12 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 }
 
 type postEndpointsRequest struct {
-	Name      string `valid:"required"`
-	URL       string `valid:"required"`
-	PublicURL string `valid:"-"`
-	TLS       bool
+	Name          string `valid:"required"`
+	URL           string `valid:"required"`
+	PublicURL     string `valid:"-"`
+	TLS           bool
+	TLSVerify     bool
+	TLSClientCert bool
 }
 
 type postEndpointsResponse struct {
@@ -274,12 +287,34 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 
 	if req.TLS {
 		endpoint.TLS = true
-		caCertPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCA)
-		endpoint.TLSCACertPath = caCertPath
-		certPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCert)
-		endpoint.TLSCertPath = certPath
-		keyPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileKey)
-		endpoint.TLSKeyPath = keyPath
+
+		if req.TLSVerify {
+			endpoint.TLSVerify = true
+
+			caCertPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCA)
+			endpoint.TLSCACertPath = caCertPath
+		} else {
+			endpoint.TLSVerify = false
+			endpoint.TLSCACertPath = ""
+			handler.FileService.DeleteTLSFile(endpoint.ID, portainer.TLSFileCA)
+		}
+
+
+		if req.TLSClientCert {
+			endpoint.TLSClientCert = true
+
+			certPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileCert)
+			endpoint.TLSCertPath = certPath
+			keyPath, _ := handler.FileService.GetPathForTLSFile(endpoint.ID, portainer.TLSFileKey)
+			endpoint.TLSKeyPath = keyPath
+		} else {
+			endpoint.TLSClientCert = false
+
+			endpoint.TLSCertPath = ""
+			endpoint.TLSKeyPath = ""
+			handler.FileService.DeleteTLSFile(endpoint.ID, portainer.TLSFileCert)
+			handler.FileService.DeleteTLSFile(endpoint.ID, portainer.TLSFileKey)
+		}
 	} else {
 		endpoint.TLS = false
 		endpoint.TLSCACertPath = ""
@@ -306,10 +341,12 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 }
 
 type putEndpointsRequest struct {
-	Name      string `valid:"-"`
-	URL       string `valid:"-"`
-	PublicURL string `valid:"-"`
-	TLS       bool   `valid:"-"`
+	Name          string `valid:"-"`
+	URL           string `valid:"-"`
+	PublicURL     string `valid:"-"`
+	TLS           bool   `valid:"-"`
+	TLSVerify     bool   `valid:"-"`
+	TLSClientCert bool   `valid:"-"`
 }
 
 // handleDeleteEndpoint handles DELETE requests on /endpoints/:id

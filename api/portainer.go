@@ -129,6 +129,8 @@ type (
 		URL             string     `json:"URL"`
 		PublicURL       string     `json:"PublicURL"`
 		TLS             bool       `json:"TLS"`
+		TLSVerify       bool       `json:"TLSVerify"`
+		TLSClientCert   bool       `json:"TLSClientCert"`
 		TLSCACertPath   string     `json:"TLSCACert,omitempty"`
 		TLSCertPath     string     `json:"TLSCert,omitempty"`
 		TLSKeyPath      string     `json:"TLSKey,omitempty"`
@@ -295,6 +297,7 @@ type (
 		StoreTLSFile(endpointID EndpointID, fileType TLSFileType, r io.Reader) error
 		GetPathForTLSFile(endpointID EndpointID, fileType TLSFileType) (string, error)
 		DeleteTLSFiles(endpointID EndpointID) error
+		DeleteTLSFile(endpointID EndpointID, fileType TLSFileType) error
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.

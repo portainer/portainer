@@ -72,7 +72,9 @@ func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
 	// Should not be managed here
 	var tlsConfig *tls.Config
 	if endpoint.TLS {
-		tlsConfig, err = crypto.CreateTLSConfiguration(endpoint.TLSCACertPath,
+		tlsConfig, err = crypto.CreateTLSConfiguration(endpoint.TLSVerify,
+			endpoint.TLSClientCert,
+			endpoint.TLSCACertPath,
 			endpoint.TLSCertPath,
 			endpoint.TLSKeyPath)
 		if err != nil {
