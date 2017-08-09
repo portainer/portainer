@@ -11,7 +11,7 @@ angular.module('portainer.helpers')
     if (slashCount >= 1) {
       // assume something/something[/...]
       registry = repository.substr(0, repository.indexOf('/'));
-      // assume invalid DNS name or IP
+      // assume valid DNS name or IP (contains at least one '.')
       if (_.countBy(registry)['.'] > 0) {
         image = repository.substr(repository.indexOf('/') + 1);
       } else {
