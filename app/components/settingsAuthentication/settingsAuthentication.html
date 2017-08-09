@@ -52,7 +52,10 @@
           <div class="form-group" ng-if="settings.AuthenticationMethod === 2">
             <span class="col-sm-12 text-muted small">
               When using LDAP authentication, Portainer will delegate user authentication to a LDAP server (exception for the <b>admin</b> user that always use internal authentication).
-              Users still need to be created in Portainer beforehand.
+              <p style="margin-top:5px;">
+                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                <u>Users still need to be created in Portainer beforehand.</u>
+              </p>
             </span>
           </div>
 
