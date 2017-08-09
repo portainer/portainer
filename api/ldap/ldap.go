@@ -65,7 +65,7 @@ func createConnection(settings *portainer.LDAPSettings) (*ldap.Conn, error) {
 	}
 
 	if settings.StartTLS {
-		config, _ := crypto.CreateTLSConfiguration("", "", "", settings.TLSConfig.TLSSkipVerify)
+		config, _ := crypto.CreateTLSConfiguration(settings.TLSConfig.TLSCACertPath, "", "", settings.TLSConfig.TLSSkipVerify)
 		config.ServerName = strings.Split(settings.URL, ":")[0]
 		err = conn.StartTLS(config)
 		if err != nil {

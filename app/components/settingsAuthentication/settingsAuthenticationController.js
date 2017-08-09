@@ -22,7 +22,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     $scope.LDAPSettings.SearchSettings.splice(index, 1);
   };
 
-  $scope.LDAPConnectivityCheck = function(tls) {
+  $scope.LDAPConnectivityCheck = function() {
     $('#connectivityCheckSpinner').show();
     var settings = $scope.settings;
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
@@ -30,6 +30,9 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     var TLSCertFile = null;
     // var TLSKeyFile = $scope.formValues.TLSKey !== settings.LDAPSettings.TLSConfig.TLSKey ? $scope.formValues.TLSKey : null;
     var TLSKeyFile = null;
+
+
+    var tls = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
     $scope.state.uploadInProgress = tls;
 
     $q.when(!tls || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, TLSCertFile, TLSKeyFile))
@@ -61,8 +64,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     // var TLSKeyFile = $scope.formValues.TLSKey !== settings.LDAPSettings.TLSConfig.TLSKey ? $scope.formValues.TLSKey : null;
     var TLSKeyFile = null;
 
-
-    var tls = $scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS;
+    var tls = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
     $scope.state.uploadInProgress = tls;
 
     $q.when(!tls || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, TLSCertFile, TLSKeyFile))
