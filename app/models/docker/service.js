@@ -79,10 +79,12 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.UpdateParallelism = (typeof data.Spec.UpdateConfig.Parallelism !== undefined) ? data.Spec.UpdateConfig.Parallelism || 0 : 1;
     this.UpdateDelay = data.Spec.UpdateConfig.Delay || 0;
     this.UpdateFailureAction = data.Spec.UpdateConfig.FailureAction || 'pause';
+    this.UpdateOrder = data.Spec.UpdateConfig.Order || 'stop-first';
   } else {
     this.UpdateParallelism = 1;
     this.UpdateDelay = 0;
     this.UpdateFailureAction = 'pause';
+    this.UpdateOrder = 'stop-first';
   }
 
   this.RollbackConfig = data.Spec.RollbackConfig;

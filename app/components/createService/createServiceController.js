@@ -25,6 +25,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     PlacementConstraints: [],
     PlacementPreferences: [],
     UpdateDelay: 0,
+    UpdateOrder: 'stop-first',
     FailureAction: 'pause',
     Secrets: [],
     AccessControlData: new AccessControlFormData()
@@ -199,7 +200,8 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     config.UpdateConfig = {
       Parallelism: input.Parallelism || 0,
       Delay: input.UpdateDelay || 0,
-      FailureAction: input.FailureAction
+      FailureAction: input.FailureAction,
+      Order: input.UpdateOrder
     };
   }
 
