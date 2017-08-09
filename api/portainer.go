@@ -47,12 +47,14 @@ type (
 		Password       string               `json:"Password"`
 		URL            string               `json:"URL"`
 		TLSConfig      TLSConfiguration     `json:"TLSConfig"`
+		StartTLS       bool                 `json:"StartTLS"`
 		SearchSettings []LDAPSearchSettings `json:"SearchSettings"`
 	}
 
 	// TLSConfiguration represents a TLS configuration.
 	TLSConfiguration struct {
 		TLS           bool   `json:"TLS"`
+		TLSSkipVerify bool   `json:"TLSSkipVerify"`
 		TLSCACertPath string `json:"TLSCACert,omitempty"`
 		TLSCertPath   string `json:"TLSCert,omitempty"`
 		TLSKeyPath    string `json:"TLSKey,omitempty"`

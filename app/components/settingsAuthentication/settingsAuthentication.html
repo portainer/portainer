@@ -74,7 +74,7 @@
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" ng-if="!formValues.TLSCert && !formValues.TLSKey">
               <label for="ldap_username" class="col-sm-3 col-lg-2 control-label text-left">
                 Reader DN
                 <portainer-tooltip position="bottom" message="Account that will be used to search for users."></portainer-tooltip>
@@ -84,7 +84,7 @@
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" ng-if="!formValues.TLSCert && !formValues.TLSKey">
               <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
                 Password
               </label>
@@ -93,7 +93,7 @@
               </div>
             </div>
 
-            <div class="form-group" ng-if="!LDAPSettings.TLSConfig.TLS">
+            <div class="form-group" ng-if="!LDAPSettings.TLSConfig.TLS && !LDAPSettings.StartTLS">
               <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
                 Connectivity check
                 <i class="fa fa-check green-icon" style="margin-left: 5px;" ng-if="state.successfulConnectivityCheck"></i>
@@ -109,11 +109,25 @@
               LDAP security
             </div>
 
-            <!-- tls-checkbox -->
-            <div class="form-group">
+            <!-- starttls -->
+            <div class="form-group" ng-if="!LDAPSettings.TLSConfig.TLS">
               <div class="col-sm-12">
                 <label for="tls" class="control-label text-left">
-                  TLS
+                  Use StartTLS
+                  <portainer-tooltip position="bottom" message="Enable this option if want to use StartTLS to secure the connection to the server. Ignored if Use TLS is selected."></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="LDAPSettings.StartTLS"><i></i>
+                </label>
+              </div>
+            </div>
+            <!-- !starttls -->
+
+            <!-- tls-checkbox -->
+            <div class="form-group" ng-if="!LDAPSettings.StartTLS">
+              <div class="col-sm-12">
+                <label for="tls" class="control-label text-left">
+                  Use TLS
                   <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the LDAP server."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
@@ -122,10 +136,25 @@
               </div>
             </div>
             <!-- !tls-checkbox -->
+
+            <!-- tls-skip-verify -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="tls" class="control-label text-left">
+                  Skip verification of server certificate
+                  <portainer-tooltip position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="LDAPSettings.TLSConfig.TLSSkipVerify"><i></i>
+                </label>
+              </div>
+            </div>
+            <!-- !tls-skip-verify -->
+
             <!-- tls-certs -->
-            <div ng-if="LDAPSettings.TLSConfig.TLS">
+            <div ng-if="LDAPSettings.TLSConfig.TLS || LDAPSettings.StartTLS">
               <!-- ca-input -->
-              <div class="form-group">
+              <div class="form-group" ng-if="!LDAPSettings.TLSConfig.TLSSkipVerify">
                 <label class="col-sm-2 control-label text-left">TLS CA certificate</label>
                 <div class="col-sm-10">
                   <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
@@ -139,7 +168,7 @@
               </div>
               <!-- !ca-input -->
               <!-- cert-input -->
-              <div class="form-group">
+              <!-- <div class="form-group" ng-if="!LDAPSettings.StartTLS">
                 <label for="tls_cert" class="col-sm-2 control-label text-left">TLS certificate</label>
                 <div class="col-sm-10">
                   <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
@@ -150,10 +179,10 @@
                     <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
                   </span>
                 </div>
-              </div>
+              </div> -->
               <!-- !cert-input -->
               <!-- key-input -->
-              <div class="form-group">
+              <!-- <div class="form-group" ng-if="!LDAPSettings.StartTLS">
                 <label class="col-sm-2 control-label text-left">TLS key</label>
                 <div class="col-sm-10">
                   <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
@@ -164,19 +193,19 @@
                     <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
                   </span>
                 </div>
-              </div>
+              </div> -->
               <!-- !key-input -->
             </div>
             <!-- !tls-certs -->
 
-            <div class="form-group" ng-if="LDAPSettings.TLSConfig.TLS">
+            <div class="form-group" ng-if="LDAPSettings.TLSConfig.TLS || LDAPSettings.StartTLS">
               <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
                 Connectivity check
                 <i class="fa fa-check green-icon" style="margin-left: 5px;" ng-if="state.successfulConnectivityCheck"></i>
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck(true)" ng-disabled="!LDAPSettings.URL || !LDAPSettings.ReaderDN || !LDAPSettings.Password || !formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey">Test connectivity</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck(true)" ng-disabled="!LDAPSettings.URL || !LDAPSettings.ReaderDN || !LDAPSettings.Password || (!formValues.TLSCACert && !LDAPSettings.TLSConfig.TLSSkipVerify)">Test connectivity</button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               </div>
             </div>

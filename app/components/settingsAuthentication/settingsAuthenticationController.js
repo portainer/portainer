@@ -26,8 +26,10 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     $('#connectivityCheckSpinner').show();
     var settings = $scope.settings;
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
-    var TLSCertFile = $scope.formValues.TLSCert !== settings.LDAPSettings.TLSConfig.TLSCert ? $scope.formValues.TLSCert : null;
-    var TLSKeyFile = $scope.formValues.TLSKey !== settings.LDAPSettings.TLSConfig.TLSKey ? $scope.formValues.TLSKey : null;
+    // var TLSCertFile = $scope.formValues.TLSCert !== settings.LDAPSettings.TLSConfig.TLSCert ? $scope.formValues.TLSCert : null;
+    var TLSCertFile = null;
+    // var TLSKeyFile = $scope.formValues.TLSKey !== settings.LDAPSettings.TLSConfig.TLSKey ? $scope.formValues.TLSKey : null;
+    var TLSKeyFile = null;
 
     $scope.state.uploadInProgress = tls;
 

@@ -2,6 +2,7 @@ package ldap
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
@@ -50,14 +51,29 @@ func searchUser(username string, conn *ldap.Conn, settings []portainer.LDAPSearc
 
 func createConnection(settings *portainer.LDAPSettings) (*ldap.Conn, error) {
 	if settings.TLSConfig.TLS {
-		config, err := crypto.CreateTLSConfiguration(settings.TLSConfig.TLSCACertPath, settings.TLSConfig.TLSCertPath, settings.TLSConfig.TLSKeyPath)
+		config, err := crypto.CreateTLSConfiguration(settings.TLSConfig.TLSCACertPath, settings.TLSConfig.TLSCertPath, settings.TLSConfig.TLSKeyPath, settings.TLSConfig.TLSSkipVerify)
 		if err != nil {
 			return nil, err
 		}
+		config.ServerName = strings.Split(settings.URL, ":")[0]
 		return ldap.DialTLS("tcp", settings.URL, config)
 	}
 
-	return ldap.Dial("tcp", settings.URL)
+	conn, err := ldap.Dial("tcp", settings.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	if settings.StartTLS {
+		config, _ := crypto.CreateTLSConfiguration("", "", "", true)
+		config.ServerName = strings.Split(settings.URL, ":")[0]
+		err = conn.StartTLS(config)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return conn, nil
 }
 
 // AuthenticateUser is used to authenticate a user against a LDAP/AD.
