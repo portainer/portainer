@@ -9,9 +9,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
   };
 
   $scope.formValues = {
-    TLSCACert: '',
-    TLSCert: '',
-    TLSKey: ''
+    TLSCACert: ''
   };
 
   $scope.addSearchConfiguration = function() {
@@ -26,16 +24,11 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     $('#connectivityCheckSpinner').show();
     var settings = $scope.settings;
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
-    // var TLSCertFile = $scope.formValues.TLSCert !== settings.LDAPSettings.TLSConfig.TLSCert ? $scope.formValues.TLSCert : null;
-    var TLSCertFile = null;
-    // var TLSKeyFile = $scope.formValues.TLSKey !== settings.LDAPSettings.TLSConfig.TLSKey ? $scope.formValues.TLSKey : null;
-    var TLSKeyFile = null;
 
+    var uploadRequired = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
+    $scope.state.uploadInProgress = uploadRequired;
 
-    var tls = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
-    $scope.state.uploadInProgress = tls;
-
-    $q.when(!tls || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, TLSCertFile, TLSKeyFile))
+    $q.when(!uploadRequired || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, null, null))
     .then(function success(data) {
       return SettingsService.checkLDAPConnectivity(settings);
     })
@@ -59,15 +52,11 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     $('#updateSettingsSpinner').show();
     var settings = $scope.settings;
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
-    // var TLSCertFile = $scope.formValues.TLSCert !== settings.LDAPSettings.TLSConfig.TLSCert ? $scope.formValues.TLSCert : null;
-    var TLSCertFile = null;
-    // var TLSKeyFile = $scope.formValues.TLSKey !== settings.LDAPSettings.TLSConfig.TLSKey ? $scope.formValues.TLSKey : null;
-    var TLSKeyFile = null;
 
-    var tls = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
-    $scope.state.uploadInProgress = tls;
+    var uploadRequired = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
+    $scope.state.uploadInProgress = uploadRequired;
 
-    $q.when(!tls || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, TLSCertFile, TLSKeyFile))
+    $q.when(!uploadRequired || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, null, null))
     .then(function success(data) {
       return SettingsService.update(settings);
     })
@@ -91,8 +80,6 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
       $scope.settings = settings;
       $scope.LDAPSettings = settings.LDAPSettings;
       $scope.formValues.TLSCACert = settings.LDAPSettings.TLSConfig.TLSCACert;
-      $scope.formValues.TLSCert = settings.LDAPSettings.TLSConfig.TLSCert;
-      $scope.formValues.TLSKey = settings.LDAPSettings.TLSConfig.TLSKey;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');

@@ -74,7 +74,7 @@
               </div>
             </div>
 
-            <div class="form-group" ng-if="!formValues.TLSCert && !formValues.TLSKey">
+            <div class="form-group">
               <label for="ldap_username" class="col-sm-3 col-lg-2 control-label text-left">
                 Reader DN
                 <portainer-tooltip position="bottom" message="Account that will be used to search for users."></portainer-tooltip>
@@ -84,7 +84,7 @@
               </div>
             </div>
 
-            <div class="form-group" ng-if="!formValues.TLSCert && !formValues.TLSKey">
+            <div class="form-group">
               <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
                 Password
               </label>
@@ -167,34 +167,6 @@
                 </div>
               </div>
               <!-- !ca-input -->
-              <!-- cert-input -->
-              <!-- <div class="form-group" ng-if="!LDAPSettings.StartTLS">
-                <label for="tls_cert" class="col-sm-2 control-label text-left">TLS certificate</label>
-                <div class="col-sm-10">
-                  <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
-                  <span style="margin-left: 5px;">
-                    {{ formValues.TLSCert.name }}
-                    <i class="fa fa-check green-icon" ng-if="formValues.TLSCert && formValues.TLSCert === LDAPSettings.TLSConfig.TLSCert" aria-hidden="true"></i>
-                    <i class="fa fa-times red-icon" ng-if="!formValues.TLSCert" aria-hidden="true"></i>
-                    <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
-                  </span>
-                </div>
-              </div> -->
-              <!-- !cert-input -->
-              <!-- key-input -->
-              <!-- <div class="form-group" ng-if="!LDAPSettings.StartTLS">
-                <label class="col-sm-2 control-label text-left">TLS key</label>
-                <div class="col-sm-10">
-                  <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
-                  <span style="margin-left: 5px;">
-                    {{ formValues.TLSKey.name }}
-                    <i class="fa fa-check green-icon" ng-if="formValues.TLSKey && formValues.TLSKey === LDAPSettings.TLSConfig.TLSKey" aria-hidden="true"></i>
-                    <i class="fa fa-times red-icon" ng-if="!formValues.TLSKey" aria-hidden="true"></i>
-                    <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
-                  </span>
-                </div>
-              </div> -->
-              <!-- !key-input -->
             </div>
             <!-- !tls-certs -->
 

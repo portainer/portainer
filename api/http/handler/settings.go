@@ -113,16 +113,8 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 	if (settings.LDAPSettings.TLSConfig.TLS || settings.LDAPSettings.StartTLS) && !settings.LDAPSettings.TLSConfig.TLSSkipVerify {
 		caCertPath, _ := handler.FileService.GetPathForTLSFile(file.LDAPStorePath, portainer.TLSFileCA)
 		settings.LDAPSettings.TLSConfig.TLSCACertPath = caCertPath
-		settings.LDAPSettings.TLSConfig.TLSCertPath = ""
-		settings.LDAPSettings.TLSConfig.TLSKeyPath = ""
-		// certPath, _ := handler.FileService.GetPathForTLSFile(file.LDAPStorePath, portainer.TLSFileCert)
-		// settings.LDAPSettings.TLSConfig.TLSCertPath = certPath
-		// keyPath, _ := handler.FileService.GetPathForTLSFile(file.LDAPStorePath, portainer.TLSFileKey)
-		// settings.LDAPSettings.TLSConfig.TLSKeyPath = keyPath
 	} else {
 		settings.LDAPSettings.TLSConfig.TLSCACertPath = ""
-		settings.LDAPSettings.TLSConfig.TLSCertPath = ""
-		settings.LDAPSettings.TLSConfig.TLSKeyPath = ""
 		err := handler.FileService.DeleteTLSFiles(file.LDAPStorePath)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -158,14 +150,9 @@ func (handler *SettingsHandler) handlePutSettingsLDAPCheck(w http.ResponseWriter
 		return
 	}
 
-	if req.LDAPSettings.TLSConfig.TLS && !req.LDAPSettings.TLSConfig.TLSSkipVerify {
-
+	if (req.LDAPSettings.TLSConfig.TLS || req.LDAPSettings.StartTLS) && !req.LDAPSettings.TLSConfig.TLSSkipVerify {
 		caCertPath, _ := handler.FileService.GetPathForTLSFile(file.LDAPStorePath, portainer.TLSFileCA)
 		req.LDAPSettings.TLSConfig.TLSCACertPath = caCertPath
-		// certPath, _ := handler.FileService.GetPathForTLSFile(file.LDAPStorePath, portainer.TLSFileCert)
-		// req.LDAPSettings.TLSConfig.TLSCertPath = certPath
-		// keyPath, _ := handler.FileService.GetPathForTLSFile(file.LDAPStorePath, portainer.TLSFileKey)
-		// req.LDAPSettings.TLSConfig.TLSKeyPath = keyPath
 	}
 
 	err = handler.LDAPService.TestConnectivity(&req.LDAPSettings)

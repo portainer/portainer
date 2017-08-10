@@ -50,30 +50,32 @@ func searchUser(username string, conn *ldap.Conn, settings []portainer.LDAPSearc
 }
 
 func createConnection(settings *portainer.LDAPSettings) (*ldap.Conn, error) {
-	if settings.TLSConfig.TLS {
-		config, err := crypto.CreateTLSConfiguration(settings.TLSConfig.TLSCACertPath, settings.TLSConfig.TLSCertPath, settings.TLSConfig.TLSKeyPath, settings.TLSConfig.TLSSkipVerify)
+
+	if settings.TLSConfig.TLS || settings.StartTLS {
+		config, err := crypto.CreateTLSConfiguration(settings.TLSConfig.TLSCACertPath, "", "", settings.TLSConfig.TLSSkipVerify)
 		if err != nil {
 			return nil, err
 		}
 		config.ServerName = strings.Split(settings.URL, ":")[0]
-		return ldap.DialTLS("tcp", settings.URL, config)
-	}
 
-	conn, err := ldap.Dial("tcp", settings.URL)
-	if err != nil {
-		return nil, err
-	}
+		if settings.TLSConfig.TLS {
+			return ldap.DialTLS("tcp", settings.URL, config)
+		}
 
-	if settings.StartTLS {
-		config, _ := crypto.CreateTLSConfiguration(settings.TLSConfig.TLSCACertPath, "", "", settings.TLSConfig.TLSSkipVerify)
-		config.ServerName = strings.Split(settings.URL, ":")[0]
+		conn, err := ldap.Dial("tcp", settings.URL)
+		if err != nil {
+			return nil, err
+		}
+
 		err = conn.StartTLS(config)
 		if err != nil {
 			return nil, err
 		}
+
+		return conn, nil
 	}
 
-	return conn, nil
+	return ldap.Dial("tcp", settings.URL)
 }
 
 // AuthenticateUser is used to authenticate a user against a LDAP/AD.
