@@ -95,7 +95,7 @@
                   <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
                 </th>
                 <th>
-                  <a ui-sref="users" ng-click="order('Name')">
+                  <a ng-click="order('Name')">
                     Name
                     <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
