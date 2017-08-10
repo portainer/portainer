@@ -144,27 +144,20 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
     return containerMapping;
   }
 
-  function filterNetworksBasedOnProvider(networks) {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
-    if (endpointProvider === 'DOCKER_SWARM' || endpointProvider === 'DOCKER_SWARM_MODE') {
-      if (endpointProvider === 'DOCKER_SWARM') {
-        networks = NetworkService.filterGlobalNetworks(networks);
-      } else {
-        networks = NetworkService.filterSwarmModeAttachableNetworks(networks);
-      }
-      $scope.globalNetworkCount = networks.length;
-      NetworkService.addPredefinedLocalNetworks(networks);
-    }
-    return networks;
-  }
-
   function initTemplates() {
     var templatesKey = $stateParams.key;
+    var provider = $scope.applicationState.endpoint.mode.provider;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+
     $q.all({
       templates: TemplateService.getTemplates(templatesKey),
       containers: ContainerService.getContainers(0),
-      networks: NetworkService.networks(),
-      volumes: VolumeService.getVolumes()
+      volumes: VolumeService.getVolumes(),
+      networks: NetworkService.networks(
+        provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
+        false,
+        provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
+        provider === 'DOCKER_SWARM')
     })
     .then(function success(data) {
       $scope.templates = data.templates;
@@ -174,8 +167,10 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
       });
       $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
       $scope.runningContainers = data.containers;
-      $scope.availableNetworks = filterNetworksBasedOnProvider(data.networks);
       $scope.availableVolumes = data.volumes.Volumes;
+      var networks = data.networks;
+      $scope.availableNetworks = networks;
+      $scope.globalNetworkCount = networks.length;
     })
     .catch(function error(err) {
       $scope.templates = [];

@@ -305,10 +305,11 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   function initView() {
     $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+
     $q.all({
       volumes: VolumeService.volumes(),
-      networks: NetworkService.retrieveSwarmNetworks(),
-      secrets: apiVersion >= 1.25 ? SecretService.secrets() : []
+      secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
+      networks: NetworkService.networks(true, true, false, false)
     })
     .then(function success(data) {
       $scope.availableVolumes = data.volumes;
