@@ -32,29 +32,6 @@
                 </label>
               </td>
             </tr>
-            <!-- <tr ng-if="!formValues.Administrator">
-              <td colspan="2">
-                <label for="teams" class="control-label text-left">
-                  Teams
-                </label>
-                <span class="small text-muted" style="margin-left: 20px;" ng-if="teams.length === 0">
-                  You have not yet created any team. Head over the <a ui-sref="teams">teams view</a> to manage user teams.</span>
-                </span>
-                <span isteven-multi-select
-                 ng-if="teams.length > 0"
-                 input-model="teams"
-                 output-model="formValues.Teams"
-                 button-label="Name"
-                 item-label="Name"
-                 tick-property="ticked"
-                 helper-elements="filter"
-                 search-property="Name"
-                 translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
-                 style="margin-left: 20px;"
-                 on-item-click="onTeamClick(data)"
-               </span>
-              </td>
-            </tr> -->
           </tbody>
         </table>
       </rd-widget-body>
@@ -62,7 +39,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" ng-if="AuthenticationMethod === 1">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-lock" title="Change user password"></rd-widget-header>

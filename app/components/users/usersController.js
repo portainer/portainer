@@ -1,6 +1,6 @@
 angular.module('users', [])
-.controller('UsersController', ['$q', '$scope', '$state', '$sanitize', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication',
-function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication) {
+.controller('UsersController', ['$q', '$scope', '$state', '$sanitize', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication', 'SettingsService',
+function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication, SettingsService) {
   $scope.state = {
     userCreationError: '',
     selectedItemCount: 0,
@@ -140,13 +140,15 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
     $q.all({
       users: UserService.users(true),
       teams: isAdmin ? TeamService.teams() : UserService.userLeadingTeams(userDetails.ID),
-      memberships: TeamMembershipService.memberships()
+      memberships: TeamMembershipService.memberships(),
+      settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
       var users = data.users;
       assignTeamLeaders(users, data.memberships);
       $scope.users = users;
       $scope.teams = data.teams;
+      $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve users and teams');

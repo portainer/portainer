@@ -65,7 +65,7 @@
             <thead>
               <tr>
                 <th>
-                  <a ui-sref="endpoint.access({id: endpoint.Id})" ng-click="orderUsers('Username')">
+                  <a ng-click="orderUsers('Username')">
                     Name
                     <span ng-show="sortTypeUsers == 'Username' && !sortReverseUsers" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortTypeUsers == 'Username' && sortReverseUsers" class="glyphicon glyphicon-chevron-up"></span>
@@ -125,14 +125,14 @@
             <thead>
               <tr>
                 <th>
-                  <a ui-sref="team({id: team.Id})" ng-click="orderGroupMembers('Username')">
+                  <a ng-click="orderGroupMembers('Username')">
                     Name
                     <span ng-show="sortTypeGroupMembers == 'Username' && !sortReverseGroupMembers" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortTypeGroupMembers == 'Username' && sortReverseGroupMembers" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
                 <th>
-                  <a ui-sref="team({id: team.Id})" ng-click="orderGroupMembers('TeamRole')">
+                  <a ng-click="orderGroupMembers('TeamRole')">
                     Team Role
                     <span ng-show="sortTypeGroupMembers == 'TeamRole' && !sortReverseGroupMembers" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortTypeGroupMembers == 'TeamRole' && sortReverseGroupMembers" class="glyphicon glyphicon-chevron-up"></span>
