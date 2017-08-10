@@ -1,6 +1,6 @@
 angular.module('user', [])
-.controller('UserController', ['$q', '$scope', '$state', '$stateParams', 'UserService', 'ModalService', 'Notifications',
-function ($q, $scope, $state, $stateParams, UserService, ModalService, Notifications) {
+.controller('UserController', ['$q', '$scope', '$state', '$stateParams', 'UserService', 'ModalService', 'Notifications', 'SettingsService',
+function ($q, $scope, $state, $stateParams, UserService, ModalService, Notifications, SettingsService) {
 
   $scope.state = {
     updatePasswordError: ''
@@ -72,12 +72,14 @@ function ($q, $scope, $state, $stateParams, UserService, ModalService, Notificat
   function initView() {
     $('#loadingViewSpinner').show();
     $q.all({
-      user: UserService.user($stateParams.id)
+      user: UserService.user($stateParams.id),
+      settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
       var user = data.user;
       $scope.user = user;
       $scope.formValues.Administrator = user.Role === 1 ? true : false;
+      $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve user information');
