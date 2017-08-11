@@ -17,11 +17,13 @@ import (
 // AuthHandler represents an HTTP API handler for managing authentication.
 type AuthHandler struct {
 	*mux.Router
-	Logger        *log.Logger
-	authDisabled  bool
-	UserService   portainer.UserService
-	CryptoService portainer.CryptoService
-	JWTService    portainer.JWTService
+	Logger          *log.Logger
+	authDisabled    bool
+	UserService     portainer.UserService
+	CryptoService   portainer.CryptoService
+	JWTService      portainer.JWTService
+	LDAPService     portainer.LDAPService
+	SettingsService portainer.SettingsService
 }
 
 const (
@@ -82,10 +84,24 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = handler.CryptoService.CompareHashAndData(u.Password, password)
+	settings, err := handler.SettingsService.Settings()
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
+	}
+
+	if settings.AuthenticationMethod == portainer.AuthenticationLDAP && u.ID != 1 {
+		err = handler.LDAPService.AuthenticateUser(username, password, &settings.LDAPSettings)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
+	} else {
+		err = handler.CryptoService.CompareHashAndData(u.Password, password)
+		if err != nil {
+			httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
+			return
+		}
 	}
 
 	tokenData := &portainer.TokenData{
@@ -93,6 +109,7 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 		Username: u.Username,
 		Role:     u.Role,
 	}
+
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
