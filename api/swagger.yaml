@@ -1,9 +1,26 @@
 ---
 swagger: "2.0"
 info:
-  description: "Portainer HTTP API allows you to manage your Docker environments by\
-    \ using Portainer as a gateway.  You can find out more about Portainer at [http://portainer.io](http://portainer.io)\
-    \ and get some support on [Slack](http://portainer.io/slack/)."
+  description: "Portainer API is an HTTP API served by Portainer. It is used by the\
+    \ Portainer UI and everything you can do with the UI can be done using the HTTP\
+    \ API.\nYou can find out more about Portainer at [http://portainer.io](http://portainer.io)\
+    \ and get some support on [Slack](http://portainer.io/slack/).\n\n# Authentication\n\
+    \nMost of the API endpoints require to be authenticated as well as some level\
+    \ of authorization to be used.\nPortainer API uses JSON Web Token to manage authentication\
+    \ and thus requires you to provide a token in the **Authorization** header of\
+    \ each request\nwith the **Bearer** authentication mechanism.\n\nExample:\n```\n\
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE\n\
+    ```\n\n# Security\n\nEach API endpoint has an associated access policy, it is\
+    \ documented in the description of each endpoint.\n\nDifferent access policies\
+    \ are available:\n* Public access\n* Authenticated access\n* Restricted access\n\
+    * Administrator access\n\n### Public access\n\nNo authentication is required to\
+    \ access the endpoints with this access policy.\n\n### Authenticated access\n\n\
+    Authentication is required to access the endpoints with this access policy.\n\n\
+    ### Restricted access\n\nAuthentication is required to access the endpoints with\
+    \ this access policy.\nExtra-checks might be added to ensure access to the resource\
+    \ is granted. Returned data might also be filtered.\n\n### Administrator access\n\
+    \nAuthentication as well as an administrator role are required to access the endpoints\
+    \ with this access policy.\n"
   version: "1.13.6"
   title: "Portainer API"
   contact:
@@ -47,7 +64,7 @@ paths:
       - "auth"
       summary: "Authenticate a user"
       description: "Use this endpoint to authenticate against Portainer using a username\
-        \ and password"
+        \ and password.  \n**Access policy**: public\n"
       operationId: "AuthenticateUser"
       consumes:
       - "application/json"
@@ -89,7 +106,7 @@ paths:
       - "dockerhub"
       summary: "Retrieve DockerHub information"
       description: "Use this endpoint to retrieve the information used to connect\
-        \ to the DockerHub"
+        \ to the DockerHub  \n**Access policy**: authenticated\n"
       operationId: "DockerHubInspect"
       produces:
       - "application/json"
@@ -108,7 +125,7 @@ paths:
       - "dockerhub"
       summary: "Update DockerHub information"
       description: "Use this endpoint to update the information used to connect to\
-        \ the DockerHub"
+        \ the DockerHub  \n**Access policy**: administrator\n"
       operationId: "DockerHubUpdate"
       consumes:
       - "application/json"
@@ -140,9 +157,9 @@ paths:
       tags:
       - "endpoints"
       summary: "List endpoints"
-      description: "List all endpoints based on the current user authorizations. Will\
-        \ return all endpoints if using an administrator account otherwise it will\
-        \ only return authorized endpoints"
+      description: "List all endpoints based on the current user authorizations. Will\n\
+        return all endpoints if using an administrator account otherwise it will\n\
+        only return authorized endpoints.  \n**Access policy**: restricted      \n"
       operationId: "EndpointList"
       produces:
       - "application/json"
@@ -160,7 +177,8 @@ paths:
       tags:
       - "endpoints"
       summary: "Create a new endpoint"
-      description: "Create a new endpoint that will be used to manage a Docker environment"
+      description: "Create a new endpoint that will be used to manage a Docker environment.\
+        \  \n**Access policy**: administrator\n"
       operationId: "EndpointCreate"
       consumes:
       - "application/json"
@@ -201,6 +219,8 @@ paths:
       tags:
       - "endpoints"
       summary: "Inspect an endpoint"
+      description: "Retrieve details abount an endpoint.  \n**Access policy**: administrator\
+        \      \n"
       operationId: "EndpointInspect"
       produces:
       - "application/json"
@@ -237,6 +257,7 @@ paths:
       tags:
       - "endpoints"
       summary: "Update an endpoint"
+      description: "Update an endpoint.  \n**Access policy**: administrator\n"
       operationId: "EndpointUpdate"
       consumes:
       - "application/json"
@@ -286,6 +307,7 @@ paths:
       tags:
       - "endpoints"
       summary: "Remove an endpoint"
+      description: "Remove an endpoint.  \n**Access policy**: administrator      \n"
       operationId: "EndpointDelete"
       parameters:
       - name: "id"
@@ -326,6 +348,8 @@ paths:
       tags:
       - "endpoints"
       summary: "Manage accesses to an endpoint"
+      description: "Manage user and team accesses to an endpoint.  \n**Access policy**:\
+        \ administrator            \n"
       operationId: "EndpointAccessUpdate"
       consumes:
       - "application/json"
@@ -369,9 +393,10 @@ paths:
       tags:
       - "registries"
       summary: "List registries"
-      description: "List all registries based on the current user authorizations.\
-        \ Will return all registries if using an administrator account otherwise it\
-        \ will only return authorized registries"
+      description: "List all registries based on the current user authorizations.\n\
+        Will return all registries if using an administrator account otherwise it\n\
+        will only return authorized registries.  \n**Access policy**: restricted \
+        \                 \n"
       operationId: "RegistryList"
       produces:
       - "application/json"
@@ -389,6 +414,8 @@ paths:
       tags:
       - "registries"
       summary: "Create a new registry"
+      description: "Create a new registry.  \n**Access policy**: administrator   \
+        \   \n"
       operationId: "RegistryCreate"
       consumes:
       - "application/json"
@@ -429,6 +456,8 @@ paths:
       tags:
       - "registries"
       summary: "Inspect a registry"
+      description: "Retrieve details about a registry.  \n**Access policy**: administrator\
+        \      \n"
       operationId: "RegistryInspect"
       produces:
       - "application/json"
@@ -465,6 +494,7 @@ paths:
       tags:
       - "registries"
       summary: "Update a registry"
+      description: "Update a registry.  \n**Access policy**: administrator      \n"
       operationId: "RegistryUpdate"
       consumes:
       - "application/json"
@@ -521,6 +551,8 @@ paths:
       tags:
       - "registries"
       summary: "Remove a registry"
+      description: "Remove a registry.  \n**Access policy**: administrator       \
+        \     \n"
       operationId: "RegistryDelete"
       parameters:
       - name: "id"
@@ -554,6 +586,8 @@ paths:
       tags:
       - "registries"
       summary: "Manage accesses to a registry"
+      description: "Manage user and team accesses to a registry.  \n**Access policy**:\
+        \ administrator            \n"
       operationId: "RegistryAccessUpdate"
       consumes:
       - "application/json"
@@ -597,7 +631,8 @@ paths:
       tags:
       - "resource_controls"
       summary: "Create a new resource control"
-      description: "Create a new resource control to restrict access to a Docker resource"
+      description: "Create a new resource control to restrict access to a Docker resource.\
+        \  \n**Access policy**: restricted            \n"
       operationId: "ResourceControlCreate"
       consumes:
       - "application/json"
@@ -643,6 +678,8 @@ paths:
       tags:
       - "resource_controls"
       summary: "Update a resource control"
+      description: "Update a resource control.  \n**Access policy**: restricted  \
+        \       \n"
       operationId: "ResourceControlUpdate"
       consumes:
       - "application/json"
@@ -692,6 +729,8 @@ paths:
       tags:
       - "resource_controls"
       summary: "Remove a resource control"
+      description: "Remove a resource control.  \n**Access policy**: restricted  \
+        \    \n"
       operationId: "ResourceControlDelete"
       parameters:
       - name: "id"
@@ -732,6 +771,8 @@ paths:
       tags:
       - "settings"
       summary: "Retrieve Portainer settings"
+      description: "Retrieve Portainer settings.  \n**Access policy**: public    \
+        \  \n"
       operationId: "SettingsInspect"
       produces:
       - "application/json"
@@ -749,6 +790,8 @@ paths:
       tags:
       - "settings"
       summary: "Update Portainer settings"
+      description: "Update Portainer settings.  \n**Access policy**: administrator\
+        \        \n"
       operationId: "SettingsUpdate"
       consumes:
       - "application/json"
@@ -780,6 +823,8 @@ paths:
       tags:
       - "status"
       summary: "Check Portainer status"
+      description: "Retrieve Portainer status.  \n**Access policy**: public      \
+        \  \n"
       operationId: "StatusInspect"
       produces:
       - "application/json"
@@ -798,6 +843,9 @@ paths:
       tags:
       - "users"
       summary: "List users"
+      description: "List Portainer users. Non-administrator users will only be able\
+        \ to list other non-administrator user accounts.  \n**Access policy**: restricted\
+        \        \n"
       operationId: "UserList"
       produces:
       - "application/json"
@@ -815,6 +863,9 @@ paths:
       tags:
       - "users"
       summary: "Create a new user"
+      description: "Create a new Portainer user. Only team leaders and administrators\
+        \ can create users. Only administrators can\ncreate an administrator user\
+        \ account.  \n**Access policy**: restricted        \n"
       operationId: "UserCreate"
       consumes:
       - "application/json"
@@ -862,6 +913,8 @@ paths:
       tags:
       - "users"
       summary: "Inspect a user"
+      description: "Retrieve details about a user.  \n**Access policy**: administrator\
+        \        \n"
       operationId: "UserInspect"
       produces:
       - "application/json"
@@ -898,6 +951,8 @@ paths:
       tags:
       - "users"
       summary: "Update a user"
+      description: "Update user details. A regular user account can only update his\
+        \ details.  \n**Access policy**: authenticated      \n"
       operationId: "UserUpdate"
       consumes:
       - "application/json"
@@ -947,6 +1002,7 @@ paths:
       tags:
       - "users"
       summary: "Remove a user"
+      description: "Remove a user.  \n**Access policy**: administrator      \n"
       operationId: "UserDelete"
       parameters:
       - name: "id"
@@ -980,6 +1036,8 @@ paths:
       tags:
       - "users"
       summary: "Inspect a user memberships"
+      description: "Inspect a user memberships.  \n**Access policy**: authenticated\
+        \      \n"
       operationId: "UserMembershipsInspect"
       produces:
       - "application/json"
@@ -1017,6 +1075,8 @@ paths:
       tags:
       - "users"
       summary: "Check password validity for a user"
+      description: "Check if the submitted password is valid for the specified user.\
+        \  \n**Access policy**: authenticated      \n"
       operationId: "UserPasswordCheck"
       consumes:
       - "application/json"
@@ -1062,6 +1122,8 @@ paths:
       tags:
       - "teams"
       summary: "List teams"
+      description: "List teams. For non-administrator users, will only list the teams\
+        \ they are member of.  \n**Access policy**: restricted      \n"
       operationId: "TeamList"
       produces:
       - "application/json"
@@ -1079,6 +1141,8 @@ paths:
       tags:
       - "teams"
       summary: "Create a new team"
+      description: "Create a new team.  \n**Access policy**: administrator       \
+        \     \n"
       operationId: "TeamCreate"
       consumes:
       - "application/json"
@@ -1126,6 +1190,8 @@ paths:
       tags:
       - "teams"
       summary: "Inspect a team"
+      description: "Retrieve details about a team. Access is only available for administrator\
+        \ and leaders of that team.  \n**Access policy**: restricted      \n"
       operationId: "TeamInspect"
       produces:
       - "application/json"
@@ -1169,6 +1235,8 @@ paths:
       tags:
       - "teams"
       summary: "Update a team"
+      description: "Update a team.  \n**Access policy**: administrator           \
+        \ \n"
       operationId: "TeamUpdate"
       consumes:
       - "application/json"
@@ -1211,6 +1279,7 @@ paths:
       tags:
       - "teams"
       summary: "Remove a team"
+      description: "Remove a team.  \n**Access policy**: administrator      \n"
       operationId: "TeamDelete"
       parameters:
       - name: "id"
@@ -1244,6 +1313,8 @@ paths:
       tags:
       - "teams"
       summary: "Inspect a team memberships"
+      description: "Inspect a team memberships. Access is only available for administrator\
+        \ and leaders of that team.  \n**Access policy**: restricted      \n"
       operationId: "TeamMembershipsInspect"
       produces:
       - "application/json"
@@ -1281,6 +1352,8 @@ paths:
       tags:
       - "team_memberships"
       summary: "List team memberships"
+      description: "List team memberships. Access is only available to administrators\
+        \ and team leaders.  \n**Access policy**: restricted         \n"
       operationId: "TeamMembershipList"
       produces:
       - "application/json"
@@ -1305,6 +1378,8 @@ paths:
       tags:
       - "team_memberships"
       summary: "Create a new team membership"
+      description: "Create a new team memberships. Access is only available to administrators\
+        \ leaders of the associated team.  \n**Access policy**: restricted      \n"
       operationId: "TeamMembershipCreate"
       consumes:
       - "application/json"
@@ -1352,6 +1427,9 @@ paths:
       tags:
       - "team_memberships"
       summary: "Update a team membership"
+      description: "Update a team membership. Access is only available to administrators\
+        \ leaders of the associated team.  \n**Access policy**: restricted       \
+        \ \n"
       operationId: "TeamMembershipUpdate"
       consumes:
       - "application/json"
@@ -1401,6 +1479,8 @@ paths:
       tags:
       - "team_memberships"
       summary: "Remove a team membership"
+      description: "Remove a team membership. Access is only available to administrators\
+        \ leaders of the associated team.  \n**Access policy**: restricted      \n"
       operationId: "TeamMembershipDelete"
       parameters:
       - name: "id"
@@ -1441,6 +1521,8 @@ paths:
       tags:
       - "templates"
       summary: "Retrieve App templates"
+      description: "Retrieve App templates.  \n**Access policy**: authenticated  \
+        \    \n"
       operationId: "TemplateList"
       produces:
       - "application/json"
