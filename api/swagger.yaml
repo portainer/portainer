@@ -1171,6 +1171,73 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /users/admin/check:
+    get:
+      tags:
+      - "users"
+      summary: "Check administrator account existence"
+      description: "Check if an administrator account exists in the database.\n**Access\
+        \ policy**: public        \n"
+      operationId: "UserAdminCheck"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserListResponse"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users/admin/init:
+    post:
+      tags:
+      - "users"
+      summary: "Initialize administrator account"
+      description: "Initialize the 'admin' user account.\n**Access policy**: public\
+        \        \n"
+      operationId: "UserAdminInit"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User details"
+        required: true
+        schema:
+          $ref: "#/definitions/UserAdminInitRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        409:
+          description: "Admin user already initialized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
   /teams:
     get:
       tags:
@@ -2327,3 +2394,10 @@ definitions:
     properties:
       LDAPSettings:
         $ref: "#/definitions/LDAPSettings"
+  UserAdminInitRequest:
+    type: "object"
+    properties:
+      Password:
+        type: "string"
+        example: "admin-password"
+        description: "Password for the admin user"
