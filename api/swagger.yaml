@@ -1,9 +1,18 @@
 ---
 swagger: "2.0"
 info:
-  description: "Portainer HTTP API allows you to manage your Docker environments by\
-    \ using Portainer as a gateway.  You can find out more about Portainer at [http://portainer.io](http://portainer.io)\
-    \ and get some support on [Slack](http://portainer.io/slack/)."
+  description: "Portainer API is an HTTP API served by Portainer. It is used by the\
+    \ Portainer UI and everything you can do with the UI can be done using the HTTP\
+    \ API.\nYou can find out more about Portainer at [http://portainer.io](http://portainer.io)\
+    \ and get some support on [Slack](http://portainer.io/slack/).\n\n# Authentication\n\
+    \nMost of the API endpoints require to be authenticated as well as some level\
+    \ of authorization to be used.\nPortainer API uses JSON Web Token to manage authentication\
+    \ and thus requires you to provide a token in the **Authorization** header of\
+    \ each request\nwith the **Bearer** authentication mechanism.\n\nExample:\n```\n\
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE\n\
+    ```\n\nDifferent authorization levels are available:\n* Administrator\n* Regular\
+    \ user\n\nEach endpoint is documented with the required authentication and authorization\
+    \ details.\n"
   version: "1.13.6"
   title: "Portainer API"
   contact:
