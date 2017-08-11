@@ -10,9 +10,17 @@ info:
     \ and thus requires you to provide a token in the **Authorization** header of\
     \ each request\nwith the **Bearer** authentication mechanism.\n\nExample:\n```\n\
     Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE\n\
-    ```\n\nDifferent authorization levels are available:\n* Administrator\n* Regular\
-    \ user\n\nEach endpoint is documented with the required authentication and authorization\
-    \ details.\n"
+    ```\n\n# Security\n\nEach API endpoint has an associated access policy, it is\
+    \ documented in the description of each endpoint.\n\nDifferent access policies\
+    \ are available:\n* Public access\n* Authenticated access\n* Restricted access\n\
+    * Administrator access\n\n### Public access\n\nNo authentication is required to\
+    \ access the endpoints with this access policy.\n\n### Authenticated access\n\n\
+    Authentication is required to access the endpoints with this access policy.\n\n\
+    ### Restricted access\n\nAuthentication is required to access the endpoints with\
+    \ this access policy.\nExtra-checks might be added to ensure access to the resource\
+    \ is granted. Returned data might also be filtered.\n\n### Administrator access\n\
+    \nAuthentication as well as an administrator role are required to access the endpoints\
+    \ with this access policy.\n"
   version: "1.13.6"
   title: "Portainer API"
   contact:
