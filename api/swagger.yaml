@@ -64,7 +64,7 @@ paths:
       - "auth"
       summary: "Authenticate a user"
       description: "Use this endpoint to authenticate against Portainer using a username\
-        \ and password"
+        \ and password  \n**Access policy**: public\n"
       operationId: "AuthenticateUser"
       consumes:
       - "application/json"
