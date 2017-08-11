@@ -771,8 +771,8 @@ paths:
       tags:
       - "settings"
       summary: "Retrieve Portainer settings"
-      description: "Retrieve Portainer settings.  \n**Access policy**: public    \
-        \  \n"
+      description: "Retrieve Portainer settings.  \n**Access policy**: administrator\
+        \      \n"
       operationId: "SettingsInspect"
       produces:
       - "application/json"
@@ -804,6 +804,60 @@ paths:
         required: true
         schema:
           $ref: "#/definitions/SettingsUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /settings/public:
+    get:
+      tags:
+      - "settings"
+      summary: "Retrieve Portainer public settings"
+      description: "Retrieve public settings. Returns a small set of settings that\
+        \ are not reserved to administrators only.\n**Access policy**: public    \
+        \  \n"
+      operationId: "PublicSettingsInspect"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/PublicSettingsInspectResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /settings/authentication/checkLDAP:
+    put:
+      tags:
+      - "settings"
+      summary: "Test LDAP connectivity"
+      description: "Test LDAP connectivity using LDAP details.\n**Access policy**:\
+        \ administrator        \n"
+      operationId: "SettingsLDAPCheck"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "LDAP settings"
+        required: true
+        schema:
+          $ref: "#/definitions/SettingsLDAPCheckRequest"
       responses:
         200:
           description: "Success"
@@ -1113,6 +1167,73 @@ paths:
           examples:
             application/json:
               err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users/admin/check:
+    get:
+      tags:
+      - "users"
+      summary: "Check administrator account existence"
+      description: "Check if an administrator account exists in the database.\n**Access\
+        \ policy**: public        \n"
+      operationId: "UserAdminCheck"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserListResponse"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users/admin/init:
+    post:
+      tags:
+      - "users"
+      summary: "Initialize administrator account"
+      description: "Initialize the 'admin' user account.\n**Access policy**: public\
+        \        \n"
+      operationId: "UserAdminInit"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User details"
+        required: true
+        schema:
+          $ref: "#/definitions/UserAdminInitRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        409:
+          description: "Admin user already initialized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User already exists"
         500:
           description: "Server error"
           schema:
@@ -1616,6 +1737,89 @@ definitions:
         type: "string"
         example: "1.13.6"
         description: "Portainer API version"
+  PublicSettingsInspectResponse:
+    type: "object"
+    properties:
+      LogoURL:
+        type: "string"
+        example: "https://mycompany.mydomain.tld/logo.png"
+        description: "URL to a logo that will be displayed on the login page as well\
+          \ as on top of the sidebar. Will use default Portainer logo when value is\
+          \ empty string"
+      DisplayExternalContributors:
+        type: "boolean"
+        example: false
+        description: "Whether to display or not external templates contributions as\
+          \ sub-menus in the UI."
+      AuthenticationMethod:
+        type: "integer"
+        example: 1
+        description: "Active authentication method for the Portainer instance. Valid\
+          \ values are: 1 for managed or 2 for LDAP."
+  TLSConfiguration:
+    type: "object"
+    properties:
+      TLS:
+        type: "boolean"
+        example: true
+        description: "Use TLS"
+      TLSSkipVerify:
+        type: "boolean"
+        example: false
+        description: "Skip the verification of the server TLS certificate"
+      TLSCACertPath:
+        type: "string"
+        example: "/data/tls/ca.pem"
+        description: "Path to the TLS CA certificate file"
+      TLSCertPath:
+        type: "string"
+        example: "/data/tls/cert.pem"
+        description: "Path to the TLS client certificate file"
+      TLSKeyPath:
+        type: "string"
+        example: "/data/tls/key.pem"
+        description: "Path to the TLS client key file"
+  LDAPSearchSettings:
+    type: "object"
+    properties:
+      BaseDN:
+        type: "string"
+        example: "dc=ldap,dc=domain,dc=tld"
+        description: "The distinguished name of the element from which the LDAP server\
+          \ will search for users"
+      Filter:
+        type: "string"
+        example: "(objectClass=account)"
+        description: "Optional LDAP search filter used to select user elements"
+      UserNameAttribute:
+        type: "string"
+        example: "uid"
+        description: "LDAP attribute which denotes the username"
+  LDAPSettings:
+    type: "object"
+    properties:
+      ReaderDN:
+        type: "string"
+        example: "cn=readonly-account,dc=ldap,dc=domain,dc=tld"
+        description: "Account that will be used to search for users"
+      Password:
+        type: "string"
+        example: "readonly-password"
+        description: "Password of the account that will be used to search users"
+      URL:
+        type: "string"
+        example: "myldap.domain.tld:389"
+        description: "URL or IP address of the LDAP server"
+      TLSConfig:
+        $ref: "#/definitions/TLSConfiguration"
+      StartTLS:
+        type: "boolean"
+        example: true
+        description: "Whether LDAP connection should use StartTLS"
+      SearchSettings:
+        type: "array"
+        items:
+          $ref: "#/definitions/LDAPSearchSettings"
   Settings:
     type: "object"
     properties:
@@ -1641,6 +1845,13 @@ definitions:
         example: false
         description: "Whether to display or not external templates contributions as\
           \ sub-menus in the UI."
+      AuthenticationMethod:
+        type: "integer"
+        example: 1
+        description: "Active authentication method for the Portainer instance. Valid\
+          \ values are: 1 for managed or 2 for LDAP."
+      LDAPSettings:
+        $ref: "#/definitions/LDAPSettings"
   Settings_BlackListedLabels:
     properties:
       name:
@@ -2001,6 +2212,7 @@ definitions:
   SettingsUpdateRequest:
     type: "object"
     required:
+    - "AuthenticationMethod"
     - "TemplatesURL"
     properties:
       TemplatesURL:
@@ -2025,6 +2237,13 @@ definitions:
         example: false
         description: "Whether to display or not external templates contributions as\
           \ sub-menus in the UI."
+      AuthenticationMethod:
+        type: "integer"
+        example: 1
+        description: "Active authentication method for the Portainer instance. Valid\
+          \ values are: 1 for managed or 2 for LDAP."
+      LDAPSettings:
+        $ref: "#/definitions/LDAPSettings"
   UserCreateRequest:
     type: "object"
     required:
@@ -2170,3 +2389,15 @@ definitions:
         example: 1
         description: "Role for the user inside the team (1 for leader and 2 for regular\
           \ member)"
+  SettingsLDAPCheckRequest:
+    type: "object"
+    properties:
+      LDAPSettings:
+        $ref: "#/definitions/LDAPSettings"
+  UserAdminInitRequest:
+    type: "object"
+    properties:
+      Password:
+        type: "string"
+        example: "admin-password"
+        description: "Password for the admin user"
