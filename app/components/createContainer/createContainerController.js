@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'Network', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService',
-function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, Network, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService',
+function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -449,33 +449,25 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       Notifications.error('Failure', e, 'Unable to retrieve volumes');
     });
 
-    Network.query({}, function (d) {
-      var networks = d;
-      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
-          networks = d.filter(function (network) {
-            if (network.Scope === 'global') {
-              return network;
-            }
-          });
-        }
-        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-          networks = d.filter(function (network) {
-            return network.Driver !== 'overlay' || network.Attachable;
-          });
-        }
-        $scope.globalNetworkCount = networks.length;
-        networks.push({Name: 'bridge'});
-        networks.push({Name: 'host'});
-        networks.push({Name: 'none'});
-      }
-      networks.push({Name: 'container'});
+    var provider = $scope.applicationState.endpoint.mode.provider;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    NetworkService.networks(
+      provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
+      false,
+      provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
+      provider === 'DOCKER_SWARM'
+    )
+    .then(function success(data) {
+      var networks = data;
+      networks.push({ Name: 'container' });
       $scope.availableNetworks = networks;
-      if (!_.find(networks, {'Name': 'bridge'})) {
+
+      if (_.find(networks, {'Name': 'nat'})) {
         $scope.config.HostConfig.NetworkMode = 'nat';
       }
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to retrieve networks');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve networks');
     });
 
     Container.query({}, function (d) {

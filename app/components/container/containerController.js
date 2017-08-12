@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService, ResourceControlService, RegistryService, ImageService) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, Pagination, ModalService, ResourceControlService, RegistryService, ImageService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -273,25 +273,21 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     });
   };
 
-  Network.query({}, function (d) {
-      var networks = d;
-      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-        networks = d.filter(function (network) {
-          if (network.Scope === 'global') {
-            return network;
-          }
-        });
-        networks.push({Name: 'bridge'});
-        networks.push({Name: 'host'});
-        networks.push({Name: 'none'});
-      }
-      $scope.availableNetworks = networks;
-      if (!_.find(networks, {'Name': 'bridge'})) {
-        networks.push({Name: 'nat'});
-      }
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to retrieve networks');
-    });
+  var provider = $scope.applicationState.endpoint.mode.provider;
+  var apiVersion = $scope.applicationState.endpoint.apiVersion;
+  NetworkService.networks(
+    provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
+    false,
+    provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
+    provider === 'DOCKER_SWARM'
+  )
+  .then(function success(data) {
+    var networks = data;
+    $scope.availableNetworks = networks;
+  })
+  .catch(function error(err) {
+    Notifications.error('Failure', err, 'Unable to retrieve networks');
+  });
 
   update();
 }]);
