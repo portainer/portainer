@@ -1701,8 +1701,8 @@ definitions:
         description: "Team identifier"
       Role:
         type: "integer"
-        example: 0
-        description: "Team role (0 for team leader and 1 for team member)"
+        example: 1
+        description: "Team role (1 for team leader and 2 for team member)"
   User:
     type: "object"
     properties:
@@ -1717,7 +1717,7 @@ definitions:
       Role:
         type: "integer"
         example: 1
-        description: "User role (0 for administrator account and 1 for regular account)"
+        description: "User role (1 for administrator account and 2 for regular account)"
   Status:
     type: "object"
     properties:
@@ -2262,7 +2262,7 @@ definitions:
       Role:
         type: "integer"
         example: 1
-        description: "User role (0 for administrator account and 1 for regular account)"
+        description: "User role (1 for administrator account and 2 for regular account)"
   UserCreateResponse:
     type: "object"
     properties:
@@ -2284,7 +2284,7 @@ definitions:
       Role:
         type: "integer"
         example: 1
-        description: "User role (0 for administrator account and 1 for regular account)"
+        description: "User role (1 for administrator account and 2 for regular account)"
   UserMembershipsResponse:
     type: "array"
     items:
