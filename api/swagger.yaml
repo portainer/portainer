@@ -1642,8 +1642,9 @@ paths:
       tags:
       - "templates"
       summary: "Retrieve App templates"
-      description: "Retrieve App templates.  \n**Access policy**: authenticated  \
-        \    \n"
+      description: "Retrieve App templates.  \nYou can find more information about\
+        \ the format at http://portainer.readthedocs.io/en/stable/templates.html \
+        \ \n**Access policy**: authenticated      \n"
       operationId: "TemplateList"
       produces:
       - "application/json"
@@ -1656,6 +1657,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/TemplateListResponse"
         400:
           description: "Invalid request"
           schema:
@@ -2401,3 +2404,26 @@ definitions:
         type: "string"
         example: "admin-password"
         description: "Password for the admin user"
+  TemplateListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Template"
+  Template:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+        example: "Nginx"
+        description: "Title of the template"
+      description:
+        type: "string"
+        example: "High performance web server"
+        description: "Description of the template"
+      logo:
+        type: "string"
+        example: "https://cloudinovasi.id/assets/img/logos/nginx.png"
+        description: "URL of the template's logo"
+      image:
+        type: "string"
+        example: "nginx:latest"
+        description: "The Docker image associated to the template"
