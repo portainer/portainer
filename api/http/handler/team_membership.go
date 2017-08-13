@@ -42,6 +42,24 @@ func NewTeamMembershipHandler(bouncer *security.RequestBouncer) *TeamMembershipH
 	return h
 }
 
+type (
+	postTeamMembershipsRequest struct {
+		UserID int `valid:"required"`
+		TeamID int `valid:"required"`
+		Role   int `valid:"required"`
+	}
+
+	postTeamMembershipsResponse struct {
+		ID int `json:"Id"`
+	}
+
+	putTeamMembershipRequest struct {
+		UserID int `valid:"required"`
+		TeamID int `valid:"required"`
+		Role   int `valid:"required"`
+	}
+)
+
 // handlePostTeamMemberships handles POST requests on /team_memberships
 func (handler *TeamMembershipHandler) handlePostTeamMemberships(w http.ResponseWriter, r *http.Request) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -98,16 +116,6 @@ func (handler *TeamMembershipHandler) handlePostTeamMemberships(w http.ResponseW
 	}
 
 	encodeJSON(w, &postTeamMembershipsResponse{ID: int(membership.ID)}, handler.Logger)
-}
-
-type postTeamMembershipsResponse struct {
-	ID int `json:"Id"`
-}
-
-type postTeamMembershipsRequest struct {
-	UserID int `valid:"required"`
-	TeamID int `valid:"required"`
-	Role   int `valid:"required"`
 }
 
 // handleGetTeamsMemberships handles GET requests on /team_memberships
@@ -193,12 +201,6 @@ func (handler *TeamMembershipHandler) handlePutTeamMembership(w http.ResponseWri
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-}
-
-type putTeamMembershipRequest struct {
-	UserID int `valid:"required"`
-	TeamID int `valid:"required"`
-	Role   int `valid:"required"`
 }
 
 // handleDeleteTeamMembership handles DELETE requests on /team_memberships/:id

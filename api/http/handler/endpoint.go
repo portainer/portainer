@@ -55,6 +55,31 @@ func NewEndpointHandler(bouncer *security.RequestBouncer, authorizeEndpointManag
 	return h
 }
 
+type (
+	postEndpointsRequest struct {
+		Name      string `valid:"required"`
+		URL       string `valid:"required"`
+		PublicURL string `valid:"-"`
+		TLS       bool
+	}
+
+	postEndpointsResponse struct {
+		ID int `json:"Id"`
+	}
+
+	putEndpointAccessRequest struct {
+		AuthorizedUsers []int `valid:"-"`
+		AuthorizedTeams []int `valid:"-"`
+	}
+
+	putEndpointsRequest struct {
+		Name      string `valid:"-"`
+		URL       string `valid:"-"`
+		PublicURL string `valid:"-"`
+		TLS       bool   `valid:"-"`
+	}
+)
+
 // handleGetEndpoints handles GET requests on /endpoints
 func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *http.Request) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -128,17 +153,6 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 	}
 
 	encodeJSON(w, &postEndpointsResponse{ID: int(endpoint.ID)}, handler.Logger)
-}
-
-type postEndpointsRequest struct {
-	Name      string `valid:"required"`
-	URL       string `valid:"required"`
-	PublicURL string `valid:"-"`
-	TLS       bool
-}
-
-type postEndpointsResponse struct {
-	ID int `json:"Id"`
 }
 
 // handleGetEndpoint handles GET requests on /endpoints/:id
@@ -217,11 +231,6 @@ func (handler *EndpointHandler) handlePutEndpointAccess(w http.ResponseWriter, r
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-}
-
-type putEndpointAccessRequest struct {
-	AuthorizedUsers []int `valid:"-"`
-	AuthorizedTeams []int `valid:"-"`
 }
 
 // handlePutEndpoint handles PUT requests on /endpoints/:id
@@ -305,13 +314,6 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-}
-
-type putEndpointsRequest struct {
-	Name      string `valid:"-"`
-	URL       string `valid:"-"`
-	PublicURL string `valid:"-"`
-	TLS       bool   `valid:"-"`
 }
 
 // handleDeleteEndpoint handles DELETE requests on /endpoints/:id

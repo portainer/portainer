@@ -43,6 +43,27 @@ func NewSettingsHandler(bouncer *security.RequestBouncer) *SettingsHandler {
 	return h
 }
 
+type (
+	publicSettingsResponse struct {
+		LogoURL                     string                         `json:"LogoURL"`
+		DisplayExternalContributors bool                           `json:"DisplayExternalContributors"`
+		AuthenticationMethod        portainer.AuthenticationMethod `json:"AuthenticationMethod"`
+	}
+
+	putSettingsRequest struct {
+		TemplatesURL                string                 `valid:"required"`
+		LogoURL                     string                 `valid:""`
+		BlackListedLabels           []portainer.Pair       `valid:""`
+		DisplayExternalContributors bool                   `valid:""`
+		AuthenticationMethod        int                    `valid:"required"`
+		LDAPSettings                portainer.LDAPSettings `valid:""`
+	}
+
+	putSettingsLDAPCheckRequest struct {
+		LDAPSettings portainer.LDAPSettings `valid:""`
+	}
+)
+
 // handleGetSettings handles GET requests on /settings
 func (handler *SettingsHandler) handleGetSettings(w http.ResponseWriter, r *http.Request) {
 	settings, err := handler.SettingsService.Settings()
@@ -71,12 +92,6 @@ func (handler *SettingsHandler) handleGetPublicSettings(w http.ResponseWriter, r
 
 	encodeJSON(w, publicSettings, handler.Logger)
 	return
-}
-
-type publicSettingsResponse struct {
-	LogoURL                     string                         `json:"LogoURL"`
-	DisplayExternalContributors bool                           `json:"DisplayExternalContributors"`
-	AuthenticationMethod        portainer.AuthenticationMethod `json:"AuthenticationMethod"`
 }
 
 // handlePutSettings handles PUT requests on /settings
@@ -127,15 +142,6 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 	}
 }
 
-type putSettingsRequest struct {
-	TemplatesURL                string                 `valid:"required"`
-	LogoURL                     string                 `valid:""`
-	BlackListedLabels           []portainer.Pair       `valid:""`
-	DisplayExternalContributors bool                   `valid:""`
-	AuthenticationMethod        int                    `valid:"required"`
-	LDAPSettings                portainer.LDAPSettings `valid:""`
-}
-
 // handlePutSettingsLDAPCheck handles PUT requests on /settings/ldap/check
 func (handler *SettingsHandler) handlePutSettingsLDAPCheck(w http.ResponseWriter, r *http.Request) {
 	var req putSettingsLDAPCheckRequest
@@ -160,8 +166,4 @@ func (handler *SettingsHandler) handlePutSettingsLDAPCheck(w http.ResponseWriter
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-}
-
-type putSettingsLDAPCheckRequest struct {
-	LDAPSettings portainer.LDAPSettings `valid:""`
 }

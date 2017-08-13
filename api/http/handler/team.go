@@ -47,6 +47,20 @@ func NewTeamHandler(bouncer *security.RequestBouncer) *TeamHandler {
 	return h
 }
 
+type (
+	postTeamsRequest struct {
+		Name string `valid:"required"`
+	}
+
+	postTeamsResponse struct {
+		ID int `json:"Id"`
+	}
+
+	putTeamRequest struct {
+		Name string `valid:"-"`
+	}
+)
+
 // handlePostTeams handles POST requests on /teams
 func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Request) {
 	var req postTeamsRequest
@@ -82,14 +96,6 @@ func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Reque
 	}
 
 	encodeJSON(w, &postTeamsResponse{ID: int(team.ID)}, handler.Logger)
-}
-
-type postTeamsResponse struct {
-	ID int `json:"Id"`
-}
-
-type postTeamsRequest struct {
-	Name string `valid:"required"`
 }
 
 // handleGetTeams handles GET requests on /teams
@@ -187,10 +193,6 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-}
-
-type putTeamRequest struct {
-	Name string `valid:"-"`
 }
 
 // handleDeleteTeam handles DELETE requests on /teams/:id

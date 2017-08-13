@@ -36,6 +36,14 @@ func NewDockerHubHandler(bouncer *security.RequestBouncer) *DockerHubHandler {
 	return h
 }
 
+type (
+	putDockerHubRequest struct {
+		Authentication bool   `valid:""`
+		Username       string `valid:""`
+		Password       string `valid:""`
+	}
+)
+
 // handleGetDockerHub handles GET requests on /dockerhub
 func (handler *DockerHubHandler) handleGetDockerHub(w http.ResponseWriter, r *http.Request) {
 	dockerhub, err := handler.DockerHubService.DockerHub()
@@ -78,10 +86,4 @@ func (handler *DockerHubHandler) handlePutDockerHub(w http.ResponseWriter, r *ht
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
-}
-
-type putDockerHubRequest struct {
-	Authentication bool   `valid:""`
-	Username       string `valid:""`
-	Password       string `valid:""`
 }

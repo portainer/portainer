@@ -57,6 +57,35 @@ func NewUserHandler(bouncer *security.RequestBouncer) *UserHandler {
 	return h
 }
 
+type (
+	postUsersRequest struct {
+		Username string `valid:"required"`
+		Password string `valid:""`
+		Role     int    `valid:"required"`
+	}
+
+	postUsersResponse struct {
+		ID int `json:"Id"`
+	}
+
+	postUserPasswdRequest struct {
+		Password string `valid:"required"`
+	}
+
+	postUserPasswdResponse struct {
+		Valid bool `json:"valid"`
+	}
+
+	putUserRequest struct {
+		Password string `valid:"-"`
+		Role     int    `valid:"-"`
+	}
+
+	postAdminInitRequest struct {
+		Password string `valid:"required"`
+	}
+)
+
 // handlePostUsers handles POST requests on /users
 func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Request) {
 	var req postUsersRequest
@@ -137,16 +166,6 @@ func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Reque
 	encodeJSON(w, &postUsersResponse{ID: int(user.ID)}, handler.Logger)
 }
 
-type postUsersResponse struct {
-	ID int `json:"Id"`
-}
-
-type postUsersRequest struct {
-	Username string `valid:"required"`
-	Password string `valid:""`
-	Role     int    `valid:"required"`
-}
-
 // handleGetUsers handles GET requests on /users
 func (handler *UserHandler) handleGetUsers(w http.ResponseWriter, r *http.Request) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -211,14 +230,6 @@ func (handler *UserHandler) handlePostUserPasswd(w http.ResponseWriter, r *http.
 	}
 
 	encodeJSON(w, &postUserPasswdResponse{Valid: valid}, handler.Logger)
-}
-
-type postUserPasswdRequest struct {
-	Password string `valid:"required"`
-}
-
-type postUserPasswdResponse struct {
-	Valid bool `json:"valid"`
 }
 
 // handleGetUser handles GET requests on /users/:id
@@ -320,11 +331,6 @@ func (handler *UserHandler) handlePutUser(w http.ResponseWriter, r *http.Request
 	}
 }
 
-type putUserRequest struct {
-	Password string `valid:"-"`
-	Role     int    `valid:"-"`
-}
-
 // handleGetAdminCheck handles GET requests on /users/admin/check
 func (handler *UserHandler) handleGetAdminCheck(w http.ResponseWriter, r *http.Request) {
 	users, err := handler.UserService.UsersByRole(portainer.AdministratorRole)
@@ -377,10 +383,6 @@ func (handler *UserHandler) handlePostAdminInit(w http.ResponseWriter, r *http.R
 		httperror.WriteErrorResponse(w, portainer.ErrAdminAlreadyInitialized, http.StatusConflict, handler.Logger)
 		return
 	}
-}
-
-type postAdminInitRequest struct {
-	Password string `valid:"required"`
 }
 
 // handleDeleteUser handles DELETE requests on /users/:id
