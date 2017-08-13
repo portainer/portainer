@@ -244,7 +244,7 @@ angular.module('portainer', [
       }
     })
     .state('actions.create.container', {
-      url: '/container',
+      url: '/container/:from',
       views: {
         'content@': {
           templateUrl: 'app/components/createContainer/createcontainer.html',

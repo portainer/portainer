@@ -51,8 +51,9 @@ function ($scope, $state, $stateParams, $filter, Network, Container, ContainerHe
   }
 
   function getContainersInNetwork(network) {
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
     if (network.Containers) {
-      if ($scope.applicationState.endpoint.apiVersion < 1.24) {
+      if (apiVersion < 1.24) {
         Container.query({}, function success(data) {
           var containersInNetwork = data.filter(function filter(container) {
             if (container.HostConfig.NetworkMode === network.Name) {
@@ -81,12 +82,20 @@ function ($scope, $state, $stateParams, $filter, Network, Container, ContainerHe
 
   function initView() {
     $('#loadingViewSpinner').show();
-    Network.get({id: $stateParams.id}, function success(data) {
+    Network.get({id: $stateParams.id}).$promise
+    .then(function success(data) {
       $scope.network = data;
-      getContainersInNetwork(data);
-    }, function error(err) {
+      var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+      if (endpointProvider !== 'VMWARE_VIC') {
+        getContainersInNetwork(data);
+      }
+    })
+    .catch(function error(err) {
       $('#loadingViewSpinner').hide();
       Notifications.error('Failure', err, 'Unable to retrieve network info');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
     });
   }
 
