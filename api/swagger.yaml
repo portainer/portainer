@@ -21,7 +21,7 @@ info:
     \ is granted. Returned data might also be filtered.\n\n### Administrator access\n\
     \nAuthentication as well as an administrator role are required to access the endpoints\
     \ with this access policy.\n"
-  version: "1.13.6"
+  version: "1.14.0"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -1780,7 +1780,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.13.6"
+        example: "1.14.0"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
