@@ -70,7 +70,7 @@
         <div class="pull-right">
           <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
         </div>
-        <span class="btn-group btn-group-sm pull-right" style="margin-right: 20px;" ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM' && applicationState.endpoint.apiVersion >= 1.25">
+        <span class="btn-group btn-group-sm pull-right" style="margin-right: 20px;" ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM' && applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider !== 'VMWARE_VIC'">
           <label class="btn btn-primary" ng-model="state.containersCountFilter" uib-btn-radio="undefined">
             All
           </label>
@@ -126,7 +126,7 @@
                 <td>
                   <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a>
                   <span style="margin-left: 10px;" class="label label-warning image-tag"
-                    ng-if="::image.Containers === 0 && applicationState.endpoint.mode.provider !== 'DOCKER_SWARM' && applicationState.endpoint.apiVersion >= 1.25">
+                    ng-if="::image.Containers === 0 && applicationState.endpoint.mode.provider !== 'DOCKER_SWARM' && applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider !== 'VMWARE_VIC'">
                     Unused
                   </span>
                 </td>

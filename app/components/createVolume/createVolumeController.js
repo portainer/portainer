@@ -73,7 +73,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     if (endpointProvider !== 'DOCKER_SWARM') {
-      PluginService.volumePlugins(apiVersion < 1.25)
+      PluginService.volumePlugins(apiVersion < 1.25 || endpointProvider === 'VMWARE_VIC')
       .then(function success(data) {
         $scope.availableVolumeDrivers = data;
       })

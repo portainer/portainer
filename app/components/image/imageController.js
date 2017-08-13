@@ -1,6 +1,6 @@
 angular.module('image', [])
-.controller('ImageController', ['$scope', '$stateParams', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications',
-function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService, Notifications) {
+.controller('ImageController', ['$q', '$scope', '$stateParams', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications',
+function ($q, $scope, $stateParams, $state, $timeout, ImageService, RegistryService, Notifications) {
 	$scope.formValues = {
 		Image: '',
 		Registry: ''
@@ -109,11 +109,16 @@ function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService,
 		});
 	};
 
-	function retrieveImageDetails() {
+	function initView() {
 		$('#loadingViewSpinner').show();
-		ImageService.image($stateParams.id)
+		var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+		$q.all({
+			image: ImageService.image($stateParams.id),
+			history: endpointProvider !== 'VMWARE_VIC' ? ImageService.history($stateParams.id) : []
+		})
 		.then(function success(data) {
-			$scope.image = data;
+			$scope.image = data.image;
+			$scope.history = data.history;
 		})
 		.catch(function error(err) {
 			Notifications.error('Failure', err, 'Unable to retrieve image details');
@@ -122,19 +127,7 @@ function ($scope, $stateParams, $state, $timeout, ImageService, RegistryService,
 		.finally(function final() {
 			$('#loadingViewSpinner').hide();
 		});
-
-		$('#loadingViewSpinner').show();
-		ImageService.history($stateParams.id)
-		.then(function success(data) {
-			$scope.history = data;
-		})
-		.catch(function error(err) {
-			Notifications.error('Failure', err, 'Unable to retrieve image history');
-		})
-		.finally(function final() {
-			$('#loadingViewSpinner').hide();
-		});
 	}
 
-	retrieveImageDetails();
+	initView();
 }]);
