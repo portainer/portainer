@@ -46,6 +46,19 @@ angular.module('portainer.services')
     applyBoxCSS(box);
   };
 
+  service.customPrompt = function(options) {
+    var box = bootbox.prompt({
+      title: options.title,
+      inputType: options.inputType,
+      inputOptions: options.inputOptions,
+      buttons: confirmButtons(options),
+      callback: options.callback
+    });
+    applyBoxCSS(box);
+    box.find('.bootbox-body').prepend('<p>' + options.message + '</p>');
+    box.find('.bootbox-input-checkbox').prop('checked', true);
+  };
+
   service.confirmAccessControlUpdate = function(callback, msg) {
     service.confirm({
       title: 'Are you sure ?',
@@ -101,6 +114,27 @@ angular.module('portainer.services')
       buttons: {
         confirm: {
           label: 'Remove',
+          className: 'btn-danger'
+        }
+      },
+      callback: callback
+    });
+  };
+
+  service.confirmContainerRecreation = function(callback) {
+    service.customPrompt({
+      title: 'Are you sure?',
+      message: 'You\'re about to re-create this container, any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.',
+      inputType: 'checkbox',
+      inputOptions: [
+        {
+          text: 'Pull latest image<i></i>',
+          value: '1'
+        }
+      ],
+      buttons: {
+        confirm: {
+          label: 'Recreate',
           className: 'btn-danger'
         }
       },
