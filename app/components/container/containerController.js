@@ -269,7 +269,6 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerCommit,
 
       ModalService.confirmContainerRecreation(function (result) {
         if(!result) { return; }
-        console.log(JSON.stringify(result, null, 4));
         var pullImage = false;
         if (result[0]) {
           pullImage = true;
