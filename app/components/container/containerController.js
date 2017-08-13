@@ -197,7 +197,6 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
   };
 
   $scope.recreate = function() {
-    var config = ContainerHelper.configFromContainer($scope.container);
     ModalService.confirmExperimentalFeature(function (experimental) {
       if(!experimental) { return; }
       ModalService.confirm({
@@ -214,6 +213,7 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
           else {
             $('#loadingViewSpinner').show();
             var container = $scope.container;
+            var config = ContainerHelper.configFromContainer(container.Model);
             ContainerService.remove(container, true)
             .then(function success() {
               return RegistryService.retrieveRegistryFromRepository(container.Config.Image);

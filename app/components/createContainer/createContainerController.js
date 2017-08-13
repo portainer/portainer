@@ -421,12 +421,12 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     // Get container
     Container.get({ id: $stateParams.from }).$promise
     .then(function success(d) {
-      var fromContainer = new ContainerViewModel(d);
+      var fromContainer = new ContainerDetailsViewModel(d);
       if (!fromContainer.ResourceControl) {
         $scope.formValues.AccessControlData.AccessControlEnabled = false;
       }
       $scope.fromContainer = fromContainer;
-      $scope.config = ContainerHelper.configFromContainer(d);
+      $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
       loadFromContainerCmd(d);
       loadFromContainerPortBindings(d);
       loadFromContainerVolumes(d);
