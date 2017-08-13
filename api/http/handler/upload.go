@@ -26,7 +26,7 @@ func NewUploadHandler(bouncer *security.RequestBouncer) *UploadHandler {
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/upload/tls/{certificate:(?:ca|cert|key)}",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUploadTLS))).Methods(http.MethodPost)
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePostUploadTLS))).Methods(http.MethodPost)
 	return h
 }
 

@@ -22,14 +22,14 @@ type DockerHubHandler struct {
 	DockerHubService portainer.DockerHubService
 }
 
-// NewDockerHubHandler returns a new instance of OldDockerHubHandler.
+// NewDockerHubHandler returns a new instance of NewDockerHubHandler.
 func NewDockerHubHandler(bouncer *security.RequestBouncer) *DockerHubHandler {
 	h := &DockerHubHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/dockerhub",
-		bouncer.PublicAccess(http.HandlerFunc(h.handleGetDockerHub))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetDockerHub))).Methods(http.MethodGet)
 	h.Handle("/dockerhub",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutDockerHub))).Methods(http.MethodPut)
 

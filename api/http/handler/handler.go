@@ -36,8 +36,6 @@ const (
 	ErrInvalidRequestFormat = portainer.Error("Invalid request data format")
 	// ErrInvalidQueryFormat defines an error raised when the data sent in the query or the URL is invalid
 	ErrInvalidQueryFormat = portainer.Error("Invalid query format")
-	// ErrEmptyResponseBody defines an error raised when portainer excepts to parse the body of a HTTP response and there is nothing to parse
-	// ErrEmptyResponseBody = portainer.Error("Empty response body")
 )
 
 // ServeHTTP delegates a request to the appropriate subhandler.
