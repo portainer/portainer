@@ -22,5 +22,24 @@ angular.module('portainer.services')
     return Settings.update({}, settings).$promise;
   };
 
+  service.publicSettings = function() {
+    var deferred = $q.defer();
+
+    Settings.publicSettings().$promise
+    .then(function success(data) {
+      var settings = new SettingsViewModel(data);
+      deferred.resolve(settings);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve application settings', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.checkLDAPConnectivity = function(settings) {
+    return Settings.checkLDAPConnectivity({}, settings).$promise;
+  };
+
   return service;
 }]);

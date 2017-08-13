@@ -52,7 +52,7 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-  <div class="col-lg-6">
+  <div class="col-lg-6" ng-if="applicationState.endpoint.mode.provider !== 'VMWARE_VIC'">
     <rd-widget>
       <rd-widget-header icon="fa-tasks" title="Processes">
         <div class="pull-right">

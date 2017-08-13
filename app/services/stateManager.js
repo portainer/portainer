@@ -44,7 +44,7 @@ angular.module('portainer.services')
       deferred.resolve(state);
     } else {
       $q.all({
-        settings: SettingsService.settings(),
+        settings: SettingsService.publicSettings(),
         status: StatusService.status()
       })
       .then(function success(data) {

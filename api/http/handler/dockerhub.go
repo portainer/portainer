@@ -22,19 +22,27 @@ type DockerHubHandler struct {
 	DockerHubService portainer.DockerHubService
 }
 
-// NewDockerHubHandler returns a new instance of OldDockerHubHandler.
+// NewDockerHubHandler returns a new instance of NewDockerHubHandler.
 func NewDockerHubHandler(bouncer *security.RequestBouncer) *DockerHubHandler {
 	h := &DockerHubHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/dockerhub",
-		bouncer.PublicAccess(http.HandlerFunc(h.handleGetDockerHub))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetDockerHub))).Methods(http.MethodGet)
 	h.Handle("/dockerhub",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutDockerHub))).Methods(http.MethodPut)
 
 	return h
 }
+
+type (
+	putDockerHubRequest struct {
+		Authentication bool   `valid:""`
+		Username       string `valid:""`
+		Password       string `valid:""`
+	}
+)
 
 // handleGetDockerHub handles GET requests on /dockerhub
 func (handler *DockerHubHandler) handleGetDockerHub(w http.ResponseWriter, r *http.Request) {
@@ -78,10 +86,4 @@ func (handler *DockerHubHandler) handlePutDockerHub(w http.ResponseWriter, r *ht
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
-}
-
-type putDockerHubRequest struct {
-	Authentication bool   `valid:""`
-	Username       string `valid:""`
-	Password       string `valid:""`
 }

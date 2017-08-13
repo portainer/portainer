@@ -44,6 +44,33 @@ func NewRegistryHandler(bouncer *security.RequestBouncer) *RegistryHandler {
 	return h
 }
 
+type (
+	postRegistriesRequest struct {
+		Name           string `valid:"required"`
+		URL            string `valid:"required"`
+		Authentication bool   `valid:""`
+		Username       string `valid:""`
+		Password       string `valid:""`
+	}
+
+	postRegistriesResponse struct {
+		ID int `json:"Id"`
+	}
+
+	putRegistryAccessRequest struct {
+		AuthorizedUsers []int `valid:"-"`
+		AuthorizedTeams []int `valid:"-"`
+	}
+
+	putRegistriesRequest struct {
+		Name           string `valid:"required"`
+		URL            string `valid:"required"`
+		Authentication bool   `valid:""`
+		Username       string `valid:""`
+		Password       string `valid:""`
+	}
+)
+
 // handleGetRegistries handles GET requests on /registries
 func (handler *RegistryHandler) handleGetRegistries(w http.ResponseWriter, r *http.Request) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -110,18 +137,6 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 	}
 
 	encodeJSON(w, &postRegistriesResponse{ID: int(registry.ID)}, handler.Logger)
-}
-
-type postRegistriesRequest struct {
-	Name           string `valid:"required"`
-	URL            string `valid:"required"`
-	Authentication bool   `valid:""`
-	Username       string `valid:""`
-	Password       string `valid:""`
-}
-
-type postRegistriesResponse struct {
-	ID int `json:"Id"`
 }
 
 // handleGetRegistry handles GET requests on /registries/:id
@@ -202,11 +217,6 @@ func (handler *RegistryHandler) handlePutRegistryAccess(w http.ResponseWriter, r
 	}
 }
 
-type putRegistryAccessRequest struct {
-	AuthorizedUsers []int `valid:"-"`
-	AuthorizedTeams []int `valid:"-"`
-}
-
 // handlePutRegistry handles PUT requests on /registries/:id
 func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -274,14 +284,6 @@ func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-}
-
-type putRegistriesRequest struct {
-	Name           string `valid:"required"`
-	URL            string `valid:"required"`
-	Authentication bool   `valid:""`
-	Username       string `valid:""`
-	Password       string `valid:""`
 }
 
 // handleDeleteRegistry handles DELETE requests on /registries/:id

@@ -68,7 +68,7 @@
           </div>
           <!-- !env -->
           <!-- access-control -->
-          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
+          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
           <!-- !access-control -->
           <div class="form-group">
             <div class="col-sm-12">

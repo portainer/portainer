@@ -67,7 +67,7 @@
 </div>
 
 
-<div class="row" ng-if="!(network.Containers | emptyobject)">
+<div class="row" ng-if="containersInNetwork.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-server" title="Containers in network"></rd-widget-header>

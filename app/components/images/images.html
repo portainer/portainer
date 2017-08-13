@@ -70,7 +70,7 @@
         <div class="pull-right">
           <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
         </div>
-        <span class="btn-group btn-group-sm pull-right" style="margin-right: 20px;" ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'">
+        <span class="btn-group btn-group-sm pull-right" style="margin-right: 20px;" ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM' && applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider !== 'VMWARE_VIC'">
           <label class="btn btn-primary" ng-model="state.containersCountFilter" uib-btn-radio="undefined">
             All
           </label>
@@ -125,7 +125,11 @@
                 <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
                 <td>
                   <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a>
-                  <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="::image.Containers === 0 && applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'">Unused</span></td>
+                  <span style="margin-left: 10px;" class="label label-warning image-tag"
+                    ng-if="::image.Containers === 0 && applicationState.endpoint.mode.provider !== 'DOCKER_SWARM' && applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider !== 'VMWARE_VIC'">
+                    Unused
+                  </span>
+                </td>
                 <td>
                   <span class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>
                 </td>
@@ -135,7 +139,7 @@
               <tr ng-if="!images">
                 <td colspan="5" class="text-center text-muted">Loading...</td>
               </tr>
-              <tr ng-if="images.length == 0">
+              <tr ng-if="state.filteredImages.length === 0">
                 <td colspan="5" class="text-center text-muted">No images available.</td>
               </tr>
             </tbody>

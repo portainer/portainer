@@ -38,7 +38,7 @@ function ($scope, $stateParams, Container, Image, EndpointProvider, Notification
 
   $scope.connect = function() {
     $('#loadConsoleSpinner').show();
-    var termWidth = Math.round($('#terminal-container').width() / 8.2);
+    var termWidth = Math.floor(($('#terminal-container').width() - 20) / 8.39);
     var termHeight = 30;
     var command = $scope.formValues.isCustomCommand ?
                     $scope.formValues.customCommand : $scope.formValues.command;
@@ -97,6 +97,11 @@ function ($scope, $stateParams, Container, Image, EndpointProvider, Notification
       term.open(document.getElementById('terminal-container'), true);
       term.resize(width, height);
       term.setOption('cursorBlink', true);
+      term.fit();
+
+      window.onresize = function() {
+        term.fit();
+      };
 
       socket.onmessage = function (e) {
         term.write(e.data);
