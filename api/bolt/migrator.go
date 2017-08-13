@@ -7,6 +7,7 @@ type Migrator struct {
 	UserService            *UserService
 	EndpointService        *EndpointService
 	ResourceControlService *ResourceControlService
+	SettingsService        *SettingsService
 	VersionService         *VersionService
 	CurrentDBVersion       int
 	store                  *Store
@@ -18,6 +19,7 @@ func NewMigrator(store *Store, version int) *Migrator {
 		UserService:            store.UserService,
 		EndpointService:        store.EndpointService,
 		ResourceControlService: store.ResourceControlService,
+		SettingsService:        store.SettingsService,
 		VersionService:         store.VersionService,
 		CurrentDBVersion:       version,
 		store:                  store,
@@ -42,6 +44,14 @@ func (m *Migrator) Migrate() error {
 			return err
 		}
 		err = m.updateEndpointsToDBVersion2()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Portainer 1.13.x
+	if m.CurrentDBVersion == 2 {
+		err := m.updateSettingsToVersion3()
 		if err != nil {
 			return err
 		}

@@ -1,5 +1,6 @@
 <rd-header>
   <rd-header-title title="User settings">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>User settings</rd-header-content>
 </rd-header>
@@ -70,7 +71,11 @@
           <!-- !confirm-password-input -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.currentPassword || formValues.newPassword.length < 8 || formValues.newPassword !== formValues.confirmPassword" ng-click="updatePassword()">Update password</button>
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="AuthenticationMethod !== 1 || !formValues.currentPassword || formValues.newPassword.length < 8 || formValues.newPassword !== formValues.confirmPassword" ng-click="updatePassword()">Update password</button>
+              <span class="text-muted small" style="margin-left: 5px;" ng-if="AuthenticationMethod === 2">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                You cannot change your password when using LDAP authentication.
+              </span>
             </div>
           </div>
         </form>

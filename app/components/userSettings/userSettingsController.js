@@ -1,7 +1,7 @@
 angular.module('userSettings', [])
-.controller('UserSettingsController', ['$scope', '$state', '$sanitize', 'Authentication', 'UserService', 'Notifications',
-function ($scope, $state, $sanitize, Authentication, UserService, Notifications) {
-  $scope.UserId = Authentication.getUserDetails().ID; 
+.controller('UserSettingsController', ['$scope', '$state', '$sanitize', 'Authentication', 'UserService', 'Notifications', 'SettingsService',
+function ($scope, $state, $sanitize, Authentication, UserService, Notifications, SettingsService) {
+  $scope.UserId = Authentication.getUserDetails().ID;
   $scope.formValues = {
     currentPassword: '',
     newPassword: '',
@@ -27,4 +27,19 @@ function ($scope, $state, $sanitize, Authentication, UserService, Notifications)
       }
     });
   };
+
+  function initView() {
+    SettingsService.publicSettings()
+    .then(function success(data) {
+      $scope.AuthenticationMethod = data.AuthenticationMethod;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve application settings');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
+  }
+
+  initView();
 }]);

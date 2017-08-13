@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/file"
 	"github.com/portainer/portainer/http"
 	"github.com/portainer/portainer/jwt"
+	"github.com/portainer/portainer/ldap"
 
 	"log"
 )
@@ -98,6 +99,10 @@ func initCryptoService() portainer.CryptoService {
 	return &crypto.Service{}
 }
 
+func initLDAPService() portainer.LDAPService {
+	return &ldap.Service{}
+}
+
 func initEndpointWatcher(endpointService portainer.EndpointService, externalEnpointFile string, syncInterval string) bool {
 	authorizeEndpointMgmt := true
 	if externalEnpointFile != "" {
@@ -143,6 +148,13 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		settings := &portainer.Settings{
 			LogoURL:                     *flags.Logo,
 			DisplayExternalContributors: true,
+			AuthenticationMethod:        portainer.AuthenticationInternal,
+			LDAPSettings: portainer.LDAPSettings{
+				TLSConfig: portainer.TLSConfiguration{},
+				SearchSettings: []portainer.LDAPSearchSettings{
+					portainer.LDAPSearchSettings{},
+				},
+			},
 		}
 
 		if *flags.Templates != "" {
@@ -186,6 +198,8 @@ func main() {
 	cryptoService := initCryptoService()
 
 	initDemoData(store, cryptoService)
+
+	ldapService := initLDAPService()
 
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
@@ -257,6 +271,7 @@ func main() {
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,
+		LDAPService:            ldapService,
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,

@@ -1,6 +1,8 @@
 function ContainerDetailsViewModel(data) {
+  this.Model = data;
   this.Id = data.Id;
   this.State = data.State;
+  this.Created = data.Created;
   this.Name = data.Name;
   this.NetworkSettings = data.NetworkSettings;
   this.Args = data.Args;

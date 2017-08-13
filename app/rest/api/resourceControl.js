@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('ResourceControl', ['$resource', 'RESOURCE_CONTROL_ENDPOINT', function ResourceControlFactory($resource, RESOURCE_CONTROL_ENDPOINT) {
+.factory('ResourceControl', ['$resource', 'API_ENDPOINT_RESOURCE_CONTROLS', function ResourceControlFactory($resource, API_ENDPOINT_RESOURCE_CONTROLS) {
   'use strict';
-  return $resource(RESOURCE_CONTROL_ENDPOINT + '/:id', {}, {
+  return $resource(API_ENDPOINT_RESOURCE_CONTROLS + '/:id', {}, {
     create: { method: 'POST' },
     get: { method: 'GET', params: { id: '@id' } },
     update: { method: 'PUT', params: { id: '@id' } },

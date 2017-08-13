@@ -1,6 +1,6 @@
 angular.module('portainer.rest')
-.factory('Template', ['$resource', 'TEMPLATES_ENDPOINT', function TemplateFactory($resource, TEMPLATES_ENDPOINT) {
-  return $resource(TEMPLATES_ENDPOINT, {}, {
+.factory('Template', ['$resource', 'API_ENDPOINT_TEMPLATES', function TemplateFactory($resource, API_ENDPOINT_TEMPLATES) {
+  return $resource(API_ENDPOINT_TEMPLATES, {}, {
     get: {method: 'GET', isArray: true}
   });
 }]);

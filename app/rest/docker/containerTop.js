@@ -1,15 +1,17 @@
 angular.module('portainer.rest')
-.factory('ContainerTop', ['$http', 'DOCKER_ENDPOINT', 'EndpointProvider', function ($http, DOCKER_ENDPOINT, EndpointProvider) {
+.factory('ContainerTop', ['$http', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function ($http, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
   return {
     get: function (id, params, callback, errorCallback) {
       $http({
         method: 'GET',
-        url: DOCKER_ENDPOINT + '/' + EndpointProvider.endpointID() + '/containers/' + id + '/top',
+        url: API_ENDPOINT_ENDPOINTS + '/' + EndpointProvider.endpointID() + '/docker/containers/' + id + '/top',
         params: {
           ps_args: params.ps_args
         }
-      }).success(callback);
+      }).success(callback).error(function (data, status, headers, config) {
+        console.log(data);
+      });
     }
   };
 }]);

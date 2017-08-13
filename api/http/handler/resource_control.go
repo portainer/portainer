@@ -39,6 +39,23 @@ func NewResourceHandler(bouncer *security.RequestBouncer) *ResourceHandler {
 	return h
 }
 
+type (
+	postResourcesRequest struct {
+		ResourceID         string   `valid:"required"`
+		Type               string   `valid:"required"`
+		AdministratorsOnly bool     `valid:"-"`
+		Users              []int    `valid:"-"`
+		Teams              []int    `valid:"-"`
+		SubResourceIDs     []string `valid:"-"`
+	}
+
+	putResourcesRequest struct {
+		AdministratorsOnly bool  `valid:"-"`
+		Users              []int `valid:"-"`
+		Teams              []int `valid:"-"`
+	}
+)
+
 // handlePostResources handles POST requests on /resources
 func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *http.Request) {
 	var req postResourcesRequest
@@ -121,20 +138,11 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 
 	err = handler.ResourceControlService.CreateResourceControl(&resourceControl)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
 	return
-}
-
-type postResourcesRequest struct {
-	ResourceID         string   `valid:"required"`
-	Type               string   `valid:"required"`
-	AdministratorsOnly bool     `valid:"-"`
-	Users              []int    `valid:"-"`
-	Teams              []int    `valid:"-"`
-	SubResourceIDs     []string `valid:"-"`
 }
 
 // handlePutResources handles PUT requests on /resources/:id
@@ -208,12 +216,6 @@ func (handler *ResourceHandler) handlePutResources(w http.ResponseWriter, r *htt
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-}
-
-type putResourcesRequest struct {
-	AdministratorsOnly bool  `valid:"-"`
-	Users              []int `valid:"-"`
-	Teams              []int `valid:"-"`
 }
 
 // handleDeleteResources handles DELETE requests on /resources/:id

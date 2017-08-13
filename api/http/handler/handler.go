@@ -36,46 +36,48 @@ const (
 	ErrInvalidRequestFormat = portainer.Error("Invalid request data format")
 	// ErrInvalidQueryFormat defines an error raised when the data sent in the query or the URL is invalid
 	ErrInvalidQueryFormat = portainer.Error("Invalid query format")
-	// ErrEmptyResponseBody defines an error raised when portainer excepts to parse the body of a HTTP response and there is nothing to parse
-	// ErrEmptyResponseBody = portainer.Error("Empty response body")
 )
 
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if strings.HasPrefix(r.URL.Path, "/api/auth") {
+
+	switch {
+	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/users") {
-		http.StripPrefix("/api", h.UserHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/teams") {
-		http.StripPrefix("/api", h.TeamHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/team_memberships") {
-		http.StripPrefix("/api", h.TeamMembershipHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/endpoints") {
-		http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/registries") {
-		http.StripPrefix("/api", h.RegistryHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/dockerhub") {
+	case strings.HasPrefix(r.URL.Path, "/api/dockerhub"):
 		http.StripPrefix("/api", h.DockerHubHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/resource_controls") {
+	case strings.HasPrefix(r.URL.Path, "/api/endpoints"):
+		if strings.Contains(r.URL.Path, "/docker") {
+			http.StripPrefix("/api/endpoints", h.DockerHandler).ServeHTTP(w, r)
+		} else {
+			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
+		}
+	case strings.HasPrefix(r.URL.Path, "/api/registries"):
+		http.StripPrefix("/api", h.RegistryHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/resource_controls"):
 		http.StripPrefix("/api", h.ResourceHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/settings") {
+	case strings.HasPrefix(r.URL.Path, "/api/settings"):
 		http.StripPrefix("/api", h.SettingsHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/status") {
+	case strings.HasPrefix(r.URL.Path, "/api/status"):
 		http.StripPrefix("/api", h.StatusHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/templates") {
+	case strings.HasPrefix(r.URL.Path, "/api/templates"):
 		http.StripPrefix("/api", h.TemplatesHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/upload") {
+	case strings.HasPrefix(r.URL.Path, "/api/upload"):
 		http.StripPrefix("/api", h.UploadHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/websocket") {
+	case strings.HasPrefix(r.URL.Path, "/api/users"):
+		http.StripPrefix("/api", h.UserHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/teams"):
+		http.StripPrefix("/api", h.TeamHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/team_memberships"):
+		http.StripPrefix("/api", h.TeamMembershipHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/websocket"):
 		http.StripPrefix("/api", h.WebSocketHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/docker") {
-		http.StripPrefix("/api/docker", h.DockerHandler).ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/") {
+	case strings.HasPrefix(r.URL.Path, "/"):
 		h.FileHandler.ServeHTTP(w, r)
 	}
 }
 
-// encodeJSON encodes v to w in JSON format. Error() is called if encoding fails.
+// encodeJSON encodes v to w in JSON format. WriteErrorResponse() is called if encoding fails.
 func encodeJSON(w http.ResponseWriter, v interface{}, logger *log.Logger) {
 	if err := json.NewEncoder(w).Encode(v); err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, logger)

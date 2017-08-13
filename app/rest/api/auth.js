@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Auth', ['$resource', 'AUTH_ENDPOINT', function AuthFactory($resource, AUTH_ENDPOINT) {
+.factory('Auth', ['$resource', 'API_ENDPOINT_AUTH', function AuthFactory($resource, API_ENDPOINT_AUTH) {
   'use strict';
-  return $resource(AUTH_ENDPOINT, {}, {
+  return $resource(API_ENDPOINT_AUTH, {}, {
     login: {
       method: 'POST'
     }
