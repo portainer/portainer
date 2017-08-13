@@ -824,8 +824,8 @@ paths:
       - "settings"
       summary: "Retrieve Portainer public settings"
       description: "Retrieve public settings. Returns a small set of settings that\
-        \ are not reserved to administrators only.\n**Access policy**: public    \
-        \  \n"
+        \ are not reserved to administrators only.  \n**Access policy**: public  \
+        \    \n"
       operationId: "PublicSettingsInspect"
       produces:
       - "application/json"
@@ -844,7 +844,7 @@ paths:
       tags:
       - "settings"
       summary: "Test LDAP connectivity"
-      description: "Test LDAP connectivity using LDAP details.\n**Access policy**:\
+      description: "Test LDAP connectivity using LDAP details.  \n**Access policy**:\
         \ administrator        \n"
       operationId: "SettingsLDAPCheck"
       consumes:
