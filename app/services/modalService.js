@@ -120,7 +120,7 @@ angular.module('portainer.services')
       },
       callback: callback
     });
-  }
+  };
 
   return service;
 }]);

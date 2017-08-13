@@ -196,6 +196,13 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     });
   };
 
+  $scope.duplicate = function() {
+    ModalService.confirmExperimentalFeature(function (experimental) {
+      if(!experimental) { return; }
+      $state.go('actions.create.container', {from: $stateParams.id}, {reload: true});
+    });
+  };
+
   $scope.recreate = function() {
     ModalService.confirmExperimentalFeature(function (experimental) {
       if(!experimental) { return; }
