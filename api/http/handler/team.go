@@ -34,7 +34,7 @@ func NewTeamHandler(bouncer *security.RequestBouncer) *TeamHandler {
 	h.Handle("/teams",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePostTeams))).Methods(http.MethodPost)
 	h.Handle("/teams",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
 		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeam))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
@@ -46,6 +46,20 @@ func NewTeamHandler(bouncer *security.RequestBouncer) *TeamHandler {
 
 	return h
 }
+
+type (
+	postTeamsRequest struct {
+		Name string `valid:"required"`
+	}
+
+	postTeamsResponse struct {
+		ID int `json:"Id"`
+	}
+
+	putTeamRequest struct {
+		Name string `valid:"-"`
+	}
+)
 
 // handlePostTeams handles POST requests on /teams
 func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Request) {
@@ -84,23 +98,23 @@ func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Reque
 	encodeJSON(w, &postTeamsResponse{ID: int(team.ID)}, handler.Logger)
 }
 
-type postTeamsResponse struct {
-	ID int `json:"Id"`
-}
-
-type postTeamsRequest struct {
-	Name string `valid:"required"`
-}
-
 // handleGetTeams handles GET requests on /teams
 func (handler *TeamHandler) handleGetTeams(w http.ResponseWriter, r *http.Request) {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
 	teams, err := handler.TeamService.Teams()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	encodeJSON(w, teams, handler.Logger)
+	filteredTeams := security.FilterUserTeams(teams, securityContext)
+
+	encodeJSON(w, filteredTeams, handler.Logger)
 }
 
 // handleGetTeam handles GET requests on /teams/:id
@@ -179,10 +193,6 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-}
-
-type putTeamRequest struct {
-	Name string `valid:"-"`
 }
 
 // handleDeleteTeam handles DELETE requests on /teams/:id

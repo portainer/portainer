@@ -47,17 +47,44 @@ func NewUserHandler(bouncer *security.RequestBouncer) *UserHandler {
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteUser))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/memberships",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetMemberships))).Methods(http.MethodGet)
-	h.Handle("/users/{id}/teams",
-		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetTeams))).Methods(http.MethodGet)
 	h.Handle("/users/{id}/passwd",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUserPasswd)))
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostUserPasswd))).Methods(http.MethodPost)
 	h.Handle("/users/admin/check",
-		bouncer.PublicAccess(http.HandlerFunc(h.handleGetAdminCheck)))
+		bouncer.PublicAccess(http.HandlerFunc(h.handleGetAdminCheck))).Methods(http.MethodGet)
 	h.Handle("/users/admin/init",
-		bouncer.PublicAccess(http.HandlerFunc(h.handlePostAdminInit)))
+		bouncer.PublicAccess(http.HandlerFunc(h.handlePostAdminInit))).Methods(http.MethodPost)
 
 	return h
 }
+
+type (
+	postUsersRequest struct {
+		Username string `valid:"required"`
+		Password string `valid:""`
+		Role     int    `valid:"required"`
+	}
+
+	postUsersResponse struct {
+		ID int `json:"Id"`
+	}
+
+	postUserPasswdRequest struct {
+		Password string `valid:"required"`
+	}
+
+	postUserPasswdResponse struct {
+		Valid bool `json:"valid"`
+	}
+
+	putUserRequest struct {
+		Password string `valid:"-"`
+		Role     int    `valid:"-"`
+	}
+
+	postAdminInitRequest struct {
+		Password string `valid:"required"`
+	}
+)
 
 // handlePostUsers handles POST requests on /users
 func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Request) {
@@ -139,16 +166,6 @@ func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Reque
 	encodeJSON(w, &postUsersResponse{ID: int(user.ID)}, handler.Logger)
 }
 
-type postUsersResponse struct {
-	ID int `json:"Id"`
-}
-
-type postUsersRequest struct {
-	Username string `valid:"required"`
-	Password string `valid:""`
-	Role     int    `valid:"required"`
-}
-
 // handleGetUsers handles GET requests on /users
 func (handler *UserHandler) handleGetUsers(w http.ResponseWriter, r *http.Request) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -174,11 +191,6 @@ func (handler *UserHandler) handleGetUsers(w http.ResponseWriter, r *http.Reques
 
 // handlePostUserPasswd handles POST requests on /users/:id/passwd
 func (handler *UserHandler) handlePostUserPasswd(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		httperror.WriteMethodNotAllowedResponse(w, []string{http.MethodPost})
-		return
-	}
-
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -218,14 +230,6 @@ func (handler *UserHandler) handlePostUserPasswd(w http.ResponseWriter, r *http.
 	}
 
 	encodeJSON(w, &postUserPasswdResponse{Valid: valid}, handler.Logger)
-}
-
-type postUserPasswdRequest struct {
-	Password string `valid:"required"`
-}
-
-type postUserPasswdResponse struct {
-	Valid bool `json:"valid"`
 }
 
 // handleGetUser handles GET requests on /users/:id
@@ -327,18 +331,8 @@ func (handler *UserHandler) handlePutUser(w http.ResponseWriter, r *http.Request
 	}
 }
 
-type putUserRequest struct {
-	Password string `valid:"-"`
-	Role     int    `valid:"-"`
-}
-
-// handlePostAdminInit handles GET requests on /users/admin/check
+// handleGetAdminCheck handles GET requests on /users/admin/check
 func (handler *UserHandler) handleGetAdminCheck(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		httperror.WriteMethodNotAllowedResponse(w, []string{http.MethodGet})
-		return
-	}
-
 	users, err := handler.UserService.UsersByRole(portainer.AdministratorRole)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -352,11 +346,6 @@ func (handler *UserHandler) handleGetAdminCheck(w http.ResponseWriter, r *http.R
 
 // handlePostAdminInit handles POST requests on /users/admin/init
 func (handler *UserHandler) handlePostAdminInit(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		httperror.WriteMethodNotAllowedResponse(w, []string{http.MethodPost})
-		return
-	}
-
 	var req postAdminInitRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
@@ -391,13 +380,9 @@ func (handler *UserHandler) handlePostAdminInit(w http.ResponseWriter, r *http.R
 		return
 	}
 	if user != nil {
-		httperror.WriteErrorResponse(w, portainer.ErrAdminAlreadyInitialized, http.StatusForbidden, handler.Logger)
+		httperror.WriteErrorResponse(w, portainer.ErrAdminAlreadyInitialized, http.StatusConflict, handler.Logger)
 		return
 	}
-}
-
-type postAdminInitRequest struct {
-	Password string `valid:"required"`
 }
 
 // handleDeleteUser handles DELETE requests on /users/:id
@@ -463,38 +448,4 @@ func (handler *UserHandler) handleGetMemberships(w http.ResponseWriter, r *http.
 	}
 
 	encodeJSON(w, memberships, handler.Logger)
-}
-
-// handleGetTeams handles GET requests on /users/:id/teams
-func (handler *UserHandler) handleGetTeams(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	uid, err := strconv.Atoi(id)
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-	userID := portainer.UserID(uid)
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
-	if !security.AuthorizedUserManagement(userID, securityContext) {
-		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
-		return
-	}
-
-	teams, err := handler.TeamService.Teams()
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
-	filteredTeams := security.FilterUserTeams(teams, securityContext)
-
-	encodeJSON(w, filteredTeams, handler.Logger)
 }

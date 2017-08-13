@@ -1,0 +1,2471 @@
+---
+swagger: "2.0"
+info:
+  description: "Portainer API is an HTTP API served by Portainer. It is used by the\
+    \ Portainer UI and everything you can do with the UI can be done using the HTTP\
+    \ API.\nYou can find out more about Portainer at [http://portainer.io](http://portainer.io)\
+    \ and get some support on [Slack](http://portainer.io/slack/).\n\n# Authentication\n\
+    \nMost of the API endpoints require to be authenticated as well as some level\
+    \ of authorization to be used.\nPortainer API uses JSON Web Token to manage authentication\
+    \ and thus requires you to provide a token in the **Authorization** header of\
+    \ each request\nwith the **Bearer** authentication mechanism.\n\nExample:\n```\n\
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE\n\
+    ```\n\n# Security\n\nEach API endpoint has an associated access policy, it is\
+    \ documented in the description of each endpoint.\n\nDifferent access policies\
+    \ are available:\n* Public access\n* Authenticated access\n* Restricted access\n\
+    * Administrator access\n\n### Public access\n\nNo authentication is required to\
+    \ access the endpoints with this access policy.\n\n### Authenticated access\n\n\
+    Authentication is required to access the endpoints with this access policy.\n\n\
+    ### Restricted access\n\nAuthentication is required to access the endpoints with\
+    \ this access policy.\nExtra-checks might be added to ensure access to the resource\
+    \ is granted. Returned data might also be filtered.\n\n### Administrator access\n\
+    \nAuthentication as well as an administrator role are required to access the endpoints\
+    \ with this access policy.\n"
+  version: "1.13.6"
+  title: "Portainer API"
+  contact:
+    email: "info@portainer.io"
+host: "portainer.domain"
+basePath: "/api"
+tags:
+- name: "auth"
+  description: "Authenticate against Portainer HTTP API"
+- name: "dockerhub"
+  description: "Manage how Portainer connects to the DockerHub"
+- name: "endpoints"
+  description: "Manage Docker environments"
+- name: "registries"
+  description: "Manage Docker registries"
+- name: "resource_controls"
+  description: "Manage access control on Docker resources"
+- name: "settings"
+  description: "Manage Portainer settings"
+- name: "status"
+  description: "Information about the Portainer instance"
+- name: "users"
+  description: "Manage users"
+- name: "teams"
+  description: "Manage teams"
+- name: "team_memberships"
+  description: "Manage team memberships"
+- name: "templates"
+  description: "Manage App Templates"
+- name: "upload"
+  description: "Upload files"
+- name: "websocket"
+  description: "Create exec sessions using websockets"
+schemes:
+- "http"
+- "https"
+paths:
+  /auth:
+    post:
+      tags:
+      - "auth"
+      summary: "Authenticate a user"
+      description: "Use this endpoint to authenticate against Portainer using a username\
+        \ and password.  \n**Access policy**: public\n"
+      operationId: "AuthenticateUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Credentials used for authentication"
+        required: true
+        schema:
+          $ref: "#/definitions/AuthenticateUserRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/AuthenticateUserResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid credentials"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        503:
+          description: "Authentication disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Authentication is disabled"
+  /dockerhub:
+    get:
+      tags:
+      - "dockerhub"
+      summary: "Retrieve DockerHub information"
+      description: "Use this endpoint to retrieve the information used to connect\
+        \ to the DockerHub  \n**Access policy**: authenticated\n"
+      operationId: "DockerHubInspect"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/DockerHubInspectResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "dockerhub"
+      summary: "Update DockerHub information"
+      description: "Use this endpoint to update the information used to connect to\
+        \ the DockerHub  \n**Access policy**: administrator\n"
+      operationId: "DockerHubUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "DockerHub information"
+        required: true
+        schema:
+          $ref: "#/definitions/DockerHubUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /endpoints:
+    get:
+      tags:
+      - "endpoints"
+      summary: "List endpoints"
+      description: "List all endpoints based on the current user authorizations. Will\n\
+        return all endpoints if using an administrator account otherwise it will\n\
+        only return authorized endpoints.  \n**Access policy**: restricted      \n"
+      operationId: "EndpointList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/EndpointListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "endpoints"
+      summary: "Create a new endpoint"
+      description: "Create a new endpoint that will be used to manage a Docker environment.\
+        \  \n**Access policy**: administrator\n"
+      operationId: "EndpointCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Endpoint details"
+        required: true
+        schema:
+          $ref: "#/definitions/EndpointCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/EndpointCreateResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        503:
+          description: "Endpoint management disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint management is disabled"
+  /endpoints/{id}:
+    get:
+      tags:
+      - "endpoints"
+      summary: "Inspect an endpoint"
+      description: "Retrieve details abount an endpoint.  \n**Access policy**: administrator\
+        \      \n"
+      operationId: "EndpointInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Endpoint"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Endpoint not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "endpoints"
+      summary: "Update an endpoint"
+      description: "Update an endpoint.  \n**Access policy**: administrator\n"
+      operationId: "EndpointUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Endpoint details"
+        required: true
+        schema:
+          $ref: "#/definitions/EndpointUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Endpoint not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        503:
+          description: "Endpoint management disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint management is disabled"
+    delete:
+      tags:
+      - "endpoints"
+      summary: "Remove an endpoint"
+      description: "Remove an endpoint.  \n**Access policy**: administrator      \n"
+      operationId: "EndpointDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Endpoint not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        503:
+          description: "Endpoint management disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint management is disabled"
+  /endpoints/{id}/access:
+    put:
+      tags:
+      - "endpoints"
+      summary: "Manage accesses to an endpoint"
+      description: "Manage user and team accesses to an endpoint.  \n**Access policy**:\
+        \ administrator            \n"
+      operationId: "EndpointAccessUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Authorizations details"
+        required: true
+        schema:
+          $ref: "#/definitions/EndpointAccessUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Endpoint not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /registries:
+    get:
+      tags:
+      - "registries"
+      summary: "List registries"
+      description: "List all registries based on the current user authorizations.\n\
+        Will return all registries if using an administrator account otherwise it\n\
+        will only return authorized registries.  \n**Access policy**: restricted \
+        \                 \n"
+      operationId: "RegistryList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/RegistryListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "registries"
+      summary: "Create a new registry"
+      description: "Create a new registry.  \n**Access policy**: administrator   \
+        \   \n"
+      operationId: "RegistryCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Registry details"
+        required: true
+        schema:
+          $ref: "#/definitions/RegistryCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/RegistryCreateResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        409:
+          description: "Registry already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A registry is already defined for this URL"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /registries/{id}:
+    get:
+      tags:
+      - "registries"
+      summary: "Inspect a registry"
+      description: "Retrieve details about a registry.  \n**Access policy**: administrator\
+        \      \n"
+      operationId: "RegistryInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Registry identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Registry"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Registry not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "registries"
+      summary: "Update a registry"
+      description: "Update a registry.  \n**Access policy**: administrator      \n"
+      operationId: "RegistryUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Registry identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Registry details"
+        required: true
+        schema:
+          $ref: "#/definitions/RegistryUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Registry not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        409:
+          description: "Registry already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A registry is already defined for this URL"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        503:
+          description: "Endpoint management disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint management is disabled"
+    delete:
+      tags:
+      - "registries"
+      summary: "Remove a registry"
+      description: "Remove a registry.  \n**Access policy**: administrator       \
+        \     \n"
+      operationId: "RegistryDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Registry identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Registry not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Registry not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /registries/{id}/access:
+    put:
+      tags:
+      - "registries"
+      summary: "Manage accesses to a registry"
+      description: "Manage user and team accesses to a registry.  \n**Access policy**:\
+        \ administrator            \n"
+      operationId: "RegistryAccessUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Registry identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Authorizations details"
+        required: true
+        schema:
+          $ref: "#/definitions/RegistryAccessUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Registry not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Registry not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /resource_controls:
+    post:
+      tags:
+      - "resource_controls"
+      summary: "Create a new resource control"
+      description: "Create a new resource control to restrict access to a Docker resource.\
+        \  \n**Access policy**: restricted            \n"
+      operationId: "ResourceControlCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Resource control details"
+        required: true
+        schema:
+          $ref: "#/definitions/ResourceControlCreateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        409:
+          description: "Resource control already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A resource control is already applied on this resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /resource_controls/{id}:
+    put:
+      tags:
+      - "resource_controls"
+      summary: "Update a resource control"
+      description: "Update a resource control.  \n**Access policy**: restricted  \
+        \       \n"
+      operationId: "ResourceControlUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Resource control identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Resource control details"
+        required: true
+        schema:
+          $ref: "#/definitions/ResourceControlUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "Resource control not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Resource control not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "resource_controls"
+      summary: "Remove a resource control"
+      description: "Remove a resource control.  \n**Access policy**: restricted  \
+        \    \n"
+      operationId: "ResourceControlDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Resource control identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "Resource control not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Resource control not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /settings:
+    get:
+      tags:
+      - "settings"
+      summary: "Retrieve Portainer settings"
+      description: "Retrieve Portainer settings.  \n**Access policy**: administrator\
+        \      \n"
+      operationId: "SettingsInspect"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Settings"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "settings"
+      summary: "Update Portainer settings"
+      description: "Update Portainer settings.  \n**Access policy**: administrator\
+        \        \n"
+      operationId: "SettingsUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "New settings"
+        required: true
+        schema:
+          $ref: "#/definitions/SettingsUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /settings/public:
+    get:
+      tags:
+      - "settings"
+      summary: "Retrieve Portainer public settings"
+      description: "Retrieve public settings. Returns a small set of settings that\
+        \ are not reserved to administrators only.  \n**Access policy**: public  \
+        \    \n"
+      operationId: "PublicSettingsInspect"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/PublicSettingsInspectResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /settings/authentication/checkLDAP:
+    put:
+      tags:
+      - "settings"
+      summary: "Test LDAP connectivity"
+      description: "Test LDAP connectivity using LDAP details.  \n**Access policy**:\
+        \ administrator        \n"
+      operationId: "SettingsLDAPCheck"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "LDAP settings"
+        required: true
+        schema:
+          $ref: "#/definitions/SettingsLDAPCheckRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /status:
+    get:
+      tags:
+      - "status"
+      summary: "Check Portainer status"
+      description: "Retrieve Portainer status.  \n**Access policy**: public      \
+        \  \n"
+      operationId: "StatusInspect"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Status"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users:
+    get:
+      tags:
+      - "users"
+      summary: "List users"
+      description: "List Portainer users. Non-administrator users will only be able\
+        \ to list other non-administrator user accounts.  \n**Access policy**: restricted\
+        \        \n"
+      operationId: "UserList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "users"
+      summary: "Create a new user"
+      description: "Create a new Portainer user. Only team leaders and administrators\
+        \ can create users. Only administrators can\ncreate an administrator user\
+        \ account.  \n**Access policy**: restricted        \n"
+      operationId: "UserCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User details"
+        required: true
+        schema:
+          $ref: "#/definitions/UserCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserCreateResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        409:
+          description: "User already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users/{id}:
+    get:
+      tags:
+      - "users"
+      summary: "Inspect a user"
+      description: "Retrieve details about a user.  \n**Access policy**: administrator\
+        \        \n"
+      operationId: "UserInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "users"
+      summary: "Update a user"
+      description: "Update user details. A regular user account can only update his\
+        \ details.  \n**Access policy**: authenticated      \n"
+      operationId: "UserUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "User details"
+        required: true
+        schema:
+          $ref: "#/definitions/UserUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "users"
+      summary: "Remove a user"
+      description: "Remove a user.  \n**Access policy**: administrator      \n"
+      operationId: "UserDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users/{id}/memberships:
+    get:
+      tags:
+      - "users"
+      summary: "Inspect a user memberships"
+      description: "Inspect a user memberships.  \n**Access policy**: authenticated\
+        \      \n"
+      operationId: "UserMembershipsInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserMembershipsResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users/{id}/passwd:
+    post:
+      tags:
+      - "users"
+      summary: "Check password validity for a user"
+      description: "Check if the submitted password is valid for the specified user.\
+        \  \n**Access policy**: authenticated      \n"
+      operationId: "UserPasswordCheck"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "User details"
+        required: true
+        schema:
+          $ref: "#/definitions/UserPasswordCheckRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserPasswordCheckResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users/admin/check:
+    get:
+      tags:
+      - "users"
+      summary: "Check administrator account existence"
+      description: "Check if an administrator account exists in the database.\n**Access\
+        \ policy**: public        \n"
+      operationId: "UserAdminCheck"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserListResponse"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /users/admin/init:
+    post:
+      tags:
+      - "users"
+      summary: "Initialize administrator account"
+      description: "Initialize the 'admin' user account.\n**Access policy**: public\
+        \        \n"
+      operationId: "UserAdminInit"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User details"
+        required: true
+        schema:
+          $ref: "#/definitions/UserAdminInitRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        409:
+          description: "Admin user already initialized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "User already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /upload/tls/{certificate}:
+    post:
+      tags:
+      - "upload"
+      summary: "Upload TLS files"
+      description: "Use this endpoint to upload TLS files.  \n**Access policy**: administrator\n"
+      operationId: "UploadTLS"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "certificate"
+        in: "path"
+        description: "TLS file type. Valid values are 'ca', 'cert' or 'key'."
+        required: true
+        type: "string"
+      - name: "folder"
+        in: "query"
+        description: "Folder where the TLS file will be stored. Will be created if\
+          \ not existing."
+        required: true
+        type: "string"
+      - name: "file"
+        in: "formData"
+        description: "The file to upload."
+        required: false
+        type: "file"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /teams:
+    get:
+      tags:
+      - "teams"
+      summary: "List teams"
+      description: "List teams. For non-administrator users, will only list the teams\
+        \ they are member of.  \n**Access policy**: restricted      \n"
+      operationId: "TeamList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TeamListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "teams"
+      summary: "Create a new team"
+      description: "Create a new team.  \n**Access policy**: administrator       \
+        \     \n"
+      operationId: "TeamCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Team details"
+        required: true
+        schema:
+          $ref: "#/definitions/TeamCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TeamCreateResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        409:
+          description: "Team already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /teams/{id}:
+    get:
+      tags:
+      - "teams"
+      summary: "Inspect a team"
+      description: "Retrieve details about a team. Access is only available for administrator\
+        \ and leaders of that team.  \n**Access policy**: restricted      \n"
+      operationId: "TeamInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Team identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Team"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "Team not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "teams"
+      summary: "Update a team"
+      description: "Update a team.  \n**Access policy**: administrator           \
+        \ \n"
+      operationId: "TeamUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Team identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Team details"
+        required: true
+        schema:
+          $ref: "#/definitions/TeamUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Team not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "teams"
+      summary: "Remove a team"
+      description: "Remove a team.  \n**Access policy**: administrator      \n"
+      operationId: "TeamDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Team identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Team not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /teams/{id}/memberships:
+    get:
+      tags:
+      - "teams"
+      summary: "Inspect a team memberships"
+      description: "Inspect a team memberships. Access is only available for administrator\
+        \ and leaders of that team.  \n**Access policy**: restricted      \n"
+      operationId: "TeamMembershipsInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Team identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TeamMembershipsResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /team_memberships:
+    get:
+      tags:
+      - "team_memberships"
+      summary: "List team memberships"
+      description: "List team memberships. Access is only available to administrators\
+        \ and team leaders.  \n**Access policy**: restricted         \n"
+      operationId: "TeamMembershipList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TeamMembershipListResponse"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "team_memberships"
+      summary: "Create a new team membership"
+      description: "Create a new team memberships. Access is only available to administrators\
+        \ leaders of the associated team.  \n**Access policy**: restricted      \n"
+      operationId: "TeamMembershipCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Team membership details"
+        required: true
+        schema:
+          $ref: "#/definitions/TeamMembershipCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TeamMembershipCreateResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        409:
+          description: "Team membership already exists"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team membership already exists for this user and team."
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /team_memberships/{id}:
+    put:
+      tags:
+      - "team_memberships"
+      summary: "Update a team membership"
+      description: "Update a team membership. Access is only available to administrators\
+        \ leaders of the associated team.  \n**Access policy**: restricted       \
+        \ \n"
+      operationId: "TeamMembershipUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Team membership identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Team membership details"
+        required: true
+        schema:
+          $ref: "#/definitions/TeamMembershipUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "Team membership not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team membership not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "team_memberships"
+      summary: "Remove a team membership"
+      description: "Remove a team membership. Access is only available to administrators\
+        \ leaders of the associated team.  \n**Access policy**: restricted      \n"
+      operationId: "TeamMembershipDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "TeamMembership identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "Team membership not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Team membership not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /templates:
+    get:
+      tags:
+      - "templates"
+      summary: "Retrieve App templates"
+      description: "Retrieve App templates.  \nYou can find more information about\
+        \ the format at http://portainer.readthedocs.io/en/stable/templates.html \
+        \ \n**Access policy**: authenticated      \n"
+      operationId: "TemplateList"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "key"
+        in: "query"
+        description: "Templates key. Valid values are 'container' or 'linuxserver.io'."
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TemplateListResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid query format"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+securityDefinitions:
+  jwt:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+definitions:
+  Team:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Team identifier"
+      Name:
+        type: "string"
+        example: "developers"
+        description: "Team name"
+  TeamMembership:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Membership identifier"
+      UserID:
+        type: "integer"
+        example: 1
+        description: "User identifier"
+      TeamID:
+        type: "integer"
+        example: 1
+        description: "Team identifier"
+      Role:
+        type: "integer"
+        example: 1
+        description: "Team role (1 for team leader and 2 for team member)"
+  User:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "User identifier"
+      Username:
+        type: "string"
+        example: "bob"
+        description: "Username"
+      Role:
+        type: "integer"
+        example: 1
+        description: "User role (1 for administrator account and 2 for regular account)"
+  Status:
+    type: "object"
+    properties:
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication enabled"
+      EndpointManagement:
+        type: "boolean"
+        example: true
+        description: "Is endpoint management enabled"
+      Analytics:
+        type: "boolean"
+        example: true
+        description: "Is analytics enabled"
+      Version:
+        type: "string"
+        example: "1.13.6"
+        description: "Portainer API version"
+  PublicSettingsInspectResponse:
+    type: "object"
+    properties:
+      LogoURL:
+        type: "string"
+        example: "https://mycompany.mydomain.tld/logo.png"
+        description: "URL to a logo that will be displayed on the login page as well\
+          \ as on top of the sidebar. Will use default Portainer logo when value is\
+          \ empty string"
+      DisplayExternalContributors:
+        type: "boolean"
+        example: false
+        description: "Whether to display or not external templates contributions as\
+          \ sub-menus in the UI."
+      AuthenticationMethod:
+        type: "integer"
+        example: 1
+        description: "Active authentication method for the Portainer instance. Valid\
+          \ values are: 1 for managed or 2 for LDAP."
+  TLSConfiguration:
+    type: "object"
+    properties:
+      TLS:
+        type: "boolean"
+        example: true
+        description: "Use TLS"
+      TLSSkipVerify:
+        type: "boolean"
+        example: false
+        description: "Skip the verification of the server TLS certificate"
+      TLSCACertPath:
+        type: "string"
+        example: "/data/tls/ca.pem"
+        description: "Path to the TLS CA certificate file"
+      TLSCertPath:
+        type: "string"
+        example: "/data/tls/cert.pem"
+        description: "Path to the TLS client certificate file"
+      TLSKeyPath:
+        type: "string"
+        example: "/data/tls/key.pem"
+        description: "Path to the TLS client key file"
+  LDAPSearchSettings:
+    type: "object"
+    properties:
+      BaseDN:
+        type: "string"
+        example: "dc=ldap,dc=domain,dc=tld"
+        description: "The distinguished name of the element from which the LDAP server\
+          \ will search for users"
+      Filter:
+        type: "string"
+        example: "(objectClass=account)"
+        description: "Optional LDAP search filter used to select user elements"
+      UserNameAttribute:
+        type: "string"
+        example: "uid"
+        description: "LDAP attribute which denotes the username"
+  LDAPSettings:
+    type: "object"
+    properties:
+      ReaderDN:
+        type: "string"
+        example: "cn=readonly-account,dc=ldap,dc=domain,dc=tld"
+        description: "Account that will be used to search for users"
+      Password:
+        type: "string"
+        example: "readonly-password"
+        description: "Password of the account that will be used to search users"
+      URL:
+        type: "string"
+        example: "myldap.domain.tld:389"
+        description: "URL or IP address of the LDAP server"
+      TLSConfig:
+        $ref: "#/definitions/TLSConfiguration"
+      StartTLS:
+        type: "boolean"
+        example: true
+        description: "Whether LDAP connection should use StartTLS"
+      SearchSettings:
+        type: "array"
+        items:
+          $ref: "#/definitions/LDAPSearchSettings"
+  Settings:
+    type: "object"
+    properties:
+      TemplatesURL:
+        type: "string"
+        example: "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
+        description: "URL to the templates that will be displayed in the UI when navigating\
+          \ to App Templates"
+      LogoURL:
+        type: "string"
+        example: "https://mycompany.mydomain.tld/logo.png"
+        description: "URL to a logo that will be displayed on the login page as well\
+          \ as on top of the sidebar. Will use default Portainer logo when value is\
+          \ empty string"
+      BlackListedLabels:
+        type: "array"
+        description: "A list of label name & value that will be used to hide containers\
+          \ when querying containers"
+        items:
+          $ref: "#/definitions/Settings_BlackListedLabels"
+      DisplayExternalContributors:
+        type: "boolean"
+        example: false
+        description: "Whether to display or not external templates contributions as\
+          \ sub-menus in the UI."
+      AuthenticationMethod:
+        type: "integer"
+        example: 1
+        description: "Active authentication method for the Portainer instance. Valid\
+          \ values are: 1 for managed or 2 for LDAP."
+      LDAPSettings:
+        $ref: "#/definitions/LDAPSettings"
+  Settings_BlackListedLabels:
+    properties:
+      name:
+        type: "string"
+        example: "com.foo"
+      value:
+        type: "string"
+        example: "bar"
+  Registry:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Registry identifier"
+      Name:
+        type: "string"
+        example: "my-registry"
+        description: "Registry name"
+      URL:
+        type: "string"
+        example: "registry.mydomain.tld:2375"
+        description: "URL or IP address of the Docker registry"
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication against this registry enabled"
+      Username:
+        type: "string"
+        example: "registry_user"
+        description: "Username used to authenticate against this registry"
+      Password:
+        type: "string"
+        example: "registry_password"
+        description: "Password used to authenticate against this registry"
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to use this registry"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to use this registry"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+  Endpoint:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Endpoint identifier"
+      Name:
+        type: "string"
+        example: "my-endpoint"
+        description: "Endpoint name"
+      URL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address of the Docker host associated to this endpoint"
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+  GenericError:
+    type: "object"
+    properties:
+      err:
+        type: "string"
+        example: "Something bad happened"
+        description: "Error message"
+  AuthenticateUserRequest:
+    type: "object"
+    required:
+    - "Password"
+    - "Username"
+    properties:
+      Username:
+        type: "string"
+        example: "admin"
+        description: "Username"
+      Password:
+        type: "string"
+        example: "mypassword"
+        description: "Password"
+  AuthenticateUserResponse:
+    type: "object"
+    properties:
+      jwt:
+        type: "string"
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE"
+        description: "JWT token used to authenticate against the API"
+  DockerHubInspectResponse:
+    type: "object"
+    properties:
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication against DockerHub enabled"
+      Username:
+        type: "string"
+        example: "hub_user"
+        description: "Username used to authenticate against the DockerHub"
+      Password:
+        type: "string"
+        example: "hub_password"
+        description: "Password used to authenticate against the DockerHub"
+  DockerHubUpdateRequest:
+    type: "object"
+    required:
+    - "Authentication"
+    - "Password"
+    - "Username"
+    properties:
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Enable authentication against DockerHub"
+      Username:
+        type: "string"
+        example: "hub_user"
+        description: "Username used to authenticate against the DockerHub"
+      Password:
+        type: "string"
+        example: "hub_password"
+        description: "Password used to authenticate against the DockerHub"
+  EndpointCreateRequest:
+    type: "object"
+    required:
+    - "Name"
+    - "URL"
+    properties:
+      Name:
+        type: "string"
+        example: "my-endpoint"
+        description: "Name that will be used to identify this endpoint"
+      URL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address of a Docker host"
+      PublicURL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address where exposed containers will be reachable.\
+          \ Defaults to URL if not specified"
+      TLS:
+        type: "boolean"
+        example: true
+        description: "Require TLS to connect against this endpoint"
+  EndpointCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Id of the endpoint"
+  EndpointListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Endpoint"
+  EndpointUpdateRequest:
+    type: "object"
+    properties:
+      Name:
+        type: "string"
+        example: "my-endpoint"
+        description: "Name that will be used to identify this endpoint"
+      URL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address of a Docker host"
+      PublicURL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address where exposed containers will be reachable.\
+          \ Defaults to URL if not specified"
+      TLS:
+        type: "boolean"
+        example: true
+        description: "Require TLS to connect against this endpoint"
+  EndpointAccessUpdateRequest:
+    type: "object"
+    properties:
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+  RegistryCreateRequest:
+    type: "object"
+    required:
+    - "Authentication"
+    - "Name"
+    - "Password"
+    - "URL"
+    - "Username"
+    properties:
+      Name:
+        type: "string"
+        example: "my-registry"
+        description: "Name that will be used to identify this registry"
+      URL:
+        type: "string"
+        example: "registry.mydomain.tld:2375"
+        description: "URL or IP address of the Docker registry"
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication against this registry enabled"
+      Username:
+        type: "string"
+        example: "registry_user"
+        description: "Username used to authenticate against this registry"
+      Password:
+        type: "string"
+        example: "registry_password"
+        description: "Password used to authenticate against this registry"
+  RegistryCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Id of the registry"
+  RegistryListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Registry"
+  RegistryUpdateRequest:
+    type: "object"
+    required:
+    - "Name"
+    - "URL"
+    properties:
+      Name:
+        type: "string"
+        example: "my-registry"
+        description: "Name that will be used to identify this registry"
+      URL:
+        type: "string"
+        example: "registry.mydomain.tld:2375"
+        description: "URL or IP address of the Docker registry"
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication against this registry enabled"
+      Username:
+        type: "string"
+        example: "registry_user"
+        description: "Username used to authenticate against this registry"
+      Password:
+        type: "string"
+        example: "registry_password"
+        description: "Password used to authenticate against this registry"
+  RegistryAccessUpdateRequest:
+    type: "object"
+    properties:
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to use thi registry"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to use thi registry"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+  ResourceControlCreateRequest:
+    type: "object"
+    required:
+    - "ResourceID"
+    - "Type"
+    properties:
+      ResourceID:
+        type: "string"
+        example: "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
+        description: "Docker resource identifier on which access control will be applied"
+      Type:
+        type: "string"
+        example: "container"
+        description: "Type of Docker resource. Valid values are: container, volume\
+          \ or service"
+      AdministratorsOnly:
+        type: "boolean"
+        example: true
+        description: "Restrict access to the associated resource to administrators\
+          \ only"
+      Users:
+        type: "array"
+        description: "List of user identifiers with access to the associated resource"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      Teams:
+        type: "array"
+        description: "List of team identifiers with access to the associated resource"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+      SubResourceIDs:
+        type: "array"
+        description: "List of Docker resources that will inherit this access control"
+        items:
+          type: "string"
+          example: "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
+          description: "Docker resource identifier"
+  ResourceControlUpdateRequest:
+    type: "object"
+    properties:
+      AdministratorsOnly:
+        type: "boolean"
+        example: false
+        description: "Restrict access to the associated resource to administrators\
+          \ only"
+      Users:
+        type: "array"
+        description: "List of user identifiers with access to the associated resource"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      Teams:
+        type: "array"
+        description: "List of team identifiers with access to the associated resource"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+  SettingsUpdateRequest:
+    type: "object"
+    required:
+    - "AuthenticationMethod"
+    - "TemplatesURL"
+    properties:
+      TemplatesURL:
+        type: "string"
+        example: "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
+        description: "URL to the templates that will be displayed in the UI when navigating\
+          \ to App Templates"
+      LogoURL:
+        type: "string"
+        example: "https://mycompany.mydomain.tld/logo.png"
+        description: "URL to a logo that will be displayed on the login page as well\
+          \ as on top of the sidebar. Will use default Portainer logo when value is\
+          \ empty string"
+      BlackListedLabels:
+        type: "array"
+        description: "A list of label name & value that will be used to hide containers\
+          \ when querying containers"
+        items:
+          $ref: "#/definitions/Settings_BlackListedLabels"
+      DisplayExternalContributors:
+        type: "boolean"
+        example: false
+        description: "Whether to display or not external templates contributions as\
+          \ sub-menus in the UI."
+      AuthenticationMethod:
+        type: "integer"
+        example: 1
+        description: "Active authentication method for the Portainer instance. Valid\
+          \ values are: 1 for managed or 2 for LDAP."
+      LDAPSettings:
+        $ref: "#/definitions/LDAPSettings"
+  UserCreateRequest:
+    type: "object"
+    required:
+    - "Password"
+    - "Role"
+    - "Username"
+    properties:
+      Username:
+        type: "string"
+        example: "bob"
+        description: "Username"
+      Password:
+        type: "string"
+        example: "cg9Wgky3"
+        description: "Password"
+      Role:
+        type: "integer"
+        example: 1
+        description: "User role (1 for administrator account and 2 for regular account)"
+  UserCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Id of the user"
+  UserListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/User"
+  UserUpdateRequest:
+    type: "object"
+    properties:
+      Password:
+        type: "string"
+        example: "cg9Wgky3"
+        description: "Password"
+      Role:
+        type: "integer"
+        example: 1
+        description: "User role (1 for administrator account and 2 for regular account)"
+  UserMembershipsResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/TeamMembership"
+  UserPasswordCheckRequest:
+    type: "object"
+    required:
+    - "Password"
+    properties:
+      Password:
+        type: "string"
+        example: "cg9Wgky3"
+        description: "Password"
+  UserPasswordCheckResponse:
+    type: "object"
+    properties:
+      valid:
+        type: "boolean"
+        example: true
+        description: "Is the password valid"
+  TeamCreateRequest:
+    type: "object"
+    required:
+    - "Name"
+    properties:
+      Name:
+        type: "string"
+        example: "developers"
+        description: "Name"
+  TeamCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Id of the team"
+  TeamListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Team"
+  TeamUpdateRequest:
+    type: "object"
+    required:
+    - "Name"
+    properties:
+      Name:
+        type: "string"
+        example: "developers"
+        description: "Name"
+  TeamMembershipsResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/TeamMembership"
+  TeamMembershipCreateRequest:
+    type: "object"
+    required:
+    - "Role"
+    - "TeamID"
+    - "UserID"
+    properties:
+      UserID:
+        type: "integer"
+        example: 1
+        description: "User identifier"
+      TeamID:
+        type: "integer"
+        example: 1
+        description: "Team identifier"
+      Role:
+        type: "integer"
+        example: 1
+        description: "Role for the user inside the team (1 for leader and 2 for regular\
+          \ member)"
+  TeamMembershipCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Id of the team membership"
+  TeamMembershipListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/TeamMembership"
+  TeamMembershipUpdateRequest:
+    type: "object"
+    required:
+    - "Role"
+    - "TeamID"
+    - "UserID"
+    properties:
+      UserID:
+        type: "integer"
+        example: 1
+        description: "User identifier"
+      TeamID:
+        type: "integer"
+        example: 1
+        description: "Team identifier"
+      Role:
+        type: "integer"
+        example: 1
+        description: "Role for the user inside the team (1 for leader and 2 for regular\
+          \ member)"
+  SettingsLDAPCheckRequest:
+    type: "object"
+    properties:
+      LDAPSettings:
+        $ref: "#/definitions/LDAPSettings"
+  UserAdminInitRequest:
+    type: "object"
+    properties:
+      Password:
+        type: "string"
+        example: "admin-password"
+        description: "Password for the admin user"
+  TemplateListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Template"
+  Template:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+        example: "Nginx"
+        description: "Title of the template"
+      description:
+        type: "string"
+        example: "High performance web server"
+        description: "Description of the template"
+      logo:
+        type: "string"
+        example: "https://cloudinovasi.id/assets/img/logos/nginx.png"
+        description: "URL of the template's logo"
+      image:
+        type: "string"
+        example: "nginx:latest"
+        description: "The Docker image associated to the template"

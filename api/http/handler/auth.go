@@ -44,17 +44,23 @@ func NewAuthHandler(bouncer *security.RequestBouncer, authDisabled bool) *AuthHa
 		authDisabled: authDisabled,
 	}
 	h.Handle("/auth",
-		bouncer.PublicAccess(http.HandlerFunc(h.handlePostAuth)))
+		bouncer.PublicAccess(http.HandlerFunc(h.handlePostAuth))).Methods(http.MethodPost)
 
 	return h
 }
 
-func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		httperror.WriteMethodNotAllowedResponse(w, []string{http.MethodPost})
-		return
+type (
+	postAuthRequest struct {
+		Username string `valid:"required"`
+		Password string `valid:"required"`
 	}
 
+	postAuthResponse struct {
+		JWT string `json:"jwt"`
+	}
+)
+
+func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Request) {
 	if handler.authDisabled {
 		httperror.WriteErrorResponse(w, ErrAuthDisabled, http.StatusServiceUnavailable, handler.Logger)
 		return
@@ -117,13 +123,4 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	}
 
 	encodeJSON(w, &postAuthResponse{JWT: token}, handler.Logger)
-}
-
-type postAuthRequest struct {
-	Username string `valid:"required"`
-	Password string `valid:"required"`
-}
-
-type postAuthResponse struct {
-	JWT string `json:"jwt"`
 }
