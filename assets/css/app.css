@@ -82,10 +82,6 @@ a[ng-click]{
   margin-right: 5px;
 }
 
-.fa.green-icon {
-  color: #23ae89;
-}
-
 .tooltip.portainer-tooltip .tooltip-inner {
   font-family: Montserrat;
   background-color: #ffffff;
@@ -104,6 +100,10 @@ a[ng-click]{
   margin-left: 5px;
   font-size: 1.3em;
   color: #337ab7;
+}
+
+.fa.green-icon {
+  color: #23ae89;
 }
 
 .fa.red-icon {

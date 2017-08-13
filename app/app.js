@@ -51,6 +51,7 @@ angular.module('portainer', [
   'service',
   'services',
   'settings',
+  'settingsAuthentication',
   'sidebar',
   'stats',
   'swarm',
@@ -243,7 +244,7 @@ angular.module('portainer', [
       }
     })
     .state('actions.create.container', {
-      url: '/container',
+      url: '/container/:from',
       views: {
         'content@': {
           templateUrl: 'app/components/createContainer/createcontainer.html',
@@ -556,6 +557,19 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/settings/settings.html',
           controller: 'SettingsController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('settings_authentication', {
+      url: '^/settings/authentication',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/settingsAuthentication/settingsAuthentication.html',
+          controller: 'SettingsAuthenticationController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',

@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerService', 'ImageHelper', 'Network', 'Notifications', 'Pagination', 'ModalService',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerService, ImageHelper, Network, Notifications, Pagination, ModalService) {
+.controller('ContainerController', ['$q', '$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
+function ($q, $scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, Pagination, ModalService, ResourceControlService, RegistryService, ImageService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -196,6 +196,89 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     });
   };
 
+  $scope.duplicate = function() {
+    ModalService.confirmExperimentalFeature(function (experimental) {
+      if(!experimental) { return; }
+      $state.go('actions.create.container', {from: $stateParams.id}, {reload: true});
+    });
+  };
+
+  $scope.confirmRemove = function () {
+    var title = 'You are about to remove a container.';
+    if ($scope.container.State.Running) {
+      title = 'You are about to remove a running container.';
+    }
+    ModalService.confirmContainerDeletion(
+      title,
+      function (result) {
+        if(!result) { return; }
+        var cleanAssociatedVolumes = false;
+        if (result[0]) {
+          cleanAssociatedVolumes = true;
+        }
+        $scope.remove(cleanAssociatedVolumes);
+      }
+    );
+  };
+
+  function recreateContainer(pullImage) {
+    $('#loadingViewSpinner').show();
+    var container = $scope.container;
+    var config = ContainerHelper.configFromContainer(container.Model);
+    ContainerService.remove(container, true)
+    .then(function success() {
+      return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
+    })
+    .then(function success(data) {
+      return $q.when(!pullImage || ImageService.pullImage(container.Config.Image, data, true));
+    })
+    .then(function success() {
+      return ContainerService.createAndStartContainer(config);
+    })
+    .then(function success(data) {
+      if (!container.ResourceControl) {
+        return true;
+      } else {
+        var containerIdentifier = data.Id;
+        var resourceControl = container.ResourceControl;
+        var users = resourceControl.UserAccesses.map(function(u) {
+          return u.UserId;
+        });
+        var teams = resourceControl.TeamAccesses.map(function(t) {
+          return t.TeamId;
+        });
+        return ResourceControlService.createResourceControl(resourceControl.AdministratorsOnly,
+          users, teams, containerIdentifier, 'container', []);
+      }
+    })
+    .then(function success(data) {
+      Notifications.success('Container successfully re-created');
+      $state.go('containers', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to re-create container');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
+  }
+
+  $scope.recreate = function() {
+    ModalService.confirmExperimentalFeature(function (experimental) {
+      if(!experimental) { return; }
+
+      ModalService.confirmContainerRecreation(function (result) {
+        if(!result) { return; }
+        console.log(JSON.stringify(result, null, 4));
+        var pullImage = false;
+        if (result[0]) {
+          pullImage = true;
+        }
+        recreateContainer(pullImage);
+      });
+    });
+  };
+
   $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
     $('#joinNetworkSpinner').show();
     Network.connect({id: networkId}, { Container: $stateParams.id }, function (d) {
@@ -213,25 +296,21 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     });
   };
 
-  Network.query({}, function (d) {
-      var networks = d;
-      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-        networks = d.filter(function (network) {
-          if (network.Scope === 'global') {
-            return network;
-          }
-        });
-        networks.push({Name: 'bridge'});
-        networks.push({Name: 'host'});
-        networks.push({Name: 'none'});
-      }
-      $scope.availableNetworks = networks;
-      if (!_.find(networks, {'Name': 'bridge'})) {
-        networks.push({Name: 'nat'});
-      }
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to retrieve networks');
-    });
+  var provider = $scope.applicationState.endpoint.mode.provider;
+  var apiVersion = $scope.applicationState.endpoint.apiVersion;
+  NetworkService.networks(
+    provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
+    false,
+    provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
+    provider === 'DOCKER_SWARM'
+  )
+  .then(function success(data) {
+    var networks = data;
+    $scope.availableNetworks = networks;
+  })
+  .catch(function error(err) {
+    Notifications.error('Failure', err, 'Unable to retrieve networks');
+  });
 
   update();
 }]);

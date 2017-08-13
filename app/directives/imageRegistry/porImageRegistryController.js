@@ -12,7 +12,11 @@ function ($q, RegistryService, DockerHubService, Notifications) {
       var dockerhub = data.dockerhub;
       var registries = data.registries;
       ctrl.availableRegistries = [dockerhub].concat(registries);
-      ctrl.registry = dockerhub;
+      if (!ctrl.registry.Id) {
+        ctrl.registry = dockerhub;
+      } else {
+        ctrl.registry = _.find(ctrl.availableRegistries, { 'Id': ctrl.registry.Id });
+      }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve registries');

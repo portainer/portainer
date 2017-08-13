@@ -25,6 +25,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     PlacementConstraints: [],
     PlacementPreferences: [],
     UpdateDelay: 0,
+    UpdateOrder: 'stop-first',
     FailureAction: 'pause',
     Secrets: [],
     AccessControlData: new AccessControlFormData()
@@ -199,7 +200,8 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     config.UpdateConfig = {
       Parallelism: input.Parallelism || 0,
       Delay: input.UpdateDelay || 0,
-      FailureAction: input.FailureAction
+      FailureAction: input.FailureAction,
+      Order: input.UpdateOrder
     };
   }
 
@@ -303,10 +305,11 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   function initView() {
     $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+
     $q.all({
       volumes: VolumeService.volumes(),
-      networks: NetworkService.retrieveSwarmNetworks(),
-      secrets: apiVersion >= 1.25 ? SecretService.secrets() : []
+      secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
+      networks: NetworkService.networks(true, true, false, false)
     })
     .then(function success(data) {
       $scope.availableVolumes = data.volumes;

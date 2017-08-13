@@ -8,10 +8,15 @@ angular.module('portainer.helpers')
     var slashCount = _.countBy(repository)['/'];
     var registry = null;
     var image = repository;
-    if (slashCount > 1) {
-      // assume something/some/thing[/...]
+    if (slashCount >= 1) {
+      // assume something/something[/...]
       registry = repository.substr(0, repository.indexOf('/'));
-      image = repository.substr(repository.indexOf('/') + 1);
+      // assume valid DNS name or IP (contains at least one '.')
+      if (_.countBy(registry)['.'] > 0) {
+        image = repository.substr(repository.indexOf('/') + 1);
+      } else {
+        registry = null;
+      }
     }
 
     return {

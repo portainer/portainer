@@ -26,6 +26,7 @@ type UserHandler struct {
 	TeamMembershipService  portainer.TeamMembershipService
 	ResourceControlService portainer.ResourceControlService
 	CryptoService          portainer.CryptoService
+	SettingsService        portainer.SettingsService
 }
 
 // NewUserHandler returns a new instance of UserHandler.
@@ -93,13 +94,6 @@ func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	var role portainer.UserRole
-	if req.Role == 1 {
-		role = portainer.AdministratorRole
-	} else {
-		role = portainer.StandardUserRole
-	}
-
 	user, err := handler.UserService.UserByUsername(req.Username)
 	if err != nil && err != portainer.ErrUserNotFound {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -110,14 +104,30 @@ func (handler *UserHandler) handlePostUsers(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	var role portainer.UserRole
+	if req.Role == 1 {
+		role = portainer.AdministratorRole
+	} else {
+		role = portainer.StandardUserRole
+	}
+
 	user = &portainer.User{
 		Username: req.Username,
 		Role:     role,
 	}
-	user.Password, err = handler.CryptoService.Hash(req.Password)
+
+	settings, err := handler.SettingsService.Settings()
 	if err != nil {
-		httperror.WriteErrorResponse(w, portainer.ErrCryptoHashFailure, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
+	}
+
+	if settings.AuthenticationMethod == portainer.AuthenticationInternal {
+		user.Password, err = handler.CryptoService.Hash(req.Password)
+		if err != nil {
+			httperror.WriteErrorResponse(w, portainer.ErrCryptoHashFailure, http.StatusBadRequest, handler.Logger)
+			return
+		}
 	}
 
 	err = handler.UserService.CreateUser(user)
@@ -135,7 +145,7 @@ type postUsersResponse struct {
 
 type postUsersRequest struct {
 	Username string `valid:"required"`
-	Password string `valid:"required"`
+	Password string `valid:""`
 	Role     int    `valid:"required"`
 }
 
