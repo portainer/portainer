@@ -824,8 +824,8 @@ paths:
       - "settings"
       summary: "Retrieve Portainer public settings"
       description: "Retrieve public settings. Returns a small set of settings that\
-        \ are not reserved to administrators only.\n**Access policy**: public    \
-        \  \n"
+        \ are not reserved to administrators only.  \n**Access policy**: public  \
+        \    \n"
       operationId: "PublicSettingsInspect"
       produces:
       - "application/json"
@@ -844,7 +844,7 @@ paths:
       tags:
       - "settings"
       summary: "Test LDAP connectivity"
-      description: "Test LDAP connectivity using LDAP details.\n**Access policy**:\
+      description: "Test LDAP connectivity using LDAP details.  \n**Access policy**:\
         \ administrator        \n"
       operationId: "SettingsLDAPCheck"
       consumes:
@@ -1234,6 +1234,48 @@ paths:
           examples:
             application/json:
               err: "User already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /upload/tls/{certificate}:
+    post:
+      tags:
+      - "upload"
+      summary: "Upload TLS files"
+      description: "Use this endpoint to upload TLS files.  \n**Access policy**: administrator\n"
+      operationId: "UploadTLS"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "certificate"
+        in: "path"
+        description: "TLS file type. Valid values are 'ca', 'cert' or 'key'."
+        required: true
+        type: "string"
+      - name: "folder"
+        in: "query"
+        description: "Folder where the TLS file will be stored. Will be created if\
+          \ not existing."
+        required: true
+        type: "string"
+      - name: "file"
+        in: "formData"
+        description: "The file to upload."
+        required: false
+        type: "file"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data"
         500:
           description: "Server error"
           schema:
