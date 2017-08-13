@@ -9,7 +9,7 @@ angular.module('portainer.helpers')
 
   helper.commandArrayToString = function(array) {
     return array.map(function(elem) {
-      return '"' + elem + '"';
+      return '\'' + elem + '\'';
     }).join(' ');
   };
 

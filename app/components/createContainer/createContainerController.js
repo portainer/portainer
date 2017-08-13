@@ -23,6 +23,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   $scope.config = {
     Image: '',
     Env: [],
+    Cmd: '',
     ExposedPorts: {},
     HostConfig: {
       RestartPolicy: {
