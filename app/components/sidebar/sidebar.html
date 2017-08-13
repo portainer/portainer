@@ -25,7 +25,7 @@
         <a ui-sref="templates_linuxserver" ui-sref-active="active">LinuxServer.io</a>
       </div>
     </li>
-    <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+    <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="services" ui-sref-active="active">Services <span class="menu-icon fa fa-list-alt"></span></a>
     </li>
     <li class="sidebar-list">
@@ -40,7 +40,7 @@
     <li class="sidebar-list">
       <a ui-sref="volumes" ui-sref-active="active">Volumes <span class="menu-icon fa fa-cubes"></span></a>
     </li>
-    <li class="sidebar-list" ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+    <li class="sidebar-list" ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="secrets" ui-sref-active="active">Secrets <span class="menu-icon fa fa-user-secret"></span></a>
     </li>
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'">
