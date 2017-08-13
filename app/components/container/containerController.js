@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'Pagination', 'ModalService',
-function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerService, ImageHelper, Network, NetworkService, Notifications, Pagination, ModalService) {
+.controller('ContainerController', ['$scope', '$state','$stateParams', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
+function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, Pagination, ModalService, ResourceControlService, RegistryService, ImageService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -193,6 +193,73 @@ function ($scope, $state, $stateParams, $filter, Container, ContainerCommit, Con
     }, function (e) {
       $('#loadingViewSpinner').hide();
       Notifications.error('Failure', e, 'Unable to disconnect container from network');
+    });
+  };
+
+  $scope.duplicate = function() {
+    ModalService.confirmExperimentalFeature(function (experimental) {
+      if(!experimental) { return; }
+      $state.go('actions.create.container', {from: $stateParams.id}, {reload: true});
+    });
+  };
+
+  $scope.recreate = function() {
+    ModalService.confirmExperimentalFeature(function (experimental) {
+      if(!experimental) { return; }
+      ModalService.confirm({
+        title: 'Are you sure ?',
+        message: 'You\'re about to re-create this container, any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.',
+        buttons: {
+          confirm: {
+            label: 'Recreate',
+            className: 'btn-danger'
+          }
+        },
+        callback: function onConfirm(confirmed) {
+          if(!confirmed) { return; }
+          else {
+            $('#loadingViewSpinner').show();
+            var container = $scope.container;
+            var config = ContainerHelper.configFromContainer(container.Model);
+            ContainerService.remove(container, true)
+            .then(function success() {
+              return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
+            })
+            .then(function success(data) {
+              return ImageService.pullImage(container.Config.Image, data, true);
+            })
+            .then(function success() {
+              return ContainerService.createAndStartContainer(config);
+            })
+            .then(function success(data) {
+              if (!container.ResourceControl) {
+                return true;
+              } else {
+                var containerIdentifier = data.Id;
+                var resourceControl = container.ResourceControl;
+                var users = resourceControl.UserAccesses.map(function(u) {
+                  return u.UserId;
+                });
+                var teams = resourceControl.TeamAccesses.map(function(t) {
+                  return t.TeamId;
+                });
+                return ResourceControlService.createResourceControl(resourceControl.AdministratorsOnly,
+                  users, teams, containerIdentifier, 'container', []);
+              }
+            })
+            .then(function success(data) {
+              Notifications.success('Container successfully re-created');
+              $state.go('containers', {}, {reload: true});
+            })
+            .catch(function error(err) {
+              Notifications.error('Failure', err, 'Unable to re-create container');
+            })
+            .finally(function final() {
+              $('#loadingViewSpinner').hide();
+            });
+          }
+        }
+      });
     });
   };
 
