@@ -1792,7 +1792,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.13.6"
+        example: "1.14.0"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
