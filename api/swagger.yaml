@@ -3,7 +3,8 @@ swagger: "2.0"
 info:
   description: "Portainer API is an HTTP API served by Portainer. It is used by the\
     \ Portainer UI and everything you can do with the UI can be done using the HTTP\
-    \ API.\nYou can find out more about Portainer at [http://portainer.io](http://portainer.io)\
+    \ API.  \nExamples are available at https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8\
+    \  \nYou can find out more about Portainer at [http://portainer.io](http://portainer.io)\
     \ and get some support on [Slack](http://portainer.io/slack/).\n\n# Authentication\n\
     \nMost of the API endpoints require to be authenticated as well as some level\
     \ of authorization to be used.\nPortainer API uses JSON Web Token to manage authentication\
@@ -20,7 +21,18 @@ info:
     \ this access policy.\nExtra-checks might be added to ensure access to the resource\
     \ is granted. Returned data might also be filtered.\n\n### Administrator access\n\
     \nAuthentication as well as an administrator role are required to access the endpoints\
-    \ with this access policy.\n"
+    \ with this access policy.\n\n# Execute Docker requests\n\nPortainer **DO NOT**\
+    \ expose specific endpoints to manage your Docker resources (create a container,\
+    \ remove a volume, etc...).  \n\nInstead, it acts as a reverse-proxy to the Docker\
+    \ HTTP API. This means that you can execute Docker requests **via** the Portainer\
+    \ HTTP API.\n\nTo do so, you can use the `/endpoints/{id}/docker` Portainer API\
+    \ endpoint (which is not documented below due to Swagger limitations). This\n\
+    endpoint has a restricted access policy so you still need to be authenticated\
+    \ to be able to query this endpoint. Any query on this endpoint will be proxied\
+    \ to the\nDocker API of the associated endpoint (requests and responses objects\
+    \ are the same as documented in the Docker API).\n\n**NOTE**: You can find more\
+    \ information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/)\
+    \ as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).\n"
   version: "1.14.0"
   title: "Portainer API"
   contact:
