@@ -49,6 +49,12 @@
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || (applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER')">
       <a ui-sref="swarm" ui-sref-active="active">Swarm <span class="menu-icon fa fa-object-group"></span></a>
     </li>
+    <li class="sidebar-list">
+      <a ui-sref="storidge.cluster" ui-sref-active="active">Storidge <span class="menu-icon fa fa-object-group"></span></a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles')">
+        <a ui-sref="storidge.profiles" ui-sref-active="active">Profiles</a>
+      </div>
+    </li>
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'">
       <a ui-sref="docker" ui-sref-active="active">Docker <span class="menu-icon fa fa-th"></span></a>
     </li>

@@ -1,3 +1,4 @@
+angular.module('extension.storidge', []);
 angular.module('portainer.filters', []);
 angular.module('portainer.rest', ['ngResource']);
 angular.module('portainer.services', []);
@@ -18,6 +19,7 @@ angular.module('portainer', [
   'portainer.rest',
   'portainer.helpers',
   'portainer.services',
+  'extension.storidge',
   'auth',
   'dashboard',
   'container',
@@ -570,6 +572,44 @@ angular.module('portainer', [
         'content@': {
           templateUrl: 'app/components/settingsAuthentication/settingsAuthentication.html',
           controller: 'SettingsAuthenticationController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('storidge', {
+      abstract: true,
+      url: '/storidge',
+      views: {
+        'content@': {
+          template: '<div ui-view="content@"></div>'
+        },
+        'sidebar@': {
+          template: '<div ui-view="sidebar@"></div>'
+        }
+      }
+    })
+    .state('storidge.profiles', {
+      url: '/profiles',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/storidge/profiles/profiles.html',
+          controller: 'StoridgeProfilesController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('storidge.cluster', {
+      url: '/cluster',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/storidge/cluster/cluster.html',
+          controller: 'StoridgeClusterController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
