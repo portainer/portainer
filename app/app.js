@@ -13,6 +13,7 @@ angular.module('portainer', [
   'LocalStorageModule',
   'angular-jwt',
   'angular-google-analytics',
+  'pascalprecht.translate',
   'portainer.templates',
   'portainer.filters',
   'portainer.rest',
@@ -64,7 +65,7 @@ angular.module('portainer', [
   'userSettings',
   'volume',
   'volumes'])
-  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider) {
+  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', '$translateProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider, $translateProvider) {
     'use strict';
 
     var environment = '@@ENVIRONMENT';
@@ -98,6 +99,14 @@ angular.module('portainer', [
       'focus': 'blur',
       'outsideClick': 'outsideClick'
     });
+
+    $translateProvider.useSanitizeValueStrategy('sanitize');
+    $translateProvider
+    .useStaticFilesLoader({
+        'prefix': 'i18n/',
+        'suffix': '.json'
+    });
+    $translateProvider.preferredLanguage('en');
 
     $stateProvider
     .state('root', {

@@ -59,6 +59,8 @@ angular:
   - bower_components/angular-ui-router/release/angular-ui-router.js
   - bower_components/angular-utils-pagination/dirPagination.js
   - bower_components/ng-file-upload/ng-file-upload.js
+  - bower_components/angular-translate/angular-translate.js
+  - bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js
   minified:
   - bower_components/angular/angular.min.js
   - bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js
@@ -72,3 +74,5 @@ angular:
   - bower_components/angular-ui-router/release/angular-ui-router.min.js
   - bower_components/angular-utils-pagination/dirPagination.js
   - bower_components/ng-file-upload/ng-file-upload.min.js
+  - bower_components/angular-translate/angular-translate.min.js
+  - bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js
