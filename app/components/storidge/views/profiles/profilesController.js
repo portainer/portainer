@@ -1,6 +1,6 @@
 angular.module('extension.storidge')
-.controller('StoridgeProfilesController', ['$q', '$scope', '$state', 'Notifications', 'Pagination',
-function ($q, $scope, $state, Notifications, Pagination) {
+.controller('StoridgeProfilesController', ['$q', '$scope', '$state', 'Notifications', 'Pagination', 'StoridgeProfileService',
+function ($q, $scope, $state, Notifications, Pagination, StoridgeProfileService) {
 
   $scope.state = {
     selectedItemCount: 0,
@@ -11,7 +11,6 @@ function ($q, $scope, $state, Notifications, Pagination) {
 
   // $scope.formValues = {
   //   Name: '',
-  //   Leaders: []
   // };
 
   $scope.order = function(sortType) {
@@ -40,37 +39,23 @@ function ($q, $scope, $state, Notifications, Pagination) {
     }
   };
 
+  $scope.remove = function() {
+    Notifications.success('Profile successfully removed');
+  };
+
   function initView() {
     $('#loadingViewSpinner').show();
-    $scope.profiles = [
-      {
-        Id: 1,
-        Name: 'profileA'
-      },
-      {
-        Id: 2,
-        Name: 'profileB'
-      }
-    ];
-    // var userDetails = Authentication.getUserDetails();
-    // var isAdmin = userDetails.role === 1 ? true: false;
-    // $scope.isAdmin = isAdmin;
-    // $q.all({
-    //   users: UserService.users(false),
-    //   profiles: isAdmin ? ProfileService.profiles() : UserService.userLeadingProfiles(userDetails.ID)
-    // })
-    // .then(function success(data) {
-    //   $scope.profiles = data.profiles;
-    //   $scope.users = data.users;
-    // })
-    // .catch(function error(err) {
-    //   $scope.profiles = [];
-    //   $scope.users = [];
-    //   Notifications.error('Failure', err, 'Unable to retrieve profiles');
-    // })
-    // .finally(function final() {
-    //   $('#loadingViewSpinner').hide();
-    // });
+
+    StoridgeProfileService.profiles()
+    .then(function success(data) {
+      $scope.profiles = data;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve profiles');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
   }
 
   initView();

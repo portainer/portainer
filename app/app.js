@@ -595,8 +595,34 @@ angular.module('portainer', [
       url: '/profiles',
       views: {
         'content@': {
-          templateUrl: 'app/components/storidge/profiles/profiles.html',
+          templateUrl: 'app/components/storidge/views/profiles/profiles.html',
           controller: 'StoridgeProfilesController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('storidge.profiles.create', {
+      url: '/create',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/storidge/views/profiles/create/createProfile.html',
+          controller: 'CreateProfileController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    .state('storidge.profiles.edit', {
+      url: '/edit/:id',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/storidge/views/profiles/edit/editProfile.html',
+          controller: 'EditProfileController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
@@ -608,7 +634,7 @@ angular.module('portainer', [
       url: '/cluster',
       views: {
         'content@': {
-          templateUrl: 'app/components/storidge/cluster/cluster.html',
+          templateUrl: 'app/components/storidge/views/cluster/cluster.html',
           controller: 'StoridgeClusterController'
         },
         'sidebar@': {

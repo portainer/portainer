@@ -1,0 +1,46 @@
+<rd-header>
+  <rd-header-title title="Storidge cluster">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="storidge.cluster" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="storidge.cluster">Storidge</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-md-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tachometer" title="Cluster status"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Nodes</td>
+              <td>{{ cluster.Nodes.length }}</td>
+            </tr>
+            <tr>
+              <td>Capacity</td>
+              <td>{{ cluster.Capacity.Available }} / {{ cluster.Capacity.Total }}</td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <div class="btn-group" role="group" aria-label="...">
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i>Reboot cluster</a>
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Shutdown cluster</a>
+                </div>
+              </td>
+            </tr>
+            <!-- <tr>
+              <td colspan="2">
+                <button type="button" class="btn btn-primary btn-sm" ng-click="shutdownCluster()">Shutdown cluster</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="rebootCluster()">Reboot cluster</button>
+              </td>
+            </tr> -->
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
