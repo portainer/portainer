@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
-function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Authentication, Users, EndpointService, StateManager, EndpointProvider, Notifications) {
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'SettingsService',
+function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Authentication, Users, EndpointService, StateManager, EndpointProvider, Notifications, SettingsService) {
 
   $scope.authData = {
     username: 'admin',
@@ -78,9 +78,19 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Authentica
 
   $scope.authenticateUser = function() {
     $scope.authenticationError = false;
-    var username = $sanitize($scope.authData.username);
-    var password = $sanitize($scope.authData.password);
-    Authentication.login(username, password)
+
+    SettingsService.publicSettings()
+    .then(function success(data) {
+      var settings = data;
+      var username = $scope.authData.username;
+      var password = $scope.authData.password;
+      if (settings.AuthenticationMethod === 1) {
+        username = $sanitize($scope.authData.username);
+        password = $sanitize($scope.authData.password);
+      }
+
+      return Authentication.login(username, password);
+    })
     .then(function success(data) {
       return EndpointService.endpoints();
     })
