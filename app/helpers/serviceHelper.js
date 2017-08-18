@@ -118,7 +118,22 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
         return keyValueConstraints;
       }
       return [];
+    },
+    convertUnitStringToNumber: function(string) {
+      var re = new RegExp('^(.*)([kmg])$','i');
+      var matches = re.exec(string);
+      if (matches) {
+        var nb = parseInt(matches[1], 10);
+        if (matches[2] === 'k' || matches[2] == 'K') {
+          nb *= 1024;
+        } else if (matches[2] === 'm' || matches[2] == 'M') {
+          nb *= 1024 * 1024;
+        } else if (matches[2] === 'g' || matches[2] == 'G') {
+          nb *= 1024 * 1024 * 1024;
+        }
+        return nb;
+      }
+      return parseInt(string, 10);
     }
-
   };
 }]);

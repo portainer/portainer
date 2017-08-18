@@ -28,7 +28,11 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     UpdateOrder: 'stop-first',
     FailureAction: 'pause',
     Secrets: [],
-    AccessControlData: new AccessControlFormData()
+    AccessControlData: new AccessControlFormData(),
+    CpuLimit: 0,
+    CpuReservation: 0,
+    MemoryLimit: '0m',
+    MemoryReservation: '0m'
   };
 
   $scope.state = {
@@ -224,6 +228,23 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     }
   }
 
+  function prepareResourcesConfig(config, input) {
+    if (input.CpuLimit > 0) {
+      config.TaskTemplate.Resources.Limits.NanoCPUs = input.CpuLimit * 1000000000;
+    }
+    if (input.CpuReservation > 0) {
+      config.TaskTemplate.Resources.Reservations.NanoCPUs = input.CpuReservation * 1000000000;
+    }
+    var memoryLimit = ServiceHelper.convertUnitStringToNumber(input.MemoryLimit);
+    if (memoryLimit > 0) {
+      config.TaskTemplate.Resources.Limits.MemoryBytes = memoryLimit;
+    }
+    var memoryReservation = ServiceHelper.convertUnitStringToNumber(input.MemoryReservation);
+    if (memoryReservation > 0) {
+      config.TaskTemplate.Resources.Reservations.MemoryBytes = memoryReservation;
+    }
+  }
+
   function prepareConfiguration() {
     var input = $scope.formValues;
     var config = {
@@ -232,7 +253,11 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
         ContainerSpec: {
           Mounts: []
         },
-        Placement: {}
+        Placement: {},
+        Resources: {
+          Limits: {},
+          Reservations: {}
+        },
       },
       Mode: {},
       EndpointSpec: {}
@@ -248,6 +273,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     prepareUpdateConfig(config, input);
     prepareSecretConfig(config, input);
     preparePlacementConfig(config, input);
+    prepareResourcesConfig(config, input);
     return config;
   }
 

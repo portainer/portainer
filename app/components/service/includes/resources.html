@@ -6,31 +6,65 @@
       <table class="table">
         <tbody>
           <tr>
-            <td>CPU limits</td>
-            <td ng-if="service.LimitNanoCPUs">
-              {{ service.LimitNanoCPUs / 1000000000 }}
+            <td>CPU limit</td>
+            <td>
+              <input class="input-sm" type="number" step="0.1" ng-model="service.LimitNanoCPUs | fromnano" ng-change="updateServiceAttribute(service, 'LimitNanoCPUs')" ng-disabled="isUpdating"/>
             </td>
-            <td ng-if="!service.LimitNanoCPUs">None</td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Maximum number of CPU the service can use (0 to unlimited).
+              </p>
+            </td>
           </tr>
           <tr>
-            <td>Memory limits</td>
-            <td ng-if="service.LimitMemoryBytes">{{service.LimitMemoryBytes|humansize}}</td>
-            <td ng-if="!service.LimitMemoryBytes">None</td>
+            <td>Memory limit</td>
+            <td>
+              <input class="input-sm" type="text" ng-model="service.LimitMemoryBytes|memoryhumansize" ng-change="updateServiceAttribute(service, 'LimitMemoryBytes')" ng-disabled="isUpdating"/>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Maximum memory the service can use (0 to unlimited).
+              </p>
+            </td>
           </tr>
           <tr>
             <td>CPU reservation</td>
-            <td ng-if="service.ReservationNanoCPUs">
-              {{service.ReservationNanoCPUs / 1000000000}}
+            <td>
+              <input class="input-sm" type="number" step="0.1" ng-model="service.ReservationNanoCPUs|fromnano" ng-change="updateServiceAttribute(service, 'ReservationNanoCPUs')" ng-disabled="isUpdating"/>
             </td>
-            <td ng-if="!service.ReservationNanoCPUs">None</td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Minimum number of CPU guaranteed to the service.
+              </p>
+            </td>
           </tr>
           <tr>
             <td>Memory reservation</td>
-            <td ng-if="service.ReservationMemoryBytes">{{service.ReservationMemoryBytes|humansize}}</td>
-            <td ng-if="!service.ReservationMemoryBytes">None</td>
+            <td>
+              <input class="input-sm" type="text" ng-model="service.ReservationMemoryBytes|memoryhumansize" ng-change="updateServiceAttribute(service, 'ReservationMemoryBytes')" ng-disabled="isUpdating"/>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Minimum memory guaranteed to the service.
+              </p>
+            </td>
           </tr>
         </tbody>
       </table>
     </rd-widget-body>
+    <rd-widget-footer>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['LimitNanoCPUs', 'LimitMemoryBytes', 'ReservationNanoCPUs', 'ReservationMemoryBytes'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['LimitNanoCPUs', 'LimitMemoryBytes', 'ReservationNanoCPUs', 'ReservationMemoryBytes'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
   </rd-widget>
 </div>
