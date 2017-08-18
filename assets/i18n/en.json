@@ -1,5 +1,11 @@
 {
-    "DASHBOARD": {
-        "NODE_NAME": "Name"
+  "DASHBOARD": {
+    "WIDGET_NODE": {
+      "TITLE": "Node info",
+      "NODE_NAME": "Name",
+      "DOCKER_VERSION": "Docker version",
+      "CPU": "CPU",
+      "MEMORY": "Memory"
     }
+  }
 }

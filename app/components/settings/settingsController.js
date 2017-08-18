@@ -55,6 +55,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     .then(function success(data) {
       Notifications.success('Settings updated');
       StateManager.updateLogo(settings.LogoURL);
+      StateManager.updateLang(settings.Language);
       StateManager.updateExternalContributions(settings.DisplayExternalContributors);
       if (resetForm) {
         resetFormValues();

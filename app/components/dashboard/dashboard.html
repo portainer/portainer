@@ -8,24 +8,24 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'">
     <rd-widget>
-      <rd-widget-header icon="fa-tachometer" title="Node info"></rd-widget-header>
+      <rd-widget-header icon="fa-tachometer" title="DASHBOARD.WIDGET_NODE.TITLE"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
             <tr>
-              <td>{{ 'DASHBOARD.NODE_NAME' | translate }}</td>
+              <td translate>DASHBOARD.WIDGET_NODE.NODE_NAME</td>
               <td>{{ infoData.Name }}</td>
             </tr>
             <tr>
-              <td>Docker version</td>
+              <td translate>DASHBOARD.WIDGET_NODE.DOCKER_VERSION</td>
               <td>{{ infoData.ServerVersion }}</td>
             </tr>
             <tr>
-              <td>CPU</td>
+              <td translate>DASHBOARD.WIDGET_NODE.CPU</td>
               <td>{{ infoData.NCPU }}</td>
             </tr>
             <tr>
-              <td>Memory</td>
+              <td translate>DASHBOARD.WIDGET_NODE.MEMORY</td>
               <td>{{ infoData.MemTotal|humansize }}</td>
             </tr>
           </tbody>

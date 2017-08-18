@@ -57,6 +57,7 @@ type (
 		DisplayExternalContributors bool                   `valid:""`
 		AuthenticationMethod        int                    `valid:"required"`
 		LDAPSettings                portainer.LDAPSettings `valid:""`
+		Language                    string                 `valid:"required"`
 	}
 
 	putSettingsLDAPCheckRequest struct {
@@ -114,6 +115,7 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 		BlackListedLabels:           req.BlackListedLabels,
 		DisplayExternalContributors: req.DisplayExternalContributors,
 		LDAPSettings:                req.LDAPSettings,
+		Language:                    req.Language,
 	}
 
 	if req.AuthenticationMethod == 1 {
