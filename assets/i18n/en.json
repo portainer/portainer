@@ -1,11 +1,81 @@
 {
+  "WIDGETS": {
+    "HEADER_CONTENT": {
+      "USER_PREFERENCES": "my account",
+      "LOGOUT": "log out"
+    }
+  },
+  "SIDEBAR": {
+    "ACTIVE_ENDPOINT": {
+      "TITLE": "Active endpoint"
+    },
+    "ENDPOINT_ACTIONS": {
+      "TITLE": "Endpoint actions",
+      "DASHBOARD": "Dashboard",
+      "APP_TEMPLATES": "App Templates",
+      "SERVICES": "Services",
+      "CONTAINERS": "Containers",
+      "IMAGES": "Images",
+      "NETWORKS": "Networks",
+      "VOLUMES": "Volumes",
+      "SECRETS": "Secrets",
+      "EVENTS": "Events",
+      "SWARM": "Swarm",
+      "DOCKER": "Docker"
+    },
+    "PORTAINER_SETTINGS": {
+      "TITLE": "Portainer settings",
+      "USER_MANAGEMENT": {
+        "TITLE": "User management",
+        "TEAMS": "Teams"
+      },
+      "ENDPOINTS": "Endpoints",
+      "REGISTRIES": "Registries",
+      "SETTINGS": {
+        "TITLE": "Settings",
+        "AUTHENTICATION": "Authentication"
+      }
+    }
+  },
   "DASHBOARD": {
+    "HEADER": {
+      "TITLE": "Home",
+      "CONTENT": "Dashboard"
+    },
+    "WIDGET_CLUSTER": {
+      "TITLE": "Cluster info",
+      "NODES": "Nodes",
+      "SWARM_VERSION": "Swarm version",
+      "CPU": "Total CPU",
+      "MEMORY": "Total memory"
+    },
+    "WIDGET_SWARM": {
+      "TITLE": "Swarm info",
+      "COMMENT": "This node is part of a Swarm cluster",
+      "NODE_ROLE": "Node role",
+      "NODES_IN_CLUSTER": "Nodes in the cluster"
+    },
     "WIDGET_NODE": {
       "TITLE": "Node info",
       "NODE_NAME": "Name",
       "DOCKER_VERSION": "Docker version",
       "CPU": "CPU",
       "MEMORY": "Memory"
+    },
+    "WIDGET_CONTAINERS": {
+      "COMMENT": "Containers",
+      "RUNNING_CONTAINERS": "running",
+      "STOPPED_CONTAINERS": "stopped"
+    },
+    "WIDGET_IMAGES": {
+      "COMMENT": "Images"
+    },
+    "WIDGET_VOLUMES": {
+      "COMMENT": "Volumes",
+      "DRIVER": "driver"
+    },
+    "WIDGET_NETWORKS": {
+      "COMMENT": "Networks"
     }
   }
 }

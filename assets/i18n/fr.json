@@ -1,11 +1,81 @@
 {
+  "WIDGETS": {
+    "HEADER_CONTENT": {
+      "USER_PREFERENCES": "mon compte",
+      "LOGOUT": "se déconnecter"
+    }
+  },
+  "SIDEBAR": {
+    "ACTIVE_ENDPOINT": {
+      "TITLE": "Environnement actif"
+    },
+    "ENDPOINT_ACTIONS": {
+      "TITLE": "Actions de l'environnement",
+      "DASHBOARD": "Tableau de bord",
+      "APP_TEMPLATES": "App Templates",
+      "SERVICES": "Services",
+      "CONTAINERS": "Conteneurs",
+      "IMAGES": "Images",
+      "NETWORKS": "Réseaux",
+      "VOLUMES": "Volumes",
+      "SECRETS": "Secrets",
+      "EVENTS": "Evénements",
+      "SWARM": "Swarm",
+      "DOCKER": "Docker"
+    },
+    "PORTAINER_SETTINGS": {
+      "TITLE": "Paramètres de Portainer",
+      "USER_MANAGEMENT": {
+        "TITLE": "Gestion utilisateurs",
+        "TEAMS": "Equipes"
+      },
+      "ENDPOINTS": "Environnements",
+      "REGISTRIES": "Registres",
+      "SETTINGS": {
+        "TITLE": "Paramètres",
+        "AUTHENTICATION": "Authentification"
+      }
+    }
+  },
   "DASHBOARD": {
+    "HEADER": {
+      "TITLE": "Accueil",
+      "CONTENT": "Tableau de bord"
+    },
+    "WIDGET_CLUSTER": {
+      "TITLE": "Informations à propos du cluster",
+      "NODES": "Nombre de noeuds",
+      "SWARM_VERSION": "Version de Swarm",
+      "CPU": "Total des processeurs",
+      "MEMORY": "Mémoire totale"
+    },
+    "WIDGET_SWARM": {
+      "TITLE": "Informations à propos de Swarm",
+      "COMMENT": "Cet hôte fait partie d'un cluster Swarm",
+      "NODE_ROLE": "Rôle de l'hôte",
+      "NODES_IN_CLUSTER": "Nombre d'hôtes dans le cluster"
+    },
     "WIDGET_NODE": {
       "TITLE": "Informations à propos de l'hôte",
       "NODE_NAME": "Nom",
       "DOCKER_VERSION": "Version de Docker",
       "CPU": "Processeurs",
       "MEMORY": "Mémoire"
+    },
+    "WIDGET_CONTAINERS": {
+      "COMMENT": "Conteneurs",
+      "RUNNING_CONTAINERS": "en marche",
+      "STOPPED_CONTAINERS": "à l'arrêt"
+    },
+    "WIDGET_IMAGES": {
+      "COMMENT": "Images"
+    },
+    "WIDGET_VOLUMES": {
+      "COMMENT": "Volumes",
+      "DRIVER": "driver"
+    },
+    "WIDGET_NETWORKS": {
+      "COMMENT": "Réseaux"
     }
   }
 }
