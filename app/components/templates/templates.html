@@ -45,7 +45,7 @@
               <por-translation key="TEMPLATES.SELECTED_TEMPLATE.FORM.NAME"></por-translation>
             </label>
             <div class="col-sm-10">
-              <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)">
+              <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. web (optional)" translate translate-attr-placeholder="COMMON.PLACEHOLDERS.CONTAINER_NAME">
             </div>
           </div>
           <!-- !name-input -->
@@ -113,7 +113,7 @@
                     <!-- host-port -->
                     <div class="input-group col-sm-4 input-group-sm">
                       <span class="input-group-addon"><por-translation key="COMMON.DOCKER.HOST"></por-translation></span>
-                      <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
+                      <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)" translate translate-attr-placeholder="COMMON.PLACEHOLDERS.CONTAINER_HOST_PORT">
                     </div>
                     <!-- !host-port -->
                     <span style="margin: 0 10px 0 10px;">

@@ -3,7 +3,8 @@
     "VERBS": {
       "CREATE": "Créer",
       "REFRESH": "Rafraîchir",
-      "HIDE": "Cacher"
+      "HIDE": "Cacher",
+      "FILTER": "Filtrer"
     },
     "DOCKER": {
       "CONTAINER": "conteneur",
@@ -13,12 +14,19 @@
     "UI": {
       "LOADING": "Chargement...",
       "ALL": "Tous"
+    },
+    "PLACEHOLDERS": {
+      "CONTAINER_NAME": "e.g. web (optionnel)",
+      "CONTAINER_HOST_PORT": "e.g. 80 or 1.2.3.4:80 (optionnel)"
     }
   },
   "WIDGETS": {
     "HEADER_CONTENT": {
       "USER_PREFERENCES": "mon compte",
       "LOGOUT": "se déconnecter"
+    },
+    "PAGINATION": {
+      "TEXT": "Objets par page:"
     }
   },
   "SIDEBAR": {
@@ -35,7 +43,7 @@
       "NETWORKS": "Réseaux",
       "VOLUMES": "Volumes",
       "SECRETS": "Secrets",
-      "EVENTS": "Evénements",
+      "EVENTS": "Evènements",
       "SWARM": "Swarm",
       "DOCKER": "Docker"
     },
@@ -106,6 +114,20 @@
       }
     }
   },
+  "EVENTS": {
+    "HEADER": {
+      "TITLE": "Liste d'évènements",
+      "CONTENT": "Evènements"
+    },
+    "TABLE": {
+      "TITLE": "Evènements",
+      "HEADERS": {
+        "DATE": "Date",
+        "CATEGORY": "Catégorie",
+        "DETAILS": "Détails"
+      }
+    }
+  },
   "DASHBOARD": {
     "HEADER": {
       "TITLE": "Accueil",
@@ -133,8 +155,8 @@
     },
     "WIDGET_CONTAINERS": {
       "COMMENT": "Conteneurs",
-      "RUNNING_CONTAINERS": "en marche",
-      "STOPPED_CONTAINERS": "à l'arrêt"
+      "RUNNING_CONTAINERS": "démarré(s)",
+      "STOPPED_CONTAINERS": "stoppé(s)"
     },
     "WIDGET_IMAGES": {
       "COMMENT": "Images"

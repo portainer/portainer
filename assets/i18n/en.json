@@ -3,22 +3,30 @@
     "VERBS": {
       "CREATE": "Create",
       "REFRESH": "Refresh",
-      "HIDE": "Hide"
+      "HIDE": "Hide",
+      "FILTER": "Filter"
     },
     "DOCKER": {
       "CONTAINER": "container",
       "VOLUME": "volume",
-      "HOST": "host",
+      "HOST": "host"
     },
     "UI": {
       "LOADING": "Loading...",
       "ALL": "All"
+    },
+    "PLACEHOLDERS": {
+      "CONTAINER_NAME": "e.g. web (optional)",
+      "CONTAINER_HOST_PORT": "e.g. 80 or 1.2.3.4:80 (optional)"
     }
   },
   "WIDGETS": {
     "HEADER_CONTENT": {
       "USER_PREFERENCES": "my account",
       "LOGOUT": "log out"
+    },
+    "PAGINATION": {
+      "TEXT": "Items per page:"
     }
   },
   "SIDEBAR": {
@@ -104,6 +112,20 @@
       },
       "LIST": {
         "EMPTY": "No templates available."
+      }
+    }
+  },
+  "EVENTS": {
+    "HEADER": {
+      "TITLE": "Event list",
+      "CONTENT": "Events"
+    },
+    "TABLE": {
+      "TITLE": "Events",
+      "HEADERS": {
+        "DATE": "Date",
+        "CATEGORY": "Category",
+        "DETAILS": "Details"
       }
     }
   },
