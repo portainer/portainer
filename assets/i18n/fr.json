@@ -1,4 +1,20 @@
 {
+  "COMMON": {
+    "VERBS": {
+      "CREATE": "Créer",
+      "REFRESH": "Rafraîchir",
+      "HIDE": "Cacher"
+    },
+    "DOCKER": {
+      "CONTAINER": "conteneur",
+      "VOLUME": "volume",
+      "HOST": "hôte"
+    },
+    "UI": {
+      "LOADING": "Chargement...",
+      "ALL": "Tous"
+    }
+  },
   "WIDGETS": {
     "HEADER_CONTENT": {
       "USER_PREFERENCES": "mon compte",
@@ -34,6 +50,59 @@
       "SETTINGS": {
         "TITLE": "Paramètres",
         "AUTHENTICATION": "Authentification"
+      }
+    }
+  },
+  "TEMPLATES": {
+    "HEADER": {
+      "TITLE": "Liste de templates applicatifs",
+      "CONTENT": "Templates"
+    },
+    "SELECTED_TEMPLATE": {
+      "TITLE_INFORMATION": "Information",
+      "TITLE_CONFIGURATION": "Configuration",
+      "FORM": {
+        "NAME": "Nom",
+        "NETWORK": "Réseau",
+        "SELECT_CONTAINER": "Choisir un conteneur",
+        "SHOW_ADVANCED_OPTIONS": "Afficher les options avancées",
+        "HIDE_ADVANCED_OPTIONS": "Cacher les options avancées",
+        "ADVANCED_OPTIONS": {
+          "PORT_MAPPING": {
+            "LABEL": "Associer port",
+            "MAP_PORT": "associer un port supplémentaire",
+            "NOTE": "Portainer va automatiquement assigner un port quand le port hôte est vide."
+          },
+          "VOLUME_MAPPING": {
+            "LABEL": "Associer volume",
+            "MAP_VOLUME": "associer un volume supplémentaire",
+            "NOTE": "Portainer va automatiquement créer et associer un volume local quand l'option <b>auto</b> est sélectionnée.",
+            "TYPE": {
+              "AUTO": "Auto",
+              "VOLUME": "Volume",
+              "BIND": "Bind"
+            },
+            "SELECT_VOLUME": "Choisir un volume",
+            "WRITABLE": "Ecriture",
+            "READONLY": "Lecture seule"
+          }
+        },
+        "ACTIONS": {
+          "SWARM_NOTE_NETWORK": "Vous utilisez Swarm, nous recommandons le deployment de vos conteneurs dans un réseau partagé. Vous pouvez en créer un dans la <a ui-sref='networks'>vue réseaux</a>.",
+          "SWARM_NOTE_STACK": "Les App Templates ne peuvent pas être déployés en tant que services Swarm pour le moment. Vous pouvez toujours les utiliser pour déployer des conteneurs sur cet hôte."
+        }
+      }
+    },
+    "WIDGET_TEMPLATE_LIST": {
+      "HEADER": {
+        "CATEGORY": "Catégorie",
+        "PLATFORM_FILTERS": {
+          "WINDOWS": "Windows",
+          "LINUX": "Linux"
+        }
+      },
+      "LIST": {
+        "EMPTY": "Aucun template disponible."
       }
     }
   },

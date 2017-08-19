@@ -100,13 +100,14 @@ angular.module('portainer', [
       'outsideClick': 'outsideClick'
     });
 
-    $translateProvider.useSanitizeValueStrategy('sanitize');
+    $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
     $translateProvider
     .useStaticFilesLoader({
         'prefix': 'i18n/',
         'suffix': '.json'
     });
     $translateProvider.preferredLanguage('en');
+    $translateProvider.fallbackLanguage('en');
 
     $stateProvider
     .state('root', {

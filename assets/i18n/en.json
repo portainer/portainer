@@ -1,4 +1,20 @@
 {
+  "COMMON": {
+    "VERBS": {
+      "CREATE": "Create",
+      "REFRESH": "Refresh",
+      "HIDE": "Hide"
+    },
+    "DOCKER": {
+      "CONTAINER": "container",
+      "VOLUME": "volume",
+      "HOST": "host",
+    },
+    "UI": {
+      "LOADING": "Loading...",
+      "ALL": "All"
+    }
+  },
   "WIDGETS": {
     "HEADER_CONTENT": {
       "USER_PREFERENCES": "my account",
@@ -34,6 +50,60 @@
       "SETTINGS": {
         "TITLE": "Settings",
         "AUTHENTICATION": "Authentication"
+      }
+    }
+  },
+  "TEMPLATES": {
+    "HEADER": {
+      "TITLE": "Application templates list",
+      "CONTENT": "Templates"
+    },
+    "SELECTED_TEMPLATE": {
+      "TITLE_INFORMATION": "Information",
+      "TITLE_CONFIGURATION": "Configuration",
+      "FORM": {
+        "NAME": "Name",
+        "NETWORK": "Network",
+        "SELECT_CONTAINER": "Select a container",
+        "SHOW_ADVANCED_OPTIONS": "Show advanced options",
+        "HIDE_ADVANCED_OPTIONS": "Hide advanced options",
+        "ADVANCED_OPTIONS": {
+          "PORT_MAPPING": {
+            "LABEL": "Port mapping",
+            "MAP_PORT": "map additional port",
+            "NOTE": "Portainer will automatically assign a port if you leave the host port empty.",
+            "HOST": "host"
+          },
+          "VOLUME_MAPPING": {
+            "LABEL": "Volume mapping",
+            "MAP_VOLUME": "map additional volume",
+            "NOTE": "Portainer will automatically create and map a local volume when using the <b>auto</b> option.",
+            "TYPE": {
+              "AUTO": "Auto",
+              "VOLUME": "Volume",
+              "BIND": "Bind"
+            },
+            "SELECT_VOLUME": "Select a volume",
+            "WRITABLE": "Writable",
+            "READONLY": "Read-only"
+          }
+        },
+        "ACTIONS": {
+          "SWARM_NOTE_NETWORK": "When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref='networks'>networks view</a> to create one.",
+          "SWARM_NOTE_STACK": "App templates cannot be deployed as Swarm Mode services for the moment. You can still use them to quickly deploy containers on the Docker host."
+        }
+      }
+    },
+    "WIDGET_TEMPLATE_LIST": {
+      "HEADER": {
+        "CATEGORY": "Category",
+        "PLATFORM_FILTERS": {
+          "WINDOWS": "Windows",
+          "LINUX": "Linux"
+        }
+      },
+      "LIST": {
+        "EMPTY": "No templates available."
       }
     }
   },
