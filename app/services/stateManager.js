@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService) {
+.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'ExtensionService', function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, ExtensionService) {
   'use strict';
 
   var manager = {};
@@ -8,7 +8,8 @@ angular.module('portainer.services')
     loading: true,
     application: {},
     endpoint: {},
-    UI: {}
+    UI: {},
+    extensions: []
   };
 
   manager.getState = function() {
@@ -38,6 +39,7 @@ angular.module('portainer.services')
     }
 
     var applicationState = LocalStorage.getApplicationState();
+    var extensions = LocalStorage.getExtensions();
     if (applicationState) {
       state.application = applicationState;
       state.loading = false;
@@ -45,7 +47,8 @@ angular.module('portainer.services')
     } else {
       $q.all({
         settings: SettingsService.publicSettings(),
-        status: StatusService.status()
+        status: StatusService.status(),
+        extensions: ExtensionService.extensions()
       })
       .then(function success(data) {
         var status = data.status;
@@ -56,7 +59,9 @@ angular.module('portainer.services')
         state.application.version = status.Version;
         state.application.logo = settings.LogoURL;
         state.application.displayExternalContributors = settings.DisplayExternalContributors;
+        state.extensions = data.extensions;
         LocalStorage.storeApplicationState(state.application);
+        LocalStorage.storeExtensions(state.extensions);
         deferred.resolve(state);
       })
       .catch(function error(err) {
@@ -77,14 +82,17 @@ angular.module('portainer.services')
     }
     $q.all({
       info: SystemService.info(),
-      version: SystemService.version()
+      version: SystemService.version(),
+      extensions: ExtensionService.extensions()
     })
     .then(function success(data) {
       var endpointMode = InfoHelper.determineEndpointMode(data.info);
       var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
       state.endpoint.apiVersion = endpointAPIVersion;
+      state.extensions = data.extensions;
       LocalStorage.storeEndpointState(state.endpoint);
+      LocalStorage.storeExtensions(state.extensions);
       deferred.resolve();
     })
     .catch(function error(err) {
