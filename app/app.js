@@ -83,7 +83,8 @@ angular.module('portainer', [
       }],
       unauthenticatedRedirector: ['$state', function($state) {
         $state.go('auth', {error: 'Your session has expired'});
-      }]
+      }],
+      whiteListedDomains: ['.*']
     });
     $httpProvider.interceptors.push('jwtInterceptor');
 
@@ -595,7 +596,7 @@ angular.module('portainer', [
       url: '/profiles',
       views: {
         'content@': {
-          templateUrl: 'app/components/storidge/views/profiles/profiles.html',
+          templateUrl: 'app/extensions/storidge/views/profiles/profiles.html',
           controller: 'StoridgeProfilesController'
         },
         'sidebar@': {
@@ -608,7 +609,7 @@ angular.module('portainer', [
       url: '/create',
       views: {
         'content@': {
-          templateUrl: 'app/components/storidge/views/profiles/create/createProfile.html',
+          templateUrl: 'app/extensions/storidge/views/profiles/create/createProfile.html',
           controller: 'CreateProfileController'
         },
         'sidebar@': {
@@ -621,7 +622,7 @@ angular.module('portainer', [
       url: '/edit/:id',
       views: {
         'content@': {
-          templateUrl: 'app/components/storidge/views/profiles/edit/editProfile.html',
+          templateUrl: 'app/extensions/storidge/views/profiles/edit/editProfile.html',
           controller: 'EditProfileController'
         },
         'sidebar@': {
@@ -634,7 +635,7 @@ angular.module('portainer', [
       url: '/cluster',
       views: {
         'content@': {
-          templateUrl: 'app/components/storidge/views/cluster/cluster.html',
+          templateUrl: 'app/extensions/storidge/views/cluster/cluster.html',
           controller: 'StoridgeClusterController'
         },
         'sidebar@': {

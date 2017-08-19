@@ -61,7 +61,7 @@ module.exports = function (grunt) {
       js: ['app/**/*.js', '!app/**/*.spec.js'],
       jsTpl: ['<%= distdir %>/templates/**/*.js'],
       html: ['index.html'],
-      tpl: ['app/components/**/*.html', 'app/directives/**/*.html'],
+      tpl: ['app/components/**/*.html', 'app/directives/**/*.html', 'app/extensions/**/*.html'],
       css: ['assets/css/app.css']
     },
     clean: {
