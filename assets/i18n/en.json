@@ -16,6 +16,7 @@
       "ALL": "All"
     },
     "PLACEHOLDERS": {
+      "USERNAME": "Username",
       "CONTAINER_NAME": "e.g. web (optional)",
       "CONTAINER_HOST_PORT": "e.g. 80 or 1.2.3.4:80 (optional)"
     }
@@ -28,6 +29,9 @@
     "PAGINATION": {
       "TEXT": "Items per page:"
     }
+  },
+  "AUTH": {
+    "LOGIN": "Login"
   },
   "SIDEBAR": {
     "ACTIVE_ENDPOINT": {
