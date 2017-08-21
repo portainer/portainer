@@ -194,7 +194,7 @@
           }
         },
         "ACTIONS": {
-          "SWARM_NOTE_NETWORK": "Vous utilisez Swarm, nous recommandons le deployment de vos conteneurs dans un réseau partagé. Vous pouvez en créer un dans la <a ui-sref='networks'>vue réseaux</a>.",
+          "SWARM_NOTE_NETWORK": "Vous utilisez Swarm, nous recommandons le deployment de vos conteneurs dans un réseau Swarm. Vous pouvez en créer un dans la <a ui-sref='networks'>vue réseaux</a>.",
           "SWARM_NOTE_STACK": "Les App Templates ne peuvent pas être déployés en tant que services Swarm pour le moment. Vous pouvez toujours les utiliser pour déployer des conteneurs sur cet hôte."
         }
       }

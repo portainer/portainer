@@ -194,7 +194,7 @@
           }
         },
         "ACTIONS": {
-          "SWARM_NOTE_NETWORK": "When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref='networks'>networks view</a> to create one.",
+          "SWARM_NOTE_NETWORK": "When using Swarm, we recommend deploying containers in a Swarm network. Looks like you don't have any Swarm network, head over the <a ui-sref='networks'>networks view</a> to create one.",
           "SWARM_NOTE_STACK": "App templates cannot be deployed as Swarm Mode services for the moment. You can still use them to quickly deploy containers on the Docker host."
         }
       }
