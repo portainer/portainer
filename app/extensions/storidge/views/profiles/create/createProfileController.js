@@ -2,17 +2,16 @@ angular.module('extension.storidge')
 .controller('CreateProfileController', ['$scope', '$state', 'Notifications',
 function ($scope, $state, Notifications) {
 
-  $scope.config = {
-    Driver: 'bridge',
-    CheckDuplicate: true,
-    Internal: false,
-    // Force IPAM Driver to 'default', should not be required.
-    // See: https://github.com/docker/docker/issues/25735
-    IPAM: {
-      Driver: 'default',
-      Config: []
-    },
-    Labels: {}
+  $scope.formValues = {
+    Directory: '/cio/volumes',
+    Capacity: 20,
+    Redundancy: '2',
+    Provisioning: 'thin',
+    Type: 'ssd',
+    MinIOPS: 100,
+    MaxIOPS: 2000,
+    MinBandwidth: 1,
+    MaxBandwidth: 100
   };
 
   $scope.createProfile = function () {
