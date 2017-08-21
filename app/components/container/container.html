@@ -64,7 +64,7 @@
                 <i class="fa fa-heartbeat space-right red-icon" ng-if="!container.State.Running && container.State.Status !== 'created'"></i>
                 <por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.STATUS.RUNNING" values="{time: activityTime}" ng-if="container.State.Running"></por-translation>
                 <por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.STATUS.CREATED" values="{time: activityTime}" ng-if="container.State.Status === 'created'"></por-translation>
-                <por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.STATUS.STOPPED" values="{time: activityTime, code: container.State.ExitCode}" ng-if="!container.state.Running && container.State.Status !== 'created'"></por-translation>
+                <por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.STATUS.STOPPED" values="{time: activityTime, code: container.State.ExitCode}" ng-if="!container.State.Running && container.State.Status !== 'created'"></por-translation>
                 <por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.STATUS.DEAD" values="{time: activityTime, code: container.State.ExitCode}" ng-if="container.State.Dead"></por-translation>
               </td>
             </tr>
