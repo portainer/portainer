@@ -1,15 +1,38 @@
 {
   "COMMON": {
+    "NOUNS": {
+      "STATUS": "Status",
+      "NAME": "Name"
+    },
     "VERBS": {
       "CREATE": "Create",
       "REFRESH": "Refresh",
       "HIDE": "Hide",
-      "FILTER": "Filter"
+      "FILTER": "Filter",
+      "START": "Start",
+      "STOP": "Stop",
+      "KILL": "Kill",
+      "RESTART": "Restart",
+      "PAUSE": "Pause",
+      "RESUME": "Resume",
+      "REMOVE": "Remove",
+      "RECREATE": "Recreate",
+      "DUPLICATE": "Duplicate",
+      "EDIT": "Edit"
     },
     "DOCKER": {
+      "ID": "ID",
       "CONTAINER": "container",
+      "CONTAINERS": "Containers",
       "VOLUME": "volume",
-      "HOST": "host"
+      "HOST": "host",
+      "CONTAINER_STATUS": {
+        "DEAD": "Dead",
+        "GHOST": "Ghost",
+        "RUNNING": "Running",
+        "CREATED": "Created",
+        "STOPPED": "Stopped"
+      }
     },
     "UI": {
       "LOADING": "Loading...",
@@ -65,6 +88,77 @@
       }
     }
   },
+  "CONTAINER_DETAILS": {
+    "HEADER": {
+      "TITLE": "Container details"
+    },
+    "WIDGET_ACTIONS": {
+      "TITLE": "Actions"
+    },
+    "WIDGET_CONTAINER_STATUS": {
+      "TITLE": "Container status",
+      "ROW_NAME": "Name",
+      "ROW_IP": "IP address",
+      "ROW_STATUS": "Status",
+      "ROW_CREATED": "Created",
+      "ROW_START_TIME": "Start time",
+      "ROW_FINISHED": "Finished",
+      "STATUS": {
+        "RUNNING": "Running since {{ time }}",
+        "CREATED": "Created since {{ time }}",
+        "STOPPED": "Stopped since {{ time }} with exit code {{ code }}",
+        "DEAD": "Dead since {{ time }} with exit code {{ code }}"
+      },
+      "ACTIONS": {
+        "STATS": "Stats",
+        "LOGS": "Logs",
+        "CONSOLE": "Console"
+      }
+    },
+    "WIDGET_CONTAINER_HEALTH": {
+      "TITLE": "Container health",
+      "FAILURE_COUNT": "Failure count",
+      "LAST_OUTPUT": "Last output"
+    },
+    "WIDGET_CREATE_IMAGE": {
+      "TITLE": "Create image",
+      "DESCRIPTION": "You can create an image from this container, this allows you to backup important data or save helpful configurations. You'll be able to spin up another container based on this image afterward.",
+      "TAG_NOTE": "Note: if you don't specify the tag in the image name, <span class='label label-default'>latest</span> will be used."
+    },
+    "WIDGET_CONTAINER_DETAILS": {
+      "TITLE": "Container details",
+      "ROW_IMAGE": "Image",
+      "ROW_PORT": "Port configuration",
+      "ROW_LABELS": "Labels",
+      "ROW_RESTART_POLICIES": "Restart policies"
+    },
+    "WIDGET_CONTAINER_VOLUMES": {
+      "TITLE": "Volumes",
+      "TABLE": {
+        "HEADERS": {
+          "HOST": "Host",
+          "CONTAINER": "Container"
+        }
+      }
+    },
+    "WIDGET_CONTAINER_NETWORKS": {
+      "TITLE": "Connected networks",
+      "TABLE": {
+        "HEADERS": {
+          "NETWORK_NAME": "Network name",
+          "IP": "IP address",
+          "GATEWAY": "Gateway",
+          "MAC": "MAC address",
+          "ACTIONS": "Actions"
+        },
+        "EMPTY": "No networks connected."
+      },
+      "CONNECT_NETWORK": "Join a network",
+      "SELECT_NETWORK": "Select a network",
+      "CONNECT": "Join network",
+      "DISCONNECT": "Leaver network"
+    }
+  },
   "TEMPLATES": {
     "HEADER": {
       "TITLE": "Application templates list",
@@ -84,7 +178,6 @@
             "LABEL": "Port mapping",
             "MAP_PORT": "map additional port",
             "NOTE": "Portainer will automatically assign a port if you leave the host port empty.",
-            "HOST": "host"
           },
           "VOLUME_MAPPING": {
             "LABEL": "Volume mapping",

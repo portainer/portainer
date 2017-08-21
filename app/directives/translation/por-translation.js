@@ -1,7 +1,8 @@
 angular.module('portainer').component('porTranslation', {
   bindings: {
     'key': '@',
-    'compile': '@'
+    'compile': '@',
+    'values': '<'
   },
-  template: '<span translate translate-compile="{{ $ctrl.compile ? $ctrl.compile : false }}">{{ $ctrl.key }}</span>'
+  template: '<span translate translate-compile="{{ $ctrl.compile ? $ctrl.compile : false }}" translate-values="{{ $ctrl.values }}">{{ $ctrl.key }}</span>'
 });

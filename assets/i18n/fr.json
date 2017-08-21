@@ -1,15 +1,38 @@
 {
   "COMMON": {
+    "NOUNS": {
+      "STATUS": "Statut",
+      "NAME": "Nom"
+    },
     "VERBS": {
       "CREATE": "Créer",
       "REFRESH": "Rafraîchir",
       "HIDE": "Cacher",
-      "FILTER": "Filtrer"
+      "FILTER": "Filtrer",
+      "START": "Démarrer",
+      "STOP": "Stopper",
+      "KILL": "Tuer",
+      "RESTART": "Redémarrer",
+      "PAUSE": "Pause",
+      "RESUME": "Reprendre",
+      "REMOVE": "Supprimer",
+      "RECREATE": "Re-créer",
+      "DUPLICATE": "Dupliquer",
+      "EDIT": "Editer"
     },
     "DOCKER": {
+      "ID": "ID",
       "CONTAINER": "conteneur",
+      "CONTAINERS": "Containers",
       "VOLUME": "volume",
-      "HOST": "hôte"
+      "HOST": "hôte",
+      "CONTAINER_STATUS": {
+        "DEAD": "Mort",
+        "GHOST": "Fantôme",
+        "RUNNING": "Démarré",
+        "CREATED": "Créé",
+        "STOPPED": "Stoppé"
+      }
     },
     "UI": {
       "LOADING": "Chargement...",
@@ -63,6 +86,77 @@
         "TITLE": "Paramètres",
         "AUTHENTICATION": "Authentification"
       }
+    }
+  },
+  "CONTAINER_DETAILS": {
+    "HEADER": {
+      "TITLE": "Informations à propos du conteneur"
+    },
+    "WIDGET_ACTIONS": {
+      "TITLE": "Actions"
+    },
+    "WIDGET_CONTAINER_STATUS": {
+      "TITLE": "Statut du conteneur",
+      "ROW_NAME": "Nom",
+      "ROW_IP": "Adresse IP",
+      "ROW_STATUS": "Statut",
+      "ROW_CREATED": "Date de création",
+      "ROW_START_TIME": "Date de démarrage",
+      "ROW_FINISHED": "Date de fin",
+      "STATUS": {
+        "RUNNING": "Démarré depuis {{ time }}",
+        "CREATED": "Créé depuis {{ time }}",
+        "STOPPED": "Stoppé depuis {{ time }} avec code de retour {{ code }}",
+        "DEAD": "Mort depuis {{ time }} avec code de retour {{ code }}"
+      },
+      "ACTIONS": {
+        "STATS": "Stats",
+        "LOGS": "Logs",
+        "CONSOLE": "Console"
+      }
+    },
+    "WIDGET_CONTAINER_HEALTH": {
+      "TITLE": "Santé du conteneur (health check)",
+      "FAILURE_COUNT": "Nombre d'échecs",
+      "LAST_OUTPUT": "Dernière sortie"
+    },
+    "WIDGET_CREATE_IMAGE": {
+      "TITLE": "Créer une image",
+      "DESCRIPTION": "Vous pouvez créer une image à partir de ce conteneur, ceci vous permettra de sauvegarder les données ou toute configuration présente dans ce conteneur. Vous pourrez ensuite démarrer un autre conteneur basé sur cette image.",
+      "TAG_NOTE": "Note: si vous ne spécifiez pas de tag dans le nom de l'image, le tag <span class='label label-default'>latest</span> sera utilisé."
+    },
+    "WIDGET_CONTAINER_DETAILS": {
+      "TITLE": "A propos du conteneur",
+      "ROW_IMAGE": "Image",
+      "ROW_PORT": "Configuration des ports",
+      "ROW_LABELS": "Labels",
+      "ROW_RESTART_POLICIES": "Politiques de redémarrage"
+    },
+    "WIDGET_CONTAINER_VOLUMES": {
+      "TITLE": "Volumes",
+      "TABLE": {
+        "HEADERS": {
+          "HOST": "Hôte",
+          "CONTAINER": "Conteneur"
+        }
+      }
+    },
+    "WIDGET_CONTAINER_NETWORKS": {
+      "TITLE": "Réseaux connectés",
+      "TABLE": {
+        "HEADERS": {
+          "NETWORK_NAME": "Nom du réseau",
+          "IP": "Adresse IP",
+          "GATEWAY": "Passerelle",
+          "MAC": "Adresse MAC",
+          "ACTIONS": "Actions"
+        },
+        "EMPTY": "Aucun réseau connecté."
+      },
+      "CONNECT_NETWORK": "Connecter à un réseau",
+      "SELECT_NETWORK": "Choisir un réseau",
+      "CONNECT": "Connecter",
+      "DISCONNECT": "Déconnecter"
     }
   },
   "TEMPLATES": {

@@ -5,6 +5,7 @@ angular.module('portainer.services')
   var service = {};
 
   service.setLang = function(lang) {
+    moment.locale(lang);
     $translate.use(lang);
   };
 
