@@ -403,7 +403,6 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
   }
 
   function loadFromContainerImageConfig(d) {
-    // If no registry found, we let default DockerHub and let full image path
     var imageInfo = ImageHelper.extractImageAndRegistryFromRepository($scope.config.Image);
     RegistryService.retrieveRegistryFromRepository($scope.config.Image)
     .then(function success(data) {
