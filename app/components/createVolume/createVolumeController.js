@@ -76,7 +76,6 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
       PluginService.volumePlugins(apiVersion < 1.25 || endpointProvider === 'VMWARE_VIC')
       .then(function success(data) {
         $scope.availableVolumeDrivers = data;
-        $scope.availableVolumeDrivers.push('cio');
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to retrieve volume drivers');

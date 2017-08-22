@@ -35,19 +35,19 @@
           </div>
           <!-- !driver-input -->
           <!-- storidge-profile -->
-          <div class="form-group" ng-if="formValues.Driver === 'cio'">
+          <div class="form-group" ng-if="formValues.Driver === 'cio:latest'">
             <label for="storidge_profile" class="col-sm-2 col-lg-1 control-label text-left">Profile</label>
             <div class="col-sm-10 col-lg-11">
               <select id="storidge_profile" ng-model="formValues.StoridgeProfile" class="form-control">
                 <option selected disabled hidden value="">Select a profile</option>
-                <option value="1">profileA</option>
-                <option value="2">profileB</option>
+                <option value="1">AIRVIDEO</option>
+                <option value="2">NGINX</option>
               </select>
             </div>
           </div>
           <!-- !storidge-profile -->
           <!-- driver-options -->
-          <div class="form-group" ng-if="formValues.Driver !== 'cio'">
+          <div class="form-group" ng-if="formValues.Driver !== 'cio:latest'">
             <div class="col-sm-12" style="margin-top: 5px;">
               <label class="control-label text-left">
                 Driver options
