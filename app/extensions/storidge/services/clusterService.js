@@ -1,5 +1,5 @@
 angular.module('extension.storidge')
-.factory('StoridgeClusterService', ['$q', 'StoridgeProfiles', function StoridgeClusterServiceFactory($q, StoridgeProfiles) {
+.factory('StoridgeClusterService', ['$q', function StoridgeClusterServiceFactory($q) {
   'use strict';
   var service = {};
 

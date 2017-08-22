@@ -39,7 +39,6 @@ angular.module('portainer.services')
     }
 
     var applicationState = LocalStorage.getApplicationState();
-    var extensions = LocalStorage.getExtensions();
     if (applicationState) {
       state.application = applicationState;
       state.loading = false;
@@ -47,8 +46,7 @@ angular.module('portainer.services')
     } else {
       $q.all({
         settings: SettingsService.publicSettings(),
-        status: StatusService.status(),
-        extensions: ExtensionService.extensions()
+        status: StatusService.status()
       })
       .then(function success(data) {
         var status = data.status;
@@ -59,9 +57,7 @@ angular.module('portainer.services')
         state.application.version = status.Version;
         state.application.logo = settings.LogoURL;
         state.application.displayExternalContributors = settings.DisplayExternalContributors;
-        state.extensions = data.extensions;
         LocalStorage.storeApplicationState(state.application);
-        LocalStorage.storeExtensions(state.extensions);
         deferred.resolve(state);
       })
       .catch(function error(err) {
