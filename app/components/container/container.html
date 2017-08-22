@@ -1,27 +1,27 @@
 <rd-header>
-  <rd-header-title title="Container details">
+  <rd-header-title title="CONTAINER_DETAILS.HEADER.TITLE">
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="containers">Containers</a> &gt; <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a>
+    <a ui-sref="containers"><por-translation key="COMMON.DOCKER.CONTAINERS"></por-translation></a> &gt; <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a>
   </rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-cogs" title="Actions"></rd-widget-header>
+      <rd-widget-header icon="fa-cogs" title="CONTAINER_DETAILS.WIDGET_ACTIONS.TITLE"></rd-widget-header>
       <rd-widget-body classes="padding">
         <div class="btn-group" role="group" aria-label="...">
-          <button class="btn btn-success" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
-          <button class="btn btn-danger" ng-click="stop()" ng-disabled="!container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
-          <button class="btn btn-danger" ng-click="kill()" ng-disabled="!container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
-          <button class="btn btn-primary" ng-click="restart()" ng-disabled="!container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
-          <button class="btn btn-primary" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
-          <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
-          <button class="btn btn-danger" ng-click="confirmRemove()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-          <button class="btn btn-danger" ng-click="recreate()"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Recreate</button>
-          <button class="btn btn-primary" ng-click="duplicate()"><i class="fa fa-files-o space-right" aria-hidden="true"></i>Duplicate/Edit</button>
+          <button class="btn btn-success" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i><por-translation key="COMMON.VERBS.START"></por-translation></button>
+          <button class="btn btn-danger" ng-click="stop()" ng-disabled="!container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i><por-translation key="COMMON.VERBS.STOP"></por-translation></button>
+          <button class="btn btn-danger" ng-click="kill()" ng-disabled="!container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i><por-translation key="COMMON.VERBS.KILL"></por-translation></button>
+          <button class="btn btn-primary" ng-click="restart()" ng-disabled="!container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i><por-translation key="COMMON.VERBS.RESTART"></por-translation></button>
+          <button class="btn btn-primary" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i><por-translation key="COMMON.VERBS.PAUSE"></por-translation></button>
+          <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i><por-translation key="COMMON.VERBS.RESUME"></por-translation></button>
+          <button class="btn btn-danger" ng-click="confirmRemove()"><i class="fa fa-trash space-right" aria-hidden="true"></i><por-translation key="COMMON.VERBS.REMOVE"></por-translation></button>
+          <button class="btn btn-danger" ng-click="recreate()"><i class="fa fa-refresh space-right" aria-hidden="true"></i><por-translation key="COMMON.VERBS.RECREATE"></por-translation></button>
+          <button class="btn btn-primary" ng-click="duplicate()"><i class="fa fa-files-o space-right" aria-hidden="true"></i><por-translation key="COMMON.VERBS.DUPLICATE"></por-translation> / <por-translation key="COMMON.VERBS.EDIT"></por-translation></button>
         </div>
       </rd-widget-body>
     </rd-widget>
@@ -31,16 +31,16 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-server" title="Container status"></rd-widget-header>
+      <rd-widget-header icon="fa-server" title="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.TITLE"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
             <tr>
-              <td>ID</td>
+              <td><por-translation key="COMMON.DOCKER.ID"></por-translation></td>
               <td>{{ container.Id }}</td>
             </tr>
             <tr>
-              <td>Name</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.ROW_NAME"></por-translation></td>
               <td ng-if="!container.edit">
                 {{ container.Name|trimcontainername }}
                 <a href="" data-toggle="tooltip" title="Edit container name" ng-click="container.edit = true;"><i class="fa fa-edit"></i></a>
@@ -54,35 +54,38 @@
               </td>
             </tr>
             <tr ng-if="container.NetworkSettings.IPAddress">
-              <td>IP address</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.ROW_IP"></por-translation></td>
               <td>{{ container.NetworkSettings.IPAddress }}</td>
             </tr>
             <tr>
-              <td>Status</td>
+              <td><por-translation key="COMMON.NOUNS.STATUS"></por-translation></td>
               <td>
                 <i class="fa fa-heartbeat space-right green-icon" ng-if="container.State.Running"></i>
                 <i class="fa fa-heartbeat space-right red-icon" ng-if="!container.State.Running && container.State.Status !== 'created'"></i>
-                {{ container.State|getstatetext }} since {{ activityTime }}<span ng-if="!container.State.Running && container.State.Status !== 'created'"> with exit code {{ container.State.ExitCode }}</span>
+                <por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.STATUS.RUNNING" values="{time: activityTime}" ng-if="container.State.Running"></por-translation>
+                <por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.STATUS.CREATED" values="{time: activityTime}" ng-if="container.State.Status === 'created'"></por-translation>
+                <por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.STATUS.STOPPED" values="{time: activityTime, code: container.State.ExitCode}" ng-if="!container.State.Running && container.State.Status !== 'created'"></por-translation>
+                <por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.STATUS.DEAD" values="{time: activityTime, code: container.State.ExitCode}" ng-if="container.State.Dead"></por-translation>
               </td>
             </tr>
             <tr>
-              <td>Created</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.ROW_CREATED"></por-translation></td>
               <td>{{ container.Created|getisodate }}</td>
             </tr>
             <tr ng-if="container.State.Running">
-              <td>Start time</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.ROW_START_TIME"></por-translation></td>
               <td>{{ container.State.StartedAt|getisodate }}</td>
             </tr>
             <tr ng-if="!container.State.Running && container.State.Status !== 'created'">
-              <td>Finished</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.ROW_FINISHED"></por-translation></td>
               <td>{{ container.State.FinishedAt|getisodate }}</td>
             </tr>
             <tr>
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i>Stats</a>
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="console({id: container.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.ACTIONS.STATS"></por-translation></a>
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.ACTIONS.LOGS"></por-translation></a>
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="console({id: container.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_STATUS.ACTIONS.CONSOLE"></por-translation></a>
                 </div>
               </td>
             </tr>
@@ -105,23 +108,23 @@
 <div ng-if="container.State.Health" class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-server" title="Container health"></rd-widget-header>
+      <rd-widget-header icon="fa-server" title="CONTAINER_DETAILS.WIDGET_CONTAINER_HEALTH.TITLE"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
             <tr>
-              <td>Status</td>
+              <td><por-translation key="COMMON.NOUNS.STATUS"></por-translation></td>
               <td>
                 <i ng-class="{'healthy': 'fa fa-heartbeat space-right green-icon', 'unhealthy': 'fa fa-heartbeat space-right red-icon', 'starting': 'fa fa-heartbeat space-right orange-icon'}[container.State.Health.Status]"></i>
                 {{ container.State.Health.Status }}
               </td>
             </tr>
             <tr>
-              <td>Failure count</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_HEALTH.FAILURE_COUNT"></por-translation></td>
               <td>{{ container.State.Health.FailingStreak }}</td>
             </tr>
             <tr>
-              <td>Last output</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_HEALTH.LAST_OUTPUT"></por-translation></td>
               <td>{{ container.State.Health.Log[container.State.Health.Log.length - 1].Output }}</td>
             </tr>
           </tbody>
@@ -134,15 +137,14 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Create image"></rd-widget-header>
+      <rd-widget-header icon="fa-clone" title="CONTAINER_DETAILS.WIDGET_CREATE_IMAGE.TITLE"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- tag-description -->
           <div class="form-group">
             <div class="col-sm-12">
               <span class="small text-muted">
-                You can create an image from this container, this allows you to backup important data or save
-                helpful configurations. You'll be able to spin up another container based on this image afterward.
+                <por-translation key="CONTAINER_DETAILS.WIDGET_CREATE_IMAGE.DESCRIPTION"></por-translation>
               </span>
             </div>
           </div>
@@ -155,13 +157,15 @@
           <!-- tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <span class="small text-muted">Note: if you don't specify the tag in the image name, <span class="label label-default">latest</span> will be used.</span>
+              <span class="small text-muted">
+                <por-translation key="CONTAINER_DETAILS.WIDGET_CREATE_IMAGE.TAG_NOTE"></por-translation>
+              </span>
             </div>
           </div>
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="commit()">Create</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="commit()"><por-translation key="COMMON.VERBS.CREATE"></por-translation></button>
               <i id="createImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
@@ -174,16 +178,16 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-server" title="Container details"></rd-widget-header>
+      <rd-widget-header icon="fa-server" title="CONTAINER_DETAILS.WIDGET_CONTAINER_DETAILS.TITLE"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
             <tr>
-              <td>Image</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_DETAILS.ROW_IMAGE"></por-translation></td>
               <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
             </tr>
             <tr ng-if="portBindings.length > 0">
-              <td>Port configuration</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_DETAILS.ROW_PORT"></por-translation></td>
               <td>
                 <div ng-repeat="portMapping in portBindings">
                   {{ portMapping.container }} <i class="fa fa-long-arrow-right"></i> {{ portMapping.host }}
@@ -206,7 +210,7 @@
               </td>
             </tr>
             <tr ng-if="!(container.Config.Labels | emptyobject)">
-              <td>Labels</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_DETAILS.ROW_LABELS"></por-translation></td>
               <td>
                 <table class="table table-bordered table-condensed">
                   <tr ng-repeat="(k, v) in container.Config.Labels">
@@ -217,11 +221,11 @@
               </td>
             </tr>
             <tr ng-if="container.HostConfig.RestartPolicy.Name !== 'no'">
-              <td>Restart policies</td>
+              <td><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_DETAILS.ROW_RESTART_POLICIES"></por-translation></td>
               <td>
                 <table class="table table-bordered table-condensed">
                   <tr>
-                    <td class="col-md-3">Name</td>
+                    <td class="col-md-3"><por-translation key="COMMON.NOUNS.NAME"></por-translation></td>
                     <td>{{ container.HostConfig.RestartPolicy.Name }}</td>
                   </tr>
                   <tr>
@@ -243,13 +247,13 @@
 <div class="row" ng-if="container.HostConfig.Binds.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-cubes" title="Volumes"></rd-widget-header>
+      <rd-widget-header icon="fa-cubes" title="CONTAINER_DETAILS.WIDGET_CONTAINER_VOLUMES.TITLE"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
             <tr>
-              <th>Host</th>
-              <th>Container</th>
+              <th><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_VOLUMES.TABLE.HEADERS.HOST"></por-translation></th>
+              <th><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_VOLUMES.TABLE.HEADERS.CONTAINER"></por-translation></th>
             </tr>
           </thead>
           <tbody>
@@ -267,11 +271,11 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-sitemap" title="Connected networks">
+      <rd-widget-header icon="fa-sitemap" title="CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.TITLE">
         <div class="pull-right">
-          Items per page:
+          <por-translation key="WIDGETS.PAGINATION.TEXT"></por-translation>
           <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-            <option value="0">All</option>
+            <option value="0" translate>COMMON.UI.ALL</option>
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
@@ -282,11 +286,11 @@
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>
-            <th>Network Name</th>
-            <th>IP Address</th>
-            <th>Gateway</th>
-            <th>MacAddress</th>
-            <th>Actions</th>
+            <th><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.TABLE.HEADERS.NETWORK_NAME"></por-translation></th>
+            <th><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.TABLE.HEADERS.IP"></por-translation></th>
+            <th><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.TABLE.HEADERS.GATEWAY"></por-translation></th>
+            <th><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.TABLE.HEADERS.MAC"></por-translation></th>
+            <th><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.TABLE.HEADERS.ACTIONS"></por-translation></th>
           </thead>
           <tbody>
             <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: state.pagination_count">
@@ -295,11 +299,13 @@
               <td>{{ value.Gateway || '-' }}</td>
               <td>{{ value.MacAddress || '-' }}</td>
               <td>
-                <button type="button" class="btn btn-xs btn-danger" ng-click="containerLeaveNetwork(container, value.NetworkID)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Leave Network</button>
+                <button type="button" class="btn btn-xs btn-danger" ng-click="containerLeaveNetwork(container, value.NetworkID)"><i class="fa fa-trash space-right" aria-hidden="true"></i><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.DISCONNECT"></por-translation></button>
               </td>
             </tr>
             <tr ng-if="(container.NetworkSettings.Networks | emptyobject)">
-              <td colspan="5" class="text-center text-muted">No networks connected.</td>
+              <td colspan="5" class="text-center text-muted">
+                <por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.TABLE.EMPTY"></por-translation>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -310,15 +316,15 @@
         <form class="form-horizontal">
           <!-- network-input -->
           <div class="row">
-            <label for="container_network" class="col-sm-3 col-lg-2 control-label text-left">Join a Network</label>
+            <label for="container_network" class="col-sm-3 col-lg-2 control-label text-left"><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.CONNECT_NETWORK"></por-translation></label>
             <div class="col-sm-5 col-lg-4">
               <select class="form-control" ng-model="selectedNetwork" id="container_network">
-                <option selected disabled hidden value="">Select a network</option>
+                <option selected disabled hidden value="" translate>CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.SELECT_NETWORK</option>
                 <option ng-repeat="net in availableNetworks" ng-value="net.Id">{{ net.Name }}</option>
               </select>
             </div>
             <div class="col-sm-1">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!selectedNetwork" ng-click="containerJoinNetwork(container, selectedNetwork)">Join Network</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!selectedNetwork" ng-click="containerJoinNetwork(container, selectedNetwork)"><por-translation key="CONTAINER_DETAILS.WIDGET_CONTAINER_NETWORKS.CONNECT"></por-translation></button>
             </div>
           </div>
         </form>

@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService) {
+.factory('StateManager', ['$q', 'TranslationService', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', function StateManagerFactory($q, TranslationService, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService) {
   'use strict';
 
   var manager = {};
@@ -24,6 +24,12 @@ angular.module('portainer.services')
     LocalStorage.storeApplicationState(state.application);
   };
 
+  manager.updateLang = function(lang) {
+    state.application.lang = lang;
+    LocalStorage.storeApplicationState(state.application);
+    TranslationService.setLang(state.application.lang);
+  };
+
   manager.updateExternalContributions = function(displayExternalContributors) {
     state.application.displayExternalContributors = displayExternalContributors;
     LocalStorage.storeApplicationState(state.application);
@@ -41,6 +47,7 @@ angular.module('portainer.services')
     if (applicationState) {
       state.application = applicationState;
       state.loading = false;
+      TranslationService.setLang(state.application.lang);
       deferred.resolve(state);
     } else {
       $q.all({
@@ -55,8 +62,10 @@ angular.module('portainer.services')
         state.application.endpointManagement = status.EndpointManagement;
         state.application.version = status.Version;
         state.application.logo = settings.LogoURL;
+        state.application.lang = settings.Language;
         state.application.displayExternalContributors = settings.DisplayExternalContributors;
         LocalStorage.storeApplicationState(state.application);
+        TranslationService.setLang(state.application.lang);
         deferred.resolve(state);
       })
       .catch(function error(err) {

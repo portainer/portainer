@@ -1,0 +1,270 @@
+{
+  "COMMON": {
+    "NOUNS": {
+      "STATUS": "Statut",
+      "NAME": "Nom"
+    },
+    "VERBS": {
+      "CREATE": "Créer",
+      "REFRESH": "Rafraîchir",
+      "HIDE": "Cacher",
+      "FILTER": "Filtrer",
+      "START": "Démarrer",
+      "STOP": "Stopper",
+      "KILL": "Tuer",
+      "RESTART": "Redémarrer",
+      "PAUSE": "Pause",
+      "RESUME": "Reprendre",
+      "REMOVE": "Supprimer",
+      "RECREATE": "Re-créer",
+      "DUPLICATE": "Dupliquer",
+      "EDIT": "Editer"
+    },
+    "DOCKER": {
+      "ID": "ID",
+      "CONTAINER": "conteneur",
+      "CONTAINERS": "Containers",
+      "VOLUME": "volume",
+      "HOST": "hôte",
+      "CONTAINER_STATUS": {
+        "DEAD": "Mort",
+        "GHOST": "Fantôme",
+        "RUNNING": "Démarré",
+        "CREATED": "Créé",
+        "STOPPED": "Stoppé"
+      }
+    },
+    "UI": {
+      "LOADING": "Chargement...",
+      "ALL": "Tous"
+    },
+    "PLACEHOLDERS": {
+      "USERNAME": "Utilisateur",
+      "CONTAINER_NAME": "e.g. web (optionnel)",
+      "CONTAINER_HOST_PORT": "e.g. 80 or 1.2.3.4:80 (optionnel)"
+    }
+  },
+  "WIDGETS": {
+    "HEADER_CONTENT": {
+      "USER_PREFERENCES": "mon compte",
+      "LOGOUT": "se déconnecter"
+    },
+    "PAGINATION": {
+      "TEXT": "Objets par page:"
+    }
+  },
+  "AUTH": {
+    "LOGIN": "S'authentifier"
+  },
+  "SIDEBAR": {
+    "ACTIVE_ENDPOINT": {
+      "TITLE": "Environnement actif"
+    },
+    "ENDPOINT_ACTIONS": {
+      "TITLE": "Actions de l'environnement",
+      "DASHBOARD": "Tableau de bord",
+      "APP_TEMPLATES": "App Templates",
+      "SERVICES": "Services",
+      "CONTAINERS": "Conteneurs",
+      "IMAGES": "Images",
+      "NETWORKS": "Réseaux",
+      "VOLUMES": "Volumes",
+      "SECRETS": "Secrets",
+      "EVENTS": "Evènements",
+      "SWARM": "Swarm",
+      "DOCKER": "Docker"
+    },
+    "PORTAINER_SETTINGS": {
+      "TITLE": "Paramètres de Portainer",
+      "USER_MANAGEMENT": {
+        "TITLE": "Gestion utilisateurs",
+        "TEAMS": "Equipes"
+      },
+      "ENDPOINTS": "Environnements",
+      "REGISTRIES": "Registres",
+      "SETTINGS": {
+        "TITLE": "Paramètres",
+        "AUTHENTICATION": "Authentification"
+      }
+    }
+  },
+  "CONTAINER_DETAILS": {
+    "HEADER": {
+      "TITLE": "Informations à propos du conteneur"
+    },
+    "WIDGET_ACTIONS": {
+      "TITLE": "Actions"
+    },
+    "WIDGET_CONTAINER_STATUS": {
+      "TITLE": "Statut du conteneur",
+      "ROW_NAME": "Nom",
+      "ROW_IP": "Adresse IP",
+      "ROW_STATUS": "Statut",
+      "ROW_CREATED": "Date de création",
+      "ROW_START_TIME": "Date de démarrage",
+      "ROW_FINISHED": "Date de fin",
+      "STATUS": {
+        "RUNNING": "Démarré depuis {{ time }}",
+        "CREATED": "Créé depuis {{ time }}",
+        "STOPPED": "Stoppé depuis {{ time }} avec code de retour {{ code }}",
+        "DEAD": "Mort depuis {{ time }} avec code de retour {{ code }}"
+      },
+      "ACTIONS": {
+        "STATS": "Stats",
+        "LOGS": "Logs",
+        "CONSOLE": "Console"
+      }
+    },
+    "WIDGET_CONTAINER_HEALTH": {
+      "TITLE": "Santé du conteneur (health check)",
+      "FAILURE_COUNT": "Nombre d'échecs",
+      "LAST_OUTPUT": "Dernière sortie"
+    },
+    "WIDGET_CREATE_IMAGE": {
+      "TITLE": "Créer une image",
+      "DESCRIPTION": "Vous pouvez créer une image à partir de ce conteneur, ceci vous permettra de sauvegarder les données ou toute configuration présente dans ce conteneur. Vous pourrez ensuite démarrer un autre conteneur basé sur cette image.",
+      "TAG_NOTE": "Note: si vous ne spécifiez pas de tag dans le nom de l'image, le tag <span class='label label-default'>latest</span> sera utilisé."
+    },
+    "WIDGET_CONTAINER_DETAILS": {
+      "TITLE": "A propos du conteneur",
+      "ROW_IMAGE": "Image",
+      "ROW_PORT": "Configuration des ports",
+      "ROW_LABELS": "Labels",
+      "ROW_RESTART_POLICIES": "Politiques de redémarrage"
+    },
+    "WIDGET_CONTAINER_VOLUMES": {
+      "TITLE": "Volumes",
+      "TABLE": {
+        "HEADERS": {
+          "HOST": "Hôte",
+          "CONTAINER": "Conteneur"
+        }
+      }
+    },
+    "WIDGET_CONTAINER_NETWORKS": {
+      "TITLE": "Réseaux connectés",
+      "TABLE": {
+        "HEADERS": {
+          "NETWORK_NAME": "Nom du réseau",
+          "IP": "Adresse IP",
+          "GATEWAY": "Passerelle",
+          "MAC": "Adresse MAC",
+          "ACTIONS": "Actions"
+        },
+        "EMPTY": "Aucun réseau connecté."
+      },
+      "CONNECT_NETWORK": "Connecter à un réseau",
+      "SELECT_NETWORK": "Choisir un réseau",
+      "CONNECT": "Connecter",
+      "DISCONNECT": "Déconnecter"
+    }
+  },
+  "TEMPLATES": {
+    "HEADER": {
+      "TITLE": "Liste de templates applicatifs",
+      "CONTENT": "Templates"
+    },
+    "SELECTED_TEMPLATE": {
+      "TITLE_INFORMATION": "Information",
+      "TITLE_CONFIGURATION": "Configuration",
+      "FORM": {
+        "NAME": "Nom",
+        "NETWORK": "Réseau",
+        "SELECT_CONTAINER": "Choisir un conteneur",
+        "SHOW_ADVANCED_OPTIONS": "Afficher les options avancées",
+        "HIDE_ADVANCED_OPTIONS": "Cacher les options avancées",
+        "ADVANCED_OPTIONS": {
+          "PORT_MAPPING": {
+            "LABEL": "Associer port",
+            "MAP_PORT": "associer un port supplémentaire",
+            "NOTE": "Portainer va automatiquement assigner un port quand le port hôte est vide."
+          },
+          "VOLUME_MAPPING": {
+            "LABEL": "Associer volume",
+            "MAP_VOLUME": "associer un volume supplémentaire",
+            "NOTE": "Portainer va automatiquement créer et associer un volume local quand l'option <b>auto</b> est sélectionnée.",
+            "TYPE": {
+              "AUTO": "Auto",
+              "VOLUME": "Volume",
+              "BIND": "Bind"
+            },
+            "SELECT_VOLUME": "Choisir un volume",
+            "WRITABLE": "Ecriture",
+            "READONLY": "Lecture seule"
+          }
+        },
+        "ACTIONS": {
+          "SWARM_NOTE_NETWORK": "Vous utilisez Swarm, nous recommandons le deployment de vos conteneurs dans un réseau Swarm. Vous pouvez en créer un dans la <a ui-sref='networks'>vue réseaux</a>.",
+          "SWARM_NOTE_STACK": "Les App Templates ne peuvent pas être déployés en tant que services Swarm pour le moment. Vous pouvez toujours les utiliser pour déployer des conteneurs sur cet hôte."
+        }
+      }
+    },
+    "WIDGET_TEMPLATE_LIST": {
+      "HEADER": {
+        "CATEGORY": "Catégorie",
+        "PLATFORM_FILTERS": {
+          "WINDOWS": "Windows",
+          "LINUX": "Linux"
+        }
+      },
+      "LIST": {
+        "EMPTY": "Aucun template disponible."
+      }
+    }
+  },
+  "EVENTS": {
+    "HEADER": {
+      "TITLE": "Liste d'évènements",
+      "CONTENT": "Evènements"
+    },
+    "TABLE": {
+      "TITLE": "Evènements",
+      "HEADERS": {
+        "DATE": "Date",
+        "CATEGORY": "Catégorie",
+        "DETAILS": "Détails"
+      }
+    }
+  },
+  "DASHBOARD": {
+    "HEADER": {
+      "TITLE": "Accueil",
+      "CONTENT": "Tableau de bord"
+    },
+    "WIDGET_CLUSTER": {
+      "TITLE": "Informations à propos du cluster",
+      "NODES": "Nombre de noeuds",
+      "SWARM_VERSION": "Version de Swarm",
+      "CPU": "Total des processeurs",
+      "MEMORY": "Mémoire totale"
+    },
+    "WIDGET_SWARM": {
+      "TITLE": "Informations à propos de Swarm",
+      "COMMENT": "Cet hôte fait partie d'un cluster Swarm",
+      "NODE_ROLE": "Rôle de l'hôte",
+      "NODES_IN_CLUSTER": "Nombre d'hôtes dans le cluster"
+    },
+    "WIDGET_NODE": {
+      "TITLE": "Informations à propos de l'hôte",
+      "NODE_NAME": "Nom",
+      "DOCKER_VERSION": "Version de Docker",
+      "CPU": "Processeurs",
+      "MEMORY": "Mémoire"
+    },
+    "WIDGET_CONTAINERS": {
+      "COMMENT": "Conteneurs",
+      "RUNNING_CONTAINERS": "démarré(s)",
+      "STOPPED_CONTAINERS": "stoppé(s)"
+    },
+    "WIDGET_IMAGES": {
+      "COMMENT": "Images"
+    },
+    "WIDGET_VOLUMES": {
+      "COMMENT": "Volumes",
+      "DRIVER": "driver"
+    },
+    "WIDGET_NETWORKS": {
+      "COMMENT": "Réseaux"
+    }
+  }
+}

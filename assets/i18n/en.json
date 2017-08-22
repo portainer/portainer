@@ -1,0 +1,270 @@
+{
+  "COMMON": {
+    "NOUNS": {
+      "STATUS": "Status",
+      "NAME": "Name"
+    },
+    "VERBS": {
+      "CREATE": "Create",
+      "REFRESH": "Refresh",
+      "HIDE": "Hide",
+      "FILTER": "Filter",
+      "START": "Start",
+      "STOP": "Stop",
+      "KILL": "Kill",
+      "RESTART": "Restart",
+      "PAUSE": "Pause",
+      "RESUME": "Resume",
+      "REMOVE": "Remove",
+      "RECREATE": "Recreate",
+      "DUPLICATE": "Duplicate",
+      "EDIT": "Edit"
+    },
+    "DOCKER": {
+      "ID": "ID",
+      "CONTAINER": "container",
+      "CONTAINERS": "Containers",
+      "VOLUME": "volume",
+      "HOST": "host",
+      "CONTAINER_STATUS": {
+        "DEAD": "Dead",
+        "GHOST": "Ghost",
+        "RUNNING": "Running",
+        "CREATED": "Created",
+        "STOPPED": "Stopped"
+      }
+    },
+    "UI": {
+      "LOADING": "Loading...",
+      "ALL": "All"
+    },
+    "PLACEHOLDERS": {
+      "USERNAME": "Username",
+      "CONTAINER_NAME": "e.g. web (optional)",
+      "CONTAINER_HOST_PORT": "e.g. 80 or 1.2.3.4:80 (optional)"
+    }
+  },
+  "WIDGETS": {
+    "HEADER_CONTENT": {
+      "USER_PREFERENCES": "my account",
+      "LOGOUT": "log out"
+    },
+    "PAGINATION": {
+      "TEXT": "Items per page:"
+    }
+  },
+  "AUTH": {
+    "LOGIN": "Login"
+  },
+  "SIDEBAR": {
+    "ACTIVE_ENDPOINT": {
+      "TITLE": "Active endpoint"
+    },
+    "ENDPOINT_ACTIONS": {
+      "TITLE": "Endpoint actions",
+      "DASHBOARD": "Dashboard",
+      "APP_TEMPLATES": "App Templates",
+      "SERVICES": "Services",
+      "CONTAINERS": "Containers",
+      "IMAGES": "Images",
+      "NETWORKS": "Networks",
+      "VOLUMES": "Volumes",
+      "SECRETS": "Secrets",
+      "EVENTS": "Events",
+      "SWARM": "Swarm",
+      "DOCKER": "Docker"
+    },
+    "PORTAINER_SETTINGS": {
+      "TITLE": "Portainer settings",
+      "USER_MANAGEMENT": {
+        "TITLE": "User management",
+        "TEAMS": "Teams"
+      },
+      "ENDPOINTS": "Endpoints",
+      "REGISTRIES": "Registries",
+      "SETTINGS": {
+        "TITLE": "Settings",
+        "AUTHENTICATION": "Authentication"
+      }
+    }
+  },
+  "CONTAINER_DETAILS": {
+    "HEADER": {
+      "TITLE": "Container details"
+    },
+    "WIDGET_ACTIONS": {
+      "TITLE": "Actions"
+    },
+    "WIDGET_CONTAINER_STATUS": {
+      "TITLE": "Container status",
+      "ROW_NAME": "Name",
+      "ROW_IP": "IP address",
+      "ROW_STATUS": "Status",
+      "ROW_CREATED": "Created",
+      "ROW_START_TIME": "Start time",
+      "ROW_FINISHED": "Finished",
+      "STATUS": {
+        "RUNNING": "Running since {{ time }}",
+        "CREATED": "Created since {{ time }}",
+        "STOPPED": "Stopped since {{ time }} with exit code {{ code }}",
+        "DEAD": "Dead since {{ time }} with exit code {{ code }}"
+      },
+      "ACTIONS": {
+        "STATS": "Stats",
+        "LOGS": "Logs",
+        "CONSOLE": "Console"
+      }
+    },
+    "WIDGET_CONTAINER_HEALTH": {
+      "TITLE": "Container health",
+      "FAILURE_COUNT": "Failure count",
+      "LAST_OUTPUT": "Last output"
+    },
+    "WIDGET_CREATE_IMAGE": {
+      "TITLE": "Create image",
+      "DESCRIPTION": "You can create an image from this container, this allows you to backup important data or save helpful configurations. You'll be able to spin up another container based on this image afterward.",
+      "TAG_NOTE": "Note: if you don't specify the tag in the image name, <span class='label label-default'>latest</span> will be used."
+    },
+    "WIDGET_CONTAINER_DETAILS": {
+      "TITLE": "Container details",
+      "ROW_IMAGE": "Image",
+      "ROW_PORT": "Port configuration",
+      "ROW_LABELS": "Labels",
+      "ROW_RESTART_POLICIES": "Restart policies"
+    },
+    "WIDGET_CONTAINER_VOLUMES": {
+      "TITLE": "Volumes",
+      "TABLE": {
+        "HEADERS": {
+          "HOST": "Host",
+          "CONTAINER": "Container"
+        }
+      }
+    },
+    "WIDGET_CONTAINER_NETWORKS": {
+      "TITLE": "Connected networks",
+      "TABLE": {
+        "HEADERS": {
+          "NETWORK_NAME": "Network name",
+          "IP": "IP address",
+          "GATEWAY": "Gateway",
+          "MAC": "MAC address",
+          "ACTIONS": "Actions"
+        },
+        "EMPTY": "No networks connected."
+      },
+      "CONNECT_NETWORK": "Join a network",
+      "SELECT_NETWORK": "Select a network",
+      "CONNECT": "Join network",
+      "DISCONNECT": "Leaver network"
+    }
+  },
+  "TEMPLATES": {
+    "HEADER": {
+      "TITLE": "Application templates list",
+      "CONTENT": "Templates"
+    },
+    "SELECTED_TEMPLATE": {
+      "TITLE_INFORMATION": "Information",
+      "TITLE_CONFIGURATION": "Configuration",
+      "FORM": {
+        "NAME": "Name",
+        "NETWORK": "Network",
+        "SELECT_CONTAINER": "Select a container",
+        "SHOW_ADVANCED_OPTIONS": "Show advanced options",
+        "HIDE_ADVANCED_OPTIONS": "Hide advanced options",
+        "ADVANCED_OPTIONS": {
+          "PORT_MAPPING": {
+            "LABEL": "Port mapping",
+            "MAP_PORT": "map additional port",
+            "NOTE": "Portainer will automatically assign a port if you leave the host port empty.",
+          },
+          "VOLUME_MAPPING": {
+            "LABEL": "Volume mapping",
+            "MAP_VOLUME": "map additional volume",
+            "NOTE": "Portainer will automatically create and map a local volume when using the <b>auto</b> option.",
+            "TYPE": {
+              "AUTO": "Auto",
+              "VOLUME": "Volume",
+              "BIND": "Bind"
+            },
+            "SELECT_VOLUME": "Select a volume",
+            "WRITABLE": "Writable",
+            "READONLY": "Read-only"
+          }
+        },
+        "ACTIONS": {
+          "SWARM_NOTE_NETWORK": "When using Swarm, we recommend deploying containers in a Swarm network. Looks like you don't have any Swarm network, head over the <a ui-sref='networks'>networks view</a> to create one.",
+          "SWARM_NOTE_STACK": "App templates cannot be deployed as Swarm Mode services for the moment. You can still use them to quickly deploy containers on the Docker host."
+        }
+      }
+    },
+    "WIDGET_TEMPLATE_LIST": {
+      "HEADER": {
+        "CATEGORY": "Category",
+        "PLATFORM_FILTERS": {
+          "WINDOWS": "Windows",
+          "LINUX": "Linux"
+        }
+      },
+      "LIST": {
+        "EMPTY": "No templates available."
+      }
+    }
+  },
+  "EVENTS": {
+    "HEADER": {
+      "TITLE": "Event list",
+      "CONTENT": "Events"
+    },
+    "TABLE": {
+      "TITLE": "Events",
+      "HEADERS": {
+        "DATE": "Date",
+        "CATEGORY": "Category",
+        "DETAILS": "Details"
+      }
+    }
+  },
+  "DASHBOARD": {
+    "HEADER": {
+      "TITLE": "Home",
+      "CONTENT": "Dashboard"
+    },
+    "WIDGET_CLUSTER": {
+      "TITLE": "Cluster info",
+      "NODES": "Nodes",
+      "SWARM_VERSION": "Swarm version",
+      "CPU": "Total CPU",
+      "MEMORY": "Total memory"
+    },
+    "WIDGET_SWARM": {
+      "TITLE": "Swarm info",
+      "COMMENT": "This node is part of a Swarm cluster",
+      "NODE_ROLE": "Node role",
+      "NODES_IN_CLUSTER": "Nodes in the cluster"
+    },
+    "WIDGET_NODE": {
+      "TITLE": "Node info",
+      "NODE_NAME": "Name",
+      "DOCKER_VERSION": "Docker version",
+      "CPU": "CPU",
+      "MEMORY": "Memory"
+    },
+    "WIDGET_CONTAINERS": {
+      "COMMENT": "Containers",
+      "RUNNING_CONTAINERS": "running",
+      "STOPPED_CONTAINERS": "stopped"
+    },
+    "WIDGET_IMAGES": {
+      "COMMENT": "Images"
+    },
+    "WIDGET_VOLUMES": {
+      "COMMENT": "Volumes",
+      "DRIVER": "driver"
+    },
+    "WIDGET_NETWORKS": {
+      "COMMENT": "Networks"
+    }
+  }
+}

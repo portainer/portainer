@@ -113,30 +113,6 @@ angular.module('portainer.filters', [])
     return _.capitalize(text);
   };
 })
-.filter('getstatetext', function () {
-  'use strict';
-  return function (state) {
-    if (state === undefined) {
-      return '';
-    }
-    if (state.Dead) {
-      return 'Dead';
-    }
-    if (state.Ghost && state.Running) {
-      return 'Ghost';
-    }
-    if (state.Running && state.Paused) {
-      return 'Running (Paused)';
-    }
-    if (state.Running) {
-      return 'Running';
-    }
-    if (state.Status === 'created') {
-      return 'Created';
-    }
-    return 'Stopped';
-  };
-})
 .filter('stripprotocol', function() {
   'use strict';
   return function (url) {

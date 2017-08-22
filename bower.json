@@ -3,7 +3,7 @@
   "version": "1.14.0",
   "homepage": "https://github.com/portainer/portainer",
   "authors": [
-    "Anthony Lapenna <anthony.lapenna at gmail dot com>"
+    "Anthony Lapenna <anthony.lapenna at portainer dot com>"
   ],
   "description": "A web interface for the Docker Remote API.",
   "keywords": [
@@ -37,6 +37,7 @@
     "angular-local-storage": "~0.5.2",
     "angular-jwt": "~0.1.8",
     "angular-google-analytics": "~1.1.9",
+    "angular-translate": "~2.15.2",
     "bootstrap": "~3.3.6",
     "filesize": "~3.3.0",
     "jquery": "1.11.1",
@@ -49,7 +50,8 @@
     "bootbox.js": "bootbox#^4.4.0",
     "angular-multi-select": "~4.0.0",
     "toastr": "~2.1.3",
-    "xterm.js": "~2.8.1"
+    "xterm.js": "~2.8.1",
+    "angular-translate-loader-static-files": "~2.15.2"
   },
   "resolutions": {
     "angular": "1.5.11"

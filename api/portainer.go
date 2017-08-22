@@ -75,6 +75,7 @@ type (
 		DisplayExternalContributors bool                 `json:"DisplayExternalContributors"`
 		AuthenticationMethod        AuthenticationMethod `json:"AuthenticationMethod"`
 		LDAPSettings                LDAPSettings         `json:"LDAPSettings"`
+		Language                    string               `json:"Language"`
 	}
 
 	// User represents a user account.

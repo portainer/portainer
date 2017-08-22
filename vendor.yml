@@ -8,7 +8,7 @@ js:
   - bower_components/Chart.js/Chart.js
   - bower_components/filesize/lib/filesize.js
   - bower_components/lodash/dist/lodash.js
-  - bower_components/moment/moment.js
+  - bower_components/moment/min/moment-with-locales.js
   - bower_components/splitargs/src/splitargs.js
   - bower_components/toastr/toastr.js
   - bower_components/xterm.js/dist/xterm.js
@@ -22,7 +22,7 @@ js:
   - bower_components/Chart.js/Chart.min.js
   - bower_components/filesize/lib/filesize.min.js
   - bower_components/lodash/dist/lodash.min.js
-  - bower_components/moment/min/moment.min.js
+  - bower_components/moment/min/moment-with-locales.min.js
   - bower_components/splitargs/src/splitargs.js
   - bower_components/toastr/toastr.min.js
   - bower_components/xterm.js/dist/xterm.js
@@ -59,6 +59,8 @@ angular:
   - bower_components/angular-ui-router/release/angular-ui-router.js
   - bower_components/angular-utils-pagination/dirPagination.js
   - bower_components/ng-file-upload/ng-file-upload.js
+  - bower_components/angular-translate/angular-translate.js
+  - bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js
   minified:
   - bower_components/angular/angular.min.js
   - bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js
@@ -72,3 +74,5 @@ angular:
   - bower_components/angular-ui-router/release/angular-ui-router.min.js
   - bower_components/angular-utils-pagination/dirPagination.js
   - bower_components/ng-file-upload/ng-file-upload.min.js
+  - bower_components/angular-translate/angular-translate.min.js
+  - bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js
