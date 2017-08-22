@@ -2,6 +2,11 @@ angular.module('extension.storidge')
 .controller('EditProfileController', ['$scope', '$state', '$stateParams', 'Notifications', 'StoridgeProfileService',
 function ($scope, $state, $stateParams, Notifications, StoridgeProfileService) {
 
+  $scope.formValues = {
+    LimitIOPS: true,
+    LimitBandwidth: false
+  };
+
   $scope.updateProfile = function() {
     Notifications.success('Profile successfully updated');
     $state.go('storidge.profiles');

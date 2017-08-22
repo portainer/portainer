@@ -27,7 +27,7 @@
           <div class="form-group">
             <label for="profile_directory" class="col-sm-2 col-lg-1 control-label text-left">Directory</label>
             <div class="col-sm-10 col-lg-11">
-              <input type="number" class="form-control" ng-model="profile.Directory" id="profile_directory" placeholder="e.g. /cio/myProfile">
+              <input type="text" class="form-control" ng-model="profile.Directory" id="profile_directory" placeholder="e.g. /cio/myProfile">
             </div>
           </div>
           <!-- !directory -->
@@ -43,7 +43,7 @@
           <div class="form-group">
             <label for="profile_redundancy" class="col-sm-2 col-lg-1 control-label text-left">Redundancy</label>
             <div class="col-sm-10 col-lg-11">
-              <select id="profile_redundancy" ng-model="profile.redundancy" class="form-control">
+              <select id="profile_redundancy" ng-model="profile.Redundancy" class="form-control">
                 <option value="2">2-copy</option>
               </select>
             </div>
@@ -69,33 +69,57 @@
             </div>
           </div>
           <!-- !type -->
-          <div class="col-sm-12 form-section-title">
-            IOPS
-          </div>
           <!-- iops -->
-          <div class="form-group">
-            <label for="min_iops" class="col-sm-1 control-label text-left">Min</label>
-            <div class="col-sm-5">
-              <input type="number" class="form-control" ng-model="profile.MinIOPS" id="min_iops" placeholder="100">
+          <div ng-if="!formValues.LimitBandwidth">
+            <div class="col-sm-12 form-section-title">
+              IOPS
             </div>
-            <label for="max_iops" class="col-sm-1 control-label text-left">Max</label>
-            <div class="col-sm-5">
-              <input type="number" class="form-control" ng-model="profile.MaxIOPS" id="max_iops" placeholder="1000">
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="permissions" class="control-label text-left">
+                  Limit IOPS
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="formValues.LimitIOPS"><i></i>
+                </label>
+              </div>
+            </div>
+            <div class="form-group" ng-if="formValues.LimitIOPS">
+              <label for="min_iops" class="col-sm-1 control-label text-left">Min</label>
+              <div class="col-sm-5">
+                <input type="number" class="form-control" ng-model="profile.MinIOPS" id="min_iops" placeholder="100">
+              </div>
+              <label for="max_iops" class="col-sm-1 control-label text-left">Max</label>
+              <div class="col-sm-5">
+                <input type="number" class="form-control" ng-model="profile.MaxIOPS" id="max_iops" placeholder="2000">
+              </div>
             </div>
           </div>
           <!-- !iops -->
-          <div class="col-sm-12 form-section-title">
-            Bandwidth
-          </div>
           <!-- bandwidth -->
-          <div class="form-group">
-            <label for="min_bandwidth" class="col-sm-1 control-label text-left">Min</label>
-            <div class="col-sm-5">
-              <input type="number" class="form-control" ng-model="profile.MinIOPS" id="min_bandwidth" placeholder="100">
+          <div ng-if="!formValues.LimitIOPS">
+            <div class="col-sm-12 form-section-title">
+              Bandwidth
             </div>
-            <label for="max_bandwidth" class="col-sm-1 control-label text-left">Max</label>
-            <div class="col-sm-5">
-              <input type="number" class="form-control" ng-model="profile.MaxIOPS" id="max_bandwidth" placeholder="1000">
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="permissions" class="control-label text-left">
+                  Limit bandwidth
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="formValues.LimitBandwidth"><i></i>
+                </label>
+              </div>
+            </div>
+            <div class="form-group" ng-if="formValues.LimitBandwidth">
+              <label for="min_bandwidth" class="col-sm-1 control-label text-left">Min</label>
+              <div class="col-sm-5">
+                <input type="number" class="form-control" ng-model="profile.MinBandwidth" id="min_bandwidth" placeholder="1">
+              </div>
+              <label for="max_bandwidth" class="col-sm-1 control-label text-left">Max</label>
+              <div class="col-sm-5">
+                <input type="number" class="form-control" ng-model="profile.MaxBandwidth" id="max_bandwidth" placeholder="100">
+              </div>
             </div>
           </div>
           <!-- !bandwidth -->

@@ -48,7 +48,6 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeProfileService)
 
     StoridgeProfileService.profiles()
     .then(function success(data) {
-      console.log(JSON.stringify(data, null, 4));
       $scope.profiles = data;
     })
     .catch(function error(err) {

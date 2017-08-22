@@ -48,7 +48,7 @@
 <div class="row">
   <div class="col-md-12">
     <rd-widget>
-      <rd-widget-header icon="fa-users" title="Profiles">
+      <rd-widget-header icon="fa-sticky-note-o" title="Profiles">
         <div class="pull-right">
           Items per page:
           <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
@@ -89,7 +89,7 @@
               <tr dir-paginate="profile in (state.filteredProfiles = (profiles | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="profile.Checked" ng-change="selectItem(profile)" /></td>
                 <td>
-                  <a ui-sref="storidge.profiles.edit({id: profile.Id})">{{ profile.Name }}</a>
+                  <a ui-sref="storidge.profiles.edit({id: profile.Name})">{{ profile.Name }}</a>
                 </td>
               </tr>
               <tr ng-if="!profiles">
