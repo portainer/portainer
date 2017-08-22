@@ -177,8 +177,8 @@
                   {{ user.RoleName }}
                 </td>
                 <td>
-                  <span ng-if="AuthenticationMethod === 1 || user.Id === 1">Internal</span>
-                  <span ng-if="AuthenticationMethod === 2 && user.Id !== 1">LDAP</span>
+                  <span ng-if="AuthenticationMethod === 1 || user.Username === 'admin'">Internal</span>
+                  <span ng-if="AuthenticationMethod === 2 && user.Username !== 'admin'">LDAP</span>
                 </td>
                 <td ng-if="isAdmin">
                   <a ui-sref="user({id: user.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
