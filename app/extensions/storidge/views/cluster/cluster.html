@@ -13,34 +13,126 @@
 <div class="row">
   <div class="col-md-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tachometer" title="Cluster status"></rd-widget-header>
+      <rd-widget-header icon="fa-bolt" title="Cluster details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
             <tr>
+              <td>Domain</td>
+              <td>{{ clusterInfo.domain }}</td>
+            </tr>
+            <tr>
               <td>Nodes</td>
-              <td>{{ cluster.Nodes.length }}</td>
+              <td>{{ clusterInfo.nodes }}</td>
             </tr>
             <tr>
-              <td>Capacity</td>
-              <td>{{ cluster.Capacity.Available }} / {{ cluster.Capacity.Total }}</td>
+              <td>Status</td>
+              <td><i class="fa fa-heartbeat space-right green-icon"></i> {{ clusterInfo.status }}</td>
             </tr>
             <tr>
-              <td colspan="2">
+              <td>Version</td>
+              <td>{{ clusterVersion.version }}</td>
+            </tr>
+            <tr>
+              <td>Actions</td>
+              <td>
                 <div class="btn-group" role="group" aria-label="...">
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i>Reboot cluster</a>
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Shutdown cluster</a>
-                </div>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="shutdownCluster()">
+                  <i class="fa fa-power-off space-right" aria-hidden="true"></i> Shutdown cluster
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="rebootCluster()">
+                  <i class="fa fa-refresh space-right" aria-hidden="true"></i> Reboot cluster
+                </button>
+              </div>
               </td>
             </tr>
-            <!-- <tr>
-              <td colspan="2">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="shutdownCluster()">Shutdown cluster</button>
-                <button type="button" class="btn btn-primary btn-sm" ng-click="rebootCluster()">Reboot cluster</button>
-              </td>
-            </tr> -->
           </tbody>
         </table>
       </rd-widget-body>
     </rd-widget>
   </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tachometer" title="Cluster status"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Capacity</td>
+              <td>
+                 ? / {{ clusterInfo.totalCapacity }}
+                 <i class="fa fa-check-circle-o green-icon space-left" aria-hidden="true"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>IOPS</td>
+              <td>
+                 ? / {{ clusterInfo.totalIOPS }}
+                 <i class="fa fa-exclamation-circle orange-icon space-left" aria-hidden="true"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>Bandwidth</td>
+              <td>
+                 ? / {{ clusterInfo.totalBandwidth }}
+                 <i class="fa fa-exclamation-circle red-icon space-left" aria-hidden="true"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-history" title="Cluster events">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-lg-12">
+        <div class="pull-right">
+          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>
+                  Event
+                  <a ng-click="order('Event')">
+                    <span ng-show="sortType == 'Time' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Time' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr dir-paginate="event in (clusterEvents | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count)">
+                <td>{{ event }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="clusterEvents" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

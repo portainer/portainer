@@ -82,6 +82,10 @@ a[ng-click]{
   margin-right: 5px;
 }
 
+.space-left {
+  margin-left: 5px;
+}
+
 .tooltip.portainer-tooltip .tooltip-inner {
   font-family: Montserrat;
   background-color: #ffffff;

@@ -1,27 +1,51 @@
 angular.module('extension.storidge')
-.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'Pagination',
-function ($q, $scope, $state, Notifications, Pagination) {
+.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'Pagination', 'StoridgeClusterService', 'StoridgeNodeService',
+function ($q, $scope, $state, Notifications, Pagination, StoridgeClusterService, StoridgeNodeService) {
+
+  $scope.state = {};
+  $scope.state.pagination_count = Pagination.getPaginationCount('storidge_events');
+  $scope.sortType = 'Event';
+  $scope.sortReverse = true;
+
+  $scope.order = function(sortType) {
+    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+    $scope.sortType = sortType;
+  };
+
+  $scope.changePaginationCount = function() {
+    Pagination.setPaginationCount('storidge_events', $scope.state.pagination_count);
+  };
 
   $scope.rebootCluster = function() {
-
+    Notifications.success('Cluster successfully rebooted');
+    $state.reload();
   };
 
   $scope.shutdownCluster = function() {
-
+    Notifications.success('Cluster successfully shutdown');
+    $state.reload();
   };
 
   function initView() {
-    $scope.cluster = {
-      Capacity: {
-        Total: '1,1 TB',
-        Available: '300 GB',
-        Used: '800 GB',
-        Provisioned: '1 TB'
-      },
-      Nodes: [
-        { Name: 'NodeA' }, { Name: 'NodeB' }, { Name: 'NodeC' }
-      ]
-    };
+    $('#loadingViewSpinner').show();
+
+    $q.all({
+      info: StoridgeClusterService.info(),
+      version: StoridgeClusterService.version(),
+      events: StoridgeClusterService.events()
+    })
+    .then(function success(data) {
+      $scope.clusterInfo = data.info;
+      $scope.clusterVersion = data.version;
+      $scope.clusterEvents = data.events;
+      console.log(JSON.stringify($scope.clusterEvents, null, 4));
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve cluster information');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
   }
 
   initView();
