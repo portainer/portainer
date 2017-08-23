@@ -3,7 +3,7 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.getContainers = function (all) {
+  service.containers = function(all) {
     var deferred = $q.defer();
     Container.query({ all: all }).$promise
     .then(function success(data) {
