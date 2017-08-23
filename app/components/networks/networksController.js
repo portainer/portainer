@@ -99,7 +99,14 @@ function ($scope, $state, Network, NetworkService, Notifications, Pagination) {
 
   function initView() {
     $('#loadNetworksSpinner').show();
-    NetworkService.networks()
+    var provider = $scope.applicationState.endpoint.mode.provider;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    NetworkService.networks(
+      provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
+      false,
+      provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
+      provider === 'DOCKER_SWARM'
+    )
     .then(function success(data) {
       $scope.networks = data;
     })

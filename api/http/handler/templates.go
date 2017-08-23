@@ -20,7 +20,7 @@ type TemplatesHandler struct {
 }
 
 const (
-	containerTemplatesURLLinuxServerIo = "http://tools.linuxserver.io/portainer.json"
+	containerTemplatesURLLinuxServerIo = "https://tools.linuxserver.io/portainer.json"
 )
 
 // NewTemplatesHandler returns a new instance of TemplatesHandler.
@@ -30,17 +30,12 @@ func NewTemplatesHandler(bouncer *security.RequestBouncer) *TemplatesHandler {
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/templates",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTemplates)))
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetTemplates))).Methods(http.MethodGet)
 	return h
 }
 
 // handleGetTemplates handles GET requests on /templates?key=<key>
 func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		httperror.WriteMethodNotAllowedResponse(w, []string{http.MethodGet})
-		return
-	}
-
 	key := r.FormValue("key")
 	if key == "" {
 		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)

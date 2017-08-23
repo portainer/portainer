@@ -1,0 +1,74 @@
+---
+js:
+  regular:
+  - bower_components/jquery/dist/jquery.js
+  - bower_components/bootstrap/dist/js/bootstrap.js
+  - bower_components/angular-multi-select/isteven-multi-select.js
+  - bower_components/bootbox.js/bootbox.js
+  - bower_components/Chart.js/Chart.js
+  - bower_components/filesize/lib/filesize.js
+  - bower_components/lodash/dist/lodash.js
+  - bower_components/moment/moment.js
+  - bower_components/splitargs/src/splitargs.js
+  - bower_components/toastr/toastr.js
+  - bower_components/xterm.js/dist/xterm.js
+  - bower_components/xterm.js/dist/addons/fit/fit.js
+  - assets/js/legend.js
+  minified:
+  - bower_components/jquery/dist/jquery.min.js
+  - bower_components/bootstrap/dist/js/bootstrap.min.js
+  - bower_components/angular-multi-select/isteven-multi-select.js
+  - bower_components/bootbox.js/bootbox.js
+  - bower_components/Chart.js/Chart.min.js
+  - bower_components/filesize/lib/filesize.min.js
+  - bower_components/lodash/dist/lodash.min.js
+  - bower_components/moment/min/moment.min.js
+  - bower_components/splitargs/src/splitargs.js
+  - bower_components/toastr/toastr.min.js
+  - bower_components/xterm.js/dist/xterm.js
+  - bower_components/xterm.js/dist/addons/fit/fit.js
+  - assets/js/legend.js
+css:
+  regular:
+  - bower_components/bootstrap/dist/css/bootstrap.css
+  - bower_components/rdash-ui/dist/css/rdash.css
+  - bower_components/angular-multi-select/isteven-multi-select.css
+  - bower_components/angular-ui-select/dist/select.css
+  - bower_components/font-awesome/css/font-awesome.css
+  - bower_components/toastr/toastr.css
+  - bower_components/xterm.js/dist/xterm.css
+  minified:
+  - bower_components/bootstrap/dist/css/bootstrap.min.css
+  - bower_components/rdash-ui/dist/css/rdash.min.css
+  - bower_components/angular-multi-select/isteven-multi-select.css
+  - bower_components/angular-ui-select/dist/select.min.css
+  - bower_components/font-awesome/css/font-awesome.min.css
+  - bower_components/toastr/toastr.min.css
+  - bower_components/xterm.js/dist/xterm.css
+angular:
+  regular:
+  - bower_components/angular/angular.js
+  - bower_components/angular-bootstrap/ui-bootstrap-tpls.js
+  - bower_components/angular-cookies/angular-cookies.js
+  - bower_components/angular-google-analytics/dist/angular-google-analytics.js
+  - bower_components/angular-jwt/dist/angular-jwt.js
+  - bower_components/angular-local-storage/dist/angular-local-storage.js
+  - bower_components/angular-resource/angular-resource.js
+  - bower_components/angular-sanitize/angular-sanitize.js
+  - bower_components/angular-ui-select/dist/select.js
+  - bower_components/angular-ui-router/release/angular-ui-router.js
+  - bower_components/angular-utils-pagination/dirPagination.js
+  - bower_components/ng-file-upload/ng-file-upload.js
+  minified:
+  - bower_components/angular/angular.min.js
+  - bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js
+  - bower_components/angular-cookies/angular-cookies.min.js
+  - bower_components/angular-google-analytics/dist/angular-google-analytics.min.js
+  - bower_components/angular-jwt/dist/angular-jwt.min.js
+  - bower_components/angular-local-storage/dist/angular-local-storage.min.js
+  - bower_components/angular-resource/angular-resource.min.js
+  - bower_components/angular-sanitize/angular-sanitize.min.js
+  - bower_components/angular-ui-select/dist/select.min.js
+  - bower_components/angular-ui-router/release/angular-ui-router.min.js
+  - bower_components/angular-utils-pagination/dirPagination.js
+  - bower_components/ng-file-upload/ng-file-upload.min.js

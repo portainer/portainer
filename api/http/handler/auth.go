@@ -17,11 +17,13 @@ import (
 // AuthHandler represents an HTTP API handler for managing authentication.
 type AuthHandler struct {
 	*mux.Router
-	Logger        *log.Logger
-	authDisabled  bool
-	UserService   portainer.UserService
-	CryptoService portainer.CryptoService
-	JWTService    portainer.JWTService
+	Logger          *log.Logger
+	authDisabled    bool
+	UserService     portainer.UserService
+	CryptoService   portainer.CryptoService
+	JWTService      portainer.JWTService
+	LDAPService     portainer.LDAPService
+	SettingsService portainer.SettingsService
 }
 
 const (
@@ -42,17 +44,23 @@ func NewAuthHandler(bouncer *security.RequestBouncer, authDisabled bool) *AuthHa
 		authDisabled: authDisabled,
 	}
 	h.Handle("/auth",
-		bouncer.PublicAccess(http.HandlerFunc(h.handlePostAuth)))
+		bouncer.PublicAccess(http.HandlerFunc(h.handlePostAuth))).Methods(http.MethodPost)
 
 	return h
 }
 
-func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		httperror.WriteMethodNotAllowedResponse(w, []string{http.MethodPost})
-		return
+type (
+	postAuthRequest struct {
+		Username string `valid:"required"`
+		Password string `valid:"required"`
 	}
 
+	postAuthResponse struct {
+		JWT string `json:"jwt"`
+	}
+)
+
+func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Request) {
 	if handler.authDisabled {
 		httperror.WriteErrorResponse(w, ErrAuthDisabled, http.StatusServiceUnavailable, handler.Logger)
 		return
@@ -75,17 +83,31 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 
 	u, err := handler.UserService.UserByUsername(username)
 	if err == portainer.ErrUserNotFound {
-		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
 		return
 	} else if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	err = handler.CryptoService.CompareHashAndData(u.Password, password)
+	settings, err := handler.SettingsService.Settings()
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
+	}
+
+	if settings.AuthenticationMethod == portainer.AuthenticationLDAP && u.ID != 1 {
+		err = handler.LDAPService.AuthenticateUser(username, password, &settings.LDAPSettings)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
+	} else {
+		err = handler.CryptoService.CompareHashAndData(u.Password, password)
+		if err != nil {
+			httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
+			return
+		}
 	}
 
 	tokenData := &portainer.TokenData{
@@ -93,6 +115,7 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 		Username: u.Username,
 		Role:     u.Role,
 	}
+
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -100,13 +123,4 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	}
 
 	encodeJSON(w, &postAuthResponse{JWT: token}, handler.Logger)
-}
-
-type postAuthRequest struct {
-	Username string `valid:"required"`
-	Password string `valid:"required"`
-}
-
-type postAuthResponse struct {
-	JWT string `json:"jwt"`
 }

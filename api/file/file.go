@@ -8,12 +8,13 @@ import (
 	"io"
 	"os"
 	"path"
-	"strconv"
 )
 
 const (
 	// TLSStorePath represents the subfolder where TLS files are stored in the file store folder.
 	TLSStorePath = "tls"
+	// LDAPStorePath represents the subfolder where LDAP TLS files are stored in the TLSStorePath.
+	LDAPStorePath = "ldap"
 	// TLSCACertFile represents the name on disk for a TLS CA file.
 	TLSCACertFile = "ca.pem"
 	// TLSCertFile represents the name on disk for a TLS certificate file.
@@ -100,11 +101,10 @@ func (service *Service) StoreComposeFile(name, composeFileContent string) (strin
 	return path.Join(service.fileStorePath, stackStorePath), nil
 }
 
-// StoreTLSFile creates a subfolder in the TLSStorePath and stores a new file with the content from r.
-func (service *Service) StoreTLSFile(endpointID portainer.EndpointID, fileType portainer.TLSFileType, r io.Reader) error {
-	ID := strconv.Itoa(int(endpointID))
-	endpointStorePath := path.Join(TLSStorePath, ID)
-	err := service.createDirectoryInStoreIfNotExist(endpointStorePath)
+// StoreTLSFile creates a folder in the TLSStorePath and stores a new file with the content from r.
+func (service *Service) StoreTLSFile(folder string, fileType portainer.TLSFileType, r io.Reader) error {
+	storePath := path.Join(TLSStorePath, folder)
+	err := service.createDirectoryInStoreIfNotExist(storePath)
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func (service *Service) StoreTLSFile(endpointID portainer.EndpointID, fileType p
 		return portainer.ErrUndefinedTLSFileType
 	}
 
-	tlsFilePath := path.Join(endpointStorePath, fileName)
+	tlsFilePath := path.Join(storePath, fileName)
 	err = service.createFileInStore(tlsFilePath, r)
 	if err != nil {
 		return err
@@ -130,7 +130,7 @@ func (service *Service) StoreTLSFile(endpointID portainer.EndpointID, fileType p
 }
 
 // GetPathForTLSFile returns the absolute path to a specific TLS file for an endpoint.
-func (service *Service) GetPathForTLSFile(endpointID portainer.EndpointID, fileType portainer.TLSFileType) (string, error) {
+func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSFileType) (string, error) {
 	var fileName string
 	switch fileType {
 	case portainer.TLSFileCA:
@@ -142,8 +142,7 @@ func (service *Service) GetPathForTLSFile(endpointID portainer.EndpointID, fileT
 	default:
 		return "", portainer.ErrUndefinedTLSFileType
 	}
-	ID := strconv.Itoa(int(endpointID))
-	return path.Join(service.fileStorePath, TLSStorePath, ID, fileName), nil
+	return path.Join(service.fileStorePath, TLSStorePath, folder, fileName), nil
 }
 
 // DeleteStackFiles deletes a folder containing all the files associated to a stack.
@@ -156,10 +155,9 @@ func (service *Service) DeleteStackFiles(projectPath string) error {
 }
 
 // DeleteTLSFiles deletes a folder containing the TLS files for an endpoint.
-func (service *Service) DeleteTLSFiles(endpointID portainer.EndpointID) error {
-	ID := strconv.Itoa(int(endpointID))
-	endpointPath := path.Join(service.fileStorePath, TLSStorePath, ID)
-	err := os.RemoveAll(endpointPath)
+func (service *Service) DeleteTLSFiles(folder string) error {
+	storePath := path.Join(service.fileStorePath, TLSStorePath, folder)
+	err := os.RemoveAll(storePath)
 	if err != nil {
 		return err
 	}

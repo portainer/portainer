@@ -1,11 +1,11 @@
 angular.module('containerConsole', [])
-.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'Exec', '$timeout', 'EndpointProvider', 'Notifications', 'ContainerHelper',
-function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvider, Notifications, ContainerHelper) {
+.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ContainerService', 'ExecService',
+function ($scope, $stateParams, Container, Image, EndpointProvider, Notifications, ContainerHelper, ContainerService, ExecService) {
   $scope.state = {};
   $scope.state.loaded = false;
   $scope.state.connected = false;
   $scope.formValues = {};
-  
+
   var socket, term;
 
   // Ensure the socket is closed before leaving the view
@@ -38,9 +38,9 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
 
   $scope.connect = function() {
     $('#loadConsoleSpinner').show();
-    var termWidth = Math.round($('#terminal-container').width() / 8.2);
+    var termWidth = Math.floor(($('#terminal-container').width() - 20) / 8.39);
     var termHeight = 30;
-    var command = $scope.formValues.isCustomCommand ? 
+    var command = $scope.formValues.isCustomCommand ?
                     $scope.formValues.customCommand : $scope.formValues.command;
     var execConfig = {
       id: $stateParams.id,
@@ -52,24 +52,24 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
       Cmd: ContainerHelper.commandStringToArray(command)
     };
 
-    Container.exec(execConfig, function(d) {
-      if (d.message) {
-        $('#loadConsoleSpinner').hide();
-        Notifications.error('Error', {}, d.message);
+    var execId;
+    ContainerService.createExec(execConfig)
+    .then(function success(data) {
+      execId = data.Id;
+      var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
+      if (url.indexOf('https') > -1) {
+        url = url.replace('https://', 'wss://');
       } else {
-        var execId = d.Id;
-        resizeTTY(execId, termHeight, termWidth);
-        var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
-        if (url.indexOf('https') > -1) {
-          url = url.replace('https://', 'wss://');
-        } else {
-          url = url.replace('http://', 'ws://');
-        }
-        initTerm(url, termHeight, termWidth);
+        url = url.replace('http://', 'ws://');
       }
-    }, function (e) {
+      initTerm(url, termHeight, termWidth);
+      return ExecService.resizeTTY(execId, termHeight, termWidth, 2000);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to exec into container');
+    })
+    .finally(function final() {
       $('#loadConsoleSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to start an exec instance');
     });
   };
 
@@ -83,19 +83,6 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
     }
   };
 
-  function resizeTTY(execId, height, width) {
-    $timeout(function() {
-      Exec.resize({id: execId, height: height, width: width}, function (d) {
-        if (d.message) {
-          Notifications.error('Error', {}, 'Unable to resize TTY');
-        }
-      }, function (e) {
-        Notifications.error('Failure', {}, 'Unable to resize TTY');
-      });
-    }, 2000);
-
-  }
-
   function initTerm(url, height, width) {
     socket = new WebSocket(url);
 
@@ -107,9 +94,14 @@ function ($scope, $stateParams, Container, Image, Exec, $timeout, EndpointProvid
       term.on('data', function (data) {
         socket.send(data);
       });
-      term.open(document.getElementById('terminal-container'));
+      term.open(document.getElementById('terminal-container'), true);
       term.resize(width, height);
       term.setOption('cursorBlink', true);
+      term.fit();
+
+      window.onresize = function() {
+        term.fit();
+      };
 
       socket.onmessage = function (e) {
         term.write(e.data);

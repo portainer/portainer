@@ -16,14 +16,18 @@ function ContainerViewModel(data) {
   } else if (this.Labels && this.Labels['com.docker.stack.namespace']) {
     this.StackName = this.Labels['com.docker.stack.namespace'];
   }
-  this.Ports = [];
   this.Mounts = data.Mounts;
-  for (var i = 0; i < data.Ports.length; ++i) {
-    var p = data.Ports[i];
-    if (p.PublicPort) {
-      this.Ports.push({ host: p.IP, private: p.PrivatePort, public: p.PublicPort });
+
+  this.Ports = [];
+  if (data.Ports) {
+    for (var i = 0; i < data.Ports.length; ++i) {
+      var p = data.Ports[i];
+      if (p.PublicPort) {
+        this.Ports.push({ host: p.IP, private: p.PrivatePort, public: p.PublicPort });
+      }
     }
   }
+
   if (data.Portainer) {
     if (data.Portainer.ResourceControl) {
       this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);

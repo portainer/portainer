@@ -68,7 +68,7 @@
           </div>
           <!-- !env -->
           <!-- access-control -->
-          <div ng-include="'app/components/common/accessControlForm/accessControlForm.html'" ng-if="applicationState.application.authentication"></div>
+          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
           <!-- !access-control -->
           <div class="form-group">
             <div class="col-sm-12">
@@ -202,13 +202,14 @@
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
               <i id="createContainerSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
-              <span class="small text-muted" style="margin-left: 10px" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
+              <span class="small text-muted" style="margin-left: 10px" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM' && !state.formValidationError">
                 When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref="networks">networks view</a> to create one.
               </span>
-              <span ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'" style="margin-left: 10px">
+              <span ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && !state.formValidationError" style="margin-left: 10px">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="small text-muted" style="margin-left: 5px;">App templates cannot be deployed as Swarm Mode services for the moment. You can still use them to quickly deploy containers on the Docker host.</span>
               </span>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
           <!-- !actions -->

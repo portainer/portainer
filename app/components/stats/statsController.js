@@ -213,5 +213,8 @@ function (Pagination, $scope, Notifications, $timeout, Container, ContainerTop, 
   }, function (e) {
     Notifications.error('Failure', e, 'Unable to retrieve container info');
   });
-  $scope.getTop();
+  var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+  if (endpointProvider !== 'VMWARE_VIC') {
+    $scope.getTop();
+  }
 }]);

@@ -57,7 +57,7 @@ function (AccessService, Pagination, Notifications) {
 
   function removeFromAccesses(access, accesses) {
     _.remove(accesses, function(n) {
-      return n.Id === access.Id;
+      return n.Id === access.Id && n.Type === access.Type;
     });
   }
 

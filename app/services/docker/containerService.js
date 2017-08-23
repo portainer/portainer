@@ -91,5 +91,23 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.createExec = function(execConfig) {
+    var deferred = $q.defer();
+
+    Container.exec(execConfig).$promise
+    .then(function success(data) {
+      if (data.message) {
+        deferred.reject({ msg: data.message, err: data.message });
+      } else {
+        deferred.resolve(data);
+      }
+    })
+    .catch(function error(err) {
+      deferred.reject(err);
+    });
+
+    return deferred.promise;
+  };
+
   return service;
 }]);

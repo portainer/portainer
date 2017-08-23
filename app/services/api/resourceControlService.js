@@ -29,14 +29,14 @@ angular.module('portainer.services')
   };
 
   service.applyResourceControl = function(resourceControlType, resourceIdentifier, userId, accessControlData, subResources) {
-    if (!accessControlData.accessControlEnabled) {
+    if (!accessControlData.AccessControlEnabled) {
       return;
     }
 
     var authorizedUserIds = [];
     var authorizedTeamIds = [];
     var administratorsOnly = false;
-    switch (accessControlData.ownership) {
+    switch (accessControlData.Ownership) {
       case 'administrators':
         administratorsOnly = true;
         break;
@@ -44,10 +44,10 @@ angular.module('portainer.services')
         authorizedUserIds.push(userId);
         break;
       case 'restricted':
-        angular.forEach(accessControlData.authorizedUsers, function(user) {
+        angular.forEach(accessControlData.AuthorizedUsers, function(user) {
           authorizedUserIds.push(user.Id);
         });
-        angular.forEach(accessControlData.authorizedTeams, function(team) {
+        angular.forEach(accessControlData.AuthorizedTeams, function(team) {
           authorizedTeamIds.push(team.Id);
         });
         break;
@@ -83,9 +83,9 @@ angular.module('portainer.services')
       teams: resourceControl.TeamAccesses.length > 0 ? TeamService.teams() : []
     })
     .then(function success(data) {
-      var authorizedUserNames = ResourceControlHelper.retrieveAuthorizedUsers(resourceControl, data.users);
-      var authorizedTeamNames = ResourceControlHelper.retrieveAuthorizedTeams(resourceControl, data.teams);
-      deferred.resolve({ authorizedUsers: authorizedUserNames, authorizedTeams: authorizedTeamNames });
+      var authorizedUsers = ResourceControlHelper.retrieveAuthorizedUsers(resourceControl, data.users);
+      var authorizedTeams = ResourceControlHelper.retrieveAuthorizedTeams(resourceControl, data.teams);
+      deferred.resolve({ authorizedUsers: authorizedUsers, authorizedTeams: authorizedTeams });
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve user and team information', err: err });

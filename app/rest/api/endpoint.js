@@ -1,7 +1,7 @@
 angular.module('portainer.rest')
-.factory('Endpoints', ['$resource', 'ENDPOINTS_ENDPOINT', function EndpointsFactory($resource, ENDPOINTS_ENDPOINT) {
+.factory('Endpoints', ['$resource', 'API_ENDPOINT_ENDPOINTS', function EndpointsFactory($resource, API_ENDPOINT_ENDPOINTS) {
   'use strict';
-  return $resource(ENDPOINTS_ENDPOINT + '/:id/:action', {}, {
+  return $resource(API_ENDPOINT_ENDPOINTS + '/:id/:action', {}, {
     create: { method: 'POST' },
     query: { method: 'GET', isArray: true },
     get: { method: 'GET', params: { id: '@id' } },

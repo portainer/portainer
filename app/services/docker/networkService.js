@@ -3,62 +3,38 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.networks = function() {
+  service.networks = function(localNetworks, swarmNetworks, swarmAttachableNetworks, globalNetworks) {
     var deferred = $q.defer();
 
     Network.query({}).$promise
     .then(function success(data) {
-      var networks = data.map(function (item) {
-        return new NetworkViewModel(item);
-      });
-      deferred.resolve(networks);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve networks', err: err });
-    });
+      var networks = data;
 
-    return deferred.promise;
-  };
-
-  service.retrieveSwarmNetworks = function() {
-    var deferred = $q.defer();
-
-    service.networks()
-    .then(function success(data) {
-      var networks = data.filter(function (network) {
-        if (network.Scope === 'swarm') {
+      var filteredNetworks = networks.filter(function(network) {
+        if (localNetworks && network.Scope === 'local') {
           return network;
         }
+        if (swarmNetworks && network.Scope === 'swarm') {
+          return network;
+        }
+        if (swarmAttachableNetworks && network.Scope === 'swarm' && network.Attachable === true) {
+          return network;
+        }
+        if (globalNetworks && network.Scope === 'global') {
+          return network;
+        }
+      })
+      .map(function (item) {
+        return new NetworkViewModel(item);
       });
-      deferred.resolve(networks);
+
+      deferred.resolve(filteredNetworks);
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve networks', err: err});
     });
 
     return deferred.promise;
-  };
-
-  service.filterGlobalNetworks = function(networks) {
-    return networks.filter(function (network) {
-      if (network.Scope === 'global') {
-        return network;
-      }
-    });
-  };
-
-  service.filterSwarmModeAttachableNetworks = function(networks) {
-    return networks.filter(function (network) {
-      if (network.Scope === 'swarm' && network.Attachable === true) {
-        return network;
-      }
-    });
-  };
-
-  service.addPredefinedLocalNetworks = function(networks) {
-    networks.push({Scope: 'local', Name: 'bridge'});
-    networks.push({Scope: 'local', Name: 'host'});
-    networks.push({Scope: 'local', Name: 'none'});
   };
 
   return service;

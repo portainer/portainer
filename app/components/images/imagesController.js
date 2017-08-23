@@ -93,7 +93,9 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
 
   function fetchImages() {
     $('#loadImagesSpinner').show();
-    ImageService.images()
+    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    ImageService.images(apiVersion >= 1.25 && endpointProvider !== 'DOCKER_SWARM' && endpointProvider !== 'VMWARE_VIC')
     .then(function success(data) {
       $scope.images = data;
     })
