@@ -20,7 +20,7 @@ function TemplateViewModel(data) {
       var volume = {
         readOnly: false,
         containerPath: v.container,
-        type: 'auto',
+        type: 'auto'
       };
 
       if (v.bind) {
