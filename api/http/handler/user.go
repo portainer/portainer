@@ -82,6 +82,7 @@ type (
 	}
 
 	postAdminInitRequest struct {
+		Username string `valid:"required"`
 		Password string `valid:"required"`
 	}
 )
@@ -358,10 +359,14 @@ func (handler *UserHandler) handlePostAdminInit(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	user, err := handler.UserService.UserByUsername("admin")
-	if err == portainer.ErrUserNotFound {
+	users, err := handler.UserService.UsersByRole(portainer.AdministratorRole)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+	if len(users) == 0 {
 		user := &portainer.User{
-			Username: "admin",
+			Username: req.Username,
 			Role:     portainer.AdministratorRole,
 		}
 		user.Password, err = handler.CryptoService.Hash(req.Password)
@@ -375,11 +380,7 @@ func (handler *UserHandler) handlePostAdminInit(w http.ResponseWriter, r *http.R
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return
 		}
-	} else if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-	if user != nil {
+	} else {
 		httperror.WriteErrorResponse(w, portainer.ErrAdminAlreadyInitialized, http.StatusConflict, handler.Logger)
 		return
 	}

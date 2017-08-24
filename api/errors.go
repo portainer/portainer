@@ -14,7 +14,7 @@ const (
 	ErrUserNotFound            = Error("User not found")
 	ErrUserAlreadyExists       = Error("User already exists")
 	ErrInvalidUsername         = Error("Invalid username. White spaces are not allowed.")
-	ErrAdminAlreadyInitialized = Error("Admin user already initialized")
+	ErrAdminAlreadyInitialized = Error("An administrator user already exists")
 )
 
 // Team errors.
