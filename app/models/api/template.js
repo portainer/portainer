@@ -17,7 +17,7 @@ function TemplateViewModel(data) {
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
       var volume = {
-        readOnly: false,
+        readOnly: v.readonly || false,
         containerPath: v.container,
         type: 'auto'
       };
