@@ -15,12 +15,25 @@ function TemplateViewModel(data) {
   this.RestartPolicy = data.restart_policy ? data.restart_policy : 'always';
   this.Volumes = [];
   if (data.volumes) {
+    var self = this;
     this.Volumes = data.volumes.map(function (v) {
-      return {
+      var volume = {
         readOnly: false,
-        containerPath: v,
-        type: 'auto'
+        containerPath: v.container,
+        type: 'auto',
       };
+
+      if (v.bind) {
+        volume.name = v.bind;
+        volume.type = 'bind';
+      }
+
+      if (typeof v === 'string') {
+        volume.containerPath = v;
+        self.DeprecatedFormat = true;
+      }
+
+      return volume;
     });
   }
   this.Ports = [];

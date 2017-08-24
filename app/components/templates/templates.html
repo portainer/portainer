@@ -21,13 +21,17 @@
 
         <form class="form-horizontal">
           <!-- description -->
-          <div ng-if="state.selectedTemplate.Note">
+          <div ng-if="state.selectedTemplate.Note || state.selectedTemplate.DeprecatedFormat">
             <div class="col-sm-12 form-section-title">
               Information
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <span class="template-note" ng-bind-html="state.selectedTemplate.Note"></span>
+                <div class="template-note" ng-if="state.selectedTemplate.Note" ng-bind-html="state.selectedTemplate.Note"></div>
+                <div class="template-note text-warning" ng-if="state.selectedTemplate.DeprecatedFormat">
+                  <i class="fa fa-exclamation-triangle"></i>
+                  This template is using a deprecated format for volumes. You should update the template definition, see: *LINK_TO_PORTAINER_DOCUMENTATION*
+                </div>
               </div>
             </div>
           </div>
