@@ -15,7 +15,6 @@ function TemplateViewModel(data) {
   this.RestartPolicy = data.restart_policy ? data.restart_policy : 'always';
   this.Volumes = [];
   if (data.volumes) {
-    var self = this;
     this.Volumes = data.volumes.map(function (v) {
       var volume = {
         readOnly: false,
@@ -30,11 +29,11 @@ function TemplateViewModel(data) {
 
       if (typeof v === 'string') {
         volume.containerPath = v;
-        self.DeprecatedFormat = true;
+        this.DeprecatedFormat = true;
       }
 
       return volume;
-    });
+    }.bind(this));
   }
   this.Ports = [];
   if (data.ports) {
