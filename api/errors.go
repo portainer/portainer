@@ -13,8 +13,10 @@ const (
 const (
 	ErrUserNotFound            = Error("User not found")
 	ErrUserAlreadyExists       = Error("User already exists")
-	ErrInvalidUsername         = Error("Invalid username. White spaces are not allowed.")
+	ErrInvalidUsername         = Error("Invalid username. White spaces are not allowed")
 	ErrAdminAlreadyInitialized = Error("An administrator user already exists")
+	ErrCannotRemoveAdmin       = Error("Cannot remove the default administrator account")
+	ErrAdminCannotRemoveSelf   = Error("Cannot remove your own user account. Contact another administrator")
 )
 
 // Team errors.
