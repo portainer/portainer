@@ -18,7 +18,7 @@ function TemplateViewModel(data) {
     this.Volumes = data.volumes.map(function (v) {
       var volume = {
         readOnly: v.readonly || false,
-        containerPath: v.container,
+        containerPath: v.container || v,
         type: 'auto'
       };
 
@@ -27,13 +27,8 @@ function TemplateViewModel(data) {
         volume.type = 'bind';
       }
 
-      if (typeof v === 'string') {
-        volume.containerPath = v;
-        this.DeprecatedFormat = true;
-      }
-
       return volume;
-    }.bind(this));
+    });
   }
   this.Ports = [];
   if (data.ports) {

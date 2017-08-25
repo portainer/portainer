@@ -28,11 +28,6 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <div class="template-note" ng-if="state.selectedTemplate.Note" ng-bind-html="state.selectedTemplate.Note"></div>
-                <div class="template-note text-danger" ng-if="state.selectedTemplate.DeprecatedFormat">
-                  <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
-                  This template is using a deprecated format for volumes. You should update the template definition, see:
-                  <a href="https://portainer.readthedocs.io/en/stable/templates.html#volumes" target="_blank">Templates Documentation</a>
-                </div>
               </div>
             </div>
           </div>
