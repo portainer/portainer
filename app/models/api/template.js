@@ -16,6 +16,8 @@ function TemplateViewModel(data) {
   this.Volumes = [];
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
+      // @DEPRECATED: New volume definition introduced
+      // via https://github.com/portainer/portainer/pull/1154
       var volume = {
         readOnly: v.readonly || false,
         containerPath: v.container || v,
