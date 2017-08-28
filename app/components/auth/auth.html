@@ -1,92 +1,38 @@
 <div class="page-wrapper">
   <!-- login box -->
   <div class="container simple-box">
-    <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+    <div class="col-sm-6 col-sm-offset-3">
       <!-- login box logo -->
       <div class="row">
-        <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
         <img ng-if="!logo" src="images/logo_alt.png" class="simple-box-logo" alt="Portainer">
+        <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
       </div>
       <!-- !login box logo -->
-      <!-- init password panel -->
-      <div class="panel panel-default" ng-if="initPassword">
-        <div class="panel-body">
-          <!-- init password form -->
-          <form class="login-form form-horizontal" enctype="multipart/form-data" method="POST">
-            <!-- comment -->
-            <div class="input-group">
-              <p style="margin: 5px;">
-                Please specify a password for the <b>admin</b> user account.
-              </p>
-            </div>
-            <!-- !comment input -->
-            <!-- comment -->
-            <div class="input-group">
-              <p style="margin: 5px;">
-                <i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[initPasswordData.password.length >= 8]" aria-hidden="true"></i>
-                Your password must be at least 8 characters long
-              </p>
-            </div>
-            <!-- !comment input -->
-            <!-- password input -->
-            <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-              <input id="admin_password" type="password" class="form-control" name="password" ng-model="initPasswordData.password" autofocus>
-            </div>
-            <!-- !password input -->
-            <!-- comment -->
-            <div class="input-group">
-              <p style="margin: 5px;">
-                <i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[initPasswordData.password !== '' && initPasswordData.password === initPasswordData.password_confirmation]" aria-hidden="true"></i>
-                Confirm your password
-              </p>
-            </div>
-            <!-- !comment input -->
-            <!-- password confirmation input -->
-            <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-              <input id="password_confirmation" type="password" class="form-control" name="password" ng-model="initPasswordData.password_confirmation">
-            </div>
-            <!-- !password confirmation input -->
-            <!-- validate button -->
-            <div class="form-group">
-              <div class="col-sm-12 controls">
-                <p class="pull-left text-danger" ng-if="initPasswordData.error" style="margin: 5px;">
-                  <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Unable to create default user
-                </p>
-                <button type="submit" class="btn btn-primary pull-right" ng-disabled="initPasswordData.password.length < 8 || initPasswordData.password !== initPasswordData.password_confirmation" ng-click="createAdminUser()"><i class="fa fa-key" aria-hidden="true"></i> Validate</button>
-              </div>
-            </div>
-            <!-- !validate button -->
-          </form>
-          <!-- !init password form -->
-        </div>
-      </div>
-      <!-- !init password panel -->
       <!-- login panel -->
-      <div class="panel panel-default" ng-if="!initPassword">
+      <div class="panel panel-default">
         <div class="panel-body">
           <!-- login form -->
-          <form class="login-form form-horizontal" enctype="multipart/form-data" method="POST">
+          <form class="simple-box-form form-horizontal">
             <!-- username input -->
             <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
-              <input id="username" type="text" class="form-control" name="username" ng-model="authData.username" placeholder="Username">
+              <input id="username" type="text" class="form-control" name="username" ng-model="formValues.Username" placeholder="admin" autofocus>
             </div>
             <!-- !username input -->
             <!-- password input -->
             <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-              <input id="password" type="password" class="form-control" name="password" ng-model="authData.password" autofocus>
+              <input id="password" type="password" class="form-control" name="password" ng-model="formValues.Password">
             </div>
             <!-- !password input -->
             <!-- login button -->
             <div class="form-group">
-              <div class="col-sm-12 controls">
-                <p class="pull-left text-danger" ng-if="authData.error" style="margin: 5px;">
-                  <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ authData.error }}
-                </p>
-                <button type="submit" class="btn btn-primary pull-right" ng-click="authenticateUser()"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</button>
+              <div class="col-sm-12">
+                <button type="submit" class="btn btn-primary btn-sm pull-right" ng-click="authenticateUser()"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</button>
+                <span class="pull-left" style="margin: 5px;" ng-if="state.AuthenticationError">
+                  <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  <span class="small text-danger">{{ state.AuthenticationError }}</span>
+                </span>
               </div>
             </div>
             <!-- !login button -->
