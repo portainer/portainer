@@ -16,11 +16,18 @@ function TemplateViewModel(data) {
   this.Volumes = [];
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
-      return {
-        readOnly: false,
-        containerPath: v,
+      var volume = {
+        readOnly: v.readonly || false,
+        containerPath: v.container || v,
         type: 'auto'
       };
+
+      if (v.bind) {
+        volume.name = v.bind;
+        volume.type = 'bind';
+      }
+
+      return volume;
     });
   }
   this.Ports = [];
