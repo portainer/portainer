@@ -124,14 +124,13 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
       var matches = re.exec(string);
       if (matches) {
         var nb = parseInt(matches[1], 10);
-        if (matches[2] === 'k' || matches[2] === 'K') {
-          nb *= 1024;
-        } else if (matches[2] === 'm' || matches[2] === 'M') {
-          nb *= 1024 * 1024;
-        } else if (matches[2] === 'g' || matches[2] === 'G') {
-          nb *= 1024 * 1024 * 1024;
+        if (matches[2].match(/k/i)) {
+          return nb * 1024;
+        } else if (matches[2].match(/m/i)) {
+          return nb * 1024 * 1024;
+        } else if (matches[2].match(/g/i)) {
+          return nb * 1024 * 1024 * 1024;
         }
-        return nb;
       }
       return parseInt(string, 10);
     },
@@ -142,9 +141,8 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
         return number / (1024 * 1024) + 'm';
       } else if (number % 1024 === 0) {
         return number / 1024 + 'k';
-      } else {
-        return number;
       }
+      return number;
     },
     convertNanoToUnit: function(number) {
       return number / 1000000000;

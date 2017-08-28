@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ServiceHelper',
-function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ServiceHelper) {
+.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
+function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -292,6 +292,13 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     service.ServicePreferences = ServiceHelper.translatePreferencesToKeyValue(service.Preferences);
   }
 
+  function transformResources(service) {
+    service.LimitNanoCPUs = ServiceHelper.convertNanoToUnit(service.LimitNanoCPUs) || 0;
+    service.LimitMemoryBytes = ServiceHelper.convertNumberToHuman(service.LimitMemoryBytes) || '0m';
+    service.ReservationNanoCPUs = ServiceHelper.convertNanoToUnit(service.ReservationNanoCPUs) || 0;
+    service.ReservationMemoryBytes = ServiceHelper.convertNumberToHuman(service.ReservationMemoryBytes) || '0m';
+  }
+
   function initView() {
     $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
@@ -303,10 +310,7 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
         $scope.lastVersion = service.Version;
       }
 
-      service.LimitNanoCPUs = ServiceHelper.convertNanoToUnit(service.LimitNanoCPUs) || 0;
-      service.LimitMemoryBytes = ServiceHelper.convertNumberToHuman(service.LimitMemoryBytes) || '0m';
-      service.ReservationNanoCPUs = ServiceHelper.convertNanoToUnit(service.ReservationNanoCPUs) || 0;
-      service.ReservationMemoryBytes = ServiceHelper.convertNumberToHuman(service.ReservationMemoryBytes) || '0m';
+      transformResources(service);
       translateServiceArrays(service);
       $scope.service = service;
       originalService = angular.copy(service);
