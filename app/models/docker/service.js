@@ -18,6 +18,10 @@ function ServiceViewModel(data, runningTasks, nodes) {
   if (runningTasks) {
     this.Running = runningTasks.length;
   }
+  this.LimitNanoCPUs = 0;
+  this.LimitMemoryBytes = 0;
+  this.ReservationNanoCPUs = 0;
+  this.ReservationMemoryBytes = 0;
   if (data.Spec.TaskTemplate.Resources) {
     if (data.Spec.TaskTemplate.Resources.Limits) {
     this.LimitNanoCPUs = data.Spec.TaskTemplate.Resources.Limits.NanoCPUs;

@@ -8,7 +8,7 @@
           <tr>
             <td>CPU limit</td>
             <td>
-              <input class="input-sm" type="number" step="0.1" ng-model="service.LimitNanoCPUs | fromnano" ng-change="updateServiceAttribute(service, 'LimitNanoCPUs')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="number" step="0.1" ng-model="service.LimitNanoCPUs" ng-change="updateServiceAttribute(service, 'LimitNanoCPUs')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -19,7 +19,7 @@
           <tr>
             <td>Memory limit</td>
             <td>
-              <input class="input-sm" type="text" ng-model="service.LimitMemoryBytes|memoryhumansize" ng-change="updateServiceAttribute(service, 'LimitMemoryBytes')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="text" ng-model="service.LimitMemoryBytes" ng-change="updateServiceAttribute(service, 'LimitMemoryBytes')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -30,7 +30,7 @@
           <tr>
             <td>CPU reservation</td>
             <td>
-              <input class="input-sm" type="number" step="0.1" ng-model="service.ReservationNanoCPUs|fromnano" ng-change="updateServiceAttribute(service, 'ReservationNanoCPUs')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="number" step="0.1" ng-model="service.ReservationNanoCPUs" ng-change="updateServiceAttribute(service, 'ReservationNanoCPUs')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -41,7 +41,7 @@
           <tr>
             <td>Memory reservation</td>
             <td>
-              <input class="input-sm" type="text" ng-model="service.ReservationMemoryBytes|memoryhumansize" ng-change="updateServiceAttribute(service, 'ReservationMemoryBytes')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="text" ng-model="service.ReservationMemoryBytes" ng-change="updateServiceAttribute(service, 'ReservationMemoryBytes')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
