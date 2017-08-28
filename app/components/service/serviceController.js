@@ -207,11 +207,11 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.Resources = {
       Limits: {
         NanoCPUs: service.LimitNanoCPUs,
-        MemoryBytes: service.LimitMemoryBytes
+        MemoryBytes: parseInt(service.LimitMemoryBytes, 10)
       },
       Reservations: {
         NanoCPUs: service.ReservationNanoCPUs,
-        MemoryBytes: service.ReservationMemoryBytes
+        MemoryBytes: parseInt(service.ReservationMemoryBytes, 10)
       }
     };
 
@@ -299,6 +299,10 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
         $scope.lastVersion = service.Version;
       }
 
+      service.LimitNanoCPUs = service.LimitNanoCPUs || 0;
+      service.LimitMemoryBytes = service.LimitMemoryBytes || 0;
+      service.ReservationNanoCPUs = service.ReservationNanoCPUs || 0;
+      service.ReservationMemoryBytes = service.ReservationMemoryBytes || 0;
       translateServiceArrays(service);
       $scope.service = service;
       originalService = angular.copy(service);
