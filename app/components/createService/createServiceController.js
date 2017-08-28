@@ -257,7 +257,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
         Resources: {
           Limits: {},
           Reservations: {}
-        },
+        }
       },
       Mode: {},
       EndpointSpec: {}
