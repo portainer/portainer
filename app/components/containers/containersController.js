@@ -8,9 +8,6 @@ angular.module('containers', [])
   $scope.sortType = 'State';
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
-  $scope.truncate_size = 40;
-  $scope.showMore = true;
-  
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
@@ -163,12 +160,6 @@ angular.module('containers', [])
   $scope.removeAction = function () {
     batch($scope.containers, Container.remove, 'Removed');
   };
-  
-  
-  $scope.truncateMore = function(size) {
-	  $scope.truncate_size = 80
-	  $scope.showMore = false;
-  }
 
   $scope.confirmRemoveAction = function () {
     var isOneContainerRunning = false;

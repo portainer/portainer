@@ -61,9 +61,6 @@
                   <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-				<button type="button" style="float:right" class="btn btn-primary btn-xs" ng-click="truncateMore();" ng-show="showMore">
-				  <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> More
-				</button>
               </th>
               <th>
                 <a ui-sref="containers" ng-click="order('Image')">
@@ -109,8 +106,8 @@
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ container.Status }}</span>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) === -1" class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span>
               </td>
-              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: truncate_size}}</a></td>
-              <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: truncate_size}}</a></td>
+              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: 40}}</a></td>
+              <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: 40}}</a></td>
               <td><a ui-sref="image({id: container.Image})">{{ container.Image | hideshasum }}</a></td>
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">{{ container.hostIP }}</td>
