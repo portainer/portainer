@@ -34,11 +34,12 @@ angular.module('portainer', [
   'docker',
   'endpoint',
   'endpointAccess',
-  'endpointInit',
   'endpoints',
   'events',
   'image',
   'images',
+  'initAdmin',
+  'initEndpoint',
   'main',
   'network',
   'networks',
@@ -321,6 +322,33 @@ angular.module('portainer', [
         }
       }
     })
+    .state('init', {
+      abstract: true,
+      url: '/init',
+      views: {
+        'content@': {
+          template: '<div ui-view="content@"></div>'
+        }
+      }
+    })
+    .state('init.endpoint', {
+      url: '/endpoint',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/initEndpoint/initEndpoint.html',
+          controller: 'InitEndpointController'
+        }
+      }
+    })
+    .state('init.admin', {
+      url: '/admin',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/initAdmin/initAdmin.html',
+          controller: 'InitAdminController'
+        }
+      }
+    })
     .state('docker', {
       url: '/docker/',
       views: {
@@ -370,15 +398,6 @@ angular.module('portainer', [
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
-        }
-      }
-    })
-    .state('endpointInit', {
-      url: '/init/endpoint',
-      views: {
-        'content@': {
-          templateUrl: 'app/components/endpointInit/endpointInit.html',
-          controller: 'EndpointInitController'
         }
       }
     })
