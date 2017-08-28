@@ -61,9 +61,9 @@
                   <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
-				<button type="button" style="float:right" class="btn btn-primary btn-xs" ng-click="truncateMore();" ng-show="showMore">
-				  <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> More
-				</button>
+				<a data-toggle="tooltip" title="More" ng-click="truncateMore();" ng-show="showMore">
+					<i class="fa fa-plus-square" aria-hidden="true"></i>
+				</a>
               </th>
               <th>
                 <a ui-sref="containers" ng-click="order('Image')">
