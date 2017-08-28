@@ -235,11 +235,11 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     if (input.CpuReservation > 0) {
       config.TaskTemplate.Resources.Reservations.NanoCPUs = input.CpuReservation * 1000000000;
     }
-    var memoryLimit = ServiceHelper.convertUnitStringToNumber(input.MemoryLimit);
+    var memoryLimit = ServiceHelper.convertHumanToNumber(input.MemoryLimit);
     if (memoryLimit > 0) {
       config.TaskTemplate.Resources.Limits.MemoryBytes = memoryLimit;
     }
-    var memoryReservation = ServiceHelper.convertUnitStringToNumber(input.MemoryReservation);
+    var memoryReservation = ServiceHelper.convertHumanToNumber(input.MemoryReservation);
     if (memoryReservation > 0) {
       config.TaskTemplate.Resources.Reservations.MemoryBytes = memoryReservation;
     }

@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
-function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService', 'ServiceHelper',
+function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService, ServiceHelper) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -206,12 +206,12 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
 
     config.TaskTemplate.Resources = {
       Limits: {
-        NanoCPUs: service.LimitNanoCPUs,
-        MemoryBytes: parseInt(service.LimitMemoryBytes, 10)
+        NanoCPUs: ServiceHelper.convertUnitToNano(service.LimitNanoCPUs),
+        MemoryBytes: ServiceHelper.convertHumanToNumber(service.LimitMemoryBytes)
       },
       Reservations: {
-        NanoCPUs: service.ReservationNanoCPUs,
-        MemoryBytes: parseInt(service.ReservationMemoryBytes, 10)
+        NanoCPUs: ServiceHelper.convertUnitToNano(service.ReservationNanoCPUs),
+        MemoryBytes: ServiceHelper.convertHumanToNumber(service.ReservationMemoryBytes)
       }
     };
 
@@ -244,7 +244,11 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadingViewSpinner').hide();
-      Notifications.success('Service successfully updated', 'Service updated');
+      if (data.message && data.message.match(/^rpc error:/)) {
+        Notifications.error(data.message, 'Error');
+      } else {
+        Notifications.success('Service successfully updated', 'Service updated');
+      }
       $scope.cancelChanges({});
       initView();
     }, function (e) {
@@ -299,10 +303,10 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
         $scope.lastVersion = service.Version;
       }
 
-      service.LimitNanoCPUs = service.LimitNanoCPUs || 0;
-      service.LimitMemoryBytes = service.LimitMemoryBytes || 0;
-      service.ReservationNanoCPUs = service.ReservationNanoCPUs || 0;
-      service.ReservationMemoryBytes = service.ReservationMemoryBytes || 0;
+      service.LimitNanoCPUs = ServiceHelper.convertNanoToUnit(service.LimitNanoCPUs) || 0;
+      service.LimitMemoryBytes = ServiceHelper.convertNumberToHuman(service.LimitMemoryBytes) || '0m';
+      service.ReservationNanoCPUs = ServiceHelper.convertNanoToUnit(service.ReservationNanoCPUs) || 0;
+      service.ReservationMemoryBytes = ServiceHelper.convertNumberToHuman(service.ReservationMemoryBytes) || '0m';
       translateServiceArrays(service);
       $scope.service = service;
       originalService = angular.copy(service);

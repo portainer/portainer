@@ -169,32 +169,6 @@ angular.module('portainer.filters', [])
     }
   };
 })
-.filter('memoryhumansize', function () {
-  'use strict';
-  return function (bytes) {
-    if (bytes % (1024 * 1024 * 1024) === 0) {
-      return bytes / (1024 * 1024 * 1024) + 'g';
-    } else if (bytes % (1024 * 1024) === 0) {
-      return bytes / (1024 * 1024) + 'm';
-    } else if (bytes % 1024 === 0) {
-      return bytes / 1024 + 'k';
-    } else {
-      return bytes;
-    }
-  };
-})
-.filter('fromnano', function () {
-  'use strict';
-  return function (number) {
-    return number / 1000000000;
-  };
-})
-.filter('tonano', function () {
-  'use strict';
-  return function (number) {
-    return number * 1000000000;
-  };
-})
 .filter('containername', function () {
   'use strict';
   return function (container) {

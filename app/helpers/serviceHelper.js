@@ -119,7 +119,7 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
       }
       return [];
     },
-    convertUnitStringToNumber: function(string) {
+    convertHumanToNumber: function(string) {
       var re = new RegExp('^(.*)([kmg])$','i');
       var matches = re.exec(string);
       if (matches) {
@@ -134,6 +134,23 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
         return nb;
       }
       return parseInt(string, 10);
+    },
+    convertNumberToHuman: function(number) {
+      if (number % (1024 * 1024 * 1024) === 0) {
+        return number / (1024 * 1024 * 1024) + 'g';
+      } else if (number % (1024 * 1024) === 0) {
+        return number / (1024 * 1024) + 'm';
+      } else if (number % 1024 === 0) {
+        return number / 1024 + 'k';
+      } else {
+        return number;
+      }
+    },
+    convertNanoToUnit: function(number) {
+      return number / 1000000000;
+    },
+    convertUnitToNano: function(number) {
+      return number * 1000000000;
     }
   };
 }]);
