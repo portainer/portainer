@@ -20,6 +20,8 @@ angular.module('portainer.services')
       name: endpointParams.name,
       PublicURL: endpointParams.PublicURL,
       TLS: endpointParams.TLS,
+      TLSVerify: endpointParams.TLSVerify,
+      TLSClientCert: endpointParams.TLSClientCert,
       authorizedUsers: endpointParams.authorizedUsers
     };
     if (endpointParams.type && endpointParams.URL) {
@@ -55,18 +57,20 @@ angular.module('portainer.services')
     return Endpoints.create({}, endpoint).$promise;
   };
 
-  service.createRemoteEndpoint = function(name, URL, PublicURL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  service.createRemoteEndpoint = function(name, URL, PublicURL, TLS, TLSVerify, TLSClientCert, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var endpoint = {
       Name: name,
       URL: 'tcp://' + URL,
       PublicURL: PublicURL,
-      TLS: TLS
+      TLS: TLS,
+      TLSVerify: TLSVerify,
+      TLSClientCert: TLSClientCert
     };
     var deferred = $q.defer();
     Endpoints.create({}, endpoint).$promise
     .then(function success(data) {
       var endpointID = data.Id;
-      if (TLS) {
+      if (TLSVerify || TLSClientCert) {
         deferred.notify({upload: true});
         FileUploadService.uploadTLSFilesForEndpoint(endpointID, TLSCAFile, TLSCertFile, TLSKeyFile)
         .then(function success() {

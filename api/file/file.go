@@ -95,10 +95,33 @@ func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSF
 	return path.Join(service.fileStorePath, TLSStorePath, folder, fileName), nil
 }
 
-// DeleteTLSFiles deletes a folder containing the TLS files for an endpoint.
+// DeleteTLSFiles deletes a folder in the TLS store path.
 func (service *Service) DeleteTLSFiles(folder string) error {
 	storePath := path.Join(service.fileStorePath, TLSStorePath, folder)
 	err := os.RemoveAll(storePath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeleteTLSFile deletes a specific TLS file from a folder.
+func (service *Service) DeleteTLSFile(folder string, fileType portainer.TLSFileType) error {
+	var fileName string
+	switch fileType {
+	case portainer.TLSFileCA:
+		fileName = TLSCACertFile
+	case portainer.TLSFileCert:
+		fileName = TLSCertFile
+	case portainer.TLSFileKey:
+		fileName = TLSKeyFile
+	default:
+		return portainer.ErrUndefinedTLSFileType
+	}
+
+	filePath := path.Join(service.fileStorePath, TLSStorePath, folder, fileName)
+
+	err := os.Remove(filePath)
 	if err != nil {
 		return err
 	}

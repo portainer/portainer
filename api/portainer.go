@@ -19,6 +19,7 @@ type (
 		Endpoint          *string
 		NoAuth            *bool
 		NoAnalytics       *bool
+		TLS               *bool
 		TLSVerify         *bool
 		TLSCacert         *string
 		TLSCert           *string
@@ -155,16 +156,22 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
-		ID              EndpointID `json:"Id"`
-		Name            string     `json:"Name"`
-		URL             string     `json:"URL"`
-		PublicURL       string     `json:"PublicURL"`
-		TLS             bool       `json:"TLS"`
-		TLSCACertPath   string     `json:"TLSCACert,omitempty"`
-		TLSCertPath     string     `json:"TLSCert,omitempty"`
-		TLSKeyPath      string     `json:"TLSKey,omitempty"`
-		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
+		ID              EndpointID       `json:"Id"`
+		Name            string           `json:"Name"`
+		URL             string           `json:"URL"`
+		PublicURL       string           `json:"PublicURL"`
+		TLSConfig       TLSConfiguration `json:"TLSConfig"`
+		AuthorizedUsers []UserID         `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID         `json:"AuthorizedTeams"`
+
+		// Deprecated fields
+		// Deprecated in DBVersion == 4
+		// TLS             bool       `json:"TLS"`
+		// TLSVerify       bool       `json:"TLSVerify"`
+		// TLSClientCert   bool       `json:"TLSClientCert"`
+		// TLSCACertPath   string     `json:"TLSCACert,omitempty"`
+		// TLSCertPath     string     `json:"TLSCert,omitempty"`
+		// TLSKeyPath      string     `json:"TLSKey,omitempty"`
 	}
 
 	// ResourceControlID represents a resource control identifier.
@@ -325,6 +332,7 @@ type (
 	FileService interface {
 		StoreTLSFile(folder string, fileType TLSFileType, r io.Reader) error
 		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)
+		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 	}
 
@@ -344,7 +352,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.14.0"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 3
+	DBVersion = 4
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 )

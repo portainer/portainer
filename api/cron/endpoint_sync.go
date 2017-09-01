@@ -66,22 +66,22 @@ func endpointExists(endpoint *portainer.Endpoint, endpoints []portainer.Endpoint
 
 func mergeEndpointIfRequired(original, updated *portainer.Endpoint) *portainer.Endpoint {
 	var endpoint *portainer.Endpoint
-	if original.URL != updated.URL || original.TLS != updated.TLS ||
-		(updated.TLS && original.TLSCACertPath != updated.TLSCACertPath) ||
-		(updated.TLS && original.TLSCertPath != updated.TLSCertPath) ||
-		(updated.TLS && original.TLSKeyPath != updated.TLSKeyPath) {
+	if original.URL != updated.URL || original.TLSConfig.TLS != updated.TLSConfig.TLS ||
+		(updated.TLSConfig.TLS && original.TLSConfig.TLSCACertPath != updated.TLSConfig.TLSCACertPath) ||
+		(updated.TLSConfig.TLS && original.TLSConfig.TLSCertPath != updated.TLSConfig.TLSCertPath) ||
+		(updated.TLSConfig.TLS && original.TLSConfig.TLSKeyPath != updated.TLSConfig.TLSKeyPath) {
 		endpoint = original
 		endpoint.URL = updated.URL
-		if updated.TLS {
-			endpoint.TLS = true
-			endpoint.TLSCACertPath = updated.TLSCACertPath
-			endpoint.TLSCertPath = updated.TLSCertPath
-			endpoint.TLSKeyPath = updated.TLSKeyPath
+		if updated.TLSConfig.TLS {
+			endpoint.TLSConfig.TLS = true
+			endpoint.TLSConfig.TLSCACertPath = updated.TLSConfig.TLSCACertPath
+			endpoint.TLSConfig.TLSCertPath = updated.TLSConfig.TLSCertPath
+			endpoint.TLSConfig.TLSKeyPath = updated.TLSConfig.TLSKeyPath
 		} else {
-			endpoint.TLS = false
-			endpoint.TLSCACertPath = ""
-			endpoint.TLSCertPath = ""
-			endpoint.TLSKeyPath = ""
+			endpoint.TLSConfig.TLS = false
+			endpoint.TLSConfig.TLSCACertPath = ""
+			endpoint.TLSConfig.TLSCertPath = ""
+			endpoint.TLSConfig.TLSKeyPath = ""
 		}
 	}
 	return endpoint

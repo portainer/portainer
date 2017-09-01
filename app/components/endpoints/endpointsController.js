@@ -14,7 +14,10 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
     Name: '',
     URL: '',
     PublicURL: '',
+    TLSSetup: 'tls_client_ca',
     TLS: false,
+    // TLSVerify: true,
+    // TLSClientCert: true,
     TLSCACert: null,
     TLSCert: null,
     TLSKey: null
@@ -54,11 +57,16 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
     if (PublicURL === '') {
       PublicURL = URL.split(':')[0];
     }
+
     var TLS = $scope.formValues.TLS;
-    var TLSCAFile = $scope.formValues.TLSCACert;
-    var TLSCertFile = $scope.formValues.TLSCert;
-    var TLSKeyFile = $scope.formValues.TLSKey;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, false).then(function success(data) {
+    var TLSSetup = $scope.formValues.TLSSetup;
+    var TLSVerify = TLS && (TLSSetup === 'tls_client_ca' || TLSSetup === 'tls_ca');
+    var TLSClientCert = TLS && (TLSSetup === 'tls_client_ca' || TLSSetup === 'tls_client_noca');
+    var TLSCAFile = TLSVerify ? $scope.formValues.TLSCACert : null;
+    var TLSCertFile = TLSClientCert ? $scope.formValues.TLSCert : null;
+    var TLSKeyFile = TLSClientCert ? $scope.formValues.TLSKey : null;
+
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSVerify, TLSClientCert, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
       Notifications.success('Endpoint created', name);
       $state.reload();
     }, function error(err) {
