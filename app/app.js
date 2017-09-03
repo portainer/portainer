@@ -64,7 +64,8 @@ angular.module('portainer', [
   'users',
   'userSettings',
   'volume',
-  'volumes'])
+  'volumes',
+  'ansiToHtml'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider) {
     'use strict';
 
