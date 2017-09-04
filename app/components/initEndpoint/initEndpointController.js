@@ -2,6 +2,10 @@ angular.module('initEndpoint', [])
 .controller('InitEndpointController', ['$scope', '$state', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
 function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notifications) {
 
+  if (!_.isEmpty($scope.applicationState.endpoint)) {
+    $state.go('dashboard');
+  }
+
   $scope.logo = StateManager.getState().application.logo;
 
   $scope.state = {
@@ -13,26 +17,22 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     Name: '',
     URL: '',
     TLS: false,
-    TLSVerify: true,
-    TLSClientCert: true,
+    TLSSkipVerify: false,
+    TLSSKipClientVerify: false,
     TLSCACert: null,
     TLSCert: null,
     TLSKey: null
   };
-
-  if (!_.isEmpty($scope.applicationState.endpoint)) {
-    $state.go('dashboard');
-  }
-
 
   $scope.createLocalEndpoint = function() {
     $('#createResourceSpinner').show();
     var name = 'local';
     var URL = 'unix:///var/run/docker.sock';
 
+    var endpointID = 1;
     EndpointService.createLocalEndpoint(name, URL, false, true)
     .then(function success(data) {
-      var endpointID = data.Id;
+      endpointID = data.Id;
       EndpointProvider.setEndpointID(endpointID);
       return StateManager.updateEndpointState(false);
     })
@@ -40,7 +40,8 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
       $state.go('dashboard');
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
+      Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
+      EndpointService.deleteEndpoint(endpointID);
     })
     .finally(function final() {
       $('#createResourceSpinner').hide();
@@ -53,15 +54,16 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var URL = $scope.formValues.URL;
     var PublicURL = URL.split(':')[0];
     var TLS = $scope.formValues.TLS;
-    var TLSVerify = TLS && $scope.formValues.TLSVerify;
-    var TLSClientCert = TLS && $scope.formValues.TLSClientCert;
-    var TLSCAFile = TLSVerify ? $scope.formValues.TLSCACert : null;
-    var TLSCertFile = TLSClientCert ? $scope.formValues.TLSCert : null;
-    var TLSKeyFile = TLSClientCert ? $scope.formValues.TLSKey: null;
+    var TLSSkipVerify = TLS && $scope.formValues.TLSSkipVerify;
+    var TLSSKipClientVerify = TLS && $scope.formValues.TLSSKipClientVerify;
+    var TLSCAFile = TLSSkipVerify ? null : $scope.formValues.TLSCACert;
+    var TLSCertFile = TLSSKipClientVerify ? null : $scope.formValues.TLSCert;
+    var TLSKeyFile = TLSSKipClientVerify ? null : $scope.formValues.TLSKey;
 
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSVerify, TLSClientCert, TLSCAFile, TLSCertFile, TLSKeyFile)
+    var endpointID = 1;
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
-      var endpointID = data.Id;
+      endpointID = data.Id;
       EndpointProvider.setEndpointID(endpointID);
       return StateManager.updateEndpointState(false);
     })
@@ -69,7 +71,8 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
       $state.go('dashboard');
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
+      Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
+      EndpointService.deleteEndpoint(endpointID);
     })
     .finally(function final() {
       $('#createResourceSpinner').hide();

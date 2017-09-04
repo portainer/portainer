@@ -19,7 +19,6 @@ type (
 		Endpoint          *string
 		NoAuth            *bool
 		NoAnalytics       *bool
-		TLS               *bool
 		TLSVerify         *bool
 		TLSCacert         *string
 		TLSCert           *string
@@ -166,12 +165,10 @@ type (
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
-		// TLS             bool       `json:"TLS"`
-		// TLSVerify       bool       `json:"TLSVerify"`
-		// TLSClientCert   bool       `json:"TLSClientCert"`
-		// TLSCACertPath   string     `json:"TLSCACert,omitempty"`
-		// TLSCertPath     string     `json:"TLSCert,omitempty"`
-		// TLSKeyPath      string     `json:"TLSKey,omitempty"`
+		TLS           bool   `json:"TLS,omitempty"`
+		TLSCACertPath string `json:"TLSCACert,omitempty"`
+		TLSCertPath   string `json:"TLSCert,omitempty"`
+		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
 	// ResourceControlID represents a resource control identifier.
@@ -179,20 +176,18 @@ type (
 
 	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
-		ID                 ResourceControlID   `json:"Id"`
-		ResourceID         string              `json:"ResourceId"`
-		SubResourceIDs     []string            `json:"SubResourceIds"`
-		Type               ResourceControlType `json:"Type"`
-		AdministratorsOnly bool                `json:"AdministratorsOnly"`
-
-		UserAccesses []UserResourceAccess `json:"UserAccesses"`
-		TeamAccesses []TeamResourceAccess `json:"TeamAccesses"`
+		ID                 ResourceControlID    `json:"Id"`
+		ResourceID         string               `json:"ResourceId"`
+		SubResourceIDs     []string             `json:"SubResourceIds"`
+		Type               ResourceControlType  `json:"Type"`
+		AdministratorsOnly bool                 `json:"AdministratorsOnly"`
+		UserAccesses       []UserResourceAccess `json:"UserAccesses"`
+		TeamAccesses       []TeamResourceAccess `json:"TeamAccesses"`
 
 		// Deprecated fields
-		// Deprecated: OwnerID field is deprecated in DBVersion == 2
-		OwnerID UserID `json:"OwnerId"`
-		// Deprecated: AccessLevel field is deprecated in DBVersion == 2
-		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+		// Deprecated in DBVersion == 2
+		OwnerID     UserID              `json:"OwnerId,omitempty"`
+		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
 	}
 
 	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service).

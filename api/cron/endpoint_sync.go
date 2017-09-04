@@ -22,6 +22,15 @@ type (
 		endpointsToUpdate []*portainer.Endpoint
 		endpointsToDelete []*portainer.Endpoint
 	}
+
+	fileEndpoint struct {
+		Name      string `json:"Name"`
+		URL       string `json:"URL"`
+		TLS       bool   `json:"TLS,omitempty"`
+		TLSCACert string `json:"TLSCACert,omitempty"`
+		TLSCert   string `json:"TLSCert,omitempty"`
+		TLSKey    string `json:"TLSKey,omitempty"`
+	}
 )
 
 const (
@@ -53,6 +62,28 @@ func isValidEndpoint(endpoint *portainer.Endpoint) bool {
 		return true
 	}
 	return false
+}
+
+func convertFileEndpoints(fileEndpoints []fileEndpoint) []portainer.Endpoint {
+	convertedEndpoints := make([]portainer.Endpoint, 0)
+
+	for _, e := range fileEndpoints {
+		endpoint := portainer.Endpoint{
+			Name:      e.Name,
+			URL:       e.URL,
+			TLSConfig: portainer.TLSConfiguration{},
+		}
+		if e.TLS {
+			endpoint.TLSConfig.TLS = true
+			endpoint.TLSConfig.TLSSkipVerify = false
+			endpoint.TLSConfig.TLSCACertPath = e.TLSCACert
+			endpoint.TLSConfig.TLSCertPath = e.TLSCert
+			endpoint.TLSConfig.TLSKeyPath = e.TLSKey
+		}
+		convertedEndpoints = append(convertedEndpoints, endpoint)
+	}
+
+	return convertedEndpoints
 }
 
 func endpointExists(endpoint *portainer.Endpoint, endpoints []portainer.Endpoint) int {
@@ -141,7 +172,7 @@ func (job endpointSyncJob) Sync() error {
 		return err
 	}
 
-	var fileEndpoints []portainer.Endpoint
+	var fileEndpoints []fileEndpoint
 	err = json.Unmarshal(data, &fileEndpoints)
 	if endpointSyncError(err, job.logger) {
 		return err
@@ -156,7 +187,9 @@ func (job endpointSyncJob) Sync() error {
 		return err
 	}
 
-	sync := job.prepareSyncData(storedEndpoints, fileEndpoints)
+	convertedFileEndpoints := convertFileEndpoints(fileEndpoints)
+
+	sync := job.prepareSyncData(storedEndpoints, convertedFileEndpoints)
 	if sync.requireSync() {
 		err = job.endpointService.Synchronize(sync.endpointsToCreate, sync.endpointsToUpdate, sync.endpointsToDelete)
 		if endpointSyncError(err, job.logger) {

@@ -1,6 +1,6 @@
 angular.module('initAdmin', [])
-.controller('InitAdminController', ['$scope', '$state', '$sanitize', 'Notifications', 'Authentication', 'StateManager', 'UserService',
-function ($scope, $state, $sanitize, Notifications, Authentication, StateManager, UserService) {
+.controller('InitAdminController', ['$scope', '$state', '$sanitize', 'Notifications', 'Authentication', 'StateManager', 'UserService', 'EndpointService', 'EndpointProvider',
+function ($scope, $state, $sanitize, Notifications, Authentication, StateManager, UserService, EndpointService, EndpointProvider) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -20,7 +20,22 @@ function ($scope, $state, $sanitize, Notifications, Authentication, StateManager
       return Authentication.login(username, password);
     })
     .then(function success() {
-      $state.go('init.endpoint');
+      return EndpointService.endpoints();
+    })
+    .then(function success(data) {
+      if (data.length === 0) {
+        $state.go('init.endpoint');
+      } else {
+        var endpointID = data[0].Id;
+        EndpointProvider.setEndpointID(endpointID);
+        StateManager.updateEndpointState(false)
+        .then(function success() {
+          $state.go('dashboard');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to connect to Docker environment');
+        });
+      }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to create administrator user');

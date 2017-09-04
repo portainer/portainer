@@ -8,7 +8,6 @@ const (
 	defaultAssetsDirectory = "."
 	defaultNoAuth          = "false"
 	defaultNoAnalytics     = "false"
-	defaultTLS             = "false"
 	defaultTLSVerify       = "false"
 	defaultTLSCACertPath   = "/certs/ca.pem"
 	defaultTLSCertPath     = "/certs/cert.pem"

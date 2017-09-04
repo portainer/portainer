@@ -57,12 +57,12 @@ func NewEndpointHandler(bouncer *security.RequestBouncer, authorizeEndpointManag
 
 type (
 	postEndpointsRequest struct {
-		Name          string `valid:"required"`
-		URL           string `valid:"required"`
-		PublicURL     string `valid:"-"`
-		TLS           bool
-		TLSVerify     bool
-		TLSClientCert bool
+		Name                string `valid:"required"`
+		URL                 string `valid:"required"`
+		PublicURL           string `valid:"-"`
+		TLS                 bool
+		TLSSkipVerify       bool
+		TLSSkipClientVerify bool
 	}
 
 	postEndpointsResponse struct {
@@ -75,12 +75,12 @@ type (
 	}
 
 	putEndpointsRequest struct {
-		Name          string `valid:"-"`
-		URL           string `valid:"-"`
-		PublicURL     string `valid:"-"`
-		TLS           bool   `valid:"-"`
-		TLSVerify     bool   `valid:"-"`
-		TLSClientCert bool   `valid:"-"`
+		Name                string `valid:"-"`
+		URL                 string `valid:"-"`
+		PublicURL           string `valid:"-"`
+		TLS                 bool   `valid:"-"`
+		TLSSkipVerify       bool   `valid:"-"`
+		TLSSkipClientVerify bool   `valid:"-"`
 	}
 )
 
@@ -132,7 +132,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		PublicURL: req.PublicURL,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS:           req.TLS,
-			TLSSkipVerify: req.TLSVerify,
+			TLSSkipVerify: req.TLSSkipVerify,
 		},
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
@@ -147,12 +147,12 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 	if req.TLS {
 		folder := strconv.Itoa(int(endpoint.ID))
 
-		if req.TLSVerify {
+		if !req.TLSSkipVerify {
 			caCertPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCA)
 			endpoint.TLSConfig.TLSCACertPath = caCertPath
 		}
 
-		if req.TLSClientCert {
+		if !req.TLSSkipClientVerify {
 			certPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCert)
 			endpoint.TLSConfig.TLSCertPath = certPath
 			keyPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileKey)
@@ -165,8 +165,6 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 			return
 		}
 	}
-
-	log.Printf("Endpoint: %+v", endpoint)
 
 	encodeJSON(w, &postEndpointsResponse{ID: int(endpoint.ID)}, handler.Logger)
 }
@@ -301,24 +299,21 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 	folder := strconv.Itoa(int(endpoint.ID))
 	if req.TLS {
 		endpoint.TLSConfig.TLS = true
-		if req.TLSVerify {
-			endpoint.TLSConfig.TLSSkipVerify = true
+		endpoint.TLSConfig.TLSSkipVerify = req.TLSSkipVerify
+		if !req.TLSSkipVerify {
 			caCertPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCA)
 			endpoint.TLSConfig.TLSCACertPath = caCertPath
 		} else {
-			endpoint.TLSConfig.TLSSkipVerify = true
 			endpoint.TLSConfig.TLSCACertPath = ""
 			handler.FileService.DeleteTLSFile(folder, portainer.TLSFileCA)
 		}
 
-		if req.TLSClientCert {
-			// endpoint.TLSClientCert = true
+		if !req.TLSSkipClientVerify {
 			certPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCert)
 			endpoint.TLSConfig.TLSCertPath = certPath
 			keyPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileKey)
 			endpoint.TLSConfig.TLSKeyPath = keyPath
 		} else {
-			// endpoint.TLSClientCert = false
 			endpoint.TLSConfig.TLSCertPath = ""
 			handler.FileService.DeleteTLSFile(folder, portainer.TLSFileCert)
 			endpoint.TLSConfig.TLSKeyPath = ""
@@ -326,6 +321,7 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		}
 	} else {
 		endpoint.TLSConfig.TLS = false
+		endpoint.TLSConfig.TLSSkipVerify = true
 		endpoint.TLSConfig.TLSCACertPath = ""
 		endpoint.TLSConfig.TLSCertPath = ""
 		endpoint.TLSConfig.TLSKeyPath = ""
