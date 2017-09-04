@@ -245,7 +245,7 @@ func main() {
 		SSLKey:                 *flags.SSLKey,
 	}
 
-	log.Printf("Starting Portainer on %s", *flags.Addr)
+	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)
 	err = server.Start()
 	if err != nil {
 		log.Fatal(err)
