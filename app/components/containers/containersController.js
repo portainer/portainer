@@ -168,7 +168,7 @@ angular.module('containers', [])
   $scope.truncateMore = function(size) {
     $scope.truncate_size = 80;
     $scope.showMore = false;
-  }
+  };
 
   $scope.confirmRemoveAction = function () {
     var isOneContainerRunning = false;
