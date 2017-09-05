@@ -50,6 +50,20 @@ angular.module('extension.storidge')
   };
 
   service.profiles = function() {
+    var deferred = $q.defer();
+
+    StoridgeProfiles.query()
+    .then(function success(response) {
+      var profiles = response.data.profiles;
+      deferred.resolve(profiles);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve Storidge profiles', err: err });
+    });
+
+    return deferred.promise;
+
+
     // var profiles = {
     //   'profiles': [
     //     'AIRVIDEO                                 Wed Jul 19 13:03:19 2017',
@@ -73,24 +87,24 @@ angular.module('extension.storidge')
     //   ]
     // };
 
-    var profiles = [
-      {
-        'name': 'AIRVIDEO',
-        'capacity': 30,
-        'directory': '/cio/airvideo'
-      },
-      {
-        'name': 'NGINX',
-        'capacity': 30,
-        'directory': '/cio/nginx'
-      }
-    ];
-
-    var models = profiles.map(function (item) {
-      return new StoridgeProfileModel(item);
-    });
-
-    return $q.when(models);
+    // var profiles = [
+    //   {
+    //     'name': 'AIRVIDEO',
+    //     'capacity': 30,
+    //     'directory': '/cio/airvideo'
+    //   },
+    //   {
+    //     'name': 'NGINX',
+    //     'capacity': 30,
+    //     'directory': '/cio/nginx'
+    //   }
+    // ];
+    //
+    // var models = profiles.map(function (item) {
+    //   return new StoridgeProfileModel(item);
+    // });
+    //
+    // return $q.when(models);
 
     // return StoridgeProfiles.query().$promise;
   };

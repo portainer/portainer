@@ -89,7 +89,7 @@
               <tr dir-paginate="profile in (state.filteredProfiles = (profiles | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="profile.Checked" ng-change="selectItem(profile)" /></td>
                 <td>
-                  <a ui-sref="storidge.profiles.edit({id: profile.Name})">{{ profile.Name }}</a>
+                  <a ui-sref="storidge.profiles.edit({id: profile})">{{ profile }}</a>
                 </td>
               </tr>
               <tr ng-if="!profiles">
