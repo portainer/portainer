@@ -17,8 +17,19 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeClusterService,
   };
 
   $scope.rebootCluster = function() {
-    Notifications.success('Cluster successfully rebooted');
-    $state.reload();
+    $('#loadingViewSpinner').show();
+
+    StoridgeClusterService.reboot()
+    .then(function success(data) {
+      Notifications.success('Cluster successfully rebooted');
+      $state.reload();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to reboot cluster');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').show();
+    });
   };
 
   $scope.shutdownCluster = function() {
@@ -38,7 +49,6 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeClusterService,
       $scope.clusterInfo = data.info;
       $scope.clusterVersion = data.version;
       $scope.clusterEvents = data.events;
-      console.log(JSON.stringify($scope.clusterEvents, null, 4));
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve cluster information');

@@ -10,7 +10,7 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row">
+<div class="row" ng-if="clusterInfo && clusterVersion">
   <div class="col-md-12">
     <rd-widget>
       <rd-widget-header icon="fa-bolt" title="Cluster details"></rd-widget-header>
@@ -19,19 +19,19 @@
           <tbody>
             <tr>
               <td>Domain</td>
-              <td>{{ clusterInfo.domain }}</td>
+              <td>{{ clusterInfo.Domain }}</td>
             </tr>
             <tr>
               <td>Nodes</td>
-              <td>{{ clusterInfo.nodes }}</td>
+              <td>{{ clusterInfo.Nodes }}</td>
             </tr>
             <tr>
               <td>Status</td>
-              <td><i class="fa fa-heartbeat space-right green-icon"></i> {{ clusterInfo.status }}</td>
+              <td><i class="fa fa-heartbeat space-right green-icon"></i> {{ clusterInfo.Status }}</td>
             </tr>
             <tr>
               <td>Version</td>
-              <td>{{ clusterVersion.version }}</td>
+              <td>{{ clusterVersion }}</td>
             </tr>
             <tr>
               <td>Actions</td>
@@ -53,7 +53,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" ng-if="clusterInfo">
   <div class="col-md-12">
     <rd-widget>
       <rd-widget-header icon="fa-tachometer" title="Cluster status"></rd-widget-header>
@@ -63,21 +63,21 @@
             <tr>
               <td>Capacity</td>
               <td>
-                 ? / {{ clusterInfo.totalCapacity }}
+                 {{ clusterInfo.UsedCapacity|humansize }} / {{ clusterInfo.TotalCapacity|humansize }}
                  <i class="fa fa-check-circle-o green-icon space-left" aria-hidden="true"></i>
               </td>
             </tr>
             <tr>
               <td>IOPS</td>
               <td>
-                 ? / {{ clusterInfo.totalIOPS }}
+                 {{ clusterInfo.UsedIOPS|humansize }} / {{ clusterInfo.TotalIOPS|humansize }}
                  <i class="fa fa-exclamation-circle orange-icon space-left" aria-hidden="true"></i>
               </td>
             </tr>
             <tr>
               <td>Bandwidth</td>
               <td>
-                 ? / {{ clusterInfo.totalBandwidth }}
+                 {{ clusterInfo.UsedBandwidth|humansize }} / {{ clusterInfo.TotalBandwidth|humansize }}
                  <i class="fa fa-exclamation-circle red-icon space-left" aria-hidden="true"></i>
               </td>
             </tr>
@@ -114,17 +114,47 @@
             <thead>
               <tr>
                 <th>
-                  Event
-                  <a ng-click="order('Event')">
+                  <a ng-click="order('Time')">
+                    Date
                     <span ng-show="sortType == 'Time' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'Time' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ng-click="order('Category')">
+                    Category
+                    <span ng-show="sortType == 'Category' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Category' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ng-click="order('Module')">
+                    Module
+                    <span ng-show="sortType == 'Module' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Module' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ng-click="order('Content')">
+                    Content
+                    <span ng-show="sortType == 'Content' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Content' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr dir-paginate="event in (clusterEvents | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count)">
-                <td>{{ event }}</td>
+                <td>{{ event.Time }}</td>
+                <td>{{ event.Category }}</td>
+                <td>{{ event.Module }}</td>
+                <td>{{ event.Content }}</td>
+              </tr>
+              <tr ng-if="!clusterEvents">
+                <td colspan="4" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="clusterEvents.length === 0">
+                <td colspan="4" class="text-center text-muted">No events available.</td>
               </tr>
             </tbody>
           </table>

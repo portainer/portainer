@@ -9,9 +9,9 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeProfileService)
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
 
-  // $scope.formValues = {
-  //   Name: '',
-  // };
+  $scope.formValues = {
+    Name: ''
+  };
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
@@ -43,12 +43,29 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeProfileService)
     Notifications.success('Profile successfully removed');
   };
 
+  $scope.createProfile = function() {
+    $('#createResourceSpinner').show();
+    var model = new StoridgeProfileDefaultModel();
+    model.Name = $scope.formValues.Name;
+
+    StoridgeProfileService.create(model)
+    .then(function success(data) {
+      Notifications.success('Profile successfully created');
+      $state.reload();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to create profile');
+    })
+    .finally(function final() {
+      $('#createResourceSpinner').hide();
+    });
+  };
+
   function initView() {
     $('#loadingViewSpinner').show();
 
     StoridgeProfileService.profiles()
     .then(function success(data) {
-      console.log(JSON.stringify(data, null, 4));
       $scope.profiles = data;
     })
     .catch(function error(err) {

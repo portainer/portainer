@@ -36,7 +36,7 @@
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ng-click="createProfile()">Create</button>
               <button type="button" class="btn btn-primary btn-sm" ui-sref="storidge.profiles.create">Advanced settings...</button>
-              <i id="createActionSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
         </form>
@@ -89,7 +89,7 @@
               <tr dir-paginate="profile in (state.filteredProfiles = (profiles | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="profile.Checked" ng-change="selectItem(profile)" /></td>
                 <td>
-                  <a ui-sref="storidge.profiles.edit({id: profile})">{{ profile }}</a>
+                  <a ui-sref="storidge.profiles.edit({id: profile.Name})">{{ profile.Name }}</a>
                 </td>
               </tr>
               <tr ng-if="!profiles">
@@ -100,7 +100,7 @@
               </tr>
             </tbody>
           </table>
-          <div ng-if="teams" class="pull-left pagination-controls">
+          <div ng-if="profiles" class="pull-left pagination-controls">
             <dir-pagination-controls></dir-pagination-controls>
           </div>
         </div>

@@ -10,11 +10,15 @@ function StoridgeProfileDefaultModel() {
   this.MaxBandwidth = 100;
 }
 
+function StoridgeProfileListModel(data) {
+  this.Name = data;
+  this.Checked = false;
+}
+
 function StoridgeProfileModel(data) {
   this.Name = data.name;
   this.Directory = data.directory;
   this.Capacity = data.capacity;
-  // this.Redundancy = data.
   this.Provisioning = data.provision;
   this.Type = data.type;
 

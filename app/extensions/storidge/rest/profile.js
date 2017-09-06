@@ -1,10 +1,20 @@
 angular.module('extension.storidge')
-.factory('StoridgeProfiles', ['$http', '$resource', function StoridgeProfilesFactory($http, $resource) {
+.factory('StoridgeProfiles', ['$http', function StoridgeProfilesFactory($http) {
   'use strict';
 
   var API_URL = 'http://114.23.120.182:8282';
 
   var service = {};
+
+  service.create = function(payload) {
+    return $http({
+      method: 'POST',
+      url: API_URL + '/profiles',
+      data: payload,
+      headers: { 'Content-type': 'application/json' },
+      skipAuthorization: true
+    });
+  };
 
   service.query = function() {
     return $http({
@@ -14,15 +24,13 @@ angular.module('extension.storidge')
     });
   };
 
+  service.inspect = function(name) {
+    return $http({
+      method: 'GET',
+      url: API_URL + '/profiles/' + name,
+      skipAuthorization: true
+    });
+  };
 
-  // var resource = $resource(API_URL + '/profiles/:name', {}, {
-  //   create: { method: 'POST' },
-  //   query: { method: 'GET', isArray: true },
-  //   get: { method: 'GET', params: { name: '@name' } },
-  //   update: { method: 'PUT', params: { name: '@name' } },
-  //   remove: { method: 'DELETE', params: { name: '@name'} }
-  // });
-  //
   return service;
-  // return resource;
 }]);
