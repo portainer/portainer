@@ -1,6 +1,6 @@
 angular.module('serviceLogs', [])
-.controller('ServiceLogsController', ['$scope', '$stateParams', '$anchorScroll', 'ServiceLogs', 'Service',
-function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
+.controller('ServiceLogsController', ['$scope', '$stateParams', '$anchorScroll', '$sce', 'ServiceLogs', 'Service', 'ansi2html',
+function ($scope, $stateParams, $anchorScroll, $sce, ServiceLogs, Service, ansi2html) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
@@ -27,7 +27,7 @@ function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
       // Strip 8 byte header from each line of output
       data = data.substring(8);
       data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stderr = data;
+      $scope.stderr = $sce.trustAsHtml(ansi2html.toHtml(data));
     });
   }
 
@@ -43,7 +43,7 @@ function ($scope, $stateParams, $anchorScroll, ServiceLogs, Service) {
       // Strip 8 byte header from each line of output
       data = data.substring(8);
       data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stdout = data;
+      $scope.stdout = $sce.trustAsHtml(ansi2html.toHtml(data));
     });
   }
 
