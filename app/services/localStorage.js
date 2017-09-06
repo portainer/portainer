@@ -26,12 +26,12 @@ angular.module('portainer.services')
     getApplicationState: function() {
       return localStorageService.get('APPLICATION_STATE');
     },
-    storeExtensions: function(extensions) {
-      localStorageService.set('EXTENSIONS', extensions);
-    },
-    getExtensions: function() {
-      return localStorageService.get('EXTENSIONS');
-    },
+    // storeExtensions: function(extensions) {
+    //   localStorageService.set('EXTENSIONS', extensions);
+    // },
+    // getExtensions: function() {
+    //   return localStorageService.get('EXTENSIONS');
+    // },
     storeJWT: function(jwt) {
       localStorageService.set('JWT', jwt);
     },

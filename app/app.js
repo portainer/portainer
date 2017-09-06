@@ -644,6 +644,19 @@ angular.module('portainer', [
         }
       }
     })
+    .state('storidge.events', {
+      url: '/events',
+      views: {
+        'content@': {
+          templateUrl: 'app/extensions/storidge/views/events/events.html',
+          controller: 'StoridgeEventsController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
     .state('task', {
       url: '^/task/:id',
       views: {

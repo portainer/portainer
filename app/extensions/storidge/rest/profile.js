@@ -16,6 +16,16 @@ angular.module('extension.storidge')
     });
   };
 
+  service.update = function(id, payload) {
+    return $http({
+      method: 'PUT',
+      url: API_URL + '/profiles/' + id,
+      data: payload,
+      headers: { 'Content-type': 'application/json' },
+      skipAuthorization: true
+    });
+  };
+
   service.query = function() {
     return $http({
       method: 'GET',
@@ -24,10 +34,18 @@ angular.module('extension.storidge')
     });
   };
 
-  service.inspect = function(name) {
+  service.inspect = function(id) {
     return $http({
       method: 'GET',
-      url: API_URL + '/profiles/' + name,
+      url: API_URL + '/profiles/' + id,
+      skipAuthorization: true
+    });
+  };
+
+  service.delete = function(id) {
+    return $http({
+      method: 'DELETE',
+      url: API_URL + '/profiles/' + id,
       skipAuthorization: true
     });
   };

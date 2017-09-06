@@ -8,8 +8,7 @@ angular.module('portainer.services')
     loading: true,
     application: {},
     endpoint: {},
-    UI: {},
-    extensions: []
+    UI: {}
   };
 
   manager.getState = function() {
@@ -86,9 +85,9 @@ angular.module('portainer.services')
       var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
       state.endpoint.apiVersion = endpointAPIVersion;
-      state.extensions = data.extensions;
+      state.endpoint.extensions = data.extensions;
       LocalStorage.storeEndpointState(state.endpoint);
-      LocalStorage.storeExtensions(state.extensions);
+      // LocalStorage.storeExtensions(state.extensions);
       deferred.resolve();
     })
     .catch(function error(err) {

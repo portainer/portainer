@@ -39,8 +39,28 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeProfileService)
     }
   };
 
-  $scope.remove = function() {
-    Notifications.success('Profile successfully removed');
+  $scope.removeProfiles = function() {
+    $('#loadingViewSpinner').show();
+
+    var profiles = $scope.profiles;
+    var deleteRequests = [];
+    for (var i = 0; i < profiles.length; i++) {
+      var profile = profiles[i];
+      if (profile.Checked) {
+        deleteRequests.push(StoridgeProfileService.delete(profile.Name));
+      }
+    }
+
+    $q.all(deleteRequests)
+    .then(function success(data) {
+      Notifications.success('Selected profiles successfully removed');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'An error occured when deleting selected profiles');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
+    });
   };
 
   $scope.createProfile = function() {

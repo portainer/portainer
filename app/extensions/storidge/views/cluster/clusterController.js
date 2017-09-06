@@ -1,22 +1,47 @@
 angular.module('extension.storidge')
-.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'Pagination', 'StoridgeClusterService', 'StoridgeNodeService',
-function ($q, $scope, $state, Notifications, Pagination, StoridgeClusterService, StoridgeNodeService) {
-
-  $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('storidge_events');
-  $scope.sortType = 'Event';
-  $scope.sortReverse = true;
-
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('storidge_events', $scope.state.pagination_count);
-  };
+.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'Pagination', 'StoridgeClusterService', 'StoridgeNodeService', 'ModalService',
+function ($q, $scope, $state, Notifications, Pagination, StoridgeClusterService, StoridgeNodeService, ModalService) {
 
   $scope.rebootCluster = function() {
+    ModalService.confirm({
+      title: 'Are you sure?',
+      message: 'Do you want to reboot the Storidge cluster?',
+      buttons: {
+        confirm: {
+          label: 'Reboot',
+          className: 'btn-danger'
+        }
+      },
+      callback: function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        rebootCluster();
+      }
+    });
+  };
+
+  $scope.shutdownCluster = function() {
+    ModalService.confirm({
+      title: 'Are you sure?',
+      message: 'Do you want to shutdown the Storidge cluster?',
+      buttons: {
+        confirm: {
+          label: 'Shutdown',
+          className: 'btn-danger'
+        }
+      },
+      callback: function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        shutdownCluster();
+      }
+    });
+  };
+
+  function shutdownCluster() {
+    Notifications.success('Cluster successfully shutdown');
+    $state.reload();
+  }
+
+  function rebootCluster() {
     $('#loadingViewSpinner').show();
 
     StoridgeClusterService.reboot()
@@ -30,25 +55,18 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeClusterService,
     .finally(function final() {
       $('#loadingViewSpinner').show();
     });
-  };
-
-  $scope.shutdownCluster = function() {
-    Notifications.success('Cluster successfully shutdown');
-    $state.reload();
-  };
+  }
 
   function initView() {
     $('#loadingViewSpinner').show();
 
     $q.all({
       info: StoridgeClusterService.info(),
-      version: StoridgeClusterService.version(),
-      events: StoridgeClusterService.events()
+      version: StoridgeClusterService.version()
     })
     .then(function success(data) {
       $scope.clusterInfo = data.info;
       $scope.clusterVersion = data.version;
-      $scope.clusterEvents = data.events;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve cluster information');

@@ -8,6 +8,15 @@ angular.module('extension.storidge')
     return StoridgeProfiles.create(payload);
   };
 
+  service.update = function(model) {
+    var payload = new StoridgeCreateProfileRequest(model);
+    return StoridgeProfiles.update(model.Name, payload);
+  };
+
+  service.delete = function(profileName) {
+    return StoridgeProfiles.delete(profileName);
+  };
+
   service.profile = function(profileName) {
     var deferred = $q.defer();
 
