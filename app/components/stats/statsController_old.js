@@ -1,5 +1,5 @@
 angular.module('stats', [])
-.controller('StatsController', ['Pagination', '$scope', 'Notifications', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
+.controller('StatsControllerOld', ['Pagination', '$scope', 'Notifications', '$timeout', 'Container', 'ContainerTop', '$stateParams', 'humansizeFilter', '$sce', '$document',
 function (Pagination, $scope, Notifications, $timeout, Container, ContainerTop, $stateParams, humansizeFilter, $sce, $document) {
   // TODO: Force scale to 0-100 for cpu, fix charts on dashboard,
   // TODO: Force memory scale to 0 - max memory

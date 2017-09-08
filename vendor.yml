@@ -5,10 +5,10 @@ js:
   - bower_components/bootstrap/dist/js/bootstrap.js
   - bower_components/angular-multi-select/isteven-multi-select.js
   - bower_components/bootbox.js/bootbox.js
-  - bower_components/Chart.js/Chart.js
   - bower_components/filesize/lib/filesize.js
   - bower_components/lodash/dist/lodash.js
   - bower_components/moment/moment.js
+  - bower_components/chart.js/dist/Chart.js
   - bower_components/splitargs/src/splitargs.js
   - bower_components/toastr/toastr.js
   - bower_components/xterm.js/dist/xterm.js
@@ -23,6 +23,7 @@ js:
   - bower_components/filesize/lib/filesize.min.js
   - bower_components/lodash/dist/lodash.min.js
   - bower_components/moment/min/moment.min.js
+  - bower_components/chart.js/dist/Chart.min.js
   - bower_components/splitargs/src/splitargs.js
   - bower_components/toastr/toastr.min.js
   - bower_components/xterm.js/dist/xterm.js
