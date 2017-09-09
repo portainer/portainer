@@ -23,14 +23,7 @@
             </div>
           </div>
           <div class="form-group">
-            <div class="col-sm-12">
-              <span class="small text-muted">
-                <i class="fa fa-info-circle" aria-hidden="true"></i> Tip: you can click on the labels in any chart legend to filter the data.
-              </span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="refreshRate" class="col-sm-3 col-md-2 margin-sm-top control-label text-left">
+            <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left">
               Refresh rate
             </label>
             <div class="col-sm-3 col-md-2">
@@ -52,30 +45,37 @@
 </div>
 
 <div class="row">
-  <div class="col-lg-6 col-sm-12">
+  <div class="col-lg-4 col-md-6 col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-area-chart" title="Memory usage"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="memoryChart" width="770" height="300"></canvas>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-4 col-md-6 col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-area-chart" title="CPU usage"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="cpuChart" width="770" height="300"></canvas>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-4 col-md-12 col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-area-chart" title="Network usage"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative;">
-          <canvas id="networkChart" width="770" height="230"></canvas>
+          <canvas id="networkChart" width="770" height="300"></canvas>
         </div>
       </rd-widget-body>
     </rd-widget>
   </div>
-  <div class="col-lg-6 col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-area-chart" title="Memory & CPU usage"></rd-widget-header>
-      <rd-widget-body>
-        <div class="chart-container" style="position: relative;">
-          <canvas id="cpuMemoryChart" width="770" height="230"></canvas>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<div class="row" ng-if="applicationState.endpoint.mode.provider !== 'VMWARE_VIC'">
-  <div class="col-sm-12">
+  <div class="col-sm-12" ng-if="applicationState.endpoint.mode.provider !== 'VMWARE_VIC'">
     <rd-widget>
       <rd-widget-header icon="fa-tasks" title="Processes">
         <div class="pull-right">

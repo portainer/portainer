@@ -1,6 +1,6 @@
 angular.module('containerStats', [])
-.controller('ContainerStatsController', ['$q', '$scope', '$stateParams', '$document', '$interval', 'ContainerService', 'Notifications', 'Pagination',
-function ($q, $scope, $stateParams, $document, $interval, ContainerService, Notifications, Pagination) {
+.controller('ContainerStatsController', ['$q', '$scope', '$stateParams', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'Pagination',
+function ($q, $scope, $stateParams, $document, $interval, ContainerService, ChartService, Notifications, Pagination) {
 
   $scope.state = {
     refreshRate: '5'
@@ -20,11 +20,11 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Noti
   };
 
   $scope.$on('$destroy', function() {
-    var repeater = $scope.repeater;
-    stopRepeater(repeater);
+    stopRepeater();
   });
 
-  function stopRepeater(repeater) {
+  function stopRepeater() {
+    var repeater = $scope.repeater;
     if (angular.isDefined(repeater)) {
       $interval.cancel(repeater);
       repeater = null;
@@ -34,31 +34,23 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Noti
   function updateNetworkChart(stats, chart) {
     var rx = stats.Networks[0].rx_bytes;
     var tx = stats.Networks[0].tx_bytes;
-    chart.data.labels.push(moment(stats.Date).format('HH:mm:ss'));
-    chart.data.datasets[0].data.push(rx);
-    chart.data.datasets[1].data.push(tx);
+    var label = moment(stats.Date).format('HH:mm:ss');
 
-    if (chart.data.datasets[0].data.length > 600) {
-      chart.data.labels.pop();
-      chart.data.datasets[0].data.pop();
-      chart.data.datasets[1].data.pop();
-    }
-
-    chart.update(0);
+    ChartService.UpdateNetworkChart(label, rx, tx, chart);
   }
 
-  function updateCPUMemoryChart(stats, chart) {
-    chart.data.labels.push(moment(stats.Date).format('HH:mm:ss'));
-    chart.data.datasets[0].data.push(stats.MemoryUsage);
-    chart.data.datasets[1].data.push(calculateCPUPercentUnix(stats));
+  function updateMemoryChart(stats, chart) {
+    var label = moment(stats.Date).format('HH:mm:ss');
+    var value = stats.MemoryUsage;
 
-    if (chart.data.datasets[0].data.length > 600) {
-      chart.data.labels.pop();
-      chart.data.datasets[0].data.pop();
-      chart.data.datasets[1].data.pop();
-    }
+    ChartService.UpdateMemoryChart(label, value, chart);
+  }
 
-    chart.update(0);
+  function updateCPUChart(stats, chart) {
+    var label = moment(stats.Date).format('HH:mm:ss');
+    var value = calculateCPUPercentUnix(stats);
+
+    ChartService.UpdateCPUChart(label, value, chart);
   }
 
   function calculateCPUPercentUnix(stats) {
@@ -73,7 +65,18 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Noti
     return cpuPercent;
   }
 
-  function updateCharts(networkChart, cpuMemoryChart) {
+  $scope.changeUpdateRepeater = function() {
+    var networkChart = $scope.networkChart;
+    var cpuChart = $scope.cpuChart;
+    var memoryChart = $scope.memoryChart;
+
+    stopRepeater();
+    setUpdateRepeater(networkChart, cpuChart, memoryChart);
+    $('#refreshRateChange').show();
+    $('#refreshRateChange').fadeOut(1500);
+  };
+
+  function startChartUpdate(networkChart, cpuChart, memoryChart) {
     $('#loadingViewSpinner').show();
     $q.all({
       stats: ContainerService.containerStats($stateParams.id),
@@ -83,10 +86,12 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Noti
       var stats = data.stats;
       $scope.processInfo = data.top;
       updateNetworkChart(stats, networkChart);
-      updateCPUMemoryChart(stats, cpuMemoryChart);
-      setUpdateRepeater(networkChart, cpuMemoryChart);
+      updateMemoryChart(stats, memoryChart);
+      updateCPUChart(stats, cpuChart);
+      setUpdateRepeater(networkChart, cpuChart, memoryChart);
     })
     .catch(function error(err) {
+      stopRepeater();
       Notifications.error('Failure', err, 'Unable to retrieve container statistics');
     })
     .finally(function final() {
@@ -94,34 +99,7 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Noti
     });
   }
 
-  $scope.changeUpdateRepeater = function() {
-    var refreshRate = $scope.state.refreshRate;
-    var repeater = $scope.repeater;
-    stopRepeater(repeater);
-
-    var networkChart = $scope.networkChart;
-    var cpuMemoryChart = $scope.cpuMemoryChart;
-
-    $scope.repeater = $interval(function() {
-      $q.all({
-        stats: ContainerService.containerStats($stateParams.id),
-        top: ContainerService.containerTop($stateParams.id)
-      })
-      .then(function success(data) {
-        var stats = data.stats;
-        $scope.processInfo = data.top;
-        updateNetworkChart(stats, networkChart);
-        updateCPUMemoryChart(stats, cpuMemoryChart);
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve container statistics');
-      });
-    }, refreshRate * 1000);
-    $('#refreshRateChange').show();
-    $('#refreshRateChange').fadeOut(1500);
-  };
-
-  function setUpdateRepeater(networkChart, cpuMemoryChart) {
+  function setUpdateRepeater(networkChart, cpuChart, memoryChart) {
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
       $q.all({
@@ -132,196 +110,30 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Noti
         var stats = data.stats;
         $scope.processInfo = data.top;
         updateNetworkChart(stats, networkChart);
-        updateCPUMemoryChart(stats, cpuMemoryChart);
+        updateMemoryChart(stats, memoryChart);
+        updateCPUChart(stats, cpuChart);
       })
       .catch(function error(err) {
+        stopRepeater();
         Notifications.error('Failure', err, 'Unable to retrieve container statistics');
       });
     }, refreshRate * 1000);
-  }
-
-  function byteBasedTooltipLabel(label, value) {
-    var processedValue = 0;
-    if (value > 5) {
-      processedValue = filesize(value, {base: 10, round: 1});
-    } else {
-      processedValue = value.toFixed(1) + 'B';
-    }
-    return label + ': ' + processedValue;
-  }
-
-  function byteBasedAxisLabel(value, index, values) {
-    if (value > 5) {
-      return filesize(value, {base: 10, round: 1});
-    }
-    return value.toFixed(1) + 'B';
-  }
-
-  function percentageBasedAxisLabel(value, index, values) {
-    if (value > 1) {
-      return Math.round(value) + '%';
-    }
-    return value.toFixed(1) + '%';
-  }
-
-  function percentageBasedTooltipLabel(label, value) {
-    var processedValue = 0;
-    if (value > 1) {
-      processedValue = Math.round(value);
-    } else {
-      processedValue = value.toFixed(1);
-    }
-    return label + ': ' + processedValue + '%';
   }
 
   function initCharts() {
     var networkChartCtx = $('#networkChart');
-    var networkChart = new Chart(networkChartCtx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: 'RX on eth0',
-            data: [],
-            fill: false,
-            backgroundColor: 'rgba(151,187,205,0.5)',
-            borderColor: 'rgba(151,187,205,0.7)',
-            pointBackgroundColor: 'rgba(151,187,205,1)',
-            pointBorderColor: 'rgba(151,187,205,1)'
-          },
-          {
-            label: 'TX on eth0',
-            data: [],
-            fill: false,
-            backgroundColor: 'rgba(255,180,174,0.5)',
-            borderColor: 'rgba(255,180,174,0.7)',
-            pointBackgroundColor: 'rgba(255,180,174,1)',
-            pointBorderColor: 'rgba(255,180,174,1)'
-          }
-        ]
-      },
-      options: {
-        animation: {
-          duration: 0
-        },
-        responsiveAnimationDuration: 0,
-        responsive: true,
-        tooltips: {
-          mode: 'index',
-          intersect: false,
-          position: 'average',
-          callbacks: {
-            label: function(tooltipItem, data) {
-              var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
-              return byteBasedTooltipLabel(datasetLabel, tooltipItem.yLabel);
-            }
-          }
-        },
-        hover: {
-          mode: 'average',
-          animationDuration: 0,
-          intersect: true
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-              callback: byteBasedAxisLabel
-            }
-          }]
-        }
-      }
-    });
+    var networkChart = ChartService.CreateNetworkChart(networkChartCtx);
     $scope.networkChart = networkChart;
 
-    var cpuMemoryChartCtx = $('#cpuMemoryChart');
-    var cpuMemoryChart = new Chart(cpuMemoryChartCtx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: 'Memory',
-            data: [],
-            fill: false,
-            backgroundColor: 'rgba(151,187,205,0.5)',
-            borderColor: 'rgba(151,187,205,0.7)',
-            pointBackgroundColor: 'rgba(151,187,205,1)',
-            pointBorderColor: 'rgba(151,187,205,1)',
-            yAxisID: 'memory-axis'
-          },
-          {
-            label: 'CPU',
-            data: [],
-            fill: false,
-            backgroundColor: 'rgba(255,180,174,0.5)',
-            borderColor: 'rgba(255,180,174,0.7)',
-            pointBackgroundColor: 'rgba(255,180,174,1)',
-            pointBorderColor: 'rgba(255,180,174,1)',
-            yAxisID: 'cpu-axis'
-          }
-        ]
-      },
-      options: {
-        animation: {
-          duration: 0
-        },
-        responsiveAnimationDuration: 0,
-        responsive: true,
-        tooltips: {
-          mode: 'index',
-          intersect: false,
-          position: 'average',
-          callbacks: {
-            label: function(tooltipItem, data) {
-              var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
-              if (tooltipItem.datasetIndex === 0) {
-                return byteBasedTooltipLabel(datasetLabel, tooltipItem.yLabel);
-              } else {
-                return percentageBasedTooltipLabel(datasetLabel, tooltipItem.yLabel);
-              }
-            }
-          }
-        },
-        hover: {
-          mode: 'average',
-          animationDuration: 0,
-          intersect: true
-        },
-        scales: {
-          yAxes: [
-            {
-              position: 'left',
-              id: 'memory-axis',
-              scaleLabel: {
-                display: true,
-                labelString: 'Memory usage'
-              },
-              ticks: {
-                beginAtZero: true,
-                callback: byteBasedAxisLabel
-              }
-            },
-            {
-              position: 'right',
-              id: 'cpu-axis',
-              scaleLabel: {
-                display: true,
-                labelString: 'CPU usage'
-              },
-              ticks: {
-                beginAtZero: true,
-                callback: percentageBasedAxisLabel
-              }
-            }
-          ]
-        }
-      }
-    });
-    $scope.cpuMemoryChart = cpuMemoryChart;
+    var cpuChartCtx = $('#cpuChart');
+    var cpuChart = ChartService.CreateCPUChart(cpuChartCtx);
+    $scope.cpuChart = cpuChart;
 
-    updateCharts(networkChart, cpuMemoryChart);
+    var memoryChartCtx = $('#memoryChart');
+    var memoryChart = ChartService.CreateMemoryChart(memoryChartCtx);
+    $scope.memoryChart = memoryChart;
+
+    startChartUpdate(networkChart, cpuChart, memoryChart);
   }
 
   function initView() {
