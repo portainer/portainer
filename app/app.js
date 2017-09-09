@@ -23,6 +23,7 @@ angular.module('portainer', [
   'container',
   'containerConsole',
   'containerLogs',
+  'containerStats',
   'serviceLogs',
   'containers',
   'createContainer',
@@ -54,7 +55,6 @@ angular.module('portainer', [
   'settings',
   'settingsAuthentication',
   'sidebar',
-  'stats',
   'swarm',
   'task',
   'team',
@@ -158,8 +158,8 @@ angular.module('portainer', [
       url: '^/containers/:id/stats',
       views: {
         'content@': {
-          templateUrl: 'app/components/stats/stats.html',
-          controller: 'StatsController'
+          templateUrl: 'app/components/containerStats/containerStats.html',
+          controller: 'ContainerStatsController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
