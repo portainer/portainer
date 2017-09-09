@@ -13,7 +13,6 @@ js:
   - bower_components/toastr/toastr.js
   - bower_components/xterm.js/dist/xterm.js
   - bower_components/xterm.js/dist/addons/fit/fit.js
-  - assets/js/legend.js
   minified:
   - bower_components/jquery/dist/jquery.min.js
   - bower_components/bootstrap/dist/js/bootstrap.min.js
@@ -28,7 +27,6 @@ js:
   - bower_components/toastr/toastr.min.js
   - bower_components/xterm.js/dist/xterm.js
   - bower_components/xterm.js/dist/addons/fit/fit.js
-  - assets/js/legend.js
 css:
   regular:
   - bower_components/bootstrap/dist/css/bootstrap.css
