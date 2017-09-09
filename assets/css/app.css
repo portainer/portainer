@@ -258,11 +258,11 @@ a[ng-click]{
   margin-bottom: 10px;
 }
 
-.login-form > div {
+.simple-box-form > div {
   margin-bottom: 25px;
 }
 
-.login-form > div:last-child {
+.simple-box-form > div:last-child {
   margin-top: 10px;
   margin-bottom: 10px;
 }

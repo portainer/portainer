@@ -1,12 +1,15 @@
 angular.module('createNetwork', [])
-.controller('CreateNetworkController', ['$scope', '$state', 'Notifications', 'Network', 'LabelHelper',
-function ($scope, $state, Notifications, Network, LabelHelper) {
+.controller('CreateNetworkController', ['$q', '$scope', '$state', 'PluginService', 'Notifications', 'Network', 'LabelHelper',
+function ($q, $scope, $state, PluginService, Notifications, Network, LabelHelper) {
+
   $scope.formValues = {
     DriverOptions: [],
     Subnet: '',
     Gateway: '',
     Labels: []
   };
+
+  $scope.availableNetworkDrivers = [];
 
   $scope.config = {
     Driver: 'bridge',
@@ -89,4 +92,24 @@ function ($scope, $state, Notifications, Network, LabelHelper) {
     var config = prepareConfiguration();
     createNetwork(config);
   };
+
+  function initView() {
+    $('#loadingViewSpinner').show();
+    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    if(endpointProvider !== 'DOCKER_SWARM') {
+      PluginService.networkPlugins(apiVersion < 1.25)
+      .then(function success(data){
+          $scope.availableNetworkDrivers = data;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve network drivers');
+      })
+      .finally(function final() {
+        $('#loadingViewSpinner').hide();
+      });
+    }
+  }
+
+  initView();
 }]);

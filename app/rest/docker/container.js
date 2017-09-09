@@ -13,7 +13,14 @@ angular.module('portainer.rest')
     kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
     pause: {method: 'POST', params: {id: '@id', action: 'pause'}},
     unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
-    stats: {method: 'GET', params: {id: '@id', stream: false, action: 'stats'}, timeout: 5000},
+    stats: {
+      method: 'GET', params: { id: '@id', stream: false, action: 'stats' },
+      timeout: 4500
+    },
+    top: {
+      method: 'GET', params: { id: '@id', action: 'top' },
+      timeout: 4500
+    },
     start: {
       method: 'POST', params: {id: '@id', action: 'start'},
       transformResponse: genericHandler

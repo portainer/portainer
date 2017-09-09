@@ -12,51 +12,74 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <!-- init-endpoint form -->
-          <form class="form-horizontal" style="margin: 20px;" enctype="multipart/form-data" method="POST">
-            <!-- comment -->
-            <div class="form-group" style="text-align: center;">
-              <h4>Connect Portainer to a Docker engine or Swarm cluster endpoint</h4>
-            </div>
-            <!-- !comment input -->
-            <!-- endpoin-type radio -->
+          <form class="simple-box-form form-horizontal">
+            <!-- note -->
             <div class="form-group">
-              <div class="radio">
-                <label><input type="radio" name="endpointType" value="local" ng-model="formValues.endpointType" ng-click="resetErrorMessage()">Manage the Docker instance where Portainer is running</label>
-              </div>
-              <div class="radio">
-                <label><input type="radio" name="endpointType" value="remote" ng-model="formValues.endpointType" ng-click="resetErrorMessage()">Manage a remote Docker instance</label>
+              <div class="col-sm-12">
+                <span class="small text-muted">
+                  Connect Portainer to the Docker environment you want to manage.
+                </span>
               </div>
             </div>
-            <!-- endpoint-type radio -->
-            <!-- local-endpoint -->
-            <div ng-if="formValues.endpointType === 'local'" style="margin-top: 25px;">
-              <div class="form-group">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 5px;"></i>
-                <span class="small text-primary">This feature is not yet available for native Docker Windows containers.</span>
-                <div class="small text-primary">On Linux and when using Docker for Mac or Docker for Windows or Docker Toolbox, ensure that you have started Portainer container with the following Docker flag <code>-v "/var/run/docker.sock:/var/run/docker.sock"</code></div>
+            <!-- !note -->
+            <!-- endpoint-type -->
+            <div class="form-group" style="margin-bottom: 0">
+              <div class="boxselector_wrapper">
+                <div>
+                  <input type="radio" id="local_endpoint" ng-model="formValues.EndpointType" value="local">
+                  <label for="local_endpoint">
+                    <div class="boxselector_header">
+                      <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Local
+                    </div>
+                    <p>Manage the Docker environment where Portainer is running</p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="remote_endpoint" ng-model="formValues.EndpointType" value="remote">
+                  <label for="remote_endpoint">
+                    <div class="boxselector_header">
+                      <i class="fa fa-plug" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Remote
+                    </div>
+                    <p>Manage a remote Docker environment</p>
+                  </label>
+                </div>
               </div>
-              <!-- connect button -->
-              <div class="form-group" style="margin-top: 10px;">
-                <div class="col-sm-12 controls">
-                  <p class="pull-left text-danger" ng-if="state.error" style="margin: 5px;">
-                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
-                  </p>
-                  <span class="pull-right">
-                    <i id="initEndpointSpinner" class="fa fa-cog fa-spin" style="margin-right: 5px; display: none;"></i>
-                    <button type="submit" class="btn btn-primary" ng-click="createLocalEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+            </div>
+            <!-- !endpoint-type  -->
+            <!-- local-endpoint -->
+            <div ng-if="formValues.EndpointType === 'local'">
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <span class="small">
+                    <p class="text-muted">
+                      <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                      This feature is not yet available for <u>native Docker Windows containers</u>.
+                    </p>
+                    <p class="text-primary">
+                      Please ensure that you have started the Portainer container with the following Docker flag <code>-v "/var/run/docker.sock:/var/run/docker.sock"</code> in order to connect to the local Docker environment.
+                    </p>
                   </span>
                 </div>
               </div>
-              <!-- !connect button -->
+              <!-- actions -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <button type="submit" class="btn btn-primary btn-sm" ng-click="createLocalEndpoint()"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</button>
+                  <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+                </div>
+              </div>
+              <!-- !actions -->
             </div>
             <!-- !local-endpoint -->
             <!-- remote-endpoint -->
-            <div ng-if="formValues.endpointType === 'remote'" style="margin-top: 25px;">
+            <div ng-if="formValues.EndpointType === 'remote'">
               <!-- name-input -->
               <div class="form-group">
-                <label for="container_name" class="col-sm-4 col-lg-3 control-label text-left">Name</label>
+                <label for="endpoint_name" class="col-sm-4 col-lg-3 control-label text-left">Name</label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="container_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01">
+                  <input type="text" class="form-control" id="endpoint_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01">
                 </div>
               </div>
               <!-- !name-input -->
@@ -127,19 +150,14 @@
                 <!-- !key-input -->
               </div>
               <!-- !tls-certs -->
-              <!-- connect button -->
-              <div class="form-group" style="margin-top: 10px;">
-                <div class="col-sm-12 controls">
-                  <p class="pull-left text-danger" ng-if="state.error" style="margin: 5px;">
-                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
-                  </p>
-                  <span class="pull-right">
-                    <i id="initEndpointSpinner" class="fa fa-cog fa-spin" style="margin-right: 5px; display: none;"></i>
-                    <button type="submit" class="btn btn-primary" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && (!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey))" ng-click="createRemoteEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
-                  </span>
+              <!-- actions -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && (!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey))" ng-click="createRemoteEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+                  <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
                 </div>
               </div>
-              <!-- !connect button -->
+              <!-- !actions -->
             </div>
             <!-- !remote-endpoint -->
           </form>
