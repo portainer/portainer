@@ -45,7 +45,7 @@ func (factory *proxyFactory) newSocketProxy(path string) http.Handler {
 	return proxy
 }
 
-func (factory *proxyFactory) namedPipeProxy(path string) http.Handler {
+func (factory *proxyFactory) newNamedPipeProxy(path string) http.Handler {
 	proxy := &localProxy{}
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,

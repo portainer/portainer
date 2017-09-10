@@ -47,7 +47,7 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 		}
 	}
 	case "npipe":
-		proxy = manager.proxyFactory.namedPipeProxy(endpointURL.Path)
+		proxy = manager.proxyFactory.newNamedPipeProxy(endpointURL.Path)
 	default:
 		// Assume unix:// scheme
 		proxy = manager.proxyFactory.newSocketProxy(endpointURL.Path)
