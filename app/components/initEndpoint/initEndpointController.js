@@ -26,7 +26,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
   $scope.createLocalEndpoint = function() {
     $('#createResourceSpinner').show();
     var name = 'local';
-    var URL = 'unix:///var/run/docker.sock';
+    var URL = 'npipe:\\\\.\\pipe\\docker_engine';
 
     EndpointService.createLocalEndpoint(name, URL, false, true)
     .then(function success(data) {

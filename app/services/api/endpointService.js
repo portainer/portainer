@@ -49,7 +49,7 @@ angular.module('portainer.services')
   service.createLocalEndpoint = function(name, URL, TLS, active) {
     var endpoint = {
       Name: 'local',
-      URL: 'unix:///var/run/docker.sock',
+      URL: 'npipe:\\\\.\\pipe\\docker_engine',
       TLS: false
     };
     return Endpoints.create({}, endpoint).$promise;
