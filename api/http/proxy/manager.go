@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"strings"
 	"net/http"
 	"net/url"
 
@@ -48,8 +47,7 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 		}
 	}
 	case "npipe":
-		var namedPipePath = strings.Replace(endpoint.URL, "npipe:", "", 1)
-		proxy = manager.proxyFactory.namePipeProxy(namedPipePath)
+		proxy = manager.proxyFactory.namePipeProxy(endpointURL.Path)
 	default:
 		// Assume unix:// scheme
 		proxy = manager.proxyFactory.newSocketProxy(endpointURL.Path)
