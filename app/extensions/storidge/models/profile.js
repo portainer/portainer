@@ -21,6 +21,7 @@ function StoridgeProfileModel(data) {
   this.Capacity = data.capacity;
   this.Provisioning = data.provision;
   this.Type = data.type;
+  this.Redundancy = data.level;
 
   if (data.iops) {
     this.MinIOPS = data.iops.min;
@@ -39,4 +40,13 @@ function StoridgeCreateProfileRequest(model) {
   this.directory = model.Directory;
   this.provision = model.Provisioning;
   this.type = model.Type;
+  this.level = model.Redundancy;
+  this.iops = {
+    min: model.MinIOPS,
+    max: model.MaxIOPS
+  };
+  this.bandwidth = {
+    min: model.MinBandwidth,
+    max: model.MaxBandwidth
+  };
 }

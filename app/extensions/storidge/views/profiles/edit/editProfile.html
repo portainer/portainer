@@ -43,8 +43,8 @@
           <div class="form-group">
             <label for="profile_redundancy" class="col-sm-2 col-lg-1 control-label text-left">Redundancy</label>
             <div class="col-sm-10 col-lg-11">
-              <select id="profile_redundancy" ng-model="profile.Redundancy" class="form-control">
-                <option value="2">2-copy</option>
+              <select id="profile_redundancy" ng-model="profile.Redundancy" ng-options="+(opt.value) as opt.label for opt in RedundancyOptions" class="form-control">
+                <!-- <option value="2">2-copy</option> -->
               </select>
             </div>
           </div>

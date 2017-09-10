@@ -7,6 +7,11 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, M
     LimitBandwidth: false
   };
 
+  $scope.RedundancyOptions = [
+    { value: 2, label: '2-copy' },
+    { value: 3, label: '3-copy' }
+  ];
+
   $scope.updateProfile = function() {
     $('#createResourceSpinner').show();
 

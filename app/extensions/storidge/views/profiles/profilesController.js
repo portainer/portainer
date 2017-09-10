@@ -54,6 +54,7 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeProfileService)
     $q.all(deleteRequests)
     .then(function success(data) {
       Notifications.success('Selected profiles successfully removed');
+      $state.reload();
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'An error occured when deleting selected profiles');
