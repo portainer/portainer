@@ -1,6 +1,6 @@
 package proxy
 
-// unixSocketHandler represents a handler to proxy HTTP requests via a unix:// socket
+// represents a handler to proxy HTTP requests via a unix:// socket and npope:// named pipes
 import (
 	"io"
 	"net/http"
@@ -8,16 +8,11 @@ import (
 	httperror "github.com/portainer/portainer/http/error"
 )
 
-type socketProxy struct {
+type localProxy struct {
 	Transport *proxyTransport
 }
 
-func (proxy *socketProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Force URL/domain to http/unixsocket to be able to
-	// use http.Transport RoundTrip to do the requests via the socket
-	r.URL.Scheme = "http"
-	r.URL.Host = "unixsocket"
-
+func (proxy *localProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	res, err := proxy.Transport.proxyDockerRequest(r)
 	if err != nil {
 		code := http.StatusInternalServerError

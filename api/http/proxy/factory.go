@@ -34,7 +34,7 @@ func (factory *proxyFactory) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpo
 }
 
 func (factory *proxyFactory) newSocketProxy(path string) http.Handler {
-	proxy := &socketProxy{}
+	proxy := &localProxy{}
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
@@ -45,8 +45,8 @@ func (factory *proxyFactory) newSocketProxy(path string) http.Handler {
 	return proxy
 }
 
-func (factory *proxyFactory) namePipeProxy(path string) http.Handler {
-	proxy := &socketProxy{}
+func (factory *proxyFactory) namedPipeProxy(path string) http.Handler {
+	proxy := &localProxy{}
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
