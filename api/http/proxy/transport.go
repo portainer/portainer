@@ -8,6 +8,8 @@ import (
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/security"
+
+	"gopkg.in/natefinch/npipe.v2"
 )
 
 type (
@@ -34,6 +36,14 @@ func newSocketTransport(socketPath string) *http.Transport {
 	return &http.Transport{
 		Dial: func(proto, addr string) (conn net.Conn, err error) {
 			return net.Dial("unix", socketPath)
+		},
+	}
+}
+
+func newNamedPipeTransport(namedPipePath string) *http.Transport {
+	return &http.Transport{
+		Dial: func(proto, addr string) (conn net.Conn, err error) {
+			return npipe.Dial(namedPipePath)
 		},
 	}
 }

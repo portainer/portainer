@@ -45,6 +45,18 @@ func (factory *proxyFactory) newSocketProxy(path string) http.Handler {
 	return proxy
 }
 
+func (factory *proxyFactory) namePipeProxy(path string) http.Handler {
+	proxy := &socketProxy{}
+	transport := &proxyTransport{
+		ResourceControlService: factory.ResourceControlService,
+		TeamMembershipService:  factory.TeamMembershipService,
+		SettingsService:        factory.SettingsService,
+		dockerTransport:        newNamedPipeTransport(path),
+	}
+	proxy.Transport = transport
+	return proxy
+}
+
 func (factory *proxyFactory) createReverseProxy(u *url.URL) *httputil.ReverseProxy {
 	proxy := newSingleHostReverseProxyWithHostHeader(u)
 	transport := &proxyTransport{

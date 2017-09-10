@@ -48,7 +48,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
     EndpointService.endpoint($stateParams.id).then(function success(data) {
       $('#loadingViewSpinner').hide();
       $scope.endpoint = data;
-      if (data.URL.indexOf('unix://') === 0) {
+      if (data.URL.indexOf('unix://') === 0 || data.URL.indexOf('npipe:') === 0) {
         $scope.endpointType = 'local';
       } else {
         $scope.endpointType = 'remote';

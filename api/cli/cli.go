@@ -16,7 +16,7 @@ import (
 type Service struct{}
 
 const (
-	errInvalidEndpointProtocol    = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
+	errInvalidEndpointProtocol    = portainer.Error("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
 	errSocketNotFound             = portainer.Error("Unable to locate Unix socket")
 	errEndpointsFileNotFound      = portainer.Error("Unable to locate external endpoints file")
 	errInvalidSyncInterval        = portainer.Error("Invalid synchronization interval")
@@ -88,7 +88,7 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 
 func validateEndpoint(endpoint string) error {
 	if endpoint != "" {
-		if !strings.HasPrefix(endpoint, "unix://") && !strings.HasPrefix(endpoint, "tcp://") {
+		if !strings.HasPrefix(endpoint, "unix://") && !strings.HasPrefix(endpoint, "tcp://") && !strings.HasPrefix(endpoint, "npipe://") {
 			return errInvalidEndpointProtocol
 		}
 
