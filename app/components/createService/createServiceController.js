@@ -31,8 +31,10 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     AccessControlData: new AccessControlFormData(),
     CpuLimit: 0,
     CpuReservation: 0,
-    MemoryLimit: '0m',
-    MemoryReservation: '0m'
+    MemoryLimit: 0,
+    MemoryReservation: 0,
+    MemoryLimitUnit: 'MB',
+    MemoryReservationUnit: 'MB'
   };
 
   $scope.state = {
@@ -229,17 +231,29 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   }
 
   function prepareResourcesConfig(config, input) {
+    // CPU Limit
     if (input.CpuLimit > 0) {
       config.TaskTemplate.Resources.Limits.NanoCPUs = input.CpuLimit * 1000000000;
     }
+    // CPU Reservation
     if (input.CpuReservation > 0) {
       config.TaskTemplate.Resources.Reservations.NanoCPUs = input.CpuReservation * 1000000000;
     }
-    var memoryLimit = ServiceHelper.convertHumanToNumber(input.MemoryLimit);
+    // Memory Limit - Round to 0.125
+    var memoryLimit = (Math.round(input.MemoryLimit * 8) / 8).toFixed(3);
+    memoryLimit *= 1024 * 1024;
+    if (input.MemoryLimitUnit === 'GB') {
+      memoryLimit *= 1024;
+    }
     if (memoryLimit > 0) {
       config.TaskTemplate.Resources.Limits.MemoryBytes = memoryLimit;
     }
-    var memoryReservation = ServiceHelper.convertHumanToNumber(input.MemoryReservation);
+    // Memory Resevation - Round to 0.125
+    var memoryReservation = (Math.round(input.MemoryReservation * 8) / 8).toFixed(3);
+    memoryReservation *= 1024 * 1024;
+    if (input.MemoryReservationUnit === 'GB') {
+      memoryReservation *= 1024;
+    }
     if (memoryReservation > 0) {
       config.TaskTemplate.Resources.Reservations.MemoryBytes = memoryReservation;
     }

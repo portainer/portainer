@@ -449,58 +449,46 @@
           <!-- tab-resources -->
           <div class="tab-pane" id="resources">
             <form class="form-horizontal" style="margin-top: 15px;">
-              <!-- cpu-limit-input -->
               <div class="form-group">
-                <label for="cpu-limit" class="col-sm-3 col-lg-1 control-label text-left">CPU limit</label>
-                <div class="col-sm-4 col-lg-3">
-                  <input type="number" step="0.1" class="form-control" ng-model="formValues.CpuLimit" id="cpu-limit" placeholder="e.g. 0.3">
+                <!-- cpu-limit-input -->
+                <label for="cpu-limit" class="col-sm-2 col-lg-2 control-label text-left">CPU limit<portainer-tooltip position="top" message="Maximum number of CPU the service can use (0 to unlimited)."></portainer-tooltip></label>
+                <div class="col-sm-4 col-lg-4">
+                  <input type="number" step="0.1" class="form-control" ng-model="formValues.CpuLimit" id="cpu-limit" placeholder="e.g. 0.5">
                 </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Maximum number of CPU the service can use (0 to unlimited).
-                  </p>
+                <!-- !cpu-limit-input -->
+                <!-- cpu-reservation-input -->
+                <label for="cpu-reservation" class="col-sm-2 col-lg-2 control-label text-left">CPU res<portainer-tooltip position="top" message="Minimum number of CPU guaranteed to the service."></portainer-tooltip></label>
+                <div class="col-sm-4 col-lg-4">
+                  <input type="number" step="0.1" class="form-control" ng-model="formValues.CpuReservation" id="cpu-limit" placeholder="e.g. 0.3">
                 </div>
+                <!-- !cpu-reservation-input -->
               </div>
-              <!-- !cpu-limit-input -->
-              <!-- memory-limit-input -->
               <div class="form-group">
-                <label for="memory-limit" class="col-sm-3 col-lg-1 control-label text-left">Memory limit</label>
-                <div class="col-sm-4 col-lg-3">
-                  <input type="text" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit" placeholder="e.g. 128m">
+                <!-- memory-limit-input -->
+                <label for="memory-limit" class="col-sm-2 col-lg-2 control-label text-left">Mem limit<portainer-tooltip position="top" message="Maximum memory the service can use (0 to unlimited)."></portainer-tooltip></label>
+                <div class="col-sm-2 col-lg-2">
+                  <input type="number" step="0.125" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit" placeholder="e.g. 128">
                 </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Maximum memory the service can use (0 to unlimited).
-                  </p>
+                <div class="col-sm-2 col-lg-2">
+                  <select class="form-control" ng-model="formValues.MemoryLimitUnit">
+                    <option value="MB">MB</option>
+                    <option value="GB">GB</option>
+                  </select>
                 </div>
+                <!-- !memory-limit-input -->
+                <!-- memory-reservation-input -->
+                <label for="memory-reservation" class="col-sm-2 col-lg-2 control-label text-left">Mem res<portainer-tooltip position="top" message="Minimum memory guaranteed to the service."></portainer-tooltip></label>
+                <div class="col-sm-2 col-lg-2">
+                  <input type="number" step="0.125" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation" placeholder="e.g. 64">
+                </div>
+                <div class="col-sm-2 col-lg-2">
+                  <select class="form-control" ng-model="formValues.MemoryReservationUnit">
+                    <option value="MB">MB</option>
+                    <option value="GB">GB</option>
+                  </select>
+                </div>
+                <!-- !memory-reservation-input -->
               </div>
-              <!-- !memory-limit-input -->
-              <!-- cpu-reservation-input -->
-              <div class="form-group">
-                <label for="cpu-reservation" class="col-sm-3 col-lg-1 control-label text-left">CPU reservation</label>
-                <div class="col-sm-4 col-lg-3">
-                  <input type="number" step="0.1" class="form-control" ng-model="formValues.CpuReservation" id="cpu-reservation" placeholder="e.g. 0.2">
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Minimum number of CPU guaranteed to the service.
-                  </p>
-                </div>
-              </div>
-              <!-- !cpu-reservation-input -->
-              <!-- memory-reservation-input -->
-              <div class="form-group">
-                <label for="memory-reservation" class="col-sm-3 col-lg-1 control-label text-left">Memory reservation</label>
-                <div class="col-sm-4 col-lg-3">
-                  <input type="text" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation" placeholder="e.g. 64m">
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Minimum memory guaranteed to the service.
-                  </p>
-                </div>
-              </div>
-              <!-- !memory-reservation-input -->
             </form>
           </div>
           <!-- !tab-resources -->
