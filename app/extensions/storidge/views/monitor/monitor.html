@@ -1,14 +1,37 @@
 <rd-header>
-  <rd-header-title title="Storidge events">
+  <rd-header-title title="Storidge monitor">
     <a data-toggle="tooltip" title="Refresh" ui-sref="storidge.events" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.events">Events</a>
+    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.monitor">Cluster monitoring</a>
   </rd-header-content>
 </rd-header>
+
+<div class="row">
+  <div class="col-md-6 col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-area-chart" title="IOPS usage"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="iopsChart" width="770" height="300"></canvas>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-md-6 col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-area-chart" title="Bandwith usage"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="bandwithChart" width="770" height="300"></canvas>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
 
 <div class="row">
   <div class="col-md-12">

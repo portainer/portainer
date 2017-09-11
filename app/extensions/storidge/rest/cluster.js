@@ -10,7 +10,8 @@ angular.module('extension.storidge')
     return $http({
       method: 'GET',
       url: API_URL + '/events',
-      skipAuthorization: true
+      skipAuthorization: true,
+      timeout: 5000
     });
   };
 
@@ -26,7 +27,8 @@ angular.module('extension.storidge')
     return $http({
       method: 'GET',
       url: API_URL + '/info',
-      skipAuthorization: true
+      skipAuthorization: true,
+      timeout: 5000
     });
   };
 

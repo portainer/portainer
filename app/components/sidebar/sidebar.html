@@ -57,11 +57,11 @@
     </li>
     <li class="sidebar-list" ng-if="applicationState.endpoint.extensions.indexOf('storidge') !== -1">
       <a ui-sref="storidge.cluster" ui-sref-active="active">Storidge <span class="menu-icon fa fa-bolt"></span></a>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.events')">
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor')">
         <a ui-sref="storidge.profiles" ui-sref-active="active">Profiles</a>
       </div>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.events')">
-        <a ui-sref="storidge.events" ui-sref-active="active">Events</a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor')">
+        <a ui-sref="storidge.monitor" ui-sref-active="active">Monitor</a>
       </div>
     </li>
     <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin || isTeamLeader">

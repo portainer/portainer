@@ -663,12 +663,12 @@ angular.module('portainer', [
         }
       }
     })
-    .state('storidge.events', {
+    .state('storidge.monitor', {
       url: '/events',
       views: {
         'content@': {
-          templateUrl: 'app/extensions/storidge/views/events/events.html',
-          controller: 'StoridgeEventsController'
+          templateUrl: 'app/extensions/storidge/views/monitor/monitor.html',
+          controller: 'StoridgeMonitorController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
