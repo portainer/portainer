@@ -11,7 +11,7 @@ angular.module('extension.storidge')
       method: 'GET',
       url: API_URL + '/events',
       skipAuthorization: true,
-      timeout: 5000
+      timeout: 4500
     });
   };
 
@@ -28,7 +28,7 @@ angular.module('extension.storidge')
       method: 'GET',
       url: API_URL + '/info',
       skipAuthorization: true,
-      timeout: 5000
+      timeout: 4500
     });
   };
 

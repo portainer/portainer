@@ -43,7 +43,7 @@ function ($q, $scope, $interval, $document, Notifications, Pagination, StoridgeC
   }
 
   function setUpdateRepeater(iopsChart, bandwidthChart) {
-    var refreshRate = 10000;
+    var refreshRate = 5000;
     $scope.repeater = $interval(function() {
       $q.all({
         events: StoridgeClusterService.events(),
