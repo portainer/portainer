@@ -26,12 +26,6 @@ angular.module('portainer.services')
     getApplicationState: function() {
       return localStorageService.get('APPLICATION_STATE');
     },
-    // storeExtensions: function(extensions) {
-    //   localStorageService.set('EXTENSIONS', extensions);
-    // },
-    // getExtensions: function() {
-    //   return localStorageService.get('EXTENSIONS');
-    // },
     storeJWT: function(jwt) {
       localStorageService.set('JWT', jwt);
     },
@@ -46,6 +40,14 @@ angular.module('portainer.services')
     },
     getPaginationCount: function(key) {
       return localStorageService.cookie.get('pagination_' + key);
+    },
+    // STORIDGE_TMP
+    storeStoridgeAPI: function(state) {
+      localStorageService.set('STORIDGE_API', state);
+    },
+    // STORIDGE_TMP
+    getStoridgeAPI: function() {
+      return localStorageService.get('STORIDGE_API');
     },
     clean: function() {
       localStorageService.clearAll();

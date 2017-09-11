@@ -87,7 +87,6 @@ angular.module('portainer.services')
       state.endpoint.apiVersion = endpointAPIVersion;
       state.endpoint.extensions = data.extensions;
       LocalStorage.storeEndpointState(state.endpoint);
-      // LocalStorage.storeExtensions(state.extensions);
       deferred.resolve();
     })
     .catch(function error(err) {

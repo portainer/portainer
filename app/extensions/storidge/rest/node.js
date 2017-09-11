@@ -1,15 +1,15 @@
 angular.module('extension.storidge')
-.factory('StoridgeNodes', ['$http', function StoridgeNodesFactory($http) {
+.factory('StoridgeNodes', ['$http', 'EndpointProvider', function StoridgeNodesFactory($http, EndpointProvider) {
   'use strict';
 
-  var API_URL = 'http://114.23.120.182:8282';
+  // var EndpointProvider.StoridgeAPI() = 'http://114.23.120.182:8282';
 
   var service = {};
 
   service.query = function() {
     return $http({
       method: 'GET',
-      url: API_URL + '/nodes',
+      url: EndpointProvider.StoridgeAPI() + '/nodes',
       skipAuthorization: true
     });
   };
@@ -17,7 +17,7 @@ angular.module('extension.storidge')
   service.inspect = function(id) {
     return $http({
       method: 'GET',
-      url: API_URL + '/nodes/' + id,
+      url: EndpointProvider.StoridgeAPI() + '/nodes/' + id,
       skipAuthorization: true
     });
   };
