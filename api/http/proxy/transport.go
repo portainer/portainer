@@ -9,7 +9,6 @@ import (
 	"github.com/Microsoft/go-winio"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/security"
-
 )
 
 type (
