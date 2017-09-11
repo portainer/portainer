@@ -230,7 +230,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     }
   }
 
-  function prepareResourcesConfig(config, input) {
+  function prepareResourcesCpuConfig(config, input) {
     // CPU Limit
     if (input.CpuLimit > 0) {
       config.TaskTemplate.Resources.Limits.NanoCPUs = input.CpuLimit * 1000000000;
@@ -239,6 +239,9 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     if (input.CpuReservation > 0) {
       config.TaskTemplate.Resources.Reservations.NanoCPUs = input.CpuReservation * 1000000000;
     }
+  }
+
+  function prepareResourcesMemoryConfig(config, input) {
     // Memory Limit - Round to 0.125
     var memoryLimit = (Math.round(input.MemoryLimit * 8) / 8).toFixed(3);
     memoryLimit *= 1024 * 1024;
@@ -287,7 +290,8 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     prepareUpdateConfig(config, input);
     prepareSecretConfig(config, input);
     preparePlacementConfig(config, input);
-    prepareResourcesConfig(config, input);
+    prepareResourcesCpuConfig(config, input);
+    prepareResourcesMemoryConfig(config, input);
     return config;
   }
 
