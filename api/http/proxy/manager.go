@@ -36,16 +36,17 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 		return nil, err
 	}
 	switch endpointURL.Scheme {
-	case "tcp": {
-		if endpoint.TLS {
-			proxy, err = manager.proxyFactory.newHTTPSProxy(endpointURL, endpoint)
-			if err != nil {
-				return nil, err
+	case "tcp":
+		{
+			if endpoint.TLS {
+				proxy, err = manager.proxyFactory.newHTTPSProxy(endpointURL, endpoint)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				proxy = manager.proxyFactory.newHTTPProxy(endpointURL)
 			}
-		} else {
-			proxy = manager.proxyFactory.newHTTPProxy(endpointURL)
 		}
-	}
 	case "npipe":
 		proxy = manager.proxyFactory.newNamedPipeProxy(endpointURL.Path)
 	default:
