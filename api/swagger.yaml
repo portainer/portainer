@@ -2454,10 +2454,14 @@ definitions:
   UserAdminInitRequest:
     type: "object"
     properties:
+      Username:
+        type: "string"
+        example: "admin"
+        description: "Username of the initial administrator account"
       Password:
         type: "string"
         example: "admin-password"
-        description: "Password for the admin user"
+        description: "Password of the initial administrator account"
   TemplateListResponse:
     type: "array"
     items:
