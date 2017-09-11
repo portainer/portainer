@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 
 	"github.com/asaskevich/govalidator"
@@ -58,7 +59,7 @@ func NewEndpointHandler(bouncer *security.RequestBouncer, authorizeEndpointManag
 type (
 	postEndpointsRequest struct {
 		Name      string `valid:"required"`
-		URL       string `valid:"required"`
+		URL       string
 		PublicURL string `valid:"-"`
 		TLS       bool
 	}
@@ -129,6 +130,15 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		TLS:             req.TLS,
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
+	}
+
+	if req.Name == "local" && req.URL == "" {
+		switch runtime.GOOS {
+		case "linux":
+			endpoint.URL = "unix:///var/run/docker.sock"
+		case "windows":
+			endpoint.URL = "npipe:////./pipe/docker_engine"
+		}
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
