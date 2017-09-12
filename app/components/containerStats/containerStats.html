@@ -1,0 +1,123 @@
+<rd-header>
+  <rd-header-title title="Container statistics">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="containers">Containers</a> &gt; <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a> &gt; Stats
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-md-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-info-circle" title="About statistics">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">
+                This view displays real-time statistics about the container <b>{{ container.Name|trimcontainername }}</b> as well as a list of the running processes
+                inside this container.
+              </span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left">
+              Refresh rate
+            </label>
+            <div class="col-sm-3 col-md-2">
+              <select id="refreshRate" ng-model="state.refreshRate" ng-change="changeUpdateRepeater()" class="form-control">
+                <option value="5">5s</option>
+                <option value="10">10s</option>
+                <option value="30">30s</option>
+                <option value="60">60s</option>
+              </select>
+            </div>
+            <span>
+              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
+            </span>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-4 col-md-6 col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-area-chart" title="Memory usage"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="memoryChart" width="770" height="300"></canvas>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-4 col-md-6 col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-area-chart" title="CPU usage"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="cpuChart" width="770" height="300"></canvas>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-4 col-md-12 col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-area-chart" title="Network usage"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="networkChart" width="770" height="300"></canvas>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-sm-12" ng-if="applicationState.endpoint.mode.provider !== 'VMWARE_VIC'">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title="Processes">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th ng-repeat="title in processInfo.Titles">
+                <a ng-click="order(title)">
+                  {{ title }}
+                  <span ng-show="sortType == title && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == title && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="processDetails in state.filteredProcesses = (processInfo.Processes | orderBy:sortType:sortReverse |  itemsPerPage: state.pagination_count)">
+              <td ng-repeat="procInfo in processDetails track by $index">{{ procInfo }}</td>
+            </tr>
+            <tr ng-if="!processInfo.Processes">
+              <td colspan="processInfo.Titles.length" class="text-center text-muted">Loading...</td>
+            </tr>
+            <tr ng-if="state.filteredProcesses.length === 0">
+              <td colspan="processInfo.Titles.length" class="text-center text-muted">No processes available.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div ng-if="processInfo.Processes" class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

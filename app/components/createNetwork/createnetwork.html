@@ -1,5 +1,7 @@
 <rd-header>
-  <rd-header-title title="Create network"></rd-header-title>
+  <rd-header-title title="Create network">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
   <rd-header-content>
     <a ui-sref="networks">Networks</a> &gt; Add network
   </rd-header-content>
@@ -39,8 +41,11 @@
           <!-- driver-input -->
           <div class="form-group">
             <label for="network_driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
-            <div class="col-sm-10">
-              <input type="text" class="form-control" ng-model="config.Driver" id="network_driver" placeholder="e.g. driverName">
+            <div class="col-sm-11">
+              <select class="form-control" ng-options="driver for driver in availableNetworkDrivers" ng-model="config.Driver" ng-if="availableNetworkDrivers.length > 0">
+                <option disabled hidden value="">Select a driver</option>
+              </select>
+              <input type="text" class="form-control" ng-model="config.Driver" id="network_driver" placeholder="e.g. driverName" ng-if="availableNetworkDrivers.length === 0">
             </div>
           </div>
           <!-- !driver-input -->
