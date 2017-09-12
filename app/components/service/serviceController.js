@@ -10,6 +10,9 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
 
   $scope.lastVersion = 0;
 
+  $scope.limitMemory = 0;
+  $scope.reservationMemory = 0;
+
   var originalService = {};
   var previousServiceValues = [];
 
@@ -204,14 +207,19 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(service.ServiceConstraints);
     config.TaskTemplate.Placement.Preferences = ServiceHelper.translateKeyValueToPlacementPreferences(service.ServicePreferences);
 
+    // Round memory values to 0.125 and convert MB to B
+    var memoryLimit = (Math.round(service.LimitMemoryBytes * 8) / 8).toFixed(3);
+    memoryLimit *= 1024 * 1024;
+    var memoryReservation = (Math.round(service.ReservationMemoryBytes * 8) / 8).toFixed(3);
+    memoryReservation *= 1024 * 1024;
     config.TaskTemplate.Resources = {
       Limits: {
         NanoCPUs: ServiceHelper.convertUnitToNano(service.LimitNanoCPUs),
-        MemoryBytes: ServiceHelper.convertHumanToNumber(service.LimitMemoryBytes)
+        MemoryBytes: memoryLimit
       },
       Reservations: {
         NanoCPUs: ServiceHelper.convertUnitToNano(service.ReservationNanoCPUs),
-        MemoryBytes: ServiceHelper.convertHumanToNumber(service.ReservationMemoryBytes)
+        MemoryBytes: memoryReservation
       }
     };
 
@@ -294,9 +302,9 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
 
   function transformResources(service) {
     service.LimitNanoCPUs = ServiceHelper.convertNanoToUnit(service.LimitNanoCPUs) || 0;
-    service.LimitMemoryBytes = ServiceHelper.convertNumberToHuman(service.LimitMemoryBytes) || '0m';
     service.ReservationNanoCPUs = ServiceHelper.convertNanoToUnit(service.ReservationNanoCPUs) || 0;
-    service.ReservationMemoryBytes = ServiceHelper.convertNumberToHuman(service.ReservationMemoryBytes) || '0m';
+    service.LimitMemoryBytes = service.LimitMemoryBytes / 1024 / 1024;
+    service.ReservationMemoryBytes = service.ReservationMemoryBytes / 1024 / 1024;
   }
 
   function initView() {

@@ -6,47 +6,23 @@
       <table class="table">
         <tbody>
           <tr>
-            <td>CPU limit</td>
+            <td>CPU limit<portainer-tooltip position="top" message="Maximum number of CPU the service can use (0 to unlimited)."></portainer-tooltip></td>
             <td>
               <input class="input-sm" type="number" step="0.1" ng-model="service.LimitNanoCPUs" ng-change="updateServiceAttribute(service, 'LimitNanoCPUs')" ng-disabled="isUpdating"/>
             </td>
-            <td>
-              <p class="small text-muted" style="margin-top: 10px;">
-                Maximum number of CPU the service can use (0 to unlimited).
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <td>Memory limit</td>
-            <td>
-              <input class="input-sm" type="text" ng-model="service.LimitMemoryBytes" ng-change="updateServiceAttribute(service, 'LimitMemoryBytes')" ng-disabled="isUpdating"/>
-            </td>
-            <td>
-              <p class="small text-muted" style="margin-top: 10px;">
-                Maximum memory the service can use (0 to unlimited).
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <td>CPU reservation</td>
+            <td>CPU res<portainer-tooltip position="top" message="Minimum number of CPU guaranteed to the service."></portainer-tooltip></td>
             <td>
               <input class="input-sm" type="number" step="0.1" ng-model="service.ReservationNanoCPUs" ng-change="updateServiceAttribute(service, 'ReservationNanoCPUs')" ng-disabled="isUpdating"/>
             </td>
-            <td>
-              <p class="small text-muted" style="margin-top: 10px;">
-                Minimum number of CPU guaranteed to the service.
-              </p>
-            </td>
           </tr>
           <tr>
-            <td>Memory reservation</td>
+            <td>Mem limit in MB<portainer-tooltip position="top" message="Maximum memory the service can use (0 to unlimited)."></portainer-tooltip></td>
             <td>
-              <input class="input-sm" type="text" ng-model="service.ReservationMemoryBytes" ng-change="updateServiceAttribute(service, 'ReservationMemoryBytes')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="number" step="0.125" ng-model="service.LimitMemoryBytes" ng-change="updateServiceAttribute(service, 'LimitMemoryBytes')" ng-disabled="isUpdating"/>
             </td>
+            <td>Mem res in MB<portainer-tooltip position="top" message="Minimum memory guaranteed to the service."></portainer-tooltip></td>
             <td>
-              <p class="small text-muted" style="margin-top: 10px;">
-                Minimum memory guaranteed to the service.
-              </p>
+              <input class="input-sm" type="number" step="0.125" ng-model="service.ReservationMemoryBytes" ng-change="updateServiceAttribute(service, 'ReservationMemoryBytes')" ng-disabled="isUpdating"/>
             </td>
           </tr>
         </tbody>
