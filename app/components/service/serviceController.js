@@ -10,9 +10,6 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
 
   $scope.lastVersion = 0;
 
-  $scope.limitMemory = 0;
-  $scope.reservationMemory = 0;
-
   var originalService = {};
   var previousServiceValues = [];
 
