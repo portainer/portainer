@@ -1,17 +1,29 @@
 angular.module('extension.storidge')
-.controller('CreateProfileController', ['$scope', '$state', 'Notifications', 'StoridgeProfileService',
-function ($scope, $state, Notifications, StoridgeProfileService) {
+.controller('CreateProfileController', ['$scope', '$state', '$stateParams', 'Notifications', 'StoridgeProfileService',
+function ($scope, $state, $stateParams, Notifications, StoridgeProfileService) {
 
-  $scope.formValues = {
+  $scope.state = {
+    NoLimit: true,
     LimitIOPS: false,
-    LimitBandwidth: false
+    LimitBandwidth: false,
+    ManualInputDirectory: false
   };
-
-  $scope.model = new StoridgeProfileDefaultModel();
 
   $scope.createProfile = function () {
     $('#resourceCreationSpinner').show();
-    StoridgeProfileService.create($scope.model)
+    var profile = $scope.model;
+
+    if (!$scope.state.LimitIOPS) {
+      delete profile.MinIOPS;
+      delete profile.MaxIOPS;
+    }
+
+    if (!$scope.state.LimitBandwidth) {
+      delete profile.MinBandwidth;
+      delete profile.MaxBandwidth;
+    }
+
+    StoridgeProfileService.create(profile)
     .then(function success(data) {
       Notifications.success('Profile successfully created');
       $state.go('storidge.profiles');
@@ -23,4 +35,26 @@ function ($scope, $state, Notifications, StoridgeProfileService) {
       $('#resourceCreationSpinner').hide();
     });
   };
+
+  $scope.updatedName = function() {
+    if (!$scope.state.ManualInputDirectory) {
+      var profile = $scope.model;
+      profile.Directory = '/cio/' + profile.Name;
+    }
+  };
+
+  $scope.updatedDirectory = function() {
+    if (!$scope.state.ManualInputDirectory) {
+      $scope.state.ManualInputDirectory = true;
+    }
+  };
+
+  function initView() {
+    var profile = new StoridgeProfileDefaultModel();
+    profile.Name = $stateParams.profileName;
+    profile.Directory = '/cio/' + profile.Name;
+    $scope.model = profile;
+  }
+
+  initView();
 }]);

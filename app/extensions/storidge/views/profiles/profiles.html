@@ -35,7 +35,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ng-click="createProfile()">Create</button>
-              <button type="button" class="btn btn-primary btn-sm" ui-sref="storidge.profiles.create">Advanced settings...</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ui-sref="storidge.profiles.create({ profileName: formValues.Name })">Modify defaults...</button>
               <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>

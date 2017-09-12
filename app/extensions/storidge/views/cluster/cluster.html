@@ -11,7 +11,7 @@
 </rd-header>
 
 <div class="row">
-  <div class="col-md-8 col-sm-12">
+  <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-bolt" title="Cluster details"></rd-widget-header>
       <rd-widget-body>
@@ -50,45 +50,12 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-  <div class="col-md-4 col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-tachometer" title="Cluster capacity"></rd-widget-header>
-      <rd-widget-body>
-        <div class="chart-container" style="position: relative;">
-          <canvas id="capacityChart" width="770" height="300"></canvas>
-        </div>
-        <div style="margin-top: 10px;" ng-if="clusterInfo">
-          <table class="table">
-            <tbody>
-              <tr>
-                <td>Capacity available</td>
-                <td>{{ ((clusterInfo.FreeCapacity * 100) / clusterInfo.TotalCapacity).toFixed(1) }}%</td>
-              </tr>
-              <tr>
-                <td>Provisioned capacity</td>
-                <td>
-                  {{ clusterInfo.ProvisionedCapacity | humansize }}
-                  <span ng-if="+(clusterInfo.ProvisionedCapacity) >= +(clusterInfo.ProvisionedCapacity)">
-                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td>Total capacity</td>
-                <td>{{ clusterInfo.TotalCapacity | humansize }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
 </div>
 
 <div class="row" ng-if="clusterInfo">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-object-group" title="Cluster topology">
+      <rd-widget-header icon="fa-object-group" title="Cluster nodes">
         <div class="pull-right">
           Items per page:
           <select ng-model="state.pagination_count" ng-change="changePaginationCount()">

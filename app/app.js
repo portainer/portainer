@@ -626,6 +626,9 @@ angular.module('portainer', [
     })
     .state('storidge.profiles.create', {
       url: '/create',
+      params: {
+        profileName: ''
+      },
       views: {
         'content@': {
           templateUrl: 'app/extensions/storidge/views/profiles/create/createProfile.html',

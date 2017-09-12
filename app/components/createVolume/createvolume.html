@@ -34,16 +34,8 @@
             </div>
           </div>
           <!-- !driver-input -->
-          <!-- storidge -->
-          <div ng-if="formValues.Driver === 'cio:latest'">
-            <div class="col-sm-12 form-section-title">
-              Storidge
-            </div>
-            <storidge-profile-selector storidge-profile="formValues.StoridgeProfile"></storidge-profile-selector>
-          </div>
-          <!-- storidge -->
           <!-- driver-options -->
-          <div class="form-group" ng-if="formValues.Driver !== 'cio:latest'">
+          <div class="form-group">
             <div class="col-sm-12" style="margin-top: 5px;">
               <label class="control-label text-left">
                 Driver options
@@ -72,6 +64,14 @@
             <!-- !driver-options-input-list -->
           </div>
           <!-- !driver-options -->
+          <!-- storidge -->
+          <div ng-if="formValues.Driver === 'cio:latest'">
+            <div class="col-sm-12 form-section-title">
+              Storidge
+            </div>
+            <storidge-profile-selector storidge-profile="formValues.StoridgeProfile"></storidge-profile-selector>
+          </div>
+          <!-- storidge -->
           <!-- access-control -->
           <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
           <!-- !access-control -->

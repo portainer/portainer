@@ -42,6 +42,14 @@ function ($q, $scope, $interval, $document, Notifications, Pagination, StoridgeC
     StoridgeChartService.UpdateChart(label, usedBandwidth, chart);
   }
 
+  function updateCapacityChart(info, chart) {
+    var usedCapacity = info.UsedCapacity;
+    var freeCapacity = info.FreeCapacity;
+
+    StoridgeChartService.UpdateChart('Free', freeCapacity, chart);
+    StoridgeChartService.UpdateChart('Used', usedCapacity, chart);
+  }
+
   function setUpdateRepeater(iopsChart, bandwidthChart) {
     var refreshRate = 5000;
     $scope.repeater = $interval(function() {
@@ -62,7 +70,7 @@ function ($q, $scope, $interval, $document, Notifications, Pagination, StoridgeC
     }, refreshRate);
   }
 
-  function startViewUpdate(iopsChart, bandwidthChart) {
+  function startViewUpdate(iopsChart, bandwidthChart, capacityChart) {
     $('#loadingViewSpinner').show();
     $q.all({
       events: StoridgeClusterService.events(),
@@ -71,8 +79,10 @@ function ($q, $scope, $interval, $document, Notifications, Pagination, StoridgeC
     .then(function success(data) {
       $scope.events = data.events;
       var info = data.info;
+      $scope.info = info;
       updateIOPSChart(info, iopsChart);
       updateBandwithChart(info, bandwidthChart);
+      updateCapacityChart(info, capacityChart);
       setUpdateRepeater(iopsChart, bandwidthChart);
     })
     .catch(function error(err) {
@@ -87,13 +97,14 @@ function ($q, $scope, $interval, $document, Notifications, Pagination, StoridgeC
   function initCharts() {
     var iopsChartCtx = $('#iopsChart');
     var iopsChart = StoridgeChartService.CreateIOPSChart(iopsChartCtx);
-    $scope.iopsChart = iopsChart;
 
     var bandwidthChartCtx = $('#bandwithChart');
     var bandwidthChart = StoridgeChartService.CreateBandwidthChart(bandwidthChartCtx);
-    $scope.bandwidthChart = bandwidthChart;
 
-    startViewUpdate(iopsChart, bandwidthChart);
+    var capacityChartCtx = $('#capacityChart');
+    var capacityChart = StoridgeChartService.CreateCapacityChart(capacityChartCtx);
+
+    startViewUpdate(iopsChart, bandwidthChart, capacityChart);
   }
 
   function initView() {

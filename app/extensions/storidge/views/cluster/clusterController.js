@@ -1,6 +1,6 @@
 angular.module('extension.storidge')
-.controller('StoridgeClusterController', ['$q', '$scope', '$state', '$document', 'Notifications', 'Pagination', 'StoridgeClusterService', 'StoridgeNodeService', 'StoridgeChartService', 'ModalService',
-function ($q, $scope, $state, $document, Notifications, Pagination, StoridgeClusterService, StoridgeNodeService, StoridgeChartService, ModalService) {
+.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'Pagination', 'StoridgeClusterService', 'StoridgeNodeService', 'ModalService',
+function ($q, $scope, $state, Notifications, Pagination, StoridgeClusterService, StoridgeNodeService, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('storidge_nodes');
@@ -71,28 +71,16 @@ function ($q, $scope, $state, $document, Notifications, Pagination, StoridgeClus
     });
   }
 
-  function updateCapacityChart(info, chart) {
-    var usedCapacity = info.UsedCapacity;
-    var freeCapacity = info.FreeCapacity;
-
-    StoridgeChartService.UpdateChart('Free', freeCapacity, chart);
-    StoridgeChartService.UpdateChart('Used', usedCapacity, chart);
-  }
-
-  function initCharts() {
-    var capacityChartCtx = $('#capacityChart');
-    var capacityChart = StoridgeChartService.CreateCapacityChart(capacityChartCtx);
-
+  function initView() {
+    $('#loadingViewSpinner').show();
     $q.all({
       info: StoridgeClusterService.info(),
       version: StoridgeClusterService.version(),
       nodes: StoridgeNodeService.nodes()
     })
     .then(function success(data) {
-      var info = data.info;
-      $scope.clusterInfo = info;
+      $scope.clusterInfo = data.info;
       $scope.clusterVersion = data.version;
-      updateCapacityChart(info, capacityChart);
       $scope.clusterNodes = data.nodes;
     })
     .catch(function error(err) {
@@ -100,13 +88,6 @@ function ($q, $scope, $state, $document, Notifications, Pagination, StoridgeClus
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
-    });
-  }
-
-  function initView() {
-    $('#loadingViewSpinner').show();
-    $document.ready(function() {
-      initCharts();
     });
   }
 
