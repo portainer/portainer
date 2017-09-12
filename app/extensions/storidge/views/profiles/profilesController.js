@@ -19,7 +19,7 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeProfileService)
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('profiles', $scope.state.pagination_count);
+    Pagination.setPaginationCount('storidge_profiles', $scope.state.pagination_count);
   };
 
   $scope.selectItems = function (allSelected) {
@@ -68,6 +68,7 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeProfileService)
     $('#createResourceSpinner').show();
     var model = new StoridgeProfileDefaultModel();
     model.Name = $scope.formValues.Name;
+    model.Directory = model.Directory + model.Name;
 
     StoridgeProfileService.create(model)
     .then(function success(data) {

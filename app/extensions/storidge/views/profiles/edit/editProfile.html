@@ -70,7 +70,7 @@
           </div>
           <!-- !type -->
           <!-- iops -->
-          <div ng-if="!formValues.LimitBandwidth">
+          <div ng-if="!state.LimitBandwidth || state.NoLimit">
             <div class="col-sm-12 form-section-title">
               IOPS
             </div>
@@ -80,11 +80,11 @@
                   Limit IOPS
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="formValues.LimitIOPS"><i></i>
+                  <input type="checkbox" ng-model="state.LimitIOPS"><i></i>
                 </label>
               </div>
             </div>
-            <div class="form-group" ng-if="formValues.LimitIOPS">
+            <div class="form-group" ng-if="state.LimitIOPS">
               <label for="min_iops" class="col-sm-1 control-label text-left">Min</label>
               <div class="col-sm-5">
                 <input type="number" class="form-control" ng-model="profile.MinIOPS" id="min_iops" placeholder="100">
@@ -97,7 +97,7 @@
           </div>
           <!-- !iops -->
           <!-- bandwidth -->
-          <div ng-if="!formValues.LimitIOPS">
+          <div ng-if="!state.LimitIOPS || state.NoLimit">
             <div class="col-sm-12 form-section-title">
               Bandwidth
             </div>
@@ -107,11 +107,11 @@
                   Limit bandwidth
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="formValues.LimitBandwidth"><i></i>
+                  <input type="checkbox" ng-model="state.LimitBandwidth"><i></i>
                 </label>
               </div>
             </div>
-            <div class="form-group" ng-if="formValues.LimitBandwidth">
+            <div class="form-group" ng-if="state.LimitBandwidth">
               <label for="min_bandwidth" class="col-sm-1 control-label text-left">Min</label>
               <div class="col-sm-5">
                 <input type="number" class="form-control" ng-model="profile.MinBandwidth" id="min_bandwidth" placeholder="1">

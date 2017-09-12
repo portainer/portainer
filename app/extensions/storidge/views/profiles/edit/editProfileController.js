@@ -2,8 +2,9 @@ angular.module('extension.storidge')
 .controller('EditProfileController', ['$scope', '$state', '$stateParams', 'Notifications', 'StoridgeProfileService', 'ModalService',
 function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, ModalService) {
 
-  $scope.formValues = {
-    LimitIOPS: true,
+  $scope.state = {
+    NoLimit: true,
+    LimitIOPS: false,
     LimitBandwidth: false
   };
 
@@ -16,6 +17,17 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, M
     $('#createResourceSpinner').show();
 
     var profile = $scope.profile;
+
+    if (!$scope.state.LimitIOPS) {
+      delete profile.MinIOPS;
+      delete profile.MaxIOPS;
+    }
+
+    if (!$scope.state.LimitBandwidth) {
+      delete profile.MinBandwidth;
+      delete profile.MaxBandwidth;
+    }
+
     StoridgeProfileService.update(profile)
     .then(function success(data) {
       Notifications.success('Profile successfully updated');
@@ -61,7 +73,15 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, M
 
     StoridgeProfileService.profile($stateParams.id)
     .then(function success(data) {
-      $scope.profile = data;
+      var profile = data;
+      if ((profile.MinIOPS && profile.MinIOPS !== 0) || (profile.MaxIOPS && profile.MaxIOPS !== 0)) {
+        $scope.state.LimitIOPS = true;
+      } else if ((profile.MinBandwidth && profile.MinBandwidth !== 0) || (profile.MaxBandwidth && profile.MaxBandwidth !== 0)) {
+        $scope.state.LimitBandwidth = true;
+      } else {
+        $scope.state.NoLimit = true;
+      }
+      $scope.profile = profile;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve profile details');

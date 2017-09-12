@@ -13,7 +13,7 @@ function ($q, $scope, $state, $document, Notifications, Pagination, StoridgeClus
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('storidge_events', $scope.state.pagination_count);
+    Pagination.setPaginationCount('storidge_nodes', $scope.state.pagination_count);
   };
 
   $scope.rebootCluster = function() {

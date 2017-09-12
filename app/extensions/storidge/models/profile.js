@@ -1,5 +1,5 @@
 function StoridgeProfileDefaultModel() {
-  this.Directory = '/cio/volumes';
+  this.Directory = '/cio/';
   this.Capacity = 20;
   this.Redundancy = '2';
   this.Provisioning = 'thin';
