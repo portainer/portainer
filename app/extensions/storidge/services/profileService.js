@@ -22,7 +22,7 @@ angular.module('extension.storidge')
 
     StoridgeProfiles.inspect(profileName)
     .then(function success(response) {
-      var profile = new StoridgeProfileModel(response.data);
+      var profile = new StoridgeProfileModel(profileName, response.data);
       deferred.resolve(profile);
     })
     .catch(function error(err) {

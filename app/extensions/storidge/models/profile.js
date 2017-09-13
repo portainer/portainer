@@ -15,8 +15,8 @@ function StoridgeProfileListModel(data) {
   this.Checked = false;
 }
 
-function StoridgeProfileModel(data) {
-  this.Name = data.name;
+function StoridgeProfileModel(name, data) {
+  this.Name = name;
   this.Directory = data.directory;
   this.Capacity = data.capacity;
   this.Provisioning = data.provision;
@@ -41,12 +41,17 @@ function StoridgeCreateProfileRequest(model) {
   this.provision = model.Provisioning;
   this.type = model.Type;
   this.level = model.Redundancy;
-  this.iops = {
-    min: model.MinIOPS,
-    max: model.MaxIOPS
-  };
-  this.bandwidth = {
-    min: model.MinBandwidth,
-    max: model.MaxBandwidth
-  };
+  if (model.MinIOPS && model.MaxIOPS) {
+    this.iops = {
+      min: model.MinIOPS,
+      max: model.MaxIOPS
+    };
+  }
+
+  if (model.MinBandwidth && model.MaxBandwidth) {
+    this.bandwidth = {
+      min: model.MinBandwidth,
+      max: model.MaxBandwidth
+    };
+  }
 }
