@@ -300,8 +300,8 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
   function transformResources(service) {
     service.LimitNanoCPUs = ServiceHelper.convertNanoToUnit(service.LimitNanoCPUs) || 0;
     service.ReservationNanoCPUs = ServiceHelper.convertNanoToUnit(service.ReservationNanoCPUs) || 0;
-    service.LimitMemoryBytes = service.LimitMemoryBytes / 1024 / 1024;
-    service.ReservationMemoryBytes = service.ReservationMemoryBytes / 1024 / 1024;
+    service.LimitMemoryBytes = service.LimitMemoryBytes / 1024 / 1024 || 0;
+    service.ReservationMemoryBytes = service.ReservationMemoryBytes / 1024 / 1024 || 0;
   }
 
   function initView() {
