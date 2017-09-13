@@ -1,6 +1,10 @@
 angular.module('swarmVisualizer', [])
-.controller('SwarmVisualizerController', ['$q', '$scope', 'NodeService', 'ServiceService', 'TaskService', 'Notifications',
-function ($q, $scope, NodeService, ServiceService, TaskService, Notifications) {
+.controller('SwarmVisualizerController', ['$q', '$scope', '$document', 'NodeService', 'ServiceService', 'TaskService', 'Notifications',
+function ($q, $scope, $document, NodeService, ServiceService, TaskService, Notifications) {
+
+  $scope.state = {
+    DisplayOnlyRunningTasks: false
+  };
 
   function assignServiceName(services, tasks) {
     for (var i = 0; i < services.length; i++) {
@@ -43,7 +47,6 @@ function ($q, $scope, NodeService, ServiceService, TaskService, Notifications) {
 
   function initView() {
     $('#loadingViewSpinner').show();
-
     $q.all({
       nodes: NodeService.nodes(),
       services: ServiceService.services(),
@@ -52,16 +55,10 @@ function ($q, $scope, NodeService, ServiceService, TaskService, Notifications) {
     .then(function success(data) {
       var nodes = data.nodes;
       $scope.nodes = nodes;
-      // console.log(JSON.stringify(data.nodes, null, 4));
-      // console.log('#################');
       var services = data.services;
       $scope.services = services;
-      // console.log(JSON.stringify(data.services, null, 4));
-      // console.log('#################');
       var tasks = data.tasks;
       $scope.tasks = tasks;
-      // console.log(JSON.stringify(data.tasks, null, 4));
-      // console.log('#################');
       prepareVisualizerData(nodes, services, tasks);
     })
     .catch(function error(err) {

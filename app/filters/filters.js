@@ -41,7 +41,7 @@ angular.module('portainer.filters', [])
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (includeString(status, ['new', 'allocated', 'assigned', 'accepted', 'complete'])) {
+    if (includeString(status, ['new', 'allocated', 'assigned', 'accepted', 'complete', 'preparing'])) {
       return 'info';
     } else if (includeString(status, ['pending'])) {
       return 'warning';

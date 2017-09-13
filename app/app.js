@@ -736,7 +736,7 @@ angular.module('portainer', [
       }
     })
     .state('swarm', {
-      url: '/swarm/',
+      url: '/swarm',
       views: {
         'content@': {
           templateUrl: 'app/components/swarm/swarm.html',
