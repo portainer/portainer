@@ -118,37 +118,6 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
         return keyValueConstraints;
       }
       return [];
-    },
-    convertHumanToNumber: function(string) {
-      var re = new RegExp('^(.*)([kmg])$','i');
-      var matches = re.exec(string);
-      if (matches) {
-        var nb = parseInt(matches[1], 10);
-        if (matches[2].match(/k/i)) {
-          return nb * 1024;
-        } else if (matches[2].match(/m/i)) {
-          return nb * 1024 * 1024;
-        } else if (matches[2].match(/g/i)) {
-          return nb * 1024 * 1024 * 1024;
-        }
-      }
-      return parseInt(string, 10);
-    },
-    convertNumberToHuman: function(number) {
-      if (number % (1024 * 1024 * 1024) === 0) {
-        return number / (1024 * 1024 * 1024) + 'g';
-      } else if (number % (1024 * 1024) === 0) {
-        return number / (1024 * 1024) + 'm';
-      } else if (number % 1024 === 0) {
-        return number / 1024 + 'k';
-      }
-      return number;
-    },
-    convertNanoToUnit: function(number) {
-      return number / 1000000000;
-    },
-    convertUnitToNano: function(number) {
-      return number * 1000000000;
     }
   };
 }]);

@@ -211,11 +211,11 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     memoryReservation *= 1024 * 1024;
     config.TaskTemplate.Resources = {
       Limits: {
-        NanoCPUs: ServiceHelper.convertUnitToNano(service.LimitNanoCPUs),
+        NanoCPUs: service.LimitNanoCPUs * 1000000000,
         MemoryBytes: memoryLimit
       },
       Reservations: {
-        NanoCPUs: ServiceHelper.convertUnitToNano(service.ReservationNanoCPUs),
+        NanoCPUs: service.ReservationNanoCPUs * 1000000000,
         MemoryBytes: memoryReservation
       }
     };
@@ -298,8 +298,8 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
   }
 
   function transformResources(service) {
-    service.LimitNanoCPUs = ServiceHelper.convertNanoToUnit(service.LimitNanoCPUs) || 0;
-    service.ReservationNanoCPUs = ServiceHelper.convertNanoToUnit(service.ReservationNanoCPUs) || 0;
+    service.LimitNanoCPUs = service.LimitNanoCPUs / 1000000000 || 0;
+    service.ReservationNanoCPUs = service.ReservationNanoCPUs / 1000000000 || 0;
     service.LimitMemoryBytes = service.LimitMemoryBytes / 1024 / 1024 || 0;
     service.ReservationMemoryBytes = service.ReservationMemoryBytes / 1024 / 1024 || 0;
   }
