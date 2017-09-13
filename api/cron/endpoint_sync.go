@@ -24,12 +24,13 @@ type (
 	}
 
 	fileEndpoint struct {
-		Name      string `json:"Name"`
-		URL       string `json:"URL"`
-		TLS       bool   `json:"TLS,omitempty"`
-		TLSCACert string `json:"TLSCACert,omitempty"`
-		TLSCert   string `json:"TLSCert,omitempty"`
-		TLSKey    string `json:"TLSKey,omitempty"`
+		Name          string `json:"Name"`
+		URL           string `json:"URL"`
+		TLS           bool   `json:"TLS,omitempty"`
+		TLSSkipVerify bool   `json:"TLSSkipVerify,omitempty"`
+		TLSCACert     string `json:"TLSCACert,omitempty"`
+		TLSCert       string `json:"TLSCert,omitempty"`
+		TLSKey        string `json:"TLSKey,omitempty"`
 	}
 )
 
@@ -75,7 +76,7 @@ func convertFileEndpoints(fileEndpoints []fileEndpoint) []portainer.Endpoint {
 		}
 		if e.TLS {
 			endpoint.TLSConfig.TLS = true
-			endpoint.TLSConfig.TLSSkipVerify = false
+			endpoint.TLSConfig.TLSSkipVerify = e.TLSSkipVerify
 			endpoint.TLSConfig.TLSCACertPath = e.TLSCACert
 			endpoint.TLSConfig.TLSCertPath = e.TLSCert
 			endpoint.TLSConfig.TLSKeyPath = e.TLSKey
@@ -98,6 +99,7 @@ func endpointExists(endpoint *portainer.Endpoint, endpoints []portainer.Endpoint
 func mergeEndpointIfRequired(original, updated *portainer.Endpoint) *portainer.Endpoint {
 	var endpoint *portainer.Endpoint
 	if original.URL != updated.URL || original.TLSConfig.TLS != updated.TLSConfig.TLS ||
+		(updated.TLSConfig.TLS && original.TLSConfig.TLSSkipVerify != updated.TLSConfig.TLSSkipVerify) ||
 		(updated.TLSConfig.TLS && original.TLSConfig.TLSCACertPath != updated.TLSConfig.TLSCACertPath) ||
 		(updated.TLSConfig.TLS && original.TLSConfig.TLSCertPath != updated.TLSConfig.TLSCertPath) ||
 		(updated.TLSConfig.TLS && original.TLSConfig.TLSKeyPath != updated.TLSConfig.TLSKeyPath) {
@@ -105,11 +107,13 @@ func mergeEndpointIfRequired(original, updated *portainer.Endpoint) *portainer.E
 		endpoint.URL = updated.URL
 		if updated.TLSConfig.TLS {
 			endpoint.TLSConfig.TLS = true
+			endpoint.TLSConfig.TLSSkipVerify = updated.TLSConfig.TLSSkipVerify
 			endpoint.TLSConfig.TLSCACertPath = updated.TLSConfig.TLSCACertPath
 			endpoint.TLSConfig.TLSCertPath = updated.TLSConfig.TLSCertPath
 			endpoint.TLSConfig.TLSKeyPath = updated.TLSConfig.TLSKeyPath
 		} else {
 			endpoint.TLSConfig.TLS = false
+			endpoint.TLSConfig.TLSSkipVerify = false
 			endpoint.TLSConfig.TLSCACertPath = ""
 			endpoint.TLSConfig.TLSCertPath = ""
 			endpoint.TLSConfig.TLSKeyPath = ""
