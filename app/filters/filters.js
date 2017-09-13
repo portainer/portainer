@@ -37,6 +37,20 @@ angular.module('portainer.filters', [])
     }
   };
 })
+.filter('visualizerTask', function () {
+  'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (includeString(status, ['new', 'allocated', 'assigned', 'accepted', 'complete'])) {
+      return 'info';
+    } else if (includeString(status, ['pending'])) {
+      return 'warning';
+    } else if (includeString(status, ['shutdown', 'failed', 'rejected'])) {
+      return 'stopped';
+    }
+    return 'running';
+  };
+})
 .filter('taskstatusbadge', function () {
   'use strict';
   return function (text) {

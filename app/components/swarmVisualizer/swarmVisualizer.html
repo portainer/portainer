@@ -1,0 +1,42 @@
+<rd-header>
+  <rd-header-title title="Swarm visualizer">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="swarm.visualizer" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="swarm">Swarm</a> &gt; <a ui-sref="swarm.visualizer">Cluster visualizer</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+  </div>
+</div>
+
+<div class="row" ng-if="visualizerData">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title="Cluster visualizer"></rd-widget-header>
+      <rd-widget-body>
+        <div class="visualizer_container">
+          <div class="node" ng-repeat="node in visualizerData.nodes track by $index">
+            <div class="node_info">
+              <div>{{ node.Hostname }}</div>
+              <div>{{ node.Role }}</div>
+            </div>
+            <div class="tasks">
+              <div class="task task_{{ task.Status.State | visualizerTask }}" ng-repeat="task in node.Tasks track by $index">
+                <div class="service_name">{{ task.ServiceName }}</div>
+                <div>Image: {{ task.Spec.ContainerSpec.Image | hideshasum }}</div>
+                <div>Status: {{ task.Status.State }}</div>
+                <div>Update: {{ task.Updated }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
