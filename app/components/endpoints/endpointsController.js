@@ -2,7 +2,6 @@ angular.module('endpoints', [])
 .controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Notifications', 'Pagination',
 function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagination) {
   $scope.state = {
-    error: '',
     uploadInProgress: false,
     selectedItemCount: 0,
     pagination_count: Pagination.getPaginationCount('endpoints')
@@ -14,10 +13,7 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
     Name: '',
     URL: '',
     PublicURL: '',
-    TLS: false,
-    TLSCACert: null,
-    TLSCert: null,
-    TLSKey: null
+    SecurityFormData: new EndpointSecurityFormData()
   };
 
   $scope.order = function(sortType) {
@@ -47,23 +43,28 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
   };
 
   $scope.addEndpoint = function() {
-    $scope.state.error = '';
     var name = $scope.formValues.Name;
     var URL = $scope.formValues.URL;
     var PublicURL = $scope.formValues.PublicURL;
     if (PublicURL === '') {
       PublicURL = URL.split(':')[0];
     }
-    var TLS = $scope.formValues.TLS;
-    var TLSCAFile = $scope.formValues.TLSCACert;
-    var TLSCertFile = $scope.formValues.TLSCert;
-    var TLSKeyFile = $scope.formValues.TLSKey;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSCAFile, TLSCertFile, TLSKeyFile, false).then(function success(data) {
+
+    var securityData = $scope.formValues.SecurityFormData;
+    var TLS = securityData.TLS;
+    var TLSMode = securityData.TLSMode;
+    var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
+    var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
+    var TLSCAFile = TLSSkipVerify ? null : securityData.TLSCACert;
+    var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
+    var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
+
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
       Notifications.success('Endpoint created', name);
       $state.reload();
     }, function error(err) {
       $scope.state.uploadInProgress = false;
-      $scope.state.error = err.msg;
+      Notifications.error('Failure', err, 'Unable to create endpoint');
     }, function update(evt) {
       if (evt.upload) {
         $scope.state.uploadInProgress = evt.upload;
