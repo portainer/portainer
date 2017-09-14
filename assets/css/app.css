@@ -483,6 +483,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 
 .visualizer_container .node {
   border: 1px dashed #337ab7;
+  background-color: rgb(51, 122, 183);
   background-color: rgba(51, 122, 183, 0.1);
   border-radius: 4px;
   box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
@@ -520,24 +521,28 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .visualizer_container .node .tasks .task_running {
   border: 2px solid #23ae89;
   border-radius: 4px;
+  background-color: rgb(35, 174, 137);
   background-color: rgba(35, 174, 137, 0.2);
 }
 
 .visualizer_container .node .tasks .task_stopped {
   border: 2px solid #ae2323;
   border-radius: 4px;
+  background-color: rgb(174, 35, 35);
   background-color: rgba(174, 35, 35, 0.2);
 }
 
 .visualizer_container .node .tasks .task_warning {
   border: 2px solid #f0ad4e;
   border-radius: 4px;
+  background-color: rgb(240, 173, 78);
   background-color: rgba(240, 173, 78, 0.2);
 }
 
 .visualizer_container .node .tasks .task_info {
   border: 2px solid #46b8da;
   border-radius: 4px;
+  background-color: rgb(70, 184, 218);
   background-color: rgba(70, 184, 218, 0.2);
 }
 
