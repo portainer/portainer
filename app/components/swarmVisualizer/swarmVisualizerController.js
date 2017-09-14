@@ -3,6 +3,7 @@ angular.module('swarmVisualizer', [])
 function ($q, $scope, $document, NodeService, ServiceService, TaskService, Notifications) {
 
   $scope.state = {
+    ShowInformationPanel: true,
     DisplayOnlyRunningTasks: false
   };
 
