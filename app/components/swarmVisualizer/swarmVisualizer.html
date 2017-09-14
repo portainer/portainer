@@ -64,7 +64,15 @@
         <div class="visualizer_container">
           <div class="node" ng-repeat="node in visualizerData.nodes track by $index">
             <div class="node_info">
-              <div><b>{{ node.Hostname }}</b></div>
+              <div>
+                <div>
+                  <b>{{ node.Hostname }}</b>
+                  <span class="node_platform">
+                    <i class="fa fa-linux" aria-hidden="true" ng-if="node.PlatformOS === 'linux'"></i>
+                    <i class="fa fa-windows" aria-hidden="true" ng-if="node.PlatformOS === 'windows'"></i>
+                  </span>
+                </div>
+              </div>
               <div>{{ node.Role }}</div>
             </div>
             <div class="tasks">
