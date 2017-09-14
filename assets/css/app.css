@@ -500,6 +500,11 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   padding-bottom: 10px;
 }
 
+.visualizer_container .node .node_info .node_platform {
+  margin-left: 2px;
+  font-size: 16px;
+}
+
 .visualizer_container .node .tasks {
   display: flex;
   flex-direction: column;
