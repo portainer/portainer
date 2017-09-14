@@ -60,6 +60,7 @@ function ($q, $scope, $interval, $document, Notifications, Pagination, StoridgeC
       .then(function success(data) {
         $scope.events = data.events;
         var info = data.info;
+        $scope.info = info;
         updateIOPSChart(info, iopsChart);
         updateBandwithChart(info, bandwidthChart);
       })

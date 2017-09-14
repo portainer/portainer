@@ -29,7 +29,7 @@
                 <td>Provisioned capacity</td>
                 <td>
                   {{ info.ProvisionedCapacity | humansize }}
-                  <span ng-if="+(info.ProvisionedCapacity) >= +(info.ProvisionedCapacity)">
+                  <span ng-if="+(info.ProvisionedCapacity) >= +(info.TotalCapacity)">
                     <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
                   </span>
                 </td>
@@ -51,6 +51,29 @@
         <div class="chart-container" style="position: relative;">
           <canvas id="iopsChart" width="770" height="300"></canvas>
         </div>
+        <div style="margin-top: 10px;" ng-if="info">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>IOPS available</td>
+                <td>{{ ((info.FreeIOPS * 100) / info.TotalIOPS).toFixed(1) }}%</td>
+              </tr>
+              <tr>
+                <td>Provisioned IOPS</td>
+                <td>
+                  {{ info.ProvisionedIOPS }}
+                  <span ng-if="+(info.ProvisionedIOPS) >= +(info.TotalIOPS)">
+                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Total IOPS</td>
+                <td>{{ info.TotalIOPS }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </rd-widget-body>
     </rd-widget>
   </div>
@@ -60,6 +83,29 @@
       <rd-widget-body>
         <div class="chart-container" style="position: relative;">
           <canvas id="bandwithChart" width="770" height="300"></canvas>
+        </div>
+        <div style="margin-top: 10px;" ng-if="info">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>Bandwidth available</td>
+                <td>{{ ((info.FreeBandwidth * 100) / info.TotalBandwidth).toFixed(1) }}%</td>
+              </tr>
+              <tr>
+                <td>Provisioned bandwidth</td>
+                <td>
+                  {{ info.ProvisionedBandwidth | humansize }}
+                  <span ng-if="+(info.ProvisionedBandwidth) >= +(info.TotalBandwidth)">
+                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Total bandwidth</td>
+                <td>{{ info.TotalBandwidth | humansize }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </rd-widget-body>
     </rd-widget>
