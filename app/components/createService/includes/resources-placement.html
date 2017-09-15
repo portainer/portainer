@@ -1,5 +1,48 @@
 <form class="form-horizontal" style="margin-top: 15px;">
   <div class="form-group">
+    <!-- cpu-reservation-input -->
+    <label for="cpu-reservation" class="col-sm-2 control-label text-left">CPU reservation<portainer-tooltip position="top" message="Minimum CPU available on a node to run a task"></portainer-tooltip></label>
+    <div class="col-sm-4">
+      <input type="number" step="0.1" class="form-control" ng-model="formValues.CpuReservation" id="cpu-limit" placeholder="e.g. 0.3">
+    </div>
+    <!-- !cpu-reservation-input -->
+    <!-- cpu-limit-input -->
+    <label for="cpu-limit" class="col-sm-2 control-label text-left">CPU limit<portainer-tooltip position="top" message="Maximum CPU usage per task (set to 0 for unlimited)"></portainer-tooltip></label>
+    <div class="col-sm-4">
+      <input type="number" step="0.1" class="form-control" ng-model="formValues.CpuLimit" id="cpu-limit" placeholder="e.g. 0.5">
+    </div>
+    <!-- !cpu-limit-input -->
+  </div>
+  <div class="form-group">
+    <!-- memory-reservation-input -->
+    <label for="memory-reservation" class="col-sm-2 control-label text-left">Memory reservation<portainer-tooltip position="top" message="Minimum memory available on a node to run a task"></portainer-tooltip></label>
+    <div class="col-sm-2">
+      <input type="number" step="0.125" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation" placeholder="e.g. 64">
+    </div>
+    <div class="col-sm-2">
+      <select class="form-control" ng-model="formValues.MemoryReservationUnit">
+        <option value="MB">MB</option>
+        <option value="GB">GB</option>
+      </select>
+    </div>
+    <!-- !memory-reservation-input -->
+    <!-- memory-limit-input -->
+    <label for="memory-limit" class="col-sm-2 control-label text-left">Memory limit<portainer-tooltip position="top" message="Maximum memory usage per task (set to 0 for unlimited)"></portainer-tooltip></label>
+    <div class="col-sm-2">
+      <input type="number" step="0.125" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit" placeholder="e.g. 128">
+    </div>
+    <div class="col-sm-2">
+      <select class="form-control" ng-model="formValues.MemoryLimitUnit">
+        <option value="MB">MB</option>
+        <option value="GB">GB</option>
+      </select>
+    </div>
+    <!-- !memory-limit-input -->
+  </div>
+</form>
+
+<form class="form-horizontal" style="margin-top: 15px;">
+  <div class="form-group">
     <div class="col-sm-12" style="margin-top: 5px;">
       <label class="control-label text-left">Placement constraints</label>
       <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPlacementConstraint()">
