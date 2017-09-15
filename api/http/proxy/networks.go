@@ -7,13 +7,13 @@ import (
 )
 
 const (
-	// ErrDockerNetworkIdentifierNotFound defines an error raised when Portainer is unable to find a container identifier
+	// ErrDockerNetworkIdentifierNotFound defines an error raised when Portainer is unable to find a network identifier
 	ErrDockerNetworkIdentifierNotFound = portainer.Error("Docker network identifier not found")
 	networkIdentifier                  = "Id"
 )
 
-// networkListOperation extracts the response as a JSON object, loop through the containers array
-// decorate and/or filter the containers based on resource controls before rewriting the response
+// networkListOperation extracts the response as a JSON object, loop through the networks array
+// decorate and/or filter the networks based on resource controls before rewriting the response
 func networkListOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
 	var err error
 	// NetworkList response is a JSON array
@@ -24,9 +24,9 @@ func networkListOperation(request *http.Request, response *http.Response, execut
 	}
 
 	if executor.operationContext.isAdmin {
-		responseArray, err = decorateContainerList(responseArray, executor.operationContext.resourceControls)
+		responseArray, err = decorateNetworkList(responseArray, executor.operationContext.resourceControls)
 	} else {
-		responseArray, err = filterContainerList(responseArray, executor.operationContext.resourceControls,
+		responseArray, err = filterNetworkList(responseArray, executor.operationContext.resourceControls,
 			executor.operationContext.userID, executor.operationContext.userTeamIDs)
 	}
 	if err != nil {
@@ -38,7 +38,7 @@ func networkListOperation(request *http.Request, response *http.Response, execut
 
 // networkInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the network based on resource control and either rewrite an access denied response
-// or a decorated container.
+// or a decorated network.
 func networkInspectOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
 	// NetworkInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
