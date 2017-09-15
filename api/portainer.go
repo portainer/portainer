@@ -399,4 +399,6 @@ const (
 	ServiceResourceControl
 	// VolumeResourceControl represents a resource control associated to a Docker volume
 	VolumeResourceControl
+	// SecretResourceControl represents a resource control associated to a Docker secret
+	SecretResourceControl
 )
