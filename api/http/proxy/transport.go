@@ -53,17 +53,20 @@ func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Resp
 func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Response, error) {
 	path := request.URL.Path
 
-	if strings.HasPrefix(path, "/containers") {
+	switch {
+	case strings.HasPrefix(path, "/containers"):
 		return p.proxyContainerRequest(request)
-	} else if strings.HasPrefix(path, "/services") {
+	case strings.HasPrefix(path, "/services"):
 		return p.proxyServiceRequest(request)
-	} else if strings.HasPrefix(path, "/volumes") {
+	case strings.HasPrefix(path, "/volumes"):
 		return p.proxyVolumeRequest(request)
-	} else if strings.HasPrefix(path, "/swarm") {
+	case strings.HasPrefix(path, "/networks"):
+		return p.proxyNetworkRequest(request)
+	case strings.HasPrefix(path, "/swarm"):
 		return p.proxySwarmRequest(request)
+	default:
+		return p.executeDockerRequest(request)
 	}
-
-	return p.executeDockerRequest(request)
 }
 
 func (p *proxyTransport) proxyContainerRequest(request *http.Request) (*http.Response, error) {
@@ -139,6 +142,24 @@ func (p *proxyTransport) proxyVolumeRequest(request *http.Request) (*http.Respon
 		// assume /volumes/{name}
 		if request.Method == http.MethodGet {
 			return p.rewriteOperation(request, volumeInspectOperation)
+		}
+		volumeID := path.Base(requestPath)
+		return p.restrictedOperation(request, volumeID)
+	}
+}
+
+func (p *proxyTransport) proxyNetworkRequest(request *http.Request) (*http.Response, error) {
+	switch requestPath := request.URL.Path; requestPath {
+	case "/networks/create":
+		return p.executeDockerRequest(request)
+
+	case "/networks":
+		return p.rewriteOperation(request, networkListOperation)
+
+	default:
+		// assume /networks/{name}
+		if request.Method == http.MethodGet {
+			return p.rewriteOperation(request, networkInspectOperation)
 		}
 		volumeID := path.Base(requestPath)
 		return p.restrictedOperation(request, volumeID)

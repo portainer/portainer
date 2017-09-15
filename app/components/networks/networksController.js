@@ -1,6 +1,6 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Notifications', 'Pagination',
-function ($scope, $state, Network, Notifications, Pagination) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'NetworkService', 'Notifications', 'Pagination',
+function ($scope, $state, Network, NetworkService, Notifications, Pagination) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('networks');
   $scope.state.selectedItemCount = 0;
@@ -9,6 +9,10 @@ function ($scope, $state, Network, Notifications, Pagination) {
   $scope.sortReverse = false;
   $scope.config = {
     Name: ''
+  };
+
+  $scope.formValues = {
+    AccessControlData: new AccessControlFormData()
   };
 
   $scope.changePaginationCount = function() {
@@ -99,13 +103,17 @@ function ($scope, $state, Network, Notifications, Pagination) {
 
   function initView() {
     $('#loadNetworksSpinner').show();
-    Network.query({}, function (d) {
-      $scope.networks = d;
-      $('#loadNetworksSpinner').hide();
-    }, function (e) {
-      $('#loadNetworksSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to retrieve networks');
+
+    NetworkService.networks(true, true, true, true)
+    .then(function success(data) {
+      $scope.networks = data;
+    })
+    .catch(function error(err) {
       $scope.networks = [];
+      Notifications.error('Failure', err, 'Unable to retrieve networks');
+    })
+    .finally(function final() {
+      $('#loadNetworksSpinner').hide();
     });
   }
 
