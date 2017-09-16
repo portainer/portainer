@@ -11,52 +11,6 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-plus" title="Add a network">
-      </rd-widget-header>
-      <rd-widget-body>
-        <form class="form-horizontal">
-          <!-- name-input -->
-          <div class="form-group">
-            <label for="network_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="config.Name" id="network_name" placeholder="e.g. myNetwork">
-            </div>
-          </div>
-          <!-- !name-input -->
-          <!-- tag-note -->
-          <div class="form-group" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-            <div class="col-sm-12">
-              <span class="small text-muted">Note: The network will be created using the overlay driver and will allow containers to communicate across the hosts of your cluster.</span>
-            </div>
-          </div>
-          <div class="form-group" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'">
-            <div class="col-sm-12">
-              <span class="small text-muted">Note: The network will be created using the bridge driver and default options.</span>
-            </div>
-          </div>
-          <!-- !tag-note -->
-          <!-- access-control -->
-          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
-          <!-- !access-control -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Name" ng-click="createNetwork()">Create</button>
-              <button type="button" class="btn btn-primary btn-sm" ui-sref="actions.create.network">Advanced settings...</button>
-              <i id="createNetworkSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
-            </div>
-          </div>
-        </form>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
       <rd-widget-header icon="fa-sitemap" title="Networks">
         <div class="pull-right">
           Items per page:
@@ -72,6 +26,7 @@
       <rd-widget-taskbar classes="col-lg-12">
         <div class="pull-left">
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+          <a class="btn btn-primary" type="button" ui-sref="actions.create.network"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add network</a>
         </div>
         <div class="pull-right">
           <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
