@@ -9,13 +9,14 @@ import (
 const (
 	// ErrDockerSecretIdentifierNotFound defines an error raised when Portainer is unable to find a secret identifier
 	ErrDockerSecretIdentifierNotFound = portainer.Error("Docker secret identifier not found")
-	secretIdentifier                  = "Id"
+	secretIdentifier                  = "ID"
 )
 
 // secretListOperation extracts the response as a JSON object, loop through the secrets array
 // decorate and/or filter the secrets based on resource controls before rewriting the response
 func secretListOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
 	var err error
+
 	// SecretList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/SecretList
 	responseArray, err := getResponseAsJSONArray(response)

@@ -1,6 +1,6 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', '$state', '$stateParams', '$filter', 'Network', 'Container', 'ContainerHelper', 'Notifications',
-function ($scope, $state, $stateParams, $filter, Network, Container, ContainerHelper, Notifications) {
+.controller('NetworkController', ['$scope', '$state', '$stateParams', '$filter', 'Network', 'NetworkService', 'Container', 'ContainerHelper', 'Notifications',
+function ($scope, $state, $stateParams, $filter, Network, NetworkService, Container, ContainerHelper, Notifications) {
 
   $scope.removeNetwork = function removeNetwork(networkId) {
     $('#loadingViewSpinner').show();
@@ -82,7 +82,7 @@ function ($scope, $state, $stateParams, $filter, Network, Container, ContainerHe
 
   function initView() {
     $('#loadingViewSpinner').show();
-    Network.get({id: $stateParams.id}).$promise
+    NetworkService.network($stateParams.id)
     .then(function success(data) {
       $scope.network = data;
       var endpointProvider = $scope.applicationState.endpoint.mode.provider;

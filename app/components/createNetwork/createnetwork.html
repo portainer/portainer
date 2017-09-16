@@ -121,6 +121,9 @@
             </div>
           </div>
           <!-- !internal -->
+          <!-- access-control -->
+          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions
@@ -129,7 +132,8 @@
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Name" ng-click="create()">Create network</button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="networks">Cancel</a>
-              <i id="createNetworkSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
           <!-- !actions -->
