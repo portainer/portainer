@@ -61,6 +61,7 @@ type (
 		Name                string `valid:"required"`
 		URL                 string `valid:"required"`
 		PublicURL           string `valid:"-"`
+		Local               bool
 		TLS                 bool
 		TLSSkipVerify       bool
 		TLSSkipClientVerify bool
@@ -139,7 +140,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		AuthorizedTeams: []portainer.TeamID{},
 	}
 
-	if req.Name == "local" && req.URL == "" {
+	if req.Local && req.URL == "" {
 		switch runtime.GOOS {
 		case "linux":
 			endpoint.URL = "unix:///var/run/docker.sock"

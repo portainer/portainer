@@ -51,6 +51,7 @@ angular.module('portainer.services')
   service.createLocalEndpoint = function(name, URL, TLS, active) {
     var endpoint = {
       Name: 'local',
+      Local: true,
       TLS: false
     };
     return Endpoints.create({}, endpoint).$promise;
