@@ -38,7 +38,7 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 	switch endpointURL.Scheme {
 	case "tcp":
 		{
-			if endpoint.TLS {
+			if endpoint.TLSConfig.TLS {
 				proxy, err = manager.proxyFactory.newHTTPSProxy(endpointURL, endpoint)
 				if err != nil {
 					return nil, err

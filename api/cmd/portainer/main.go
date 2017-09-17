@@ -191,12 +191,15 @@ func main() {
 		}
 		if len(endpoints) == 0 {
 			endpoint := &portainer.Endpoint{
-				Name:            "primary",
-				URL:             *flags.Endpoint,
-				TLS:             *flags.TLSVerify,
-				TLSCACertPath:   *flags.TLSCacert,
-				TLSCertPath:     *flags.TLSCert,
-				TLSKeyPath:      *flags.TLSKey,
+				Name: "primary",
+				URL:  *flags.Endpoint,
+				TLSConfig: portainer.TLSConfiguration{
+					TLS:           *flags.TLSVerify,
+					TLSSkipVerify: false,
+					TLSCACertPath: *flags.TLSCacert,
+					TLSCertPath:   *flags.TLSCert,
+					TLSKeyPath:    *flags.TLSKey,
+				},
 				AuthorizedUsers: []portainer.UserID{},
 				AuthorizedTeams: []portainer.TeamID{},
 			}

@@ -34,6 +34,9 @@ func (proxy *localProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add(k, v)
 		}
 	}
+
+	w.WriteHeader(res.StatusCode)
+
 	if _, err := io.Copy(w, res.Body); err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, nil)
 	}

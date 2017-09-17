@@ -103,12 +103,41 @@
                 </div>
               </div>
               <!-- !tls-checkbox -->
-              <!-- tls-certs -->
+              <!-- tls-options -->
               <div ng-if="formValues.TLS">
-                <!-- ca-input -->
+                <!-- skip-server-verification -->
                 <div class="form-group">
-                  <label class="col-sm-3 control-label text-left">TLS CA certificate</label>
-                  <div class="col-sm-9">
+                  <div class="col-sm-10">
+                    <label for="tls_verify" class="control-label text-left">
+                      Skip server verification
+                      <portainer-tooltip position="bottom" message="Enable this option if you need to authenticate server based on given CA."></portainer-tooltip>
+                    </label>
+                    <label class="switch" style="margin-left: 20px;">
+                      <input type="checkbox" ng-model="formValues.TLSSkipVerify"><i></i>
+                    </label>
+                  </div>
+                </div>
+                <!-- !skip-server-verification -->
+                <!-- skip-client-verification -->
+                <div class="form-group">
+                  <div class="col-sm-10">
+                    <label for="tls_client_cert" class="control-label text-left">
+                      Skip client verification
+                      <portainer-tooltip position="bottom" message="Enable this option if you need to authenticate with a client certificate."></portainer-tooltip>
+                    </label>
+                    <label class="switch" style="margin-left: 20px;">
+                      <input type="checkbox" ng-model="formValues.TLSSKipClientVerify"><i></i>
+                    </label>
+                  </div>
+                </div>
+                <!-- !skip-client-verification -->
+                <div class="col-sm-12 form-section-title" ng-if="!formValues.TLSSkipVerify || !formValues.TLSSKipClientVerify">
+                  Required TLS files
+                </div>
+                <!-- ca-input -->
+                <div class="form-group" ng-if="!formValues.TLSSkipVerify">
+                  <label class="col-sm-4 col-lg-3 control-label text-left">TLS CA certificate</label>
+                  <div class="col-sm-8 col-lg-9">
                     <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
                     <span style="margin-left: 5px;">
                       {{ formValues.TLSCACert.name }}
@@ -118,38 +147,40 @@
                   </div>
                 </div>
                 <!-- !ca-input -->
-                <!-- cert-input -->
-                <div class="form-group">
-                  <label for="tls_cert" class="col-sm-3 control-label text-left">TLS certificate</label>
-                  <div class="col-sm-9">
-                    <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
-                    <span style="margin-left: 5px;">
-                      {{ formValues.TLSCert.name }}
-                      <i class="fa fa-times red-icon" ng-if="!formValues.TLSCert" aria-hidden="true"></i>
-                      <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
-                    </span>
+                <div ng-if="!formValues.TLSSKipClientVerify">
+                  <!-- cert-input -->
+                  <div class="form-group">
+                    <label for="tls_cert" class="col-sm-4 col-lg-3 control-label text-left">TLS certificate</label>
+                    <div class="col-sm-8 col-lg-9">
+                      <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
+                      <span style="margin-left: 5px;">
+                        {{ formValues.TLSCert.name }}
+                        <i class="fa fa-times red-icon" ng-if="!formValues.TLSCert" aria-hidden="true"></i>
+                        <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <!-- !cert-input -->
-                <!-- key-input -->
-                <div class="form-group">
-                  <label class="col-sm-3 control-label text-left">TLS key</label>
-                  <div class="col-sm-9">
-                    <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
-                    <span style="margin-left: 5px;">
-                      {{ formValues.TLSKey.name }}
-                      <i class="fa fa-times red-icon" ng-if="!formValues.TLSKey" aria-hidden="true"></i>
-                      <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
-                    </span>
+                  <!-- !cert-input -->
+                  <!-- key-input -->
+                  <div class="form-group">
+                    <label class="col-sm-4 col-lg-3 control-label text-left">TLS key</label>
+                    <div class="col-sm-8 col-lg-9">
+                      <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
+                      <span style="margin-left: 5px;">
+                        {{ formValues.TLSKey.name }}
+                        <i class="fa fa-times red-icon" ng-if="!formValues.TLSKey" aria-hidden="true"></i>
+                        <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+                      </span>
+                    </div>
                   </div>
+                  <!-- !key-input -->
                 </div>
-                <!-- !key-input -->
               </div>
-              <!-- !tls-certs -->
+              <!-- !tls-options -->
               <!-- actions -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && (!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey))" ng-click="createRemoteEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
+                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (!formValues.TLSSKipClientVerify && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="createRemoteEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
                   <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
                 </div>
               </div>
