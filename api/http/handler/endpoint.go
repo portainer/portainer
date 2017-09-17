@@ -140,7 +140,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		AuthorizedTeams: []portainer.TeamID{},
 	}
 
-	if req.Local && req.URL == "" {
+	if req.Local {
 		switch runtime.GOOS {
 		case "linux":
 			endpoint.URL = "unix:///var/run/docker.sock"
