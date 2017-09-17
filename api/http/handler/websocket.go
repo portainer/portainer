@@ -15,8 +15,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/Microsoft/go-winio"
+	"github.com/gorilla/mux"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
 	"golang.org/x/net/websocket"
