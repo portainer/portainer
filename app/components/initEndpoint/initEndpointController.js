@@ -29,7 +29,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var name = 'local';
 
     var endpointID = 1;
-    EndpointService.createLocalEndpoint(name, URL, false, true)
+    EndpointService.createLocalEndpoint(name, false, true)
     .then(function success(data) {
       endpointID = data.Id;
       EndpointProvider.setEndpointID(endpointID);
