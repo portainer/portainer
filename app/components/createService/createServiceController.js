@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper',
-function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService',
+function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService) {
 
   $scope.formValues = {
     Name: '',
@@ -35,6 +35,14 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     MemoryReservation: 0,
     MemoryLimitUnit: 'MB',
     MemoryReservationUnit: 'MB'
+  };
+
+  $scope.cpuSliderOptions = {
+    floor: 0,
+    ceil: 32,
+    step: 0.25,
+    precision: 2,
+    showSelectionBar: true
   };
 
   $scope.state = {
@@ -349,16 +357,28 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   function initView() {
     $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    var provider = $scope.applicationState.endpoint.mode.provider;
 
     $q.all({
       volumes: VolumeService.volumes(),
       secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
-      networks: NetworkService.networks(true, true, false, false)
+      networks: NetworkService.networks(true, true, false, false),
+      nodes: provider !== 'DOCKER_SWARM_MODE' || NodeService.nodes()
     })
     .then(function success(data) {
       $scope.availableVolumes = data.volumes;
       $scope.availableNetworks = data.networks;
       $scope.availableSecrets = data.secrets;
+      // Set max cpu value
+      var maxCpus = 0;
+      for (var n in data.nodes) {
+        if (data.nodes[n].CPUs && data.nodes[n].CPUs > maxCpus) {
+          maxCpus = data.nodes[n].CPUs;
+        }
+      }
+      if (maxCpus > 0) {
+        $scope.cpuSliderOptions.ceil = maxCpus / 1000000000;
+      }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');

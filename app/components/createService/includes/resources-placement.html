@@ -3,13 +3,13 @@
     <!-- cpu-reservation-input -->
     <label for="cpu-reservation" class="col-sm-2 control-label text-left">CPU reservation<portainer-tooltip position="top" message="Minimum CPU available on a node to run a task"></portainer-tooltip></label>
     <div class="col-sm-4">
-      <input type="number" step="0.25" min="0" max="32" class="form-control" ng-model="formValues.CpuReservation" id="cpu-limit" placeholder="e.g. 0.3">
+      <rzslider rz-slider-options="cpuSliderOptions" rz-slider-model="formValues.CpuReservation" id="cpu-reservation"></rzslider>
     </div>
     <!-- !cpu-reservation-input -->
     <!-- cpu-limit-input -->
     <label for="cpu-limit" class="col-sm-2 control-label text-left">CPU limit<portainer-tooltip position="top" message="Maximum CPU usage per task (set to 0 for unlimited)"></portainer-tooltip></label>
     <div class="col-sm-4">
-      <input type="number" step="0.25" min="0" max="32" class="form-control" ng-model="formValues.CpuLimit" id="cpu-limit" placeholder="e.g. 0.5">
+      <rzslider rz-slider-options="cpuSliderOptions" rz-slider-model="formValues.CpuLimit" id="cpu-limit"></rzslider>
     </div>
     <!-- !cpu-limit-input -->
   </div>

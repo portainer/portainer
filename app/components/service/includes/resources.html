@@ -8,6 +8,16 @@
           <tr>
             <td>CPU limit<portainer-tooltip position="top" message="Maximum CPU usage per task (set to 0 for unlimited)"></portainer-tooltip></td>
             <td>
+              <rzslider rz-slider-options="cpuSliderOptions" rz-slider-model="service.LimitNanoCPUs" ng-model="service.LimitNanoCPUs" ng-change="updateServiceAttribute(service, 'LimitNanoCPUs')" ng-disabled="isUpdating"></rzslider>
+            </td>
+            <td>CPU reservation<portainer-tooltip position="top" message="Minimum CPU available on a node to run a task"></portainer-tooltip></td>
+            <td>
+              <rzslider rz-slider-options="cpuSliderOptions" rz-slider-model="service.ReservationNanoCPUs" ng-model="service.ReservationNanoCPUs" ng-change="updateServiceAttribute(service, 'ReservationNanoCPUs')" ng-disabled="isUpdating"></rzslider>
+            </td>
+          </tr>
+          <tr>
+            <td>CPU limit<portainer-tooltip position="top" message="Maximum CPU usage per task (set to 0 for unlimited)"></portainer-tooltip></td>
+            <td>
               <input class="input-sm" type="number" step="0.25" min="0" max="32" ng-model="service.LimitNanoCPUs" ng-change="updateServiceAttribute(service, 'LimitNanoCPUs')" ng-disabled="isUpdating"/>
             </td>
             <td>CPU reservation<portainer-tooltip position="top" message="Minimum CPU available on a node to run a task"></portainer-tooltip></td>
