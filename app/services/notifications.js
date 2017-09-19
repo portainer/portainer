@@ -24,7 +24,9 @@ angular.module('portainer.services')
     } else if (e.data && e.data.err) {
       msg = e.data.err;
     }
-    toastr.error($sanitize(msg), $sanitize(title), {timeOut: 6000});
+    if (msg !== 'Invalid JWT token') {
+      toastr.error($sanitize(msg), $sanitize(title), {timeOut: 6000});
+    }
   };
 
   return service;
