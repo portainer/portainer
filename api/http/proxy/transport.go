@@ -68,6 +68,8 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxySwarmRequest(request)
 	case strings.HasPrefix(path, "/nodes"):
 		return p.proxyNodeRequest(request)
+	case strings.HasPrefix(path, "/tasks"):
+		return p.proxyTaskRequest(request)
 	default:
 		return p.executeDockerRequest(request)
 	}
@@ -201,6 +203,16 @@ func (p *proxyTransport) proxyNodeRequest(request *http.Request) (*http.Response
 
 func (p *proxyTransport) proxySwarmRequest(request *http.Request) (*http.Response, error) {
 	return p.administratorOperation(request)
+}
+
+func (p *proxyTransport) proxyTaskRequest(request *http.Request) (*http.Response, error) {
+	switch requestPath := request.URL.Path; requestPath {
+	case "/tasks":
+		return p.rewriteOperation(request, taskListOperation)
+	default:
+		// assume /tasks/{id}
+		return p.executeDockerRequest(request)
+	}
 }
 
 // restrictedOperation ensures that the current user has the required authorizations
