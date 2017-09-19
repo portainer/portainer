@@ -62,6 +62,8 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxyVolumeRequest(request)
 	case strings.HasPrefix(path, "/networks"):
 		return p.proxyNetworkRequest(request)
+	case strings.HasPrefix(path, "/secrets"):
+		return p.proxySecretRequest(request)
 	case strings.HasPrefix(path, "/swarm"):
 		return p.proxySwarmRequest(request)
 	default:
@@ -157,12 +159,30 @@ func (p *proxyTransport) proxyNetworkRequest(request *http.Request) (*http.Respo
 		return p.rewriteOperation(request, networkListOperation)
 
 	default:
-		// assume /networks/{name}
+		// assume /networks/{id}
 		if request.Method == http.MethodGet {
 			return p.rewriteOperation(request, networkInspectOperation)
 		}
-		volumeID := path.Base(requestPath)
-		return p.restrictedOperation(request, volumeID)
+		networkID := path.Base(requestPath)
+		return p.restrictedOperation(request, networkID)
+	}
+}
+
+func (p *proxyTransport) proxySecretRequest(request *http.Request) (*http.Response, error) {
+	switch requestPath := request.URL.Path; requestPath {
+	case "/secrets/create":
+		return p.executeDockerRequest(request)
+
+	case "/secrets":
+		return p.rewriteOperation(request, secretListOperation)
+
+	default:
+		// assume /secrets/{id}
+		if request.Method == http.MethodGet {
+			return p.rewriteOperation(request, secretInspectOperation)
+		}
+		secretID := path.Base(requestPath)
+		return p.restrictedOperation(request, secretID)
 	}
 }
 

@@ -401,4 +401,6 @@ const (
 	VolumeResourceControl
 	// NetworkResourceControl represents a resource control associated to a Docker network
 	NetworkResourceControl
+	// SecretResourceControl represents a resource control associated to a Docker secret
+	SecretResourceControl
 )
