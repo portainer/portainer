@@ -47,7 +47,7 @@ css:
   - bower_components/font-awesome/css/font-awesome.min.css
   - bower_components/toastr/toastr.min.css
   - bower_components/xterm.js/dist/xterm.css
-  - bower_components/angularjs-slider/dist/rzslider.css
+  - bower_components/angularjs-slider/rzslider.min.css
 angular:
   regular:
   - bower_components/angular/angular.js
