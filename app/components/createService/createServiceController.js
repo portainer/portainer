@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService',
-function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService',
+function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService) {
 
   $scope.formValues = {
     Name: '',
@@ -37,16 +37,14 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     MemoryReservationUnit: 'MB'
   };
 
-  $scope.cpuSliderOptions = {
-    floor: 0,
-    ceil: 32,
-    step: 0.25,
-    precision: 2,
-    showSelectionBar: true
-  };
-
   $scope.state = {
     formValidationError: ''
+  };
+
+  $scope.refreshSlider = function () {
+    $timeout(function () {
+      $scope.$broadcast('rzSliderForceRender');
+    });
   };
 
   $scope.addPortBinding = function() {
@@ -363,7 +361,7 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
       volumes: VolumeService.volumes(),
       secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
       networks: NetworkService.networks(true, true, false, false),
-      nodes: provider !== 'DOCKER_SWARM_MODE' || NodeService.nodes()
+      nodes: NodeService.nodes()
     })
     .then(function success(data) {
       $scope.availableVolumes = data.volumes;
@@ -377,7 +375,9 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
         }
       }
       if (maxCpus > 0) {
-        $scope.cpuSliderOptions.ceil = maxCpus / 1000000000;
+        $scope.state.sliderMaxCpu = maxCpus / 1000000000;
+      } else {
+        $scope.state.sliderMaxCpu = 32;
       }
     })
     .catch(function error(err) {

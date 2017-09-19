@@ -13,14 +13,6 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
   var originalService = {};
   var previousServiceValues = [];
 
-  $scope.cpuSliderOptions = {
-    floor: 0,
-    ceil: 32,
-    step: 0.25,
-    precision: 2,
-    showSelectionBar: true
-  };
-
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
@@ -347,7 +339,9 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
         }
       }
       if (maxCpus > 0) {
-        $scope.cpuSliderOptions.ceil = maxCpus / 1000000000;
+        $scope.state.sliderMaxCpu = maxCpus / 1000000000;
+      } else {
+        $scope.state.sliderMaxCpu = 32;
       }
 
       $timeout(function() {

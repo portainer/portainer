@@ -133,7 +133,7 @@
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
           <li class="interactive" ng-if="applicationState.endpoint.apiVersion >= 1.25"><a data-target="#secrets" data-toggle="tab">Secrets</a></li>
-          <li class="interactive"><a data-target="#resources-placement" data-toggle="tab">Resources & Placement</a></li>
+          <li class="interactive"><a data-target="#resources-placement" data-toggle="tab" ng-click="refreshSlider()">Resources & Placement</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
