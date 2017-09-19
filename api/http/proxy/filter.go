@@ -110,3 +110,28 @@ func filterServiceList(serviceData []interface{}, resourceControls []portainer.R
 
 	return filteredServiceData, nil
 }
+
+// filterNetworkList loops through all networks, filters networks without any resource control (public resources) or with
+// any resource control giving access to the user (these networks will be decorated).
+// Network object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
+func filterNetworkList(networkData []interface{}, resourceControls []portainer.ResourceControl, userID portainer.UserID, userTeamIDs []portainer.TeamID) ([]interface{}, error) {
+	filteredNetworkData := make([]interface{}, 0)
+
+	for _, network := range networkData {
+		networkObject := network.(map[string]interface{})
+		if networkObject[networkIdentifier] == nil {
+			return nil, ErrDockerNetworkIdentifierNotFound
+		}
+
+		networkID := networkObject[networkIdentifier].(string)
+		resourceControl := getResourceControlByResourceID(networkID, resourceControls)
+		if resourceControl == nil {
+			filteredNetworkData = append(filteredNetworkData, networkObject)
+		} else if resourceControl != nil && canUserAccessResource(userID, userTeamIDs, resourceControl) {
+			networkObject = decorateObject(networkObject, resourceControl)
+			filteredNetworkData = append(filteredNetworkData, networkObject)
+		}
+	}
+
+	return filteredNetworkData, nil
+}

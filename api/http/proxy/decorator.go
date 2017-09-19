@@ -82,6 +82,30 @@ func decorateServiceList(serviceData []interface{}, resourceControls []portainer
 	return decoratedServiceData, nil
 }
 
+// decorateNetworkList loops through all networks and will decorate any network with an existing resource control.
+// Network object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
+func decorateNetworkList(networkData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+	decoratedNetworkData := make([]interface{}, 0)
+
+	for _, network := range networkData {
+
+		networkObject := network.(map[string]interface{})
+		if networkObject[networkIdentifier] == nil {
+			return nil, ErrDockerNetworkIdentifierNotFound
+		}
+
+		networkID := networkObject[networkIdentifier].(string)
+		resourceControl := getResourceControlByResourceID(networkID, resourceControls)
+		if resourceControl != nil {
+			networkObject = decorateObject(networkObject, resourceControl)
+		}
+
+		decoratedNetworkData = append(decoratedNetworkData, networkObject)
+	}
+
+	return decoratedNetworkData, nil
+}
+
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {
 	metadata := make(map[string]interface{})
 	metadata["ResourceControl"] = resourceControl
