@@ -7,16 +7,27 @@
         <tbody>
           <tr>
             <td style="vertical-align : middle;">
-              <div>
-                CPU limit
-              </div>
+              Memory reservation (MB)
             </td>
             <td>
-              <por-slider model="service.LimitNanoCPUs" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="service && state.sliderMaxCpu" on-change="updateServiceAttribute(service, 'LimitNanoCPUs')"></por-slider>
+              <input class="input-sm" type="number" step="0.125" min="0" ng-model="service.ReservationMemoryBytes" ng-change="updateServiceAttribute(service, 'ReservationMemoryBytes')" ng-disabled="isUpdating"/>
             </td>
             <td style="vertical-align : middle;">
               <p class="small text-muted">
-                Maximum CPU usage per task
+                Minimum memory available on a node to run a task (set to 0 for unlimited)
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align : middle;">
+              Memory limit (MB)
+            </td>
+            <td>
+              <input class="input-sm" type="number" step="0.125" min="0" ng-model="service.LimitMemoryBytes" ng-change="updateServiceAttribute(service, 'LimitMemoryBytes')" ng-disabled="isUpdating"/>
+            </td>
+            <td style="vertical-align : middle;">
+              <p class="small text-muted">
+                Maximum memory usage per task (set to 0 for unlimited)
               </p>
             </td>
           </tr>
@@ -37,27 +48,16 @@
           </tr>
           <tr>
             <td style="vertical-align : middle;">
-              Memory limit (MB)
+              <div>
+                CPU limit
+              </div>
             </td>
             <td>
-              <input class="input-sm" type="number" step="0.125" min="0" ng-model="service.LimitMemoryBytes" ng-change="updateServiceAttribute(service, 'LimitMemoryBytes')" ng-disabled="isUpdating"/>
+              <por-slider model="service.LimitNanoCPUs" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="service && state.sliderMaxCpu" on-change="updateServiceAttribute(service, 'LimitNanoCPUs')"></por-slider>
             </td>
             <td style="vertical-align : middle;">
               <p class="small text-muted">
-                Maximum memory usage per task (set to 0 for unlimited)
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <td style="vertical-align : middle;">
-              Memory reservation (MB)
-            </td>
-            <td>
-              <input class="input-sm" type="number" step="0.125" min="0" ng-model="service.ReservationMemoryBytes" ng-change="updateServiceAttribute(service, 'ReservationMemoryBytes')" ng-disabled="isUpdating"/>
-            </td>
-            <td style="vertical-align : middle;">
-              <p class="small text-muted">
-                Minimum memory available on a node to run a task (set to 0 for unlimited)
+                Maximum CPU usage per task
               </p>
             </td>
           </tr>
