@@ -66,6 +66,8 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxySecretRequest(request)
 	case strings.HasPrefix(path, "/swarm"):
 		return p.proxySwarmRequest(request)
+	case strings.HasPrefix(path, "/nodes"):
+		return p.proxyNodeRequest(request)
 	default:
 		return p.executeDockerRequest(request)
 	}
@@ -184,6 +186,17 @@ func (p *proxyTransport) proxySecretRequest(request *http.Request) (*http.Respon
 		secretID := path.Base(requestPath)
 		return p.restrictedOperation(request, secretID)
 	}
+}
+
+func (p *proxyTransport) proxyNodeRequest(request *http.Request) (*http.Response, error) {
+	requestPath := request.URL.Path
+
+	// assume /nodes/{id}
+	if path.Base(requestPath) != "nodes" {
+		return p.administratorOperation(request)
+	}
+
+	return p.executeDockerRequest(request)
 }
 
 func (p *proxyTransport) proxySwarmRequest(request *http.Request) (*http.Response, error) {
