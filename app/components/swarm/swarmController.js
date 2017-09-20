@@ -1,6 +1,6 @@
 angular.module('swarm', [])
-.controller('SwarmController', ['$q', '$scope', 'SystemService', 'NodeService', 'Pagination', 'Notifications',
-function ($q, $scope, SystemService, NodeService, Pagination, Notifications) {
+.controller('SwarmController', ['$q', '$scope', 'SystemService', 'NodeService', 'Pagination', 'Notifications', 'StateManager', 'Authentication',
+function ($q, $scope, SystemService, NodeService, Pagination, Notifications, StateManager, Authentication) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('swarm_nodes');
   $scope.sortType = 'Spec.Role';
@@ -73,6 +73,13 @@ function ($q, $scope, SystemService, NodeService, Pagination, Notifications) {
 
   function initView() {
     $('#loadingViewSpinner').show();
+
+    if (StateManager.getState().application.authentication) {
+      var userDetails = Authentication.getUserDetails();
+      var isAdmin = userDetails.role === 1 ? true: false;
+      $scope.isAdmin = isAdmin;
+    }
+
     var provider = $scope.applicationState.endpoint.mode.provider;
     $q.all({
       version: SystemService.version(),

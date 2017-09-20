@@ -1,9 +1,7 @@
-angular.module('docker', [])
-.controller('DockerController', ['$q', '$scope', 'SystemService', 'Notifications',
+angular.module('engine', [])
+.controller('EngineController', ['$q', '$scope', 'SystemService', 'Notifications',
 function ($q, $scope, SystemService, Notifications) {
-  $scope.info = {};
-  $scope.version = {};
-
+  
   function initView() {
     $('#loadingViewSpinner').show();
     $q.all({
@@ -15,6 +13,8 @@ function ($q, $scope, SystemService, Notifications) {
       $scope.info = data.info;
     })
     .catch(function error(err) {
+      $scope.info = {};
+      $scope.version = {};
       Notifications.error('Failure', err, 'Unable to retrieve engine details');
     })
     .finally(function final() {

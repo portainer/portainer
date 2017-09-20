@@ -155,16 +155,20 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
-		ID              EndpointID `json:"Id"`
-		Name            string     `json:"Name"`
-		URL             string     `json:"URL"`
-		PublicURL       string     `json:"PublicURL"`
-		TLS             bool       `json:"TLS"`
-		TLSCACertPath   string     `json:"TLSCACert,omitempty"`
-		TLSCertPath     string     `json:"TLSCert,omitempty"`
-		TLSKeyPath      string     `json:"TLSKey,omitempty"`
-		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
+		ID              EndpointID       `json:"Id"`
+		Name            string           `json:"Name"`
+		URL             string           `json:"URL"`
+		PublicURL       string           `json:"PublicURL"`
+		TLSConfig       TLSConfiguration `json:"TLSConfig"`
+		AuthorizedUsers []UserID         `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID         `json:"AuthorizedTeams"`
+
+		// Deprecated fields
+		// Deprecated in DBVersion == 4
+		TLS           bool   `json:"TLS,omitempty"`
+		TLSCACertPath string `json:"TLSCACert,omitempty"`
+		TLSCertPath   string `json:"TLSCert,omitempty"`
+		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
 	// ResourceControlID represents a resource control identifier.
@@ -172,20 +176,18 @@ type (
 
 	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
-		ID                 ResourceControlID   `json:"Id"`
-		ResourceID         string              `json:"ResourceId"`
-		SubResourceIDs     []string            `json:"SubResourceIds"`
-		Type               ResourceControlType `json:"Type"`
-		AdministratorsOnly bool                `json:"AdministratorsOnly"`
-
-		UserAccesses []UserResourceAccess `json:"UserAccesses"`
-		TeamAccesses []TeamResourceAccess `json:"TeamAccesses"`
+		ID                 ResourceControlID    `json:"Id"`
+		ResourceID         string               `json:"ResourceId"`
+		SubResourceIDs     []string             `json:"SubResourceIds"`
+		Type               ResourceControlType  `json:"Type"`
+		AdministratorsOnly bool                 `json:"AdministratorsOnly"`
+		UserAccesses       []UserResourceAccess `json:"UserAccesses"`
+		TeamAccesses       []TeamResourceAccess `json:"TeamAccesses"`
 
 		// Deprecated fields
-		// Deprecated: OwnerID field is deprecated in DBVersion == 2
-		OwnerID UserID `json:"OwnerId"`
-		// Deprecated: AccessLevel field is deprecated in DBVersion == 2
-		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+		// Deprecated in DBVersion == 2
+		OwnerID     UserID              `json:"OwnerId,omitempty"`
+		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
 	}
 
 	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service).
@@ -325,6 +327,7 @@ type (
 	FileService interface {
 		StoreTLSFile(folder string, fileType TLSFileType, r io.Reader) error
 		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)
+		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 	}
 
@@ -344,7 +347,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.14.0"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 3
+	DBVersion = 4
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 )
@@ -396,4 +399,8 @@ const (
 	ServiceResourceControl
 	// VolumeResourceControl represents a resource control associated to a Docker volume
 	VolumeResourceControl
+	// NetworkResourceControl represents a resource control associated to a Docker network
+	NetworkResourceControl
+	// SecretResourceControl represents a resource control associated to a Docker secret
+	SecretResourceControl
 )

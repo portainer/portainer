@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper',
-function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService',
+function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService) {
 
   $scope.formValues = {
     Name: '',
@@ -28,11 +28,23 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     UpdateOrder: 'stop-first',
     FailureAction: 'pause',
     Secrets: [],
-    AccessControlData: new AccessControlFormData()
+    AccessControlData: new AccessControlFormData(),
+    CpuLimit: 0,
+    CpuReservation: 0,
+    MemoryLimit: 0,
+    MemoryReservation: 0,
+    MemoryLimitUnit: 'MB',
+    MemoryReservationUnit: 'MB'
   };
 
   $scope.state = {
     formValidationError: ''
+  };
+
+  $scope.refreshSlider = function () {
+    $timeout(function () {
+      $scope.$broadcast('rzSliderForceRender');
+    });
   };
 
   $scope.addPortBinding = function() {
@@ -224,6 +236,38 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     }
   }
 
+  function prepareResourcesCpuConfig(config, input) {
+    // CPU Limit
+    if (input.CpuLimit > 0) {
+      config.TaskTemplate.Resources.Limits.NanoCPUs = input.CpuLimit * 1000000000;
+    }
+    // CPU Reservation
+    if (input.CpuReservation > 0) {
+      config.TaskTemplate.Resources.Reservations.NanoCPUs = input.CpuReservation * 1000000000;
+    }
+  }
+
+  function prepareResourcesMemoryConfig(config, input) {
+    // Memory Limit - Round to 0.125
+    var memoryLimit = (Math.round(input.MemoryLimit * 8) / 8).toFixed(3);
+    memoryLimit *= 1024 * 1024;
+    if (input.MemoryLimitUnit === 'GB') {
+      memoryLimit *= 1024;
+    }
+    if (memoryLimit > 0) {
+      config.TaskTemplate.Resources.Limits.MemoryBytes = memoryLimit;
+    }
+    // Memory Resevation - Round to 0.125
+    var memoryReservation = (Math.round(input.MemoryReservation * 8) / 8).toFixed(3);
+    memoryReservation *= 1024 * 1024;
+    if (input.MemoryReservationUnit === 'GB') {
+      memoryReservation *= 1024;
+    }
+    if (memoryReservation > 0) {
+      config.TaskTemplate.Resources.Reservations.MemoryBytes = memoryReservation;
+    }
+  }
+
   function prepareConfiguration() {
     var input = $scope.formValues;
     var config = {
@@ -232,7 +276,11 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
         ContainerSpec: {
           Mounts: []
         },
-        Placement: {}
+        Placement: {},
+        Resources: {
+          Limits: {},
+          Reservations: {}
+        }
       },
       Mode: {},
       EndpointSpec: {}
@@ -248,6 +296,8 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
     prepareUpdateConfig(config, input);
     prepareSecretConfig(config, input);
     preparePlacementConfig(config, input);
+    prepareResourcesCpuConfig(config, input);
+    prepareResourcesMemoryConfig(config, input);
     return config;
   }
 
@@ -305,16 +355,30 @@ function ($q, $scope, $state, Service, ServiceHelper, SecretHelper, SecretServic
   function initView() {
     $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    var provider = $scope.applicationState.endpoint.mode.provider;
 
     $q.all({
       volumes: VolumeService.volumes(),
       secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
-      networks: NetworkService.networks(true, true, false, false)
+      networks: NetworkService.networks(true, true, false, false),
+      nodes: NodeService.nodes()
     })
     .then(function success(data) {
       $scope.availableVolumes = data.volumes;
       $scope.availableNetworks = data.networks;
       $scope.availableSecrets = data.secrets;
+      // Set max cpu value
+      var maxCpus = 0;
+      for (var n in data.nodes) {
+        if (data.nodes[n].CPUs && data.nodes[n].CPUs > maxCpus) {
+          maxCpus = data.nodes[n].CPUs;
+        }
+      }
+      if (maxCpus > 0) {
+        $scope.state.sliderMaxCpu = maxCpus / 1000000000;
+      } else {
+        $scope.state.sliderMaxCpu = 32;
+      }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');

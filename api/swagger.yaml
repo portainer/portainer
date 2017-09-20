@@ -1,38 +1,61 @@
 ---
 swagger: "2.0"
 info:
-  description: "Portainer API is an HTTP API served by Portainer. It is used by the\
-    \ Portainer UI and everything you can do with the UI can be done using the HTTP\
-    \ API.  \nExamples are available at https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8\
-    \  \nYou can find out more about Portainer at [http://portainer.io](http://portainer.io)\
-    \ and get some support on [Slack](http://portainer.io/slack/).\n\n# Authentication\n\
-    \nMost of the API endpoints require to be authenticated as well as some level\
-    \ of authorization to be used.\nPortainer API uses JSON Web Token to manage authentication\
-    \ and thus requires you to provide a token in the **Authorization** header of\
-    \ each request\nwith the **Bearer** authentication mechanism.\n\nExample:\n```\n\
-    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE\n\
-    ```\n\n# Security\n\nEach API endpoint has an associated access policy, it is\
-    \ documented in the description of each endpoint.\n\nDifferent access policies\
-    \ are available:\n* Public access\n* Authenticated access\n* Restricted access\n\
-    * Administrator access\n\n### Public access\n\nNo authentication is required to\
-    \ access the endpoints with this access policy.\n\n### Authenticated access\n\n\
-    Authentication is required to access the endpoints with this access policy.\n\n\
-    ### Restricted access\n\nAuthentication is required to access the endpoints with\
-    \ this access policy.\nExtra-checks might be added to ensure access to the resource\
-    \ is granted. Returned data might also be filtered.\n\n### Administrator access\n\
-    \nAuthentication as well as an administrator role are required to access the endpoints\
-    \ with this access policy.\n\n# Execute Docker requests\n\nPortainer **DO NOT**\
-    \ expose specific endpoints to manage your Docker resources (create a container,\
-    \ remove a volume, etc...).  \n\nInstead, it acts as a reverse-proxy to the Docker\
-    \ HTTP API. This means that you can execute Docker requests **via** the Portainer\
-    \ HTTP API.\n\nTo do so, you can use the `/endpoints/{id}/docker` Portainer API\
-    \ endpoint (which is not documented below due to Swagger limitations). This\n\
-    endpoint has a restricted access policy so you still need to be authenticated\
-    \ to be able to query this endpoint. Any query on this endpoint will be proxied\
-    \ to the\nDocker API of the associated endpoint (requests and responses objects\
-    \ are the same as documented in the Docker API).\n\n**NOTE**: You can find more\
-    \ information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/)\
-    \ as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).\n"
+  description: |
+    Portainer API is an HTTP API served by Portainer. It is used by the Portainer UI and everything you can do with the UI can be done using the HTTP API.
+    Examples are available at https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8
+    You can find out more about Portainer at [http://portainer.io](http://portainer.io) and get some support on [Slack](http://portainer.io/slack/).
+
+    # Authentication
+
+    Most of the API endpoints require to be authenticated as well as some level of authorization to be used.
+    Portainer API uses JSON Web Token to manage authentication and thus requires you to provide a token in the **Authorization** header of each request
+    with the **Bearer** authentication mechanism.
+
+    Example:
+    ```
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE
+    ```
+
+    # Security
+
+    Each API endpoint has an associated access policy, it is documented in the description of each endpoint.
+
+    Different access policies are available:
+    * Public access
+    * Authenticated access
+    * Restricted access
+    * Administrator access
+
+    ### Public access
+
+    No authentication is required to access the endpoints with this access policy.
+
+    ### Authenticated access
+
+    Authentication is required to access the endpoints with this access policy.
+
+    ### Restricted access
+
+    Authentication is required to access the endpoints with this access policy.
+    Extra-checks might be added to ensure access to the resource is granted. Returned data might also be filtered.
+
+    ### Administrator access
+
+    Authentication as well as an administrator role are required to access the endpoints with this access policy.
+
+    # Execute Docker requests
+
+    Portainer **DO NOT** expose specific endpoints to manage your Docker resources (create a container, remove a volume, etc...).
+
+    Instead, it acts as a reverse-proxy to the Docker HTTP API. This means that you can execute Docker requests **via** the Portainer HTTP API.
+
+    To do so, you can use the `/endpoints/{id}/docker` Portainer API endpoint (which is not documented below due to Swagger limitations). This
+    endpoint has a restricted access policy so you still need to be authenticated to be able to query this endpoint. Any query on this endpoint will be proxied to the
+    Docker API of the associated endpoint (requests and responses objects are the same as documented in the Docker API).
+
+    **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
+
   version: "1.14.0"
   title: "Portainer API"
   contact:
@@ -75,8 +98,9 @@ paths:
       tags:
       - "auth"
       summary: "Authenticate a user"
-      description: "Use this endpoint to authenticate against Portainer using a username\
-        \ and password.  \n**Access policy**: public\n"
+      description: |
+        Use this endpoint to authenticate against Portainer using a username and password.
+        **Access policy**: public
       operationId: "AuthenticateUser"
       consumes:
       - "application/json"
@@ -117,8 +141,9 @@ paths:
       tags:
       - "dockerhub"
       summary: "Retrieve DockerHub information"
-      description: "Use this endpoint to retrieve the information used to connect\
-        \ to the DockerHub  \n**Access policy**: authenticated\n"
+      description: |
+        Use this endpoint to retrieve the information used to connect to the DockerHub
+        **Access policy**: authenticated
       operationId: "DockerHubInspect"
       produces:
       - "application/json"
@@ -136,8 +161,9 @@ paths:
       tags:
       - "dockerhub"
       summary: "Update DockerHub information"
-      description: "Use this endpoint to update the information used to connect to\
-        \ the DockerHub  \n**Access policy**: administrator\n"
+      description: |
+        Use this endpoint to update the information used to connect to the DockerHub
+        **Access policy**: administrator
       operationId: "DockerHubUpdate"
       consumes:
       - "application/json"
@@ -169,9 +195,11 @@ paths:
       tags:
       - "endpoints"
       summary: "List endpoints"
-      description: "List all endpoints based on the current user authorizations. Will\n\
-        return all endpoints if using an administrator account otherwise it will\n\
-        only return authorized endpoints.  \n**Access policy**: restricted      \n"
+      description: |
+        List all endpoints based on the current user authorizations. Will
+        return all endpoints if using an administrator account otherwise it will
+        only return authorized endpoints.
+        **Access policy**: restricted
       operationId: "EndpointList"
       produces:
       - "application/json"
@@ -189,8 +217,9 @@ paths:
       tags:
       - "endpoints"
       summary: "Create a new endpoint"
-      description: "Create a new endpoint that will be used to manage a Docker environment.\
-        \  \n**Access policy**: administrator\n"
+      description: |
+        Create a new endpoint that will be used to manage a Docker environment.
+        **Access policy**: administrator
       operationId: "EndpointCreate"
       consumes:
       - "application/json"
@@ -231,8 +260,9 @@ paths:
       tags:
       - "endpoints"
       summary: "Inspect an endpoint"
-      description: "Retrieve details abount an endpoint.  \n**Access policy**: administrator\
-        \      \n"
+      description: |
+        Retrieve details abount an endpoint.
+        **Access policy**: administrator
       operationId: "EndpointInspect"
       produces:
       - "application/json"
@@ -269,7 +299,9 @@ paths:
       tags:
       - "endpoints"
       summary: "Update an endpoint"
-      description: "Update an endpoint.  \n**Access policy**: administrator\n"
+      description: |
+        Update an endpoint.
+        **Access policy**: administrator
       operationId: "EndpointUpdate"
       consumes:
       - "application/json"
@@ -319,7 +351,9 @@ paths:
       tags:
       - "endpoints"
       summary: "Remove an endpoint"
-      description: "Remove an endpoint.  \n**Access policy**: administrator      \n"
+      description: |
+        Remove an endpoint.
+        **Access policy**: administrator
       operationId: "EndpointDelete"
       parameters:
       - name: "id"
@@ -360,8 +394,9 @@ paths:
       tags:
       - "endpoints"
       summary: "Manage accesses to an endpoint"
-      description: "Manage user and team accesses to an endpoint.  \n**Access policy**:\
-        \ administrator            \n"
+      description: |
+        Manage user and team accesses to an endpoint.
+        **Access policy**: administrator
       operationId: "EndpointAccessUpdate"
       consumes:
       - "application/json"
@@ -400,15 +435,17 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+
   /registries:
     get:
       tags:
       - "registries"
       summary: "List registries"
-      description: "List all registries based on the current user authorizations.\n\
-        Will return all registries if using an administrator account otherwise it\n\
-        will only return authorized registries.  \n**Access policy**: restricted \
-        \                 \n"
+      description: |
+        List all registries based on the current user authorizations.
+        Will return all registries if using an administrator account otherwise it
+        will only return authorized registries.
+        **Access policy**: restricted
       operationId: "RegistryList"
       produces:
       - "application/json"
@@ -426,8 +463,9 @@ paths:
       tags:
       - "registries"
       summary: "Create a new registry"
-      description: "Create a new registry.  \n**Access policy**: administrator   \
-        \   \n"
+      description: |
+        Create a new registry.
+        **Access policy**: administrator
       operationId: "RegistryCreate"
       consumes:
       - "application/json"
@@ -468,8 +506,9 @@ paths:
       tags:
       - "registries"
       summary: "Inspect a registry"
-      description: "Retrieve details about a registry.  \n**Access policy**: administrator\
-        \      \n"
+      description: |
+        Retrieve details about a registry.
+        **Access policy**: administrator
       operationId: "RegistryInspect"
       produces:
       - "application/json"
@@ -506,7 +545,9 @@ paths:
       tags:
       - "registries"
       summary: "Update a registry"
-      description: "Update a registry.  \n**Access policy**: administrator      \n"
+      description: |
+        Update a registry.
+        **Access policy**: administrator
       operationId: "RegistryUpdate"
       consumes:
       - "application/json"
@@ -563,8 +604,9 @@ paths:
       tags:
       - "registries"
       summary: "Remove a registry"
-      description: "Remove a registry.  \n**Access policy**: administrator       \
-        \     \n"
+      description: |
+        Remove a registry.
+        **Access policy**: administrator
       operationId: "RegistryDelete"
       parameters:
       - name: "id"
@@ -598,8 +640,9 @@ paths:
       tags:
       - "registries"
       summary: "Manage accesses to a registry"
-      description: "Manage user and team accesses to a registry.  \n**Access policy**:\
-        \ administrator            \n"
+      description: |
+        Manage user and team accesses to a registry.
+        **Access policy**: administrator
       operationId: "RegistryAccessUpdate"
       consumes:
       - "application/json"
@@ -643,8 +686,9 @@ paths:
       tags:
       - "resource_controls"
       summary: "Create a new resource control"
-      description: "Create a new resource control to restrict access to a Docker resource.\
-        \  \n**Access policy**: restricted            \n"
+      description: |
+        Create a new resource control to restrict access to a Docker resource.
+        **Access policy**: restricted
       operationId: "ResourceControlCreate"
       consumes:
       - "application/json"
@@ -690,8 +734,9 @@ paths:
       tags:
       - "resource_controls"
       summary: "Update a resource control"
-      description: "Update a resource control.  \n**Access policy**: restricted  \
-        \       \n"
+      description: |
+        Update a resource control.
+        **Access policy**: restricted
       operationId: "ResourceControlUpdate"
       consumes:
       - "application/json"
@@ -741,8 +786,9 @@ paths:
       tags:
       - "resource_controls"
       summary: "Remove a resource control"
-      description: "Remove a resource control.  \n**Access policy**: restricted  \
-        \    \n"
+      description: |
+        Remove a resource control.
+        **Access policy**: restricted
       operationId: "ResourceControlDelete"
       parameters:
       - name: "id"
@@ -783,8 +829,9 @@ paths:
       tags:
       - "settings"
       summary: "Retrieve Portainer settings"
-      description: "Retrieve Portainer settings.  \n**Access policy**: administrator\
-        \      \n"
+      description: |
+        Retrieve Portainer settings.
+        **Access policy**: administrator
       operationId: "SettingsInspect"
       produces:
       - "application/json"
@@ -802,8 +849,9 @@ paths:
       tags:
       - "settings"
       summary: "Update Portainer settings"
-      description: "Update Portainer settings.  \n**Access policy**: administrator\
-        \        \n"
+      description: |
+        Update Portainer settings.
+        **Access policy**: administrator
       operationId: "SettingsUpdate"
       consumes:
       - "application/json"
@@ -835,9 +883,9 @@ paths:
       tags:
       - "settings"
       summary: "Retrieve Portainer public settings"
-      description: "Retrieve public settings. Returns a small set of settings that\
-        \ are not reserved to administrators only.  \n**Access policy**: public  \
-        \    \n"
+      description: |
+        Retrieve public settings. Returns a small set of settings that are not reserved to administrators only.
+        **Access policy**: public
       operationId: "PublicSettingsInspect"
       produces:
       - "application/json"
@@ -856,8 +904,9 @@ paths:
       tags:
       - "settings"
       summary: "Test LDAP connectivity"
-      description: "Test LDAP connectivity using LDAP details.  \n**Access policy**:\
-        \ administrator        \n"
+      description: |
+        Test LDAP connectivity using LDAP details.
+        **Access policy**: administrator
       operationId: "SettingsLDAPCheck"
       consumes:
       - "application/json"
@@ -889,8 +938,9 @@ paths:
       tags:
       - "status"
       summary: "Check Portainer status"
-      description: "Retrieve Portainer status.  \n**Access policy**: public      \
-        \  \n"
+      description: |
+        Retrieve Portainer status.
+        **Access policy**: public
       operationId: "StatusInspect"
       produces:
       - "application/json"
@@ -909,9 +959,9 @@ paths:
       tags:
       - "users"
       summary: "List users"
-      description: "List Portainer users. Non-administrator users will only be able\
-        \ to list other non-administrator user accounts.  \n**Access policy**: restricted\
-        \        \n"
+      description: |
+        List Portainer users. Non-administrator users will only be able to list other non-administrator user accounts.
+        **Access policy**: restricted
       operationId: "UserList"
       produces:
       - "application/json"
@@ -929,9 +979,10 @@ paths:
       tags:
       - "users"
       summary: "Create a new user"
-      description: "Create a new Portainer user. Only team leaders and administrators\
-        \ can create users. Only administrators can\ncreate an administrator user\
-        \ account.  \n**Access policy**: restricted        \n"
+      description: |
+        Create a new Portainer user. Only team leaders and administrators can create users. Only administrators can
+        create an administrator user account.
+        **Access policy**: restricted
       operationId: "UserCreate"
       consumes:
       - "application/json"
@@ -979,8 +1030,9 @@ paths:
       tags:
       - "users"
       summary: "Inspect a user"
-      description: "Retrieve details about a user.  \n**Access policy**: administrator\
-        \        \n"
+      description: |
+        Retrieve details about a user.
+        **Access policy**: administrator
       operationId: "UserInspect"
       produces:
       - "application/json"
@@ -1017,8 +1069,9 @@ paths:
       tags:
       - "users"
       summary: "Update a user"
-      description: "Update user details. A regular user account can only update his\
-        \ details.  \n**Access policy**: authenticated      \n"
+      description: |
+        Update user details. A regular user account can only update his details.
+        **Access policy**: authenticated
       operationId: "UserUpdate"
       consumes:
       - "application/json"
@@ -1068,7 +1121,9 @@ paths:
       tags:
       - "users"
       summary: "Remove a user"
-      description: "Remove a user.  \n**Access policy**: administrator      \n"
+      description: |
+        Remove a user.
+        **Access policy**: administrator
       operationId: "UserDelete"
       parameters:
       - name: "id"
@@ -1102,8 +1157,9 @@ paths:
       tags:
       - "users"
       summary: "Inspect a user memberships"
-      description: "Inspect a user memberships.  \n**Access policy**: authenticated\
-        \      \n"
+      description: |
+        Inspect a user memberships.
+        **Access policy**: authenticated
       operationId: "UserMembershipsInspect"
       produces:
       - "application/json"
@@ -1136,13 +1192,15 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+
   /users/{id}/passwd:
     post:
       tags:
       - "users"
       summary: "Check password validity for a user"
-      description: "Check if the submitted password is valid for the specified user.\
-        \  \n**Access policy**: authenticated      \n"
+      description: |
+        Check if the submitted password is valid for the specified user.
+        **Access policy**: authenticated
       operationId: "UserPasswordCheck"
       consumes:
       - "application/json"
@@ -1183,13 +1241,15 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+
   /users/admin/check:
     get:
       tags:
       - "users"
       summary: "Check administrator account existence"
-      description: "Check if an administrator account exists in the database.\n**Access\
-        \ policy**: public        \n"
+      description: |
+        Check if an administrator account exists in the database.
+        **Access policy**: public
       operationId: "UserAdminCheck"
       produces:
       - "application/json"
@@ -1210,13 +1270,15 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+
   /users/admin/init:
     post:
       tags:
       - "users"
       summary: "Initialize administrator account"
-      description: "Initialize the 'admin' user account.\n**Access policy**: public\
-        \        \n"
+      description: |
+        Initialize the 'admin' user account.
+        **Access policy**: public
       operationId: "UserAdminInit"
       consumes:
       - "application/json"
@@ -1250,34 +1312,35 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+
   /upload/tls/{certificate}:
     post:
       tags:
       - "upload"
       summary: "Upload TLS files"
-      description: "Use this endpoint to upload TLS files.  \n**Access policy**: administrator\n"
+      description: |
+        Use this endpoint to upload TLS files.
+        **Access policy**: administrator
       operationId: "UploadTLS"
       consumes:
-      - "multipart/form-data"
+      - multipart/form-data
       produces:
       - "application/json"
       parameters:
-      - name: "certificate"
-        in: "path"
+      - in: "path"
+        name: "certificate"
         description: "TLS file type. Valid values are 'ca', 'cert' or 'key'."
         required: true
         type: "string"
-      - name: "folder"
-        in: "query"
-        description: "Folder where the TLS file will be stored. Will be created if\
-          \ not existing."
+      - in: "query"
+        name: "folder"
+        description: "Folder where the TLS file will be stored. Will be created if not existing."
         required: true
         type: "string"
-      - name: "file"
-        in: "formData"
-        description: "The file to upload."
-        required: false
+      - in: "formData"
+        name: "file"
         type: "file"
+        description: "The file to upload."
       responses:
         200:
           description: "Success"
@@ -1292,13 +1355,15 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+
   /teams:
     get:
       tags:
       - "teams"
       summary: "List teams"
-      description: "List teams. For non-administrator users, will only list the teams\
-        \ they are member of.  \n**Access policy**: restricted      \n"
+      description: |
+        List teams. For non-administrator users, will only list the teams they are member of.
+        **Access policy**: restricted
       operationId: "TeamList"
       produces:
       - "application/json"
@@ -1316,8 +1381,9 @@ paths:
       tags:
       - "teams"
       summary: "Create a new team"
-      description: "Create a new team.  \n**Access policy**: administrator       \
-        \     \n"
+      description: |
+        Create a new team.
+        **Access policy**: administrator
       operationId: "TeamCreate"
       consumes:
       - "application/json"
@@ -1365,8 +1431,9 @@ paths:
       tags:
       - "teams"
       summary: "Inspect a team"
-      description: "Retrieve details about a team. Access is only available for administrator\
-        \ and leaders of that team.  \n**Access policy**: restricted      \n"
+      description: |
+        Retrieve details about a team. Access is only available for administrator and leaders of that team.
+        **Access policy**: restricted
       operationId: "TeamInspect"
       produces:
       - "application/json"
@@ -1410,8 +1477,9 @@ paths:
       tags:
       - "teams"
       summary: "Update a team"
-      description: "Update a team.  \n**Access policy**: administrator           \
-        \ \n"
+      description: |
+        Update a team.
+        **Access policy**: administrator
       operationId: "TeamUpdate"
       consumes:
       - "application/json"
@@ -1454,7 +1522,9 @@ paths:
       tags:
       - "teams"
       summary: "Remove a team"
-      description: "Remove a team.  \n**Access policy**: administrator      \n"
+      description: |
+        Remove a team.
+        **Access policy**: administrator
       operationId: "TeamDelete"
       parameters:
       - name: "id"
@@ -1483,13 +1553,15 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+
   /teams/{id}/memberships:
     get:
       tags:
       - "teams"
       summary: "Inspect a team memberships"
-      description: "Inspect a team memberships. Access is only available for administrator\
-        \ and leaders of that team.  \n**Access policy**: restricted      \n"
+      description: |
+        Inspect a team memberships. Access is only available for administrator and leaders of that team.
+        **Access policy**: restricted
       operationId: "TeamMembershipsInspect"
       produces:
       - "application/json"
@@ -1522,13 +1594,15 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+
   /team_memberships:
     get:
       tags:
       - "team_memberships"
       summary: "List team memberships"
-      description: "List team memberships. Access is only available to administrators\
-        \ and team leaders.  \n**Access policy**: restricted         \n"
+      description: |
+        List team memberships. Access is only available to administrators and team leaders.
+        **Access policy**: restricted
       operationId: "TeamMembershipList"
       produces:
       - "application/json"
@@ -1553,8 +1627,9 @@ paths:
       tags:
       - "team_memberships"
       summary: "Create a new team membership"
-      description: "Create a new team memberships. Access is only available to administrators\
-        \ leaders of the associated team.  \n**Access policy**: restricted      \n"
+      description: |
+        Create a new team memberships. Access is only available to administrators leaders of the associated team.
+        **Access policy**: restricted
       operationId: "TeamMembershipCreate"
       consumes:
       - "application/json"
@@ -1602,9 +1677,9 @@ paths:
       tags:
       - "team_memberships"
       summary: "Update a team membership"
-      description: "Update a team membership. Access is only available to administrators\
-        \ leaders of the associated team.  \n**Access policy**: restricted       \
-        \ \n"
+      description: |
+        Update a team membership. Access is only available to administrators leaders of the associated team.
+        **Access policy**: restricted
       operationId: "TeamMembershipUpdate"
       consumes:
       - "application/json"
@@ -1654,8 +1729,9 @@ paths:
       tags:
       - "team_memberships"
       summary: "Remove a team membership"
-      description: "Remove a team membership. Access is only available to administrators\
-        \ leaders of the associated team.  \n**Access policy**: restricted      \n"
+      description: |
+        Remove a team membership. Access is only available to administrators leaders of the associated team.
+        **Access policy**: restricted
       operationId: "TeamMembershipDelete"
       parameters:
       - name: "id"
@@ -1696,17 +1772,18 @@ paths:
       tags:
       - "templates"
       summary: "Retrieve App templates"
-      description: "Retrieve App templates.  \nYou can find more information about\
-        \ the format at http://portainer.readthedocs.io/en/stable/templates.html \
-        \ \n**Access policy**: authenticated      \n"
+      description: |
+        Retrieve App templates.
+        You can find more information about the format at http://portainer.readthedocs.io/en/stable/templates.html
+        **Access policy**: authenticated
       operationId: "TemplateList"
       produces:
       - "application/json"
       parameters:
       - name: "key"
         in: "query"
-        description: "Templates key. Valid values are 'container' or 'linuxserver.io'."
         required: true
+        description: "Templates key. Valid values are 'container' or 'linuxserver.io'."
         type: "string"
       responses:
         200:
@@ -1811,8 +1888,8 @@ definitions:
       AuthenticationMethod:
         type: "integer"
         example: 1
-        description: "Active authentication method for the Portainer instance. Valid\
-          \ values are: 1 for managed or 2 for LDAP."
+        description: "Active authentication method for the Portainer instance. Valid values are: 1 for managed or 2 for LDAP."
+
   TLSConfiguration:
     type: "object"
     properties:
@@ -1836,14 +1913,14 @@ definitions:
         type: "string"
         example: "/data/tls/key.pem"
         description: "Path to the TLS client key file"
+
   LDAPSearchSettings:
     type: "object"
     properties:
       BaseDN:
         type: "string"
         example: "dc=ldap,dc=domain,dc=tld"
-        description: "The distinguished name of the element from which the LDAP server\
-          \ will search for users"
+        description: "The distinguished name of the element from which the LDAP server will search for users"
       Filter:
         type: "string"
         example: "(objectClass=account)"
@@ -1852,6 +1929,7 @@ definitions:
         type: "string"
         example: "uid"
         description: "LDAP attribute which denotes the username"
+
   LDAPSettings:
     type: "object"
     properties:
@@ -1877,6 +1955,7 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/LDAPSearchSettings"
+
   Settings:
     type: "object"
     properties:
@@ -1905,8 +1984,7 @@ definitions:
       AuthenticationMethod:
         type: "integer"
         example: 1
-        description: "Active authentication method for the Portainer instance. Valid\
-          \ values are: 1 for managed or 2 for LDAP."
+        description: "Active authentication method for the Portainer instance. Valid values are: 1 for managed or 2 for LDAP."
       LDAPSettings:
         $ref: "#/definitions/LDAPSettings"
   Settings_BlackListedLabels:
@@ -2072,6 +2150,14 @@ definitions:
         type: "boolean"
         example: true
         description: "Require TLS to connect against this endpoint"
+      TLSSkipVerify:
+        type: "boolean"
+        example: false
+        description: "Skip server verification when using TLS"
+      TLSSkipClientVerify:
+        type: "boolean"
+        example: false
+        description: "Skip client verification when using TLS"
   EndpointCreateResponse:
     type: "object"
     properties:
@@ -2103,6 +2189,14 @@ definitions:
         type: "boolean"
         example: true
         description: "Require TLS to connect against this endpoint"
+      TLSSkipVerify:
+        type: "boolean"
+        example: false
+        description: "Skip server verification when using TLS"
+      TLSSkipClientVerify:
+        type: "boolean"
+        example: false
+        description: "Skip client verification when using TLS"
   EndpointAccessUpdateRequest:
     type: "object"
     properties:
@@ -2269,8 +2363,8 @@ definitions:
   SettingsUpdateRequest:
     type: "object"
     required:
-    - "AuthenticationMethod"
     - "TemplatesURL"
+    - "AuthenticationMethod"
     properties:
       TemplatesURL:
         type: "string"
@@ -2297,8 +2391,7 @@ definitions:
       AuthenticationMethod:
         type: "integer"
         example: 1
-        description: "Active authentication method for the Portainer instance. Valid\
-          \ values are: 1 for managed or 2 for LDAP."
+        description: "Active authentication method for the Portainer instance. Valid values are: 1 for managed or 2 for LDAP."
       LDAPSettings:
         $ref: "#/definitions/LDAPSettings"
   UserCreateRequest:
@@ -2395,12 +2488,13 @@ definitions:
     type: "array"
     items:
       $ref: "#/definitions/TeamMembership"
+
   TeamMembershipCreateRequest:
     type: "object"
     required:
-    - "Role"
-    - "TeamID"
     - "UserID"
+    - "TeamID"
+    - "Role"
     properties:
       UserID:
         type: "integer"
@@ -2413,8 +2507,7 @@ definitions:
       Role:
         type: "integer"
         example: 1
-        description: "Role for the user inside the team (1 for leader and 2 for regular\
-          \ member)"
+        description: "Role for the user inside the team (1 for leader and 2 for regular member)"
   TeamMembershipCreateResponse:
     type: "object"
     properties:
@@ -2429,9 +2522,9 @@ definitions:
   TeamMembershipUpdateRequest:
     type: "object"
     required:
-    - "Role"
-    - "TeamID"
     - "UserID"
+    - "TeamID"
+    - "Role"
     properties:
       UserID:
         type: "integer"
@@ -2444,8 +2537,7 @@ definitions:
       Role:
         type: "integer"
         example: 1
-        description: "Role for the user inside the team (1 for leader and 2 for regular\
-          \ member)"
+        description: "Role for the user inside the team (1 for leader and 2 for regular member)"
   SettingsLDAPCheckRequest:
     type: "object"
     properties:
@@ -2454,14 +2546,10 @@ definitions:
   UserAdminInitRequest:
     type: "object"
     properties:
-      Username:
-        type: "string"
-        example: "admin"
-        description: "Username of the initial administrator account"
       Password:
         type: "string"
         example: "admin-password"
-        description: "Password of the initial administrator account"
+        description: "Password for the admin user"
   TemplateListResponse:
     type: "array"
     items:

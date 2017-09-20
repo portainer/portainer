@@ -23,19 +23,18 @@ function ($scope, $state, $sanitize, Notifications, Authentication, StateManager
       return EndpointService.endpoints();
     })
     .then(function success(data) {
-      var endpoints = data;
-      if (endpoints.length > 0)  {
-        var endpoint = endpoints[0];
-        EndpointProvider.setEndpointID(endpoint.Id);
-        StateManager.updateEndpointState(true)
-        .then(function success(data) {
+      if (data.length === 0) {
+        $state.go('init.endpoint');
+      } else {
+        var endpointID = data[0].Id;
+        EndpointProvider.setEndpointID(endpointID);
+        StateManager.updateEndpointState(false)
+        .then(function success() {
           $state.go('dashboard');
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
+          Notifications.error('Failure', err, 'Unable to connect to Docker environment');
         });
-      } else {
-        $state.go('init.endpoint');
       }
     })
     .catch(function error(err) {

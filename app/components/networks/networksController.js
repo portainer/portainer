@@ -1,49 +1,15 @@
 angular.module('networks', [])
-.controller('NetworksController', ['$scope', '$state', 'Network', 'Notifications', 'Pagination',
-function ($scope, $state, Network, Notifications, Pagination) {
+.controller('NetworksController', ['$scope', '$state', 'Network', 'NetworkService', 'Notifications', 'Pagination',
+function ($scope, $state, Network, NetworkService, Notifications, Pagination) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('networks');
   $scope.state.selectedItemCount = 0;
   $scope.state.advancedSettings = false;
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
-  $scope.config = {
-    Name: ''
-  };
 
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('networks', $scope.state.pagination_count);
-  };
-
-  function prepareNetworkConfiguration() {
-    var config = angular.copy($scope.config);
-    if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-      config.Driver = 'overlay';
-      // Force IPAM Driver to 'default', should not be required.
-      // See: https://github.com/docker/docker/issues/25735
-      config.IPAM = {
-        Driver: 'default'
-      };
-    }
-    return config;
-  }
-
-  $scope.createNetwork = function() {
-    $('#createNetworkSpinner').show();
-    var config = prepareNetworkConfiguration();
-    Network.create(config, function (d) {
-      if (d.message) {
-        $('#createNetworkSpinner').hide();
-        Notifications.error('Unable to create network', {}, d.message);
-      } else {
-        Notifications.success('Network created', d.Id);
-        $('#createNetworkSpinner').hide();
-        $state.reload();
-      }
-    }, function (e) {
-      $('#createNetworkSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to create network');
-    });
   };
 
   $scope.order = function(sortType) {
@@ -99,13 +65,17 @@ function ($scope, $state, Network, Notifications, Pagination) {
 
   function initView() {
     $('#loadNetworksSpinner').show();
-    Network.query({}, function (d) {
-      $scope.networks = d;
-      $('#loadNetworksSpinner').hide();
-    }, function (e) {
-      $('#loadNetworksSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to retrieve networks');
+
+    NetworkService.networks(true, true, true, true)
+    .then(function success(data) {
+      $scope.networks = data;
+    })
+    .catch(function error(err) {
       $scope.networks = [];
+      Notifications.error('Failure', err, 'Unable to retrieve networks');
+    })
+    .finally(function final() {
+      $('#loadNetworksSpinner').hide();
     });
   }
 

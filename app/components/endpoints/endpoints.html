@@ -60,75 +60,21 @@
             </div>
           </div>
           <!-- !endpoint-public-url-input -->
-          <!-- tls-checkbox -->
+          <!-- endpoint-security -->
+          <por-endpoint-security form-data="formValues.SecurityFormData"></por-endpoint-security>
+          <!-- !endpoint-security -->
+          <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="tls" class="control-label text-left">
-                TLS
-                <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the Docker endpoint."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="formValues.TLS"><i></i>
-              </label>
-            </div>
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addEndpoint()"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</button>
+              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
           </div>
-          <!-- !tls-checkbox -->
-          <!-- tls-certs -->
-          <div ng-if="formValues.TLS">
-            <!-- ca-input -->
-            <div class="form-group">
-              <label class="col-sm-2 control-label text-left">TLS CA certificate</label>
-              <div class="col-sm-10">
-                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
-                <span style="margin-left: 5px;">
-                  {{ formValues.TLSCACert.name }}
-                  <i class="fa fa-times red-icon" ng-if="!formValues.TLSCACert" aria-hidden="true"></i>
-                  <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
-                </span>
-              </div>
-            </div>
-            <!-- !ca-input -->
-            <!-- cert-input -->
-            <div class="form-group">
-              <label for="tls_cert" class="col-sm-2 control-label text-left">TLS certificate</label>
-              <div class="col-sm-10">
-                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCert">Select file</button>
-                <span style="margin-left: 5px;">
-                  {{ formValues.TLSCert.name }}
-                  <i class="fa fa-times red-icon" ng-if="!formValues.TLSCert" aria-hidden="true"></i>
-                  <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
-                </span>
-              </div>
-            </div>
-            <!-- !cert-input -->
-            <!-- key-input -->
-            <div class="form-group">
-              <label class="col-sm-2 control-label text-left">TLS key</label>
-              <div class="col-sm-10">
-                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSKey">Select file</button>
-                <span style="margin-left: 5px;">
-                  {{ formValues.TLSKey.name }}
-                  <i class="fa fa-times red-icon" ng-if="!formValues.TLSKey" aria-hidden="true"></i>
-                  <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
-                </span>
-              </div>
-            </div>
-            <!-- !key-input -->
-          </div>
-          <!-- !tls-certs -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && (!formValues.TLSCACert || !formValues.TLSCert || !formValues.TLSKey))" ng-click="addEndpoint()">Add endpoint</button>
-              <i id="createEndpointSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
-              <span class="text-danger" ng-if="state.error" style="margin: 5px;">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.error }}
-              </span>
-            </div>
-          </div>
-        </form>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
+        </div>
+        <!-- !actions -->
+      </form>
+    </rd-widget-body>
+  </rd-widget>
+</div>
 </div>
 
 <div class="row">
@@ -191,7 +137,7 @@
                   <span ng-if="applicationState.application.authentication">
                     <a ui-sref="endpoint.access({id: endpoint.Id})"><i class="fa fa-users" aria-hidden="true" style="margin-left: 7px;"></i> Manage access</a>
                   </span>
-              </td>
+                </td>
               </tr>
               <tr ng-if="!endpoints">
                 <td colspan="5" class="text-center text-muted">Loading...</td>

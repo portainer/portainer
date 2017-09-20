@@ -1,11 +1,17 @@
 angular.module('createSecret', [])
-.controller('CreateSecretController', ['$scope', '$state', 'Notifications', 'SecretService', 'LabelHelper',
-function ($scope, $state, Notifications, SecretService, LabelHelper) {
+.controller('CreateSecretController', ['$scope', '$state', 'Notifications', 'SecretService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator',
+function ($scope, $state, Notifications, SecretService, LabelHelper, Authentication, ResourceControlService, FormValidator) {
+
   $scope.formValues = {
     Name: '',
     Data: '',
     Labels: [],
-    encodeSecret: true
+    encodeSecret: true,
+    AccessControlData: new AccessControlFormData()
+  };
+
+  $scope.state = {
+    formValidationError: ''
   };
 
   $scope.addLabel = function() {
@@ -36,10 +42,38 @@ function ($scope, $state, Notifications, SecretService, LabelHelper) {
     return config;
   }
 
-  function createSecret(config) {
-    $('#createSecretSpinner').show();
-    SecretService.create(config)
+  function validateForm(accessControlData, isAdmin) {
+    $scope.state.formValidationError = '';
+    var error = '';
+    error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+
+    if (error) {
+      $scope.state.formValidationError = error;
+      return false;
+    }
+    return true;
+  }
+
+  $scope.create = function () {
+    $('#createResourceSpinner').show();
+
+    var accessControlData = $scope.formValues.AccessControlData;
+    var userDetails = Authentication.getUserDetails();
+    var isAdmin = userDetails.role === 1 ? true : false;
+
+    if (!validateForm(accessControlData, isAdmin)) {
+      $('#createResourceSpinner').hide();
+      return;
+    }
+
+    var secretConfiguration = prepareConfiguration();
+    SecretService.create(secretConfiguration)
     .then(function success(data) {
+      var secretIdentifier = data.ID;
+      var userId = userDetails.ID;
+      return ResourceControlService.applyResourceControl('secret', secretIdentifier, userId, accessControlData, []);
+    })
+    .then(function success() {
       Notifications.success('Secret successfully created');
       $state.go('secrets', {}, {reload: true});
     })
@@ -47,12 +81,7 @@ function ($scope, $state, Notifications, SecretService, LabelHelper) {
       Notifications.error('Failure', err, 'Unable to create secret');
     })
     .finally(function final() {
-      $('#createSecretSpinner').hide();
+      $('#createResourceSpinner').hide();
     });
-  }
-
-  $scope.create = function () {
-    var config = prepareConfiguration();
-    createSecret(config);
   };
 }]);
