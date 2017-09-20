@@ -1,13 +1,16 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider',
-  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
+  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
-  $scope.state.displayAll = true;
+  $scope.state.displayAll = LocalStorage.getFilterContainerShowAll();
   $scope.state.displayIP = false;
   $scope.sortType = 'State';
   $scope.sortReverse = false;
   $scope.state.selectedItemCount = 0;
+  $scope.truncate_size = 40;
+  $scope.showMore = true;
+
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
@@ -130,6 +133,7 @@ angular.module('containers', [])
   };
 
   $scope.toggleGetAll = function () {
+    LocalStorage.storeFilterContainerShowAll($scope.state.displayAll);
     update({all: $scope.state.displayAll ? 1 : 0});
   };
 
@@ -159,6 +163,12 @@ angular.module('containers', [])
 
   $scope.removeAction = function () {
     batch($scope.containers, Container.remove, 'Removed');
+  };
+
+
+  $scope.truncateMore = function(size) {
+    $scope.truncate_size = 80;
+    $scope.showMore = false;
   };
 
   $scope.confirmRemoveAction = function () {
@@ -205,7 +215,7 @@ angular.module('containers', [])
 
       if(container.Status === 'paused') {
         $scope.state.noPausedItemsSelected = false;
-      } else if(container.Status === 'stopped' || 
+      } else if(container.Status === 'stopped' ||
                 container.Status === 'created') {
         $scope.state.noStoppedItemsSelected = false;
       } else if(container.Status === 'running') {

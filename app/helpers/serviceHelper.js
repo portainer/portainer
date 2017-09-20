@@ -119,6 +119,5 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
       }
       return [];
     }
-
   };
 }]);

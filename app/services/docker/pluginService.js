@@ -52,5 +52,37 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.networkPlugins = function(systemOnly) {
+    var deferred = $q.defer();
+
+    $q.all({
+      system: SystemService.plugins(),
+      plugins: systemOnly ? [] : service.plugins()
+    })
+    .then(function success(data) {
+      var networkPlugins = [];
+      var systemPlugins = data.system;
+      var plugins = data.plugins;
+
+      if (systemPlugins.Network) {
+        networkPlugins = networkPlugins.concat(systemPlugins.Network);
+      }
+
+      for (var i = 0; i < plugins.length; i++) {
+        var plugin = plugins[i];
+        if (plugin.Enabled && _.includes(plugin.Config.Interface.Types, 'docker.networkdriver/1.0')) {
+          networkPlugins.push(plugin.Name);
+        }
+      }
+
+      deferred.resolve(networkPlugins);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: err.msg, err: err });
+    });
+
+    return deferred.promise;
+  };
+
   return service;
 }]);

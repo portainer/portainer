@@ -1,113 +1,110 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
-function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Authentication, Users, EndpointService, StateManager, EndpointProvider, Notifications) {
-
-  $scope.authData = {
-    username: 'admin',
-    password: '',
-    error: ''
-  };
-  $scope.initPasswordData = {
-    password: '',
-    password_confirmation: '',
-    error: false
-  };
+.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'UserService', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'SettingsService',
+function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Authentication, Users, UserService, EndpointService, StateManager, EndpointProvider, Notifications, SettingsService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
-  if (!$scope.applicationState.application.authentication) {
-    EndpointService.endpoints()
-    .then(function success(data) {
-      if (data.length > 0)  {
-        endpointID = EndpointProvider.endpointID();
-        if (!endpointID) {
-          endpointID = data[0].Id;
-          EndpointProvider.setEndpointID(endpointID);
-        }
-        StateManager.updateEndpointState(true)
-        .then(function success() {
-          $state.go('dashboard');
-        }, function error(err) {
-          Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
-        });
-      }
-      else {
-        $state.go('endpointInit');
-      }
-    }, function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve endpoints');
-    });
-  } else {
-    Users.checkAdminUser({}, function () {},
-    function (e) {
-      if (e.status === 404) {
-        $scope.initPassword = true;
-      } else {
-        Notifications.error('Failure', e, 'Unable to verify administrator account existence');
-      }
-    });
-  }
-
-  if ($stateParams.logout) {
-    Authentication.logout();
-  }
-
-  if ($stateParams.error) {
-    $scope.authData.error = $stateParams.error;
-    Authentication.logout();
-  }
-
-  if (Authentication.isAuthenticated()) {
-    $state.go('dashboard');
-  }
-
-  $scope.createAdminUser = function() {
-    var password = $sanitize($scope.initPasswordData.password);
-    Users.initAdminUser({password: password}, function (d) {
-      $scope.initPassword = false;
-      $timeout(function() {
-        var element = $window.document.getElementById('password');
-        if(element) {
-          element.focus();
-        }
-      });
-    }, function (e) {
-      $scope.initPassword.error = true;
-    });
+  $scope.formValues = {
+    Username: '',
+    Password: ''
   };
 
-  $scope.authenticateUser = function() {
-    $scope.authenticationError = false;
-    var username = $sanitize($scope.authData.username);
-    var password = $sanitize($scope.authData.password);
-    Authentication.login(username, password)
+  $scope.state = {
+    AuthenticationError: ''
+  };
+
+  function setActiveEndpointAndRedirectToDashboard(endpoint) {
+    var endpointID = EndpointProvider.endpointID();
+    if (!endpointID) {
+      EndpointProvider.setEndpointID(endpoint.Id);
+    }
+    StateManager.updateEndpointState(true)
     .then(function success(data) {
-      return EndpointService.endpoints();
+      $state.go('dashboard');
     })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
+    });
+  }
+
+  function unauthenticatedFlow() {
+    EndpointService.endpoints()
     .then(function success(data) {
-      var userDetails = Authentication.getUserDetails();
-      if (data.length > 0)  {
-        endpointID = EndpointProvider.endpointID();
-        if (!endpointID) {
-          endpointID = data[0].Id;
-          EndpointProvider.setEndpointID(endpointID);
-        }
-        StateManager.updateEndpointState(true)
-        .then(function success() {
-          $state.go('dashboard');
-        }, function error(err) {
-          Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
-        });
-      }
-      else if (data.length === 0 && userDetails.role === 1) {
-        $state.go('endpointInit');
-      } else if (data.length === 0 && userDetails.role === 2) {
-        Authentication.logout();
-        $scope.authData.error = 'User not allowed. Please contact your administrator.';
+      var endpoints = data;
+      if (endpoints.length > 0)  {
+        setActiveEndpointAndRedirectToDashboard(endpoints[0]);
+      } else {
+        $state.go('init.endpoint');
       }
     })
     .catch(function error(err) {
-      $scope.authData.error = 'Authentication error';
+      Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+    });
+  }
+
+  function authenticatedFlow() {
+    UserService.administratorExists()
+    .then(function success(exists) {
+      if (!exists) {
+        $state.go('init.admin');
+      }
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to verify administrator account existence');
+    });
+  }
+
+  $scope.authenticateUser = function() {
+    var username = $scope.formValues.Username;
+    var password = $scope.formValues.Password;
+
+    SettingsService.publicSettings()
+    .then(function success(data) {
+      var settings = data;
+      if (settings.AuthenticationMethod === 1) {
+        username = $sanitize(username);
+        password = $sanitize(password);
+      }
+      return Authentication.login(username, password);
+    })
+    .then(function success() {
+      return EndpointService.endpoints();
+    })
+    .then(function success(data) {
+      var endpoints = data;
+      var userDetails = Authentication.getUserDetails();
+      if (endpoints.length > 0)  {
+        setActiveEndpointAndRedirectToDashboard(endpoints[0]);
+      } else if (endpoints.length === 0 && userDetails.role === 1) {
+        $state.go('init.endpoint');
+      } else if (endpoints.length === 0 && userDetails.role === 2) {
+        Authentication.logout();
+        $scope.state.AuthenticationError = 'User not allowed. Please contact your administrator.';
+      }
+    })
+    .catch(function error() {
+      $scope.state.AuthenticationError = 'Invalid credentials';
     });
   };
+
+  function initView() {
+    if ($stateParams.logout || $stateParams.error) {
+      Authentication.logout();
+      $scope.state.AuthenticationError = $stateParams.error;
+      return;
+    }
+
+    if (Authentication.isAuthenticated()) {
+      $state.go('dashboard');
+    }
+
+    var authenticationEnabled = $scope.applicationState.application.authentication;
+    if (!authenticationEnabled) {
+      unauthenticatedFlow();
+    } else {
+      authenticatedFlow();
+    }
+  }
+
+  initView();
 }]);

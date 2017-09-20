@@ -5,4 +5,10 @@ function SecretViewModel(data) {
   this.Version = data.Version.Index;
   this.Name = data.Spec.Name;
   this.Labels = data.Spec.Labels;
+
+  if (data.Portainer) {
+    if (data.Portainer.ResourceControl) {
+      this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
+    }
+  }
 }

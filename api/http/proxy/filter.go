@@ -110,3 +110,76 @@ func filterServiceList(serviceData []interface{}, resourceControls []portainer.R
 
 	return filteredServiceData, nil
 }
+
+// filterNetworkList loops through all networks, filters networks without any resource control (public resources) or with
+// any resource control giving access to the user (these networks will be decorated).
+// Network object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
+func filterNetworkList(networkData []interface{}, resourceControls []portainer.ResourceControl, userID portainer.UserID, userTeamIDs []portainer.TeamID) ([]interface{}, error) {
+	filteredNetworkData := make([]interface{}, 0)
+
+	for _, network := range networkData {
+		networkObject := network.(map[string]interface{})
+		if networkObject[networkIdentifier] == nil {
+			return nil, ErrDockerNetworkIdentifierNotFound
+		}
+
+		networkID := networkObject[networkIdentifier].(string)
+		resourceControl := getResourceControlByResourceID(networkID, resourceControls)
+		if resourceControl == nil {
+			filteredNetworkData = append(filteredNetworkData, networkObject)
+		} else if resourceControl != nil && canUserAccessResource(userID, userTeamIDs, resourceControl) {
+			networkObject = decorateObject(networkObject, resourceControl)
+			filteredNetworkData = append(filteredNetworkData, networkObject)
+		}
+	}
+
+	return filteredNetworkData, nil
+}
+
+// filterSecretList loops through all secrets, filters secrets without any resource control (public resources) or with
+// any resource control giving access to the user (these secrets will be decorated).
+// Secret object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/SecretList
+func filterSecretList(secretData []interface{}, resourceControls []portainer.ResourceControl, userID portainer.UserID, userTeamIDs []portainer.TeamID) ([]interface{}, error) {
+	filteredSecretData := make([]interface{}, 0)
+
+	for _, secret := range secretData {
+		secretObject := secret.(map[string]interface{})
+		if secretObject[secretIdentifier] == nil {
+			return nil, ErrDockerSecretIdentifierNotFound
+		}
+
+		secretID := secretObject[secretIdentifier].(string)
+		resourceControl := getResourceControlByResourceID(secretID, resourceControls)
+		if resourceControl == nil {
+			filteredSecretData = append(filteredSecretData, secretObject)
+		} else if resourceControl != nil && canUserAccessResource(userID, userTeamIDs, resourceControl) {
+			secretObject = decorateObject(secretObject, resourceControl)
+			filteredSecretData = append(filteredSecretData, secretObject)
+		}
+	}
+
+	return filteredSecretData, nil
+}
+
+// filterTaskList loops through all tasks, filters tasks without any resource control (public resources) or with
+// any resource control giving access to the user based on the associated service identifier.
+// Task object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/TaskList
+func filterTaskList(taskData []interface{}, resourceControls []portainer.ResourceControl, userID portainer.UserID, userTeamIDs []portainer.TeamID) ([]interface{}, error) {
+	filteredTaskData := make([]interface{}, 0)
+
+	for _, task := range taskData {
+		taskObject := task.(map[string]interface{})
+		if taskObject[taskServiceIdentifier] == nil {
+			return nil, ErrDockerTaskServiceIdentifierNotFound
+		}
+
+		serviceID := taskObject[taskServiceIdentifier].(string)
+
+		resourceControl := getResourceControlByResourceID(serviceID, resourceControls)
+		if resourceControl == nil || (resourceControl != nil && canUserAccessResource(userID, userTeamIDs, resourceControl)) {
+			filteredTaskData = append(filteredTaskData, taskObject)
+		}
+	}
+
+	return filteredTaskData, nil
+}

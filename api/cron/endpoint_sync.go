@@ -22,6 +22,16 @@ type (
 		endpointsToUpdate []*portainer.Endpoint
 		endpointsToDelete []*portainer.Endpoint
 	}
+
+	fileEndpoint struct {
+		Name          string `json:"Name"`
+		URL           string `json:"URL"`
+		TLS           bool   `json:"TLS,omitempty"`
+		TLSSkipVerify bool   `json:"TLSSkipVerify,omitempty"`
+		TLSCACert     string `json:"TLSCACert,omitempty"`
+		TLSCert       string `json:"TLSCert,omitempty"`
+		TLSKey        string `json:"TLSKey,omitempty"`
+	}
 )
 
 const (
@@ -55,6 +65,28 @@ func isValidEndpoint(endpoint *portainer.Endpoint) bool {
 	return false
 }
 
+func convertFileEndpoints(fileEndpoints []fileEndpoint) []portainer.Endpoint {
+	convertedEndpoints := make([]portainer.Endpoint, 0)
+
+	for _, e := range fileEndpoints {
+		endpoint := portainer.Endpoint{
+			Name:      e.Name,
+			URL:       e.URL,
+			TLSConfig: portainer.TLSConfiguration{},
+		}
+		if e.TLS {
+			endpoint.TLSConfig.TLS = true
+			endpoint.TLSConfig.TLSSkipVerify = e.TLSSkipVerify
+			endpoint.TLSConfig.TLSCACertPath = e.TLSCACert
+			endpoint.TLSConfig.TLSCertPath = e.TLSCert
+			endpoint.TLSConfig.TLSKeyPath = e.TLSKey
+		}
+		convertedEndpoints = append(convertedEndpoints, endpoint)
+	}
+
+	return convertedEndpoints
+}
+
 func endpointExists(endpoint *portainer.Endpoint, endpoints []portainer.Endpoint) int {
 	for idx, v := range endpoints {
 		if endpoint.Name == v.Name && isValidEndpoint(&v) {
@@ -66,22 +98,25 @@ func endpointExists(endpoint *portainer.Endpoint, endpoints []portainer.Endpoint
 
 func mergeEndpointIfRequired(original, updated *portainer.Endpoint) *portainer.Endpoint {
 	var endpoint *portainer.Endpoint
-	if original.URL != updated.URL || original.TLS != updated.TLS ||
-		(updated.TLS && original.TLSCACertPath != updated.TLSCACertPath) ||
-		(updated.TLS && original.TLSCertPath != updated.TLSCertPath) ||
-		(updated.TLS && original.TLSKeyPath != updated.TLSKeyPath) {
+	if original.URL != updated.URL || original.TLSConfig.TLS != updated.TLSConfig.TLS ||
+		(updated.TLSConfig.TLS && original.TLSConfig.TLSSkipVerify != updated.TLSConfig.TLSSkipVerify) ||
+		(updated.TLSConfig.TLS && original.TLSConfig.TLSCACertPath != updated.TLSConfig.TLSCACertPath) ||
+		(updated.TLSConfig.TLS && original.TLSConfig.TLSCertPath != updated.TLSConfig.TLSCertPath) ||
+		(updated.TLSConfig.TLS && original.TLSConfig.TLSKeyPath != updated.TLSConfig.TLSKeyPath) {
 		endpoint = original
 		endpoint.URL = updated.URL
-		if updated.TLS {
-			endpoint.TLS = true
-			endpoint.TLSCACertPath = updated.TLSCACertPath
-			endpoint.TLSCertPath = updated.TLSCertPath
-			endpoint.TLSKeyPath = updated.TLSKeyPath
+		if updated.TLSConfig.TLS {
+			endpoint.TLSConfig.TLS = true
+			endpoint.TLSConfig.TLSSkipVerify = updated.TLSConfig.TLSSkipVerify
+			endpoint.TLSConfig.TLSCACertPath = updated.TLSConfig.TLSCACertPath
+			endpoint.TLSConfig.TLSCertPath = updated.TLSConfig.TLSCertPath
+			endpoint.TLSConfig.TLSKeyPath = updated.TLSConfig.TLSKeyPath
 		} else {
-			endpoint.TLS = false
-			endpoint.TLSCACertPath = ""
-			endpoint.TLSCertPath = ""
-			endpoint.TLSKeyPath = ""
+			endpoint.TLSConfig.TLS = false
+			endpoint.TLSConfig.TLSSkipVerify = false
+			endpoint.TLSConfig.TLSCACertPath = ""
+			endpoint.TLSConfig.TLSCertPath = ""
+			endpoint.TLSConfig.TLSKeyPath = ""
 		}
 	}
 	return endpoint
@@ -141,7 +176,7 @@ func (job endpointSyncJob) Sync() error {
 		return err
 	}
 
-	var fileEndpoints []portainer.Endpoint
+	var fileEndpoints []fileEndpoint
 	err = json.Unmarshal(data, &fileEndpoints)
 	if endpointSyncError(err, job.logger) {
 		return err
@@ -156,7 +191,9 @@ func (job endpointSyncJob) Sync() error {
 		return err
 	}
 
-	sync := job.prepareSyncData(storedEndpoints, fileEndpoints)
+	convertedFileEndpoints := convertFileEndpoints(fileEndpoints)
+
+	sync := job.prepareSyncData(storedEndpoints, convertedFileEndpoints)
 	if sync.requireSync() {
 		err = job.endpointService.Synchronize(sync.endpointsToCreate, sync.endpointsToUpdate, sync.endpointsToDelete)
 		if endpointSyncError(err, job.logger) {

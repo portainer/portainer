@@ -30,6 +30,7 @@ func NewFileHandler(assetPath string) *FileHandler {
 			"/js":     true,
 			"/images": true,
 			"/fonts":  true,
+			"/ico":    true,
 		},
 	}
 	return h
