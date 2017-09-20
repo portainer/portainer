@@ -16,12 +16,13 @@ import (
 type Service struct{}
 
 const (
-	errInvalidEndpointProtocol    = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
-	errSocketNotFound             = portainer.Error("Unable to locate Unix socket")
-	errEndpointsFileNotFound      = portainer.Error("Unable to locate external endpoints file")
-	errInvalidSyncInterval        = portainer.Error("Invalid synchronization interval")
-	errEndpointExcludeExternal    = portainer.Error("Cannot use the -H flag mutually with --external-endpoints")
-	errNoAuthExcludeAdminPassword = portainer.Error("Cannot use --no-auth with --admin-password")
+	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
+	errSocketNotFound                = portainer.Error("Unable to locate Unix socket")
+	errEndpointsFileNotFound         = portainer.Error("Unable to locate external endpoints file")
+	errInvalidSyncInterval           = portainer.Error("Invalid synchronization interval")
+	errEndpointExcludeExternal       = portainer.Error("Cannot use the -H flag mutually with --external-endpoints")
+	errNoAuthExcludeAdminPassword    = portainer.Error("Cannot use --no-auth with --admin-password or --admin-password-file")
+	errAdminPassExcludeAdminPassFile = portainer.Error("Cannot use --admin-password with --admin-password-file")
 )
 
 // ParseFlags parse the CLI flags and return a portainer.Flags struct
@@ -45,6 +46,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		SSLCert:           kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").Default(defaultSSLCertPath).String(),
 		SSLKey:            kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").Default(defaultSSLKeyPath).String(),
 		AdminPassword:     kingpin.Flag("admin-password", "Hashed admin password").String(),
+		AdminPasswordFile: kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
 		// Deprecated flags
 		Labels:    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
 		Logo:      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
@@ -77,8 +79,12 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 		return err
 	}
 
-	if *flags.NoAuth && (*flags.AdminPassword != "") {
+	if *flags.NoAuth && (*flags.AdminPassword != "" || *flags.AdminPasswordFile != "") {
 		return errNoAuthExcludeAdminPassword
+	}
+
+	if *flags.AdminPassword != "" && *flags.AdminPasswordFile != "" {
+		return errAdminPassExcludeAdminPassFile
 	}
 
 	displayDeprecationWarnings(*flags.Templates, *flags.Logo, *flags.Labels)
