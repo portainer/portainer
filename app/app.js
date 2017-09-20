@@ -32,7 +32,7 @@ angular.module('portainer', [
   'createSecret',
   'createService',
   'createVolume',
-  'docker',
+  'engine',
   'endpoint',
   'endpointAccess',
   'endpoints',
@@ -350,12 +350,12 @@ angular.module('portainer', [
         }
       }
     })
-    .state('docker', {
-      url: '/docker/',
+    .state('engine', {
+      url: '/engine/',
       views: {
         'content@': {
-          templateUrl: 'app/components/docker/docker.html',
-          controller: 'DockerController'
+          templateUrl: 'app/components/engine/engine.html',
+          controller: 'EngineController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
