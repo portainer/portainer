@@ -151,7 +151,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
 
     $q.all({
       templates: TemplateService.getTemplates(templatesKey),
-      containers: ContainerService.getContainers(0),
+      containers: ContainerService.containers(0),
       volumes: VolumeService.getVolumes(),
       networks: NetworkService.networks(
         provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',

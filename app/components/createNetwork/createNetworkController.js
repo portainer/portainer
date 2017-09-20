@@ -1,12 +1,20 @@
 angular.module('createNetwork', [])
-.controller('CreateNetworkController', ['$scope', '$state', 'Notifications', 'Network', 'LabelHelper',
-function ($scope, $state, Notifications, Network, LabelHelper) {
+.controller('CreateNetworkController', ['$q', '$scope', '$state', 'PluginService', 'Notifications', 'NetworkService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator',
+function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator) {
+
   $scope.formValues = {
     DriverOptions: [],
     Subnet: '',
     Gateway: '',
-    Labels: []
+    Labels: [],
+    AccessControlData: new AccessControlFormData()
   };
+
+  $scope.state = {
+    formValidationError: ''
+  };
+
+  $scope.availableNetworkDrivers = [];
 
   $scope.config = {
     Driver: 'bridge',
@@ -36,23 +44,6 @@ function ($scope, $state, Notifications, Network, LabelHelper) {
   $scope.removeLabel = function(index) {
     $scope.formValues.Labels.splice(index, 1);
   };
-
-  function createNetwork(config) {
-    $('#createNetworkSpinner').show();
-    Network.create(config, function (d) {
-      if (d.message) {
-        $('#createNetworkSpinner').hide();
-        Notifications.error('Unable to create network', {}, d.message);
-      } else {
-        Notifications.success('Network created', d.Id);
-        $('#createNetworkSpinner').hide();
-        $state.go('networks', {}, {reload: true});
-      }
-    }, function (e) {
-      $('#createNetworkSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to create network');
-    });
-  }
 
   function prepareIPAMConfiguration(config) {
     if ($scope.formValues.Subnet) {
@@ -85,8 +76,66 @@ function ($scope, $state, Notifications, Network, LabelHelper) {
     return config;
   }
 
+  function validateForm(accessControlData, isAdmin) {
+    $scope.state.formValidationError = '';
+    var error = '';
+    error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+
+    if (error) {
+      $scope.state.formValidationError = error;
+      return false;
+    }
+    return true;
+  }
+
   $scope.create = function () {
-    var config = prepareConfiguration();
-    createNetwork(config);
+    $('#createResourceSpinner').show();
+
+    var networkConfiguration = prepareConfiguration();
+    var accessControlData = $scope.formValues.AccessControlData;
+    var userDetails = Authentication.getUserDetails();
+    var isAdmin = userDetails.role === 1 ? true : false;
+
+    if (!validateForm(accessControlData, isAdmin)) {
+      $('#createResourceSpinner').hide();
+      return;
+    }
+
+    NetworkService.create(networkConfiguration)
+    .then(function success(data) {
+      var networkIdentifier = data.Id;
+      var userId = userDetails.ID;
+      return ResourceControlService.applyResourceControl('network', networkIdentifier, userId, accessControlData, []);
+    })
+    .then(function success() {
+      Notifications.success('Network successfully created');
+      $state.go('networks', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'An error occured during network creation');
+    })
+    .finally(function final() {
+      $('#createResourceSpinner').hide();
+    });
   };
+
+  function initView() {
+    $('#loadingViewSpinner').show();
+    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    if(endpointProvider !== 'DOCKER_SWARM') {
+      PluginService.networkPlugins(apiVersion < 1.25)
+      .then(function success(data){
+          $scope.availableNetworkDrivers = data;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve network drivers');
+      })
+      .finally(function final() {
+        $('#loadingViewSpinner').hide();
+      });
+    }
+  }
+
+  initView();
 }]);

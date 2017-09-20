@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', 'HttpRequestHelper', 'SystemService', function ImageServiceFactory($q, Image, ImageHelper, RegistryService, HttpRequestHelper, SystemService) {
+.factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', 'HttpRequestHelper', 'ContainerService', function ImageServiceFactory($q, Image, ImageHelper, RegistryService, HttpRequestHelper, ContainerService) {
   'use strict';
   var service = {};
 
@@ -24,17 +24,23 @@ angular.module('portainer.services')
     var deferred = $q.defer();
 
     $q.all({
-      dataUsage: withUsage ? SystemService.dataUsage() : { Images: [] },
+      containers: withUsage ? ContainerService.containers(1) : [],
       images: Image.query({}).$promise
     })
     .then(function success(data) {
-      var images = data.images.map(function(item) {
-        item.dataUsage = data.dataUsage.Images.find(function(usage) {
-           return item.Id === usage.Id;
-        });
+      var containers = data.containers;
 
+      var images = data.images.map(function(item) {
+        item.ContainerCount = 0;
+        for (var i = 0; i < containers.length; i++) {
+          var container = containers[i];
+          if (container.ImageID === item.Id) {
+            item.ContainerCount++;
+          }
+        }
         return new ImageViewModel(item);
       });
+
       deferred.resolve(images);
     })
     .catch(function error(err) {

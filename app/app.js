@@ -23,6 +23,7 @@ angular.module('portainer', [
   'container',
   'containerConsole',
   'containerLogs',
+  'containerStats',
   'serviceLogs',
   'containers',
   'createContainer',
@@ -31,14 +32,15 @@ angular.module('portainer', [
   'createSecret',
   'createService',
   'createVolume',
-  'docker',
+  'engine',
   'endpoint',
   'endpointAccess',
-  'endpointInit',
   'endpoints',
   'events',
   'image',
   'images',
+  'initAdmin',
+  'initEndpoint',
   'main',
   'network',
   'networks',
@@ -53,8 +55,8 @@ angular.module('portainer', [
   'settings',
   'settingsAuthentication',
   'sidebar',
-  'stats',
   'swarm',
+  'swarmVisualizer',
   'task',
   'team',
   'teams',
@@ -63,7 +65,8 @@ angular.module('portainer', [
   'users',
   'userSettings',
   'volume',
-  'volumes'])
+  'volumes',
+  'rzModule'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider) {
     'use strict';
 
@@ -157,8 +160,8 @@ angular.module('portainer', [
       url: '^/containers/:id/stats',
       views: {
         'content@': {
-          templateUrl: 'app/components/stats/stats.html',
-          controller: 'StatsController'
+          templateUrl: 'app/components/containerStats/containerStats.html',
+          controller: 'ContainerStatsController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
@@ -321,12 +324,39 @@ angular.module('portainer', [
         }
       }
     })
-    .state('docker', {
-      url: '/docker/',
+    .state('init', {
+      abstract: true,
+      url: '/init',
       views: {
         'content@': {
-          templateUrl: 'app/components/docker/docker.html',
-          controller: 'DockerController'
+          template: '<div ui-view="content@"></div>'
+        }
+      }
+    })
+    .state('init.endpoint', {
+      url: '/endpoint',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/initEndpoint/initEndpoint.html',
+          controller: 'InitEndpointController'
+        }
+      }
+    })
+    .state('init.admin', {
+      url: '/admin',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/initAdmin/initAdmin.html',
+          controller: 'InitAdminController'
+        }
+      }
+    })
+    .state('engine', {
+      url: '/engine/',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/engine/engine.html',
+          controller: 'EngineController'
         },
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
@@ -370,15 +400,6 @@ angular.module('portainer', [
         'sidebar@': {
           templateUrl: 'app/components/sidebar/sidebar.html',
           controller: 'SidebarController'
-        }
-      }
-    })
-    .state('endpointInit', {
-      url: '/init/endpoint',
-      views: {
-        'content@': {
-          templateUrl: 'app/components/endpointInit/endpointInit.html',
-          controller: 'EndpointInitController'
         }
       }
     })
@@ -716,7 +737,7 @@ angular.module('portainer', [
       }
     })
     .state('swarm', {
-      url: '/swarm/',
+      url: '/swarm',
       views: {
         'content@': {
           templateUrl: 'app/components/swarm/swarm.html',
@@ -727,7 +748,21 @@ angular.module('portainer', [
           controller: 'SidebarController'
         }
       }
-    });
+    })
+    .state('swarm.visualizer', {
+      url: '/visualizer',
+      views: {
+        'content@': {
+          templateUrl: 'app/components/swarmVisualizer/swarmVisualizer.html',
+          controller: 'SwarmVisualizerController'
+        },
+        'sidebar@': {
+          templateUrl: 'app/components/sidebar/sidebar.html',
+          controller: 'SidebarController'
+        }
+      }
+    })
+    ;
   }])
   .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics) {
     EndpointProvider.initialize();
