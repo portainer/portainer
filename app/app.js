@@ -65,7 +65,8 @@ angular.module('portainer', [
   'users',
   'userSettings',
   'volume',
-  'volumes'])
+  'volumes',
+  'rzModule'])
   .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider) {
     'use strict';
 
