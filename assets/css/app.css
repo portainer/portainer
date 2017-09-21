@@ -596,6 +596,12 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 }
 /*!toaster override*/
 
+/*angular-loading-bar override*/
+#loading-bar .bar {
+  background: #30426a;
+}
+/*!angular-loading-bar override*/
+
 .monospaced {
   font-family: monospace;
   font-weight: 600;

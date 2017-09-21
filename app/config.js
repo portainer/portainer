@@ -1,5 +1,6 @@
 angular.module('portainer')
-  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider) {
+  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', 'cfpLoadingBarProvider',
+  function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
     'use strict';
 
     var environment = '@@ENVIRONMENT';
@@ -31,6 +32,8 @@ angular.module('portainer')
       'focus': 'blur',
       'outsideClick': 'outsideClick'
     });
+
+    cfpLoadingBarProvider.includeSpinner = false;
 
     $urlRouterProvider.otherwise('/auth');
     configureRoutes($stateProvider);

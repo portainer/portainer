@@ -39,6 +39,7 @@ css:
   - bower_components/toastr/toastr.css
   - bower_components/xterm.js/dist/xterm.css
   - bower_components/angularjs-slider/dist/rzslider.css
+  - bower_components/angular-loading-bar/build/loading-bar.css
   minified:
   - bower_components/bootstrap/dist/css/bootstrap.min.css
   - bower_components/rdash-ui/dist/css/rdash.min.css
@@ -48,6 +49,7 @@ css:
   - bower_components/toastr/toastr.min.css
   - bower_components/xterm.js/dist/xterm.css
   - bower_components/angularjs-slider/dist/rzslider.min.css
+  - bower_components/angular-loading-bar/build/loading-bar.min.css
 angular:
   regular:
   - bower_components/angular/angular.js
@@ -62,6 +64,7 @@ angular:
   - bower_components/angular-ui-router/release/angular-ui-router.js
   - bower_components/angular-utils-pagination/dirPagination.js
   - bower_components/ng-file-upload/ng-file-upload.js
+  - bower_components/angular-loading-bar/build/loading-bar.js
   minified:
   - bower_components/angular/angular.min.js
   - bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js
@@ -75,3 +78,4 @@ angular:
   - bower_components/angular-ui-router/release/angular-ui-router.min.js
   - bower_components/angular-utils-pagination/dirPagination.js
   - bower_components/ng-file-upload/ng-file-upload.min.js
+  - bower_components/angular-loading-bar/build/loading-bar.min.js
