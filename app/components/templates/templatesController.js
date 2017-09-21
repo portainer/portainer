@@ -1,10 +1,10 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'FormValidator',
-function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, FormValidator) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'FormValidator',
+function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, FormValidator) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
-    hideDescriptions: $stateParams.hide_descriptions,
+    hideDescriptions: $transition$.params().hide_descriptions,
     formValidationError: '',
     filters: {
       Categories: '!',
@@ -145,7 +145,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
   }
 
   function initTemplates() {
-    var templatesKey = $stateParams.key;
+    var templatesKey = $transition$.params().key;
     var provider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
