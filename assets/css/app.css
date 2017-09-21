@@ -3,6 +3,10 @@ html, body, #content-wrapper, .page-content, #view {
   width: 100%;
 }
 
+#view {
+  position: relative;
+}
+
 .white-space-normal {
   white-space: normal !important;
 }
@@ -598,7 +602,9 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 
 /*angular-loading-bar override*/
 #loading-bar .bar {
-  background: #30426a;
+  position: absolute;
+  height: 3px;
+  background: #738bc0;
 }
 /*!angular-loading-bar override*/
 
