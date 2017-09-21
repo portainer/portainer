@@ -1,5 +1,5 @@
 angular.module('extension.storidge', [])
-.config(['$stateRegistry', function ($stateRegistry) {
+.config(['$stateRegistryProvider', function ($stateRegistryProvider) {
   'use strict';
 
   var storidge = {
@@ -65,7 +65,7 @@ angular.module('extension.storidge', [])
   };
 
   var cluster = {
-    name: 'cluster',
+    name: 'storidge.cluster',
     url: '/cluster',
     views: {
       'content@': {
@@ -80,7 +80,7 @@ angular.module('extension.storidge', [])
   };
 
   var monitor = {
-    name: 'monitor',
+    name: 'storidge.monitor',
     url: '/events',
     views: {
       'content@': {
@@ -94,10 +94,10 @@ angular.module('extension.storidge', [])
     }
   };
 
-  $stateRegistry.register(storidge);
-  $stateRegistry.register(profiles);
-  $stateRegistry.register(profileCreation);
-  $stateRegistry.register(profileEdition);
-  $stateRegistry.register(cluster);
-  $stateRegistry.register(monitor);
+  $stateRegistryProvider.register(storidge);
+  $stateRegistryProvider.register(profiles);
+  $stateRegistryProvider.register(profileCreation);
+  $stateRegistryProvider.register(profileEdition);
+  $stateRegistryProvider.register(cluster);
+  $stateRegistryProvider.register(monitor);
 }]);

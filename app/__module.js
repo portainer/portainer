@@ -33,6 +33,7 @@ angular.module('portainer', [
   'endpointAccess',
   'endpoints',
   'events',
+  'extension.storidge',
   'image',
   'images',
   'initAdmin',
