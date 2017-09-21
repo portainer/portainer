@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('node', [])
-.controller('NodeController', ['$scope', '$state', '$stateParams', 'LabelHelper', 'Node', 'NodeHelper', 'Task', 'Pagination', 'Notifications',
-function ($scope, $state, $stateParams, LabelHelper, Node, NodeHelper, Task, Pagination, Notifications) {
+.controller('NodeController', ['$scope', '$state', '$transition$', 'LabelHelper', 'Node', 'NodeHelper', 'Task', 'Pagination', 'Notifications',
+function ($scope, $state, $transition$, LabelHelper, Node, NodeHelper, Task, Pagination, Notifications) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('node_tasks');
@@ -80,7 +80,7 @@ function ($scope, $state, $stateParams, LabelHelper, Node, NodeHelper, Task, Pag
   function loadNodeAndTasks() {
     $scope.loading = true;
     if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
-      Node.get({ id: $stateParams.id}, function(d) {
+      Node.get({ id: $transition$.params().id}, function(d) {
         if (d.message) {
           Notifications.error('Failure', e, 'Unable to inspect the node');
         } else {

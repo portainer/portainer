@@ -1,6 +1,6 @@
 angular.module('registry', [])
-.controller('RegistryController', ['$scope', '$state', '$stateParams', '$filter', 'RegistryService', 'Notifications',
-function ($scope, $state, $stateParams, $filter, RegistryService, Notifications) {
+.controller('RegistryController', ['$scope', '$state', '$transition$', '$filter', 'RegistryService', 'Notifications',
+function ($scope, $state, $transition$, $filter, RegistryService, Notifications) {
 
   $scope.updateRegistry = function() {
     $('#updateRegistrySpinner').show();
@@ -20,7 +20,7 @@ function ($scope, $state, $stateParams, $filter, RegistryService, Notifications)
 
   function initView() {
     $('#loadingViewSpinner').show();
-    var registryID = $stateParams.id;
+    var registryID = $transition$.params().id;
     RegistryService.registry(registryID)
     .then(function success(data) {
       $scope.registry = data;
