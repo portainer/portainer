@@ -15,8 +15,8 @@ angular.module('extension.storidge')
           {
             data: [],
             backgroundColor: [
-              'rgba(151,187,205,0.7)',
-              'rgba(255,180,174,0.7)'
+              'rgba(244, 67, 54, 0.7)',
+              'rgba(63, 81, 181, 0.7)'
             ]
           }
         ],
