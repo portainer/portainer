@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$uiRouterGlobals', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
-function ($q, $scope, $uiRouterGlobals, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -307,7 +307,7 @@ function ($q, $scope, $uiRouterGlobals, $state, $location, $timeout, $anchorScro
   function initView() {
     $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    ServiceService.service($uiRouterGlobals.params.id)
+    ServiceService.service($transition$.params().id)
     .then(function success(data) {
       var service = data;
       $scope.isUpdating = $scope.lastVersion >= service.Version;

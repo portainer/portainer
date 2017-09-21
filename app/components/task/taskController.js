@@ -1,10 +1,10 @@
 angular.module('task', [])
-.controller('TaskController', ['$scope', '$uiRouterGlobals', 'TaskService', 'Service', 'Notifications',
-function ($scope, $uiRouterGlobals, TaskService, Service, Notifications) {
+.controller('TaskController', ['$scope', '$transition$', 'TaskService', 'Service', 'Notifications',
+function ($scope, $transition$, TaskService, Service, Notifications) {
 
   function initView() {
     $('#loadingViewSpinner').show();
-    TaskService.task($uiRouterGlobals.params.id)
+    TaskService.task($transition$.params().id)
     .then(function success(data) {
       var task = data;
       $scope.task = task;

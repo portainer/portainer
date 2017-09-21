@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$q', '$scope', '$state','$uiRouterGlobals', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
-function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, Pagination, ModalService, ResourceControlService, RegistryService, ImageService) {
+.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
+function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, Pagination, ModalService, ResourceControlService, RegistryService, ImageService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.config = {
@@ -16,7 +16,7 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
 
   var update = function () {
     $('#loadingViewSpinner').show();
-    Container.get({id: $uiRouterGlobals.params.id}, function (d) {
+    Container.get({id: $transition$.params().id}, function (d) {
       var container = new ContainerDetailsViewModel(d);
       $scope.container = container;
       $scope.container.edit = false;
@@ -52,7 +52,7 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
     $('#loadingViewSpinner').show();
     Container.start({id: $scope.container.Id}, {}, function (d) {
       update();
-      Notifications.success('Container started', $uiRouterGlobals.params.id);
+      Notifications.success('Container started', $transition$.params().id);
     }, function (e) {
       update();
       Notifications.error('Failure', e, 'Unable to start container');
@@ -61,9 +61,9 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
 
   $scope.stop = function () {
     $('#loadingViewSpinner').show();
-    Container.stop({id: $uiRouterGlobals.params.id}, function (d) {
+    Container.stop({id: $transition$.params().id}, function (d) {
       update();
-      Notifications.success('Container stopped', $uiRouterGlobals.params.id);
+      Notifications.success('Container stopped', $transition$.params().id);
     }, function (e) {
       update();
       Notifications.error('Failure', e, 'Unable to stop container');
@@ -72,9 +72,9 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
 
   $scope.kill = function () {
     $('#loadingViewSpinner').show();
-    Container.kill({id: $uiRouterGlobals.params.id}, function (d) {
+    Container.kill({id: $transition$.params().id}, function (d) {
       update();
-      Notifications.success('Container killed', $uiRouterGlobals.params.id);
+      Notifications.success('Container killed', $transition$.params().id);
     }, function (e) {
       update();
       Notifications.error('Failure', e, 'Unable to kill container');
@@ -86,10 +86,10 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;
     var imageConfig = ImageHelper.createImageConfigForCommit(image, registry.URL);
-    ContainerCommit.commit({id: $uiRouterGlobals.params.id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
+    ContainerCommit.commit({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
       $('#createImageSpinner').hide();
       update();
-      Notifications.success('Container commited', $uiRouterGlobals.params.id);
+      Notifications.success('Container commited', $transition$.params().id);
     }, function (e) {
       $('#createImageSpinner').hide();
       update();
@@ -99,9 +99,9 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
 
   $scope.pause = function () {
     $('#loadingViewSpinner').show();
-    Container.pause({id: $uiRouterGlobals.params.id}, function (d) {
+    Container.pause({id: $transition$.params().id}, function (d) {
       update();
-      Notifications.success('Container paused', $uiRouterGlobals.params.id);
+      Notifications.success('Container paused', $transition$.params().id);
     }, function (e) {
       update();
       Notifications.error('Failure', e, 'Unable to pause container');
@@ -110,9 +110,9 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
 
   $scope.unpause = function () {
     $('#loadingViewSpinner').show();
-    Container.unpause({id: $uiRouterGlobals.params.id}, function (d) {
+    Container.unpause({id: $transition$.params().id}, function (d) {
       update();
-      Notifications.success('Container unpaused', $uiRouterGlobals.params.id);
+      Notifications.success('Container unpaused', $transition$.params().id);
     }, function (e) {
       update();
       Notifications.error('Failure', e, 'Unable to unpause container');
@@ -154,9 +154,9 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
 
   $scope.restart = function () {
     $('#loadingViewSpinner').show();
-    Container.restart({id: $uiRouterGlobals.params.id}, function (d) {
+    Container.restart({id: $transition$.params().id}, function (d) {
       update();
-      Notifications.success('Container restarted', $uiRouterGlobals.params.id);
+      Notifications.success('Container restarted', $transition$.params().id);
     }, function (e) {
       update();
       Notifications.error('Failure', e, 'Unable to restart container');
@@ -165,7 +165,7 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
 
   $scope.renameContainer = function () {
     var container = $scope.container;
-    Container.rename({id: $uiRouterGlobals.params.id, 'name': container.newContainerName}, function (d) {
+    Container.rename({id: $transition$.params().id, 'name': container.newContainerName}, function (d) {
       if (d.message) {
         container.newContainerName = container.Name;
         Notifications.error('Unable to rename container', {}, d.message);
@@ -181,14 +181,14 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
 
   $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
     $('#loadingViewSpinner').show();
-    Network.disconnect({id: networkId}, { Container: $uiRouterGlobals.params.id, Force: false }, function (d) {
+    Network.disconnect({id: networkId}, { Container: $transition$.params().id, Force: false }, function (d) {
       if (container.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error('Error', d, 'Unable to disconnect container from network');
       } else {
         $('#loadingViewSpinner').hide();
-        Notifications.success('Container left network', $uiRouterGlobals.params.id);
-        $state.go('container', {id: $uiRouterGlobals.params.id}, {reload: true});
+        Notifications.success('Container left network', $transition$.params().id);
+        $state.go('container', {id: $transition$.params().id}, {reload: true});
       }
     }, function (e) {
       $('#loadingViewSpinner').hide();
@@ -199,7 +199,7 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
   $scope.duplicate = function() {
     ModalService.confirmExperimentalFeature(function (experimental) {
       if(!experimental) { return; }
-      $state.go('actions.create.container', {from: $uiRouterGlobals.params.id}, {reload: true});
+      $state.go('actions.create.container', {from: $transition$.params().id}, {reload: true});
     });
   };
 
@@ -280,14 +280,14 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerCom
 
   $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
     $('#joinNetworkSpinner').show();
-    Network.connect({id: networkId}, { Container: $uiRouterGlobals.params.id }, function (d) {
+    Network.connect({id: networkId}, { Container: $transition$.params().id }, function (d) {
       if (container.message) {
         $('#joinNetworkSpinner').hide();
         Notifications.error('Error', d, 'Unable to connect container to network');
       } else {
         $('#joinNetworkSpinner').hide();
-        Notifications.success('Container joined network', $uiRouterGlobals.params.id);
-        $state.go('container', {id: $uiRouterGlobals.params.id}, {reload: true});
+        Notifications.success('Container joined network', $transition$.params().id);
+        $state.go('container', {id: $transition$.params().id}, {reload: true});
       }
     }, function (e) {
       $('#joinNetworkSpinner').hide();

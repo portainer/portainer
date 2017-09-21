@@ -1,10 +1,10 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$uiRouterGlobals', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'FormValidator',
-function ($scope, $q, $state, $uiRouterGlobals, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, FormValidator) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'FormValidator',
+function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, FormValidator) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
-    hideDescriptions: $uiRouterGlobals.params.hide_descriptions,
+    hideDescriptions: $transition$.params().hide_descriptions,
     formValidationError: '',
     filters: {
       Categories: '!',
@@ -145,7 +145,7 @@ function ($scope, $q, $state, $uiRouterGlobals, $anchorScroll, $filter, Containe
   }
 
   function initTemplates() {
-    var templatesKey = $uiRouterGlobals.params.key;
+    var templatesKey = $transition$.params().key;
     var provider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
 

@@ -1,6 +1,6 @@
 angular.module('containerStats', [])
-.controller('ContainerStatsController', ['$q', '$scope', '$uiRouterGlobals', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'Pagination',
-function ($q, $scope, $uiRouterGlobals, $document, $interval, ContainerService, ChartService, Notifications, Pagination) {
+.controller('ContainerStatsController', ['$q', '$scope', '$transition$', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'Pagination',
+function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications, Pagination) {
 
   $scope.state = {
     refreshRate: '5'
@@ -79,8 +79,8 @@ function ($q, $scope, $uiRouterGlobals, $document, $interval, ContainerService, 
   function startChartUpdate(networkChart, cpuChart, memoryChart) {
     $('#loadingViewSpinner').show();
     $q.all({
-      stats: ContainerService.containerStats($uiRouterGlobals.params.id),
-      top: ContainerService.containerTop($uiRouterGlobals.params.id)
+      stats: ContainerService.containerStats($transition$.params().id),
+      top: ContainerService.containerTop($transition$.params().id)
     })
     .then(function success(data) {
       var stats = data.stats;
@@ -103,8 +103,8 @@ function ($q, $scope, $uiRouterGlobals, $document, $interval, ContainerService, 
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
       $q.all({
-        stats: ContainerService.containerStats($uiRouterGlobals.params.id),
-        top: ContainerService.containerTop($uiRouterGlobals.params.id)
+        stats: ContainerService.containerStats($transition$.params().id),
+        top: ContainerService.containerTop($transition$.params().id)
       })
       .then(function success(data) {
         var stats = data.stats;
@@ -139,7 +139,7 @@ function ($q, $scope, $uiRouterGlobals, $document, $interval, ContainerService, 
   function initView() {
     $('#loadingViewSpinner').show();
 
-    ContainerService.container($uiRouterGlobals.params.id)
+    ContainerService.container($transition$.params().id)
     .then(function success(data) {
       $scope.container = data;
     })
