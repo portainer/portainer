@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService',
-function ($q, $scope, $state, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService',
+function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -13,11 +13,22 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerHelper,
     ExtraHosts: [],
     IPv4: '',
     IPv6: '',
-    AccessControlData: new AccessControlFormData()
+    AccessControlData: new AccessControlFormData(),
+    CpuLimit: 0,
+    MemoryLimit: 0,
+    MemoryReservation: 0,
+    MemoryLimitUnit: 'MB',
+    MemoryReservationUnit: 'MB'
   };
 
   $scope.state = {
     formValidationError: ''
+  };
+
+  $scope.refreshSlider = function () {
+    $timeout(function () {
+      $scope.$broadcast('rzSliderForceRender');
+    });
   };
 
   $scope.config = {
@@ -221,6 +232,31 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerHelper,
     config.HostConfig.Devices = path;
   }
 
+  function prepareResources(config) {
+    // Memory Limit - Round to 0.125
+    var memoryLimit = (Math.round($scope.formValues.MemoryLimit * 8) / 8).toFixed(3);
+    memoryLimit *= 1024 * 1024;
+    if ($scope.formValues.MemoryLimitUnit === 'GB') {
+      memoryLimit *= 1024;
+    }
+    if (memoryLimit > 0) {
+      config.HostConfig.Memory = memoryLimit;
+    }
+    // Memory Resevation - Round to 0.125
+    var memoryReservation = (Math.round($scope.formValues.MemoryReservation * 8) / 8).toFixed(3);
+    memoryReservation *= 1024 * 1024;
+    if ($scope.formValues.MemoryReservationUnit === 'GB') {
+      memoryReservation *= 1024;
+    }
+    if (memoryReservation > 0) {
+      config.HostConfig.MemoryReservation = memoryReservation;
+    }
+    // CPU Limit
+    if ($scope.formValues.CpuLimit > 0) {
+      config.HostConfig.NanoCpus = $scope.formValues.CpuLimit * 1000000000;
+    }
+  }
+
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
     config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
@@ -232,6 +268,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerHelper,
     prepareVolumes(config);
     prepareLabels(config);
     prepareDevices(config);
+    prepareResources(config);
     return config;
   }
 
@@ -416,6 +453,18 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerHelper,
     });
   }
 
+  function loadFromContainerResources(d) {
+    if (d.HostConfig.NanoCpus) {
+      $scope.formValues.CpuLimit = d.HostConfig.NanoCpus / 1000000000;
+    }
+    if (d.HostConfig.Memory) {
+      $scope.formValues.MemoryLimit = d.HostConfig.Memory / 1024 / 1024;
+    }
+    if (d.HostConfig.MemoryReservation) {
+      $scope.formValues.MemoryReservation = d.HostConfig.MemoryReservation / 1024 / 1024;
+    }
+  }
+
   function loadFromContainerSpec() {
     // Get container
     Container.get({ id: $transition$.params().from }).$promise
@@ -435,6 +484,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerHelper,
       loadFromContainerConsole(d);
       loadFromContainerDevices(d);
       loadFromContainerImageConfig(d);
+      loadFromContainerResources(d);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve container');
@@ -480,6 +530,16 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerHelper,
       }
     }, function(e) {
       Notifications.error('Failure', e, 'Unable to retrieve running containers');
+    });
+
+    SystemService.info()
+    .then(function success(data) {
+      // Set max cpu value
+      $scope.state.sliderMaxCpu = 32;
+      if (data.NCPU) $scope.state.sliderMaxCpu = data.NCPU;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve engine details');
     });
 
   }
