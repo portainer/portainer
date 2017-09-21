@@ -16,12 +16,14 @@ angular.module('portainer.rest')
     push: {
       method: 'POST', params: {action: 'push', id: '@tag'},
       isArray: true, transformResponse: jsonObjectsToArrayHandler,
-      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader }
+      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader },
+      ignoreLoadingBar: true
     },
     create: {
       method: 'POST', params: {action: 'create', fromImage: '@fromImage', tag: '@tag'},
       isArray: true, transformResponse: jsonObjectsToArrayHandler,
-      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader }
+      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader },
+      ignoreLoadingBar: true
     },
     remove: {
       method: 'DELETE', params: {id: '@id', force: '@force'},
