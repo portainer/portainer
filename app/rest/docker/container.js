@@ -15,11 +15,11 @@ angular.module('portainer.rest')
     unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
     stats: {
       method: 'GET', params: { id: '@id', stream: false, action: 'stats' },
-      timeout: 4500
+      timeout: 4500, ignoreLoadingBar: true
     },
     top: {
       method: 'GET', params: { id: '@id', action: 'top' },
-      timeout: 4500
+      timeout: 4500, ignoreLoadingBar: true
     },
     start: {
       method: 'POST', params: {id: '@id', action: 'start'},
