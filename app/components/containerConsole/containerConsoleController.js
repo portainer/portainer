@@ -1,6 +1,6 @@
 angular.module('containerConsole', [])
-.controller('ContainerConsoleController', ['$scope', '$stateParams', 'Container', 'Image', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ContainerService', 'ExecService',
-function ($scope, $stateParams, Container, Image, EndpointProvider, Notifications, ContainerHelper, ContainerService, ExecService) {
+.controller('ContainerConsoleController', ['$scope', '$uiRouterGlobals', 'Container', 'Image', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ContainerService', 'ExecService',
+function ($scope, $uiRouterGlobals, Container, Image, EndpointProvider, Notifications, ContainerHelper, ContainerService, ExecService) {
   $scope.state = {};
   $scope.state.loaded = false;
   $scope.state.connected = false;
@@ -15,7 +15,7 @@ function ($scope, $stateParams, Container, Image, EndpointProvider, Notification
     }
   });
 
-  Container.get({id: $stateParams.id}, function(d) {
+  Container.get({id: $uiRouterGlobals.params.id}, function(d) {
     $scope.container = d;
     if (d.message) {
       Notifications.error('Error', d, 'Unable to retrieve container details');
@@ -43,7 +43,7 @@ function ($scope, $stateParams, Container, Image, EndpointProvider, Notification
     var command = $scope.formValues.isCustomCommand ?
                     $scope.formValues.customCommand : $scope.formValues.command;
     var execConfig = {
-      id: $stateParams.id,
+      id: $uiRouterGlobals.params.id,
       AttachStdin: true,
       AttachStdout: true,
       AttachStderr: true,

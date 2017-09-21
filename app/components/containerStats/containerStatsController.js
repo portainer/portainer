@@ -1,6 +1,6 @@
 angular.module('containerStats', [])
-.controller('ContainerStatsController', ['$q', '$scope', '$stateParams', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'Pagination',
-function ($q, $scope, $stateParams, $document, $interval, ContainerService, ChartService, Notifications, Pagination) {
+.controller('ContainerStatsController', ['$q', '$scope', '$uiRouterGlobals', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'Pagination',
+function ($q, $scope, $uiRouterGlobals, $document, $interval, ContainerService, ChartService, Notifications, Pagination) {
 
   $scope.state = {
     refreshRate: '5'
@@ -79,8 +79,8 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Char
   function startChartUpdate(networkChart, cpuChart, memoryChart) {
     $('#loadingViewSpinner').show();
     $q.all({
-      stats: ContainerService.containerStats($stateParams.id),
-      top: ContainerService.containerTop($stateParams.id)
+      stats: ContainerService.containerStats($uiRouterGlobals.params.id),
+      top: ContainerService.containerTop($uiRouterGlobals.params.id)
     })
     .then(function success(data) {
       var stats = data.stats;
@@ -103,8 +103,8 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Char
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
       $q.all({
-        stats: ContainerService.containerStats($stateParams.id),
-        top: ContainerService.containerTop($stateParams.id)
+        stats: ContainerService.containerStats($uiRouterGlobals.params.id),
+        top: ContainerService.containerTop($uiRouterGlobals.params.id)
       })
       .then(function success(data) {
         var stats = data.stats;
@@ -139,7 +139,7 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Char
   function initView() {
     $('#loadingViewSpinner').show();
 
-    ContainerService.container($stateParams.id)
+    ContainerService.container($uiRouterGlobals.params.id)
     .then(function success(data) {
       $scope.container = data;
     })

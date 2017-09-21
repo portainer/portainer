@@ -1,6 +1,6 @@
 angular.module('secrets', [])
-.controller('SecretsController', ['$scope', '$stateParams', '$state', 'SecretService', 'Notifications', 'Pagination',
-function ($scope, $stateParams, $state, SecretService, Notifications, Pagination) {
+.controller('SecretsController', ['$scope', '$uiRouterGlobals', '$state', 'SecretService', 'Notifications', 'Pagination',
+function ($scope, $uiRouterGlobals, $state, SecretService, Notifications, Pagination) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('secrets');

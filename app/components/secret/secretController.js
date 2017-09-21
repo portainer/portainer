@@ -1,6 +1,6 @@
 angular.module('secret', [])
-.controller('SecretController', ['$scope', '$stateParams', '$state', 'SecretService', 'Notifications',
-function ($scope, $stateParams, $state, SecretService, Notifications) {
+.controller('SecretController', ['$scope', '$uiRouterGlobals', '$state', 'SecretService', 'Notifications',
+function ($scope, $uiRouterGlobals, $state, SecretService, Notifications) {
 
   $scope.removeSecret = function removeSecret(secretId) {
     $('#loadingViewSpinner').show();
@@ -19,7 +19,7 @@ function ($scope, $stateParams, $state, SecretService, Notifications) {
 
   function initView() {
     $('#loadingViewSpinner').show();
-    SecretService.secret($stateParams.id)
+    SecretService.secret($uiRouterGlobals.params.id)
     .then(function success(data) {
       $scope.secret = data;
     })

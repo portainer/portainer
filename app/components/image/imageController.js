@@ -1,6 +1,6 @@
 angular.module('image', [])
-.controller('ImageController', ['$q', '$scope', '$stateParams', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications',
-function ($q, $scope, $stateParams, $state, $timeout, ImageService, RegistryService, Notifications) {
+.controller('ImageController', ['$q', '$scope', '$uiRouterGlobals', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications',
+function ($q, $scope, $uiRouterGlobals, $state, $timeout, ImageService, RegistryService, Notifications) {
 	$scope.formValues = {
 		Image: '',
 		Registry: ''
@@ -25,10 +25,10 @@ function ($q, $scope, $stateParams, $state, $timeout, ImageService, RegistryServ
 		var image = $scope.formValues.Image;
 		var registry = $scope.formValues.Registry;
 
-		ImageService.tagImage($stateParams.id, image, registry.URL)
+		ImageService.tagImage($uiRouterGlobals.params.id, image, registry.URL)
 		.then(function success(data) {
 			Notifications.success('Image successfully tagged');
-			$state.go('image', {id: $stateParams.id}, {reload: true});
+			$state.go('image', {id: $uiRouterGlobals.params.id}, {reload: true});
 		})
 		.catch(function error(err) {
 			Notifications.error('Failure', err, 'Unable to tag image');
@@ -83,7 +83,7 @@ function ($q, $scope, $stateParams, $state, $timeout, ImageService, RegistryServ
 				$state.go('images', {}, {reload: true});
 			} else {
 				Notifications.success('Tag successfully deleted', repository);
-				$state.go('image', {id: $stateParams.id}, {reload: true});
+				$state.go('image', {id: $uiRouterGlobals.params.id}, {reload: true});
 			}
 		})
 		.catch(function error(err) {
@@ -113,8 +113,8 @@ function ($q, $scope, $stateParams, $state, $timeout, ImageService, RegistryServ
 		$('#loadingViewSpinner').show();
 		var endpointProvider = $scope.applicationState.endpoint.mode.provider;
 		$q.all({
-			image: ImageService.image($stateParams.id),
-			history: endpointProvider !== 'VMWARE_VIC' ? ImageService.history($stateParams.id) : []
+			image: ImageService.image($uiRouterGlobals.params.id),
+			history: endpointProvider !== 'VMWARE_VIC' ? ImageService.history($uiRouterGlobals.params.id) : []
 		})
 		.then(function success(data) {
 			$scope.image = data.image;

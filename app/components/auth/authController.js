@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$stateParams', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'UserService', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'SettingsService',
-function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Authentication, Users, UserService, EndpointService, StateManager, EndpointProvider, Notifications, SettingsService) {
+.controller('AuthenticationController', ['$scope', '$state', '$uiRouterGlobals', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'UserService', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'SettingsService',
+function ($scope, $state, $uiRouterGlobals, $window, $timeout, $sanitize, Authentication, Users, UserService, EndpointService, StateManager, EndpointProvider, Notifications, SettingsService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -88,9 +88,9 @@ function ($scope, $state, $stateParams, $window, $timeout, $sanitize, Authentica
   };
 
   function initView() {
-    if ($stateParams.logout || $stateParams.error) {
+    if ($uiRouterGlobals.params.logout || $uiRouterGlobals.params.error) {
       Authentication.logout();
-      $scope.state.AuthenticationError = $stateParams.error;
+      $scope.state.AuthenticationError = $uiRouterGlobals.params.error;
       return;
     }
 

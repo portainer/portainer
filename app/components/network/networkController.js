@@ -1,16 +1,16 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', '$state', '$stateParams', '$filter', 'Network', 'NetworkService', 'Container', 'ContainerHelper', 'Notifications',
-function ($scope, $state, $stateParams, $filter, Network, NetworkService, Container, ContainerHelper, Notifications) {
+.controller('NetworkController', ['$scope', '$state', '$uiRouterGlobals', '$filter', 'Network', 'NetworkService', 'Container', 'ContainerHelper', 'Notifications',
+function ($scope, $state, $uiRouterGlobals, $filter, Network, NetworkService, Container, ContainerHelper, Notifications) {
 
   $scope.removeNetwork = function removeNetwork(networkId) {
     $('#loadingViewSpinner').show();
-    Network.remove({id: $stateParams.id}, function (d) {
+    Network.remove({id: $uiRouterGlobals.params.id}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error('Error', d, 'Unable to remove network');
       } else {
         $('#loadingViewSpinner').hide();
-        Notifications.success('Network removed', $stateParams.id);
+        Notifications.success('Network removed', $uiRouterGlobals.params.id);
         $state.go('networks', {});
       }
     }, function (e) {
@@ -21,13 +21,13 @@ function ($scope, $state, $stateParams, $filter, Network, NetworkService, Contai
 
   $scope.containerLeaveNetwork = function containerLeaveNetwork(network, containerId) {
     $('#loadingViewSpinner').show();
-    Network.disconnect({id: $stateParams.id}, { Container: containerId, Force: false }, function (d) {
+    Network.disconnect({id: $uiRouterGlobals.params.id}, { Container: containerId, Force: false }, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error('Error', d, 'Unable to disconnect container from network');
       } else {
         $('#loadingViewSpinner').hide();
-        Notifications.success('Container left network', $stateParams.id);
+        Notifications.success('Container left network', $uiRouterGlobals.params.id);
         $state.go('network', {id: network.Id}, {reload: true});
       }
     }, function (e) {
@@ -68,7 +68,7 @@ function ($scope, $state, $stateParams, $filter, Network, NetworkService, Contai
         });
       } else {
         Container.query({
-          filters: {network: [$stateParams.id]}
+          filters: {network: [$uiRouterGlobals.params.id]}
         }, function success(data) {
           filterContainersInNetwork(network, data);
           $('#loadingViewSpinner').hide();
@@ -82,7 +82,7 @@ function ($scope, $state, $stateParams, $filter, Network, NetworkService, Contai
 
   function initView() {
     $('#loadingViewSpinner').show();
-    NetworkService.network($stateParams.id)
+    NetworkService.network($uiRouterGlobals.params.id)
     .then(function success(data) {
       $scope.network = data;
       var endpointProvider = $scope.applicationState.endpoint.mode.provider;

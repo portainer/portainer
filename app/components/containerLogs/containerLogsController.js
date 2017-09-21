@@ -1,6 +1,6 @@
 angular.module('containerLogs', [])
-.controller('ContainerLogsController', ['$scope', '$stateParams', '$anchorScroll', 'ContainerLogs', 'Container',
-function ($scope, $stateParams, $anchorScroll, ContainerLogs, Container) {
+.controller('ContainerLogsController', ['$scope', '$uiRouterGlobals', '$anchorScroll', 'ContainerLogs', 'Container',
+function ($scope, $uiRouterGlobals, $anchorScroll, ContainerLogs, Container) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
@@ -9,7 +9,7 @@ function ($scope, $stateParams, $anchorScroll, ContainerLogs, Container) {
   $scope.tailLines = 2000;
 
   $('#loadingViewSpinner').show();
-  Container.get({id: $stateParams.id}, function (d) {
+  Container.get({id: $uiRouterGlobals.params.id}, function (d) {
     $scope.container = d;
     $('#loadingViewSpinner').hide();
   }, function (e) {
@@ -25,7 +25,7 @@ function ($scope, $stateParams, $anchorScroll, ContainerLogs, Container) {
   }
 
   function getLogsStderr() {
-    ContainerLogs.get($stateParams.id, {
+    ContainerLogs.get($uiRouterGlobals.params.id, {
       stdout: 0,
       stderr: 1,
       timestamps: $scope.state.displayTimestampsErr,
@@ -41,7 +41,7 @@ function ($scope, $stateParams, $anchorScroll, ContainerLogs, Container) {
   }
 
   function getLogsStdout() {
-    ContainerLogs.get($stateParams.id, {
+    ContainerLogs.get($uiRouterGlobals.params.id, {
       stdout: 1,
       stderr: 0,
       timestamps: $scope.state.displayTimestampsOut,

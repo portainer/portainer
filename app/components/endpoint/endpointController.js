@@ -1,6 +1,6 @@
 angular.module('endpoint', [])
-.controller('EndpointController', ['$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'Notifications',
-function ($scope, $state, $stateParams, $filter, EndpointService, Notifications) {
+.controller('EndpointController', ['$scope', '$state', '$uiRouterGlobals', '$filter', 'EndpointService', 'Notifications',
+function ($scope, $state, $uiRouterGlobals, $filter, EndpointService, Notifications) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('endpoints');
@@ -51,7 +51,7 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
 
   function initView() {
     $('#loadingViewSpinner').show();
-    EndpointService.endpoint($stateParams.id)
+    EndpointService.endpoint($uiRouterGlobals.params.id)
     .then(function success(data) {
       var endpoint = data;
       endpoint.URL = $filter('stripprotocol')(endpoint.URL);

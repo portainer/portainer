@@ -1,12 +1,12 @@
 angular.module('volume', [])
-.controller('VolumeController', ['$scope', '$state', '$stateParams', 'VolumeService', 'Notifications',
-function ($scope, $state, $stateParams, VolumeService, Notifications) {
+.controller('VolumeController', ['$scope', '$state', '$uiRouterGlobals', 'VolumeService', 'Notifications',
+function ($scope, $state, $uiRouterGlobals, VolumeService, Notifications) {
 
   $scope.removeVolume = function removeVolume() {
     $('#loadingViewSpinner').show();
     VolumeService.remove($scope.volume)
     .then(function success(data) {
-      Notifications.success('Volume successfully removed', $stateParams.id);
+      Notifications.success('Volume successfully removed', $uiRouterGlobals.params.id);
       $state.go('volumes', {});
     })
     .catch(function error(err) {
@@ -19,7 +19,7 @@ function ($scope, $state, $stateParams, VolumeService, Notifications) {
 
   function initView() {
     $('#loadingViewSpinner').show();
-    VolumeService.volume($stateParams.id)
+    VolumeService.volume($uiRouterGlobals.params.id)
     .then(function success(data) {
       var volume = data;
       $scope.volume = volume;
