@@ -9,11 +9,10 @@ function ($scope, $state, $sanitize, Authentication, UserService, Notifications,
 
   $scope.updatePassword = function() {
     $scope.invalidPassword = false;
-    var userID = Authentication.getUserDetails().ID;
     var currentPassword = $sanitize($scope.formValues.currentPassword);
     var newPassword = $sanitize($scope.formValues.newPassword);
 
-    UserService.updateUserPassword(userID, currentPassword, newPassword)
+    UserService.updateUserPassword($scope.userID, currentPassword, newPassword)
     .then(function success() {
       Notifications.success('Success', 'Password successfully updated');
       $state.reload();
@@ -28,6 +27,7 @@ function ($scope, $state, $sanitize, Authentication, UserService, Notifications,
   };
 
   function initView() {
+    $scope.userID = Authentication.getUserDetails().ID;
     SettingsService.publicSettings()
     .then(function success(data) {
       $scope.AuthenticationMethod = data.AuthenticationMethod;
