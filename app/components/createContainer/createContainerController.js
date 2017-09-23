@@ -537,6 +537,9 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       // Set max cpu value
       $scope.state.sliderMaxCpu = 32;
       if (data.NCPU) $scope.state.sliderMaxCpu = data.NCPU;
+      // Set max memory value
+      $scope.state.sliderMaxMemory = 32768;
+      if (data.MemTotal) $scope.state.sliderMaxMemory = Math.round(data.MemTotal / 1024 / 1024 * 10) / 10;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve engine details');
