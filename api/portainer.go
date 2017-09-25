@@ -27,6 +27,7 @@ type (
 		SSLCert           *string
 		SSLKey            *string
 		AdminPassword     *string
+		AdminPasswordFile *string
 		// Deprecated fields
 		Logo      *string
 		Templates *string
