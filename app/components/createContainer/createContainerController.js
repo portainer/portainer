@@ -485,6 +485,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerHelper,
     SettingsService.publicSettings()
     .then(function success(data) {
       $scope.allowBindMounts = data.AllowBindMountsForRegularUsers;
+      $scope.allowPrivilegedMode = data.AllowPrivilegedModeForRegularUsers;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');
