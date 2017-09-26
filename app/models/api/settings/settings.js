@@ -5,4 +5,5 @@ function SettingsViewModel(data) {
   this.DisplayExternalContributors = data.DisplayExternalContributors;
   this.AuthenticationMethod = data.AuthenticationMethod;
   this.LDAPSettings = data.LDAPSettings;
+  this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
 }

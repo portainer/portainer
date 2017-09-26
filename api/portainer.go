@@ -70,12 +70,13 @@ type (
 
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL                string               `json:"TemplatesURL"`
-		LogoURL                     string               `json:"LogoURL"`
-		BlackListedLabels           []Pair               `json:"BlackListedLabels"`
-		DisplayExternalContributors bool                 `json:"DisplayExternalContributors"`
-		AuthenticationMethod        AuthenticationMethod `json:"AuthenticationMethod"`
-		LDAPSettings                LDAPSettings         `json:"LDAPSettings"`
+		TemplatesURL                   string               `json:"TemplatesURL"`
+		LogoURL                        string               `json:"LogoURL"`
+		BlackListedLabels              []Pair               `json:"BlackListedLabels"`
+		DisplayExternalContributors    bool                 `json:"DisplayExternalContributors"`
+		AuthenticationMethod           AuthenticationMethod `json:"AuthenticationMethod"`
+		LDAPSettings                   LDAPSettings         `json:"LDAPSettings"`
+		AllowBindMountsForRegularUsers bool                 `json:"AllowBindMountsForRegularUsers"`
 	}
 
 	// User represents a user account.
@@ -348,7 +349,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.14.2"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 4
+	DBVersion = 5
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 )
