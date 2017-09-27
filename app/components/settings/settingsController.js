@@ -7,6 +7,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     customTemplates: false,
     externalContributions: false,
     restrictBindMounts: false,
+    restrictPrivilegedMode: false,
     labelName: '',
     labelValue: ''
   };
@@ -41,6 +42,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     }
     settings.DisplayExternalContributors = !$scope.formValues.externalContributions;
     settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
+    settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
 
     updateSettings(settings, false);
   };
@@ -84,6 +86,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
       }
       $scope.formValues.externalContributions = !settings.DisplayExternalContributors;
       $scope.formValues.restrictBindMounts = !settings.AllowBindMountsForRegularUsers;
+      $scope.formValues.restrictPrivilegedMode = !settings.AllowPrivilegedModeForRegularUsers;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');

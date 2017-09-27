@@ -125,7 +125,8 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 					portainer.LDAPSearchSettings{},
 				},
 			},
-			AllowBindMountsForRegularUsers: true,
+			AllowBindMountsForRegularUsers:     true,
+			AllowPrivilegedModeForRegularUsers: true,
 		}
 
 		if *flags.Templates != "" {

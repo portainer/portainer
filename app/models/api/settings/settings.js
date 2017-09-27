@@ -6,4 +6,5 @@ function SettingsViewModel(data) {
   this.AuthenticationMethod = data.AuthenticationMethod;
   this.LDAPSettings = data.LDAPSettings;
   this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
+  this.AllowPrivilegedModeForRegularUsers = data.AllowPrivilegedModeForRegularUsers;
 }
