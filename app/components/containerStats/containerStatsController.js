@@ -3,7 +3,8 @@ angular.module('containerStats', [])
 function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications, Pagination) {
 
   $scope.state = {
-    refreshRate: '5'
+    refreshRate: '5',
+    networkStatsUnavailable: false
   };
 
   $scope.state.pagination_count = Pagination.getPaginationCount('stats_processes');
@@ -32,11 +33,13 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
   }
 
   function updateNetworkChart(stats, chart) {
-    var rx = stats.Networks[0].rx_bytes;
-    var tx = stats.Networks[0].tx_bytes;
-    var label = moment(stats.Date).format('HH:mm:ss');
+    if (stats.Networks.length > 0) {
+      var rx = stats.Networks[0].rx_bytes;
+      var tx = stats.Networks[0].tx_bytes;
+      var label = moment(stats.Date).format('HH:mm:ss');
 
-    ChartService.UpdateNetworkChart(label, rx, tx, chart);
+      ChartService.UpdateNetworkChart(label, rx, tx, chart);
+    }
   }
 
   function updateMemoryChart(stats, chart) {
@@ -85,6 +88,9 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
     .then(function success(data) {
       var stats = data.stats;
       $scope.processInfo = data.top;
+      if (stats.Networks.length === 0) {
+        $scope.state.networkStatsUnavailable = true;
+      }
       updateNetworkChart(stats, networkChart);
       updateMemoryChart(stats, memoryChart);
       updateCPUChart(stats, cpuChart);

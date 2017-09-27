@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService',
-function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService',
+function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -545,6 +545,17 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       Notifications.error('Failure', err, 'Unable to retrieve engine details');
     });
 
+    SettingsService.publicSettings()
+    .then(function success(data) {
+      $scope.allowBindMounts = data.AllowBindMountsForRegularUsers;
+      $scope.allowPrivilegedMode = data.AllowPrivilegedModeForRegularUsers;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve application settings');
+    });
+
+    var userDetails = Authentication.getUserDetails();
+    $scope.isAdmin = userDetails.role === 1 ? true : false;
   }
 
   function validateForm(accessControlData, isAdmin) {

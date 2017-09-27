@@ -517,6 +517,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
   padding: 10px;
   margin: 5px;
+  font-size: 10px;
 }
 
 .visualizer_container .node .tasks .task div {

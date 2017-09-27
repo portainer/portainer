@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService',
-function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService',
+function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService, SettingsService) {
 
   $scope.formValues = {
     Name: '',
@@ -361,7 +361,8 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
       volumes: VolumeService.volumes(),
       secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
       networks: NetworkService.networks(true, true, false, false),
-      nodes: NodeService.nodes()
+      nodes: NodeService.nodes(),
+      settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
       $scope.availableVolumes = data.volumes;
@@ -379,6 +380,10 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
       } else {
         $scope.state.sliderMaxCpu = 32;
       }
+      var settings = data.settings;
+      $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
+      var userDetails = Authentication.getUserDetails();
+      $scope.isAdmin = userDetails.role === 1 ? true : false;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');

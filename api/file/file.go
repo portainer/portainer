@@ -1,6 +1,8 @@
 package file
 
 import (
+	"io/ioutil"
+
 	"github.com/portainer/portainer"
 
 	"io"
@@ -161,4 +163,14 @@ func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 		return err
 	}
 	return nil
+}
+
+// GetStringFromFile returns a string content from file.
+func GetStringFromFile(filePath string) (string, error) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return string(content), nil
 }

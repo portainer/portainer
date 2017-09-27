@@ -223,7 +223,7 @@
                         <!-- !container-path -->
                         <!-- volume-type -->
                         <div class="input-group col-sm-5" style="margin-left: 5px;">
-                          <div class="btn-group btn-group-sm">
+                          <div class="btn-group btn-group-sm" ng-if="isAdmin || allowBindMounts">
                             <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
                             <label class="btn btn-primary" ng-model="volume.Type" uib-btn-radio="'bind'" ng-click="volume.Id = ''">Bind</label>
                           </div>
