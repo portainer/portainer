@@ -235,7 +235,7 @@
                       </div>
                       <!-- !container-path -->
                       <!-- volume-type -->
-                      <div class="input-group col-sm-5" style="margin-left: 5px;">
+                      <div class="input-group col-sm-5" style="margin-left: 5px;" ng-if="isAdmin || allowBindMounts">
                         <div class="btn-group btn-group-sm">
                           <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
                           <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
@@ -470,13 +470,13 @@
           <div class="tab-pane" id="runtime">
             <form class="form-horizontal" style="margin-top: 15px;">
               <!-- privileged-mode -->
-              <div class="form-group">
+              <div class="form-group" ng-if="isAdmin || allowPrivilegedMode">
                 <div class="col-sm-12">
-                  <label for="ownership" class="control-label text-left">
+                  <label for="privileged_mode" class="control-label text-left">
                     Privileged mode
                   </label>
                   <label class="switch" style="margin-left: 20px;">
-                    <input type="checkbox" ng-model="config.HostConfig.Privileged"><i></i>
+                    <input type="checkbox" name="privileged_mode" ng-model="config.HostConfig.Privileged"><i></i>
                   </label>
                 </div>
               </div>
