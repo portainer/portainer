@@ -23,6 +23,33 @@
       <rd-widget-header icon="fa-cogs" title="Application settings"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
+          <!-- security -->
+          <div class="col-sm-12 form-section-title">
+            Security
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_allowbindmounts" class="control-label text-left">
+                Disable bind mounts for non-administrators
+                <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use bind mounts when creating containers."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictBindMounts"><i></i>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_allowbindmounts" class="control-label text-left">
+                Disable privileged mode for non-administrators
+                <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use privileged mode when creating containers."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictPrivilegedMode"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- security -->
           <!-- logo -->
           <div class="col-sm-12 form-section-title">
             Logo

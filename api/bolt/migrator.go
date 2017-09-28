@@ -65,6 +65,22 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	// https://github.com/portainer/portainer/issues/1235
+	if m.CurrentDBVersion < 5 {
+		err := m.updateSettingsToVersion5()
+		if err != nil {
+			return err
+		}
+	}
+
+	// https://github.com/portainer/portainer/issues/1236
+	if m.CurrentDBVersion < 6 {
+		err := m.updateSettingsToVersion6()
+		if err != nil {
+			return err
+		}
+	}
+
 	err := m.VersionService.StoreDBVersion(portainer.DBVersion)
 	if err != nil {
 		return err

@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$stateParams', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService',
-function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SettingsService',
+function ($q, $scope, $state, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SettingsService) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -418,7 +418,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
 
   function loadFromContainerSpec() {
     // Get container
-    Container.get({ id: $stateParams.from }).$promise
+    Container.get({ id: $transition$.params().from }).$promise
     .then(function success(d) {
       var fromContainer = new ContainerDetailsViewModel(d);
       if (!fromContainer.ResourceControl) {
@@ -472,7 +472,7 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
     Container.query({}, function (d) {
       var containers = d;
       $scope.runningContainers = containers;
-      if ($stateParams.from !== '') {
+      if ($transition$.params().from !== '') {
         loadFromContainerSpec();
       } else {
         $scope.fromContainer = {};
@@ -482,6 +482,17 @@ function ($q, $scope, $state, $stateParams, $filter, Container, ContainerHelper,
       Notifications.error('Failure', e, 'Unable to retrieve running containers');
     });
 
+    SettingsService.publicSettings()
+    .then(function success(data) {
+      $scope.allowBindMounts = data.AllowBindMountsForRegularUsers;
+      $scope.allowPrivilegedMode = data.AllowPrivilegedModeForRegularUsers;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve application settings');
+    });
+
+    var userDetails = Authentication.getUserDetails();
+    $scope.isAdmin = userDetails.role === 1 ? true : false;
   }
 
   function validateForm(accessControlData, isAdmin) {

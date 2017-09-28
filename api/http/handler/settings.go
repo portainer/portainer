@@ -45,18 +45,22 @@ func NewSettingsHandler(bouncer *security.RequestBouncer) *SettingsHandler {
 
 type (
 	publicSettingsResponse struct {
-		LogoURL                     string                         `json:"LogoURL"`
-		DisplayExternalContributors bool                           `json:"DisplayExternalContributors"`
-		AuthenticationMethod        portainer.AuthenticationMethod `json:"AuthenticationMethod"`
+		LogoURL                            string                         `json:"LogoURL"`
+		DisplayExternalContributors        bool                           `json:"DisplayExternalContributors"`
+		AuthenticationMethod               portainer.AuthenticationMethod `json:"AuthenticationMethod"`
+		AllowBindMountsForRegularUsers     bool                           `json:"AllowBindMountsForRegularUsers"`
+		AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
 	}
 
 	putSettingsRequest struct {
-		TemplatesURL                string                 `valid:"required"`
-		LogoURL                     string                 `valid:""`
-		BlackListedLabels           []portainer.Pair       `valid:""`
-		DisplayExternalContributors bool                   `valid:""`
-		AuthenticationMethod        int                    `valid:"required"`
-		LDAPSettings                portainer.LDAPSettings `valid:""`
+		TemplatesURL                       string                 `valid:"required"`
+		LogoURL                            string                 `valid:""`
+		BlackListedLabels                  []portainer.Pair       `valid:""`
+		DisplayExternalContributors        bool                   `valid:""`
+		AuthenticationMethod               int                    `valid:"required"`
+		LDAPSettings                       portainer.LDAPSettings `valid:""`
+		AllowBindMountsForRegularUsers     bool                   `valid:""`
+		AllowPrivilegedModeForRegularUsers bool                   `valid:""`
 	}
 
 	putSettingsLDAPCheckRequest struct {
@@ -85,9 +89,11 @@ func (handler *SettingsHandler) handleGetPublicSettings(w http.ResponseWriter, r
 	}
 
 	publicSettings := &publicSettingsResponse{
-		LogoURL:                     settings.LogoURL,
-		DisplayExternalContributors: settings.DisplayExternalContributors,
-		AuthenticationMethod:        settings.AuthenticationMethod,
+		LogoURL:                            settings.LogoURL,
+		DisplayExternalContributors:        settings.DisplayExternalContributors,
+		AuthenticationMethod:               settings.AuthenticationMethod,
+		AllowBindMountsForRegularUsers:     settings.AllowBindMountsForRegularUsers,
+		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
 	}
 
 	encodeJSON(w, publicSettings, handler.Logger)
@@ -109,11 +115,13 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 	}
 
 	settings := &portainer.Settings{
-		TemplatesURL:                req.TemplatesURL,
-		LogoURL:                     req.LogoURL,
-		BlackListedLabels:           req.BlackListedLabels,
-		DisplayExternalContributors: req.DisplayExternalContributors,
-		LDAPSettings:                req.LDAPSettings,
+		TemplatesURL:                       req.TemplatesURL,
+		LogoURL:                            req.LogoURL,
+		BlackListedLabels:                  req.BlackListedLabels,
+		DisplayExternalContributors:        req.DisplayExternalContributors,
+		LDAPSettings:                       req.LDAPSettings,
+		AllowBindMountsForRegularUsers:     req.AllowBindMountsForRegularUsers,
+		AllowPrivilegedModeForRegularUsers: req.AllowPrivilegedModeForRegularUsers,
 	}
 
 	if req.AuthenticationMethod == 1 {

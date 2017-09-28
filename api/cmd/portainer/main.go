@@ -155,6 +155,8 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 					portainer.LDAPSearchSettings{},
 				},
 			},
+			AllowBindMountsForRegularUsers:     true,
+			AllowPrivilegedModeForRegularUsers: true,
 		}
 
 		if *flags.Templates != "" {
@@ -244,12 +246,27 @@ func main() {
 		}
 	}
 
-	if *flags.AdminPassword != "" {
-		log.Printf("Creating admin user with password hash %s", *flags.AdminPassword)
+	adminPasswordHash := ""
+	if *flags.AdminPasswordFile != "" {
+		content, err := file.GetStringFromFile(*flags.AdminPasswordFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		adminPasswordHash, err = cryptoService.Hash(content)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else if *flags.AdminPassword != "" {
+		adminPasswordHash = *flags.AdminPassword
+	}
+
+	if adminPasswordHash != "" {
+
+		log.Printf("Creating admin user with password hash %s", adminPasswordHash)
 		user := &portainer.User{
 			Username: "admin",
 			Role:     portainer.AdministratorRole,
-			Password: *flags.AdminPassword,
+			Password: adminPasswordHash,
 		}
 		err := store.UserService.CreateUser(user)
 		if err != nil {

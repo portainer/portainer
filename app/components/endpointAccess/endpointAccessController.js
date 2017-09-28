@@ -1,14 +1,14 @@
 angular.module('endpointAccess', [])
-.controller('EndpointAccessController', ['$scope', '$stateParams', 'EndpointService', 'Notifications',
-function ($scope, $stateParams, EndpointService, Notifications) {
+.controller('EndpointAccessController', ['$scope', '$transition$', 'EndpointService', 'Notifications',
+function ($scope, $transition$, EndpointService, Notifications) {
 
   $scope.updateAccess = function(authorizedUsers, authorizedTeams) {
-    return EndpointService.updateAccess($stateParams.id, authorizedUsers, authorizedTeams);
+    return EndpointService.updateAccess($transition$.params().id, authorizedUsers, authorizedTeams);
   };
 
   function initView() {
     $('#loadingViewSpinner').show();
-    EndpointService.endpoint($stateParams.id)
+    EndpointService.endpoint($transition$.params().id)
     .then(function success(data) {
       $scope.endpoint = data;
     })

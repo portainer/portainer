@@ -154,7 +154,7 @@
                       <div class="btn-group btn-group-sm">
                         <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'auto'" ng-click="volume.name = ''">Auto</label>
                         <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
-                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''" ng-if="isAdmin || allowBindMounts">Bind</label>
                       </div>
                       <button class="btn btn-sm btn-danger" type="button" ng-click="removeVolume($index)">
                         <i class="fa fa-trash" aria-hidden="true"></i>
