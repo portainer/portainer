@@ -1,6 +1,6 @@
 angular.module('endpoint', [])
-.controller('EndpointController', ['$scope', '$state', '$transition$', '$filter', 'EndpointService', 'Notifications',
-function ($scope, $state, $transition$, $filter, EndpointService, Notifications) {
+.controller('EndpointController', ['$scope', '$state', '$transition$', '$filter', 'EndpointService', 'Notifications', 'EndpointProvider',
+function ($scope, $state, $transition$, $filter, EndpointService, Notifications, EndpointProvider) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('endpoints');
@@ -39,6 +39,8 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications)
     EndpointService.updateEndpoint(endpoint.Id, endpointParams)
     .then(function success(data) {
       Notifications.success('Endpoint updated', $scope.endpoint.Name);
+      // STORIDGE_TMP
+      EndpointProvider.setStoridgeAPI(endpoint.PublicURL + ':8282');
       $state.go('endpoints');
     }, function error(err) {
       Notifications.error('Failure', err, 'Unable to update endpoint');
