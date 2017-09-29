@@ -186,7 +186,6 @@ func main() {
 	applicationStatus := initStatus(authorizeEndpointMgmt, flags)
 
 	if *flags.Endpoint != "" {
-		var endpoints []portainer.Endpoint
 		endpoints, err := store.EndpointService.Endpoints()
 		if err != nil {
 			log.Fatal(err)
@@ -229,16 +228,24 @@ func main() {
 	}
 
 	if adminPasswordHash != "" {
-
-		log.Printf("Creating admin user with password hash %s", adminPasswordHash)
-		user := &portainer.User{
-			Username: "admin",
-			Role:     portainer.AdministratorRole,
-			Password: adminPasswordHash,
-		}
-		err := store.UserService.CreateUser(user)
+		users, err := store.UserService.UsersByRole(portainer.AdministratorRole)
 		if err != nil {
 			log.Fatal(err)
+		}
+
+		if len(users) == 0 {
+			log.Printf("Creating admin user with password hash %s", adminPasswordHash)
+			user := &portainer.User{
+				Username: "admin",
+				Role:     portainer.AdministratorRole,
+				Password: adminPasswordHash,
+			}
+			err := store.UserService.CreateUser(user)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			log.Println("Instance already has an administrator user defined. Skipping admin password related flags.")
 		}
 	}
 
