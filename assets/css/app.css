@@ -297,20 +297,16 @@ ul.sidebar .sidebar-list a.active {
 }
 
 .sidebar-footer .logo {
-  float: left;
   width: 100%;
   max-width: 100px;
   height: 100%;
   max-height: 35px;
-  margin: 2px 0 2px 30px;
+  margin: 2px 0 2px 20px;
 }
 
 .sidebar-footer .version {
-  float: right;
-  text-align: center;
-  vertical-align: middle;
   font-size: 11px;
-  margin: 11px 20px 0 0;
+  margin: 11px 20px 0 7px;
   color: #fff;
 }
 
