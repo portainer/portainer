@@ -16,9 +16,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     AccessControlData: new AccessControlFormData(),
     CpuLimit: 0,
     MemoryLimit: 0,
-    MemoryReservation: 0,
-    MemoryLimitUnit: 'MB',
-    MemoryReservationUnit: 'MB'
+    MemoryReservation: 0
   };
 
   $scope.state = {
@@ -236,18 +234,12 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     // Memory Limit - Round to 0.125
     var memoryLimit = (Math.round($scope.formValues.MemoryLimit * 8) / 8).toFixed(3);
     memoryLimit *= 1024 * 1024;
-    if ($scope.formValues.MemoryLimitUnit === 'GB') {
-      memoryLimit *= 1024;
-    }
     if (memoryLimit > 0) {
       config.HostConfig.Memory = memoryLimit;
     }
     // Memory Resevation - Round to 0.125
     var memoryReservation = (Math.round($scope.formValues.MemoryReservation * 8) / 8).toFixed(3);
     memoryReservation *= 1024 * 1024;
-    if ($scope.formValues.MemoryReservationUnit === 'GB') {
-      memoryReservation *= 1024;
-    }
     if (memoryReservation > 0) {
       config.HostConfig.MemoryReservation = memoryReservation;
     }
