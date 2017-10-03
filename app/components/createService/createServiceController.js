@@ -380,6 +380,19 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
       } else {
         $scope.state.sliderMaxCpu = 32;
       }
+      // Set Max memory value
+      var maxMemory = 0;
+      for (var n in data.nodes) {
+        if (data.nodes[n].Memory && data.nodes[n].Memory > maxMemory) {
+          maxMemory = data.nodes[n].Memory;
+        }
+      }
+      if (maxMemory > 0) {
+        $scope.state.sliderMaxMemory = maxMemory / 1024 / 1024;
+      } else {
+        $scope.state.sliderMaxMemory = 32768;
+      }
+      ///
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
