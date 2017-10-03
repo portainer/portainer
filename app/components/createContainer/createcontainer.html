@@ -522,18 +522,11 @@
                   Memory reservation (MB)
                 </label>
                 <div class="col-sm-3">
-                  <!--<input type="number" step="0.125" min="0" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation" placeholder="e.g. 64">-->
                   <por-slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
                 </div>
                 <div class="col-sm-2">
                   <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation">
                 </div>
-                <!--<div class="col-sm-2">
-                  <select class="form-control" ng-model="formValues.MemoryReservationUnit">
-                    <option value="MB">MB</option>
-                    <option value="GB">GB</option>
-                  </select>
-                </div>-->
                 <div class="col-sm-4">
                   <p class="small text-muted">
                     Memory soft limit (set to 0 for unlimited)
@@ -547,18 +540,11 @@
                   Memory limit (MB)
                 </label>
                 <div class="col-sm-3">
-                  <!--<input type="number" step="0.125" min="0" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit" placeholder="e.g. 128">-->
                   <por-slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
                 </div>
                 <div class="col-sm-2">
                   <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit">
                 </div>
-                <!--<div class="col-sm-2">
-                  <select class="form-control" ng-model="formValues.MemoryLimitUnit">
-                    <option value="MB">MB</option>
-                    <option value="GB">GB</option>
-                  </select>
-                </div>-->
                 <div class="col-sm-4">
                   <p class="small text-muted">
                     Memory limit (set to 0 for unlimited)
