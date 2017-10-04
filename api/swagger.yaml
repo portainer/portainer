@@ -2569,6 +2569,10 @@ definitions:
   UserAdminInitRequest:
     type: "object"
     properties:
+      Username:
+        type: "string"
+        example: "admin"
+        description: "Username for the admin user"
       Password:
         type: "string"
         example: "admin-password"
