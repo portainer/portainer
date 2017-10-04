@@ -4,7 +4,7 @@
   </div>
   <!-- memory-reservation-input -->
   <div class="form-group">
-    <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left">
+    <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
       Memory reservation
     </label>
     <div class="col-sm-3">
@@ -14,15 +14,15 @@
       <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation">
     </div>
     <div class="col-sm-4">
-      <p class="small text-muted">
-        Minimum memory available on a node to run a task
+      <p class="small text-muted" style="margin-top: 7px;">
+        Minimum memory available on a node to run a task (<b>MB</b>)
       </p>
     </div>
   </div>
   <!-- !memory-reservation-input -->
   <!-- memory-limit-input -->
   <div class="form-group">
-    <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left">
+    <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
       Memory limit
     </label>
     <div class="col-sm-3">
@@ -31,9 +31,9 @@
     <div class="col-sm-2">
       <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit">
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-4" style="margin-top: 7px;">
       <p class="small text-muted">
-        Maximum memory usage per task (set to 0 for unlimited)
+        Maximum memory usage per task (<b>MB</b>)
       </p>
     </div>
   </div>
