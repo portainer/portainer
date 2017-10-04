@@ -518,8 +518,8 @@
               </div>
               <!-- memory-reservation-input -->
               <div class="form-group">
-                <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left">
-                  Memory reservation (MB)
+                <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                  Memory reservation
                 </label>
                 <div class="col-sm-3">
                   <por-slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
@@ -528,16 +528,16 @@
                   <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation">
                 </div>
                 <div class="col-sm-4">
-                  <p class="small text-muted">
-                    Memory soft limit (set to 0 for unlimited)
+                  <p class="small text-muted" style="margin-top: 7px;">
+                    Memory soft limit (<b>MB</b>)
                   </p>
                 </div>
               </div>
               <!-- !memory-reservation-input -->
               <!-- memory-limit-input -->
               <div class="form-group">
-                <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left">
-                  Memory limit (MB)
+                <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                  Memory limit
                 </label>
                 <div class="col-sm-3">
                   <por-slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
@@ -546,8 +546,8 @@
                   <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit">
                 </div>
                 <div class="col-sm-4">
-                  <p class="small text-muted">
-                    Memory limit (set to 0 for unlimited)
+                  <p class="small text-muted" style="margin-top: 7px;">
+                    Memory limit (<b>MB</b>)
                   </p>
                 </div>
               </div>
