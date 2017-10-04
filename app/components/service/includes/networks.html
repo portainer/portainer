@@ -8,12 +8,14 @@
       <table class="table" >
         <thead>
           <tr>
+            <th>Name</th>
             <th>ID</th>
             <th>IP address</th>
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat="network in service.VirtualIPs">
+            <td>{{ network.Name }}</td>
             <td>
               <a ui-sref="network({id: network.NetworkID})">{{ network.NetworkID }}</a>
             </td>
