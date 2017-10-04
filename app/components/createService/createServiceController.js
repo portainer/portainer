@@ -369,7 +369,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
       $scope.state.sliderMaxCpu = 32;
     }
     if (maxMemory > 0) {
-      $scope.state.sliderMaxMemory = (maxMemory / 1000 / 1000).toFixed(1);
+      $scope.state.sliderMaxMemory = Math.floor(maxMemory / 1000 / 1000);
     } else {
       $scope.state.sliderMaxMemory = 32768;
     }
