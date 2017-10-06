@@ -82,6 +82,54 @@ func decorateServiceList(serviceData []interface{}, resourceControls []portainer
 	return decoratedServiceData, nil
 }
 
+// decorateNetworkList loops through all networks and will decorate any network with an existing resource control.
+// Network object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
+func decorateNetworkList(networkData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+	decoratedNetworkData := make([]interface{}, 0)
+
+	for _, network := range networkData {
+
+		networkObject := network.(map[string]interface{})
+		if networkObject[networkIdentifier] == nil {
+			return nil, ErrDockerNetworkIdentifierNotFound
+		}
+
+		networkID := networkObject[networkIdentifier].(string)
+		resourceControl := getResourceControlByResourceID(networkID, resourceControls)
+		if resourceControl != nil {
+			networkObject = decorateObject(networkObject, resourceControl)
+		}
+
+		decoratedNetworkData = append(decoratedNetworkData, networkObject)
+	}
+
+	return decoratedNetworkData, nil
+}
+
+// decorateSecretList loops through all secrets and will decorate any secret with an existing resource control.
+// Secret object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/SecretList
+func decorateSecretList(secretData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+	decoratedSecretData := make([]interface{}, 0)
+
+	for _, secret := range secretData {
+
+		secretObject := secret.(map[string]interface{})
+		if secretObject[secretIdentifier] == nil {
+			return nil, ErrDockerSecretIdentifierNotFound
+		}
+
+		secretID := secretObject[secretIdentifier].(string)
+		resourceControl := getResourceControlByResourceID(secretID, resourceControls)
+		if resourceControl != nil {
+			secretObject = decorateObject(secretObject, resourceControl)
+		}
+
+		decoratedSecretData = append(decoratedSecretData, secretObject)
+	}
+
+	return decoratedSecretData, nil
+}
+
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {
 	metadata := make(map[string]interface{})
 	metadata["ResourceControl"] = resourceControl

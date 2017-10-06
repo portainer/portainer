@@ -1,16 +1,16 @@
 angular.module('network', [])
-.controller('NetworkController', ['$scope', '$state', '$stateParams', '$filter', 'Network', 'Container', 'ContainerHelper', 'Notifications',
-function ($scope, $state, $stateParams, $filter, Network, Container, ContainerHelper, Notifications) {
+.controller('NetworkController', ['$scope', '$state', '$transition$', '$filter', 'Network', 'NetworkService', 'Container', 'ContainerHelper', 'Notifications',
+function ($scope, $state, $transition$, $filter, Network, NetworkService, Container, ContainerHelper, Notifications) {
 
   $scope.removeNetwork = function removeNetwork(networkId) {
     $('#loadingViewSpinner').show();
-    Network.remove({id: $stateParams.id}, function (d) {
+    Network.remove({id: $transition$.params().id}, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error('Error', d, 'Unable to remove network');
       } else {
         $('#loadingViewSpinner').hide();
-        Notifications.success('Network removed', $stateParams.id);
+        Notifications.success('Network removed', $transition$.params().id);
         $state.go('networks', {});
       }
     }, function (e) {
@@ -21,13 +21,13 @@ function ($scope, $state, $stateParams, $filter, Network, Container, ContainerHe
 
   $scope.containerLeaveNetwork = function containerLeaveNetwork(network, containerId) {
     $('#loadingViewSpinner').show();
-    Network.disconnect({id: $stateParams.id}, { Container: containerId, Force: false }, function (d) {
+    Network.disconnect({id: $transition$.params().id}, { Container: containerId, Force: false }, function (d) {
       if (d.message) {
         $('#loadingViewSpinner').hide();
         Notifications.error('Error', d, 'Unable to disconnect container from network');
       } else {
         $('#loadingViewSpinner').hide();
-        Notifications.success('Container left network', $stateParams.id);
+        Notifications.success('Container left network', $transition$.params().id);
         $state.go('network', {id: network.Id}, {reload: true});
       }
     }, function (e) {
@@ -68,7 +68,7 @@ function ($scope, $state, $stateParams, $filter, Network, Container, ContainerHe
         });
       } else {
         Container.query({
-          filters: {network: [$stateParams.id]}
+          filters: {network: [$transition$.params().id]}
         }, function success(data) {
           filterContainersInNetwork(network, data);
           $('#loadingViewSpinner').hide();
@@ -82,7 +82,7 @@ function ($scope, $state, $stateParams, $filter, Network, Container, ContainerHe
 
   function initView() {
     $('#loadingViewSpinner').show();
-    Network.get({id: $stateParams.id}).$promise
+    NetworkService.network($transition$.params().id)
     .then(function success(data) {
       $scope.network = data;
       var endpointProvider = $scope.applicationState.endpoint.mode.provider;

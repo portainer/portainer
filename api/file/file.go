@@ -2,6 +2,7 @@ package file
 
 import (
 	"bytes"
+	"io/ioutil"
 
 	"github.com/portainer/portainer"
 
@@ -154,10 +155,33 @@ func (service *Service) DeleteStackFiles(projectPath string) error {
 	return nil
 }
 
-// DeleteTLSFiles deletes a folder containing the TLS files for an endpoint.
+// DeleteTLSFiles deletes a folder in the TLS store path.
 func (service *Service) DeleteTLSFiles(folder string) error {
 	storePath := path.Join(service.fileStorePath, TLSStorePath, folder)
 	err := os.RemoveAll(storePath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeleteTLSFile deletes a specific TLS file from a folder.
+func (service *Service) DeleteTLSFile(folder string, fileType portainer.TLSFileType) error {
+	var fileName string
+	switch fileType {
+	case portainer.TLSFileCA:
+		fileName = TLSCACertFile
+	case portainer.TLSFileCert:
+		fileName = TLSCertFile
+	case portainer.TLSFileKey:
+		fileName = TLSKeyFile
+	default:
+		return portainer.ErrUndefinedTLSFileType
+	}
+
+	filePath := path.Join(service.fileStorePath, TLSStorePath, folder, fileName)
+
+	err := os.Remove(filePath)
 	if err != nil {
 		return err
 	}
@@ -197,4 +221,14 @@ func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 		return err
 	}
 	return nil
+}
+
+// GetStringFromFile returns a string content from file.
+func GetStringFromFile(filePath string) (string, error) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return string(content), nil
 }

@@ -1,10 +1,10 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$stateParams', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'FormValidator',
-function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, FormValidator) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService',
+function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, FormValidator, SettingsService) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
-    hideDescriptions: $stateParams.hide_descriptions,
+    hideDescriptions: $transition$.params().hide_descriptions,
     formValidationError: '',
     filters: {
       Categories: '!',
@@ -145,7 +145,7 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
   }
 
   function initTemplates() {
-    var templatesKey = $stateParams.key;
+    var templatesKey = $transition$.params().key;
     var provider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
@@ -157,7 +157,8 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
         provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
         false,
         provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
-        provider === 'DOCKER_SWARM')
+        provider === 'DOCKER_SWARM'),
+      settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
       $scope.templates = data.templates;
@@ -171,6 +172,10 @@ function ($scope, $q, $state, $stateParams, $anchorScroll, $filter, ContainerSer
       var networks = data.networks;
       $scope.availableNetworks = networks;
       $scope.globalNetworkCount = networks.length;
+      var settings = data.settings;
+      $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
+      var userDetails = Authentication.getUserDetails();
+      $scope.isAdmin = userDetails.role === 1 ? true : false;
     })
     .catch(function error(err) {
       $scope.templates = [];

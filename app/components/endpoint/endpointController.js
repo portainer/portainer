@@ -1,41 +1,47 @@
 angular.module('endpoint', [])
-.controller('EndpointController', ['$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'Notifications',
-function ($scope, $state, $stateParams, $filter, EndpointService, Notifications) {
+.controller('EndpointController', ['$scope', '$state', '$transition$', '$filter', 'EndpointService', 'Notifications',
+function ($scope, $state, $transition$, $filter, EndpointService, Notifications) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('endpoints');
   }
 
   $scope.state = {
-    error: '',
     uploadInProgress: false
   };
 
   $scope.formValues = {
-    TLSCACert: null,
-    TLSCert: null,
-    TLSKey: null
+    SecurityFormData: new EndpointSecurityFormData()
   };
 
   $scope.updateEndpoint = function() {
-    var ID = $scope.endpoint.Id;
+    var endpoint = $scope.endpoint;
+    var securityData = $scope.formValues.SecurityFormData;
+    var TLS = securityData.TLS;
+    var TLSMode = securityData.TLSMode;
+    var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
+    var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
+
     var endpointParams = {
-      name: $scope.endpoint.Name,
-      URL: $scope.endpoint.URL,
-      PublicURL: $scope.endpoint.PublicURL,
-      TLS: $scope.endpoint.TLS,
-      TLSCACert: $scope.formValues.TLSCACert !== $scope.endpoint.TLSCACert ? $scope.formValues.TLSCACert : null,
-      TLSCert: $scope.formValues.TLSCert !== $scope.endpoint.TLSCert ? $scope.formValues.TLSCert : null,
-      TLSKey: $scope.formValues.TLSKey !== $scope.endpoint.TLSKey ? $scope.formValues.TLSKey : null,
+      name: endpoint.Name,
+      URL: endpoint.URL,
+      PublicURL: endpoint.PublicURL,
+      TLS: TLS,
+      TLSSkipVerify: TLSSkipVerify,
+      TLSSkipClientVerify: TLSSkipClientVerify,
+      TLSCACert: TLSSkipVerify || securityData.TLSCACert === endpoint.TLSConfig.TLSCACert ? null : securityData.TLSCACert,
+      TLSCert: TLSSkipClientVerify || securityData.TLSCert === endpoint.TLSConfig.TLSCert ? null : securityData.TLSCert,
+      TLSKey: TLSSkipClientVerify || securityData.TLSKey === endpoint.TLSConfig.TLSKey ? null : securityData.TLSKey,
       type: $scope.endpointType
     };
 
-    EndpointService.updateEndpoint(ID, endpointParams)
+    $('updateResourceSpinner').show();
+    EndpointService.updateEndpoint(endpoint.Id, endpointParams)
     .then(function success(data) {
       Notifications.success('Endpoint updated', $scope.endpoint.Name);
       $state.go('endpoints');
     }, function error(err) {
-      $scope.state.error = err.msg;
+      Notifications.error('Failure', err, 'Unable to update endpoint');
     }, function update(evt) {
       if (evt.upload) {
         $scope.state.uploadInProgress = evt.upload;
@@ -43,25 +49,26 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
     });
   };
 
-  function getEndpoint(endpointID) {
+  function initView() {
     $('#loadingViewSpinner').show();
-    EndpointService.endpoint($stateParams.id).then(function success(data) {
-      $('#loadingViewSpinner').hide();
-      $scope.endpoint = data;
-      if (data.URL.indexOf('unix://') === 0) {
+    EndpointService.endpoint($transition$.params().id)
+    .then(function success(data) {
+      var endpoint = data;
+      if (endpoint.URL.indexOf('unix://') === 0) {
         $scope.endpointType = 'local';
       } else {
         $scope.endpointType = 'remote';
       }
-      $scope.endpoint.URL = $filter('stripprotocol')(data.URL);
-      $scope.formValues.TLSCACert = data.TLSCACert;
-      $scope.formValues.TLSCert = data.TLSCert;
-      $scope.formValues.TLSKey = data.TLSKey;
-    }, function error(err) {
-      $('#loadingViewSpinner').hide();
+      endpoint.URL = $filter('stripprotocol')(endpoint.URL);
+      $scope.endpoint = endpoint;
+    })
+    .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint details');
+    })
+    .finally(function final() {
+      $('#loadingViewSpinner').hide();
     });
   }
 
-  getEndpoint($stateParams.id);
+  initView();
 }]);

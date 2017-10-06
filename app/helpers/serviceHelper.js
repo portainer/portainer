@@ -138,7 +138,6 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
       });
       return keyValueConstraints;
     }
-    return [];
   };
 
   return helper;

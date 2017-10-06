@@ -61,6 +61,9 @@
                   <span ng-show="sortType == 'Names' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Names' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
+        				<a data-toggle="tooltip" title="More" ng-click="truncateMore();" ng-show="showMore">
+        					<i class="fa fa-plus-square" aria-hidden="true"></i>
+        				</a>
               </th>
               <th>
                 <a ng-click="order('StackName')">
@@ -113,8 +116,8 @@
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ container.Status | containerstatus }}</span>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) === -1" class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status | containerstatus }}</span>
               </td>
-              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: 40}}</a></td>
-              <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: 40}}</a></td>
+              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: truncate_size}}</a></td>
+              <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: truncate_size}}</a></td>
               <td>{{ container.StackName ? container.StackName : '-' }}</td>
               <td><a ui-sref="image({id: container.Image})">{{ container.Image | hideshasum }}</a></td>
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>

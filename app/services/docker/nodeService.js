@@ -3,7 +3,7 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.nodes = function(id) {
+  service.nodes = function() {
     var deferred = $q.defer();
 
     Node.query({}).$promise

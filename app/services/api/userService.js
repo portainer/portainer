@@ -134,5 +134,26 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.initAdministrator = function(username, password) {
+    return Users.initAdminUser({ Username: username, Password: password }).$promise;
+  };
+
+  service.administratorExists = function() {
+    var deferred = $q.defer();
+
+    Users.checkAdminUser({}).$promise
+    .then(function success(data) {
+      deferred.resolve(true);
+    })
+    .catch(function error(err) {
+      if (err.status === 404) {
+        deferred.resolve(false);
+      }
+      deferred.reject({ msg: 'Unable to verify administrator account existence', err: err });
+    });
+
+    return deferred.promise;
+  };
+
   return service;
 }]);

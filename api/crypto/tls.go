@@ -4,31 +4,36 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"io/ioutil"
+
+	"github.com/portainer/portainer"
 )
 
 // CreateTLSConfiguration initializes a tls.Config using a CA certificate, a certificate and a key
-func CreateTLSConfiguration(caCertPath, certPath, keyPath string, skipTLSVerify bool) (*tls.Config, error) {
+func CreateTLSConfiguration(config *portainer.TLSConfiguration) (*tls.Config, error) {
+	TLSConfig := &tls.Config{}
 
-	config := &tls.Config{}
-
-	if certPath != "" && keyPath != "" {
-		cert, err := tls.LoadX509KeyPair(certPath, keyPath)
+	if config.TLSCertPath != "" && config.TLSKeyPath != "" {
+		cert, err := tls.LoadX509KeyPair(config.TLSCertPath, config.TLSKeyPath)
 		if err != nil {
 			return nil, err
 		}
-		config.Certificates = []tls.Certificate{cert}
+
+		TLSConfig.Certificates = []tls.Certificate{cert}
 	}
 
-	if caCertPath != "" {
-		caCert, err := ioutil.ReadFile(caCertPath)
+	if !config.TLSSkipVerify {
+		caCert, err := ioutil.ReadFile(config.TLSCACertPath)
 		if err != nil {
 			return nil, err
 		}
+
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
-		config.RootCAs = caCertPool
+
+		TLSConfig.RootCAs = caCertPool
 	}
 
-	config.InsecureSkipVerify = skipTLSVerify
-	return config, nil
+	TLSConfig.InsecureSkipVerify = config.TLSSkipVerify
+
+	return TLSConfig, nil
 }

@@ -33,7 +33,10 @@ func searchUser(username string, conn *ldap.Conn, settings []portainer.LDAPSearc
 
 		// Deliberately skip errors on the search request so that we can jump to other search settings
 		// if any issue arise with the current one.
-		sr, _ := conn.Search(searchRequest)
+		sr, err := conn.Search(searchRequest)
+		if err != nil {
+			continue
+		}
 
 		if len(sr.Entries) == 1 {
 			found = true
@@ -52,7 +55,7 @@ func searchUser(username string, conn *ldap.Conn, settings []portainer.LDAPSearc
 func createConnection(settings *portainer.LDAPSettings) (*ldap.Conn, error) {
 
 	if settings.TLSConfig.TLS || settings.StartTLS {
-		config, err := crypto.CreateTLSConfiguration(settings.TLSConfig.TLSCACertPath, "", "", settings.TLSConfig.TLSSkipVerify)
+		config, err := crypto.CreateTLSConfiguration(&settings.TLSConfig)
 		if err != nil {
 			return nil, err
 		}
