@@ -16,14 +16,59 @@ function ($scope, Notifications, Pagination, StackService) {
     $scope.sortType = sortType;
   };
 
+  $scope.selectItems = function (allSelected) {
+    angular.forEach($scope.state.filteredStacks, function (stack) {
+      if (stack.Checked !== allSelected) {
+        stack.Checked = allSelected;
+        $scope.selectItem(stack);
+      }
+    });
+  };
+
+  $scope.selectItem = function (item) {
+    if (item.Checked) {
+      $scope.state.selectedItemCount++;
+    } else {
+      $scope.state.selectedItemCount--;
+    }
+  };
+
+  $scope.removeAction = function () {
+    $('#loadingViewSpinner').show();
+    var counter = 0;
+
+    var complete = function () {
+      counter = counter - 1;
+      if (counter === 0) {
+        $('#loadingViewSpinner').hide();
+      }
+    };
+
+    angular.forEach($scope.stacks, function (stack) {
+      if (stack.Checked) {
+        counter = counter + 1;
+        StackService.remove(stack)
+        .then(function success() {
+          Notifications.success('Stack deleted', stack.Name);
+          var index = $scope.stacks.indexOf(stack);
+          $scope.stacks.splice(index, 1);
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to remove stack ' + stack.Name);
+        })
+        .finally(function final() {
+          complete();
+        });
+      }
+    });
+  };
+
   function initView() {
     $('#loadingViewSpinner').show();
 
-    var includeServices = $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE';
-
-    StackService.retrieveStacksAndAnonymousStacks(includeServices)
+    StackService.stacks()
     .then(function success(data) {
-      $scope.stacks = data.stacks.concat(data.anonymousStacks);
+      $scope.stacks = data;
     })
     .catch(function error(err) {
       $scope.stacks = [];

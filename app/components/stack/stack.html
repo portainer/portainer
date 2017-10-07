@@ -25,7 +25,7 @@
             </tr>
             <tr>
               <td>Services</td>
-              <td>{{ stack.Services.length }}</td>
+              <td>{{ services.length }}</td>
             </tr>
           </tbody>
         </table>
@@ -34,5 +34,5 @@
   </div>
 </div>
 
-<por-service-list services="stack.Services" nodes="nodes"></por-service-list>
+<por-service-list services="services" nodes="nodes"></por-service-list>
 <por-task-list tasks="tasks" nodes="nodes"></por-task-list>

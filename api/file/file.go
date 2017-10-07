@@ -81,9 +81,9 @@ func (service *Service) StoreComposeEnvFile(name, envFileContent string) error {
 	return nil
 }
 
-// StoreComposeFile creates a subfolder in the ComposeStorePath and stores a new file using the content from composeFileContent.
+// StoreStackFile creates a subfolder in the ComposeStorePath and stores a new file using the content from stackFileContent.
 // It returns the path to the folder where the file is stored.
-func (service *Service) StoreComposeFile(name, composeFileContent string) (string, error) {
+func (service *Service) StoreStackFile(name, stackFileContent string) (string, error) {
 	stackStorePath := path.Join(ComposeStorePath, name)
 	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
 	if err != nil {
@@ -91,7 +91,7 @@ func (service *Service) StoreComposeFile(name, composeFileContent string) (strin
 	}
 
 	composeFilePath := path.Join(stackStorePath, "docker-compose.yml")
-	data := []byte(composeFileContent)
+	data := []byte(stackFileContent)
 	r := bytes.NewReader(data)
 
 	err = service.createFileInStore(composeFilePath, r)
@@ -146,8 +146,8 @@ func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSF
 	return path.Join(service.fileStorePath, TLSStorePath, folder, fileName), nil
 }
 
-// DeleteStackFiles deletes a folder containing all the files associated to a stack.
-func (service *Service) DeleteStackFiles(projectPath string) error {
+// DeleteStackFile deletes a folder containing all the files associated to a stack.
+func (service *Service) DeleteStackFile(projectPath string) error {
 	err := os.RemoveAll(projectPath)
 	if err != nil {
 		return err

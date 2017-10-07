@@ -6,11 +6,11 @@ import (
 	"github.com/portainer/portainer/cli"
 	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/exec"
 	"github.com/portainer/portainer/file"
 	"github.com/portainer/portainer/http"
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
-	"github.com/portainer/portainer/libcompose"
 
 	"log"
 )
@@ -56,7 +56,7 @@ func initStore(dataStorePath string) *bolt.Store {
 }
 
 func initStackManager() portainer.StackManager {
-	return libcompose.NewStackManager()
+	return exec.NewStackManager()
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {

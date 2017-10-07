@@ -689,49 +689,11 @@ function configureRoutes($stateProvider) {
     }
   })
   .state('stack', {
-    abstract: true,
-    url: '/stacks',
+    url: '^/stacks/:id/',
     views: {
       'content@': {
-        template: '<div ui-view="content@"></div>'
-      },
-      'sidebar@': {
-        template: '<div ui-view="sidebar@"></div>'
-      }
-    }
-  })
-  .state('stack.v2', {
-    url: '^/stacks/v2/:id/',
-    views: {
-      'content@': {
-        templateUrl: 'app/components/stack/v2/stack.html',
-        controller: 'StackV2Controller'
-      },
-      'sidebar@': {
-        templateUrl: 'app/components/sidebar/sidebar.html',
-        controller: 'SidebarController'
-      }
-    }
-  })
-  .state('stack.v3', {
-    url: '^/stacks/v3/:id/',
-    views: {
-      'content@': {
-        templateUrl: 'app/components/stack/v3/stack.html',
-        controller: 'StackV3Controller'
-      },
-      'sidebar@': {
-        templateUrl: 'app/components/sidebar/sidebar.html',
-        controller: 'SidebarController'
-      }
-    }
-  })
-  .state('stack.v2.unregistered', {
-    url: '^/stacks/v2/unregistered/:name/',
-    views: {
-      'content@': {
-        templateUrl: 'app/components/stack/unregisteredv2/stack.html',
-        controller: 'UnregisteredStackV2Controller'
+        templateUrl: 'app/components/stack/stack.html',
+        controller: 'StackController'
       },
       'sidebar@': {
         templateUrl: 'app/components/sidebar/sidebar.html',
@@ -739,4 +701,42 @@ function configureRoutes($stateProvider) {
       }
     }
   });
+  // .state('stack', {
+  //   abstract: true,
+  //   url: '/stacks',
+  //   views: {
+  //     'content@': {
+  //       template: '<div ui-view="content@"></div>'
+  //     },
+  //     'sidebar@': {
+  //       template: '<div ui-view="sidebar@"></div>'
+  //     }
+  //   }
+  // })
+  // .state('stack.v2', {
+  //   url: '^/stacks/v2/:id/',
+  //   views: {
+  //     'content@': {
+  //       templateUrl: 'app/components/stack/v2/stack.html',
+  //       controller: 'StackV2Controller'
+  //     },
+  //     'sidebar@': {
+  //       templateUrl: 'app/components/sidebar/sidebar.html',
+  //       controller: 'SidebarController'
+  //     }
+  //   }
+  // })
+  // .state('stack.v2.unregistered', {
+  //   url: '^/stacks/v2/unregistered/:name/',
+  //   views: {
+  //     'content@': {
+  //       templateUrl: 'app/components/stack/unregisteredv2/stack.html',
+  //       controller: 'UnregisteredStackV2Controller'
+  //     },
+  //     'sidebar@': {
+  //       templateUrl: 'app/components/sidebar/sidebar.html',
+  //       controller: 'SidebarController'
+  //     }
+  //   }
+  // });
 }

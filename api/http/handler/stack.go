@@ -40,14 +40,20 @@ func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetStack))).Methods(http.MethodGet)
 	h.Handle("/{endpointId}/stacks/{id}",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteStack))).Methods(http.MethodDelete)
-	h.Handle("/{endpointId}/stacks/{id}/up",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleStackOperationUp))).Methods(http.MethodPost)
-	h.Handle("/{endpointId}/stacks/{id}/down",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleStackOperationDown))).Methods(http.MethodPost)
-	h.Handle("/{endpointId}/stacks/{id}/scale",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleStackOperationScale))).Methods(http.MethodPost)
+	// h.Handle("/{endpointId}/stacks/{id}",
+	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutStack))).Methods(http.MethodPut)
 	return h
 }
+
+type (
+	postStacksRequest struct {
+		Name             string `valid:"required"`
+		StackFileContent string `valid:"required"`
+	}
+	postStacksResponse struct {
+		ID int `json:"Id"`
+	}
+)
 
 // handlePostStacks handles POST requests on /:endpointId/stacks
 func (handler *StackHandler) handlePostStacks(w http.ResponseWriter, r *http.Request) {
@@ -56,6 +62,15 @@ func (handler *StackHandler) handlePostStacks(w http.ResponseWriter, r *http.Req
 	endpointID, err := strconv.Atoi(vars["endpointId"])
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrEndpointNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
@@ -76,18 +91,10 @@ func (handler *StackHandler) handlePostStacks(w http.ResponseWriter, r *http.Req
 		EndpointID: portainer.EndpointID(endpointID),
 	}
 
-	projectPath, err := handler.FileService.StoreComposeFile(stack.Name, req.ComposeFileContent)
+	projectPath, err := handler.FileService.StoreStackFile(stack.Name, req.StackFileContent)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
-	}
-
-	if req.EnvFileContent != "" {
-		err = handler.FileService.StoreComposeEnvFile(stack.Name, req.EnvFileContent)
-		if err != nil {
-			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-			return
-		}
 	}
 
 	stack.ProjectPath = projectPath
@@ -97,17 +104,13 @@ func (handler *StackHandler) handlePostStacks(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	err = handler.StackManager.Deploy(stack, endpoint)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
 	encodeJSON(w, &postStacksResponse{ID: int(stack.ID)}, handler.Logger)
-}
-
-type postStacksRequest struct {
-	Name               string `valid:"required"`
-	ComposeFileContent string `valid:"required"`
-	EnvFileContent     string `valid:""`
-}
-
-type postStacksResponse struct {
-	ID int `json:"Id"`
 }
 
 // handleGetStacks handles GET requests on /:endpointId/stacks
@@ -197,7 +200,7 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	_, err = handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrEndpointNotFound {
 		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
@@ -211,6 +214,12 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
 	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.StackManager.Remove(stack, endpoint)
+	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
@@ -221,148 +230,9 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	err = handler.FileService.DeleteStackFiles(stack.ProjectPath)
+	err = handler.FileService.DeleteStackFile(stack.ProjectPath)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-}
-
-func (handler *StackHandler) handleStackOperationUp(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	endpointID, err := strconv.Atoi(vars["endpointId"])
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrEndpointNotFound {
-		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-		return
-	} else if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
-	stackID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
-	if err == portainer.ErrStackNotFound {
-		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-		return
-	} else if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
-	err = handler.StackManager.Up(stack, endpoint)
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-}
-
-func (handler *StackHandler) handleStackOperationDown(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	//TODO: common code between operationhandlers, centralize
-	endpointID, err := strconv.Atoi(vars["endpointId"])
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrEndpointNotFound {
-		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-		return
-	} else if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
-	stackID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
-	if err == portainer.ErrStackNotFound {
-		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-		return
-	} else if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
-	err = handler.StackManager.Down(stack, endpoint)
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-}
-
-func (handler *StackHandler) handleStackOperationScale(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	var req postOperationScaleRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	_, err := govalidator.ValidateStruct(req)
-	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	//TODO: common code between operationhandlers, centralize
-	endpointID, err := strconv.Atoi(vars["endpointId"])
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrEndpointNotFound {
-		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-		return
-	} else if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
-	stackID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
-	if err == portainer.ErrStackNotFound {
-		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-		return
-	} else if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
-	err = handler.StackManager.Scale(stack, endpoint, req.ServiceName, req.Scale)
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-}
-
-type postOperationScaleRequest struct {
-	ServiceName string `valid:"required"`
-	Scale       int    `valid:"required"`
 }
