@@ -1,6 +1,6 @@
 angular.module('stack', [])
-.controller('StackController', ['$q', '$scope', '$stateParams', 'StackService', 'ServiceService', 'NodeService', 'Notifications',
-function ($q, $scope, $stateParams, StackService, ServiceService, NodeService, Notifications) {
+.controller('StackController', ['$q', '$scope', '$stateParams', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'Notifications',
+function ($q, $scope, $stateParams, StackService, NodeService, ServiceService, TaskService, ServiceHelper, Notifications) {
 
   function initView() {
     $('#loadingViewSpinner').show();
@@ -17,19 +17,24 @@ function ($q, $scope, $stateParams, StackService, ServiceService, NodeService, N
 
       return $q.all({
         services: ServiceService.services(serviceFilters),
+        tasks: TaskService.tasks(serviceFilters),
         nodes: NodeService.nodes()
       });
     })
     .then(function success(data) {
       $scope.nodes = data.nodes;
+
       var services = data.services;
-      $scope.services = services;
-      var tasks = [];
+
+      var tasks = data.tasks;
+      $scope.tasks = tasks;
+
       for (var i = 0; i < services.length; i++) {
         var service = services[i];
-        tasks = tasks.concat(service.Tasks);
+        ServiceHelper.associateTasksToService(service, tasks);
       }
-      $scope.tasks = tasks;
+
+      $scope.services = services;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve tasks details');
@@ -37,28 +42,6 @@ function ($q, $scope, $stateParams, StackService, ServiceService, NodeService, N
     .finally(function final() {
       $('#loadingViewSpinner').hide();
     });
-
-    // $q.all({
-    //   stack: StackService.stackV3(stackName),
-    //   nodes: NodeService.nodes()
-    // })
-    // .then(function success(data) {
-    //   var stack = data.stack;
-    //   $scope.nodes = data.nodes;
-    //   $scope.stack = stack;
-    //   var tasks = [];
-    //   for (var i = 0; i < stack.Services.length; i++) {
-    //     var service = stack.Services[i];
-    //     tasks = tasks.concat(service.Tasks);
-    //   }
-    //   $scope.tasks = tasks;
-    // })
-    // .catch(function error(err) {
-    //   Notifications.error('Failure', err, 'Unable to retrieve tasks details');
-    // })
-    // .finally(function final() {
-    //   $('#loadingViewSpinner').hide();
-    // });
   }
 
   initView();

@@ -3,10 +3,10 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.services = function() {
+  service.services = function(filters) {
     var deferred = $q.defer();
 
-    Service.query().$promise
+    Service.query({ filters: filters ? filters : {} }).$promise
     .then(function success(data) {
       var services = data.map(function (item) {
         return new ServiceViewModel(item);
@@ -35,28 +35,28 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.services = function(filters) {
-    var deferred = $q.defer();
-
-    $q.all({
-      services: Service.query({ filters: filters ? filters : {} }).$promise,
-      tasks: TaskService.tasks(filters)
-    })
-    .then(function success(data) {
-      var tasks = data.tasks;
-      var services = data.services.map(function (item) {
-        var service = new ServiceViewModel(item);
-        ServiceHelper.associateTasksToService(service, tasks);
-        return service;
-      });
-      deferred.resolve(services);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve services', err: err });
-    });
-
-    return deferred.promise;
-  };
+  // service.services = function(filters) {
+  //   var deferred = $q.defer();
+  //
+  //   $q.all({
+  //     services: Service.query({ filters: filters ? filters : {} }).$promise,
+  //     tasks: TaskService.tasks(filters)
+  //   })
+  //   .then(function success(data) {
+  //     var tasks = data.tasks;
+  //     var services = data.services.map(function (item) {
+  //       var service = new ServiceViewModel(item);
+  //       ServiceHelper.associateTasksToService(service, tasks);
+  //       return service;
+  //     });
+  //     deferred.resolve(services);
+  //   })
+  //   .catch(function error(err) {
+  //     deferred.reject({ msg: 'Unable to retrieve services', err: err });
+  //   });
+  //
+  //   return deferred.promise;
+  // };
 
   service.remove = function(service) {
     var deferred = $q.defer();

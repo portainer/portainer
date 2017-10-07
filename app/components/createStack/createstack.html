@@ -19,40 +19,9 @@
               <input type="text" class="form-control" ng-model="formValues.Name" id="stack_name" placeholder="e.g. myStack">
             </div>
           </div>
-          <div class="col-sm-12 form-section-title">
-            Build method
-          </div>
-          <div class="form-group"></div>
-          <!-- build-method -->
-          <div class="form-group" style="margin-bottom: 0">
-            <div class="boxselector_wrapper">
-              <div>
-                <input type="radio" id="method_editor" ng-model="state.Method" value="editor">
-                <label for="method_editor">
-                  <div class="boxselector_header">
-                    <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Web editor
-                  </div>
-                  <p>Use our Web editor</p>
-                </label>
-              </div>
-              <div>
-                <input type="radio" id="method_upload" ng-model="state.Method" value="upload">
-                <label for="method_upload">
-                  <div class="boxselector_header">
-                    <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Upload
-                  </div>
-                  <p>Upload existing file</p>
-                </label>
-              </div>
-            </div>
-          </div>
-          <!-- !build-method -->
-          <!-- web-editor -->
-          <div ng-if="state.Method === 'editor'">
+          <div>
             <div class="col-sm-12 form-section-title">
-              Stack file
+              Web editor
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
@@ -63,44 +32,19 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <textarea class="form-control" rows="25" ng-model="formValues.StackFile" id="stack_file" placeholder='version: "3"'></textarea>
+                <textarea id="web-editor" class="form-control" ng-model="formValues.StackFile" placeholder='version: "3"'></textarea>
               </div>
             </div>
           </div>
           <!-- !web-editor -->
-          <!-- upload -->
-          <div ng-if="state.Method === 'upload'">
-            <div class="col-sm-12 form-section-title">
-              Stack file
-            </div>
-            <div class="form-group">
-              <span class="col-sm-12 text-muted small">
-                Upload your Stack file. This stack will be deployed using the equivalent of the <code>docker stack deploy</code> command. 
-              </span>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-12">
-                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.StackFileUpload">Select file</button>
-                <span style="margin-left: 5px;">
-                  {{ formValues.StackFileUpload.name }}
-                  <i class="fa fa-times red-icon" ng-if="!formValues.StackFileUpload" aria-hidden="true"></i>
-                  <i class="fa fa-circle-o-notch fa-spin" ng-if="state.UploadInProgress"></i>
-                </span>
-              </div>
-            </div>
-          </div>
-          <!-- !upload -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" ng-disabled="state.Method !== 'editor'" class="btn btn-primary btn-sm" ng-click="deployStack()">Deploy the stack</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.StackFile || !formValues.Name" ng-click="deployStack()">Deploy the stack</button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="stacks">Cancel</a>
-              <span class="text-danger" ng-if="state.Method !== 'editor'" style="margin: 5px;">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> This feature is not available yet.
-              </span>
               <i id="createStackSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>

@@ -35,28 +35,6 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.stackV3 = function(name) {
-    var deferred = $q.defer();
-
-    var filters = {
-      label: ['com.docker.stack.namespace=' + name]
-    };
-
-    $q.all({
-      services: ServiceService.services(filters)
-    })
-    .then(function success(data) {
-      var services = data.services;
-      var stack = new StackV3ViewModel(name, services);
-      deferred.resolve(stack);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve stack details', err: err });
-    });
-
-    return deferred.promise;
-  };
-
   service.remove = function(stack) {
     return Stack.remove({ id: stack.Id }).$promise;
   };
@@ -64,6 +42,29 @@ angular.module('portainer.services')
   service.createStack = function(name, stackFile) {
     return Stack.create({Name: name, StackFileContent: stackFile}).$promise;
   };
+
+  //
+  // service.stackV3 = function(name) {
+  //   var deferred = $q.defer();
+  //
+  //   var filters = {
+  //     label: ['com.docker.stack.namespace=' + name]
+  //   };
+  //
+  //   $q.all({
+  //     services: ServiceService.services(filters)
+  //   })
+  //   .then(function success(data) {
+  //     var services = data.services;
+  //     var stack = new StackV3ViewModel(name, services);
+  //     deferred.resolve(stack);
+  //   })
+  //   .catch(function error(err) {
+  //     deferred.reject({ msg: 'Unable to retrieve stack details', err: err });
+  //   });
+  //
+  //   return deferred.promise;
+  // };
 
   // service.retrieveStacksAndAnonymousStacks = function(includeServices) {
   //   var deferred = $q.defer();

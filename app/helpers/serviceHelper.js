@@ -4,6 +4,7 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
   var helper = {};
 
   helper.associateTasksToService = function(service, tasks) {
+    service.Tasks = [];
     var otherServicesTasks = [];
     for (var i = 0; i < tasks.length; i++) {
       var task = tasks[i];
