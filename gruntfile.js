@@ -58,7 +58,7 @@ module.exports = function (grunt) {
       prod: { options: { variables: { 'environment': 'production'  }}}
     },
     src: {
-      js: ['app/**/*.js', '!app/**/*.spec.js'],
+      js: ['app/**/__module.js', 'app/**/*.js', '!app/**/*.spec.js'],
       jsTpl: ['<%= distdir %>/templates/**/*.js'],
       html: ['index.html'],
       tpl: ['app/components/**/*.html', 'app/directives/**/*.html'],

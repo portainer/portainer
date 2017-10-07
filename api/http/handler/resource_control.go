@@ -78,6 +78,10 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 		resourceControlType = portainer.ServiceResourceControl
 	case "volume":
 		resourceControlType = portainer.VolumeResourceControl
+	case "network":
+		resourceControlType = portainer.NetworkResourceControl
+	case "secret":
+		resourceControlType = portainer.SecretResourceControl
 	default:
 		httperror.WriteErrorResponse(w, portainer.ErrInvalidResourceControlType, http.StatusBadRequest, handler.Logger)
 		return

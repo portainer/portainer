@@ -125,6 +125,8 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 					portainer.LDAPSearchSettings{},
 				},
 			},
+			AllowBindMountsForRegularUsers:     true,
+			AllowPrivilegedModeForRegularUsers: true,
 		}
 
 		if *flags.Templates != "" {
@@ -184,7 +186,6 @@ func main() {
 	applicationStatus := initStatus(authorizeEndpointMgmt, flags)
 
 	if *flags.Endpoint != "" {
-		var endpoints []portainer.Endpoint
 		endpoints, err := store.EndpointService.Endpoints()
 		if err != nil {
 			log.Fatal(err)
@@ -212,16 +213,39 @@ func main() {
 		}
 	}
 
-	if *flags.AdminPassword != "" {
-		log.Printf("Creating admin user with password hash %s", *flags.AdminPassword)
-		user := &portainer.User{
-			Username: "admin",
-			Role:     portainer.AdministratorRole,
-			Password: *flags.AdminPassword,
-		}
-		err := store.UserService.CreateUser(user)
+	adminPasswordHash := ""
+	if *flags.AdminPasswordFile != "" {
+		content, err := file.GetStringFromFile(*flags.AdminPasswordFile)
 		if err != nil {
 			log.Fatal(err)
+		}
+		adminPasswordHash, err = cryptoService.Hash(content)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else if *flags.AdminPassword != "" {
+		adminPasswordHash = *flags.AdminPassword
+	}
+
+	if adminPasswordHash != "" {
+		users, err := store.UserService.UsersByRole(portainer.AdministratorRole)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if len(users) == 0 {
+			log.Printf("Creating admin user with password hash %s", adminPasswordHash)
+			user := &portainer.User{
+				Username: "admin",
+				Role:     portainer.AdministratorRole,
+				Password: adminPasswordHash,
+			}
+			err := store.UserService.CreateUser(user)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			log.Println("Instance already has an administrator user defined. Skipping admin password related flags.")
 		}
 	}
 

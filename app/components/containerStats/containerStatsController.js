@@ -1,9 +1,10 @@
 angular.module('containerStats', [])
-.controller('ContainerStatsController', ['$q', '$scope', '$stateParams', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'Pagination',
-function ($q, $scope, $stateParams, $document, $interval, ContainerService, ChartService, Notifications, Pagination) {
+.controller('ContainerStatsController', ['$q', '$scope', '$transition$', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'Pagination',
+function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications, Pagination) {
 
   $scope.state = {
-    refreshRate: '5'
+    refreshRate: '5',
+    networkStatsUnavailable: false
   };
 
   $scope.state.pagination_count = Pagination.getPaginationCount('stats_processes');
@@ -32,11 +33,13 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Char
   }
 
   function updateNetworkChart(stats, chart) {
-    var rx = stats.Networks[0].rx_bytes;
-    var tx = stats.Networks[0].tx_bytes;
-    var label = moment(stats.Date).format('HH:mm:ss');
+    if (stats.Networks.length > 0) {
+      var rx = stats.Networks[0].rx_bytes;
+      var tx = stats.Networks[0].tx_bytes;
+      var label = moment(stats.Date).format('HH:mm:ss');
 
-    ChartService.UpdateNetworkChart(label, rx, tx, chart);
+      ChartService.UpdateNetworkChart(label, rx, tx, chart);
+    }
   }
 
   function updateMemoryChart(stats, chart) {
@@ -79,12 +82,15 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Char
   function startChartUpdate(networkChart, cpuChart, memoryChart) {
     $('#loadingViewSpinner').show();
     $q.all({
-      stats: ContainerService.containerStats($stateParams.id),
-      top: ContainerService.containerTop($stateParams.id)
+      stats: ContainerService.containerStats($transition$.params().id),
+      top: ContainerService.containerTop($transition$.params().id)
     })
     .then(function success(data) {
       var stats = data.stats;
       $scope.processInfo = data.top;
+      if (stats.Networks.length === 0) {
+        $scope.state.networkStatsUnavailable = true;
+      }
       updateNetworkChart(stats, networkChart);
       updateMemoryChart(stats, memoryChart);
       updateCPUChart(stats, cpuChart);
@@ -103,8 +109,8 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Char
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
       $q.all({
-        stats: ContainerService.containerStats($stateParams.id),
-        top: ContainerService.containerTop($stateParams.id)
+        stats: ContainerService.containerStats($transition$.params().id),
+        top: ContainerService.containerTop($transition$.params().id)
       })
       .then(function success(data) {
         var stats = data.stats;
@@ -139,7 +145,7 @@ function ($q, $scope, $stateParams, $document, $interval, ContainerService, Char
   function initView() {
     $('#loadingViewSpinner').show();
 
-    ContainerService.container($stateParams.id)
+    ContainerService.container($transition$.params().id)
     .then(function success(data) {
       $scope.container = data;
     })

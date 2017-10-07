@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$stateParams', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
-function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -204,14 +204,19 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(service.ServiceConstraints);
     config.TaskTemplate.Placement.Preferences = ServiceHelper.translateKeyValueToPlacementPreferences(service.ServicePreferences);
 
+    // Round memory values to 0.125 and convert MB to B
+    var memoryLimit = (Math.round(service.LimitMemoryBytes * 8) / 8).toFixed(3);
+    memoryLimit *= 1024 * 1024;
+    var memoryReservation = (Math.round(service.ReservationMemoryBytes * 8) / 8).toFixed(3);
+    memoryReservation *= 1024 * 1024;
     config.TaskTemplate.Resources = {
       Limits: {
-        NanoCPUs: service.LimitNanoCPUs,
-        MemoryBytes: service.LimitMemoryBytes
+        NanoCPUs: service.LimitNanoCPUs * 1000000000,
+        MemoryBytes: memoryLimit
       },
       Reservations: {
-        NanoCPUs: service.ReservationNanoCPUs,
-        MemoryBytes: service.ReservationMemoryBytes
+        NanoCPUs: service.ReservationNanoCPUs * 1000000000,
+        MemoryBytes: memoryReservation
       }
     };
 
@@ -244,7 +249,11 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
       $('#loadingViewSpinner').hide();
-      Notifications.success('Service successfully updated', 'Service updated');
+      if (data.message && data.message.match(/^rpc error:/)) {
+        Notifications.error(data.message, 'Error');
+      } else {
+        Notifications.success('Service successfully updated', 'Service updated');
+      }
       $scope.cancelChanges({});
       initView();
     }, function (e) {
@@ -288,10 +297,17 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
     service.ServicePreferences = ServiceHelper.translatePreferencesToKeyValue(service.Preferences);
   }
 
+  function transformResources(service) {
+    service.LimitNanoCPUs = service.LimitNanoCPUs / 1000000000 || 0;
+    service.ReservationNanoCPUs = service.ReservationNanoCPUs / 1000000000 || 0;
+    service.LimitMemoryBytes = service.LimitMemoryBytes / 1024 / 1024 || 0;
+    service.ReservationMemoryBytes = service.ReservationMemoryBytes / 1024 / 1024 || 0;
+  }
+
   function initView() {
     $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    ServiceService.service($stateParams.id)
+    ServiceService.service($transition$.params().id)
     .then(function success(data) {
       var service = data;
       $scope.isUpdating = $scope.lastVersion >= service.Version;
@@ -299,6 +315,7 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
         $scope.lastVersion = service.Version;
       }
 
+      transformResources(service);
       translateServiceArrays(service);
       $scope.service = service;
       originalService = angular.copy(service);
@@ -313,6 +330,19 @@ function ($q, $scope, $stateParams, $state, $location, $timeout, $anchorScroll, 
       $scope.tasks = data.tasks;
       $scope.nodes = data.nodes;
       $scope.secrets = data.secrets;
+
+      // Set max cpu value
+      var maxCpus = 0;
+      for (var n in data.nodes) {
+        if (data.nodes[n].CPUs && data.nodes[n].CPUs > maxCpus) {
+          maxCpus = data.nodes[n].CPUs;
+        }
+      }
+      if (maxCpus > 0) {
+        $scope.state.sliderMaxCpu = maxCpus / 1000000000;
+      } else {
+        $scope.state.sliderMaxCpu = 32;
+      }
 
       $timeout(function() {
         $anchorScroll();

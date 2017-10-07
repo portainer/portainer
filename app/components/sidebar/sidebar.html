@@ -50,7 +50,7 @@
       <a ui-sref="swarm" ui-sref-active="active">Swarm <span class="menu-icon fa fa-object-group"></span></a>
     </li>
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'">
-      <a ui-sref="docker" ui-sref-active="active">Docker <span class="menu-icon fa fa-th"></span></a>
+      <a ui-sref="engine" ui-sref-active="active">Engine <span class="menu-icon fa fa-th"></span></a>
     </li>
     <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin || isTeamLeader">
       <span>Portainer settings</span>
@@ -75,11 +75,9 @@
     </li>
   </ul>
   <div class="sidebar-footer">
-    <div class="col-xs-12">
-      <a href="https://github.com/portainer/portainer" target="_blank">
-        <i class="fa fa-github" aria-hidden="true"></i>
-        Portainer {{ uiVersion }}
-      </a>
+    <div class="col-sm-12">
+      <img src="images/logo_small.png" class="img-responsive logo" alt="Portainer">
+      <span class="version">{{ uiVersion }}</span>
     </div>
   </div>
 </div>

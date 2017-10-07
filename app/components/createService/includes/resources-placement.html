@@ -1,0 +1,130 @@
+<form class="form-horizontal" style="margin-top: 15px;">
+  <div class="col-sm-12 form-section-title">
+    Resources
+  </div>
+  <!-- memory-reservation-input -->
+  <div class="form-group">
+    <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+      Memory reservation
+    </label>
+    <div class="col-sm-3">
+      <por-slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
+    </div>
+    <div class="col-sm-2">
+      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation">
+    </div>
+    <div class="col-sm-4">
+      <p class="small text-muted" style="margin-top: 7px;">
+        Minimum memory available on a node to run a task (<b>MB</b>)
+      </p>
+    </div>
+  </div>
+  <!-- !memory-reservation-input -->
+  <!-- memory-limit-input -->
+  <div class="form-group">
+    <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+      Memory limit
+    </label>
+    <div class="col-sm-3">
+      <por-slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
+    </div>
+    <div class="col-sm-2">
+      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit">
+    </div>
+    <div class="col-sm-4" style="margin-top: 7px;">
+      <p class="small text-muted">
+        Maximum memory usage per task (<b>MB</b>)
+      </p>
+    </div>
+  </div>
+  <!-- !memory-limit-input -->
+  <!-- cpu-reservation-input -->
+  <div class="form-group">
+    <label for="cpu-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+      CPU reservation
+    </label>
+    <div class="col-sm-5">
+      <por-slider model="formValues.CpuReservation" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></por-slider>
+    </div>
+    <div class="col-sm-4" style="margin-top: 20px;">
+      <p class="small text-muted">
+        Minimum CPU available on a node to run a task
+      </p>
+    </div>
+  </div>
+  <!-- !cpu-reservation-input -->
+  <!-- cpu-limit-input -->
+  <div class="form-group">
+    <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+      CPU limit
+    </label>
+    <div class="col-sm-5">
+      <por-slider model="formValues.CpuLimit" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></por-slider>
+    </div>
+    <div class="col-sm-4" style="margin-top: 20px;">
+      <p class="small text-muted">
+        Maximum CPU usage per task
+      </p>
+    </div>
+  </div>
+  <!-- !cpu-limit-input -->
+  <div class="col-sm-12 form-section-title">
+    Placement
+  </div>
+  <!-- placement-constraints -->
+  <div class="form-group">
+    <div class="col-sm-12" style="margin-top: 5px;">
+      <label class="control-label text-left">Placement constraints</label>
+      <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPlacementConstraint()">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> placement constraint
+      </span>
+    </div>
+    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+      <div ng-repeat="constraint in formValues.PlacementConstraints" style="margin-top: 2px;">
+        <div class="input-group col-sm-4 input-group-sm">
+          <span class="input-group-addon">name</span>
+          <input type="text" class="form-control" ng-model="constraint.key" placeholder="e.g. node.role">
+        </div>
+        <div class="input-group col-sm-1 input-group-sm">
+          <select name="constraintOperator" class="form-control" ng-model="constraint.operator">
+            <option value="==">==</option>
+            <option value="!=">!=</option>
+          </select>
+        </div>
+        <div class="input-group col-sm-5 input-group-sm">
+          <span class="input-group-addon">value</span>
+          <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager">
+        </div>
+        <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementConstraint($index)">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- !placement-constraints -->
+  <!-- placement-preferences -->
+  <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.30">
+    <div class="col-sm-12" style="margin-top: 5px;">
+      <label class="control-label text-left">Placement preferences</label>
+      <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPlacementPreference()">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> placement preference
+      </span>
+    </div>
+    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+      <div ng-repeat="preference in formValues.PlacementPreferences" style="margin-top: 2px;">
+        <div class="input-group col-sm-4 input-group-sm">
+          <span class="input-group-addon">strategy</span>
+          <input type="text" class="form-control" ng-model="preference.strategy" placeholder="e.g. spread">
+        </div>
+        <div class="input-group col-sm-5 input-group-sm">
+          <span class="input-group-addon">value</span>
+          <input type="text" class="form-control" ng-model="preference.value" placeholder="e.g. node.labels.datacenter">
+        </div>
+        <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementPreference($index)">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- !placement-preferences -->
+</form>

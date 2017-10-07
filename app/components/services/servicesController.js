@@ -1,6 +1,6 @@
 angular.module('services', [])
-.controller('ServicesController', ['$q', '$scope', '$stateParams', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $stateParams, $state, Service, ServiceService, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, ModalService, ResourceControlService) {
+.controller('ServicesController', ['$q', '$scope', '$transition$', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $transition$, $state, Service, ServiceService, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');

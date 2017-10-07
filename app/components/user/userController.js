@@ -1,6 +1,6 @@
 angular.module('user', [])
-.controller('UserController', ['$q', '$scope', '$state', '$stateParams', 'UserService', 'ModalService', 'Notifications', 'SettingsService',
-function ($q, $scope, $state, $stateParams, UserService, ModalService, Notifications, SettingsService) {
+.controller('UserController', ['$q', '$scope', '$state', '$transition$', 'UserService', 'ModalService', 'Notifications', 'SettingsService',
+function ($q, $scope, $state, $transition$, UserService, ModalService, Notifications, SettingsService) {
 
   $scope.state = {
     updatePasswordError: ''
@@ -72,7 +72,7 @@ function ($q, $scope, $state, $stateParams, UserService, ModalService, Notificat
   function initView() {
     $('#loadingViewSpinner').show();
     $q.all({
-      user: UserService.user($stateParams.id),
+      user: UserService.user($transition$.params().id),
       settings: SettingsService.publicSettings()
     })
     .then(function success(data) {

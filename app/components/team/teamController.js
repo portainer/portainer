@@ -1,6 +1,6 @@
 angular.module('team', [])
-.controller('TeamController', ['$q', '$scope', '$state', '$stateParams', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication',
-function ($q, $scope, $state, $stateParams, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication) {
+.controller('TeamController', ['$q', '$scope', '$state', '$transition$', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication',
+function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication) {
 
   $scope.state = {
     pagination_count_users: Pagination.getPaginationCount('team_available_users'),
@@ -208,9 +208,9 @@ function ($q, $scope, $state, $stateParams, TeamService, UserService, TeamMember
     $('#loadingViewSpinner').show();
     $scope.isAdmin = Authentication.getUserDetails().role === 1 ? true: false;
     $q.all({
-      team: TeamService.team($stateParams.id),
+      team: TeamService.team($transition$.params().id),
       users: UserService.users(false),
-      memberships: TeamService.userMemberships($stateParams.id)
+      memberships: TeamService.userMemberships($transition$.params().id)
     })
     .then(function success(data) {
       var users = data.users;

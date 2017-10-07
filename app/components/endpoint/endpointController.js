@@ -1,6 +1,6 @@
 angular.module('endpoint', [])
-.controller('EndpointController', ['$scope', '$state', '$stateParams', '$filter', 'EndpointService', 'Notifications',
-function ($scope, $state, $stateParams, $filter, EndpointService, Notifications) {
+.controller('EndpointController', ['$scope', '$state', '$transition$', '$filter', 'EndpointService', 'Notifications',
+function ($scope, $state, $transition$, $filter, EndpointService, Notifications) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('endpoints');
@@ -51,17 +51,16 @@ function ($scope, $state, $stateParams, $filter, EndpointService, Notifications)
 
   function initView() {
     $('#loadingViewSpinner').show();
-    EndpointService.endpoint($stateParams.id)
+    EndpointService.endpoint($transition$.params().id)
     .then(function success(data) {
       var endpoint = data;
-      endpoint.URL = $filter('stripprotocol')(endpoint.URL);
-      $scope.endpoint = endpoint;
-
-      if (data.URL.indexOf('unix://') === 0 || data.URL.indexOf('npipe://') === 0) {
+      if (endpoint.URL.indexOf('unix://') === 0 || endpoint.URL.indexOf('npipe://') === 0) {
         $scope.endpointType = 'local';
       } else {
         $scope.endpointType = 'remote';
       }
+      endpoint.URL = $filter('stripprotocol')(endpoint.URL);
+      $scope.endpoint = endpoint;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint details');
