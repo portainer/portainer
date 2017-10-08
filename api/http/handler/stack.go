@@ -96,15 +96,15 @@ func (handler *StackHandler) handlePostStacks(w http.ResponseWriter, r *http.Req
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-
 	stack.ProjectPath = projectPath
-	err = handler.StackService.CreateStack(stack)
+
+	err = handler.StackManager.Deploy(stack, endpoint)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	err = handler.StackService.CreateStack(stack)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
