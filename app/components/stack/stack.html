@@ -27,6 +27,27 @@
               <td>Services</td>
               <td>{{ services.length }}</td>
             </tr>
+            <tr ng-if="!state.displayEditor">
+              <td colspan="2">
+                <button type="button" class="btn btn-sm btn-primary" ng-click="toggleEditor()">Show stack editor</button>
+              </td>
+            </tr>
+              <tr ng-if="state.displayEditor">
+                <td colspan="2">
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <textarea id="web-editor" class="form-control" ng-model="stackFileContent" placeholder='version: "3"'></textarea>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr ng-if="state.displayEditor">
+                <td colspan="2">
+                  <button type="button" class="btn btn-sm btn-primary" ng-click="deployStack()">Update stack</button>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="toggleEditor()">Hide</a>
+                  <i id="createStackSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+                </td>
+              </tr>
           </tbody>
         </table>
       </rd-widget-body>

@@ -6,13 +6,27 @@ angular.module('portainer.services')
   service.stack = function(id) {
     var deferred = $q.defer();
 
-    Stack.get({id: id}).$promise
+    Stack.get({ id: id }).$promise
     .then(function success(data) {
       var stack = new StackViewModel(data);
       deferred.resolve(stack);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve stack details', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.getStackFile = function(id) {
+    var deferred = $q.defer();
+
+    Stack.getStackFile({ id: id }).$promise
+    .then(function success(data) {
+      deferred.resolve(data.StackFileContent);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve stack content', err: err });
     });
 
     return deferred.promise;
@@ -40,7 +54,11 @@ angular.module('portainer.services')
   };
 
   service.createStack = function(name, stackFile) {
-    return Stack.create({Name: name, StackFileContent: stackFile}).$promise;
+    return Stack.create({ Name: name, StackFileContent: stackFile }).$promise;
+  };
+
+  service.updateStack = function(id, stackFile) {
+    return Stack.update({ id: id, StackFileContent: stackFile }).$promise;
   };
 
   //

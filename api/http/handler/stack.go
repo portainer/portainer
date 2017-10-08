@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"path"
 	"strconv"
 
 	"github.com/asaskevich/govalidator"
@@ -40,8 +41,10 @@ func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetStack))).Methods(http.MethodGet)
 	h.Handle("/{endpointId}/stacks/{id}",
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteStack))).Methods(http.MethodDelete)
-	// h.Handle("/{endpointId}/stacks/{id}",
-	// 	bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutStack))).Methods(http.MethodPut)
+	h.Handle("/{endpointId}/stacks/{id}",
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePutStack))).Methods(http.MethodPut)
+	h.Handle("/{endpointId}/stacks/{id}/stackfile",
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleGetStackFile))).Methods(http.MethodGet)
 	return h
 }
 
@@ -52,6 +55,12 @@ type (
 	}
 	postStacksResponse struct {
 		ID int `json:"Id"`
+	}
+	getStackFileResponse struct {
+		StackFileContent string `json:"StackFileContent"`
+	}
+	putStackRequest struct {
+		StackFileContent string `valid:"required"`
 	}
 )
 
@@ -181,6 +190,110 @@ func (handler *StackHandler) handleGetStack(w http.ResponseWriter, r *http.Reque
 	}
 
 	encodeJSON(w, stack, handler.Logger)
+}
+
+// handlePutStack handles PUT requests on /:endpointId/stacks/:id
+func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	endpointID, err := strconv.Atoi(vars["endpointId"])
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	id := vars["id"]
+	stackID, err := strconv.Atoi(id)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrEndpointNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
+	if err == portainer.ErrStackNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	var req putStackRequest
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = govalidator.ValidateStruct(req)
+	if err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = handler.FileService.StoreStackFile(stack.Name, req.StackFileContent)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.StackManager.Deploy(stack, endpoint)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+}
+
+// handleGetStackFile handles GET requests on /:endpointId/stacks/:id/stackfile
+func (handler *StackHandler) handleGetStackFile(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	endpointID, err := strconv.Atoi(vars["endpointId"])
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	id := vars["id"]
+	stackID, err := strconv.Atoi(id)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrEndpointNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
+	if err == portainer.ErrStackNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	stackFileContent, err := handler.FileService.GetFileContent(path.Join(stack.ProjectPath, "docker-compose.yml"))
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	encodeJSON(w, &getStackFileResponse{StackFileContent: stackFileContent}, handler.Logger)
 }
 
 // handleDeleteStack handles DELETE requests on /:endpointId/stacks/:id

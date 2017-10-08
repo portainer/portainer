@@ -222,7 +222,7 @@ func main() {
 
 	adminPasswordHash := ""
 	if *flags.AdminPasswordFile != "" {
-		content, err := file.GetStringFromFile(*flags.AdminPasswordFile)
+		content, err := fileService.GetFileContent(*flags.AdminPasswordFile)
 		if err != nil {
 			log.Fatal(err)
 		}

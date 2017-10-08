@@ -131,7 +131,7 @@ type (
 	// StackID represents a stack identifier.
 	StackID int
 
-	// Stack represents a Docker stack created via docker-compose.
+	// Stack represents a Docker stack created via docker stack deploy.
 	Stack struct {
 		ID          StackID `json:"Id"`
 		Name        string  `json:"Name"`
@@ -355,6 +355,7 @@ type (
 		DeleteTLSFiles(folder string) error
 		StoreStackFile(name, stackFileContent string) (string, error)
 		DeleteStackFile(projectPath string) error
+		GetFileContent(filePath string) (string, error)
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.

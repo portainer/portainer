@@ -1,6 +1,6 @@
 angular.module('createStack', [])
-.controller('CreateStackController', ['$scope', '$state', '$document', 'StackService', 'Notifications',
-function ($scope, $state, $document, StackService, Notifications) {
+.controller('CreateStackController', ['$scope', '$state', '$document', 'StackService', 'CodeMirrorService', 'Notifications',
+function ($scope, $state, $document, StackService, CodeMirrorService, Notifications) {
 
   $scope.formValues = {
     Name: '',
@@ -32,15 +32,7 @@ function ($scope, $state, $document, StackService, Notifications) {
     $document.ready(function() {
       var webEditorElement = $document[0].getElementById('web-editor');
       if (webEditorElement) {
-        var codeMirrorOptions = {
-          lineNumbers: true,
-          mode: 'text/x-yaml',
-          gutters: ['CodeMirror-lint-markers'],
-          lint: true
-        };
-        var cm = CodeMirror.fromTextArea(webEditorElement, codeMirrorOptions);
-        cm.setSize('100%', 500);
-        $scope.editor = cm;
+        $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement);
       }
     });
   }

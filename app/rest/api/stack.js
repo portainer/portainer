@@ -5,12 +5,11 @@ angular.module('portainer.rest')
     endpointId: EndpointProvider.endpointID
   },
   {
-    create: { method: 'POST' },
     get: { method: 'GET', params: { id: '@id' } },
     query: { method: 'GET', isArray: true },
+    create: { method: 'POST' },
+    update: { method: 'PUT', params: { id: '@id' } },
     remove: { method: 'DELETE', params: { id: '@id'} },
-    up: { method: 'POST', params: { id: '@id', action: 'up' } },
-    down: { method: 'POST', params: { id: '@id', action: 'down' } },
-    scale: { method: 'POST', params: { id: '@id', action: 'scale' } }
+    getStackFile: { method: 'GET', params: { id : '@id', action: 'stackfile' } }
   });
 }]);

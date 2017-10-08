@@ -188,6 +188,16 @@ func (service *Service) DeleteTLSFile(folder string, fileType portainer.TLSFileT
 	return nil
 }
 
+// GetFileContent returns a string content from file.
+func (service *Service) GetFileContent(filePath string) (string, error) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return string(content), nil
+}
+
 // createDirectoryInStoreIfNotExist creates a new directory in the file store if it doesn't exists on the file system.
 func (service *Service) createDirectoryInStoreIfNotExist(name string) error {
 	path := path.Join(service.fileStorePath, name)
@@ -221,14 +231,4 @@ func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 		return err
 	}
 	return nil
-}
-
-// GetStringFromFile returns a string content from file.
-func GetStringFromFile(filePath string) (string, error) {
-	content, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return "", err
-	}
-
-	return string(content), nil
 }
