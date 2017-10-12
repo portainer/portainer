@@ -44,7 +44,12 @@
             </tr>
             <tr ng-if="task.Status.ContainerStatus.ContainerID">
               <td>Container ID</td>
-              <td>{{ task.Status.ContainerStatus.ContainerID }}</td>
+              <td title="Notify 'Failure: Docker container identifier not found' -> Try 'Switch endpoint to the node where the container is running'">
+                {{ task.Status.ContainerStatus.ContainerID }}
+                <a class="btn btn-outline-secondary" target="_blank" type="button" ui-sref="console({id: task.Status.ContainerStatus.ContainerID})">
+                  <i class="fa fa-terminal space-right" aria-hidden="true"></i>Console
+                </a>
+              </td>
             </tr>
           </tbody>
         </table>
