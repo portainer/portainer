@@ -14,7 +14,7 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
     StateManager.updateEndpointState(true)
     .then(function success() {
-      $state.go('dashboard');
+      Notifications.success('switch endpoint to: ', endpoint.Name);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
