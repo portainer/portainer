@@ -8,6 +8,7 @@ function ContainerViewModel(data) {
     this.IP = data.NetworkSettings.Networks[Object.keys(data.NetworkSettings.Networks)[0]].IPAddress;
   }
   this.Image = data.Image;
+  this.ImageID = data.ImageID;
   this.Command = data.Command;
   this.Checked = false;
   this.Labels = data.Labels;
