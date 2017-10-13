@@ -61,29 +61,61 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 	return service, nil
 }
 
-// StoreComposeEnvFile stores a new .env file in the stack store path using the content of envFileContent.
-func (service *Service) StoreComposeEnvFile(name, envFileContent string) error {
-	stackStorePath := path.Join(ComposeStorePath, name)
-	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
+// CreateTemporaryDirectory creates a temporary directory. Directory name will begin with prefix.
+func (service *Service) CreateTemporaryDirectory(prefix string) (string, error) {
+	dir, err := ioutil.TempDir("", prefix)
 	if err != nil {
-		return err
+		return "", nil
 	}
-
-	envFilePath := path.Join(stackStorePath, ".env")
-	data := []byte(envFileContent)
-	r := bytes.NewReader(data)
-
-	err = service.createFileInStore(envFilePath, r)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return dir, nil
 }
 
-// StoreStackFile creates a subfolder in the ComposeStorePath and stores a new file using the content from stackFileContent.
+// RemoveDirectory removes a directory on the filesystem.
+func (service *Service) RemoveDirectory(directoryPath string) error {
+	return os.RemoveAll(directoryPath)
+}
+
+// GetStackProjectPath returns the absolute path on the FS for a stack based
+// on its name.
+func (service *Service) GetStackProjectPath(stackName string) string {
+	return path.Join(service.fileStorePath, ComposeStorePath, stackName)
+}
+
+// StoreStackFileFromPath creates a subfolder in the ComposeStorePath and copy an existing file into it.
 // It returns the path to the folder where the file is stored.
-func (service *Service) StoreStackFile(name, stackFileContent string) (string, error) {
+func (service *Service) StoreStackFileFromPath(name, stackFilePath string) (string, error) {
+	_, err := os.Stat(stackFilePath)
+	if os.IsNotExist(err) {
+		return "", portainer.ErrComposeFileNotFoundInRepository
+	} else if err != nil {
+		return "", err
+	}
+
+	stackStorePath := path.Join(ComposeStorePath, name)
+	err = service.createDirectoryInStoreIfNotExist(stackStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := path.Join(stackStorePath, "docker-compose.yml")
+
+	file, err := os.Open(stackFilePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	err = service.createFileInStore(composeFilePath, file)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, stackStorePath), nil
+}
+
+// StoreStackFileFromString creates a subfolder in the ComposeStorePath and stores a new file using the content from a string.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreStackFileFromString(name, stackFileContent string) (string, error) {
 	stackStorePath := path.Join(ComposeStorePath, name)
 	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
 	if err != nil {
@@ -93,6 +125,25 @@ func (service *Service) StoreStackFile(name, stackFileContent string) (string, e
 	composeFilePath := path.Join(stackStorePath, "docker-compose.yml")
 	data := []byte(stackFileContent)
 	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, stackStorePath), nil
+}
+
+// StoreStackFileFromReader creates a subfolder in the ComposeStorePath and stores a new file using the content from an io.Reader.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreStackFileFromReader(name string, r io.Reader) (string, error) {
+	stackStorePath := path.Join(ComposeStorePath, name)
+	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := path.Join(stackStorePath, "docker-compose.yml")
 
 	err = service.createFileInStore(composeFilePath, r)
 	if err != nil {
@@ -221,14 +272,17 @@ func createDirectoryIfNotExist(path string, mode uint32) error {
 // createFile creates a new file in the file store with the content from r.
 func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 	path := path.Join(service.fileStorePath, filePath)
+
 	out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
+
 	_, err = io.Copy(out, r)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

@@ -52,8 +52,6 @@ angular.module('portainer', [
   'settings',
   'settingsAuthentication',
   'sidebar',
-  'unregisteredstackv2',
-  'stackv2',
   'stack',
   'stacks',
   'swarm',

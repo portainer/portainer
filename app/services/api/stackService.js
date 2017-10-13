@@ -1,5 +1,6 @@
 angular.module('portainer.services')
-.factory('StackService', ['$q', 'Stack', 'ContainerService', 'ServiceService', 'TaskService', 'StackHelper', function StackServiceFactory($q, Stack, ContainerService, ServiceService, TaskService, StackHelper) {
+.factory('StackService', ['$q', 'Stack', 'ResourceControlService', 'FileUploadService', 'StackHelper', 'ServiceService',
+function StackServiceFactory($q, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService) {
   'use strict';
   var service = {};
 
@@ -32,15 +33,41 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.stacks = function() {
+  service.externalStacks = function() {
     var deferred = $q.defer();
 
-    Stack.query().$promise
+    ServiceService.services()
     .then(function success(data) {
-      var stacks = data.map(function (item) {
-        return new StackViewModel(item);
+      var services = data;
+      var stackNames = StackHelper.getExternalStackNamesFromServices(services);
+      var stacks = stackNames.map(function (item) {
+        return new StackViewModel({ Name: item, External: true });
       });
       deferred.resolve(stacks);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve external stacks', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.stacks = function(includeExternalStacks) {
+    var deferred = $q.defer();
+
+    $q.all({
+      stacks: Stack.query().$promise,
+      externalStacks: includeExternalStacks ? service.externalStacks() : []
+    })
+    .then(function success(data) {
+      var stacks = data.stacks.map(function (item) {
+        item.External = false;
+        return new StackViewModel(item);
+      });
+      var externalStacks = data.externalStacks;
+
+      var result = _.unionWith(stacks, externalStacks, function(a, b) { return a.Name === b.Name; });
+      deferred.resolve(result);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve stacks', err: err });
@@ -50,11 +77,34 @@ angular.module('portainer.services')
   };
 
   service.remove = function(stack) {
-    return Stack.remove({ id: stack.Id }).$promise;
+    var deferred = $q.defer();
+
+    Stack.remove({ id: stack.Id }).$promise
+    .then(function success(data) {
+      if (stack.ResourceControl && stack.ResourceControl.Id) {
+        return ResourceControlService.deleteResourceControl(stack.ResourceControl.Id);
+      }
+    })
+    .then(function success(data) {
+      deferred.resolve();
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to remove the stack', err: err });
+    });
+
+    return deferred.promise;
   };
 
-  service.createStack = function(name, stackFile) {
-    return Stack.create({ Name: name, StackFileContent: stackFile }).$promise;
+  service.createStackFromFileContent = function(name, stackFileContent) {
+    return Stack.create({ method: 'string' }, { Name: name, StackFileContent: stackFileContent }).$promise;
+  };
+
+  service.createStackFromGitRepository = function(name, gitRepository, pathInRepository) {
+    return Stack.create({ method: 'repository' }, { Name: name, GitRepository: gitRepository, PathInRepository: pathInRepository }).$promise;
+  };
+
+  service.createStackFromFileUpload = function(name, stackFile) {
+    return FileUploadService.createStack(name, stackFile);
   };
 
   service.updateStack = function(id, stackFile) {

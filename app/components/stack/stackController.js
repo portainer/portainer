@@ -2,12 +2,8 @@ angular.module('stack', [])
 .controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications',
 function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications) {
 
-  $scope.state = {
-    displayEditor: false
-  };
-
   $scope.deployStack = function () {
-    $('#createStackSpinner').show();
+    $('#createResourceSpinner').show();
 
     // The codemirror editor does not work with ng-model so we need to retrieve
     // the value directly from the editor.
@@ -22,21 +18,8 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
       Notifications.error('Failure', err, 'Unable to create stack');
     })
     .finally(function final() {
-      $('#createStackSpinner').hide();
+      $('#createResourceSpinner').hide();
     });
-  };
-
-  $scope.toggleEditor = function() {
-    $scope.state.displayEditor = !$scope.state.displayEditor;
-
-    if ($scope.state.displayEditor) {
-      $document.ready(function() {
-        var webEditorElement = $document[0].getElementById('web-editor');
-        if (webEditorElement) {
-          $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement);
-        }
-      });
-    }
   };
 
   function initView() {
@@ -60,6 +43,15 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
       });
     })
     .then(function success(data) {
+      $scope.stackFileContent = data.stackFile;
+
+      $document.ready(function() {
+        var webEditorElement = $document[0].getElementById('web-editor');
+        if (webEditorElement) {
+          $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement);
+        }
+      });
+
       $scope.nodes = data.nodes;
 
       var services = data.services;
@@ -73,7 +65,6 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
       }
 
       $scope.services = services;
-      $scope.stackFileContent = data.stackFile;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve tasks details');

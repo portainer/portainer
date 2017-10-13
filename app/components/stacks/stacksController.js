@@ -6,6 +6,8 @@ function ($scope, Notifications, Pagination, StackService) {
   $scope.state.pagination_count = Pagination.getPaginationCount('stacks');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
+  $scope.state.DisplayInformationPanel = false;
+  $scope.state.DisplayExternalStacks = true;
 
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('stacks', $scope.state.pagination_count);
@@ -18,7 +20,7 @@ function ($scope, Notifications, Pagination, StackService) {
 
   $scope.selectItems = function (allSelected) {
     angular.forEach($scope.state.filteredStacks, function (stack) {
-      if (stack.Checked !== allSelected) {
+      if (stack.Id && stack.Checked !== allSelected) {
         stack.Checked = allSelected;
         $scope.selectItem(stack);
       }
@@ -66,9 +68,17 @@ function ($scope, Notifications, Pagination, StackService) {
   function initView() {
     $('#loadingViewSpinner').show();
 
-    StackService.stacks()
+    StackService.stacks(true)
     .then(function success(data) {
-      $scope.stacks = data;
+      var stacks = data;
+      for (var i = 0; i < stacks.length; i++) {
+        var stack = stacks[i];
+        if (stack.External) {
+          $scope.state.DisplayInformationPanel = true;
+          break;
+        }
+      }
+      $scope.stacks = stacks;
     })
     .catch(function error(err) {
       $scope.stacks = [];

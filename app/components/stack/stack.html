@@ -1,59 +1,54 @@
 <rd-header>
   <rd-header-title title="Stack details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="stack.v3({name: stack.Name})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="stack({id: stack.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="stacks">Stacks</a> > <a ui-sref="stack.v3({name: stack.Name})">{{ stack.Name }}</a>
+    <a ui-sref="stacks">Stacks</a> > <a ui-sref="stack({id: stack.Id})">{{ stack.Name }}</a>
   </rd-header-content>
 </rd-header>
 
-<div class="row">
+<!-- access-control-panel -->
+<por-access-control-panel
+  ng-if="stack && applicationState.application.authentication"
+  resource-id="stack.Name"
+  resource-control="stack.ResourceControl"
+  resource-type="'stack'">
+</por-access-control-panel>
+<!-- !access-control-panel -->
+
+<por-service-list services="services" nodes="nodes"></por-service-list>
+<por-task-list tasks="tasks" nodes="nodes"></por-task-list>
+
+<div class="row" ng-if="stackFileContent">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-th-list" title="Stack details"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-            <tr>
-              <td>Name</td>
-              <td>
-                {{ stack.Name }}
-              </td>
-            </tr>
-            <tr>
-              <td>Services</td>
-              <td>{{ services.length }}</td>
-            </tr>
-            <tr ng-if="!state.displayEditor">
-              <td colspan="2">
-                <button type="button" class="btn btn-sm btn-primary" ng-click="toggleEditor()">Show stack editor</button>
-              </td>
-            </tr>
-              <tr ng-if="state.displayEditor">
-                <td colspan="2">
-                  <div class="form-group">
-                    <div class="col-sm-12">
-                      <textarea id="web-editor" class="form-control" ng-model="stackFileContent" placeholder='version: "3"'></textarea>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr ng-if="state.displayEditor">
-                <td colspan="2">
-                  <button type="button" class="btn btn-sm btn-primary" ng-click="deployStack()">Update stack</button>
-                  <a type="button" class="btn btn-default btn-sm" ng-click="toggleEditor()">Hide</a>
-                  <i id="createStackSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
-                </td>
-              </tr>
-          </tbody>
-        </table>
+      <rd-widget-header icon="fa-pencil" title="Stack editor"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
+            </span>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <textarea id="web-editor" class="form-control" ng-model="stackFileContent" placeholder='version: "3"'></textarea>
+            </div>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-sm btn-primary" ng-click="deployStack()">Update stack</button>
+              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+            </div>
+          </div>
+        </form>
       </rd-widget-body>
     </rd-widget>
   </div>
 </div>
-
-<por-service-list services="services" nodes="nodes"></por-service-list>
-<por-task-list tasks="tasks" nodes="nodes"></por-task-list>

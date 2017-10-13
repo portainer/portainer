@@ -30,6 +30,7 @@ type Server struct {
 	StackService           portainer.StackService
 	StackManager           portainer.StackManager
 	LDAPService            portainer.LDAPService
+	GitService             portainer.GitService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
@@ -89,7 +90,9 @@ func (server *Server) Start() error {
 	stackHandler.FileService = server.FileService
 	stackHandler.StackService = server.StackService
 	stackHandler.EndpointService = server.EndpointService
+	stackHandler.ResourceControlService = server.ResourceControlService
 	stackHandler.StackManager = server.StackManager
+	stackHandler.GitService = server.GitService
 
 	server.Handler = &handler.Handler{
 		AuthHandler:           authHandler,

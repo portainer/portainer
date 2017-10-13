@@ -52,7 +52,9 @@ const (
 
 // Stack errors
 const (
-	ErrStackNotFound = Error("Stack not found")
+	ErrStackNotFound                   = Error("Stack not found")
+	ErrStackAlreadyExists              = Error("A stack already exists with this name")
+	ErrComposeFileNotFoundInRepository = Error("Unable to find a Compose file in the repository")
 )
 
 // Version errors.

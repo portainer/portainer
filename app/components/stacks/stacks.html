@@ -8,6 +8,36 @@
   <rd-header-content>Stacks</rd-header-content>
 </rd-header>
 
+<div class="row" ng-if="state.DisplayInformationPanel">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-info-circle" title="Information"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              Stacks marked with the <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true"></i> icon are external stacks that were created outside of Portainer. You'll not be able to execute any actions against these stacks.
+            </span>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Filters
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label class="control-label text-left">
+                Display external stacks
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="state.DisplayExternalStacks"><i></i>
+              </label>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
@@ -46,19 +76,37 @@
                   <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th ng-if="applicationState.application.authentication">
+                <a ng-click="order('ResourceControl.Ownership')">
+                  Ownership
+                  <span ng-show="sortType == 'ResourceControl.Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'ResourceControl.Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
             </thead>
             <tbody>
-              <tr dir-paginate="stack in (state.filteredStacks = ( stacks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td><input type="checkbox" ng-model="stack.Checked" ng-change="selectItem(stack)"/></td>
+              <tr dir-paginate="stack in (state.filteredStacks = ( stacks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-if="state.DisplayExternalStacks || (!state.DisplayExternalStacks && !stack.External)">
+                <td><input type="checkbox" ng-model="stack.Checked" ng-change="selectItem(stack)" ng-disabled="!stack.Id"/></td>
                 <td>
-                  <a ui-sref="stack({ id: stack.Id })">{{ stack.Name }}</a>
+                  <span ng-if="stack.Id">
+                    <a ui-sref="stack({ id: stack.Id })">{{ stack.Name }}</a>
+                  </span>
+                  <span ng-if="!stack.Id">
+                    {{ stack.Name }} <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true"></i>
+                  </span>
+                </td>
+                <td ng-if="applicationState.application.authentication">
+                  <span>
+                    <i ng-class="stack.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
+                    {{ stack.ResourceControl.Ownership ? stack.ResourceControl.Ownership : stack.ResourceControl.Ownership = 'public' }}
+                  </span>
                 </td>
               </tr>
               <tr ng-if="!stacks">
-                <td colspan="1" class="text-center text-muted">Loading...</td>
+                <td colspan="3" class="text-center text-muted">Loading...</td>
               </tr>
               <tr ng-if="stacks.length === 0">
-                <td colspan="1" class="text-center text-muted">No stacks available.</td>
+                <td colspan="3" class="text-center text-muted">No stacks available.</td>
               </tr>
             </tbody>
           </table>

@@ -20,9 +20,9 @@ func NewStackManager() *StackManager {
 
 // Deploy will execute the Docker stack deploy command
 func (manager *StackManager) Deploy(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	stackFilePath := path.Join(stack.ProjectPath, "docker-compose.yml")
+	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
 	command, args := prepareDockerCommandAndArgs(endpoint)
-	args = append(args, "stack", "deploy", "--compose-file", stackFilePath, stack.Name)
+	args = append(args, "stack", "deploy", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
 	return runCommandAndCaptureStdErr(command, args)
 }
 
@@ -61,11 +61,11 @@ func prepareDockerCommandAndArgs(endpoint *portainer.Endpoint) (string, []string
 		args = append(args, "--tls")
 
 		if !endpoint.TLSConfig.TLSSkipVerify {
-			args = append(args, "--tlsverify", "--tlscacert", endpoint.TLSCACertPath)
+			args = append(args, "--tlsverify", "--tlscacert", endpoint.TLSConfig.TLSCACertPath)
 		}
 
 		if endpoint.TLSConfig.TLSCertPath != "" && endpoint.TLSConfig.TLSKeyPath != "" {
-			args = append(args, "--tlscert", endpoint.TLSCertPath, "--tlskey", endpoint.TLSKeyPath)
+			args = append(args, "--tlscert", endpoint.TLSConfig.TLSCertPath, "--tlskey", endpoint.TLSConfig.TLSKeyPath)
 		}
 	}
 

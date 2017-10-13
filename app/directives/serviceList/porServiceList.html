@@ -61,7 +61,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr pagination-id="services_list" dir-paginate="service in $ctrl.services | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage: $ctrl.state.pagination_count">
+              <tr dir-paginate="service in $ctrl.services | filter:$ctrl.state.filter | orderBy:$ctrl.sortType:$ctrl.sortReverse | itemsPerPage:$ctrl.state.pagination_count" pagination-id="services_list">
                 <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
                 <td>{{ service.Image | hideshasum }}</td>
                 <td>
@@ -71,7 +71,7 @@
                   <code data-toggle="tooltip" title="Replicas">{{ service.Mode === 'replicated' ? service.Replicas : ($ctrl.nodes | availablenodecount) }}</code>
                 </td>
                 <td>
-                  <a ng-if="service.Ports && service.Ports.length > 0" ng-repeat="p in service.Ports" class="image-tag" ng-href="http://{{PublicURL}}:{{p.PublishedPort}}" target="_blank">
+                  <a ng-if="service.Ports && service.Ports.length > 0" ng-repeat="p in service.Ports" class="image-tag" ng-href="http://{{$ctrl.state.publicURL}}:{{p.PublishedPort}}" target="_blank">
                     <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
                   </a>
                   <span ng-if="!service.Ports || service.Ports.length === 0" >-</span>
@@ -88,7 +88,7 @@
               </tr>
             </tbody>
           </table>
-          <div ng-if="$ctrl.containers" class="pull-left pagination-controls">
+          <div ng-if="$ctrl.services" class="pull-left pagination-controls">
             <dir-pagination-controls pagination-id="services_list"></dir-pagination-controls >
           </div>
         </div>

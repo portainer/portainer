@@ -135,6 +135,7 @@ type (
 	Stack struct {
 		ID          StackID `json:"Id"`
 		Name        string  `json:"Name"`
+		EntryPoint  string  `json:"EntryPoint"`
 		EndpointID  EndpointID
 		ProjectPath string
 	}
@@ -204,7 +205,7 @@ type (
 		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
 	}
 
-	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service).
+	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service...).
 	ResourceControlType int
 
 	// UserResourceAccess represents the level of control on a resource for a specific user.
@@ -353,9 +354,19 @@ type (
 		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
-		StoreStackFile(name, stackFileContent string) (string, error)
+		GetStackProjectPath(stackName string) string
+		StoreStackFileFromString(name, stackFileContent string) (string, error)
+		StoreStackFileFromReader(name string, r io.Reader) (string, error)
+		StoreStackFileFromPath(name, path string) (string, error)
 		DeleteStackFile(projectPath string) error
 		GetFileContent(filePath string) (string, error)
+		RemoveDirectory(directoryPath string) error
+		CreateTemporaryDirectory(prefix string) (string, error)
+	}
+
+	// GitService represents a service for managing Git.
+	GitService interface {
+		CloneRepository(url, destination string) error
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.
@@ -436,4 +447,6 @@ const (
 	NetworkResourceControl
 	// SecretResourceControl represents a resource control associated to a Docker secret
 	SecretResourceControl
+	// StackResourceControl represents a resource control associated to a stack composed of Docker services
+	StackResourceControl
 )

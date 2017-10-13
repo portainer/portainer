@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/crypto"
 	"github.com/portainer/portainer/exec"
 	"github.com/portainer/portainer/file"
+	"github.com/portainer/portainer/git"
 	"github.com/portainer/portainer/http"
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
@@ -76,6 +77,10 @@ func initCryptoService() portainer.CryptoService {
 
 func initLDAPService() portainer.LDAPService {
 	return &ldap.Service{}
+}
+
+func initGitService() portainer.GitService {
+	return &git.Service{}
 }
 
 func initEndpointWatcher(endpointService portainer.EndpointService, externalEnpointFile string, syncInterval string) bool {
@@ -178,6 +183,8 @@ func main() {
 
 	ldapService := initLDAPService()
 
+	gitService := initGitService()
+
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
 	err := initSettings(store.SettingsService, flags)
@@ -276,6 +283,7 @@ func main() {
 		JWTService:             jwtService,
 		FileService:            fileService,
 		LDAPService:            ldapService,
+		GitService:             gitService,
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,
