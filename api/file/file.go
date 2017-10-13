@@ -24,6 +24,8 @@ const (
 	TLSKeyFile = "key.pem"
 	// ComposeStorePath represents the subfolder where compose files are stored in the file store folder.
 	ComposeStorePath = "compose"
+	// ComposeFileDefaultName represents the default name of a compose file.
+	ComposeFileDefaultName = "docker-compose.yml"
 )
 
 // Service represents a service for managing files and directories.
@@ -61,68 +63,27 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 	return service, nil
 }
 
-// CreateTemporaryDirectory creates a temporary directory. Directory name will begin with prefix.
-func (service *Service) CreateTemporaryDirectory(prefix string) (string, error) {
-	dir, err := ioutil.TempDir("", prefix)
-	if err != nil {
-		return "", nil
-	}
-	return dir, nil
-}
-
 // RemoveDirectory removes a directory on the filesystem.
 func (service *Service) RemoveDirectory(directoryPath string) error {
 	return os.RemoveAll(directoryPath)
 }
 
 // GetStackProjectPath returns the absolute path on the FS for a stack based
-// on its name.
-func (service *Service) GetStackProjectPath(stackName string) string {
-	return path.Join(service.fileStorePath, ComposeStorePath, stackName)
-}
-
-// StoreStackFileFromPath creates a subfolder in the ComposeStorePath and copy an existing file into it.
-// It returns the path to the folder where the file is stored.
-func (service *Service) StoreStackFileFromPath(name, stackFilePath string) (string, error) {
-	_, err := os.Stat(stackFilePath)
-	if os.IsNotExist(err) {
-		return "", portainer.ErrComposeFileNotFoundInRepository
-	} else if err != nil {
-		return "", err
-	}
-
-	stackStorePath := path.Join(ComposeStorePath, name)
-	err = service.createDirectoryInStoreIfNotExist(stackStorePath)
-	if err != nil {
-		return "", err
-	}
-
-	composeFilePath := path.Join(stackStorePath, "docker-compose.yml")
-
-	file, err := os.Open(stackFilePath)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	err = service.createFileInStore(composeFilePath, file)
-	if err != nil {
-		return "", err
-	}
-
-	return path.Join(service.fileStorePath, stackStorePath), nil
+// on its identifier.
+func (service *Service) GetStackProjectPath(stackIdentifier string) string {
+	return path.Join(service.fileStorePath, ComposeStorePath, stackIdentifier)
 }
 
 // StoreStackFileFromString creates a subfolder in the ComposeStorePath and stores a new file using the content from a string.
 // It returns the path to the folder where the file is stored.
-func (service *Service) StoreStackFileFromString(name, stackFileContent string) (string, error) {
-	stackStorePath := path.Join(ComposeStorePath, name)
+func (service *Service) StoreStackFileFromString(stackIdentifier, stackFileContent string) (string, error) {
+	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
 	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	composeFilePath := path.Join(stackStorePath, "docker-compose.yml")
+	composeFilePath := path.Join(stackStorePath, ComposeFileDefaultName)
 	data := []byte(stackFileContent)
 	r := bytes.NewReader(data)
 
@@ -136,14 +97,14 @@ func (service *Service) StoreStackFileFromString(name, stackFileContent string) 
 
 // StoreStackFileFromReader creates a subfolder in the ComposeStorePath and stores a new file using the content from an io.Reader.
 // It returns the path to the folder where the file is stored.
-func (service *Service) StoreStackFileFromReader(name string, r io.Reader) (string, error) {
-	stackStorePath := path.Join(ComposeStorePath, name)
+func (service *Service) StoreStackFileFromReader(stackIdentifier string, r io.Reader) (string, error) {
+	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
 	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	composeFilePath := path.Join(stackStorePath, "docker-compose.yml")
+	composeFilePath := path.Join(stackStorePath, ComposeFileDefaultName)
 
 	err = service.createFileInStore(composeFilePath, r)
 	if err != nil {
@@ -195,15 +156,6 @@ func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSF
 		return "", portainer.ErrUndefinedTLSFileType
 	}
 	return path.Join(service.fileStorePath, TLSStorePath, folder, fileName), nil
-}
-
-// DeleteStackFile deletes a folder containing all the files associated to a stack.
-func (service *Service) DeleteStackFile(projectPath string) error {
-	err := os.RemoveAll(projectPath)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // DeleteTLSFiles deletes a folder in the TLS store path.

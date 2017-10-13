@@ -128,14 +128,15 @@ type (
 		Role     UserRole
 	}
 
-	// StackID represents a stack identifier.
-	StackID int
+	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier).
+	StackID string
 
 	// Stack represents a Docker stack created via docker stack deploy.
 	Stack struct {
 		ID          StackID `json:"Id"`
 		Name        string  `json:"Name"`
 		EntryPoint  string  `json:"EntryPoint"`
+		SwarmID     string  `json:"SwarmId"`
 		EndpointID  EndpointID
 		ProjectPath string
 	}
@@ -302,7 +303,7 @@ type (
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
 		Stacks() ([]Stack, error)
-		StacksByEndpointID(ID EndpointID) ([]Stack, error)
+		StacksBySwarmID(ID string) ([]Stack, error)
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
@@ -350,18 +351,15 @@ type (
 
 	// FileService represents a service for managing files.
 	FileService interface {
+		GetFileContent(filePath string) (string, error)
+		RemoveDirectory(directoryPath string) error
 		StoreTLSFile(folder string, fileType TLSFileType, r io.Reader) error
 		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
-		GetStackProjectPath(stackName string) string
-		StoreStackFileFromString(name, stackFileContent string) (string, error)
-		StoreStackFileFromReader(name string, r io.Reader) (string, error)
-		StoreStackFileFromPath(name, path string) (string, error)
-		DeleteStackFile(projectPath string) error
-		GetFileContent(filePath string) (string, error)
-		RemoveDirectory(directoryPath string) error
-		CreateTemporaryDirectory(prefix string) (string, error)
+		GetStackProjectPath(stackIdentifier string) string
+		StoreStackFileFromString(stackIdentifier string, stackFileContent string) (string, error)
+		StoreStackFileFromReader(stackIdentifier string, r io.Reader) (string, error)
 	}
 
 	// GitService represents a service for managing Git.

@@ -68,6 +68,7 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
 
     createStack(name)
     .then(function success(data) {
+      var stackId = data.Id;
       return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, []);
     })
     .then(function success(data) {

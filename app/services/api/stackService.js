@@ -1,6 +1,6 @@
 angular.module('portainer.services')
-.factory('StackService', ['$q', 'Stack', 'ResourceControlService', 'FileUploadService', 'StackHelper', 'ServiceService',
-function StackServiceFactory($q, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService) {
+.factory('StackService', ['$q', 'Stack', 'ResourceControlService', 'FileUploadService', 'StackHelper', 'ServiceService', 'SwarmService',
+function StackServiceFactory($q, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService, SwarmService) {
   'use strict';
   var service = {};
 
@@ -55,9 +55,14 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
   service.stacks = function(includeExternalStacks) {
     var deferred = $q.defer();
 
-    $q.all({
-      stacks: Stack.query().$promise,
-      externalStacks: includeExternalStacks ? service.externalStacks() : []
+    SwarmService.swarm()
+    .then(function success(data) {
+      var swarm = data;
+
+      return $q.all({
+        stacks: Stack.query({ swarmId: swarm.Id }).$promise,
+        externalStacks: includeExternalStacks ? service.externalStacks() : []
+      });
     })
     .then(function success(data) {
       var stacks = data.stacks.map(function (item) {
@@ -85,7 +90,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
         return ResourceControlService.deleteResourceControl(stack.ResourceControl.Id);
       }
     })
-    .then(function success(data) {
+    .then(function success() {
       deferred.resolve();
     })
     .catch(function error(err) {
@@ -96,15 +101,57 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
   };
 
   service.createStackFromFileContent = function(name, stackFileContent) {
-    return Stack.create({ method: 'string' }, { Name: name, StackFileContent: stackFileContent }).$promise;
+    var deferred = $q.defer();
+
+    SwarmService.swarm()
+    .then(function success(data) {
+      var swarm = data;
+      return Stack.create({ method: 'string' }, { Name: name, SwarmID: swarm.Id, StackFileContent: stackFileContent }).$promise;
+    })
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to create the stack', err: err });
+    });
+
+    return deferred.promise;
   };
 
   service.createStackFromGitRepository = function(name, gitRepository, pathInRepository) {
-    return Stack.create({ method: 'repository' }, { Name: name, GitRepository: gitRepository, PathInRepository: pathInRepository }).$promise;
+    var deferred = $q.defer();
+
+    SwarmService.swarm()
+    .then(function success(data) {
+      var swarm = data;
+      return Stack.create({ method: 'repository' }, { Name: name, SwarmID: swarm.Id, GitRepository: gitRepository, PathInRepository: pathInRepository }).$promise;
+    })
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to create the stack', err: err });
+    });
+
+    return deferred.promise;
   };
 
   service.createStackFromFileUpload = function(name, stackFile) {
-    return FileUploadService.createStack(name, stackFile);
+    var deferred = $q.defer();
+
+    SwarmService.swarm()
+    .then(function success(data) {
+      var swarm = data;
+      return FileUploadService.createStack(name, swarm.Id, stackFile);
+    })
+    .then(function success(data) {
+      deferred.resolve(data.data);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to create the stack', err: err });
+    });
+
+    return deferred.promise;
   };
 
   service.updateStack = function(id, stackFile) {

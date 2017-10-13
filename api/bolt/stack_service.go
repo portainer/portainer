@@ -17,7 +17,7 @@ func (service *StackService) Stack(ID portainer.StackID) (*portainer.Stack, erro
 	var data []byte
 	err := service.store.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stackBucketName))
-		value := bucket.Get(internal.Itob(int(ID)))
+		value := bucket.Get([]byte(ID))
 		if value == nil {
 			return portainer.ErrStackNotFound
 		}
@@ -63,8 +63,8 @@ func (service *StackService) Stacks() ([]portainer.Stack, error) {
 	return stacks, nil
 }
 
-// StacksByEndpointID return an array containing all the stacks related to the specified endpoint ID.
-func (service *StackService) StacksByEndpointID(id portainer.EndpointID) ([]portainer.Stack, error) {
+// StacksBySwarmID return an array containing all the stacks related to the specified Swarm ID.
+func (service *StackService) StacksBySwarmID(id string) ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)
 	err := service.store.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stackBucketName))
@@ -76,7 +76,7 @@ func (service *StackService) StacksByEndpointID(id portainer.EndpointID) ([]port
 			if err != nil {
 				return err
 			}
-			if stack.EndpointID == id {
+			if stack.SwarmID == id {
 				stacks = append(stacks, stack)
 			}
 		}
@@ -95,15 +95,12 @@ func (service *StackService) CreateStack(stack *portainer.Stack) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stackBucketName))
 
-		id, _ := bucket.NextSequence()
-		stack.ID = portainer.StackID(id)
-
 		data, err := internal.MarshalStack(stack)
 		if err != nil {
 			return err
 		}
 
-		err = bucket.Put(internal.Itob(int(stack.ID)), data)
+		err = bucket.Put([]byte(stack.ID), data)
 		if err != nil {
 			return err
 		}
@@ -120,7 +117,7 @@ func (service *StackService) UpdateStack(ID portainer.StackID, stack *portainer.
 
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stackBucketName))
-		err = bucket.Put(internal.Itob(int(ID)), data)
+		err = bucket.Put([]byte(ID), data)
 		if err != nil {
 			return err
 		}
@@ -132,7 +129,7 @@ func (service *StackService) UpdateStack(ID portainer.StackID, stack *portainer.
 func (service *StackService) DeleteStack(ID portainer.StackID) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stackBucketName))
-		err := bucket.Delete(internal.Itob(int(ID)))
+		err := bucket.Delete([]byte(ID))
 		if err != nil {
 			return err
 		}

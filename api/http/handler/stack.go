@@ -8,6 +8,7 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/file"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
@@ -55,12 +56,13 @@ func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 type (
 	postStacksRequest struct {
 		Name             string `valid:"required"`
+		SwarmID          string `valid:"required"`
 		StackFileContent string `valid:""`
 		GitRepository    string `valid:""`
 		PathInRepository string `valid:""`
 	}
 	postStacksResponse struct {
-		ID int `json:"Id"`
+		ID string `json:"Id"`
 	}
 	getStackFileResponse struct {
 		StackFileContent string `json:"StackFileContent"`
@@ -120,7 +122,20 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		return
 	}
 
-	if req.StackFileContent == "" {
+	stackName := req.Name
+	if stackName == "" {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	stackFileContent := req.StackFileContent
+	if stackFileContent == "" {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	swarmID := req.SwarmID
+	if swarmID == "" {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
@@ -132,19 +147,21 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 	}
 
 	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, req.Name) && stack.EndpointID == endpointID {
+		if strings.EqualFold(stack.Name, stackName) {
 			httperror.WriteErrorResponse(w, portainer.ErrStackAlreadyExists, http.StatusConflict, handler.Logger)
 			return
 		}
 	}
 
 	stack := &portainer.Stack{
-		Name:       req.Name,
+		ID:         portainer.StackID(stackName + "_" + swarmID),
+		Name:       stackName,
 		EndpointID: endpointID,
-		EntryPoint: "docker-compose.yml",
+		SwarmID:    swarmID,
+		EntryPoint: file.ComposeFileDefaultName,
 	}
 
-	projectPath, err := handler.FileService.StoreStackFileFromString(stack.Name, req.StackFileContent)
+	projectPath, err := handler.FileService.StoreStackFileFromString(string(stack.ID), stackFileContent)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -163,7 +180,7 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		return
 	}
 
-	encodeJSON(w, &postStacksResponse{ID: int(stack.ID)}, handler.Logger)
+	encodeJSON(w, &postStacksResponse{ID: string(stack.ID)}, handler.Logger)
 }
 
 func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWriter, r *http.Request) {
@@ -196,13 +213,25 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		return
 	}
 
+	stackName := req.Name
+	if stackName == "" {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	swarmID := req.SwarmID
+	if swarmID == "" {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
 	if req.GitRepository == "" {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	if req.PathInRepository == "" {
-		req.PathInRepository = "docker-compose.yml"
+		req.PathInRepository = file.ComposeFileDefaultName
 	}
 
 	stacks, err := handler.StackService.Stacks()
@@ -212,19 +241,21 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 	}
 
 	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, req.Name) && stack.EndpointID == endpointID {
+		if strings.EqualFold(stack.Name, stackName) {
 			httperror.WriteErrorResponse(w, portainer.ErrStackAlreadyExists, http.StatusConflict, handler.Logger)
 			return
 		}
 	}
 
 	stack := &portainer.Stack{
-		Name:       req.Name,
+		ID:         portainer.StackID(stackName + "_" + swarmID),
+		Name:       stackName,
 		EndpointID: endpointID,
+		SwarmID:    swarmID,
 		EntryPoint: req.PathInRepository,
 	}
 
-	projectPath := handler.FileService.GetStackProjectPath(stack.Name)
+	projectPath := handler.FileService.GetStackProjectPath(string(stack.ID))
 	stack.ProjectPath = projectPath
 
 	// Ensure projectPath is empty
@@ -252,7 +283,7 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		return
 	}
 
-	encodeJSON(w, &postStacksResponse{ID: int(stack.ID)}, handler.Logger)
+	encodeJSON(w, &postStacksResponse{ID: string(stack.ID)}, handler.Logger)
 }
 
 func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r *http.Request) {
@@ -279,12 +310,18 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		return
 	}
 
-	file, _, err := r.FormFile("file")
+	swarmID := r.FormValue("SwarmID")
+	if swarmID == "" {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	stackFile, _, err := r.FormFile("file")
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-	defer file.Close()
+	defer stackFile.Close()
 
 	stacks, err := handler.StackService.Stacks()
 	if err != nil && err != portainer.ErrStackNotFound {
@@ -293,19 +330,21 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 	}
 
 	for _, stack := range stacks {
-		if strings.EqualFold(stack.Name, stackName) && stack.EndpointID == endpointID {
+		if strings.EqualFold(stack.Name, stackName) {
 			httperror.WriteErrorResponse(w, portainer.ErrStackAlreadyExists, http.StatusConflict, handler.Logger)
 			return
 		}
 	}
 
 	stack := &portainer.Stack{
+		ID:         portainer.StackID(stackName + "_" + swarmID),
 		Name:       stackName,
+		SwarmID:    swarmID,
 		EndpointID: endpointID,
-		EntryPoint: "docker-compose.yml",
+		EntryPoint: file.ComposeFileDefaultName,
 	}
 
-	projectPath, err := handler.FileService.StoreStackFileFromReader(stack.Name, file)
+	projectPath, err := handler.FileService.StoreStackFileFromReader(string(stack.ID), stackFile)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -324,11 +363,17 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		return
 	}
 
-	encodeJSON(w, &postStacksResponse{ID: int(stack.ID)}, handler.Logger)
+	encodeJSON(w, &postStacksResponse{ID: string(stack.ID)}, handler.Logger)
 }
 
-// handleGetStacks handles GET requests on /:endpointId/stacks
+// handleGetStacks handles GET requests on /:endpointId/stacks?swarmId=<swarmId>
 func (handler *StackHandler) handleGetStacks(w http.ResponseWriter, r *http.Request) {
+	swarmID := r.FormValue("swarmId")
+	if swarmID == "" {
+		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
 	vars := mux.Vars(r)
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -337,13 +382,23 @@ func (handler *StackHandler) handleGetStacks(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	endpointID, err := strconv.Atoi(vars["endpointId"])
+	id, err := strconv.Atoi(vars["endpointId"])
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
+	endpointID := portainer.EndpointID(id)
 
-	stacks, err := handler.StackService.StacksByEndpointID(portainer.EndpointID(endpointID))
+	_, err = handler.EndpointService.Endpoint(endpointID)
+	if err == portainer.ErrEndpointNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	stacks, err := handler.StackService.StacksBySwarmID(swarmID)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -368,6 +423,7 @@ func (handler *StackHandler) handleGetStacks(w http.ResponseWriter, r *http.Requ
 // handleGetStack handles GET requests on /:endpointId/stacks/:id
 func (handler *StackHandler) handleGetStack(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	stackID := vars["id"]
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
@@ -376,13 +432,6 @@ func (handler *StackHandler) handleGetStack(w http.ResponseWriter, r *http.Reque
 	}
 
 	endpointID, err := strconv.Atoi(vars["endpointId"])
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	id := vars["id"]
-	stackID, err := strconv.Atoi(id)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
@@ -427,15 +476,9 @@ func (handler *StackHandler) handleGetStack(w http.ResponseWriter, r *http.Reque
 // handlePutStack handles PUT requests on /:endpointId/stacks/:id
 func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	stackID := vars["id"]
 
 	endpointID, err := strconv.Atoi(vars["endpointId"])
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	id := vars["id"]
-	stackID, err := strconv.Atoi(id)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
@@ -471,7 +514,7 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	_, err = handler.FileService.StoreStackFileFromString(stack.Name, req.StackFileContent)
+	_, err = handler.FileService.StoreStackFileFromString(string(stack.ID), req.StackFileContent)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -487,15 +530,9 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 // handleGetStackFile handles GET requests on /:endpointId/stacks/:id/stackfile
 func (handler *StackHandler) handleGetStackFile(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	stackID := vars["id"]
 
 	endpointID, err := strconv.Atoi(vars["endpointId"])
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	id := vars["id"]
-	stackID, err := strconv.Atoi(id)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
@@ -531,15 +568,9 @@ func (handler *StackHandler) handleGetStackFile(w http.ResponseWriter, r *http.R
 // handleDeleteStack handles DELETE requests on /:endpointId/stacks/:id
 func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	stackID := vars["id"]
 
 	endpointID, err := strconv.Atoi(vars["endpointId"])
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	id := vars["id"]
-	stackID, err := strconv.Atoi(id)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
@@ -575,7 +606,7 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	err = handler.FileService.DeleteStackFile(stack.ProjectPath)
+	err = handler.FileService.RemoveDirectory(stack.ProjectPath)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return

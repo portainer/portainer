@@ -8,9 +8,9 @@ angular.module('portainer.services')
     return Upload.upload({ url: url, data: { file: file }});
   }
 
-  service.createStack = function(stackName, file) {
+  service.createStack = function(stackName, swarmId, file) {
     var endpointID = EndpointProvider.endpointID();
-    return Upload.upload({ url: 'api/endpoints/' + endpointID + '/stacks?method=file', data: { file: file, Name: stackName } });
+    return Upload.upload({ url: 'api/endpoints/' + endpointID + '/stacks?method=file', data: { file: file, Name: stackName, SwarmID: swarmId } });
   };
 
   service.uploadLDAPTLSFiles = function(TLSCAFile, TLSCertFile, TLSKeyFile) {
