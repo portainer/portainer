@@ -6,7 +6,7 @@ angular.module('portainer.rest')
   },
   {
     get: { method: 'GET', params: {id: '@id'} },
-    query: { method: 'GET', isArray: true },
+    query: { method: 'GET', isArray: true, params: {filters: '@filters'} },
     create: {
       method: 'POST', params: {action: 'create'},
       headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader }

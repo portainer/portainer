@@ -1,0 +1,38 @@
+<rd-header>
+  <rd-header-title title="Stack details">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="stack.v3({name: stack.Name})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="stacks">Stacks</a> > <a ui-sref="stack.v3({name: stack.Name})">{{ stack.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-th-list" title="Stack details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>
+                {{ stack.Name }}
+              </td>
+            </tr>
+            <tr>
+              <td>Services</td>
+              <td>{{ stack.Services.length }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<por-service-list services="stack.Services" nodes="nodes"></por-service-list>
+<por-task-list tasks="tasks" nodes="nodes"></por-task-list>

@@ -50,6 +50,11 @@ const (
 	ErrRegistryAlreadyExists = Error("A registry is already defined for this URL")
 )
 
+// Stack errors
+const (
+	ErrStackNotFound = Error("Stack not found")
+)
+
 // Version errors.
 const (
 	ErrDBVersionNotFound = Error("DB version not found")

@@ -35,6 +35,23 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.tasks = function(filters) {
+    var deferred = $q.defer();
+
+    Task.query({ filters: filters ? filters : {} }).$promise
+    .then(function success(data) {
+      var tasks = data.map(function (item) {
+        return new TaskViewModel(item);
+      });
+      deferred.resolve(tasks);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve tasks', err: err });
+    });
+
+    return deferred.promise;
+  };
+
   service.serviceTasks = function(serviceName) {
     var deferred = $q.defer();
 

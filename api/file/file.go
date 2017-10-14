@@ -1,6 +1,7 @@
 package file
 
 import (
+	"bytes"
 	"io/ioutil"
 
 	"github.com/portainer/portainer"
@@ -21,6 +22,8 @@ const (
 	TLSCertFile = "cert.pem"
 	// TLSKeyFile represents the name on disk for a TLS key file.
 	TLSKeyFile = "key.pem"
+	// ComposeStorePath represents the subfolder where compose files are stored in the file store folder.
+	ComposeStorePath = "compose"
 )
 
 // Service represents a service for managing files and directories.
@@ -50,7 +53,53 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 		return nil, err
 	}
 
+	err = service.createDirectoryInStoreIfNotExist(ComposeStorePath)
+	if err != nil {
+		return nil, err
+	}
+
 	return service, nil
+}
+
+// StoreComposeEnvFile stores a new .env file in the stack store path using the content of envFileContent.
+func (service *Service) StoreComposeEnvFile(name, envFileContent string) error {
+	stackStorePath := path.Join(ComposeStorePath, name)
+	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
+	if err != nil {
+		return err
+	}
+
+	envFilePath := path.Join(stackStorePath, ".env")
+	data := []byte(envFileContent)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(envFilePath, r)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// StoreComposeFile creates a subfolder in the ComposeStorePath and stores a new file using the content from composeFileContent.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreComposeFile(name, composeFileContent string) (string, error) {
+	stackStorePath := path.Join(ComposeStorePath, name)
+	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := path.Join(stackStorePath, "docker-compose.yml")
+	data := []byte(composeFileContent)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, stackStorePath), nil
 }
 
 // StoreTLSFile creates a folder in the TLSStorePath and stores a new file with the content from r.
@@ -95,6 +144,15 @@ func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSF
 		return "", portainer.ErrUndefinedTLSFileType
 	}
 	return path.Join(service.fileStorePath, TLSStorePath, folder, fileName), nil
+}
+
+// DeleteStackFiles deletes a folder containing all the files associated to a stack.
+func (service *Service) DeleteStackFiles(projectPath string) error {
+	err := os.RemoveAll(projectPath)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // DeleteTLSFiles deletes a folder in the TLS store path.

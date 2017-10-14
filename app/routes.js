@@ -661,5 +661,82 @@ function configureRoutes($stateProvider) {
         controller: 'SidebarController'
       }
     }
+  })
+  .state('actions.create.stack', {
+    url: '/stack',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/createStack/createstack.html',
+        controller: 'CreateStackController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('stacks', {
+    url: '/stacks/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/stacks/stacks.html',
+        controller: 'StacksController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('stack', {
+    abstract: true,
+    url: '/stacks',
+    views: {
+      'content@': {
+        template: '<div ui-view="content@"></div>'
+      },
+      'sidebar@': {
+        template: '<div ui-view="sidebar@"></div>'
+      }
+    }
+  })
+  .state('stack.v2', {
+    url: '^/stacks/v2/:id/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/stack/v2/stack.html',
+        controller: 'StackV2Controller'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('stack.v3', {
+    url: '^/stacks/v3/:id/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/stack/v3/stack.html',
+        controller: 'StackV3Controller'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('stack.v2.unregistered', {
+    url: '^/stacks/v2/unregistered/:name/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/stack/unregisteredv2/stack.html',
+        controller: 'UnregisteredStackV2Controller'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
   });
 }
