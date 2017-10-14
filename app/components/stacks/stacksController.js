@@ -1,6 +1,6 @@
 angular.module('stacks', [])
-.controller('StacksController', ['$scope', 'Notifications', 'Pagination', 'StackService',
-function ($scope, Notifications, Pagination, StackService) {
+.controller('StacksController', ['$scope', 'Notifications', 'Pagination', 'StackService', 'ModalService',
+function ($scope, Notifications, Pagination, StackService, ModalService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('stacks');
@@ -36,6 +36,16 @@ function ($scope, Notifications, Pagination, StackService) {
   };
 
   $scope.removeAction = function () {
+    ModalService.confirmDeletion(
+      'Do you want to remove the selected stack(s)? Associated services will be removed as well.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        deleteSelectedStacks();
+      }
+    );
+  };
+
+  function deleteSelectedStacks() {
     $('#loadingViewSpinner').show();
     var counter = 0;
 
@@ -63,7 +73,7 @@ function ($scope, Notifications, Pagination, StackService) {
         });
       }
     });
-  };
+  }
 
   function initView() {
     $('#loadingViewSpinner').show();

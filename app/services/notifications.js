@@ -17,13 +17,14 @@ angular.module('portainer.services')
       msg = e.err.data.message;
     } else if (e.data && e.data.length > 0 && e.data[0].message) {
       msg = e.data[0].message;
-    } else if (e.err && e.err.data && e.err.data.length > 0 && e.err.data[0].message) {
-      msg = e.err.data[0].message;
-    } else if (e.msg) {
-      msg = e.msg;
+    } else if (e.err && e.err.data && e.err.data.err) {
+      msg = e.err.data.err;
     } else if (e.data && e.data.err) {
       msg = e.data.err;
+    } else if (e.msg) {
+      msg = e.msg;
     }
+
     if (msg !== 'Invalid JWT token') {
       toastr.error($sanitize(msg), $sanitize(title), {timeOut: 6000});
     }
