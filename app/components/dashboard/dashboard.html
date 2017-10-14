@@ -86,6 +86,32 @@
 
 <div class="row">
   <div class="col-xs-12 col-md-6">
+    <a ui-sref="stacks">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon blue pull-left">
+            <i class="fa fa-th-list"></i>
+          </div>
+          <div class="title">{{ stackCount }}</div>
+          <div class="comment">Stacks</div>
+        </rd-widget-body>
+      </rd-widget>
+    </a>
+  </div>
+  <div class="col-xs-12 col-md-6">
+    <a ui-sref="services">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon blue pull-left">
+            <i class="fa fa-list-alt"></i>
+          </div>
+          <div class="title">{{ serviceCount }}</div>
+          <div class="comment">Services</div>
+        </rd-widget-body>
+      </rd-widget>
+    </a>
+  </div>
+  <div class="col-xs-12 col-md-6">
     <a ui-sref="containers">
       <rd-widget>
         <rd-widget-body>

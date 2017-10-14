@@ -1,6 +1,6 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$scope', '$q', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'Notifications',
-function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, SystemService, Notifications) {
+.controller('DashboardController', ['$scope', '$q', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'ServiceService', 'StackService', 'Notifications',
+function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications) {
 
   $scope.containerData = {
     total: 0
@@ -68,13 +68,17 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
       Image.query({}).$promise,
       Volume.query({}).$promise,
       Network.query({}).$promise,
-      SystemService.info()
+      SystemService.info(),
+      ServiceService.services(),
+      StackService.stacks(true)
     ]).then(function (d) {
       prepareContainerData(d[0]);
       prepareImageData(d[1]);
       prepareVolumeData(d[2]);
       prepareNetworkData(d[3]);
       prepareInfoData(d[4]);
+      $scope.stackCount = d[5].length;
+      $scope.serviceCount = d[6].length;
       $('#loadingViewSpinner').hide();
     }, function(e) {
       $('#loadingViewSpinner').hide();
