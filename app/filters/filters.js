@@ -67,6 +67,22 @@ angular.module('portainer.filters', [])
     return 'success';
   };
 })
+.filter('servicestatusbadge', function () {
+  'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (status.indexOf('partially running') !== -1 || status.indexOf('starting') !== -1) {
+      return 'warning';
+    } else if (status.indexOf('preparing') !== -1) {
+      return 'info';
+    } else if (status.indexOf('running') !== -1) {
+      return 'success';
+    } else if (status.indexOf('down') !== -1) {
+      return 'danger';
+    }
+    return 'primary';
+  };
+})
 .filter('containerstatusbadge', function () {
   'use strict';
   return function (text) {
