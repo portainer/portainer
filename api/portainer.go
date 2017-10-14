@@ -137,7 +137,6 @@ type (
 		Name        string  `json:"Name"`
 		EntryPoint  string  `json:"EntryPoint"`
 		SwarmID     string  `json:"SwarmId"`
-		EndpointID  EndpointID
 		ProjectPath string
 	}
 

@@ -156,7 +156,6 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackName + "_" + swarmID),
 		Name:       stackName,
-		EndpointID: endpointID,
 		SwarmID:    swarmID,
 		EntryPoint: file.ComposeFileDefaultName,
 	}
@@ -250,7 +249,6 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackName + "_" + swarmID),
 		Name:       stackName,
-		EndpointID: endpointID,
 		SwarmID:    swarmID,
 		EntryPoint: req.PathInRepository,
 	}
@@ -340,7 +338,6 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		ID:         portainer.StackID(stackName + "_" + swarmID),
 		Name:       stackName,
 		SwarmID:    swarmID,
-		EndpointID: endpointID,
 		EntryPoint: file.ComposeFileDefaultName,
 	}
 
