@@ -77,8 +77,8 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
       prepareVolumeData(d[2]);
       prepareNetworkData(d[3]);
       prepareInfoData(d[4]);
-      $scope.stackCount = d[5].length;
-      $scope.serviceCount = d[6].length;
+      $scope.serviceCount = d[5].length;
+      $scope.stackCount = d[6].length;
       $('#loadingViewSpinner').hide();
     }, function(e) {
       $('#loadingViewSpinner').hide();
