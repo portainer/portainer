@@ -50,7 +50,9 @@
     "xterm.js": "~2.8.1",
     "chart.js": "~2.6.0",
     "angularjs-slider": "^6.4.0",
-    "angular-ui-router": "~1.0.6"
+    "angular-ui-router": "~1.0.6",
+    "codemirror": "~5.30.0",
+    "js-yaml": "~3.10.0"
   },
   "resolutions": {
     "angular": "1.5.11"

@@ -37,6 +37,13 @@
                 <portainer-tooltip message="Access control applied on a container created using a template is also applied on each volume associated to the container." position="bottom" style="margin-left: 2px;"></portainer-tooltip>
               </td>
             </tr>
+            <tr ng-if="$ctrl.resourceControl.Type === 6 && $ctrl.resourceType !== 'stack'">
+              <td colspan="2">
+                <i class="fa fa-info-circle" aria-hidden="true" style="margin-right: 2px;"></i>
+                Access control on this resource is inherited from the following stack: {{ $ctrl.resourceControl.ResourceId }}
+                <portainer-tooltip message="Access control applied on a stack is also applied on each resource in the stack." position="bottom" style="margin-left: 2px;"></portainer-tooltip>
+              </td>
+            </tr>
             <!-- authorized-users -->
             <tr ng-if="$ctrl.resourceControl.UserAccesses.length > 0">
               <td>Authorized users</td>
@@ -54,7 +61,11 @@
             </tr>
             <!-- !authorized-teams -->
             <!-- edit-ownership -->
-            <tr ng-if="!($ctrl.resourceControl.Type === 1 && $ctrl.resourceType === 'volume') && !($ctrl.resourceControl.Type === 2 && $ctrl.resourceType === 'container') && !$ctrl.state.editOwnership && ($ctrl.isAdmin || $ctrl.state.canEditOwnership)">
+            <tr ng-if="!($ctrl.resourceControl.Type === 1 && $ctrl.resourceType === 'volume')
+            && !($ctrl.resourceControl.Type === 2 && $ctrl.resourceType === 'container')
+            && !($ctrl.resourceControl.Type === 6 && $ctrl.resourceType !== 'stack')
+            && !$ctrl.state.editOwnership
+            && ($ctrl.isAdmin || $ctrl.state.canEditOwnership)">
               <td colspan="2">
                 <a class="btn-outline-secondary" ng-click="$ctrl.state.editOwnership = true"><i class="fa fa-edit space-right" aria-hidden="true"></i>Change ownership</a>
               </td>
