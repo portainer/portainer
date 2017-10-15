@@ -63,14 +63,17 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
 
   function initView() {
     $('#loadingViewSpinner').show();
+
+    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+
     $q.all([
       Container.query({all: 1}).$promise,
       Image.query({}).$promise,
       Volume.query({}).$promise,
       Network.query({}).$promise,
       SystemService.info(),
-      ServiceService.services(),
-      StackService.stacks(true)
+      endpointProvider === 'DOCKER_SWARM_MODE' ? ServiceService.services() : [],
+      endpointProvider === 'DOCKER_SWARM_MODE' ? StackService.stacks(true) : []
     ]).then(function (d) {
       prepareContainerData(d[0]);
       prepareImageData(d[1]);
