@@ -34,6 +34,7 @@ module.exports = function (grunt) {
     'config:dev',
     'clean:app',
     'shell:buildBinary:linux:amd64',
+    'shell:downloadDockerBinary:linux:amd64',
     'vendor:regular',
     'html2js',
     'useminPrepare:dev',
@@ -44,7 +45,7 @@ module.exports = function (grunt) {
     'after-copy'
   ]);
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
-    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy' ]);
+    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'shell:downloadDockerBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy' ]);
   });
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run-dev', ['build', 'shell:run', 'watch:build']);
@@ -53,6 +54,7 @@ module.exports = function (grunt) {
   // Project configuration.
   grunt.initConfig({
     distdir: 'dist',
+    shippedDockerVersion: '17.09.0-ce',
     pkg: grunt.file.readJSON('package.json'),
     config: {
       dev:  { options: { variables: { 'environment': 'development' }}},
@@ -67,7 +69,7 @@ module.exports = function (grunt) {
     },
     clean: {
       all: ['<%= distdir %>/*'],
-      app: ['<%= distdir %>/*', '!<%= distdir %>/portainer*'],
+      app: ['<%= distdir %>/*', '!<%= distdir %>/portainer*', '!<%= distdir %>/docker*'],
       tmpl: ['<%= distdir %>/templates'],
       tmp: ['<%= distdir %>/js/*', '!<%= distdir %>/js/app.*.js', '<%= distdir %>/css/*', '!<%= distdir %>/css/app.*.css']
     },
@@ -170,19 +172,33 @@ module.exports = function (grunt) {
     shell: {
       buildBinary: {
         command: function (p, a) {
-                   var binfile = 'dist/portainer-'+p+'-'+a;
-                   if (grunt.file.isFile( ( p === 'windows' ) ? binfile+'.exe' : binfile )) {
-                     return 'echo \'BinaryExists\'';
-                   } else {
-                     return 'build/build_in_container.sh ' + p + ' ' + a;
-                   }
-                 }
+          var binfile = 'dist/portainer-'+p+'-'+a;
+          if (grunt.file.isFile( ( p === 'windows' ) ? binfile+'.exe' : binfile )) {
+            return 'echo "Portainer binary exists"';
+          } else {
+            return 'build/build_in_container.sh ' + p + ' ' + a;
+          }
+        }
       },
       run: {
         command: [
           'docker rm -f portainer',
           'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base:docker-binary-linux-amd64 /app/portainer-linux-amd64 --no-analytics -a /app'
         ].join(';')
+      },
+      downloadDockerBinary: {
+        command: function(p, a) {
+          if (p === 'windows') p = 'win';
+          if (p === 'darwin') p = 'mac';
+          if (a === 'amd64') a = 'x86_64';
+          if (a === 'arm') a = 'armhf';
+          if (a === 'arm64') a = 'aarch64';
+          if (!grunt.file.isFile( ( p === 'win' ) ? 'dist/docker.exe' : 'dist/docker' )) {
+            return 'echo "Docker binary exists"';
+          } else {
+            return 'build/download_docker_binary.sh ' + p + ' ' + a + ' <%= shippedDockerVersion %>';
+          }
+        }
       }
     },
     replace: {

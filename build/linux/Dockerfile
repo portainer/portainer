@@ -1,4 +1,4 @@
-FROM portainer/base:docker-binary-linux-amd64
+FROM portainer/base
 
 COPY dist /
 
