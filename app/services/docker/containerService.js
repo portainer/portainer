@@ -18,9 +18,9 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.containers = function(all) {
+  service.containers = function(filters) {
     var deferred = $q.defer();
-    Container.query({ all: all }).$promise
+    Container.query(filters).$promise
     .then(function success(data) {
       var containers = data;
       deferred.resolve(containers);
