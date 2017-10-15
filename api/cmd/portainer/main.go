@@ -56,8 +56,8 @@ func initStore(dataStorePath string) *bolt.Store {
 	return store
 }
 
-func initStackManager() portainer.StackManager {
-	return exec.NewStackManager()
+func initStackManager(assetsPath string) portainer.StackManager {
+	return exec.NewStackManager(assetsPath)
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -175,7 +175,7 @@ func main() {
 	store := initStore(*flags.Data)
 	defer store.Close()
 
-	stackManager := initStackManager()
+	stackManager := initStackManager(*flags.Assets)
 
 	jwtService := initJWTService(!*flags.NoAuth)
 

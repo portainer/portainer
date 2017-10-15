@@ -146,10 +146,12 @@ func FilterStacks(stacks []portainer.Stack, resourceControls []portainer.Resourc
 	for _, stack := range stacks {
 		extendedStack := ExtendedStack{stack, portainer.ResourceControl{}}
 		resourceControl := getResourceControlByResourceID(stack.Name, resourceControls)
-		if resourceControl != nil && (isAdmin || canUserAccessResource(userID, userTeamIDs, resourceControl)) {
+		if resourceControl == nil {
+			filteredStacks = append(filteredStacks, extendedStack)
+		} else if resourceControl != nil && (isAdmin || canUserAccessResource(userID, userTeamIDs, resourceControl)) {
 			extendedStack.ResourceControl = *resourceControl
+			filteredStacks = append(filteredStacks, extendedStack)
 		}
-		filteredStacks = append(filteredStacks, extendedStack)
 	}
 
 	return filteredStacks

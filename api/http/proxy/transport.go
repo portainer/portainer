@@ -189,7 +189,13 @@ func (p *proxyTransport) proxyNodeRequest(request *http.Request) (*http.Response
 }
 
 func (p *proxyTransport) proxySwarmRequest(request *http.Request) (*http.Response, error) {
-	return p.administratorOperation(request)
+	switch requestPath := request.URL.Path; requestPath {
+	case "/swarm":
+		return p.executeDockerRequest(request)
+	default:
+		// assume /swarm/{action}
+		return p.administratorOperation(request)
+	}
 }
 
 func (p *proxyTransport) proxyTaskRequest(request *http.Request) (*http.Response, error) {

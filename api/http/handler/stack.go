@@ -461,6 +461,7 @@ func (handler *StackHandler) handleGetStack(w http.ResponseWriter, r *http.Reque
 			extendedStack.ResourceControl = *resourceControl
 		} else {
 			httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
+			return
 		}
 	}
 

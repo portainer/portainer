@@ -11,24 +11,27 @@ import (
 
 // StackManager represents a service for managing stacks.
 type StackManager struct {
+	binaryPath string
 }
 
 // NewStackManager initializes a new StackManager service.
-func NewStackManager() *StackManager {
-	return &StackManager{}
+func NewStackManager(binaryPath string) *StackManager {
+	return &StackManager{
+		binaryPath: binaryPath,
+	}
 }
 
 // Deploy will execute the Docker stack deploy command
 func (manager *StackManager) Deploy(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
-	command, args := prepareDockerCommandAndArgs(endpoint)
+	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	args = append(args, "stack", "deploy", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
 	return runCommandAndCaptureStdErr(command, args)
 }
 
 // Remove will execute the Docker stack rm command
 func (manager *StackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	command, args := prepareDockerCommandAndArgs(endpoint)
+	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	args = append(args, "stack", "rm", stack.Name)
 	return runCommandAndCaptureStdErr(command, args)
 }
@@ -46,12 +49,12 @@ func runCommandAndCaptureStdErr(command string, args []string) error {
 	return nil
 }
 
-func prepareDockerCommandAndArgs(endpoint *portainer.Endpoint) (string, []string) {
+func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint) (string, []string) {
 	// Assume Linux as a default
-	command := "/docker"
+	command := path.Join(binaryPath, "docker")
 
 	if runtime.GOOS == "windows" {
-		command = "/docker.exe"
+		command = path.Join(binaryPath, "docker.exe")
 	}
 
 	args := make([]string, 0)
