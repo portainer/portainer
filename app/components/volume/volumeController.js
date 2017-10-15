@@ -1,6 +1,6 @@
 angular.module('volume', [])
-.controller('VolumeController', ['$scope', '$state', '$transition$', 'VolumeService', 'Notifications',
-function ($scope, $state, $transition$, VolumeService, Notifications) {
+.controller('VolumeController', ['$scope', '$state', '$transition$', 'VolumeService', 'ContainerService', 'Notifications',
+function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications) {
 
   $scope.removeVolume = function removeVolume() {
     $('#loadingViewSpinner').show();
@@ -16,6 +16,12 @@ function ($scope, $state, $transition$, VolumeService, Notifications) {
       $('#loadingViewSpinner').hide();
     });
   };
+  
+  function getVolumeDataFromContainer(container) {
+    return container.Mounts.find(function(volume) {
+      return volume.Name === $scope.volume.Id;
+    });
+  }
 
   function initView() {
     $('#loadingViewSpinner').show();
@@ -23,6 +29,19 @@ function ($scope, $state, $transition$, VolumeService, Notifications) {
     .then(function success(data) {
       var volume = data;
       $scope.volume = volume;
+      return ContainerService.containers({
+        all: 1,
+        filters: {
+          volume: [volume.Id]
+        }
+      });
+    })
+    .then(function success(data) {
+      var containers = data.map(function(container) {
+        container.volumeData = getVolumeDataFromContainer(container);
+        return container;
+      });
+      $scope.containersUsingVolume = containers;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve volume details');
