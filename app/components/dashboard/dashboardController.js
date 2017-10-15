@@ -15,6 +15,9 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
     total: 0
   };
 
+  $scope.serviceCount = 0;
+  $scope.stackCount = 0;
+
   function prepareContainerData(d) {
     var running = 0;
     var stopped = 0;
