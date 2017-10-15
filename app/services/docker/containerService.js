@@ -149,6 +149,23 @@ angular.module('portainer.services')
 
     return deferred.promise;
   };
+  
+  service.inspect = function(id) {
+    var deferred = $q.defer();
+    
+    Container.inspect({id: id}).$promise
+    .then(function success(data) {
+      var inspectData = data;
+      delete data.$promise;
+      delete data.$resolved;
+      deferred.resolve(inspectData);
+    })
+    .catch(function error(err) {
+      deferred.reject(err);
+    });
+
+    return deferred.promise;
+  };
 
   return service;
 }]);
