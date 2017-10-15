@@ -167,13 +167,13 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 	}
 	stack.ProjectPath = projectPath
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	err = handler.StackService.CreateStack(stack)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.StackManager.Deploy(stack, endpoint)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -269,13 +269,13 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		return
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	err = handler.StackService.CreateStack(stack)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.StackManager.Deploy(stack, endpoint)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -348,13 +348,13 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 	}
 	stack.ProjectPath = projectPath
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	err = handler.StackService.CreateStack(stack)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.StackManager.Deploy(stack, endpoint)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return

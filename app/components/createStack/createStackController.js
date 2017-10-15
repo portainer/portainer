@@ -68,15 +68,19 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
 
     createStack(name)
     .then(function success(data) {
-      var stackId = data.Id;
-      return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, []);
+      Notifications.success('Stack successfully deployed');
+    })
+    .catch(function error(err) {
+      Notifications.warning('Deployment error', err.err.data.err);
     })
     .then(function success(data) {
-      Notifications.success('Stack successfully deployed');
+      return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, []);
+    })
+    .then(function success() {
       $state.go('stacks');
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to create stack');
+      Notifications.error('Failure', err, 'Unable to apply resource control on the stack');
     })
     .finally(function final() {
       $('#createResourceSpinner').hide();
