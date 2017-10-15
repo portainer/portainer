@@ -2,6 +2,14 @@ package proxy
 
 import "github.com/portainer/portainer"
 
+type (
+	// ExtendedStack represents a stack combined with its associated access control
+	ExtendedStack struct {
+		portainer.Stack
+		ResourceControl portainer.ResourceControl `json:"ResourceControl"`
+	}
+)
+
 // applyResourceAccessControl returns an optionally decorated object as the first return value and the
 // access level for the user (granted or denied) as the second return value.
 // It will retrieve an identifier from the labels object. If an identifier exists, it will check for
@@ -108,4 +116,41 @@ func getResourceControlByResourceID(resourceID string, resourceControls []portai
 		}
 	}
 	return nil
+}
+
+// CanAccessStack checks if a user can access a stack
+func CanAccessStack(stack *portainer.Stack, resourceControl *portainer.ResourceControl, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+	userTeamIDs := make([]portainer.TeamID, 0)
+	for _, membership := range memberships {
+		userTeamIDs = append(userTeamIDs, membership.TeamID)
+	}
+
+	if canUserAccessResource(userID, userTeamIDs, resourceControl) {
+		return true
+	}
+
+	return false
+}
+
+// FilterStacks filters stacks based on user role and resource controls.
+func FilterStacks(stacks []portainer.Stack, resourceControls []portainer.ResourceControl, isAdmin bool,
+	userID portainer.UserID, memberships []portainer.TeamMembership) []ExtendedStack {
+
+	filteredStacks := make([]ExtendedStack, 0)
+
+	userTeamIDs := make([]portainer.TeamID, 0)
+	for _, membership := range memberships {
+		userTeamIDs = append(userTeamIDs, membership.TeamID)
+	}
+
+	for _, stack := range stacks {
+		extendedStack := ExtendedStack{stack, portainer.ResourceControl{}}
+		resourceControl := getResourceControlByResourceID(stack.Name, resourceControls)
+		if resourceControl != nil && (isAdmin || canUserAccessResource(userID, userTeamIDs, resourceControl)) {
+			extendedStack.ResourceControl = *resourceControl
+		}
+		filteredStacks = append(filteredStacks, extendedStack)
+	}
+
+	return filteredStacks
 }

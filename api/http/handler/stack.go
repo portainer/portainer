@@ -366,10 +366,6 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 // handleGetStacks handles GET requests on /:endpointId/stacks?swarmId=<swarmId>
 func (handler *StackHandler) handleGetStacks(w http.ResponseWriter, r *http.Request) {
 	swarmID := r.FormValue("swarmId")
-	if swarmID == "" {
-		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
-		return
-	}
 
 	vars := mux.Vars(r)
 
@@ -395,7 +391,12 @@ func (handler *StackHandler) handleGetStacks(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	stacks, err := handler.StackService.StacksBySwarmID(swarmID)
+	var stacks []portainer.Stack
+	if swarmID == "" {
+		stacks, err = handler.StackService.Stacks()
+	} else {
+		stacks, err = handler.StackService.StacksBySwarmID(swarmID)
+	}
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -407,14 +408,10 @@ func (handler *StackHandler) handleGetStacks(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var upStacks []proxy.ExtendedStack
-	if securityContext.IsAdmin {
-		upStacks = proxy.DecorateStacks(stacks, resourceControls, securityContext.UserID, securityContext.UserMemberships)
-	} else {
-		upStacks = proxy.FilterStacks(stacks, resourceControls, securityContext.UserID, securityContext.UserMemberships)
-	}
+	filteredStacks := proxy.FilterStacks(stacks, resourceControls, securityContext.IsAdmin,
+		securityContext.UserID, securityContext.UserMemberships)
 
-	encodeJSON(w, upStacks, handler.Logger)
+	encodeJSON(w, filteredStacks, handler.Logger)
 }
 
 // handleGetStack handles GET requests on /:endpointId/stacks/:id
@@ -458,16 +455,16 @@ func (handler *StackHandler) handleGetStack(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	upStack := proxy.ExtendedStack{*stack, portainer.ResourceControl{}}
+	extendedStack := proxy.ExtendedStack{*stack, portainer.ResourceControl{}}
 	if resourceControl != nil {
 		if securityContext.IsAdmin || proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
-			upStack.ResourceControl = *resourceControl
+			extendedStack.ResourceControl = *resourceControl
 		} else {
 			httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, handler.Logger)
 		}
 	}
 
-	encodeJSON(w, upStack, handler.Logger)
+	encodeJSON(w, extendedStack, handler.Logger)
 }
 
 // handlePutStack handles PUT requests on /:endpointId/stacks/:id
