@@ -442,11 +442,6 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   cursor: pointer;
 }
 
-.boxselector_wrapper input[type="radio"]:disabled ~ label {
-  cursor: default;
-  opacity: .70;
-}
-
 .boxselector_wrapper label {
   font-weight: normal;
   font-size: 12px;

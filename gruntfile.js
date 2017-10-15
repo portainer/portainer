@@ -183,7 +183,7 @@ module.exports = function (grunt) {
       run: {
         command: [
           'docker rm -f portainer',
-          'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base:docker-binary-linux-amd64 /app/portainer-linux-amd64 --no-analytics -a /app'
+          'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer-linux-amd64 --no-analytics -a /app'
         ].join(';')
       },
       downloadDockerBinary: {
@@ -193,7 +193,7 @@ module.exports = function (grunt) {
           if (a === 'amd64') a = 'x86_64';
           if (a === 'arm') a = 'armhf';
           if (a === 'arm64') a = 'aarch64';
-          if (!grunt.file.isFile( ( p === 'win' ) ? 'dist/docker.exe' : 'dist/docker' )) {
+          if (grunt.file.isFile( ( p === 'win' ) ? 'dist/docker.exe' : 'dist/docker' )) {
             return 'echo "Docker binary exists"';
           } else {
             return 'build/download_docker_binary.sh ' + p + ' ' + a + ' <%= shippedDockerVersion %>';

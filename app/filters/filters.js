@@ -67,16 +67,6 @@ angular.module('portainer.filters', [])
     return 'success';
   };
 })
-.filter('stackstatusbadge', function () {
-  'use strict';
-  return function (text) {
-    var status = _.toLower(text);
-    if (status.indexOf('down') !== -1) {
-      return 'danger';
-    }
-    return 'success';
-  };
-})
 .filter('containerstatusbadge', function () {
   'use strict';
   return function (text) {

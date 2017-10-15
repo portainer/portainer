@@ -3,23 +3,6 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.tasks = function() {
-    var deferred = $q.defer();
-
-    Task.query().$promise
-    .then(function success(data) {
-      var tasks = data.map(function (item) {
-        return new TaskViewModel(item);
-      });
-      deferred.resolve(tasks);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve tasks', err: err });
-    });
-
-    return deferred.promise;
-  };
-
   service.task = function(id) {
     var deferred = $q.defer();
 
@@ -47,23 +30,6 @@ angular.module('portainer.services')
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve tasks', err: err });
-    });
-
-    return deferred.promise;
-  };
-
-  service.serviceTasks = function(serviceName) {
-    var deferred = $q.defer();
-
-    Task.query({ filters: { service: [serviceName] } }).$promise
-    .then(function success(data) {
-      var tasks = data.map(function (item) {
-        return new TaskViewModel(item);
-      });
-      deferred.resolve(tasks);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve tasks associated to the service', err: err });
     });
 
     return deferred.promise;
