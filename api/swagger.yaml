@@ -56,7 +56,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.14.3"
+  version: "1.15.0"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -1869,7 +1869,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.14.3"
+        example: "1.15.0"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -1889,7 +1889,14 @@ definitions:
         type: "integer"
         example: 1
         description: "Active authentication method for the Portainer instance. Valid values are: 1 for managed or 2 for LDAP."
-
+      AllowBindMountsForRegularUsers:
+        type: "boolean"
+        example: false
+        description: "Whether non-administrator should be able to use bind mounts when creating containers"
+      AllowPrivilegedModeForRegularUsers:
+        type: "boolean"
+        example: true
+        description: "Whether non-administrator should be able to use privileged mode when creating containers"
   TLSConfiguration:
     type: "object"
     properties:
@@ -1987,6 +1994,14 @@ definitions:
         description: "Active authentication method for the Portainer instance. Valid values are: 1 for managed or 2 for LDAP."
       LDAPSettings:
         $ref: "#/definitions/LDAPSettings"
+      AllowBindMountsForRegularUsers:
+        type: "boolean"
+        example: false
+        description: "Whether non-administrator should be able to use bind mounts when creating containers"
+      AllowPrivilegedModeForRegularUsers:
+        type: "boolean"
+        example: true
+        description: "Whether non-administrator should be able to use privileged mode when creating containers"
   Settings_BlackListedLabels:
     properties:
       name:
@@ -2394,6 +2409,14 @@ definitions:
         description: "Active authentication method for the Portainer instance. Valid values are: 1 for managed or 2 for LDAP."
       LDAPSettings:
         $ref: "#/definitions/LDAPSettings"
+      AllowBindMountsForRegularUsers:
+        type: "boolean"
+        example: true
+        description: "Whether non-administrator users should be able to use bind mounts when creating containers"
+      AllowPrivilegedModeForRegularUsers:
+        type: "boolean"
+        example: true
+        description: "Whether non-administrator users should be able to use privileged mode when creating containers"
   UserCreateRequest:
     type: "object"
     required:
@@ -2546,6 +2569,10 @@ definitions:
   UserAdminInitRequest:
     type: "object"
     properties:
+      Username:
+        type: "string"
+        example: "admin"
+        description: "Username for the admin user"
       Password:
         type: "string"
         example: "admin-password"

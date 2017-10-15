@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService',
-function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService',
+function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService, SettingsService) {
 
   $scope.formValues = {
     Name: '',
@@ -352,6 +352,29 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
     createNewService(config, accessControlData);
   };
 
+  function initSlidersMaxValuesBasedOnNodeData(nodes) {
+    var maxCpus = 0;
+    var maxMemory = 0;
+    for (var n in nodes) {
+      if (nodes[n].CPUs && nodes[n].CPUs > maxCpus) {
+        maxCpus = nodes[n].CPUs;
+      }
+      if (nodes[n].Memory && nodes[n].Memory > maxMemory) {
+        maxMemory = nodes[n].Memory;
+      }
+    }
+    if (maxCpus > 0) {
+      $scope.state.sliderMaxCpu = maxCpus / 1000000000;
+    } else {
+      $scope.state.sliderMaxCpu = 32;
+    }
+    if (maxMemory > 0) {
+      $scope.state.sliderMaxMemory = Math.floor(maxMemory / 1000 / 1000);
+    } else {
+      $scope.state.sliderMaxMemory = 32768;
+    }
+  }
+
   function initView() {
     $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
@@ -361,24 +384,19 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
       volumes: VolumeService.volumes(),
       secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
       networks: NetworkService.networks(true, true, false, false),
-      nodes: NodeService.nodes()
+      nodes: NodeService.nodes(),
+      settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
       $scope.availableVolumes = data.volumes;
       $scope.availableNetworks = data.networks;
       $scope.availableSecrets = data.secrets;
-      // Set max cpu value
-      var maxCpus = 0;
-      for (var n in data.nodes) {
-        if (data.nodes[n].CPUs && data.nodes[n].CPUs > maxCpus) {
-          maxCpus = data.nodes[n].CPUs;
-        }
-      }
-      if (maxCpus > 0) {
-        $scope.state.sliderMaxCpu = maxCpus / 1000000000;
-      } else {
-        $scope.state.sliderMaxCpu = 32;
-      }
+      var nodes = data.nodes;
+      initSlidersMaxValuesBasedOnNodeData(nodes);
+      var settings = data.settings;
+      $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
+      var userDetails = Authentication.getUserDetails();
+      $scope.isAdmin = userDetails.role === 1 ? true : false;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');

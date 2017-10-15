@@ -22,7 +22,7 @@ type DockerHubHandler struct {
 	DockerHubService portainer.DockerHubService
 }
 
-// NewDockerHubHandler returns a new instance of NewDockerHubHandler.
+// NewDockerHubHandler returns a new instance of DockerHubHandler.
 func NewDockerHubHandler(bouncer *security.RequestBouncer) *DockerHubHandler {
 	h := &DockerHubHandler{
 		Router: mux.NewRouter(),

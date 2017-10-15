@@ -296,6 +296,20 @@ ul.sidebar .sidebar-list a.active {
   background: #2d3e63;
 }
 
+.sidebar-footer .logo {
+  width: 100%;
+  max-width: 100px;
+  height: 100%;
+  max-height: 35px;
+  margin: 2px 0 2px 20px;
+}
+
+.sidebar-footer .version {
+  font-size: 11px;
+  margin: 11px 20px 0 7px;
+  color: #fff;
+}
+
 #image-layers .btn{
   padding: 0;
 }
@@ -517,6 +531,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
   padding: 10px;
   margin: 5px;
+  font-size: 10px;
 }
 
 .visualizer_container .node .tasks .task div {

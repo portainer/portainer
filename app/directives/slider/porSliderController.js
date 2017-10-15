@@ -8,6 +8,7 @@ angular.module('portainer')
     step: ctrl.step,
     precision: ctrl.precision,
     showSelectionBar: true,
+    enforceStep: false,
     translate: function(value, sliderId, label) {
       if (label === 'floor' || value === 0) {
         return 'unlimited';
