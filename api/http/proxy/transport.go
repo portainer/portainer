@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"net"
 	"net/http"
 	"path"
 	"strings"
@@ -29,18 +28,6 @@ type (
 	}
 	restrictedOperationRequest func(*http.Request, *http.Response, *operationExecutor) error
 )
-
-func newSocketTransport(socketPath string) *http.Transport {
-	return &http.Transport{
-		Dial: func(proto, addr string) (conn net.Conn, err error) {
-			return net.Dial("unix", socketPath)
-		},
-	}
-}
-
-func newHTTPTransport() *http.Transport {
-	return &http.Transport{}
-}
 
 func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error) {
 	return p.proxyDockerRequest(request)
@@ -202,7 +189,13 @@ func (p *proxyTransport) proxyNodeRequest(request *http.Request) (*http.Response
 }
 
 func (p *proxyTransport) proxySwarmRequest(request *http.Request) (*http.Response, error) {
-	return p.administratorOperation(request)
+	switch requestPath := request.URL.Path; requestPath {
+	case "/swarm":
+		return p.executeDockerRequest(request)
+	default:
+		// assume /swarm/{action}
+		return p.administratorOperation(request)
+	}
 }
 
 func (p *proxyTransport) proxyTaskRequest(request *http.Request) (*http.Response, error) {

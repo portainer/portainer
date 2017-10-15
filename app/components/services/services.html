@@ -38,42 +38,49 @@
             <thead>
               <th></th>
               <th>
-                <a ui-sref="services" ng-click="order('Name')">
+                <a ng-click="order('Name')">
                   Name
                   <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="services" ng-click="order('Image')">
+                <a ng-click="order('StackName')">
+                  Stack
+                  <span ng-show="sortType == 'StackName' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'StackName' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ng-click="order('Image')">
                   Image
                   <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="services" ng-click="order('Mode')">
+                <a ng-click="order('Mode')">
                   Scheduling mode
                   <span ng-show="sortType == 'Mode' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Mode' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="services" ng-click="order('Ports')">
+                <a ng-click="order('Ports')">
                   Published Ports
                   <span ng-show="sortType == 'Ports' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th>
-                <a ui-sref="services" ng-click="order('UpdatedAt')">
+                <a ng-click="order('UpdatedAt')">
                   Updated at
                   <span ng-show="sortType == 'UpdatedAt' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'UpdatedAt' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
               <th ng-if="applicationState.application.authentication">
-                <a ui-sref="services" ng-click="order('ResourceControl.Ownership')">
+                <a ng-click="order('ResourceControl.Ownership')">
                   Ownership
                   <span ng-show="sortType == 'ResourceControl.Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'ResourceControl.Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
@@ -84,6 +91,7 @@
               <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="service.Checked" ng-change="selectItem(service)"/></td>
                 <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
+                <td>{{ service.StackName ? service.StackName : '-' }}</td>
                 <td>{{ service.Image | hideshasum }}</td>
                 <td>
                   {{ service.Mode }}

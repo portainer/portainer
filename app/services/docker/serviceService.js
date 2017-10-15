@@ -1,12 +1,12 @@
 angular.module('portainer.services')
-.factory('ServiceService', ['$q', 'Service', 'ResourceControlService', function ServiceServiceFactory($q, Service, ResourceControlService) {
+.factory('ServiceService', ['$q', 'Service', 'ServiceHelper', 'TaskService', 'ResourceControlService', function ServiceServiceFactory($q, Service, ServiceHelper, TaskService, ResourceControlService) {
   'use strict';
   var service = {};
 
-  service.services = function() {
+  service.services = function(filters) {
     var deferred = $q.defer();
 
-    Service.query().$promise
+    Service.query({ filters: filters ? filters : {} }).$promise
     .then(function success(data) {
       var services = data.map(function (item) {
         return new ServiceViewModel(item);
