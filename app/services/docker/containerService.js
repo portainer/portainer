@@ -20,7 +20,8 @@ angular.module('portainer.services')
 
   service.containers = function(filters) {
     var deferred = $q.defer();
-    Container.query(filters).$promise    .then(function success(data) {
+    Container.query(filters).$promise
+    .then(function success(data) {
       var containers = data.map(function (item) {
         return new ContainerViewModel(item);
       });
