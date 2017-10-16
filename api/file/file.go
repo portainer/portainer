@@ -1,6 +1,7 @@
 package file
 
 import (
+	"bytes"
 	"io/ioutil"
 
 	"github.com/portainer/portainer"
@@ -21,6 +22,10 @@ const (
 	TLSCertFile = "cert.pem"
 	// TLSKeyFile represents the name on disk for a TLS key file.
 	TLSKeyFile = "key.pem"
+	// ComposeStorePath represents the subfolder where compose files are stored in the file store folder.
+	ComposeStorePath = "compose"
+	// ComposeFileDefaultName represents the default name of a compose file.
+	ComposeFileDefaultName = "docker-compose.yml"
 )
 
 // Service represents a service for managing files and directories.
@@ -50,7 +55,63 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 		return nil, err
 	}
 
+	err = service.createDirectoryInStoreIfNotExist(ComposeStorePath)
+	if err != nil {
+		return nil, err
+	}
+
 	return service, nil
+}
+
+// RemoveDirectory removes a directory on the filesystem.
+func (service *Service) RemoveDirectory(directoryPath string) error {
+	return os.RemoveAll(directoryPath)
+}
+
+// GetStackProjectPath returns the absolute path on the FS for a stack based
+// on its identifier.
+func (service *Service) GetStackProjectPath(stackIdentifier string) string {
+	return path.Join(service.fileStorePath, ComposeStorePath, stackIdentifier)
+}
+
+// StoreStackFileFromString creates a subfolder in the ComposeStorePath and stores a new file using the content from a string.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreStackFileFromString(stackIdentifier, stackFileContent string) (string, error) {
+	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
+	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := path.Join(stackStorePath, ComposeFileDefaultName)
+	data := []byte(stackFileContent)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, stackStorePath), nil
+}
+
+// StoreStackFileFromReader creates a subfolder in the ComposeStorePath and stores a new file using the content from an io.Reader.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreStackFileFromReader(stackIdentifier string, r io.Reader) (string, error) {
+	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
+	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := path.Join(stackStorePath, ComposeFileDefaultName)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, stackStorePath), nil
 }
 
 // StoreTLSFile creates a folder in the TLSStorePath and stores a new file with the content from r.
@@ -130,6 +191,16 @@ func (service *Service) DeleteTLSFile(folder string, fileType portainer.TLSFileT
 	return nil
 }
 
+// GetFileContent returns a string content from file.
+func (service *Service) GetFileContent(filePath string) (string, error) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return string(content), nil
+}
+
 // createDirectoryInStoreIfNotExist creates a new directory in the file store if it doesn't exists on the file system.
 func (service *Service) createDirectoryInStoreIfNotExist(name string) error {
 	path := path.Join(service.fileStorePath, name)
@@ -153,24 +224,17 @@ func createDirectoryIfNotExist(path string, mode uint32) error {
 // createFile creates a new file in the file store with the content from r.
 func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 	path := path.Join(service.fileStorePath, filePath)
+
 	out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
+
 	_, err = io.Copy(out, r)
 	if err != nil {
 		return err
 	}
+
 	return nil
-}
-
-// GetStringFromFile returns a string content from file.
-func GetStringFromFile(filePath string) (string, error) {
-	content, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return "", err
-	}
-
-	return string(content), nil
 }

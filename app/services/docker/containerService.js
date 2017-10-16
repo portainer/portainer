@@ -20,14 +20,16 @@ angular.module('portainer.services')
 
   service.containers = function(filters) {
     var deferred = $q.defer();
-    Container.query(filters).$promise
-    .then(function success(data) {
-      var containers = data;
+    Container.query(filters).$promise    .then(function success(data) {
+      var containers = data.map(function (item) {
+        return new ContainerViewModel(item);
+      });
       deferred.resolve(containers);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve containers', err: err });
     });
+
     return deferred.promise;
   };
 

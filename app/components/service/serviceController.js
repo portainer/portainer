@@ -321,7 +321,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       originalService = angular.copy(service);
 
       return $q.all({
-        tasks: TaskService.serviceTasks(service.Name),
+        tasks: TaskService.tasks({ service: [service.Name] }),
         nodes: NodeService.nodes(),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : []
       });
