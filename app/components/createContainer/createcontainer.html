@@ -522,7 +522,7 @@
                   Memory reservation
                 </label>
                 <div class="col-sm-3">
-                  <por-slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
+                  <slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
                 </div>
                 <div class="col-sm-2">
                   <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation">
@@ -540,7 +540,7 @@
                   Memory limit
                 </label>
                 <div class="col-sm-3">
-                  <por-slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
+                  <slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
                 </div>
                 <div class="col-sm-2">
                   <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit">
@@ -558,7 +558,7 @@
                   CPU limit
                 </label>
                 <div class="col-sm-5">
-                  <por-slider model="formValues.CpuLimit" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></por-slider>
+                  <slider model="formValues.CpuLimit" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></slider>
                 </div>
                 <div class="col-sm-4" style="margin-top: 20px;">
                   <p class="small text-muted">

@@ -1,0 +1,19 @@
+<span class="setting" ng-class="{ 'setting-active': $ctrl.state.isOpen }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.state.isOpen">
+  <i class="fa fa-cog fa-2x" aria-hidden="true" uib-dropdown-toggle></i>
+  <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+    <div class="settingsMenu">
+      <div class="settingsHeader">
+        Columns
+      </div>
+      <div class="settingsContent">
+        <div class="md-checkbox" ng-repeat="header in $ctrl.headers track by $index" ng-if="!header.excludeFromSelector">
+          <input id="show_{{ $index }}" type="checkbox" ng-model="header.show" ng-change="$ctrl.onColumnSelection()"/>
+          <label for="show_{{ $index }}">{{ header.label }}</label>
+        </div>
+      </div>
+      <div class="settingsActions">
+        <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.closeSettings()">Close</a>
+      </div>
+    </div>
+  </div>
+</span>
