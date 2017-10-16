@@ -172,6 +172,7 @@ type (
 	Endpoint struct {
 		ID              EndpointID       `json:"Id"`
 		Name            string           `json:"Name"`
+		Color           string           `json:"Color"`
 		URL             string           `json:"URL"`
 		PublicURL       string           `json:"PublicURL"`
 		TLSConfig       TLSConfiguration `json:"TLSConfig"`

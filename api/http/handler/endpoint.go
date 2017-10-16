@@ -60,6 +60,7 @@ type (
 		Name                string `valid:"required"`
 		URL                 string `valid:"required"`
 		PublicURL           string `valid:"-"`
+		Color               string
 		TLS                 bool
 		TLSSkipVerify       bool
 		TLSSkipClientVerify bool
@@ -78,6 +79,7 @@ type (
 		Name                string `valid:"-"`
 		URL                 string `valid:"-"`
 		PublicURL           string `valid:"-"`
+		Color               string `valid:"-"`
 		TLS                 bool   `valid:"-"`
 		TLSSkipVerify       bool   `valid:"-"`
 		TLSSkipClientVerify bool   `valid:"-"`
@@ -128,6 +130,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 
 	endpoint := &portainer.Endpoint{
 		Name:      req.Name,
+		Color:     req.Color,
 		URL:       req.URL,
 		PublicURL: req.PublicURL,
 		TLSConfig: portainer.TLSConfiguration{
@@ -286,6 +289,10 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 
 	if req.Name != "" {
 		endpoint.Name = req.Name
+	}
+
+	if req.Color != "" {
+		endpoint.Color = req.Color
 	}
 
 	if req.URL != "" {
