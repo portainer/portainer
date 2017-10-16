@@ -1,6 +1,6 @@
 angular.module('endpoints', [])
-.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Notifications', 'Pagination',
-function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagination) {
+.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Notifications', 'Pagination', 'EndpointHelper',
+function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagination, EndpointHelper) {
   $scope.state = {
     uploadInProgress: false,
     selectedItemCount: 0,
@@ -11,11 +11,12 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
 
   $scope.formValues = {
     Name: '',
+    Color: EndpointHelper.getRandomHexColor(),
     URL: '',
     PublicURL: '',
     SecurityFormData: new EndpointSecurityFormData()
   };
-
+  
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;
@@ -44,6 +45,7 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
 
   $scope.addEndpoint = function() {
     var name = $scope.formValues.Name;
+    var color = $scope.formValues.Color;
     var URL = $scope.formValues.URL;
     var PublicURL = $scope.formValues.PublicURL;
     if (PublicURL === '') {
@@ -59,7 +61,7 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, color).then(function success(data) {
       Notifications.success('Endpoint created', name);
       $state.reload();
     }, function error(err) {

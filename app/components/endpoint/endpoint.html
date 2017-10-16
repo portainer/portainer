@@ -23,6 +23,17 @@
             </div>
           </div>
           <!-- !name-input -->
+          <!-- color-input -->
+          <div class="form-group">
+            <label for="container_color" class="col-sm-3 col-lg-2 control-label text-left">
+              Color
+              <portainer-tooltip position="bottom" message="Background color when endpoint is active"></portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="color" class="form-control" id="container_color" ng-model="endpoint.Color">
+            </div>
+          </div>
+          <!-- !color-input -->
           <!-- endpoint-url-input -->
           <div class="form-group">
             <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
