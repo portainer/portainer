@@ -22,7 +22,7 @@ steps:
     image: busybox
     working_directory: ${{build_frontend}}
     commands:
-      - wget -O /tmp/docker-binaries.zip https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.zip
+      - wget -O /tmp/docker-binaries.zip https://download.docker.com/linux/static/stable/x86_64/docker-${{DOCKER_VERSION}}.zip
       - tar -xf /tmp/docker-binaries.zip -C /tmp
       - mv /tmp/docker/docker dist/
 
