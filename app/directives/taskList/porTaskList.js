@@ -1,9 +1,9 @@
 angular.module('portainer')
-.controller('porTaskListController', ['Pagination',
-function (Pagination) {
+.controller('porTaskListController', ['PaginationService',
+function (PaginationService) {
   var ctrl = this;
   ctrl.state = {
-    pagination_count: Pagination.getPaginationCount('tasks_list')
+    pagination_count: PaginationService.getPaginationCount('tasks_list')
   };
   ctrl.sortType = 'Updated';
   ctrl.sortReverse = true;
@@ -14,6 +14,6 @@ function (Pagination) {
   };
 
   ctrl.changePaginationCount = function() {
-    Pagination.setPaginationCount('tasks_list', ctrl.state.pagination_count);
+    PaginationService.setPaginationCount('tasks_list', ctrl.state.pagination_count);
   };
 }]);

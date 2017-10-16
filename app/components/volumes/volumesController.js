@@ -1,14 +1,14 @@
 angular.module('volumes', [])
-.controller('VolumesController', ['$q', '$scope', 'VolumeService', 'Notifications', 'Pagination',
-function ($q, $scope, VolumeService, Notifications, Pagination) {
+.controller('VolumesController', ['$q', '$scope', 'VolumeService', 'Notifications', 'PaginationService',
+function ($q, $scope, VolumeService, Notifications, PaginationService) {
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('volumes');
+  $scope.state.pagination_count = PaginationService.getPaginationCount('volumes');
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Id';
   $scope.sortReverse = false;
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('volumes', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('volumes', $scope.state.pagination_count);
   };
 
   $scope.order = function(sortType) {

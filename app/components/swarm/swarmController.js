@@ -1,8 +1,8 @@
 angular.module('swarm', [])
-.controller('SwarmController', ['$q', '$scope', 'SystemService', 'NodeService', 'Pagination', 'Notifications', 'StateManager', 'Authentication',
-function ($q, $scope, SystemService, NodeService, Pagination, Notifications, StateManager, Authentication) {
+.controller('SwarmController', ['$q', '$scope', 'SystemService', 'NodeService', 'PaginationService', 'Notifications', 'StateManager', 'Authentication',
+function ($q, $scope, SystemService, NodeService, PaginationService, Notifications, StateManager, Authentication) {
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('swarm_nodes');
+  $scope.state.pagination_count = PaginationService.getPaginationCount('swarm_nodes');
   $scope.sortType = 'Spec.Role';
   $scope.sortReverse = false;
   $scope.info = {};
@@ -17,7 +17,7 @@ function ($q, $scope, SystemService, NodeService, Pagination, Notifications, Sta
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('swarm_nodes', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('swarm_nodes', $scope.state.pagination_count);
   };
 
   function extractSwarmInfo(info) {

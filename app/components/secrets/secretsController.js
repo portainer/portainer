@@ -1,9 +1,9 @@
 angular.module('secrets', [])
-.controller('SecretsController', ['$scope', '$transition$', '$state', 'SecretService', 'Notifications', 'Pagination',
-function ($scope, $transition$, $state, SecretService, Notifications, Pagination) {
+.controller('SecretsController', ['$scope', '$transition$', '$state', 'SecretService', 'Notifications', 'PaginationService',
+function ($scope, $transition$, $state, SecretService, Notifications, PaginationService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
-  $scope.state.pagination_count = Pagination.getPaginationCount('secrets');
+  $scope.state.pagination_count = PaginationService.getPaginationCount('secrets');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
 

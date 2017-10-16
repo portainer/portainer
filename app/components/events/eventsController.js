@@ -1,8 +1,8 @@
 angular.module('events', [])
-.controller('EventsController', ['$scope', 'Notifications', 'SystemService', 'Pagination',
-function ($scope, Notifications, SystemService, Pagination) {
+.controller('EventsController', ['$scope', 'Notifications', 'SystemService', 'PaginationService',
+function ($scope, Notifications, SystemService, PaginationService) {
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('events');
+  $scope.state.pagination_count = PaginationService.getPaginationCount('events');
   $scope.sortType = 'Time';
   $scope.sortReverse = true;
 
@@ -12,7 +12,7 @@ function ($scope, Notifications, SystemService, Pagination) {
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('events', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('events', $scope.state.pagination_count);
   };
 
   function initView() {

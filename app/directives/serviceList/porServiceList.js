@@ -1,9 +1,9 @@
 angular.module('portainer')
-.controller('porServiceListController', ['EndpointProvider', 'Pagination',
-function (EndpointProvider, Pagination) {
+.controller('porServiceListController', ['EndpointProvider', 'PaginationService',
+function (EndpointProvider, PaginationService) {
   var ctrl = this;
   ctrl.state = {
-    pagination_count: Pagination.getPaginationCount('services_list'),
+    pagination_count: PaginationService.getPaginationCount('services_list'),
     publicURL: EndpointProvider.endpointPublicURL()
   };
   ctrl.sortType = 'Name';
@@ -15,7 +15,7 @@ function (EndpointProvider, Pagination) {
   };
 
   ctrl.changePaginationCount = function() {
-    Pagination.setPaginationCount('services_list', ctrl.state.pagination_count);
+    PaginationService.setPaginationCount('services_list', ctrl.state.pagination_count);
   };
 
 }]);

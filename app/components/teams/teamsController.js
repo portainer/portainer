@@ -1,44 +1,14 @@
 angular.module('teams', [])
-.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication',
-function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication) {
+.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Authentication',
+function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Authentication) {
   $scope.state = {
     userGroupGroupCreationError: '',
-    selectedItemCount: 0,
-    validName: false,
-    pagination_count: Pagination.getPaginationCount('teams')
+    validName: false
   };
-  $scope.sortType = 'Name';
-  $scope.sortReverse = false;
 
   $scope.formValues = {
     Name: '',
     Leaders: []
-  };
-
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('teams', $scope.state.pagination_count);
-  };
-
-  $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredTeams, function (team) {
-      if (team.Checked !== allSelected) {
-        team.Checked = allSelected;
-        $scope.selectItem(team);
-      }
-    });
-  };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
   };
 
   $scope.checkNameValidity = function() {
@@ -75,7 +45,7 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
     });
   };
 
-  function deleteSelectedTeams() {
+  function deleteSelectedTeams(teams) {
     $('#loadingViewSpinner').show();
     var counter = 0;
     var complete = function () {
@@ -83,32 +53,31 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
       if (counter === 0) {
         $('#loadingViewSpinner').hide();
       }
+      $state.reload();
     };
-    angular.forEach($scope.teams, function (team) {
-      if (team.Checked) {
-        counter = counter + 1;
-        TeamService.deleteTeam(team.Id)
-        .then(function success(data) {
-          var index = $scope.teams.indexOf(team);
-          $scope.teams.splice(index, 1);
-          Notifications.success('Team successfully deleted', team.Name);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove team');
-        })
-        .finally(function final() {
-          complete();
-        });
-      }
+    angular.forEach(teams, function (team) {
+      counter = counter + 1;
+      TeamService.deleteTeam(team.Id)
+      .then(function success(data) {
+        var index = $scope.teams.indexOf(team);
+        $scope.teams.splice(index, 1);
+        Notifications.success('Team successfully deleted', team.Name);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to remove team');
+      })
+      .finally(function final() {
+        complete();
+      });
     });
   }
 
-  $scope.removeAction = function () {
+  $scope.removeAction = function (items) {
     ModalService.confirmDeletion(
       'Do you want to delete the selected team(s)? Users in the team(s) will not be deleted.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
-        deleteSelectedTeams();
+        deleteSelectedTeams(items);
       }
     );
   };

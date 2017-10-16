@@ -1,11 +1,11 @@
 angular.module('users', [])
-.controller('UsersController', ['$q', '$scope', '$state', '$sanitize', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication', 'SettingsService',
-function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication, SettingsService) {
+.controller('UsersController', ['$q', '$scope', '$state', '$sanitize', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'PaginationService', 'Authentication', 'SettingsService',
+function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershipService, ModalService, Notifications, PaginationService, Authentication, SettingsService) {
   $scope.state = {
     userCreationError: '',
     selectedItemCount: 0,
     validUsername: false,
-    pagination_count: Pagination.getPaginationCount('users')
+    pagination_count: PaginationService.getPaginationCount('users')
   };
   $scope.sortType = 'RoleName';
   $scope.sortReverse = false;
@@ -24,7 +24,7 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('endpoints', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('endpoints', $scope.state.pagination_count);
   };
 
   $scope.selectItems = function (allSelected) {

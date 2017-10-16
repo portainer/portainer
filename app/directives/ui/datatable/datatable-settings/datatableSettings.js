@@ -1,5 +1,5 @@
 angular.module('ui').component('datatableSettings', {
-  templateUrl: 'app/ui/components/datatable/datatable-settings/datatableSettings.html',
+  templateUrl: 'app/directives/ui/datatable/datatable-settings/datatableSettings.html',
   controller: function() {
     this.state = {
       isOpen: false

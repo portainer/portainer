@@ -1,8 +1,8 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
-  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
+  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'PaginationService', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
+  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, PaginationService, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('containers');
+  $scope.state.pagination_count = PaginationService.getPaginationCount('containers');
   $scope.state.displayAll = LocalStorage.getFilterContainerShowAll();
   $scope.state.displayIP = false;
   $scope.sortType = 'State';
@@ -18,7 +18,7 @@ angular.module('containers', [])
   $scope.PublicURL = EndpointProvider.endpointPublicURL();
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('containers', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('containers', $scope.state.pagination_count);
   };
 
   $scope.cleanAssociatedVolumes = false;

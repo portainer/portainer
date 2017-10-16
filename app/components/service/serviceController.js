@@ -1,9 +1,9 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'PaginationService', 'ModalService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, PaginationService, ModalService) {
 
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
+  $scope.state.pagination_count = PaginationService.getPaginationCount('service_tasks');
   $scope.tasks = [];
   $scope.sortType = 'Updated';
   $scope.sortReverse = true;
@@ -19,7 +19,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('service_tasks', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('service_tasks', $scope.state.pagination_count);
   };
 
   $scope.renameService = function renameService(service) {

@@ -1,10 +1,10 @@
 angular.module('registries', [])
-.controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications', 'Pagination',
-function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, Pagination) {
+.controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications', 'PaginationService',
+function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, PaginationService) {
 
   $scope.state = {
     selectedItemCount: 0,
-    pagination_count: Pagination.getPaginationCount('registries')
+    pagination_count: PaginationService.getPaginationCount('registries')
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
@@ -30,7 +30,7 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('endpoints', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('endpoints', $scope.state.pagination_count);
   };
 
   $scope.selectItems = function (allSelected) {

@@ -35,11 +35,17 @@ angular.module('portainer.services')
     deleteJWT: function() {
       localStorageService.remove('JWT');
     },
-    storePaginationCount: function(key, count) {
+    storePaginationLimit: function(key, count) {
       localStorageService.cookie.set('pagination_' + key, count);
     },
-    getPaginationCount: function(key) {
+    getPaginationLimit: function(key) {
       return localStorageService.cookie.get('pagination_' + key);
+    },
+    getDataTableHeaders: function(key) {
+      return localStorageService.get(key);
+    },
+    storeDataTableHeaders: function(key, data) {
+      localStorageService.set(key, data);
     },
     clean: function() {
       localStorageService.clearAll();

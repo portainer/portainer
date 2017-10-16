@@ -1,10 +1,10 @@
 angular.module('endpoints', [])
-.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Notifications', 'Pagination',
-function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagination) {
+.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Notifications', 'PaginationService',
+function ($scope, $state, EndpointService, EndpointProvider, Notifications, PaginationService) {
   $scope.state = {
     uploadInProgress: false,
     selectedItemCount: 0,
-    pagination_count: Pagination.getPaginationCount('endpoints')
+    pagination_count: PaginationService.getPaginationCount('endpoints')
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
@@ -22,7 +22,7 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('endpoints', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('endpoints', $scope.state.pagination_count);
   };
 
   $scope.selectItems = function (allSelected) {

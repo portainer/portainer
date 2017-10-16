@@ -1,16 +1,16 @@
 angular.module('stacks', [])
-.controller('StacksController', ['$scope', 'Notifications', 'Pagination', 'StackService', 'ModalService',
-function ($scope, Notifications, Pagination, StackService, ModalService) {
+.controller('StacksController', ['$scope', 'Notifications', 'PaginationService', 'StackService', 'ModalService',
+function ($scope, Notifications, PaginationService, StackService, ModalService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
-  $scope.state.pagination_count = Pagination.getPaginationCount('stacks');
+  $scope.state.pagination_count = PaginationService.getPaginationCount('stacks');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
   $scope.state.DisplayInformationPanel = false;
   $scope.state.DisplayExternalStacks = true;
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('stacks', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('stacks', $scope.state.pagination_count);
   };
 
   $scope.order = function (sortType) {
