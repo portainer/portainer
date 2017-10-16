@@ -18,9 +18,17 @@ steps:
       - grunt build-webapp
       - mv api/cmd/portainer/portainer dist/
 
+  download_docker_binary:
+    image: busybox
+    working_directory: ${{build_frontend}}
+    commands:
+      - wget -O /tmp/docker-binaries.zip https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.zip
+      - tar -xf /tmp/docker-binaries.zip -C /tmp
+      - mv /tmp/docker/docker dist/
+
   build_image:
     type: build
-    working_directory: ${{build_frontend}}
+    working_directory: ${{download_docker_binary}}
     dockerfile: ./build/linux/Dockerfile
     image_name: portainer/portainer
     tag: ${{CF_BRANCH}}
