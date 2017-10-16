@@ -12,7 +12,9 @@
       <span>Active endpoint</span>
     </li>
     <li class="sidebar-title">
-      <select class="select-endpoint form-control" ng-options="endpoint.Name for endpoint in endpoints" ng-model="activeEndpoint" ng-change="switchEndpoint(activeEndpoint)">
+      <select class="select-endpoint form-control" ng-options="endpoint.Name for endpoint in endpoints" ng-model="activeEndpoint" ng-change="switchEndpoint(activeEndpoint)" style="
+        background: {{activeEndpoint.Color}};
+        border-color: {{activeEndpoint.Color}};">
       </select>
     </li>
     <li class="sidebar-title"><span>Endpoint actions</span></li>
