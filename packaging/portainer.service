@@ -1,0 +1,16 @@
+[Unit]
+Description=%p node
+After=docker.service
+# mongodb.service
+Wants=docker.service
+Wants=docker-latest.service
+
+[Service]
+Type=simple
+Environment=ASSETS=/usr/share/portainer
+Environment=DBFILES=/var/lib/portainer
+EnvironmentFile=-/etc/sysconfig/%p
+ExecStart=/usr/sbin/portainer -a $ASSETS -d $DBFILES
+
+[Install]
+WantedBy=multi-user.target
