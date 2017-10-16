@@ -2152,6 +2152,10 @@ definitions:
         type: "string"
         example: "my-endpoint"
         description: "Name that will be used to identify this endpoint"
+      Name:
+        type: "string"
+        example: "#FF0000"
+        description: "Color that will be used to visually identify this endpoint"
       URL:
         type: "string"
         example: "docker.mydomain.tld:2375"

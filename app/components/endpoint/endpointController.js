@@ -24,6 +24,7 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications)
 
     var endpointParams = {
       name: endpoint.Name,
+      Color: endpoint.Color,
       URL: endpoint.URL,
       PublicURL: endpoint.PublicURL,
       TLS: TLS,
@@ -54,6 +55,7 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications)
     EndpointService.endpoint($transition$.params().id)
     .then(function success(data) {
       var endpoint = data;
+      endpoint.Color = endpoint.Color || '#FFFFFF';
       if (endpoint.URL.indexOf('unix://') === 0) {
         $scope.endpointType = 'local';
       } else {

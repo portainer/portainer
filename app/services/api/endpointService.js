@@ -18,6 +18,7 @@ angular.module('portainer.services')
   service.updateEndpoint = function(id, endpointParams) {
     var query = {
       name: endpointParams.name,
+      Color: endpointParams.Color,
       PublicURL: endpointParams.PublicURL,
       TLS: endpointParams.TLS,
       TLSSkipVerify: endpointParams.TLSSkipVerify,
@@ -57,9 +58,10 @@ angular.module('portainer.services')
     return Endpoints.create({}, endpoint).$promise;
   };
 
-  service.createRemoteEndpoint = function(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  service.createRemoteEndpoint = function(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, color) {
     var endpoint = {
       Name: name,
+      Color: color,
       URL: 'tcp://' + URL,
       PublicURL: PublicURL,
       TLS: TLS,
