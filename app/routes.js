@@ -105,6 +105,19 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('inspect', {
+    url: '^/containers/:id/inspect',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/containerInspect/containerInspect.html',
+        controller: 'ContainerInspectController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('dashboard', {
     parent: 'root',
     url: '/dashboard',

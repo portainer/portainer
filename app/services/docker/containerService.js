@@ -140,18 +140,11 @@ angular.module('portainer.services')
   };
 
   service.containerTop = function(id) {
-    var deferred = $q.defer();
-
-    Container.top({id: id}).$promise
-    .then(function success(data) {
-      var containerTop = data;
-      deferred.resolve(containerTop);
-    })
-    .catch(function error(err) {
-      deferred.reject(err);
-    });
-
-    return deferred.promise;
+    return Container.top({id: id}).$promise;
+  };
+  
+  service.inspect = function(id) {
+    return Container.inspect({id: id}).$promise;
   };
 
   return service;
