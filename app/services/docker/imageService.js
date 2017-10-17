@@ -24,7 +24,7 @@ angular.module('portainer.services')
     var deferred = $q.defer();
 
     $q.all({
-      containers: withUsage ? ContainerService.containers({ all: 1 }) : [],
+      containers: withUsage ? ContainerService.containers(1) : [],
       images: Image.query({}).$promise
     })
     .then(function success(data) {
