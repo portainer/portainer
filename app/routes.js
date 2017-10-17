@@ -674,5 +674,44 @@ function configureRoutes($stateProvider) {
         controller: 'SidebarController'
       }
     }
+  })
+  .state('actions.create.stack', {
+    url: '/stack',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/createStack/createstack.html',
+        controller: 'CreateStackController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('stacks', {
+    url: '/stacks/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/stacks/stacks.html',
+        controller: 'StacksController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('stack', {
+    url: '^/stacks/:id/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/stack/stack.html',
+        controller: 'StackController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
   });
 }

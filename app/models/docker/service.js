@@ -1,6 +1,7 @@
 function ServiceViewModel(data, runningTasks, nodes) {
   this.Model = data;
   this.Id = data.ID;
+  this.Tasks = [];
   this.Name = data.Spec.Name;
   this.CreatedAt = data.CreatedAt;
   this.UpdatedAt = data.UpdatedAt;
@@ -44,6 +45,9 @@ function ServiceViewModel(data, runningTasks, nodes) {
   this.Preferences = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Preferences || [] : [];
   this.Platforms = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Platforms || [] : [];
   this.Labels = data.Spec.Labels;
+  if (this.Labels && this.Labels['com.docker.stack.namespace']) {
+    this.StackName = this.Labels['com.docker.stack.namespace'];
+  }
 
   var containerSpec = data.Spec.TaskTemplate.ContainerSpec;
   if (containerSpec) {

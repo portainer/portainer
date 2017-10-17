@@ -18,14 +18,24 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.containers = function(all) {
-    return Container.query({ all: all }).$promise
+  service.containers = function(all, filters) {
+    var deferred = $q.defer();
+
+    Container.query({ all: all, filters: filters ? filters : {} }).$promise
+    .then(function success(data) {
+      var containers = data.map(function (item) {
+        return new ContainerViewModel(item);
+      });
+      deferred.resolve(containers);
+    })
     .catch(function error(err) {
       throw {
         msg: 'Unable to retrieve containers', 
         err: err 
       };
     });
+
+    return deferred.promise;
   };
 
   service.createContainer = function(configuration) {
