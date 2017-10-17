@@ -11,6 +11,7 @@ const (
 	ErrDockerContainerIdentifierNotFound = portainer.Error("Docker container identifier not found")
 	containerIdentifier                  = "Id"
 	containerLabelForServiceIdentifier   = "com.docker.swarm.service.id"
+	containerLabelForStackIdentifier     = "com.docker.stack.namespace"
 )
 
 // containerListOperation extracts the response as a JSON object, loop through the containers array
@@ -27,8 +28,7 @@ func containerListOperation(request *http.Request, response *http.Response, exec
 	if executor.operationContext.isAdmin {
 		responseArray, err = decorateContainerList(responseArray, executor.operationContext.resourceControls)
 	} else {
-		responseArray, err = filterContainerList(responseArray, executor.operationContext.resourceControls,
-			executor.operationContext.userID, executor.operationContext.userTeamIDs)
+		responseArray, err = filterContainerList(responseArray, executor.operationContext)
 	}
 	if err != nil {
 		return err
@@ -58,30 +58,22 @@ func containerInspectOperation(request *http.Request, response *http.Response, e
 	if responseObject[containerIdentifier] == nil {
 		return ErrDockerContainerIdentifierNotFound
 	}
-	containerID := responseObject[containerIdentifier].(string)
 
-	resourceControl := getResourceControlByResourceID(containerID, executor.operationContext.resourceControls)
-	if resourceControl != nil {
-		if executor.operationContext.isAdmin || canUserAccessResource(executor.operationContext.userID,
-			executor.operationContext.userTeamIDs, resourceControl) {
-			responseObject = decorateObject(responseObject, resourceControl)
-		} else {
-			return rewriteAccessDeniedResponse(response)
-		}
+	containerID := responseObject[containerIdentifier].(string)
+	responseObject, access := applyResourceAccessControl(responseObject, containerID, executor.operationContext)
+	if !access {
+		return rewriteAccessDeniedResponse(response)
 	}
 
 	containerLabels := extractContainerLabelsFromContainerInspectObject(responseObject)
-	if containerLabels != nil && containerLabels[containerLabelForServiceIdentifier] != nil {
-		serviceID := containerLabels[containerLabelForServiceIdentifier].(string)
-		resourceControl := getResourceControlByResourceID(serviceID, executor.operationContext.resourceControls)
-		if resourceControl != nil {
-			if executor.operationContext.isAdmin || canUserAccessResource(executor.operationContext.userID,
-				executor.operationContext.userTeamIDs, resourceControl) {
-				responseObject = decorateObject(responseObject, resourceControl)
-			} else {
-				return rewriteAccessDeniedResponse(response)
-			}
-		}
+	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForServiceIdentifier, executor.operationContext)
+	if !access {
+		return rewriteAccessDeniedResponse(response)
+	}
+
+	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForStackIdentifier, executor.operationContext)
+	if !access {
+		return rewriteAccessDeniedResponse(response)
 	}
 
 	return rewriteResponse(response, responseObject, http.StatusOK)
@@ -105,4 +97,97 @@ func extractContainerLabelsFromContainerListObject(responseObject map[string]int
 	// Labels are stored under Labels
 	containerLabelsObject := extractJSONField(responseObject, "Labels")
 	return containerLabelsObject
+}
+
+// decorateContainerList loops through all containers and decorates any container with an existing resource control.
+// Resource controls checks are based on: resource identifier, service identifier (from label), stack identifier (from label).
+// Container object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
+func decorateContainerList(containerData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+	decoratedContainerData := make([]interface{}, 0)
+
+	for _, container := range containerData {
+
+		containerObject := container.(map[string]interface{})
+		if containerObject[containerIdentifier] == nil {
+			return nil, ErrDockerContainerIdentifierNotFound
+		}
+
+		containerID := containerObject[containerIdentifier].(string)
+		containerObject = decorateResourceWithAccessControl(containerObject, containerID, resourceControls)
+
+		containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
+		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, resourceControls)
+		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForStackIdentifier, resourceControls)
+
+		decoratedContainerData = append(decoratedContainerData, containerObject)
+	}
+
+	return decoratedContainerData, nil
+}
+
+// filterContainerList loops through all containers and filters public containers (no associated resource control)
+// as well as authorized containers (access granted to the user based on existing resource control).
+// Authorized containers are decorated during the process.
+// Resource controls checks are based on: resource identifier, service identifier (from label), stack identifier (from label).
+// Container object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
+func filterContainerList(containerData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+	filteredContainerData := make([]interface{}, 0)
+
+	for _, container := range containerData {
+		containerObject := container.(map[string]interface{})
+		if containerObject[containerIdentifier] == nil {
+			return nil, ErrDockerContainerIdentifierNotFound
+		}
+
+		containerID := containerObject[containerIdentifier].(string)
+		containerObject, access := applyResourceAccessControl(containerObject, containerID, context)
+		if access {
+			containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
+			containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, context)
+			if access {
+				containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForStackIdentifier, context)
+				if access {
+					filteredContainerData = append(filteredContainerData, containerObject)
+				}
+			}
+		}
+	}
+
+	return filteredContainerData, nil
+}
+
+// filterContainersWithLabels loops through a list of containers, and filters containers that do not contains
+// any labels in the labels black list.
+func filterContainersWithBlackListedLabels(containerData []interface{}, labelBlackList []portainer.Pair) ([]interface{}, error) {
+	filteredContainerData := make([]interface{}, 0)
+
+	for _, container := range containerData {
+		containerObject := container.(map[string]interface{})
+
+		containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
+		if containerLabels != nil {
+			if !containerHasBlackListedLabel(containerLabels, labelBlackList) {
+				filteredContainerData = append(filteredContainerData, containerObject)
+			}
+		} else {
+			filteredContainerData = append(filteredContainerData, containerObject)
+		}
+	}
+
+	return filteredContainerData, nil
+}
+
+func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelBlackList []portainer.Pair) bool {
+	for key, value := range containerLabels {
+		labelName := key
+		labelValue := value.(string)
+
+		for _, blackListedLabel := range labelBlackList {
+			if blackListedLabel.Name == labelName && blackListedLabel.Value == labelValue {
+				return true
+			}
+		}
+	}
+
+	return false
 }

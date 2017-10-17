@@ -41,9 +41,8 @@ else
   VERSION="$1"
   if [ `echo "$@" | cut -c1-4` == 'echo' ]; then
     bash -c "$@";
-  else  
-    build_all 'linux-amd64 linux-386 linux-arm linux-arm64 linux-ppc64le darwin-amd64 windows-amd64'
+  else
+    build_all 'linux-amd64 linux-arm linux-arm64 linux-ppc64le darwin-amd64 windows-amd64'
     exit 0
   fi
 fi
-

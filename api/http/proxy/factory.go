@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -67,4 +68,16 @@ func (factory *proxyFactory) createReverseProxy(u *url.URL) *httputil.ReversePro
 	}
 	proxy.Transport = transport
 	return proxy
+}
+
+func newSocketTransport(socketPath string) *http.Transport {
+	return &http.Transport{
+		Dial: func(proto, addr string) (conn net.Conn, err error) {
+			return net.Dial("unix", socketPath)
+		},
+	}
+}
+
+func newHTTPTransport() *http.Transport {
+	return &http.Transport{}
 }

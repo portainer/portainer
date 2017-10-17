@@ -5,7 +5,7 @@ package cli
 const (
 	defaultBindAddress     = ":9000"
 	defaultDataDirectory   = "/data"
-	defaultAssetsDirectory = "."
+	defaultAssetsDirectory = "/"
 	defaultNoAuth          = "false"
 	defaultNoAnalytics     = "false"
 	defaultTLSVerify       = "false"
