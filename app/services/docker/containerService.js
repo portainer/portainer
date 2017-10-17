@@ -19,16 +19,13 @@ angular.module('portainer.services')
   };
 
   service.containers = function(all) {
-    var deferred = $q.defer();
-    Container.query({ all: all }).$promise
-    .then(function success(data) {
-      var containers = data;
-      deferred.resolve(containers);
-    })
+    return Container.query({ all: all }).$promise
     .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve containers', err: err });
+      throw {
+        msg: 'Unable to retrieve containers', 
+        err: err 
+      };
     });
-    return deferred.promise;
   };
 
   service.createContainer = function(configuration) {
@@ -136,35 +133,11 @@ angular.module('portainer.services')
   };
 
   service.containerTop = function(id) {
-    var deferred = $q.defer();
-
-    Container.top({id: id}).$promise
-    .then(function success(data) {
-      var containerTop = data;
-      deferred.resolve(containerTop);
-    })
-    .catch(function error(err) {
-      deferred.reject(err);
-    });
-
-    return deferred.promise;
+    return Container.top({id: id}).$promise;
   };
   
   service.inspect = function(id) {
-    var deferred = $q.defer();
-    
-    Container.inspect({id: id}).$promise
-    .then(function success(data) {
-      var inspectData = data;
-      delete data.$promise;
-      delete data.$resolved;
-      deferred.resolve(inspectData);
-    })
-    .catch(function error(err) {
-      deferred.reject(err);
-    });
-
-    return deferred.promise;
+    return Container.inspect({id: id}).$promise;
   };
 
   return service;
