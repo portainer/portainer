@@ -16,7 +16,7 @@ function ($scope, $state, $transition$, VolumeService, ContainerService, Notific
       $('#loadingViewSpinner').hide();
     });
   };
-  
+
   function getVolumeDataFromContainer(container, volumeId) {
     return container.Mounts.find(function(volume) {
       return volume.Name === volumeId;
@@ -29,11 +29,8 @@ function ($scope, $state, $transition$, VolumeService, ContainerService, Notific
     .then(function success(data) {
       var volume = data;
       $scope.volume = volume;
-      return ContainerService.containers(1, {
-        filters: {
-          volume: [volume.Id]
-        }
-      });
+      var containerFilter = { volume: [volume.Id] };
+      return ContainerService.containers(1, containerFilter);
     })
     .then(function success(data) {
       var containers = data.map(function(container) {

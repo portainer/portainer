@@ -20,8 +20,7 @@ angular.module('portainer.services')
 
   service.containers = function(all, filters) {
     var deferred = $q.defer();
-    filters.all = all;
-    Container.query(filters).$promise
+    Container.query({ all : all, filters: filters }).$promise
     .then(function success(data) {
       var containers = data.map(function (item) {
         return new ContainerViewModel(item);
@@ -142,7 +141,7 @@ angular.module('portainer.services')
   service.containerTop = function(id) {
     return Container.top({id: id}).$promise;
   };
-  
+
   service.inspect = function(id) {
     return Container.inspect({id: id}).$promise;
   };
