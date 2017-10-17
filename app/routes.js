@@ -713,5 +713,18 @@ function configureRoutes($stateProvider) {
         controller: 'SidebarController'
       }
     }
+  })
+  .state('orca', {
+    url: '/orca',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/orca/orca.html',
+        controller: 'OrcaController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
   });
 }

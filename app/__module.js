@@ -57,6 +57,7 @@ angular.module('portainer', [
   'stacks',
   'swarm',
   'swarmVisualizer',
+  'orca',
   'task',
   'team',
   'teams',

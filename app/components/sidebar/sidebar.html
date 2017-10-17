@@ -55,6 +55,9 @@
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'">
       <a ui-sref="engine" ui-sref-active="active">Engine <span class="menu-icon fa fa-th"></span></a>
     </li>
+    <li class="sidebar-list">
+      <a ui-sref="orca" ui-sref-active="active">Orca <span class="menu-icon fa fa-superpowers"></span></a>
+    </li>
     <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin || isTeamLeader">
       <span>Portainer settings</span>
     </li>
