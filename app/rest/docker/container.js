@@ -42,8 +42,7 @@ angular.module('portainer.rest')
       transformResponse: genericHandler
     },
     inspect: {
-      method: 'GET', params: { id: '@id', size: '@size', action: 'json' },
-      timeout: 4500
+      method: 'GET', params: { id: '@id', action: 'json' }
     }
   });
 }]);
