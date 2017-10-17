@@ -1,6 +1,6 @@
 angular.module('endpoints', [])
-.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Notifications', 'Pagination',
-function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagination) {
+.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Notifications', 'Pagination', '$filter',
+function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagination. $filter) {
   $scope.state = {
     uploadInProgress: false,
     selectedItemCount: 0,
@@ -59,7 +59,8 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
+    var filteredURL = $filter('stripprotocol')(URL);
+    EndpointService.createRemoteEndpoint(name, filteredURL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
       Notifications.success('Endpoint created', name);
       $state.reload();
     }, function error(err) {
