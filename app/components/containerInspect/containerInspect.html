@@ -12,9 +12,9 @@
       <rd-widget-header icon="fa-icon-circle" title="Inspect">
       </rd-widget-header>
       <rd-widget-body>
-        <div class="well" style="white-space: pre;">
-          {{ containerInfo|json }}
-        </div>
+        <pre>
+          {{ containerInfo|json:4 }}
+        </pre>
       </rd-widget-body>
     </rd-widget>
   </div>
