@@ -73,7 +73,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     .finally(function final() {
       $('#createContainerSpinner').hide();
     });
-  }
+  };
 
   $scope.createTemplate = function() {
     $('#createContainerSpinner').show();
