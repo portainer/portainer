@@ -201,6 +201,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
+              <button type="button" class="btn btn-warning btn-sm" ng-click="pullImage()">Pull Image</button>
               <i id="createContainerSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               <span class="small text-muted" style="margin-left: 10px" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM' && !state.formValidationError">
                 When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref="networks">networks view</a> to create one.
