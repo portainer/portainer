@@ -6,7 +6,7 @@ function ($scope, $transition$, Notifications, ContainerService) {
     
     ContainerService.inspect($transition$.params().id)
     .then(function success(d) {
-      $scope.data = d;
+      $scope.containerInfo = d;
     })
     .catch(function error(e) {
       Notifications.error('Failure', e, 'Unable to inspect container');
