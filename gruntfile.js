@@ -4,8 +4,9 @@ var loadGruntTasks = require('load-grunt-tasks');
 
 module.exports = function (grunt) {
 
-  loadGruntTasks(grunt);
-  grunt.loadNpmTasks('gruntify-eslint');
+  loadGruntTasks(grunt, {
+    pattern: ['grunt-*', 'gruntify-*']
+  });
 
   grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('before-copy', [
