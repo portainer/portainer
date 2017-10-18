@@ -59,7 +59,7 @@ function ($scope, $state, $filter, EndpointService, EndpointProvider, Notificati
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-    EndpointService.createRemoteEndpoint(name, filteredURL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
       Notifications.success('Endpoint created', name);
       $state.reload();
     }, function error(err) {
