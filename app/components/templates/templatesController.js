@@ -47,16 +47,15 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
   }
 
   $scope.pullImage = function() {
-    $('#createContainerSpinner').show();
-
     var userDetails = Authentication.getUserDetails();
     var accessControlData = $scope.formValues.AccessControlData;
     var isAdmin = userDetails.role === 1 ? true : false;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createContainerSpinner').hide();
       return;
     }
+
+    $('#createContainerSpinner').show();
 
     var template = $scope.state.selectedTemplate;
 
