@@ -13,5 +13,17 @@ function FilterServiceFactory(LocalStorage) {
     LocalStorage.storeDataTableHeaders(key, headers);
   };
 
+  service.getDataTableOrder = function(key) {
+    return LocalStorage.getDataTableOrder(key);
+  };
+
+  service.setDataTableOrder = function(key, orderBy, reverse) {
+    var filter = {
+      orderBy: orderBy,
+      reverse: reverse
+    };
+    LocalStorage.storeDataTableOrder(key, filter);
+  };
+
   return service;
 }]);

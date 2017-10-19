@@ -1,6 +1,7 @@
 angular.module('ui').component('datatable', {
   transclude: {
-    actions: '?datatableActions'
+    actions: '?datatableActions',
+    settings: '?datatableSettings'
   },
   templateUrl: 'app/directives/ui/datatable/datatable/datatable.html',
   controller: 'DatatableController',
@@ -9,13 +10,14 @@ angular.module('ui').component('datatable', {
     titleIcon: '@',
     headers: '<',
     dataset: '<',
+    render: '<',
     datasetFields: '<',
     orderBy: '@',
     identifier: '@',
     identifierField: '@',
     stateDetails: '@',
     tableKey: '@',
-    showFilter: '<',
-    showSettings: '<'
+    showTextFilter: '<',
+    selectableRows: '<'
   }
 });

@@ -1,13 +1,14 @@
 angular.module('ui')
-.controller('DatatableController', ['$state', 'PaginationService', 'FilterService',
-function ($state, PaginationService, FilterService) {
+.controller('DatatableController', ['$state', '$filter', '$sce', 'PaginationService', 'FilterService',
+function ($state, $filter, $sce, PaginationService, FilterService) {
 
   this.state = {
     selectAll: false,
     reverseOrder: false,
     orderBy: this.orderBy,
     paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
-    displayFilter: false,
+    displayTextFilter: false,
+    filter: {},
     selectedItemCount: 0,
     selectedItems: []
   };
@@ -15,6 +16,7 @@ function ($state, PaginationService, FilterService) {
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
+    FilterService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
   };
 
   this.selectItem = function(item) {
@@ -45,10 +47,27 @@ function ($state, PaginationService, FilterService) {
     $state.go(this.stateDetails, { id: item[this.identifier] });
   };
 
-  this.updateDisplayFilter = function() {
-    this.state.displayFilter = !this.state.displayFilter;
-    if (!this.state.displayFilter) {
-      delete this.state.filter;
+  this.renderField = function(field, item) {
+    var value = item[field] ? item[field] : '-';
+    for (var i = 0; i < this.render.length; i++) {
+      var renderer = this.render[i];
+      if (renderer.field === field) {
+        if (renderer.renderFunc) {
+          return $sce.trustAsHtml(renderer.renderFunc(item, value));
+        }
+        if (renderer.filter && value) {
+          return $filter(renderer.filter)(value);
+        }
+      }
+    }
+
+    return value;
+  };
+
+  this.updatedisplayTextFilter = function() {
+    this.state.displayTextFilter = !this.state.displayTextFilter;
+    if (!this.state.displayTextFilter) {
+      delete this.state.textFilter;
     }
   };
 
@@ -57,9 +76,17 @@ function ($state, PaginationService, FilterService) {
   };
 
   this.$onInit = function() {
+    this.render = this.render ? this.render : [];
+
     var storedHeaders = FilterService.getDataTableHeaders(this.tableKey);
     if (storedHeaders !== null) {
       this.headers = storedHeaders;
+    }
+
+    var storedOrder = FilterService.getDataTableOrder(this.tableKey);
+    if (storedOrder !== null) {
+      this.state.reverseOrder = storedOrder.reverse;
+      this.state.orderBy = storedOrder.orderBy;
     }
   };
 }]);

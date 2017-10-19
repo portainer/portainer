@@ -42,10 +42,16 @@ angular.module('portainer.services')
       return localStorageService.cookie.get('pagination_' + key);
     },
     getDataTableHeaders: function(key) {
-      return localStorageService.get(key);
+      return localStorageService.get('datatable_header_' + key);
     },
     storeDataTableHeaders: function(key, data) {
-      localStorageService.set(key, data);
+      localStorageService.set('datatable_header_' + key, data);
+    },
+    getDataTableOrder: function(key) {
+      return localStorageService.get('datatable_order_' + key);
+    },
+    storeDataTableOrder: function(key, data) {
+      localStorageService.set('datatable_order_' + key, data);
     },
     clean: function() {
       localStorageService.clearAll();

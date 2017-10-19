@@ -51,9 +51,8 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        $('#loadingViewSpinner').hide();
+        $state.reload();
       }
-      $state.reload();
     };
     angular.forEach(teams, function (team) {
       counter = counter + 1;
