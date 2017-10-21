@@ -19,10 +19,24 @@ type FileHandler struct {
 	allowedDirectories map[string]bool
 }
 
+// justFilesFilesystem prevents FileServer from listing directories
+type justFilesFilesystem struct{ fs http.FileSystem }
+type neuteredReaddirFile struct{ http.File }
+
+func (fs justFilesFilesystem) Open(name string) (http.File, error) {
+	f, err := fs.fs.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	return neuteredReaddirFile{f}, nil
+}
+
+func (f neuteredReaddirFile) Readdir(count int) ([]os.FileInfo, error) { return nil, nil }
+
 // NewFileHandler returns a new instance of FileHandler.
 func NewFileHandler(assetPath string) *FileHandler {
 	h := &FileHandler{
-		Handler: http.FileServer(http.Dir(assetPath)),
+		Handler: http.FileServer(justFilesFilesystem{http.Dir(assetPath)}),
 		Logger:  log.New(os.Stderr, "", log.LstdFlags),
 		allowedDirectories: map[string]bool{
 			"/":       true,
