@@ -8,7 +8,6 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
     orderBy: this.orderBy,
     paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
     displayTextFilter: false,
-    filter: {},
     selectedItemCount: 0,
     selectedItems: []
   };
@@ -47,21 +46,17 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
     $state.go(this.stateDetails, { id: item[this.identifier] });
   };
 
-  this.renderField = function(field, item) {
-    var value = item[field] ? item[field] : '-';
-    for (var i = 0; i < this.render.length; i++) {
-      var renderer = this.render[i];
-      if (renderer.field === field) {
-        if (renderer.renderFunc) {
-          return $sce.trustAsHtml(renderer.renderFunc(item, value));
-        }
-        if (renderer.filter && value) {
-          return $filter(renderer.filter)(value);
-        }
-      }
+  this.renderField = function(prop, item) {
+    var value = item[prop.property];
+
+    if (prop.renderFunc) {
+      return $sce.trustAsHtml(prop.renderFunc(item, value));
+    }
+    if (prop.filter && value) {
+      return $filter(prop.filter)(value);
     }
 
-    return value;
+    return value ? value : '-';
   };
 
   this.updatedisplayTextFilter = function() {
@@ -76,7 +71,7 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
   };
 
   this.$onInit = function() {
-    this.render = this.render ? this.render : [];
+    setDefaults(this);
 
     var storedHeaders = FilterService.getDataTableHeaders(this.tableKey);
     if (storedHeaders !== null) {
@@ -89,4 +84,9 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
       this.state.orderBy = storedOrder.orderBy;
     }
   };
+
+  function setDefaults(ctrl) {
+    ctrl.showTextFilter = ctrl.showTextFilter ? ctrl.showTextFilter : false;
+    ctrl.selectableRows = ctrl.selectableRows ? ctrl.selectableRows : false;
+  }
 }]);

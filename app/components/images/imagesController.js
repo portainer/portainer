@@ -1,42 +1,68 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'PaginationService', 'ModalService',
-function ($scope, $state, ImageService, Notifications, PaginationService, ModalService) {
-  $scope.state = {};
-  $scope.state.pagination_count = PaginationService.getPaginationCount('images');
-  $scope.sortType = 'RepoTags';
-  $scope.sortReverse = true;
-  $scope.state.selectedItemCount = 0;
+.controller('ImagesController', ['$scope', '$state', '$filter', 'ImageService', 'Notifications', 'PaginationService', 'ModalService',
+function ($scope, $state, $filter, ImageService, Notifications, PaginationService, ModalService) {
+  // $scope.state = {};
+  // $scope.state.pagination_count = PaginationService.getPaginationCount('images');
+  // $scope.sortType = 'RepoTags';
+  // $scope.sortReverse = true;
+  // $scope.state.selectedItemCount = 0;
 
   $scope.formValues = {
     Image: '',
     Registry: ''
   };
 
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
 
-  $scope.changePaginationCount = function() {
-    PaginationService.setPaginationCount('images', $scope.state.pagination_count);
-  };
-
-  $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredImages, function (image) {
-      if (image.Checked !== allSelected) {
-        image.Checked = allSelected;
-        $scope.selectItem(image);
-      }
-    });
-  };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
+  $scope.renderFieldId = function(item, value) {
+    var render = '<span class="monospaced">' + $filter('truncate')(value, 20) + '</span>';
+    if (item.ContainerCount === 0) {
+      render += '<span style="margin-left: 10px;" class="label label-warning image-tag">Unused</span>';
     }
+    return render;
   };
+
+  $scope.renderRepoTagsField = function(item, value) {
+    if (!value || value.length === 0 || value[0] === '<none>:<none>') {
+      return '-';
+    }
+
+    var render = '';
+    for (var i = 0; i < value.length; i++) {
+      if (i > 1) {
+        render += '+' + (value.length - 2) + ' more';
+        break;
+      }
+      var tag = value[i];
+      render += '<span class="label label-primary image-tag">' + tag + '</span>';
+    }
+    return render;
+  };
+
+  // $scope.order = function(sortType) {
+  //   $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+  //   $scope.sortType = sortType;
+  // };
+  //
+  // $scope.changePaginationCount = function() {
+  //   PaginationService.setPaginationCount('images', $scope.state.pagination_count);
+  // };
+  //
+  // $scope.selectItems = function (allSelected) {
+  //   angular.forEach($scope.state.filteredImages, function (image) {
+  //     if (image.Checked !== allSelected) {
+  //       image.Checked = allSelected;
+  //       $scope.selectItem(image);
+  //     }
+  //   });
+  // };
+  //
+  // $scope.selectItem = function (item) {
+  //   if (item.Checked) {
+  //     $scope.state.selectedItemCount++;
+  //   } else {
+  //     $scope.state.selectedItemCount--;
+  //   }
+  // };
 
   $scope.pullImage = function() {
     $('#pullImageSpinner').show();
@@ -69,7 +95,7 @@ function ($scope, $state, ImageService, Notifications, PaginationService, ModalS
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        $('#loadImagesSpinner').hide();
+        $state.reload();
       }
     };
     angular.forEach($scope.images, function (i) {

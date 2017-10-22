@@ -114,17 +114,19 @@
 <div class="row">
   <div class="col-sm-12">
     <datatable title="Users" title-icon="fa-user"
+      dataset="users" table-key="users"
       headers="[
-        { label: 'Name', value: 'Username', excludeFromSelector: true },
-        { label: 'Role', value: 'RoleName', show: true },
-        { label: 'Authentication', value: 'AuthenticationMethod', show: true }
+        { property: 'Username', label: 'Name', excludeFromSelector: true },
+        { property: 'RoleName', label: 'Role', show: true },
+        { property: 'AuthenticationMethod', label: 'Authentication', show: true }
       ]"
-      dataset="users" dataset-fields="['Username', 'RoleName', 'AuthenticationMethod']" order-by="Username"
-      render="[
-        { field: 'RoleName', renderFunc: renderFieldRoleName },
-        { field: 'AuthenticationMethod', renderFunc: renderFieldAuthentication }
+      dataset-properties="[
+        { property: 'Username' },
+        { property: 'RoleName', renderFunc: renderFieldRoleName },
+        { property: 'AuthenticationMethod', renderFunc: renderFieldAuthentication }
       ]"
-      identifier="Id" identifier-field="Username" state-details="user" table-key="users"
+      order-by="Username"
+      identifier="Id" identifier-property="Username" state-details="user"
       show-text-filter="true" selectable-rows="true">
       <datatable-settings>
         <datatable-setting-column-selector></datatable-setting-column-selector>
