@@ -7,12 +7,6 @@ html, body, #content-wrapper, .page-content, #view {
   white-space: normal !important;
 }
 
-.btn-group button,
-.btn-group [role="button"] {
-  margin-right: 3px;
-  margin-left: 3px;
-}
-
 .messages {
   max-height: 50px;
   overflow-x: hidden;

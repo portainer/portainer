@@ -2,7 +2,7 @@
   <rd-header-title title="Container inspect">
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="containers">Containers</a> &gt; <a ui-sref="container({id: containerInfo.object.Id})">{{ containerInfo.object.Name|trimcontainername }}</a> &gt; Inspect
+    <a ui-sref="containers">Containers</a> &gt; <a ui-sref="container({id: containerInfo.Id})">{{ containerInfo.Name|trimcontainername }}</a> &gt; Inspect
   </rd-header-content>
 </rd-header>
 
@@ -10,14 +10,14 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-icon-circle" title="Inspect">
-        <div class="btn-group" role="group" aria-label="...">
-          <button class="btn btn-sm btn-success" ng-model="state.TextView" uib-btn-radio="false"><i class="fa fa-hand-pointer-o space-right" aria-hidden="true"></i>Tree</button>
-          <button class="btn btn-sm btn-success" ng-model="state.TextView" uib-btn-radio="true"><i class="fa fa-file-text-o space-right" aria-hidden="true"></i>Text</button>
-        </div>
+        <span class="btn-group btn-group-sm">
+          <label class="btn btn-primary" ng-model="state.DisplayTextView" uib-btn-radio="false"><i class="fa fa-code space-right" aria-hidden="true"></i>Tree</label>
+          <label class="btn btn-primary" ng-model="state.DisplayTextView" uib-btn-radio="true"><i class="fa fa-file-text-o space-right" aria-hidden="true"></i>Text</label>
+        </span>
       </rd-widget-header>
       <rd-widget-body>
-        <pre ng-show="state.TextView">{{ containerInfo.object|json:4 }}</pre>
-        <json-tree ng-hide="state.TextView" object="containerInfo.object" root-name="containerInfo.object.Id" start-expanded="true"></json-tree>
+        <pre ng-show="state.DisplayTextView">{{ containerInfo|json:4 }}</pre>
+        <json-tree ng-hide="state.DisplayTextView" object="containerInfo" root-name="containerInfo.Id" start-expanded="true"></json-tree>
       </rd-widget-body>
     </rd-widget>
   </div>
