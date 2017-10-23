@@ -11,11 +11,9 @@
     <rd-widget>
       <rd-widget-header icon="fa-icon-circle" title="Inspect">
         <div class="btn-group" role="group" aria-label="...">
-          <button class="btn btn-sm btn-success" ng-click="toggle()">
-            <span ng-show="TextView"><i class="fa fa-hand-pointer-o space-right" aria-hidden="true"></i>Tree</span>
-            <span ng-hide="TextView"><i class="fa fa-file-text-o space-right" aria-hidden="true"></i>Text</span>
-          </button>
-          <a role="button" class="btn btn-sm btn-success" href="data:text/json;charset=utf-8,{{ EncodeJSON(containerInfo.object) }}" download="{{containerInfo.date | date:'yyyyMMddhhmm'}}-inspect-{{containerInfo.object.Id.slice(0,12)}}-{{containerInfo.object.Name|trimcontainername}}.json"><i class="fa fa-download space-right" aria-hidden="true"></i>Save</a>
+          <button class="btn btn-sm btn-success" ng-click="toggle()" ng-disabled="!TextView"><i class="fa fa-hand-pointer-o space-right" aria-hidden="true"></i>Tree</button>
+          <button class="btn btn-sm btn-success" ng-click="toggle()" ng-disabled="TextView"><i class="fa fa-file-text-o space-right" aria-hidden="true"></i>Text</button>
+          <!---<a role="button" class="btn btn-sm btn-success" href="data:text/json;charset=utf-8,{{ EncodeJSON(containerInfo.object) }}" download="{{containerInfo.date | date:'yyyyMMddhhmm'}}-inspect-{{containerInfo.object.Id.slice(0,12)}}-{{containerInfo.object.Name|trimcontainername}}.json"><i class="fa fa-download space-right" aria-hidden="true"></i>Save</a>-->
         </div>
       </rd-widget-header>
       <rd-widget-body>
