@@ -7,10 +7,6 @@ html, body, #content-wrapper, .page-content, #view {
   white-space: normal !important;
 }
 
-.btn-group button {
-  margin: 3px;
-}
-
 .messages {
   max-height: 50px;
   overflow-x: hidden;
@@ -614,4 +610,21 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .monospaced {
   font-family: monospace;
   font-weight: 600;
+}
+
+/* json-tree */
+
+json-tree {
+  font-size: 13px;
+  color: #30426a;
+}
+json-tree .key {
+  color: #738bc0;
+  padding-right: 5px;
+}
+
+json-tree .branch-preview {
+  font-style: normal;
+  font-size: 11px;
+  opacity: .5;
 }

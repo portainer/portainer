@@ -1,9 +1,13 @@
-angular.module('containerInspect', [])
+angular.module('containerInspect', ['angular-json-tree'])
 .controller('ContainerInspectController', ['$scope', '$transition$', 'Notifications', 'ContainerService',
 function ($scope, $transition$, Notifications, ContainerService) {
+
+  $scope.state = { DisplayTextView: false };
+  $scope.containerInfo = {};
+
   function initView() {
     $('#loadingViewSpinner').show();
-    
+
     ContainerService.inspect($transition$.params().id)
     .then(function success(d) {
       $scope.containerInfo = d;
@@ -15,6 +19,6 @@ function ($scope, $transition$, Notifications, ContainerService) {
       $('#loadingViewSpinner').hide();
     });
   }
-  
+
   initView();
 }]);

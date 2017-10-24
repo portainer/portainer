@@ -34,6 +34,7 @@
     "angular-utils-pagination": "~0.11.1",
     "angular-local-storage": "~0.5.2",
     "angular-jwt": "~0.1.8",
+    "angular-json-tree": "1.0.1",
     "angular-google-analytics": "~1.1.9",
     "bootstrap": "~3.3.6",
     "filesize": "~3.3.0",
