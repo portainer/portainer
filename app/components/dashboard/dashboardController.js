@@ -68,6 +68,7 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
     $('#loadingViewSpinner').show();
 
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+    var endpointRole = $scope.applicationState.endpoint.mode.role;
 
     $q.all([
       Container.query({all: 1}).$promise,
@@ -75,8 +76,8 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
       Volume.query({}).$promise,
       Network.query({}).$promise,
       SystemService.info(),
-      endpointProvider === 'DOCKER_SWARM_MODE' ? ServiceService.services() : [],
-      endpointProvider === 'DOCKER_SWARM_MODE' ? StackService.stacks(true) : []
+      endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? ServiceService.services() : [],
+      endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? StackService.stacks(true) : []
     ]).then(function (d) {
       prepareContainerData(d[0]);
       prepareImageData(d[1]);
