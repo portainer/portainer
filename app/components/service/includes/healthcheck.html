@@ -8,7 +8,7 @@
           <tr>
             <td>Command</td>
             <td>
-              <input class="input-sm" type="text" ng-model="service.HealthCheck.Test[1]" ng-change="updateServiceAttribute(service, 'UpdateParallelism')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="text" ng-model="service.HealthCheck.Test[1]" ng-change="updateServiceAttribute(service, 'Healthcheck.Test')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -19,7 +19,7 @@
           <tr>
             <td>Interval</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.Healthcheck.Interval" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="number" ng-model="service.Healthcheck.Interval" ng-change="updateServiceAttribute(service, 'Healthcheck.Interval')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -30,7 +30,7 @@
 	  <tr>
             <td>Timeout</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.Healthcheck.Timeout" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="number" ng-model="service.Healthcheck.Timeout" ng-change="updateServiceAttribute(service, 'Healthcheck.Timeout')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -41,7 +41,7 @@
 	  <tr>
             <td>Retries</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.Healthcheck.Retries" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="number" ng-model="service.Healthcheck.Retries" ng-change="updateServiceAttribute(service, 'Healthcheck.Retries')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -52,7 +52,7 @@
 	  <tr>
             <td>Start Period</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.Healthcheck.StartPeriod" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="number" ng-model="service.Healthcheck.StartPeriod" ng-change="updateServiceAttribute(service, 'Healthcheck.StartPeriod')" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
