@@ -1,0 +1,81 @@
+<div id="service-update-config">
+  <rd-widget>
+    <rd-widget-header icon="fa-list-alt" title="Health Check">
+    </rd-widget-header>
+    <rd-widget-body classes="no-padding">
+      <table class="table">
+        <tbody>
+          <tr>
+            <td>Command</td>
+            <td>
+              <input class="input-sm" type="text" ng-model="service.HealthCheck.Test[1]" ng-change="updateServiceAttribute(service, 'UpdateParallelism')" ng-disabled="isUpdating"/>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Command to run to check health.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td>Interval</td>
+            <td>
+              <input class="input-sm" type="number" ng-model="service.Healthcheck.Interval" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-disabled="isUpdating"/>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Time between running the check (ms|s|m|h).
+              </p>
+            </td>
+          </tr>
+	  <tr>
+            <td>Timeout</td>
+            <td>
+              <input class="input-sm" type="number" ng-model="service.Healthcheck.Timeout" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-disabled="isUpdating"/>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Maximum time to allow one check to run (ms|s|m|h) 
+              </p>
+            </td>
+          </tr>
+	  <tr>
+            <td>Retries</td>
+            <td>
+              <input class="input-sm" type="number" ng-model="service.Healthcheck.Retries" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-disabled="isUpdating"/>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Consecutive failures needed to report unhealthy.
+              </p>
+            </td>
+          </tr>
+	  <tr>
+            <td>Start Period</td>
+            <td>
+              <input class="input-sm" type="number" ng-model="service.Healthcheck.StartPeriod" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-disabled="isUpdating"/>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Start period for the container to initialize before counting retries towards unstable (ms|s|m|h)
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+    <rd-widget-footer>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['UpdateFailureAction', 'UpdateDelay', 'UpdateParallelism', 'UpdateOrder'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['UpdateFailureAction', 'UpdateDelay', 'UpdateParallelism', 'UpdateOrder'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
+  </rd-widget>
+</div>
