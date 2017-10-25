@@ -1,5 +1,6 @@
 var loadGruntTasks = require('load-grunt-tasks');
 var gruntfile_cfg = {};
+var dwork = ( process.env.WORKDIR === '' ) ? './' : process.env.WORKDIR ; // Must include trailing slash
 var os = require('os');
 var harch = os.arch();
 var harchs = {
@@ -19,7 +20,8 @@ module.exports = function (grunt) {
   }
 
   loadGruntTasks(grunt, {
-    pattern: ['grunt-*', 'gruntify-*']
+    config: dwork + 'package.json',
+    pattern: ['grunt*', '@*/grunt-*', 'gruntify-*']
   });
 
   grunt.registerTask('default', ['eslint', 'build']);
@@ -90,15 +92,16 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    distdir: 'dist/public',
+    distdir: 'dist/public/', // Must include trailing slash
+    workdir: dwork, // Must include trailing slash
     shippedDockerVersion: '17.09.0-ce',
-    pkg: grunt.file.readJSON('package.json'),
+    pkg: grunt.file.readJSON(dwork+'package.json'),
     config: gruntfile_cfg.config,
     src: gruntfile_cfg.src,
     clean: gruntfile_cfg.clean,
     useminPrepare: gruntfile_cfg.useminPrepare,
-    filerev: { files: { src: ['<%= distdir %>/js/*.js', '<%= distdir %>/css/*.css'] }},
-    usemin: { html: ['<%= distdir %>/index.html'] },
+    filerev: { files: { src: ['<%= distdir %>js/*.js', '<%= distdir %>css/*.css'] }},
+    usemin: { html: ['<%= distdir %>index.html'] },
     copy: gruntfile_cfg.copy,
     eslint: gruntfile_cfg.eslint,
     html2js: gruntfile_cfg.html2js,
@@ -123,18 +126,18 @@ gruntfile_cfg.config = {
 };
 
 gruntfile_cfg.src = {
-  js: ['app/**/__module.js', 'app/**/*.js', '!app/**/*.spec.js'],
-  jsTpl: ['<%= distdir %>/templates/**/*.js'],
-  html: ['index.html'],
-  tpl: ['app/**/*.html'],
-  css: ['assets/css/app.css', 'app/**/*.css']
+  js: ['<%= workdir %>app/**/__module.js', '<%= workdir %>app/**/*.js', '!<%= workdir %>app/**/*.spec.js'],
+  jsTpl: ['<%= distdir %>templates/**/*.js'],
+  html: ['<%= workdir %>index.html'],
+  tpl: ['<%= workdir %>app/**/*.html'],
+  css: ['<%= workdir %>assets/css/app.css', '<%= workdir %>app/**/*.css']
 };
 
 gruntfile_cfg.clean = {
-  all: ['<%= distdir %>/../*'],
-  app: ['<%= distdir %>/*', '!<%= distdir %>/../portainer*', '!<%= distdir %>/../docker*'],
-  tmpl: ['<%= distdir %>/templates'],
-  tmp: ['<%= distdir %>/js/*', '!<%= distdir %>/js/app.*.js', '<%= distdir %>/css/*', '!<%= distdir %>/css/app.*.css']
+  all: ['<%= distdir %>../*'],
+  app: ['<%= distdir %>*'],
+  tmpl: ['<%= distdir %>templates'],
+  tmp: ['<%= distdir %>js/*', '!<%= distdir %>js/app.*.js', '<%= distdir %>css/*', '!<%= distdir %>css/app.*.css']
 };
 
 gruntfile_cfg.useminPrepare = {
@@ -162,31 +165,31 @@ gruntfile_cfg.useminPrepare = {
 gruntfile_cfg.copy = {
   bundle: {
     files: [
-      {dest:'<%= distdir %>/js/',  src: ['app.js'],  expand: true, cwd: '.tmp/concat/js/' },
-      {dest:'<%= distdir %>/css/', src: ['app.css'], expand: true, cwd: '.tmp/concat/css/' }
+      {dest:'<%= distdir %>js/',  src: ['app.js'],  expand: true, cwd: '.tmp/concat/js/' },
+      {dest:'<%= distdir %>css/', src: ['app.css'], expand: true, cwd: '.tmp/concat/css/' }
     ]
   },
   assets: {
     files: [
-      {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/bootstrap/fonts/'},
-      {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,eot,svg}', expand: true, cwd: 'node_modules/@fortawesome/fontawesome-free-webfonts/webfonts/'},
-      {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/rdash-ui/dist/fonts/'},
-      {dest: '<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
-      {dest: '<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
+      {dest: '<%= distdir %>fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/bootstrap/fonts/'},
+      {dest: '<%= distdir %>fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/@fortawesome/fontawesome-free-webfonts/webfonts/'},
+      {dest: '<%= distdir %>fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/rdash-ui/dist/fonts/'},
+      {dest: '<%= distdir %>images/', src: '**',                         expand: true, cwd: '<%= workdir %>assets/images/'},
+      {dest: '<%= distdir %>ico',     src: '**',                         expand: true, cwd: '<%= workdir %>assets/ico'}
     ]
   }
 };
 
 gruntfile_cfg.eslint = {
   src: ['gruntfile.js', '<%= src.js %>'],
-  options: { configFile: '.eslintrc.yml' }
+  options: { configFile: '<%= workdir %>.eslintrc.yml' }
 };
 
 gruntfile_cfg.html2js = {
   app: {
-    options: { base: '.' },
+    options: { base: '<%= workdir %>' },
     src: ['<%= src.tpl %>'],
-    dest: '<%= distdir %>/templates/app.js',
+    dest: '<%= distdir %>templates/app.js',
     module: '<%= pkg.name %>.templates'
   }
 };
@@ -194,28 +197,28 @@ gruntfile_cfg.html2js = {
 gruntfile_cfg.concat = {
   vendor: {
     files: {
-      '<%= distdir %>/css/<%= pkg.name %>.css': ['<%= src.cssVendor %>', '<%= src.css %>'],
-      '<%= distdir %>/js/vendor.js': ['<%= src.jsVendor %>'],
-      '<%= distdir %>/js/angular.js': ['<%= src.angularVendor %>']
+      '<%= distdir %>css/<%= pkg.name %>.css': ['<%= src.cssVendor %>', '<%= src.css %>'],
+      '<%= distdir %>js/vendor.js': ['<%= src.jsVendor %>'],
+      '<%= distdir %>js/angular.js': ['<%= src.angularVendor %>']
     }
   },
   dist: {
     options: { process: true },
     files: {
-      '<%= distdir %>/js/<%= pkg.name %>.js': ['<%= src.js %>', '<%= src.jsTpl %>'],
-      '<%= distdir %>/index.html': ['index.html']
+      '<%= distdir %>js/<%= pkg.name %>.js': ['<%= src.js %>', '<%= src.jsTpl %>'],
+      '<%= distdir %>index.html': ['index.html']
     }
   }
 };
 
 gruntfile_cfg.uglify = {
   dist: {
-    files: { '<%= distdir %>/js/<%= pkg.name %>.js': ['<%= src.js %>', '<%= src.jsTpl %>'] }
+    files: { '<%= distdir %>js/<%= pkg.name %>.js': ['<%= src.js %>', '<%= src.jsTpl %>'] }
   },
   vendor: {
     options: { preserveComments: 'some' }, // Preserve license comments
-    files: { '<%= distdir %>/js/vendor.js': ['<%= src.jsVendor %>'] ,
-             '<%= distdir %>/js/angular.js': ['<%= src.angularVendor %>']
+    files: { '<%= distdir %>js/vendor.js': ['<%= src.jsVendor %>'] ,
+             '<%= distdir %>js/angular.js': ['<%= src.angularVendor %>']
     }
   }
 };
@@ -272,7 +275,7 @@ function shell_buildBinary(p, a) {
     'if [ -f '+(( p === 'windows' ) ? binfile+'.exe' : binfile)+' ]; then',
       'echo "Portainer binary exists";',
     'else',
-      'build/build_in_container.sh ' + p + ' ' + a + ';',
+      '<%= workdir %>build/build_in_container.sh ' + p + ' ' + a + ';',
     'fi'
   ].join(' ');
 }
@@ -293,7 +296,7 @@ function shell_downloadDockerBinary(p, a) {
     'if [ -f '+(( p === 'win' ) ? 'dist/docker.exe' : 'dist/docker')+' ]; then',
       'echo "Docker binary exists";',
     'else',
-      'build/download_docker_binary.sh ' + ip + ' ' + ia + ' <%= shippedDockerVersion %>;',
+      '<%= workdir %>build/download_docker_binary.sh ' + ip + ' ' + ia + ' <%= shippedDockerVersion %>;',
     'fi'
   ].join(' ');
 }
