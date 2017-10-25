@@ -6,9 +6,10 @@
       <table class="table">
         <tbody>
           <tr>
-            <td>Command</td>
-            <td>
-              <input class="input-sm" type="text" ng-model="service.HealthCheck.Test[1]" ng-change="updateServiceAttribute(service, 'Healthcheck.Test')" ng-disabled="isUpdating"/>
+              <td>Command</td>
+              <td>
+                <input class="input-sm" type="text" class="form-control" ng-model="service.Healthcheck.Test[1]" ng-change="updateServiceAttribute(service, 'service.Healthcheck.Test[1]')" ng-disabled="isUpdating" />
+              </td>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -66,12 +67,12 @@
     <rd-widget-footer>
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['Healthcheck.Interval', 'Healthcheck.Timeout', 'Healthcheck.Retries', 'Healthcheck.StartPeriod'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['Healthcheck.Test[1]', 'Healthcheck.Interval', 'Healthcheck.Timeout', 'Healthcheck.Retries', 'Healthcheck.StartPeriod'])" ng-click="updateService(service)">Apply changes</button>
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a ng-click="cancelChanges(service, ['Healthcheck.Interval', 'Healthcheck.Timeout', 'Healthcheck.Retries', 'Healthcheck.StartPeriod'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service, ['Helthcheck.Test[1]', 'Healthcheck.Interval', 'Healthcheck.Timeout', 'Healthcheck.Retries', 'Healthcheck.StartPeriod'])">Reset changes</a></li>
             <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
           </ul>
         </div>
