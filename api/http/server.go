@@ -93,6 +93,8 @@ func (server *Server) Start() error {
 	stackHandler.ResourceControlService = server.ResourceControlService
 	stackHandler.StackManager = server.StackManager
 	stackHandler.GitService = server.GitService
+	stackHandler.RegistryService = server.RegistryService
+	stackHandler.DockerHubService = server.DockerHubService
 
 	server.Handler = &handler.Handler{
 		AuthHandler:           authHandler,
