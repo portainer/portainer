@@ -36,7 +36,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'config:dev',
     'clean:app',
-    'shell:buildBinary:linux:' + arch,
+    'checkBuildBinary:linux:' + arch,
     'shell:downloadDockerBinary:linux:' + arch,
     'vendor',
     'html2js',
@@ -48,11 +48,20 @@ module.exports = function (grunt) {
     'after-copy'
   ]);
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
-    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'shell:downloadDockerBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy' ]);
+    grunt.task.run(['config:prod', 'clean:all', 'checkBuildBinary:'+p+':'+a, 'shell:downloadDockerBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy']);
   });
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run-dev', ['build', 'shell:run:'+arch, 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
+
+  grunt.registerTask('checkBuildBinary', 'checkBuildBinary:<platform>:<arch>', function(p, a) {
+    var tag = p + '-' + a;
+    if (grunt.file.isFile('dist/portainer-' + tag + ((p === 'windows') ? '.exe' : ''))) {
+      console.log('BinaryExists');
+    } else {
+      grunt.task.run('shell:buildBinary:'+p+':'+a);
+    }
+  });
 
   // Load content of `vendor.yml` to src.jsVendor, src.cssVendor and src.angularVendor
   grunt.registerTask('vendor', function() {
@@ -203,7 +212,7 @@ gruntfile_cfg.uglify = {
   },
   vendor: {
     options: { preserveComments: 'some' }, // Preserve license comments
-    files: { '<%= distdir %>/js/vendor.js': ['<%= src.jsVendor %>'] ,
+    files: { '<%= distdir %>/js/vendor.js': ['<%= src.jsVendor %>'],
              '<%= distdir %>/js/angular.js': ['<%= src.angularVendor %>']
     }
   }
@@ -256,14 +265,7 @@ gruntfile_cfg.replace = {
 };
 
 function shell_buildBinary(p, a) {
-  var binfile = 'dist/portainer-'+p+'-'+a;
-  return [
-    'if [ -f '+(( p === 'windows' ) ? binfile+'.exe' : binfile)+' ]; then',
-      'echo "Portainer binary exists";',
-    'else',
-      'build/build_in_container.sh ' + p + ' ' + a + ';',
-    'fi'
-  ].join(' ');
+  return 'build/build_in_container.sh ' + p+'-'+a + ' ' + ((p === 'windows') ? '.exe' : '');
 }
 
 function shell_run(arch) {
