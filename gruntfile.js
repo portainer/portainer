@@ -8,7 +8,7 @@ var harchs = {
     'arm64': 'aarch64',
     'ppc64': 'ppc64le',
     's390x': 's390x',
-    'x64': 'x86_64'
+    'x64': 'amd64'
 };
 
 module.exports = function (grunt) {
@@ -65,7 +65,7 @@ module.exports = function (grunt) {
     grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'shell:downloadDockerBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy']);
   });
   grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('run-dev', ['build', 'shell:run:'+hostarch, 'watch:build']);
+  grunt.registerTask('run-dev', ['build', 'shell:run:'+hostarch, 'watch:frontend']);
   grunt.registerTask('clear', ['clean:app']);
 
   // Load content of `vendor.yml` to src.jsVendor, src.cssVendor and src.angularVendor
@@ -128,6 +128,7 @@ gruntfile_cfg.config = {
 gruntfile_cfg.src = {
   js: ['<%= workdir %>app/**/__module.js', '<%= workdir %>app/**/*.js', '!<%= workdir %>app/**/*.spec.js'],
   jsTpl: ['<%= distdir %>templates/**/*.js'],
+  go: ['<%= workdir %>api/**/*.go'],
   html: ['<%= workdir %>index.html'],
   tpl: ['<%= workdir %>app/**/*.html'],
   css: ['<%= workdir %>assets/css/app.css', '<%= workdir %>app/**/*.css']
@@ -237,8 +238,14 @@ gruntfile_cfg.postcss = {
 };
 
 gruntfile_cfg.watch = {
-  build: {
+  frontend: {
+    options: { spawn: false },
     files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
+    tasks: ['build']
+  },
+  backend: {
+    options: { spawn: false },
+    files: ['<%= src.go %>'],
     tasks: ['build']
   }
 };
