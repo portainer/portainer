@@ -5,7 +5,7 @@
     <rd-widget-body classes="no-padding">
       <table class="table">
         <tbody>
-          <tr>
+          <tr ng-if="applicationState.endpoint.apiVersion >= 1.25">
               <td>Command</td>
               <td>
                 <input type="text" class="form-control" ng-model="service.Healthcheck.Test[1]" ng-change="updateServiceAttribute(service, 'service.Healthcheck.Test[1]')" ng-disabled="isUpdating" />
@@ -17,7 +17,7 @@
               </p>
             </td>
           </tr>
-          <tr>
+          <tr ng-if="applicationState.endpoint.apiVersion >= 1.25"> 
             <td>Interval</td>
             <td>
               <input class="input-sm" type="number" ng-model="service.Healthcheck.Interval" ng-change="updateServiceAttribute(service, 'Healthcheck.Interval')" ng-disabled="isUpdating"/>
@@ -28,7 +28,7 @@
               </p>
             </td>
           </tr>
-	  <tr>
+	  <tr ng-if="applicationState.endpoint.apiVersion >= 1.25">
             <td>Timeout</td>
             <td>
               <input class="input-sm" type="number" ng-model="service.Healthcheck.Timeout" ng-change="updateServiceAttribute(service, 'Healthcheck.Timeout')" ng-disabled="isUpdating"/>
@@ -39,7 +39,7 @@
               </p>
             </td>
           </tr>
-	  <tr>
+	  <tr ng-if="applicationState.endpoint.apiVersion >= 1.25">
             <td>Retries</td>
             <td>
               <input class="input-sm" type="number" ng-model="service.Healthcheck.Retries" ng-change="updateServiceAttribute(service, 'Healthcheck.Retries')" ng-disabled="isUpdating"/>
@@ -50,7 +50,7 @@
               </p>
             </td>
           </tr>
-	  <tr>
+	  <tr ng-if="applicationState.endpoint.apiVersion >= 1.29">
             <td>Start Period</td>
             <td>
               <input class="input-sm" type="number" ng-model="service.Healthcheck.StartPeriod" ng-change="updateServiceAttribute(service, 'Healthcheck.StartPeriod')" ng-disabled="isUpdating"/>
