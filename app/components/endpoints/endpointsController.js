@@ -1,6 +1,6 @@
 angular.module('endpoints', [])
-.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'EndpointProvider', 'Notifications', 'PaginationService',
-function ($scope, $state, EndpointService, EndpointProvider, Notifications, PaginationService) {
+.controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'EndpointProvider', 'Notifications', 'PaginationService',
+function ($scope, $state, $filter, EndpointService, EndpointProvider, Notifications, PaginationService) {
   $scope.state = {
     uploadInProgress: false,
     selectedItemCount: 0,
@@ -44,7 +44,7 @@ function ($scope, $state, EndpointService, EndpointProvider, Notifications, Pagi
 
   $scope.addEndpoint = function() {
     var name = $scope.formValues.Name;
-    var URL = $scope.formValues.URL;
+    var URL = $filter('stripprotocol')($scope.formValues.URL);
     var PublicURL = $scope.formValues.PublicURL;
     if (PublicURL === '') {
       PublicURL = URL.split(':')[0];

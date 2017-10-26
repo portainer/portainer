@@ -21,6 +21,7 @@ angular.module('portainer', [
   'containerConsole',
   'containerLogs',
   'containerStats',
+  'containerInspect',
   'serviceLogs',
   'containers',
   'createContainer',
