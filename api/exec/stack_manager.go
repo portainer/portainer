@@ -21,7 +21,38 @@ func NewStackManager(binaryPath string) *StackManager {
 	}
 }
 
-// Deploy will execute the Docker stack deploy command
+// Login executes the docker login command against a list of registries (including DockerHub).
+func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []portainer.Registry, endpoint *portainer.Endpoint) error {
+	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
+	for _, registry := range registries {
+		if registry.Authentication {
+			registryArgs := append(args, "login", "--username", registry.Username, "--password", registry.Password, registry.URL)
+			err := runCommandAndCaptureStdErr(command, registryArgs)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	if dockerhub.Authentication {
+		dockerhubArgs := append(args, "login", "--username", dockerhub.Username, "--password", dockerhub.Password)
+		err := runCommandAndCaptureStdErr(command, dockerhubArgs)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Logout executes the docker logout command.
+func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
+	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
+	args = append(args, "logout")
+	return runCommandAndCaptureStdErr(command, args)
+}
+
+// Deploy executes the docker stack deploy command.
 func (manager *StackManager) Deploy(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
@@ -29,7 +60,7 @@ func (manager *StackManager) Deploy(stack *portainer.Stack, endpoint *portainer.
 	return runCommandAndCaptureStdErr(command, args)
 }
 
-// Remove will execute the Docker stack rm command
+// Remove executes the docker stack rm command.
 func (manager *StackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	args = append(args, "stack", "rm", stack.Name)

@@ -61,7 +61,7 @@ func FilterUsers(users []portainer.User, context *RestrictedRequestContext) []po
 }
 
 // FilterRegistries filters registries based on user role and team memberships.
-// Non administrator users only have access to authorized endpoints.
+// Non administrator users only have access to authorized registries.
 func FilterRegistries(registries []portainer.Registry, context *RestrictedRequestContext) ([]portainer.Registry, error) {
 
 	filteredRegistries := registries

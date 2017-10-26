@@ -5,6 +5,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
@@ -22,6 +23,8 @@ import (
 
 // StackHandler represents an HTTP API handler for managing Stack.
 type StackHandler struct {
+	stackCreationMutex *sync.Mutex
+	stackDeletionMutex *sync.Mutex
 	*mux.Router
 	Logger                 *log.Logger
 	FileService            portainer.FileService
@@ -29,17 +32,21 @@ type StackHandler struct {
 	StackService           portainer.StackService
 	EndpointService        portainer.EndpointService
 	ResourceControlService portainer.ResourceControlService
+	RegistryService        portainer.RegistryService
+	DockerHubService       portainer.DockerHubService
 	StackManager           portainer.StackManager
 }
 
 // NewStackHandler returns a new instance of StackHandler.
 func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 	h := &StackHandler{
-		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		Router:             mux.NewRouter(),
+		stackCreationMutex: &sync.Mutex{},
+		stackDeletionMutex: &sync.Mutex{},
+		Logger:             log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/{endpointId}/stacks",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostStacks))).Methods(http.MethodPost)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handlePostStacks))).Methods(http.MethodPost)
 	h.Handle("/{endpointId}/stacks",
 		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetStacks))).Methods(http.MethodGet)
 	h.Handle("/{endpointId}/stacks/{id}",
@@ -173,7 +180,31 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		return
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	dockerhub, err := handler.DockerHubService.DockerHub()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredRegistries, err := security.FilterRegistries(registries, securityContext)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -275,7 +306,31 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		return
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	dockerhub, err := handler.DockerHubService.DockerHub()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredRegistries, err := security.FilterRegistries(registries, securityContext)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -354,7 +409,31 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		return
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	dockerhub, err := handler.DockerHubService.DockerHub()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredRegistries, err := security.FilterRegistries(registries, securityContext)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -515,7 +594,31 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	dockerhub, err := handler.DockerHubService.DockerHub()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredRegistries, err := security.FilterRegistries(registries, securityContext)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -589,11 +692,13 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	handler.stackDeletionMutex.Lock()
 	err = handler.StackManager.Remove(stack, endpoint)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+	handler.stackDeletionMutex.Unlock()
 
 	err = handler.StackService.DeleteStack(portainer.StackID(stackID))
 	if err != nil {
@@ -606,4 +711,29 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+}
+
+func (handler *StackHandler) deployStack(endpoint *portainer.Endpoint, stack *portainer.Stack, dockerhub *portainer.DockerHub, registries []portainer.Registry) error {
+	handler.stackCreationMutex.Lock()
+
+	err := handler.StackManager.Login(dockerhub, registries, endpoint)
+	if err != nil {
+		handler.stackCreationMutex.Unlock()
+		return err
+	}
+
+	err = handler.StackManager.Deploy(stack, endpoint)
+	if err != nil {
+		handler.stackCreationMutex.Unlock()
+		return err
+	}
+
+	err = handler.StackManager.Logout(endpoint)
+	if err != nil {
+		handler.stackCreationMutex.Unlock()
+		return err
+	}
+
+	handler.stackCreationMutex.Unlock()
+	return nil
 }
