@@ -35,7 +35,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
   };
 
   $scope.addExtraHost = function() {
-    $scope.state.selectedTemplate.Hosts.push({ value: '' });
+    $scope.state.selectedTemplate.Hosts.push('');
   };
 
   $scope.removeExtraHost = function(index) {

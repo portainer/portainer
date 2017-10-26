@@ -206,14 +206,14 @@
               <!-- extra-host-input-list -->
               <div class="col-sm-12">
                 <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                  <div ng-repeat="host in state.selectedTemplate.Hosts" style="margin-top: 2px;">
-                      <div class="input-group col-sm-5 input-group-sm">
-                        <span class="input-group-addon">value</span>
-                        <input type="text" class="form-control" ng-model="host" placeholder="e.g. host:IP">
-                      </div>
-                      <button class="btn btn-sm btn-danger" type="button" ng-click="removeExtraHost($index)">
-                        <i class="fa fa-trash" aria-hidden="true"></i>
-                      </button>
+                  <div ng-repeat="(idx, host) in state.selectedTemplate.Hosts" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="state.selectedTemplate.Hosts[idx]" placeholder="e.g. host:IP">
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeExtraHost($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
                   </div>
                 </div>
               </div>
