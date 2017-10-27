@@ -6,6 +6,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
+	"github.com/Microsoft/go-winio"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
 )
@@ -58,6 +59,18 @@ func (factory *proxyFactory) createReverseProxy(u *url.URL) *httputil.ReversePro
 	return proxy
 }
 
+func (factory *proxyFactory) newNamedPipeProxy(path string) http.Handler {
+	proxy := &localProxy{}
+	transport := &proxyTransport{
+		ResourceControlService: factory.ResourceControlService,
+		TeamMembershipService:  factory.TeamMembershipService,
+		SettingsService:        factory.SettingsService,
+		dockerTransport:        newNamedPipeTransport(path),
+	}
+	proxy.Transport = transport
+	return proxy
+}
+
 func newSocketTransport(socketPath string) *http.Transport {
 	return &http.Transport{
 		Dial: func(proto, addr string) (conn net.Conn, err error) {
@@ -68,4 +81,12 @@ func newSocketTransport(socketPath string) *http.Transport {
 
 func newHTTPTransport() *http.Transport {
 	return &http.Transport{}
+}
+
+func newNamedPipeTransport(namedPipePath string) *http.Transport {
+	return &http.Transport{
+		Dial: func(proto, addr string) (conn net.Conn, err error) {
+			return winio.DialPipe(namedPipePath, nil)
+		},
+	}
 }
