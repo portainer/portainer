@@ -59,7 +59,7 @@ func NewEndpointHandler(bouncer *security.RequestBouncer, authorizeEndpointManag
 type (
 	postEndpointsRequest struct {
 		Name                string `valid:"required"`
-		URL                 string `valid:"required"`
+		URL                 string `valid:"-"`
 		PublicURL           string `valid:"-"`
 		Local               bool
 		TLS                 bool
