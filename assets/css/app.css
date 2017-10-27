@@ -347,7 +347,6 @@ ul.sidebar .sidebar-list a.active {
   height: 100%;
 }
 
-
 #image-layers .btn{
   padding: 0;
 }
@@ -367,6 +366,19 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   color: #fff;
   border-left: 3px solid #fff;
   background: #2d3e63;
+}
+
+@media (max-height: 768px) {
+  ul.sidebar .sidebar-list {
+    height: 32px;
+  }
+  ul.sidebar .sidebar-list a, ul.sidebar .sidebar-list .sidebar-sublist a {
+    font-size: 12px;
+    line-height: 32px;
+  }
+  ul.sidebar .sidebar-list .menu-icon {
+    line-height: 32px;
+  }
 }
 
 @media(min-width: 768px) and (max-width: 992px) {
