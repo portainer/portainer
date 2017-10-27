@@ -4,7 +4,6 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
 
   this.state = {
     selectAll: false,
-    reverseOrder: false,
     orderBy: this.orderBy,
     paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
     displayTextFilter: false,
@@ -46,8 +45,27 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
     $state.go(this.stateDetails, { id: item[this.identifier] });
   };
 
+
+  function getPropertyByPath(obj, path) {
+    path = path.replace(/\[(\w+)\]/g, '.$1');
+    path = path.replace(/^\./, '');
+    var a = path.split('.');
+    for (var i = 0, n = a.length; i < n; ++i) {
+        var k = a[i];
+        if (k in obj) {
+            obj = obj[k];
+        } else {
+            return;
+        }
+    }
+    return obj;
+  }
+
   this.renderField = function(prop, item) {
     var value = item[prop.property];
+    if (!value) {
+      value = getPropertyByPath(item, prop.property);
+    }
 
     if (prop.renderFunc) {
       return $sce.trustAsHtml(prop.renderFunc(item, value));
@@ -70,6 +88,10 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
     FilterService.setDataTableHeaders(this.tableKey, this.headers);
   };
 
+  this.updateFilter = function(filter) {
+    this.state.filter = filter;
+  };
+
   this.$onInit = function() {
     setDefaults(this);
 
@@ -88,5 +110,6 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
   function setDefaults(ctrl) {
     ctrl.showTextFilter = ctrl.showTextFilter ? ctrl.showTextFilter : false;
     ctrl.selectableRows = ctrl.selectableRows ? ctrl.selectableRows : false;
+    ctrl.state.reverseOrder = ctrl.reverseOrder ? ctrl.reverseOrder : false;
   }
 }]);

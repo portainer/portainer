@@ -1,37 +1,53 @@
 angular.module('networks', [])
 .controller('NetworksController', ['$scope', '$state', 'Network', 'NetworkService', 'Notifications', 'PaginationService',
 function ($scope, $state, Network, NetworkService, Notifications, PaginationService) {
-  $scope.state = {};
-  $scope.state.pagination_count = PaginationService.getPaginationCount('networks');
-  $scope.state.selectedItemCount = 0;
-  $scope.state.advancedSettings = false;
-  $scope.sortType = 'Name';
-  $scope.sortReverse = false;
+  // $scope.state = {};
+  // $scope.state.pagination_count = PaginationService.getPaginationCount('networks');
+  // $scope.state.selectedItemCount = 0;
+  // $scope.sortType = 'Name';
+  // $scope.sortReverse = false;
 
-  $scope.changePaginationCount = function() {
-    PaginationService.setPaginationCount('networks', $scope.state.pagination_count);
-  };
+  // $scope.changePaginationCount = function() {
+  //   PaginationService.setPaginationCount('networks', $scope.state.pagination_count);
+  // };
 
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
+  // $scope.order = function(sortType) {
+  //   $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+  //   $scope.sortType = sortType;
+  // };
+  //
+  // $scope.selectItems = function(allSelected) {
+  //   angular.forEach($scope.state.filteredNetworks, function (network) {
+  //     if (network.Checked !== allSelected) {
+  //         network.Checked = allSelected;
+  //         $scope.selectItem(network);
+  //     }
+  //   });
+  // };
+  //
+  // $scope.selectItem = function (item) {
+  //   if (item.Checked) {
+  //     $scope.state.selectedItemCount++;
+  //   } else {
+  //     $scope.state.selectedItemCount--;
+  //   }
+  // };
 
-  $scope.selectItems = function(allSelected) {
-    angular.forEach($scope.state.filteredNetworks, function (network) {
-      if (network.Checked !== allSelected) {
-          network.Checked = allSelected;
-          $scope.selectItem(network);
-      }
-    });
-  };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
+  $scope.renderFieldOwnership = function(item, value) {
+    switch (item.ResourceControl.Ownership) {
+      case 'private':
+        return '<span><i class="fa fa-eye-slash" aria-hidden="true" style="margin-right: 5px"></i>private</span>';
+      case 'administrators':
+        return '<span><i class="fa fa-eye-slash" aria-hidden="true" style="margin-right: 5px"></i>administrators</span>';
+      case 'restricted':
+        return '<span><i class="fa fa-users" aria-hidden="true" style="margin-right: 5px"></i>restricted</span>';
+      default:
+        return '<span><i class="fa fa-eye" aria-hidden="true" style="margin-right: 5px"></i>public</span>';
     }
+  };
+
+  $scope.goToNetworkCreation = function() {
+    $state.go('actions.create.network');
   };
 
   $scope.removeAction = function () {
@@ -40,7 +56,7 @@ function ($scope, $state, Network, NetworkService, Notifications, PaginationServ
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        $('#loadNetworksSpinner').hide();
+        $state.reload();
       }
     };
     angular.forEach($scope.networks, function (network) {

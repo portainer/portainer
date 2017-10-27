@@ -2,6 +2,7 @@
   <i class="fa fa-cog fa-2x" aria-hidden="true" uib-dropdown-toggle></i>
   <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
     <div class="settingsMenu">
+      <div ng-transclude="filter"></div>
       <div ng-transclude="columnSelector"></div>
       <div class="settingsActions">
         <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.closeSettings()">Close</a>

@@ -105,6 +105,10 @@
   margin-bottom: 10px;
 }
 
+.settingsMenu .settingsContent .md-radio:first-child {
+  margin: 0;
+}
+
 .md-checkbox {
   position: relative;
   margin: 1px 0;
@@ -150,4 +154,60 @@
   border: 2px solid #fff;
   border-top-style: none;
   border-right-style: none;
+}
+
+.md-radio {
+  margin: 6px 0;
+}
+
+.md-radio.md-radio-inline {
+  display: inline-block;
+}
+
+.md-radio input[type="radio"] {
+  display: none;
+}
+
+.md-radio input[type="radio"]:checked + label:before {
+  border-color: #337ab7;
+  animation: ripple 0.2s linear forwards;
+}
+
+.md-radio input[type="radio"]:checked + label:after {
+  transform: scale(1);
+}
+
+.md-radio label {
+  display: inline-block;
+  height: 16px;
+  position: relative;
+  padding: 0 22px;
+  margin-bottom: 0;
+  cursor: pointer;
+  vertical-align: bottom;
+}
+
+.md-radio label:before, .md-radio label:after {
+  position: absolute;
+  content: '';
+  border-radius: 50%;
+  transition: all .3s ease;
+  transition-property: transform, border-color;
+}
+
+.md-radio label:before {
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.54);
+}
+
+.md-radio label:after {
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  transform: scale(0);
+  background: #337ab7;
 }

@@ -12,11 +12,14 @@ angular.module('ui').component('datatable', {
     dataset: '<',
     datasetProperties: '<',
     orderBy: '@',
+    reverseOrder: '<',
     identifier: '@',
     identifierProperty: '@',
     stateDetails: '@',
     tableKey: '@',
     showTextFilter: '<',
-    selectableRows: '<'
+    selectableRows: '<',
+    labelOn: '@',
+    renderLabel: '<'
   }
 });

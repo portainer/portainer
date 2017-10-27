@@ -9,6 +9,26 @@
 </rd-header>
 
 <div class="row">
+  <div class="col-sm-12">
+    <datatable title="Events" title-icon="fa-history"
+      dataset="events" table-key="events"
+      headers="[
+        { property: 'Time', label: 'Date', excludeFromSelector: true },
+        { property: 'Type', label: 'Category', show: true },
+        { property: 'Details', label: 'Details', show: true }
+      ]"
+      dataset-properties="[
+        { property: 'Time', filter: 'getisodatefromtimestamp' },
+        { property: 'Type' },
+        { property: 'Details' }
+      ]"
+      order-by="Time" reverse-order="true"
+      show-text-filter="true">
+    </datatable>
+  </div>
+</div>
+
+<!-- <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-history" title="Events">
@@ -71,4 +91,4 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-</div>
+</div> -->

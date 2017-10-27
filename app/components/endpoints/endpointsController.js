@@ -3,11 +3,11 @@ angular.module('endpoints', [])
 function ($scope, $state, $filter, EndpointService, EndpointProvider, Notifications, PaginationService) {
   $scope.state = {
     uploadInProgress: false,
-    selectedItemCount: 0,
-    pagination_count: PaginationService.getPaginationCount('endpoints')
+    // selectedItemCount: 0,
+    // pagination_count: PaginationService.getPaginationCount('endpoints')
   };
-  $scope.sortType = 'Name';
-  $scope.sortReverse = true;
+  // $scope.sortType = 'Name';
+  // $scope.sortReverse = true;
 
   $scope.formValues = {
     Name: '',
@@ -16,31 +16,31 @@ function ($scope, $state, $filter, EndpointService, EndpointProvider, Notificati
     SecurityFormData: new EndpointSecurityFormData()
   };
 
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    PaginationService.setPaginationCount('endpoints', $scope.state.pagination_count);
-  };
-
-  $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredEndpoints, function (endpoint) {
-      if (endpoint.Checked !== allSelected) {
-        endpoint.Checked = allSelected;
-        $scope.selectItem(endpoint);
-      }
-    });
-  };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
-  };
+  // $scope.order = function(sortType) {
+  //   $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+  //   $scope.sortType = sortType;
+  // };
+  //
+  // $scope.changePaginationCount = function() {
+  //   PaginationService.setPaginationCount('endpoints', $scope.state.pagination_count);
+  // };
+  //
+  // $scope.selectItems = function (allSelected) {
+  //   angular.forEach($scope.state.filteredEndpoints, function (endpoint) {
+  //     if (endpoint.Checked !== allSelected) {
+  //       endpoint.Checked = allSelected;
+  //       $scope.selectItem(endpoint);
+  //     }
+  //   });
+  // };
+  //
+  // $scope.selectItem = function (item) {
+  //   if (item.Checked) {
+  //     $scope.state.selectedItemCount++;
+  //   } else {
+  //     $scope.state.selectedItemCount--;
+  //   }
+  // };
 
   $scope.addEndpoint = function() {
     var name = $scope.formValues.Name;

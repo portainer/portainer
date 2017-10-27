@@ -2,12 +2,49 @@ angular.module('registries', [])
 .controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications', 'PaginationService',
 function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, PaginationService) {
 
-  $scope.state = {
-    selectedItemCount: 0,
-    pagination_count: PaginationService.getPaginationCount('registries')
+  // $scope.state = {
+  //   selectedItemCount: 0,
+  //   pagination_count: PaginationService.getPaginationCount('registries')
+  // };
+  // $scope.sortType = 'Name';
+  // $scope.sortReverse = true;
+
+  // $scope.order = function(sortType) {
+  //   $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
+  //   $scope.sortType = sortType;
+  // };
+  //
+  // $scope.changePaginationCount = function() {
+  //   PaginationService.setPaginationCount('endpoints', $scope.state.pagination_count);
+  // };
+  //
+  // $scope.selectItems = function (allSelected) {
+  //   angular.forEach($scope.state.filteredRegistries, function (registry) {
+  //     if (registry.Checked !== allSelected) {
+  //       registry.Checked = allSelected;
+  //       $scope.selectItem(registry);
+  //     }
+  //   });
+  // };
+  //
+  // $scope.selectItem = function (item) {
+  //   if (item.Checked) {
+  //     $scope.state.selectedItemCount++;
+  //   } else {
+  //     $scope.state.selectedItemCount--;
+  //   }
+  // };
+
+  $scope.renderLabel = function(item) {
+    if (item.Authentication) {
+      return '<span style="margin-left: 10px;" class="label label-info image-tag">authentication-enabled</span>';
+    }
+    return '';
   };
-  $scope.sortType = 'Name';
-  $scope.sortReverse = true;
+
+  $scope.goToRegistryCreation = function() {
+    $state.go('actions.create.registry');
+  };
 
   $scope.updateDockerHub = function() {
     $('#updateDockerhubSpinner').show();
@@ -22,32 +59,6 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
     .finally(function final() {
       $('#updateDockerhubSpinner').hide();
     });
-  };
-
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    PaginationService.setPaginationCount('endpoints', $scope.state.pagination_count);
-  };
-
-  $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredRegistries, function (registry) {
-      if (registry.Checked !== allSelected) {
-        registry.Checked = allSelected;
-        $scope.selectItem(registry);
-      }
-    });
-  };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
   };
 
   $scope.removeAction = function() {

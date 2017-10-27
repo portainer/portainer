@@ -14,11 +14,14 @@ function ($scope, $state, $filter, ImageService, Notifications, PaginationServic
 
 
   $scope.renderFieldId = function(item, value) {
-    var render = '<span class="monospaced">' + $filter('truncate')(value, 20) + '</span>';
+    return '<span class="monospaced">' + $filter('truncate')(value, 20) + '</span>';
+  };
+
+  $scope.renderLabel = function(item) {
     if (item.ContainerCount === 0) {
-      render += '<span style="margin-left: 10px;" class="label label-warning image-tag">Unused</span>';
+      return '<span style="margin-left: 10px;" class="label label-warning image-tag">Unused</span>';
     }
-    return render;
+    return '';
   };
 
   $scope.renderRepoTagsField = function(item, value) {
@@ -33,7 +36,7 @@ function ($scope, $state, $filter, ImageService, Notifications, PaginationServic
         break;
       }
       var tag = value[i];
-      render += '<span class="label label-primary image-tag">' + tag + '</span>';
+      render += '<span class="label label-primary image-tag">' + $filter('truncate')(tag, 40) + '</span>';
     }
     return render;
   };

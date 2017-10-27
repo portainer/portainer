@@ -7,7 +7,7 @@
         </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updatedisplayTextFilter()" ng-if="$ctrl.showTextFilter">
-            <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
           </span>
           <span ng-transclude="settings"></span>
         </div>
@@ -35,7 +35,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))">
+            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.filter | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))">
               <td ng-repeat="prop in $ctrl.datasetProperties track by $index" ng-if="$ctrl.headers | isVisibleHeader:prop.property">
                 <span ng-if="prop.property === $ctrl.identifierProperty">
                   <span class="md-checkbox" ng-if="$ctrl.selectableRows">
@@ -45,6 +45,7 @@
                   <a ng-click="$ctrl.goToDetails(item)" ng-bind-html="$ctrl.renderField(prop, item)"></a>
                 </span>
                 <span ng-if="prop.property !== $ctrl.identifierProperty" ng-bind-html="$ctrl.renderField(prop, item)"></span>
+                <span ng-if="prop.property === $ctrl.labelOn" ng-bind-html="$ctrl.renderLabel(item)"></span>
               </td>
             </td>
           </tr>
