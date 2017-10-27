@@ -5,7 +5,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/Microsoft/go-winio"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/security"
 )
@@ -29,26 +28,6 @@ type (
 	}
 	restrictedOperationRequest func(*http.Request, *http.Response, *operationExecutor) error
 )
-
-func newSocketTransport(socketPath string) *http.Transport {
-	return &http.Transport{
-		Dial: func(proto, addr string) (conn net.Conn, err error) {
-			return net.Dial("unix", socketPath)
-		},
-	}
-}
-
-func newNamedPipeTransport(namedPipePath string) *http.Transport {
-	return &http.Transport{
-		Dial: func(proto, addr string) (conn net.Conn, err error) {
-			return winio.DialPipe(namedPipePath, nil)
-		},
-	}
-}
-
-func newHTTPTransport() *http.Transport {
-	return &http.Transport{}
-}
 
 func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error) {
 	return p.proxyDockerRequest(request)
