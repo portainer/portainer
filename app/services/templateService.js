@@ -40,6 +40,7 @@ angular.module('portainer.services')
     configuration.HostConfig.NetworkMode = network.Name;
     configuration.HostConfig.Privileged = template.Privileged;
     configuration.HostConfig.RestartPolicy = { Name: template.RestartPolicy };
+    configuration.HostConfig.ExtraHosts = template.Hosts ? template.Hosts : [];
     configuration.name = containerName;
     configuration.Hostname = containerName;
     configuration.Image = template.Image;

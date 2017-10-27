@@ -34,6 +34,14 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     $scope.state.selectedTemplate.Ports.splice(index, 1);
   };
 
+  $scope.addExtraHost = function() {
+    $scope.state.selectedTemplate.Hosts.push('');
+  };
+
+  $scope.removeExtraHost = function(index) {
+    $scope.state.selectedTemplate.Hosts.splice(index, 1);
+  };
+
   function validateForm(accessControlData, isAdmin) {
     $scope.state.formValidationError = '';
     var error = '';
