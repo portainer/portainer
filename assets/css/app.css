@@ -278,7 +278,9 @@ a[ng-click]{
 }
 
 ul.sidebar {
-  bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 ul.sidebar .sidebar-title {
@@ -292,7 +294,32 @@ ul.sidebar .sidebar-list a.active {
   background: #2d3e63;
 }
 
-.sidebar-footer .logo {
+.sidebar-header {
+  height: 60px;
+  list-style: none;
+  text-indent: 20px;
+  font-size: 18px;
+  background: #2d3e63;
+}
+
+.sidebar-header a { color: #fff; }
+.sidebar-header a:hover {text-decoration: none; }
+
+.sidebar-header .menu-icon {
+  float: right;
+  padding-right: 28px;
+  line-height: 60px;
+}
+
+#page-wrapper:not(.open) .sidebar-footer-content {
+    display: none;
+}
+
+.sidebar-footer-content {
+  text-align: center;
+}
+
+.sidebar-footer-content .logo {
   width: 100%;
   max-width: 100px;
   height: 100%;
@@ -300,11 +327,26 @@ ul.sidebar .sidebar-list a.active {
   margin: 2px 0 2px 20px;
 }
 
-.sidebar-footer .version {
+.sidebar-footer-content .version {
   font-size: 11px;
   margin: 11px 20px 0 7px;
   color: #fff;
 }
+
+#sidebar-wrapper {
+  display: flex;
+  flex-flow: column;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+}
+
 
 #image-layers .btn{
   padding: 0;
