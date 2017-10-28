@@ -49,8 +49,8 @@ html, body, #content-wrapper, .page-content, #view {
   font-size: 18px;
 }
 
-.header_title_content {
-  margin-left: 5px;
+.header_title_content > a {
+  padding-right: 5px;
 }
 
 .form-section-title {
