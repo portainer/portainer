@@ -1,13 +1,7 @@
-<rd-header>
-  <rd-header-title title="Stack details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="stack({id: stack.Id})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-refresh" aria-hidden="true"></i>
-    </a>
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="stacks">Stacks</a> > <a ui-sref="stack({id: stack.Id})">{{ stack.Name }}</a>
-  </rd-header-content>
+<rd-header title="Stack details">
+  <a data-toggle="tooltip" title="Refresh" ui-sref="stack({id: stack.Id})" ui-sref-opts="{reload: true}"><i class="refresh fa fa-refresh" aria-hidden="true"></i></a>
+  <a ui-sref="stacks">Stacks</a> > <a ui-sref="stack({id: stack.Id})">{{ stack.Name }}</a>
+  <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
 </rd-header>
 
 <!-- access-control-panel -->

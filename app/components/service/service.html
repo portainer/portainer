@@ -1,13 +1,7 @@
-<rd-header>
-  <rd-header-title title="Service details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="service({id: service.Id})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-refresh" aria-hidden="true"></i>
-    </a>
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="services">Services</a> &gt; <a ui-sref="service({id: service.Id})">{{ service.Name }}</a>
-  </rd-header-content>
+<rd-header title="Service details">
+  <a data-toggle="tooltip" title="Refresh" ui-sref="service({id: service.Id})" ui-sref-opts="{reload: true}"><i class="refresh fa fa-refresh" aria-hidden="true"></i></a>
+  <a ui-sref="services">Services</a> &gt; <a ui-sref="service({id: service.Id})">{{ service.Name }}</a>
+  <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
 </rd-header>
 
 <div class="row">

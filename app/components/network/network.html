@@ -1,10 +1,6 @@
-<rd-header>
-  <rd-header-title title="Network details">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="networks">Networks</a> &gt; <a ui-sref="network({id: network.Id})">{{ network.Name }}</a>
-  </rd-header-content>
+<rd-header title="Network details">
+  <a ui-sref="networks">Networks</a> &gt; <a ui-sref="network({id: network.Id})">{{ network.Name }}</a>
+  <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
 </rd-header>
 
 <div class="row">

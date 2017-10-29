@@ -1,10 +1,6 @@
-<rd-header>
-  <rd-header-title title="Service logs">
-      <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="services">Services</a> > <a ui-sref="service({id: service.ID})">{{ service.Spec.Name }}</a> > Logs
-  </rd-header-content>
+<rd-header title="Service logs">
+  <a ui-sref="services">Services</a> > <a ui-sref="service({id: service.ID})">{{ service.Spec.Name }}</a> > Logs
+  <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
 </rd-header>
 
 <div class="row">

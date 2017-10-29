@@ -49,7 +49,7 @@ html, body, #content-wrapper, .page-content, #view {
   font-size: 18px;
 }
 
-.header_title_content > a {
+.header_title_content > a > .refresh {
   padding-right: 5px;
 }
 
@@ -700,4 +700,20 @@ json-tree .branch-preview {
   font-style: normal;
   font-size: 11px;
   opacity: .5;
+}
+
+/* header */
+
+rd-header > .row.header {
+  height: auto;
+}
+
+rd-header > .row.header > div {
+  height: auto;
+  margin-bottom: 8px;
+}
+
+rd-header > .row.header .meta .page {
+    font-size: 17px;
+    padding-top: 8px;
 }
