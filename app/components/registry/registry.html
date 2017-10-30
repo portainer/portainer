@@ -1,10 +1,6 @@
-<rd-header>
-  <rd-header-title title="Registry details">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="registries">Registries</a> &gt; <a ui-sref="registry({id: registry.Id})">{{ registry.Name }}</a>
-  </rd-header-content>
+<rd-header title="Registry details">
+  <a ui-sref="registries">Registries</a> &gt; <a ui-sref="registry({id: registry.Id})">{{ registry.Name }}</a>
+  <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
 </rd-header>
 
 <div class="row">

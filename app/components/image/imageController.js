@@ -1,6 +1,6 @@
 angular.module('image', [])
-.controller('ImageController', ['$q', '$scope', '$transition$', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications',
-function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryService, Notifications) {
+.controller('ImageController', ['$q', '$scope', '$filter', '$transition$', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications',
+function ($q, $scope, $filter, $transition$, $state, $timeout, ImageService, RegistryService, Notifications) {
 	$scope.formValues = {
 		Image: '',
 		Registry: ''
@@ -118,6 +118,7 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		})
 		.then(function success(data) {
 			$scope.image = data.image;
+			$scope.image.truncid = $filter('truncate')(data.image.Id.substring(7), 30);
 			$scope.history = data.history;
 		})
 		.catch(function error(err) {

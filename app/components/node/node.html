@@ -1,12 +1,6 @@
-<rd-header>
-  <rd-header-title title="Node details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="node({id: node.Id})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-refresh" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="swarm">Swarm nodes</a> &gt; <a ui-sref="node({id: node.Id})">{{ node.Hostname }}</a>
-  </rd-header-content>
+<rd-header title="Node details">
+  <a data-toggle="tooltip" title="Refresh" ui-sref="node({id: node.Id})" ui-sref-opts="{reload: true}"><i class="refresh fa fa-refresh" aria-hidden="true"></i></a>
+  <a ui-sref="swarm">Swarm nodes</a> &gt; <a ui-sref="node({id: node.Id})">{{ node.Hostname }}</a>
 </rd-header>
 
 <div class="row" ng-if="!node">

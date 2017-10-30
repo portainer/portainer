@@ -1,10 +1,6 @@
-<rd-header>
-  <rd-header-title title="Volume details">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="volumes">Volumes</a> &gt; <a ui-sref="volume({id: volume.Id})">{{ volume.Id }}</a>
-  </rd-header-content>
+<rd-header title="Volume details">
+  <a ui-sref="volumes">Volumes</a> &gt; <a ui-sref="volume({id: volume.Id})">{{ volume.Id }}</a>
+  <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
 </rd-header>
 
 <div class="row" ng-if="volume">

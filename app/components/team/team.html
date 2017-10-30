@@ -1,10 +1,6 @@
-<rd-header>
-  <rd-header-title title="Team details">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="teams">Teams</a> &gt; <a ui-sref="team({id: team.Id})">{{ team.Name }}</a>
-  </rd-header-content>
+<rd-header title="Team details">
+  <a ui-sref="teams">Teams</a> &gt; <a ui-sref="team({id: team.Id})">{{ team.Name }}</a>
+  <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
 </rd-header>
 
 <div class="row">
