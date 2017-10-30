@@ -32,6 +32,9 @@
                   <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === header.property && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th ng-if="$ctrl.rowActions.length > 0">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -47,39 +50,41 @@
                 <span ng-if="prop.property !== $ctrl.identifierProperty" ng-bind-html="$ctrl.renderField(prop, item)"></span>
                 <span ng-if="prop.property === $ctrl.labelOn" ng-bind-html="$ctrl.renderLabel(item)"></span>
               </td>
-            </td>
-          </tr>
-          <tr ng-if="!$ctrl.dataset">
-            <td colspan="{{ $ctrl.headers.length + 1 }}" class="text-center text-muted">Loading...</td>
-          </tr>
-          <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-            <td colspan="{{ $ctrl.headers.length + 1 }}" class="text-center text-muted">No data available.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="footer" ng-if="$ctrl.dataset">
-      <div class="infoBar" ng-if="$ctrl.selectableRows && $ctrl.state.selectedItemCount !== 0">
-        {{ $ctrl.state.selectedItemCount }} item(s) selected
+              <td ng-repeat="action in $ctrl.rowActions track by $index">
+                <a ui-sref="{{ action.state }}({ id: {{ item[$ctrl.identifier] }} })"><i class="fa {{ action.icon }}" aria-hidden="true" style="margin-right: 2px;"></i>{{ action.label }}</a>
+              </td>
+            </tr>
+            <tr ng-if="!$ctrl.dataset">
+              <td colspan="{{ $ctrl.headers.length + 1 }}" class="text-center text-muted">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+              <td colspan="{{ $ctrl.headers.length + 1 }}" class="text-center text-muted">No data available.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <div class="paginationControls">
-        <form class="form-inline">
-          <span class="limitSelector">
-            <span style="margin-right: 5px;">
-              Items per page
+      <div class="footer" ng-if="$ctrl.dataset">
+        <div class="infoBar" ng-if="$ctrl.selectableRows && $ctrl.state.selectedItemCount !== 0">
+          {{ $ctrl.state.selectedItemCount }} item(s) selected
+        </div>
+        <div class="paginationControls">
+          <form class="form-inline">
+            <span class="limitSelector">
+              <span style="margin-right: 5px;">
+                Items per page
+              </span>
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+                <option value="0">All</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
             </span>
-            <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
-              <option value="0">All</option>
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </span>
-          <dir-pagination-controls max-size="5"></dir-pagination-controls>
-        </form>
+            <dir-pagination-controls max-size="5"></dir-pagination-controls>
+          </form>
+        </div>
       </div>
-    </div>
-  </rd-widget-body>
-</rd-widget>
+    </rd-widget-body>
+  </rd-widget>
 </div>

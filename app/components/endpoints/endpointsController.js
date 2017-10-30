@@ -2,7 +2,7 @@ angular.module('endpoints', [])
 .controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'EndpointProvider', 'Notifications', 'PaginationService',
 function ($scope, $state, $filter, EndpointService, EndpointProvider, Notifications, PaginationService) {
   $scope.state = {
-    uploadInProgress: false,
+    uploadInProgress: false
     // selectedItemCount: 0,
     // pagination_count: PaginationService.getPaginationCount('endpoints')
   };
@@ -15,6 +15,11 @@ function ($scope, $state, $filter, EndpointService, EndpointProvider, Notificati
     PublicURL: '',
     SecurityFormData: new EndpointSecurityFormData()
   };
+
+  // $scope.renderFieldActions = function(item, value) {
+  //   console.log(JSON.stringify(item, null, 4));
+  //   return '<a ui-sref="endpoint.access({id:' + item.Id + '})"><i class="fa fa-users" aria-hidden="true" style="margin-left: 7px;"></i> Manage access</a>';
+  // };
 
   // $scope.order = function(sortType) {
   //   $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;

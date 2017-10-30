@@ -89,6 +89,9 @@
         { property: 'Name' },
         { property: 'URL', filter: 'stripprotocol' }
       ]"
+      row-actions="[
+        { label: 'Manage access', icon: 'fa-users', state: 'endpoint.access' }
+      ]"
       order-by="Name"
       identifier="Id" identifier-property="Name" state-details="endpoint"
       show-text-filter="true" selectable-rows="true">

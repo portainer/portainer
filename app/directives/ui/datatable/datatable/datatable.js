@@ -11,6 +11,7 @@ angular.module('ui').component('datatable', {
     headers: '<',
     dataset: '<',
     datasetProperties: '<',
+    rowActions: '<',
     orderBy: '@',
     reverseOrder: '<',
     identifier: '@',
