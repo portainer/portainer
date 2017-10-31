@@ -1,29 +1,35 @@
-###############################################################################################
-# Docker container to deploy cenx-cf forked Portainer project UI.
-#
-# See: README.md
-###############################################################################################
+FROM portainer/golang-builder:latest as gobuilder
 
-FROM alpine:3.4
+RUN mkdir -p /dist
 
-MAINTAINER CENX "cenx.com"
+# build portainer api
+COPY api /src
+RUN OUTPUT=/dist/portainer-$(uname -s | tr '[:upper:]' '[:lower:]')-$(dpkg --print-architecture) /build.sh /src/cmd/portainer
+
+# install docker cli
+ENV DOCKER_VERSION=17.09.0-ce
+RUN wget -O /docker-binaries.tgz https://download.docker.com/$(uname -s | tr '[:upper:]' '[:lower:]')/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz \
+    && tar -xf /docker-binaries.tgz -C /dist docker/docker \
+    && rm /docker-binaries.tgz
+
+FROM node:8.7.0  as nodebuilder
+
+# build portainer web ui
+WORKDIR /code
+COPY ./package.json /code/package.json
+RUN npm install -g bower grunt-cli && npm install
+COPY --from=gobuilder /dist /code/dist
+COPY ./bower.json /code/bower.json
+RUN bower install --allow-root
+COPY . /code
+RUN grunt build
+RUN mv /code/dist/portainer-$(uname -s | tr '[:upper:]' '[:lower:]')-$(dpkg --print-architecture) /code/dist/portainer
+
+FROM portainer/base:latest
 
 ENV VERSION 1.15.0-1-SNAPSHOT
-
-ARG PLATFORM=linux
-ARG ARCH=x86_64
-ARG DOCKER_VERSION=17.09.0-ce
-
-RUN apk --no-cache --update upgrade && apk --no-cache add ca-certificates wget && update-ca-certificates && apk add bash
-RUN wget -O docker-binaries.tgz https://download.docker.com/${PLATFORM}/static/stable/${ARCH}/docker-${DOCKER_VERSION}.tgz \
-  && tar -xf docker-binaries.tgz
-
-COPY dist /
-
+COPY --from=nodebuilder /code/dist /
 VOLUME /data
-
 WORKDIR /
-
 EXPOSE 9000
-
-ENTRYPOINT ["/portainer-linux-amd64"]
+ENTRYPOINT ["/portainer"]
