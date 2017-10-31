@@ -43,6 +43,7 @@ const (
 	registryBucketName        = "registries"
 	dockerhubBucketName       = "dockerhub"
 	stackBucketName           = "stacks"
+	projectBucketName         = "projects"
 )
 
 // NewStore initializes a new Store and the associated services

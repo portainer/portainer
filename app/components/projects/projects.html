@@ -1,0 +1,90 @@
+<rd-header>
+  <rd-header-title title="Projects list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="projects" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+  </rd-header-title>
+  <rd-header-content>Projects</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-th-list" title="Projects">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-lg-12 col-md-12 col-xs-12">
+        <div class="pull-left">
+          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+          <a class="btn btn-primary" type="button" ui-sref="actions.create.project"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add project</a>
+        </div>
+        <div class="pull-right">
+          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <th>
+                <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+              </th>
+              <th>
+                <a ng-click="order('Name')">
+                  Name
+                  <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th ng-if="applicationState.application.authentication">
+                <a ng-click="order('ResourceControl.Ownership')">
+                  Ownership
+                  <span ng-show="sortType == 'ResourceControl.Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'ResourceControl.Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+            </thead>
+            <tbody>
+              <tr dir-paginate="project in (state.filteredProjects = ( projects | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-if="state.DisplayExternalProjects || (!state.DisplayExternalProjects && !project.External)">
+                <td><input type="checkbox" ng-model="project.Checked" ng-change="selectItem(project)" ng-disabled="!project.Id"/></td>
+                <td>
+                  <span ng-if="project.Id">
+                    <a ui-sref="project({ id: project.Id })">{{ project.Name }}</a>
+                  </span>
+                  <span ng-if="!project.Id">
+                    {{ project.Name }} <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true"></i>
+                  </span>
+                </td>
+                <td ng-if="applicationState.application.authentication">
+                  <span>
+                    <i ng-class="project.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
+                    {{ project.ResourceControl.Ownership ? project.ResourceControl.Ownership : project.ResourceControl.Ownership = 'public' }}
+                  </span>
+                </td>
+              </tr>
+              <tr ng-if="!projects">
+                <td colspan="3" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="projects.length === 0">
+                <td colspan="3" class="text-center text-muted">No projects available.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="projects" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    <rd-widget>
+  </div>
+</div>

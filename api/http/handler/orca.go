@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"strconv"
+	//"strconv"
 
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
@@ -15,30 +15,27 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// DockerHandler represents an HTTP API handler for proxying requests to the Docker API.
-type DockerHandler struct {
+// OrcaHandler represents an HTTP API handler for proxying requests to the Orca API.
+type OrcaHandler struct {
 	*mux.Router
 	Logger                *log.Logger
 	EndpointService       portainer.EndpointService
 	TeamMembershipService portainer.TeamMembershipService
-	ProxyManager          *proxy.Manager
+	ProxyManager          *proxy.OrcaManager
 }
 
-// NewDockerHandler returns a new instance of DockerHandler.
-func NewDockerHandler(bouncer *security.RequestBouncer) *DockerHandler {
-
-    log.Println("Starting Docker handler...")
-
-	h := &DockerHandler{
+// NewOrcaHandler returns a new instance of OrcaHandler.
+func NewOrcaHandler(bouncer *security.RequestBouncer) *OrcaHandler {
+	h := &OrcaHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.PathPrefix("/{id}/docker").Handler(
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.proxyRequestsToDockerAPI)))
+	h.PathPrefix("/{id}/orca").Handler(
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.proxyRequestsToOrcaAPI)))
 	return h
 }
 
-func (handler *DockerHandler) checkEndpointAccessControl(endpoint *portainer.Endpoint, userID portainer.UserID) bool {
+func (handler *OrcaHandler) checkEndpointAccessControl(endpoint *portainer.Endpoint, userID portainer.UserID) bool {
 	for _, authorizedUserID := range endpoint.AuthorizedUsers {
 		if authorizedUserID == userID {
 			return true
@@ -56,10 +53,11 @@ func (handler *DockerHandler) checkEndpointAccessControl(endpoint *portainer.End
 	return false
 }
 
-func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.Request) {
+func (handler *OrcaHandler) proxyRequestsToOrcaAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
+    /*
 	parsedID, err := strconv.Atoi(id)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
@@ -72,26 +70,34 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+	*/
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-	if tokenData.Role != portainer.AdministratorRole && !handler.checkEndpointAccessControl(endpoint, tokenData.ID) {
+
+	//&& !handler.checkEndpointAccessControl(endpoint, tokenData.ID)
+	if tokenData.Role != portainer.AdministratorRole {
 		httperror.WriteErrorResponse(w, portainer.ErrEndpointAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}
 
 	var proxy http.Handler
-	proxy = handler.ProxyManager.GetProxy(string(endpointID))
+	proxy = handler.ProxyManager.GetOrcaProxy(id)
+
 	if proxy == nil {
-		proxy, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
+	    log.Println("Registering new Orca proxy manager...")
+
+	    // TODO: define external gateway
+
+		proxy, err = handler.ProxyManager.CreateAndRegisterOrcaProxy(id, "http://172.17.0.1:20002", false)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 			return
 		}
 	}
 
-	http.StripPrefix("/"+id+"/docker", proxy).ServeHTTP(w, r)
+	http.StripPrefix("/"+id+"/orca", proxy).ServeHTTP(w, r)
 }

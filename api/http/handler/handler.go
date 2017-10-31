@@ -28,6 +28,7 @@ type Handler struct {
 	WebSocketHandler      *WebSocketHandler
 	UploadHandler         *UploadHandler
 	FileHandler           *FileHandler
+	OrcaHandler           *OrcaHandler
 }
 
 const (
@@ -41,7 +42,6 @@ const (
 
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
 	switch {
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
@@ -50,6 +50,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(r.URL.Path, "/api/endpoints"):
 		if strings.Contains(r.URL.Path, "/docker") {
 			http.StripPrefix("/api/endpoints", h.DockerHandler).ServeHTTP(w, r)
+		} else if strings.Contains(r.URL.Path, "/orca") {
+			http.StripPrefix("/api/endpoints", h.OrcaHandler).ServeHTTP(w, r)
 		} else if strings.Contains(r.URL.Path, "/stacks") {
 			http.StripPrefix("/api/endpoints", h.StackHandler).ServeHTTP(w, r)
 		} else {

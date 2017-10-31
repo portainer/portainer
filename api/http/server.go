@@ -41,6 +41,7 @@ type Server struct {
 func (server *Server) Start() error {
 	requestBouncer := security.NewRequestBouncer(server.JWTService, server.TeamMembershipService, server.AuthDisabled)
 	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamMembershipService, server.SettingsService)
+	proxyOrcaManager := proxy.NewOrcaManager(server.ResourceControlService, server.TeamMembershipService, server.SettingsService)
 
 	var fileHandler = handler.NewFileHandler(server.AssetsPath)
 	var authHandler = handler.NewAuthHandler(requestBouncer, server.AuthDisabled)
@@ -93,6 +94,8 @@ func (server *Server) Start() error {
 	stackHandler.ResourceControlService = server.ResourceControlService
 	stackHandler.StackManager = server.StackManager
 	stackHandler.GitService = server.GitService
+	var orcaHandler = handler.NewOrcaHandler(requestBouncer)
+	orcaHandler.ProxyManager = proxyOrcaManager
 
 	server.Handler = &handler.Handler{
 		AuthHandler:           authHandler,
@@ -106,6 +109,7 @@ func (server *Server) Start() error {
 		SettingsHandler:       settingsHandler,
 		StatusHandler:         statusHandler,
 		StackHandler:          stackHandler,
+		OrcaHandler:           orcaHandler,
 		TemplatesHandler:      templatesHandler,
 		DockerHandler:         dockerHandler,
 		WebSocketHandler:      websocketHandler,

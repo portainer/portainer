@@ -72,6 +72,8 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 
 	var resourceControlType portainer.ResourceControlType
 	switch req.Type {
+	//case "deployment":
+	//	resourceControlType = portainer.DeploymentResourceControl
 	case "container":
 		resourceControlType = portainer.ContainerResourceControl
 	case "service":
