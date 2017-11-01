@@ -1,6 +1,6 @@
 angular.module('createStack', [])
-.controller('CreateStackController', ['$scope', '$state', '$document', 'StackService', 'CodeMirrorService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService',
-function ($scope, $state, $document, StackService, CodeMirrorService, Authentication, Notifications, FormValidator, ResourceControlService) {
+.controller('CreateStackController', ['$scope', '$state', '$document', 'StackService', 'CodeMirrorService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService', 'FormHelper',
+function ($scope, $state, $document, StackService, CodeMirrorService, Authentication, Notifications, FormValidator, ResourceControlService, FormHelper) {
 
   // Store the editor content when switching builder methods
   var editorContent = '';
@@ -41,20 +41,9 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
     return true;
   }
 
-  function removeInvalidEnvVars(env) {
-    for (var i = env.length - 1; i >= 0; i--) {
-      var envvar = env[i];
-      if (!envvar.value || !envvar.name) {
-        env.splice(i, 1);
-      }
-    }
-
-    return env;
-  }
-
   function createStack(name) {
     var method = $scope.state.Method;
-    var env = removeInvalidEnvVars($scope.formValues.Env);
+    var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
 
     if (method === 'editor') {
       // The codemirror editor does not work with ng-model so we need to retrieve

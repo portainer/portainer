@@ -1,6 +1,6 @@
 angular.module('stack', [])
-.controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications',
-function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications) {
+.controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications', 'FormHelper',
+function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper) {
 
   $scope.deployStack = function () {
     $('#createResourceSpinner').show();
@@ -8,7 +8,7 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
     // The codemirror editor does not work with ng-model so we need to retrieve
     // the value directly from the editor.
     var stackFile = $scope.editor.getValue();
-    var env = removeInvalidEnvVars($scope.stack.Env);
+    var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
 
     StackService.updateStack($scope.stack.Id, stackFile, env)
     .then(function success(data) {
@@ -30,17 +30,6 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
   $scope.removeEnvironmentVariable = function(index) {
     $scope.stack.Env.splice(index, 1);
   };
-
-  function removeInvalidEnvVars(env) {
-    for (var i = env.length - 1; i >= 0; i--) {
-      var envvar = env[i];
-      if (!envvar.value || !envvar.name) {
-        env.splice(i, 1);
-      }
-    }
-
-    return env;
-  }
 
   function initView() {
     $('#loadingViewSpinner').show();
