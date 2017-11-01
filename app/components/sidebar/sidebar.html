@@ -41,6 +41,9 @@
     <li class="sidebar-list">
       <a ui-sref="containers" ui-sref-active="active">Containers <span class="menu-icon fa fa-server"></span></a>
     </li>
+    <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
+      <a ui-sref="nodes" ui-sref-active="active">Nodes <span class="menu-icon fa fa-microchip"></span></a>
+    </li>
     <li class="sidebar-list">
       <a ui-sref="images" ui-sref-active="active">Images <span class="menu-icon fa fa-clone"></span></a>
     </li>

@@ -18,16 +18,17 @@ FROM node:8.7.0  as nodebuilder
 WORKDIR /code
 COPY ./package.json /code/package.json
 RUN npm install -g bower grunt-cli && npm install
-COPY --from=gobuilder /dist /code/dist
 COPY ./bower.json /code/bower.json
 RUN bower install --allow-root
 COPY . /code
 RUN grunt build
+COPY --from=gobuilder /dist/portainer* /code/dist
 RUN mv /code/dist/portainer-$(uname -s | tr '[:upper:]' '[:lower:]')-$(dpkg --print-architecture) /code/dist/portainer
 
-FROM portainer/base:latest
+FROM alpine:3.4
 
 ENV VERSION 1.15.0-1-SNAPSHOT
+RUN apk --no-cache --update upgrade && apk --no-cache add ca-certificates && update-ca-certificates && apk add bash
 COPY --from=nodebuilder /code/dist /
 VOLUME /data
 WORKDIR /

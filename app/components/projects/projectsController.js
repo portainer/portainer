@@ -81,15 +81,16 @@ function ($scope, Notifications, Pagination, ProjectService, ModalService) {
     ProjectService.projects(true)
     .then(function success(data) {
       var projects = data;
-
-      console.log("Projects data: " + data)
-
-      for (var i = 0; i < projects.length; i++) {
-        var project = projects[i];
-        if (project.External) {
-          $scope.state.DisplayInformationPanel = true;
-          break;
-        }
+      if (projects != null) {
+          for (var i = 0; i < projects.length; i++) {
+            var project = projects[i];
+            if (project.External) {
+              $scope.state.DisplayInformationPanel = true;
+              break;
+            }
+          }
+      } else {
+        projects = []
       }
       $scope.projects = projects;
     })

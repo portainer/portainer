@@ -26,9 +26,6 @@ type DockerHandler struct {
 
 // NewDockerHandler returns a new instance of DockerHandler.
 func NewDockerHandler(bouncer *security.RequestBouncer) *DockerHandler {
-
-    log.Println("Starting Docker handler...")
-
 	h := &DockerHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),

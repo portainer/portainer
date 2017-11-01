@@ -1,0 +1,191 @@
+<rd-header>
+  <rd-header-title title="Nodes">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="nodes" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+  </rd-header-title>
+  <rd-header-content>Swarm</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
+    <rd-widget>
+      <rd-widget-header icon="fa-hdd-o" title="Node summary">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>
+                <a ui-sref="swarm" ng-click="order('name')">
+                  Name
+                  <span ng-show="sortType == 'name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('cpu')">
+                  CPU
+                  <span ng-show="sortType == 'cpu' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'cpu' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('memory')">
+                  Memory
+                  <span ng-show="sortType == 'memory' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'memory' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('ip')">
+                  IP
+                  <span ng-show="sortType == 'ip' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'ip' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('version')">
+                  Engine
+                  <span ng-show="sortType == 'version' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'version' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('status')">
+                  Status
+                  <span ng-show="sortType == 'status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="node in (state.filteredNodes = (swarm.Status | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <td>{{ node.name }}</td>
+              <td>{{ node.cpu }}</td>
+              <td>{{ node.memory }}</td>
+              <td>{{ node.ip }}</td>
+              <td>{{ node.version }}</td>
+              <td><span class="label label-{{ node.status|nodestatusbadge }}">{{ node.status }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+    <rd-widget>
+      <rd-widget-header icon="fa-hdd-o" title="Node status">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-lg-12">
+        <div class="pull-left">
+          <button type="button" class="btn btn-success btn-responsive" ng-click="startAction()" ng-disabled="!state.selectedItemCount || state.noStoppedItemsSelected"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
+          <button type="button" class="btn btn-danger btn-responsive" ng-click="stopAction()" ng-disabled="!state.selectedItemCount || state.noRunningItemsSelected"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
+              </th>
+               <th>
+                <a ui-sref="swarm" ng-click="order('Status')">
+                  State
+                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('Hostname')">
+                  Name
+                  <span ng-show="sortType == 'Hostname' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Hostname' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('Role')">
+                  Role
+                  <span ng-show="sortType == 'Role' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Role' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('CPUs')">
+                  CPU
+                  <span ng-show="sortType == 'CPUs' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'CPUs' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('Memory')">
+                  Memory
+                  <span ng-show="sortType == 'Memory' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Memory' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th>
+                <a ui-sref="swarm" ng-click="order('EngineVersion')">
+                  Engine
+                  <span ng-show="sortType == 'EngineVersion' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'EngineVersion' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+              <th ng-if="applicationState.endpoint.apiVersion >= 1.25">
+                <a ui-sref="swarm" ng-click="order('Addr')">
+                  IP Address
+                  <span ng-show="sortType == 'Addr' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Addr' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="node in (state.filteredNodes = (nodes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <td><input type="checkbox" ng-model="node.Checked" ng-change="selectItem(node)"/></td>
+              <td><span class="label label-{{ node.Status|nodestatusbadge }}">{{ node.Status }}</span></td>
+              <td>
+                <a ui-sref="node({id: node.Id})" ng-if="isAdmin">{{ node.Hostname }}</a>
+                <span ng-if="!isAdmin">{{ node.Hostname }}</span>
+              </td>
+              <td>{{ node.Role }}</td>
+              <td>{{ node.CPUs / 1000000000 }}</td>
+              <td>{{ node.Memory|humansize }}</td>
+              <td>{{ node.EngineVersion }}</td>
+              <td ng-if="applicationState.endpoint.apiVersion >= 1.25">{{ node.Addr }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination-controls">
+          <dir-pagination-controls></dir-pagination-controls>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

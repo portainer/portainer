@@ -8,7 +8,7 @@ import (
 	"github.com/portainer/portainer"
 )
 
-// OrcaManager represents a service used to manage Docker proxies.
+// OrcaManager represents a service used to manage Orca proxies.
 type OrcaManager struct {
 	proxyFactory *proxyFactory
 	proxies      cmap.ConcurrentMap

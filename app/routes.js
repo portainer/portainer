@@ -701,6 +701,19 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('nodes', {
+    url: '/nodes/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/nodes/nodes.html',
+        controller: 'NodesController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('stacks', {
     url: '/stacks/',
     views: {

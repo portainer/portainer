@@ -29,6 +29,7 @@ type Handler struct {
 	UploadHandler         *UploadHandler
 	FileHandler           *FileHandler
 	OrcaHandler           *OrcaHandler
+	CloudHandler          *CloudHandler
 }
 
 const (
@@ -52,6 +53,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.StripPrefix("/api/endpoints", h.DockerHandler).ServeHTTP(w, r)
 		} else if strings.Contains(r.URL.Path, "/orca") {
 			http.StripPrefix("/api/endpoints", h.OrcaHandler).ServeHTTP(w, r)
+		} else if strings.Contains(r.URL.Path, "/cloud") {
+			http.StripPrefix("/api/endpoints", h.CloudHandler).ServeHTTP(w, r)
 		} else if strings.Contains(r.URL.Path, "/stacks") {
 			http.StripPrefix("/api/endpoints", h.StackHandler).ServeHTTP(w, r)
 		} else {
