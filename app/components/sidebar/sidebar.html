@@ -3,8 +3,10 @@
   <ul class="sidebar">
     <li class="sidebar-main">
       <a ng-click="toggleSidebar()" class="interactive">
-        <img ng-if="logo" ng-src="{{ logo }}" class="img-responsive logo">
-        <img ng-if="!logo" src="images/logo.png" class="img-responsive logo" alt="Portainer">
+        <!-- class="img-responsive logo" -->
+        <img width="50" height="50" ng-if="logo" ng-src="{{ logo }}">
+        <!-- class="img-responsive logo" -->
+        <img width="50" height="50" ng-if="!logo" src="images/logo.png" alt="OrcaWeb">
         <span class="menu-icon glyphicon glyphicon-transfer"></span>
       </a>
     </li>
