@@ -41,6 +41,8 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 	path := request.URL.Path
 
 	switch {
+	case strings.HasPrefix(path, "/configs"):
+		return p.proxyConfigRequest(request)
 	case strings.HasPrefix(path, "/containers"):
 		return p.proxyContainerRequest(request)
 	case strings.HasPrefix(path, "/services"):
@@ -59,6 +61,24 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxyTaskRequest(request)
 	default:
 		return p.executeDockerRequest(request)
+	}
+}
+
+func (p *proxyTransport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
+	switch requestPath := request.URL.Path; requestPath {
+	case "/configs/create":
+		return p.administratorOperation(request)
+
+	case "/configs":
+		return p.rewriteOperation(request, configListOperation)
+
+	default:
+		// assume /secrets/{id}
+		if request.Method == http.MethodGet {
+			return p.rewriteOperation(request, configInspectOperation)
+		}
+		secretID := path.Base(requestPath)
+		return p.restrictedOperation(request, secretID)
 	}
 }
 
