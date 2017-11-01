@@ -138,6 +138,7 @@ type (
 		EntryPoint  string  `json:"EntryPoint"`
 		SwarmID     string  `json:"SwarmId"`
 		ProjectPath string
+		Env         []Pair `json:"Env"`
 	}
 
 	// RegistryID represents a registry identifier.
