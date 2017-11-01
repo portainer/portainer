@@ -62,11 +62,12 @@ func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 
 type (
 	postStacksRequest struct {
-		Name             string `valid:"required"`
-		SwarmID          string `valid:"required"`
-		StackFileContent string `valid:""`
-		GitRepository    string `valid:""`
-		PathInRepository string `valid:""`
+		Name             string           `valid:"required"`
+		SwarmID          string           `valid:"required"`
+		StackFileContent string           `valid:""`
+		GitRepository    string           `valid:""`
+		PathInRepository string           `valid:""`
+		Env              []portainer.Pair `valid:""`
 	}
 	postStacksResponse struct {
 		ID string `json:"Id"`
@@ -75,7 +76,8 @@ type (
 		StackFileContent string `json:"StackFileContent"`
 	}
 	putStackRequest struct {
-		StackFileContent string `valid:"required"`
+		StackFileContent string           `valid:"required"`
+		Env              []portainer.Pair `valid:""`
 	}
 )
 
@@ -165,6 +167,7 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		Name:       stackName,
 		SwarmID:    swarmID,
 		EntryPoint: file.ComposeFileDefaultName,
+		Env:        req.Env,
 	}
 
 	projectPath, err := handler.FileService.StoreStackFileFromString(string(stack.ID), stackFileContent)
@@ -282,6 +285,7 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		Name:       stackName,
 		SwarmID:    swarmID,
 		EntryPoint: req.PathInRepository,
+		Env:        req.Env,
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(string(stack.ID))
@@ -369,6 +373,13 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		return
 	}
 
+	envParam := r.FormValue("Env")
+	var env []portainer.Pair
+	if err = json.Unmarshal([]byte(envParam), &env); err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
 	stackFile, _, err := r.FormFile("file")
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -394,6 +405,7 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		Name:       stackName,
 		SwarmID:    swarmID,
 		EntryPoint: file.ComposeFileDefaultName,
+		Env:        env,
 	}
 
 	projectPath, err := handler.FileService.StoreStackFileFromReader(string(stack.ID), stackFile)
@@ -587,8 +599,15 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
+	stack.Env = req.Env
 
 	_, err = handler.FileService.StoreStackFileFromString(string(stack.ID), req.StackFileContent)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.StackService.UpdateStack(stack.ID, stack)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return

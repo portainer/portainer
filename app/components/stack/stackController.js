@@ -8,8 +8,9 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
     // The codemirror editor does not work with ng-model so we need to retrieve
     // the value directly from the editor.
     var stackFile = $scope.editor.getValue();
+    var env = removeInvalidEnvVars($scope.stack.Env);
 
-    StackService.updateStack($scope.stack.Id, stackFile)
+    StackService.updateStack($scope.stack.Id, stackFile, env)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
       $state.reload();
@@ -21,6 +22,25 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
       $('#createResourceSpinner').hide();
     });
   };
+
+  $scope.addEnvironmentVariable = function() {
+    $scope.stack.Env.push({ name: '', value: ''});
+  };
+
+  $scope.removeEnvironmentVariable = function(index) {
+    $scope.stack.Env.splice(index, 1);
+  };
+
+  function removeInvalidEnvVars(env) {
+    for (var i = env.length - 1; i >= 0; i--) {
+      var envvar = env[i];
+      if (!envvar.value || !envvar.name) {
+        env.splice(i, 1);
+      }
+    }
+
+    return env;
+  }
 
   function initView() {
     $('#loadingViewSpinner').show();

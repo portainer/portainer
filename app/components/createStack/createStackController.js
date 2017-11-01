@@ -11,6 +11,7 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
     StackFileContent: '# Define or paste the content of your docker-compose file here',
     StackFile: null,
     RepositoryURL: '',
+    Env: [],
     RepositoryPath: 'docker-compose.yml',
     AccessControlData: new AccessControlFormData()
   };
@@ -18,6 +19,14 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
   $scope.state = {
     Method: 'editor',
     formValidationError: ''
+  };
+
+  $scope.addEnvironmentVariable = function() {
+    $scope.formValues.Env.push({ name: '', value: ''});
+  };
+
+  $scope.removeEnvironmentVariable = function(index) {
+    $scope.formValues.Env.splice(index, 1);
   };
 
   function validateForm(accessControlData, isAdmin) {
@@ -32,22 +41,34 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
     return true;
   }
 
+  function removeInvalidEnvVars(env) {
+    for (var i = env.length - 1; i >= 0; i--) {
+      var envvar = env[i];
+      if (!envvar.value || !envvar.name) {
+        env.splice(i, 1);
+      }
+    }
+
+    return env;
+  }
+
   function createStack(name) {
     var method = $scope.state.Method;
+    var env = removeInvalidEnvVars($scope.formValues.Env);
 
     if (method === 'editor') {
       // The codemirror editor does not work with ng-model so we need to retrieve
       // the value directly from the editor.
       var stackFileContent = $scope.editor.getValue();
 
-      return StackService.createStackFromFileContent(name, stackFileContent);
+      return StackService.createStackFromFileContent(name, stackFileContent, env);
     } else if (method === 'upload') {
       var stackFile = $scope.formValues.StackFile;
-      return StackService.createStackFromFileUpload(name, stackFile);
+      return StackService.createStackFromFileUpload(name, stackFile, env);
     } else if (method === 'repository') {
       var gitRepository = $scope.formValues.RepositoryURL;
       var pathInRepository = $scope.formValues.RepositoryPath;
-      return StackService.createStackFromGitRepository(name, gitRepository, pathInRepository);
+      return StackService.createStackFromGitRepository(name, gitRepository, pathInRepository, env);
     }
   }
 

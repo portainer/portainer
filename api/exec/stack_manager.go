@@ -2,6 +2,7 @@ package exec
 
 import (
 	"bytes"
+	"os"
 	"os/exec"
 	"path"
 	"runtime"
@@ -27,7 +28,7 @@ func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []
 	for _, registry := range registries {
 		if registry.Authentication {
 			registryArgs := append(args, "login", "--username", registry.Username, "--password", registry.Password, registry.URL)
-			err := runCommandAndCaptureStdErr(command, registryArgs)
+			err := runCommandAndCaptureStdErr(command, registryArgs, nil)
 			if err != nil {
 				return err
 			}
@@ -36,7 +37,7 @@ func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []
 
 	if dockerhub.Authentication {
 		dockerhubArgs := append(args, "login", "--username", dockerhub.Username, "--password", dockerhub.Password)
-		err := runCommandAndCaptureStdErr(command, dockerhubArgs)
+		err := runCommandAndCaptureStdErr(command, dockerhubArgs, nil)
 		if err != nil {
 			return err
 		}
@@ -49,7 +50,7 @@ func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []
 func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	args = append(args, "logout")
-	return runCommandAndCaptureStdErr(command, args)
+	return runCommandAndCaptureStdErr(command, args, nil)
 }
 
 // Deploy executes the docker stack deploy command.
@@ -57,20 +58,31 @@ func (manager *StackManager) Deploy(stack *portainer.Stack, endpoint *portainer.
 	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	args = append(args, "stack", "deploy", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
-	return runCommandAndCaptureStdErr(command, args)
+
+	env := make([]string, 0)
+	for _, envvar := range stack.Env {
+		env = append(env, envvar.Name+"="+envvar.Value)
+	}
+
+	return runCommandAndCaptureStdErr(command, args, env)
 }
 
 // Remove executes the docker stack rm command.
 func (manager *StackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	args = append(args, "stack", "rm", stack.Name)
-	return runCommandAndCaptureStdErr(command, args)
+	return runCommandAndCaptureStdErr(command, args, nil)
 }
 
-func runCommandAndCaptureStdErr(command string, args []string) error {
+func runCommandAndCaptureStdErr(command string, args []string, env []string) error {
 	var stderr bytes.Buffer
 	cmd := exec.Command(command, args...)
 	cmd.Stderr = &stderr
+
+	if env != nil {
+		cmd.Env = os.Environ()
+		cmd.Env = append(cmd.Env, env...)
+	}
 
 	err := cmd.Run()
 	if err != nil {
