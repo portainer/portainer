@@ -43,16 +43,24 @@ func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *ht
 	}
 
 	var templatesURL string
-	if key == "containers" {
+	switch key {
+	case "containers":
 		settings, err := handler.SettingsService.Settings()
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return
 		}
 		templatesURL = settings.TemplatesURL
-	} else if key == "linuxserver.io" {
+	case "linuxserver.io":
 		templatesURL = containerTemplatesURLLinuxServerIo
-	} else {
+	case "stacks":
+		settings, err := handler.SettingsService.Settings()
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
+		templatesURL = settings.StackTemplatesURL
+	default:
 		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}

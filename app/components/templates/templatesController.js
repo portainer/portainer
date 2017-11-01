@@ -1,6 +1,6 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService',
-function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, FormValidator, SettingsService) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService',
+function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, FormValidator, SettingsService, StackService) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
@@ -54,19 +54,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     return true;
   }
 
-  $scope.createTemplate = function() {
-    $('#createContainerSpinner').show();
-
-    var userDetails = Authentication.getUserDetails();
-    var accessControlData = $scope.formValues.AccessControlData;
-    var isAdmin = userDetails.role === 1 ? true : false;
-
-    if (!validateForm(accessControlData, isAdmin)) {
-      $('#createContainerSpinner').hide();
-      return;
-    }
-
-    var template = $scope.state.selectedTemplate;
+  function createContainerFromTemplate(template, userId, accessControlData) {
     var templateConfiguration = createTemplateConfiguration(template);
     var generatedVolumeCount = TemplateHelper.determineRequiredGeneratedVolumeCount(template.Volumes);
     var generatedVolumeIds = [];
@@ -85,7 +73,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     })
     .then(function success(data) {
       var containerIdentifier = data.Id;
-      var userId = userDetails.ID;
       return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData, generatedVolumeIds);
     })
     .then(function success() {
@@ -96,8 +83,59 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       Notifications.error('Failure', err, err.msg);
     })
     .finally(function final() {
-      $('#createContainerSpinner').hide();
+      $('#createResourceSpinner').hide();
     });
+  }
+
+  function createStackFromTemplate(template, userId, accessControlData) {
+    var stackName = $scope.formValues.name;
+
+    for (var i = 0; i < template.Env.length; i++) {
+      var envvar = template.Env[i];
+      if (envvar.set) {
+        envvar.value = envvar.set;
+      }
+    }
+
+    StackService.createStackFromGitRepository(stackName, template.Repository.url, template.Repository.stackfile, template.Env)
+    .then(function success() {
+      Notifications.success('Stack successfully created');
+    })
+    .catch(function error(err) {
+      Notifications.warning('Deployment error', err.err.data.err);
+    })
+    .then(function success(data) {
+      return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, []);
+    })
+    .then(function success() {
+      $state.go('stacks', {}, {reload: true});
+    })
+    .finally(function final() {
+      $('#createResourceSpinner').hide();
+    });
+  }
+
+  $scope.createTemplate = function() {
+    $('#createResourceSpinner').show();
+
+    var userDetails = Authentication.getUserDetails();
+    var userId = userDetails.ID;
+    var accessControlData = $scope.formValues.AccessControlData;
+    var isAdmin = userDetails.role === 1 ? true : false;
+
+    if (!validateForm(accessControlData, isAdmin)) {
+      $('#createResourceSpinner').hide();
+      return;
+    }
+
+    var template = $scope.state.selectedTemplate;
+    var templatesKey = $scope.templatesKey;
+
+    if (templatesKey === 'stacks') {
+      createStackFromTemplate(template, userId, accessControlData);
+    } else {
+      createContainerFromTemplate(template, userId, accessControlData);
+    }
   };
 
   $scope.unselectTemplate = function() {
@@ -152,8 +190,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     return containerMapping;
   }
 
-  function initTemplates() {
-    var templatesKey = $transition$.params().key;
+  function initContainerTemplates(templatesKey) {
     var provider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
@@ -182,16 +219,47 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       $scope.globalNetworkCount = networks.length;
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
-      var userDetails = Authentication.getUserDetails();
-      $scope.isAdmin = userDetails.role === 1 ? true : false;
     })
     .catch(function error(err) {
       $scope.templates = [];
       Notifications.error('Failure', err, 'An error occured during apps initialization.');
     })
     .finally(function final(){
-      $('#loadTemplatesSpinner').hide();
+      $('#loadingViewSpinner').hide();
     });
+  }
+
+  function initStackTemplates(templatesKey) {
+    TemplateService.getTemplates(templatesKey)
+    .then(function success(data) {
+      $scope.templates = data;
+      var availableCategories = [];
+      angular.forEach($scope.templates, function(template) {
+        availableCategories = availableCategories.concat(template.Categories);
+      });
+      $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
+    })
+    .catch(function error(err) {
+      $scope.templates = [];
+      Notifications.error('Failure', err, 'Unable to retrieve stack templates.');
+    })
+    .finally(function final(){
+      $('#loadingViewSpinner').hide();
+    });
+  }
+
+  function initTemplates() {
+    var templatesKey = $transition$.params().key;
+    $scope.templatesKey = templatesKey;
+
+    var userDetails = Authentication.getUserDetails();
+    $scope.isAdmin = userDetails.role === 1 ? true : false;
+
+    if (templatesKey === 'stacks') {
+      initStackTemplates(templatesKey);
+    } else {
+      initContainerTemplates(templatesKey);
+    }
   }
 
   initTemplates();

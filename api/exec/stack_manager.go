@@ -57,6 +57,7 @@ func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
 func (manager *StackManager) Deploy(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
+
 	args = append(args, "stack", "deploy", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
 
 	env := make([]string, 0)
