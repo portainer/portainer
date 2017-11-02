@@ -54,6 +54,7 @@ type (
 
 	putSettingsRequest struct {
 		TemplatesURL                       string                 `valid:"required"`
+		StackTemplatesURL                  string                 `valid:"required"`
 		LogoURL                            string                 `valid:""`
 		BlackListedLabels                  []portainer.Pair       `valid:""`
 		DisplayExternalContributors        bool                   `valid:""`
@@ -116,6 +117,7 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 
 	settings := &portainer.Settings{
 		TemplatesURL:                       req.TemplatesURL,
+		StackTemplatesURL:                  req.StackTemplatesURL,
 		LogoURL:                            req.LogoURL,
 		BlackListedLabels:                  req.BlackListedLabels,
 		DisplayExternalContributors:        req.DisplayExternalContributors,

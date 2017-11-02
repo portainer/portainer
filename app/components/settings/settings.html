@@ -75,14 +75,39 @@
           <div class="form-group">
             <div class="col-sm-12">
               <label for="toggle_templates" class="control-label text-left">
-                Use custom templates
+                Use custom stack templates
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_templates" ng-model="formValues.customTemplates"><i></i>
+                <input type="checkbox" name="toggle_templates" ng-model="formValues.customStackTemplates"><i></i>
               </label>
             </div>
           </div>
-          <div ng-if="formValues.customTemplates">
+          <div ng-if="formValues.customStackTemplates">
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                You can specify the URL to your own template definitions file here. See <a href="https://portainer.readthedocs.io/en/stable/templates.html" target="_blank">Portainer documentation</a> for more details.
+              </span>
+            </div>
+            <div class="form-group" >
+              <label for="stacktemplates_url" class="col-sm-1 control-label text-left">
+                URL
+              </label>
+              <div class="col-sm-11">
+                <input type="text" class="form-control" ng-model="settings.StackTemplatesURL" id="stacktemplates_url" placeholder="https://myserver.mydomain/stack_templates.json">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_templates" class="control-label text-left">
+                Use custom container templates
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_templates" ng-model="formValues.customContainerTemplates"><i></i>
+              </label>
+            </div>
+          </div>
+          <div ng-if="formValues.customContainerTemplates">
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
                 You can specify the URL to your own template definitions file here. See <a href="https://portainer.readthedocs.io/en/stable/templates.html" target="_blank">Portainer documentation</a> for more details.

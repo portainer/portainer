@@ -1,10 +1,11 @@
 angular.module('settings', [])
-.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_TEMPLATES_URL',
-function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_TEMPLATES_URL) {
+.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_CONTAINER_TEMPLATES_URL', 'DEFAULT_STACK_TEMPLATES_URL',
+function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_CONTAINER_TEMPLATES_URL, DEFAULT_STACK_TEMPLATES_URL) {
 
   $scope.formValues = {
     customLogo: false,
-    customTemplates: false,
+    customContainerTemplates: false,
+    customStackTemplates: false,
     externalContributions: false,
     restrictBindMounts: false,
     restrictPrivilegedMode: false,
@@ -37,9 +38,14 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
       settings.LogoURL = '';
     }
 
-    if (!$scope.formValues.customTemplates) {
-      settings.TemplatesURL = DEFAULT_TEMPLATES_URL;
+    if (!$scope.formValues.customContainerTemplates) {
+      settings.TemplatesURL = DEFAULT_CONTAINER_TEMPLATES_URL;
     }
+
+    if (!$scope.formValues.customStackTemplates) {
+      settings.StackTemplatesURL = DEFAULT_STACK_TEMPLATES_URL;
+    }
+
     settings.DisplayExternalContributors = !$scope.formValues.externalContributions;
     settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
     settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
@@ -81,8 +87,11 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
       if (settings.LogoURL !== '') {
         $scope.formValues.customLogo = true;
       }
-      if (settings.TemplatesURL !== DEFAULT_TEMPLATES_URL) {
-        $scope.formValues.customTemplates = true;
+      if (settings.TemplatesURL !== DEFAULT_CONTAINER_TEMPLATES_URL) {
+        $scope.formValues.customContainerTemplates = true;
+      }
+      if (settings.StackTemplatesURL !== DEFAULT_STACK_TEMPLATES_URL) {
+        $scope.formValues.customStackTemplates = true;
       }
       $scope.formValues.externalContributions = !settings.DisplayExternalContributors;
       $scope.formValues.restrictBindMounts = !settings.AllowBindMountsForRegularUsers;
