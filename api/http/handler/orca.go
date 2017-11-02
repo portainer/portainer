@@ -92,7 +92,7 @@ func (handler *OrcaHandler) proxyRequestsToOrcaAPI(w http.ResponseWriter, r *htt
 
 	    // TODO: define external gateway
 
-		proxy, err = handler.ProxyManager.CreateAndRegisterOrcaProxy(id, "http://172.17.0.1:20002", false)
+		proxy, err = handler.ProxyManager.CreateAndRegisterOrcaProxy(id, "http://orca:20002", false)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 			return

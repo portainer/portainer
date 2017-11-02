@@ -1,4 +1,5 @@
 portainer_data
+orcaweb_data
 node_modules
 bower_components
 dist

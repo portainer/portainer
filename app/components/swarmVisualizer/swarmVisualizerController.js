@@ -4,7 +4,7 @@ function ($q, $scope, $document, NodeService, ServiceService, TaskService, Notif
 
   $scope.state = {
     ShowInformationPanel: true,
-    DisplayOnlyRunningTasks: false
+    DisplayOnlyRunningTasks: true
   };
 
   function assignServiceName(services, tasks) {
@@ -39,10 +39,18 @@ function ($q, $scope, $document, NodeService, ServiceService, TaskService, Notif
   function prepareVisualizerData(nodes, services, tasks) {
     var visualizerData = {};
 
-    assignServiceName(services, tasks);
-    assignTasksToNode(nodes, tasks);
+    var readyNodes = [];
+    for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        if (node.Status == "ready") {
+            readyNodes.push(node);
+        }
+    }
 
-    visualizerData.nodes = nodes;
+    assignServiceName(services, tasks);
+    assignTasksToNode(readyNodes, tasks);
+
+    visualizerData.nodes = readyNodes;
     $scope.visualizerData = visualizerData;
   }
 

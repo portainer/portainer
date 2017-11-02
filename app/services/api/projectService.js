@@ -38,10 +38,6 @@ function ProjectServiceFactory($q, Project, DeploymentService, ResourceControlSe
 
     DeploymentService.deployments()
     .then(function success(data) {
-
-      console.log("Data: " + data)
-
-
       var deployments = data;
       //var projectNames = ProjectHelper.getExternalProjectNamesFromOrca();
 
@@ -49,7 +45,7 @@ function ProjectServiceFactory($q, Project, DeploymentService, ResourceControlSe
       for (var i = 0; i < deployments.length; i++) {
           var deployment = deployments[i];
 
-          console.log("Deployment ID: " + deployment.Id)
+          //console.log("Deployment ID: " + deployment.Id)
 
           // TODO: VERIFY
           deploymentNames.push(deployment.Name);
