@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"fmt"
 	"errors"
+	"sync"
 
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"encoding/json"
 
 	"github.com/gorilla/mux"
 	"github.com/aws/aws-sdk-go/aws"
@@ -27,6 +28,9 @@ type CloudHandler struct {
 	EndpointService       portainer.EndpointService
 	TeamMembershipService portainer.TeamMembershipService
 	ProxyManager          *proxy.CloudManager
+	cacheRefreshCounter   map[string]int
+	cachedInstances       map[string]*ec2.Instance
+	cacheMutex            *sync.RWMutex
 }
 
 // NewCloudHandler returns a new instance of CloudHandler.
@@ -36,6 +40,12 @@ func NewCloudHandler(bouncer *security.RequestBouncer) *CloudHandler {
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 
+	// Init
+	h.cacheRefreshCounter = make(map[string]int)
+	h.cachedInstances = make(map[string]*ec2.Instance)
+	h.cacheMutex = &sync.RWMutex{}
+
+    // TODO: change prefix routing based on target cloud provider, AWS, Openstack, etc.
 	h.PathPrefix("/{id}/cloud/{resource}/{resource_id}/{action}").Handler(
 		bouncer.AuthenticatedAccess(http.HandlerFunc(h.proxyRequestsToCloudAPI)))
 
@@ -60,9 +70,32 @@ func (handler *CloudHandler) checkEndpointAccessControl(endpoint *portainer.Endp
 	return false
 }
 
+func (handler *CloudHandler) writeJSON(w http.ResponseWriter, statusCode int, response interface{}) {
+	encoder := json.NewEncoder(w)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(statusCode)
+	encoder.Encode(response)
+}
+
+// Write a fresh response based on cloud provider node data
+func (handler *CloudHandler) writeStateResponse(w http.ResponseWriter, state string) error {
+    responseMapObject := map[string]string{"State": state}
+
+	jsonData, err := json.Marshal(responseMapObject)
+	if err != nil {
+		return err
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+
+	return nil
+}
+
 func (handler *CloudHandler) proxyRequestsToCloudAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["id"]
+	//id := vars["id"]
 	resource := vars["resource"]
 	resource_id := vars["resource_id"]
 	action := vars["action"]
@@ -80,7 +113,7 @@ func (handler *CloudHandler) proxyRequestsToCloudAPI(w http.ResponseWriter, r *h
 		return
 	}
 
-	log.Println("Called proxyRequestsToCloudNodeAPI with id " + id + ", resource " + resource + ", resource_id " + resource_id + ", action " + action)
+	// log.Println("Called proxyRequestsToCloudNodeAPI with id " + id + ", resource " + resource + ", resource_id " + resource_id + ", action " + action)
 
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
@@ -104,28 +137,52 @@ func (handler *CloudHandler) proxyRequestsToCloudAPI(w http.ResponseWriter, r *h
         // Create new EC2 client
         ec2Svc := ec2.New(sess)
 
-        result, err := ec2Svc.DescribeInstances(nil)
-        if err != nil {
-            log.Fatal(err)
-        } else {
-            log.Println("Success", result)
+        var resource_instance *ec2.Instance
+
+        // Use cached instance, if it exists
+        if action == "state" {
+            // TODO: magic number
+            handler.cacheMutex.Lock()
+            if val, ok := handler.cachedInstances[resource_id]; ok {
+                if _, ok := handler.cacheRefreshCounter[resource_id]; ok {
+                } else {
+                    handler.cacheRefreshCounter[resource_id] = 0
+                }
+                if handler.cacheRefreshCounter[resource_id] >= 50 {
+                    delete(handler.cachedInstances, resource_id)
+                    handler.cacheRefreshCounter[resource_id] = 0
+                } else {
+                    handler.cacheRefreshCounter[resource_id] += 1
+                    resource_instance = val
+                }
+            }
+            handler.cacheMutex.Unlock()
         }
 
-        var resource_instance *ec2.Instance
-        for _, reservation := range result.Reservations {
-            for _, instance := range reservation.Instances {
-                for _, networkInterface := range instance.NetworkInterfaces {
-                    if *networkInterface.PrivateIpAddress == resource_id {
-                        resource_instance = instance
+        if resource_instance == nil {
+            result, err := ec2Svc.DescribeInstances(nil)
+            if err != nil {
+                httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+                return
+            }
+
+            for _, reservation := range result.Reservations {
+                for _, instance := range reservation.Instances {
+                    for _, networkInterface := range instance.NetworkInterfaces {
+                        if *networkInterface.PrivateIpAddress == resource_id {
+                            resource_instance = instance
+                            handler.cacheMutex.Lock()
+                            handler.cachedInstances[resource_id] = instance
+                            handler.cacheMutex.Unlock()
+                        }
+                    }
+                    if resource_instance != nil {
+                        break
                     }
                 }
-                //fmt.Println(*instance.InstanceId)
                 if resource_instance != nil {
                     break
                 }
-            }
-            if resource_instance != nil {
-                break
             }
         }
 
@@ -151,7 +208,7 @@ func (handler *CloudHandler) proxyRequestsToCloudAPI(w http.ResponseWriter, r *h
                     httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
                     return
                 } else {
-                    fmt.Println("Success", result)
+                    log.Println("Success", result)
                 }
             } else { // This could be due to a lack of permissions
                 httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -174,7 +231,42 @@ func (handler *CloudHandler) proxyRequestsToCloudAPI(w http.ResponseWriter, r *h
                     httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
                     return
                 } else {
-                    fmt.Println("Success", result)
+                    log.Println("Success", result)
+                }
+            } else { // This could be due to a lack of permissions
+                httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+                return
+            }
+        } else if action == "state" {
+          	input := &ec2.DescribeInstanceStatusInput {
+                InstanceIds: []*string{
+                    aws.String(*resource_instance.InstanceId),
+                },
+                DryRun: aws.Bool(true),
+            }
+            result, err := ec2Svc.DescribeInstanceStatus(input)
+            awsErr, ok := err.(awserr.Error)
+
+            if ok && awsErr.Code() == "DryRunOperation" {
+                input.DryRun = aws.Bool(false)
+                result, err = ec2Svc.DescribeInstanceStatus(input)
+                if err != nil {
+                    httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+                    return
+                } else {
+                    //log.Println("Success", result)
+                    for _, status := range result.InstanceStatuses {
+                        state := *status.InstanceState.Name
+                        //log.Println("Writing found state " + state + " for resource ID: " + resource_id)
+                        err := handler.writeStateResponse(w, state)
+                        if err != nil {
+                            httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+                            return
+                        }
+                        // TODO: multiple nodes?
+                        return
+                    }
+
                 }
             } else { // This could be due to a lack of permissions
                 httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)

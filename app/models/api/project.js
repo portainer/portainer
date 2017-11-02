@@ -1,9 +1,12 @@
 function ProjectViewModel(data) {
-  //this.Id = data.Id;
-  //this.Name = data.Name;
-
   this.Id = data.Name;
   this.Name = data.Name;
+
+  if (data.Release) {
+    this.Release = data.Release
+  } else {
+    this.Release = "Unknown"
+  }
 
   this.Checked = false;
   if (data.ResourceControl && data.ResourceControl.Id !== 0) {

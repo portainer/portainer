@@ -1,0 +1,115 @@
+<rd-header>
+  <rd-header-title title="Project details">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="project({id: project.Id})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="projects">Projects</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="!node">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div ng-if="loading">
+      <i class="fa fa-cog fa-spin"></i> Loading...
+    </div>
+
+    <rd-widget ng-if="!loading">
+      <rd-widget-header icon="fa-object-group" title="Project does not exist"></rd-widget-header>
+      <rd-widget-body>
+        <p>It looks like the project you wish to inspect does not exist.</p>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<!--
+<div class="row" ng-if="node">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title="Node specification"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>
+                <input type="text" class="input-sm" ng-model="node.Name" placeholder="e.g. my-manager" ng-change="updateNodeAttribute(node, 'Name')">
+              </td>
+            </tr>
+            <tr>
+              <td>Host name</td>
+              <td>{{ node.Hostname }}</td>
+            </tr>
+            <tr>
+              <td>Role</td>
+              <td>{{ node.Role }}</td>
+            </tr>
+            <tr>
+              <td>Availability</td>
+              <td>
+                <div class="input-group input-group-sm">
+                  <select name="nodeAvailability" class="selectpicker form-control" ng-model="node.Availability" ng-change="updateNodeAttribute(node, 'Availability')">
+                    <option value="active">Active</option>
+                    <option value="pause">Pause</option>
+                    <option value="drain">Drain</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Status</td>
+              <td><span class="label label-{{ node.Status|nodestatusbadge }}">{{ node.Status }}</span></td>
+            </tr>
+            <tr>
+              <td>Operation</td>
+              <td><span class="label label-{{ node.Status|nodestatusbadge }}">{{ node.Status }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+      <rd-widget-footer>
+        <p class="small text-muted">
+          View the Docker Swarm mode Node documentation <a href="https://docs.docker.com/engine/swarm/manage-nodes/" target="self">here</a>.
+        </p>
+        <div class="btn-toolbar" role="toolbar">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary" ng-disabled="!hasChanges(node, ['Name', 'Availability'])" ng-click="updateNode(node)">Apply changes</button>
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a ng-click="cancelChanges(node)">Reset changes</a></li>
+            </ul>
+          </div>
+        </div>
+      </rd-widget-footer>
+    </rd-widget>
+  </div>
+</div>
+-->
+
+<div class="row" ng-if="node">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title="Project description"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>{{ project.DeploymentName }}</td>
+            </tr>
+            <tr>
+              <td>Release</td>
+              <td>{{ node.Release }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+</div>

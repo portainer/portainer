@@ -28,7 +28,6 @@ angular.module('portainer.services')
       if (data.message) {
         deferred.reject({ msg: data.message, err: data.message });
       }
-      console.log("Started node " + node.Id)
     })
     .then(function success() {
       deferred.resolve();
@@ -48,13 +47,39 @@ angular.module('portainer.services')
       if (data.message) {
         deferred.reject({ msg: data.message, err: data.message });
       }
-      console.log("Stopped node " + node.Id)
     })
     .then(function success() {
       deferred.resolve();
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to stop node', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.state = function(node) {
+    var deferred = $q.defer();
+
+    CloudNode.state({id: node.Addr}).$promise
+    .then(function success(data) {
+      var state = data.State || "no response";
+      node.CloudState = state;
+      for (var i = 0; i < service.nodes.length; i++) {
+        if (service.nodes[i].Addr == node.Addr) {
+            service.nodes[i].CloudState = state
+            break
+        }
+      }
+      if (data.message) {
+        deferred.reject({ msg: data.message, err: data.message });
+      }
+    })
+    .then(function success() {
+      deferred.resolve();
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to get node state', err: err });
     });
 
     return deferred.promise;

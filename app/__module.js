@@ -55,6 +55,7 @@ angular.module('portainer', [
   'sidebar',
   'stack',
   'stacks',
+  'project',
   'projects',
   'nodes',
   'swarm',

@@ -1,6 +1,6 @@
 angular.module('nodes', [])
-.controller('NodesController', ['$q', '$scope', 'SystemService', 'NodeService', 'Pagination', 'Notifications', 'StateManager', 'Authentication',
-function ($q, $scope, SystemService, NodeService, Pagination, Notifications, StateManager, Authentication) {
+.controller('NodesController', ['$interval', '$q', '$scope', 'SystemService', 'NodeService', 'Pagination', 'Notifications', 'StateManager', 'Authentication',
+function ($interval, $q, $scope, SystemService, NodeService, Pagination, Notifications, StateManager, Authentication) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('swarm_nodes');
   $scope.state.selectedItemCount = 0;
@@ -11,6 +11,8 @@ function ($q, $scope, SystemService, NodeService, Pagination, Notifications, Sta
   $scope.swarm = {};
   $scope.totalCPU = 0;
   $scope.totalMemory = 0;
+
+  var statePromise;
 
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
@@ -54,7 +56,7 @@ function ($q, $scope, SystemService, NodeService, Pagination, Notifications, Sta
         counter = counter + 1;
         NodeService.start(node)
         .then(function success() {
-          Notifications.success('Node started', node.Id);
+          Notifications.success('Node started', node.Hostname);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to start node');
@@ -82,7 +84,7 @@ function ($q, $scope, SystemService, NodeService, Pagination, Notifications, Sta
         counter = counter + 1;
         NodeService.stop(node)
         .then(function success() {
-          Notifications.success('Node stopped', node.Id);
+          Notifications.success('Node stopped', node.Hostname);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to stop node');
@@ -91,6 +93,32 @@ function ($q, $scope, SystemService, NodeService, Pagination, Notifications, Sta
           complete();
         });
       }
+    });
+  };
+
+  $scope.stateAction = function () {
+    $('#loadingViewSpinner').show();
+    var counter = 0;
+
+    var complete = function () {
+      counter = counter - 1;
+      if (counter === 0) {
+        $('#loadingViewSpinner').hide();
+      }
+    };
+
+    angular.forEach($scope.nodes, function (node) {
+        counter = counter + 1;
+        NodeService.state(node)
+        .then(function success() {
+          //Notifications.success('Node state updated', node.Hostname);
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to get node state');
+        })
+        .finally(function final() {
+          complete();
+        });
     });
   };
 
@@ -176,8 +204,13 @@ function ($q, $scope, SystemService, NodeService, Pagination, Notifications, Sta
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
+      statePromise = $interval($scope.stateAction, 5000);
     });
   }
+
+  $scope.$on('$destroy', function() {
+      $interval.cancel(statePromise);
+  });
 
   initView();
 }]);

@@ -36,4 +36,14 @@ function NodeViewModel(data) {
     this.Reachability = data.ManagerStatus.Reachability;
     this.ManagerAddr = data.ManagerStatus.Addr;
   }
+
+  if (data.Cloud) {
+      if (data.Cloud.State) {
+        this.CloudState = data.Cloud.State
+      } else {
+        this.CloudState = "unknown";
+      }
+  } else {
+    this.CloudState = "unknown";
+  }
 }

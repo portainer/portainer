@@ -394,6 +394,19 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('project', {
+    url: '^/projects/:id/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/project/project.html',
+        controller: 'ProjectController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('registries', {
     url: '/registries/',
     views: {

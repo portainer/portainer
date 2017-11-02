@@ -7,5 +7,6 @@ angular.module('portainer.rest')
   {
     start: {method: 'GET', params: {id: '@id', action: 'start', resource: 'node'}},
     stop: {method: 'GET', params: {id: '@id', action: 'stop', resource: 'node'}},
+    state: {method: 'GET', params: {id: '@id', action: 'state', resource: 'node'}},
   });
 }]);
