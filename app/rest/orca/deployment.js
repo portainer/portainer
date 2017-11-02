@@ -5,7 +5,7 @@ angular.module('portainer.rest')
     endpointId: EndpointProvider.endpointID
   },
   {
-    get: { method: 'GET', params: { id: '@id' } },
+    get: { method: 'GET', isArray: true, params: { id: '@id', action: 'status' } },
     query: { method: 'GET', isArray: true },
     create: { method: 'POST' },
     update: { method: 'PUT', params: { id: '@id' } },

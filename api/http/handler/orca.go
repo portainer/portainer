@@ -88,7 +88,7 @@ func (handler *OrcaHandler) proxyRequestsToOrcaAPI(w http.ResponseWriter, r *htt
 	proxy = handler.ProxyManager.GetOrcaProxy(id)
 
 	if proxy == nil {
-	    log.Println("Registering new Orca proxy manager...")
+	    log.Println("Registering new Orca proxy manager for id " + id)
 
 	    // TODO: define external gateway
 

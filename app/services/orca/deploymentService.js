@@ -6,7 +6,6 @@ angular.module('portainer.services')
   deployment.deployments = function(filters) {
     var deferred = $q.defer();
 
-    //Deployment.query({ filters: filters ? filters : {} }).$promise
     Deployment.query().$promise
     .then(function success(data) {
       var deployments = data.map(function (item) {
@@ -26,7 +25,7 @@ angular.module('portainer.services')
 
     Deployment.get({ id: id }).$promise
     .then(function success(data) {
-      var deployment = new DeploymentViewModel(data);
+      var deployment = new DeploymentViewModel(data[0]);
       deferred.resolve(deployment);
     })
     .catch(function error(err) {
