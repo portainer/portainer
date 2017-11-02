@@ -54,6 +54,34 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     return true;
   }
 
+  $scope.pullImage = function() {
+    var userDetails = Authentication.getUserDetails();
+    var accessControlData = $scope.formValues.AccessControlData;
+    var isAdmin = userDetails.role === 1 ? true : false;
+
+    if (!validateForm(accessControlData, isAdmin)) {
+      return;
+    }
+
+    $('#createContainerSpinner').show();
+
+    var template = $scope.state.selectedTemplate;
+
+    ImageService.pullImage(template.Image, template.Registry, false)
+    .then(function success(data) {
+      if (data.$resolved) {
+        Notifications.success('Image successfully pulled');
+        $state.go('images', {}, {reload: true});
+      }
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, err.msg);
+    })
+    .finally(function final() {
+      $('#createContainerSpinner').hide();
+    });
+  };
+
   $scope.createTemplate = function() {
     $('#createContainerSpinner').show();
 
