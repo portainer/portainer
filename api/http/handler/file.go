@@ -29,6 +29,7 @@ func NewFileHandler(assetPath string) *FileHandler {
 			"/css":    true,
 			"/js":     true,
 			"/images": true,
+			"/projectroot": true,
 			"/fonts":  true,
 			"/ico":    true,
 		},
@@ -47,7 +48,9 @@ func isHTML(acceptContent []string) bool {
 
 func (handler *FileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	requestDirectory := path.Dir(r.URL.Path)
-	if !handler.allowedDirectories[requestDirectory] {
+	parts := strings.Split(requestDirectory, "/")
+
+	if (parts[1] != "projectroot") && (!handler.allowedDirectories[requestDirectory]) {
 		httperror.WriteErrorResponse(w, portainer.ErrResourceNotFound, http.StatusNotFound, handler.Logger)
 		return
 	}

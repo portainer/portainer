@@ -1,6 +1,6 @@
 angular.module('portainer.services')
-.factory('ProjectService', ['$q', 'Project', 'DeploymentService', 'ResourceControlService', 'FileUploadService', 'ProjectHelper', 'ServiceService', 'SwarmService',
-function ProjectServiceFactory($q, Project, DeploymentService, ResourceControlService, FileUploadService, ProjectHelper, ServiceService, SwarmService) {
+.factory('ProjectService', ['$sce', '$http', '$q', 'Project', 'DeploymentService', 'ResourceControlService', 'FileUploadService', 'ProjectHelper', 'ServiceService', 'SwarmService',
+function ProjectServiceFactory($sce, $http, $q, Project, DeploymentService, ResourceControlService, FileUploadService, ProjectHelper, ServiceService, SwarmService) {
   'use strict';
   var service = {};
 
@@ -32,6 +32,33 @@ function ProjectServiceFactory($q, Project, DeploymentService, ResourceControlSe
 
     return deferred.promise;
   };
+
+  function _arrayBufferToBase64(buffer) {
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  };
+
+  function _trustSrc(src) {
+    return $sce.trustAsResourceUrl(src);
+  }
+
+  service.getProjectImage = function(id, parentdir) {
+    return $http({
+        method: 'GET',
+        url: "projectroot/" + parentdir + "/" + id + "/target/docker-compose.png",
+        responseType: 'arraybuffer'
+      }).then(function(response) {
+        var str = _arrayBufferToBase64(response.data);
+        return str;
+      }, function(response) {
+        console.error('Error in getting static project image');
+      });
+  }
 
   service.externalProject = function(id) {
     var deferred = $q.defer();
@@ -80,9 +107,7 @@ function ProjectServiceFactory($q, Project, DeploymentService, ResourceControlSe
           externalProjects: includeExternalProjects ? service.externalProjects() : []
       })
       .then(function success(data) {
-
         var externalProjects = data.externalProjects;
-
         return externalProjects;
       })
       .catch(function error(err) {
@@ -170,4 +195,11 @@ function ProjectServiceFactory($q, Project, DeploymentService, ResourceControlSe
   };
 
   return service;
-}]);
+}])
+.config( [
+    '$sceDelegateProvider',
+    function($sceDelegateProvider)
+    {
+        $sceDelegateProvider.resourceUrlWhitelist(['self','http://orca:5000/**']);
+    }
+]);
