@@ -1,5 +1,5 @@
 angular.module('portainer.helpers')
-.factory('DeploymentHelper', [function DeploymentHelperFactory() {
+.factory('OperationHelper', [function OperationHelperFactory() {
   'use strict';
 
   var helper = {};

@@ -1,6 +1,6 @@
 angular.module('portainer.services')
-.factory('ProjectService', ['$sce', '$http', '$q', 'Project', 'DeploymentService', 'ResourceControlService', 'FileUploadService', 'ProjectHelper', 'ServiceService', 'SwarmService',
-function ProjectServiceFactory($sce, $http, $q, Project, DeploymentService, ResourceControlService, FileUploadService, ProjectHelper, ServiceService, SwarmService) {
+.factory('ProjectService', ['$sce', '$http', '$q', 'Project', 'OperationService', 'DeploymentService', 'ResourceControlService', 'FileUploadService', 'ProjectHelper', 'ServiceService', 'SwarmService',
+function ProjectServiceFactory($sce, $http, $q, Project, OperationService, DeploymentService, ResourceControlService, FileUploadService, ProjectHelper, ServiceService, SwarmService) {
   'use strict';
   var service = {};
 
@@ -59,6 +59,20 @@ function ProjectServiceFactory($sce, $http, $q, Project, DeploymentService, Reso
         console.error('Error in getting static project image');
       });
   }
+
+  service.operationStatus = function() {
+    var deferred = $q.defer();
+
+    OperationService.operation()
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve external project', err: err });
+    });
+
+    return deferred.promise;
+  };
 
   service.externalProject = function(id) {
     var deferred = $q.defer();
