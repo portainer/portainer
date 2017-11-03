@@ -20,6 +20,20 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  deployment.render = function(id) {
+    var deferred = $q.defer();
+
+    Deployment.render({ id: id }).$promise
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to render deployment', err: err });
+    });
+
+    return deferred.promise;
+  };
+
   deployment.deployment = function(id) {
     var deferred = $q.defer();
 

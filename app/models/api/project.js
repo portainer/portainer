@@ -13,4 +13,8 @@ function ProjectViewModel(data) {
     this.ResourceControl = new ResourceControlViewModel(data.ResourceControl);
   }
   this.External = data.External;
+
+  if (data.Content) {
+    this.Content = data.Content;
+  }
 }

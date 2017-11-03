@@ -1,6 +1,6 @@
 <rd-header>
   <rd-header-title title="Project details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="project({id: project.Id})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="project({id: project.Id, content: project.Content})" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
@@ -57,11 +57,45 @@
             </tr>
             <tr ng-if="messages">
               <td>Messages</td>
-              <td>{{ messageStatus.Messages }}</td>
+              <td>
+                <table class="table">
+                  <tbody>
+                    <tr dir-paginate="message in ( messages | itemsPerPage: state.pagination_count)">
+                      <td>{{ message.Name }}:</td>
+                      <td ng-if="messages">
+                        <table class="table">
+                          <tbody>
+                            <tr dir-paginate="messageEntry in ( message.Messages | itemsPerPage: state.pagination_count)">
+                              <td>{{ messageEntry }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
             </tr>
             <tr ng-if="errors">
               <td>Errors</td>
-              <td>{{ messageStatus.Errors }}</td>
+              <td>
+                <table class="table">
+                  <tbody>
+                    <tr dir-paginate="error in ( errors | itemsPerPage: state.pagination_count)">
+                      <td>{{ error.Name }}:</td>
+                      <td ng-if="errors">
+                        <table class="table">
+                          <tbody>
+                            <tr dir-paginate="errorEntry in ( error.Errors | itemsPerPage: state.pagination_count)">
+                              <td>{{ errorEntry }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -93,6 +127,10 @@
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
+            <tr>
+              <td><a class="btn btn-primary" type="button" ng-click="render()">Render</a></td>
+              <td><a class="btn btn-primary" type="button" ng-click="createStack(project.Id, project.Content)">Create Stack</a></td>
+            </tr>
             <tr>
               <td>Name</td>
               <td>{{ project.Name }}</td>

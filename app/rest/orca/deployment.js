@@ -6,6 +6,7 @@ angular.module('portainer.rest')
   },
   {
     get: { method: 'GET', isArray: true, params: { id: '@id', action: 'status' } },
+    render: { method: 'GET', params: { id: '@id', action: 'render' } },
     query: { method: 'GET', isArray: true },
     create: { method: 'POST' },
     update: { method: 'PUT', params: { id: '@id' } },

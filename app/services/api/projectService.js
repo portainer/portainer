@@ -60,6 +60,20 @@ function ProjectServiceFactory($sce, $http, $q, Project, OrcaStatusService, Oper
       });
   }
 
+  service.render = function(id) {
+    var deferred = $q.defer();
+
+    DeploymentService.render(id)
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to render project', err: err });
+    });
+
+    return deferred.promise;
+  };
+
   service.messageStatus = function(id) {
     var deferred = $q.defer();
 
@@ -109,15 +123,15 @@ function ProjectServiceFactory($sce, $http, $q, Project, OrcaStatusService, Oper
     .then(function success(data) {
       var deployments = data;
 
-      var deploymentNames = [];
+      var deploymentEntries = [];
       for (var i = 0; i < deployments.length; i++) {
           var deployment = deployments[i];
           // TODO: VERIFY
-          deploymentNames.push(deployment.Name);
+          deploymentEntries.push({ Name: deployment.Name, Content: "projectroot/" + deployment.ParentDirName + "/" + deployment.Name + "/target/docker-compose.yml"});
       }
 
-      var projects = deploymentNames.map(function (item) {
-        return new ProjectViewModel({ Name: item, External: true });
+      var projects = deploymentEntries.map(function (item) {
+        return new ProjectViewModel({ Name: item.Name, Content: item.Content, External: true });
       });
       deferred.resolve(projects);
     })
@@ -223,11 +237,4 @@ function ProjectServiceFactory($sce, $http, $q, Project, OrcaStatusService, Oper
   };
 
   return service;
-}])
-.config( [
-    '$sceDelegateProvider',
-    function($sceDelegateProvider)
-    {
-        $sceDelegateProvider.resourceUrlWhitelist(['self','http://orca:5000/**']);
-    }
-]);
+}]);

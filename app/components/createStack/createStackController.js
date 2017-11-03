@@ -1,11 +1,12 @@
 angular.module('createStack', [])
-.controller('CreateStackController', ['$scope', '$state', '$document', 'StackService', 'CodeMirrorService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService',
-function ($scope, $state, $document, StackService, CodeMirrorService, Authentication, Notifications, FormValidator, ResourceControlService) {
+.controller('CreateStackController', ['$scope', '$state', '$document', 'StackCreateService', 'StackService', 'CodeMirrorService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService',
+function ($scope, $state, $document, StackCreateService, StackService, CodeMirrorService, Authentication, Notifications, FormValidator, ResourceControlService) {
 
   // Store the editor content when switching builder methods
   var editorContent = '';
   var editorEnabled = true;
 
+  /*
   $scope.formValues = {
     Name: '',
     StackFileContent: '# Define or paste the content of your docker-compose file here',
@@ -14,6 +15,7 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
     RepositoryPath: 'docker-compose.yml',
     AccessControlData: new AccessControlFormData()
   };
+  */
 
   $scope.state = {
     Method: 'editor',
@@ -112,6 +114,8 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
   };
 
   function initView() {
+    $scope.formValues = StackCreateService.formValues()
+
     enableEditor();
   }
 

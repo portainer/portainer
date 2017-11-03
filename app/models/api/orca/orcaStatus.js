@@ -5,15 +5,15 @@ function OrcaStatusViewModel(data) {
       } else {
         this.Name = "";
       }
-      if (data.Messages == "") {
-        this.Messages = "No messages";
-      } else {
+      if (data.Messages) {
         this.Messages = data.Messages;
-      }
-      if (data.Errors == "") {
-        this.Errors = "No errors";
       } else {
+        this.Messages = "No messages";
+      }
+      if (data.Errors) {
         this.Errors = data.Errors;
+      } else {
+        this.Errors = "No errors";
       }
   } else {
     this.Name = ""

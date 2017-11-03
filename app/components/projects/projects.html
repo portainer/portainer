@@ -59,7 +59,7 @@
                 <td><input type="checkbox" ng-model="project.Checked" ng-change="selectItem(project)" ng-disabled="!project.Id"/></td>
                 <td>
                   <span ng-if="project.Id">
-                    <a ui-sref="project({ id: project.Id })">{{ project.Name }}</a>
+                    <a ui-sref="project({ id: project.Id, content: project.Content })">{{ project.Name }}</a>
                   </span>
                   <span ng-if="!project.Id">
                     {{ project.Name }} <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true"></i>

@@ -8,10 +8,13 @@ angular.module('portainer.services')
 
     OrcaStatus.get({ id: id }).$promise
     .then(function success(data) {
-      if (data.constructor === Array) {
-        data = data[0]
+      if (data[0]) {
+        var status = data.map(function (item) {
+            return new OrcaStatusViewModel(item);
+        });
+      } else {
+        var status = new OrcaStatusViewModel(data);
       }
-      var status = new OrcaStatusViewModel(data);
       deferred.resolve(status);
     })
     .catch(function error(err) {

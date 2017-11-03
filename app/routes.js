@@ -395,7 +395,7 @@ function configureRoutes($stateProvider) {
     }
   })
   .state('project', {
-    url: '^/projects/:id/',
+    url: '^/projects/:id/:content',
     views: {
       'content@': {
         templateUrl: 'app/components/project/project.html',

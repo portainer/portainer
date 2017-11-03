@@ -1,24 +1,90 @@
 angular.module('project', [])
-.controller('ProjectController', ['$interval', '$scope', '$state', '$transition$', 'LabelHelper', 'ProjectService', 'Pagination', 'Notifications',
-function ($interval, $scope, $state, $transition$, LabelHelper, ProjectService, Pagination, Notifications) {
+.controller('ProjectController', ['$q', '$http', '$window', '$interval', '$scope', '$state', '$transition$', 'StackCreateService', 'LabelHelper', 'ProjectService', 'Pagination', 'Notifications',
+function ($q, $http, $window, $interval, $scope, $state, $transition$, StackCreateService, LabelHelper, ProjectService, Pagination, Notifications) {
 
   $scope.state = {};
   $scope.loading = true;
   $scope.tasks = [];
   $scope.sortType = 'Status';
   $scope.sortReverse = false;
+  $scope.state.pagination_count = Pagination.getPaginationCount('messageStatus');
 
   var statusPromise;
+
+  $scope.getStackContent = function(content) {
+    var deferred = $q.defer();
+
+    $http({
+        method: 'GET',
+        url: content,
+        cache: true
+    }).success(function (response) {
+        console.log("Data: " + response)
+        deferred.resolve(response);
+    }).error(function (msg) {
+        deferred.reject(msg);
+    });
+
+    return deferred.promise;
+  }
+
+  $scope.createStack = function(id, content) {
+      StackCreateService.setName(id);
+      $scope.getStackContent(content)
+      .then(function(data) {
+        StackCreateService.setStackFileContent(data);
+        $window.location.href = '/#/actions/create/stack'
+      });
+  };
+
+  $scope.render = function () {
+    $('#loadingViewSpinner').show();
+
+    ProjectService.render($transition$.params().id)
+        .then(function success(data) {
+          Notifications.success('Project rendering successfully launched...');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to launch project render');
+        })
+        .finally(function final() {
+          $('#loadingViewSpinner').hide();
+        });
+  };
 
   $scope.statusAction = function () {
     $('#loadingViewSpinner').show();
 
     ProjectService.operationStatus($transition$.params().id)
         .then(function success(data) {
-          $scope.operationStatus = data;
+          if (data.Name == $transition$.params().id + ":") {
+            $scope.operationStatus = "No active operations";
+          } else {
+            $scope.operationStatus = data;
+          }
           ProjectService.messageStatus($transition$.params().id)
             .then(function success(data) {
-              $scope.messageStatus = data;
+              var messages = [];
+              var errors = [];
+              for (var i = 0; i < data.length; i++) {
+                  var entry = data[i];
+                  if (entry.Name != '' && entry.Messages != [] && entry.Messages != '') {
+                    messages.push({Name: entry.Name, Messages: entry.Messages});
+                  }
+                  if (entry.Name != '' && entry.Errors != [] && entry.Errors != '') {
+                    errors.push({Name: entry.Name, Errors: entry.Errors});
+                  }
+              }
+              if (messages != []) {
+                $scope.messages = messages;
+              } else {
+                delete $scope.messages;
+              }
+              if (errors != []) {
+                $scope.errors = errors;
+              } else {
+                delete $scope.errors;
+              }
             })
             .catch(function error(err) {
               Notifications.error('Failure', err, 'Unable to get Orca message status');
@@ -38,6 +104,7 @@ function ($interval, $scope, $state, $transition$, LabelHelper, ProjectService, 
     ProjectService.externalProject($transition$.params().id)
     .then(function success(data) {
         $scope.project = data;
+        $scope.project.Content = $transition$.params().content;
 
         // Load image from Orca UI directly
         ProjectService.getProjectImage(data.Id, data.ParentDirName)
