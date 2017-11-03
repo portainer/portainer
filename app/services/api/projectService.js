@@ -1,6 +1,6 @@
 angular.module('portainer.services')
-.factory('ProjectService', ['$sce', '$http', '$q', 'Project', 'OperationService', 'DeploymentService', 'ResourceControlService', 'FileUploadService', 'ProjectHelper', 'ServiceService', 'SwarmService',
-function ProjectServiceFactory($sce, $http, $q, Project, OperationService, DeploymentService, ResourceControlService, FileUploadService, ProjectHelper, ServiceService, SwarmService) {
+.factory('ProjectService', ['$sce', '$http', '$q', 'Project', 'OrcaStatusService', 'OperationService', 'DeploymentService', 'ResourceControlService', 'FileUploadService', 'ProjectHelper', 'ServiceService', 'SwarmService',
+function ProjectServiceFactory($sce, $http, $q, Project, OrcaStatusService, OperationService, DeploymentService, ResourceControlService, FileUploadService, ProjectHelper, ServiceService, SwarmService) {
   'use strict';
   var service = {};
 
@@ -60,15 +60,29 @@ function ProjectServiceFactory($sce, $http, $q, Project, OperationService, Deplo
       });
   }
 
-  service.operationStatus = function() {
+  service.messageStatus = function(id) {
     var deferred = $q.defer();
 
-    OperationService.operation()
+    OrcaStatusService.status(id)
     .then(function success(data) {
       deferred.resolve(data);
     })
     .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve external project', err: err });
+      deferred.reject({ msg: 'Unable to retrieve Orca status messages', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.operationStatus = function(id) {
+    var deferred = $q.defer();
+
+    OperationService.operation(id)
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve Orca operation status', err: err });
     });
 
     return deferred.promise;

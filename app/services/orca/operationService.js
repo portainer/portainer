@@ -3,10 +3,10 @@ angular.module('portainer.services')
   'use strict';
   var operation = {};
 
-  operation.operation = function() {
+  operation.operation = function(id) {
     var deferred = $q.defer();
 
-    Operation.get().$promise
+    Operation.get({ id: id }).$promise
     .then(function success(data) {
       var operation = new OperationViewModel(data);
       deferred.resolve(operation);

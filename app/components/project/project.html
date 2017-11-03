@@ -10,16 +10,58 @@
   </rd-header-content>
 </rd-header>
 
+<div class="row" ng-if="!operationStatus">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-hdd-o" title="Operations"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Summary</td>
+              <td>Checking...</td>
+            </tr>
+            <tr>
+              <td>Messages</td>
+              <td>No updates</td>
+            </tr>
+            <tr>
+              <td>Errors</td>
+              <td>No updates</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
 <div class="row" ng-if="operationStatus">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-object-group" title="Active operations"></rd-widget-header>
+      <rd-widget-header icon="fa-hdd-o" title="Operations"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
             <tr>
               <td>Summary</td>
               <td>{{ operationStatus.Name }}</td>
+            </tr>
+            <tr ng-if="!messages">
+              <td>Messages</td>
+              <td>No updates</td>
+            </tr>
+            <tr ng-if="!errors">
+              <td>Errors</td>
+              <td>No updates</td>
+            </tr>
+            <tr ng-if="messages">
+              <td>Messages</td>
+              <td>{{ messageStatus.Messages }}</td>
+            </tr>
+            <tr ng-if="errors">
+              <td>Errors</td>
+              <td>{{ messageStatus.Errors }}</td>
             </tr>
           </tbody>
         </table>
@@ -47,7 +89,7 @@
 <div class="row" ng-if="project">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-object-group" title="Project description"></rd-widget-header>
+      <rd-widget-header icon="fa-tasks" title="Project description"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>

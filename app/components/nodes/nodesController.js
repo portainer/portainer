@@ -198,6 +198,8 @@ function ($interval, $q, $scope, SystemService, NodeService, Pagination, Notific
       } else {
         extractSwarmInfo(data.info);
       }
+
+      $scope.stateAction()
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve cluster details');

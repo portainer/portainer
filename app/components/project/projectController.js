@@ -13,10 +13,16 @@ function ($interval, $scope, $state, $transition$, LabelHelper, ProjectService, 
   $scope.statusAction = function () {
     $('#loadingViewSpinner').show();
 
-    ProjectService.operationStatus()
+    ProjectService.operationStatus($transition$.params().id)
         .then(function success(data) {
-          //Notifications.success('Node state updated', node.Hostname);
           $scope.operationStatus = data;
+          ProjectService.messageStatus($transition$.params().id)
+            .then(function success(data) {
+              $scope.messageStatus = data;
+            })
+            .catch(function error(err) {
+              Notifications.error('Failure', err, 'Unable to get Orca message status');
+            });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to get Orca operation status');
@@ -41,6 +47,8 @@ function ($interval, $scope, $state, $transition$, LabelHelper, ProjectService, 
         .catch(function error(err) {
             console.error("Unable to find project image to load");
         });
+
+        $scope.statusAction()
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve project');
