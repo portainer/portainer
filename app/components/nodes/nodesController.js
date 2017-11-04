@@ -25,9 +25,11 @@ function ($interval, $q, $scope, SystemService, NodeService, Pagination, Notific
 
   $scope.selectItems = function (allSelected) {
     angular.forEach($scope.state.filteredNodes, function (node) {
-      if (node.Checked !== allSelected) {
-        node.Checked = allSelected;
-        $scope.selectItem(node);
+      if (node.Role != 'manager') {
+          if (node.Checked !== allSelected) {
+            node.Checked = allSelected;
+            $scope.selectItem(node);
+          }
       }
     });
   };
