@@ -57,8 +57,8 @@ function ($q, $http, $window, $interval, $scope, $state, $transition$, StackCrea
 
     ProjectService.operationStatus($transition$.params().id)
         .then(function success(data) {
-          if (data.Name == $transition$.params().id + ":") {
-            $scope.operationStatus = "No active operations";
+          if (data.Name == $transition$.params().id + ": ") {
+            $scope.operationStatus = {Name: "No active operations"};
           } else {
             $scope.operationStatus = data;
           }
@@ -75,12 +75,12 @@ function ($q, $http, $window, $interval, $scope, $state, $transition$, StackCrea
                     errors.push({Name: entry.Name, Errors: entry.Errors});
                   }
               }
-              if (messages != []) {
+              if (messages != [] && messages != '' && messages != null) {
                 $scope.messages = messages;
               } else {
                 delete $scope.messages;
               }
-              if (errors != []) {
+              if (errors != [] && errors != '' && errors != null) {
                 $scope.errors = errors;
               } else {
                 delete $scope.errors;

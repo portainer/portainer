@@ -44,7 +44,7 @@
         <table class="table">
           <tbody>
             <tr>
-              <td>Summary</td>
+              <td>Active Operations</td>
               <td>{{ operationStatus.Name }}</td>
             </tr>
             <tr ng-if="!messages">
@@ -57,45 +57,13 @@
             </tr>
             <tr ng-if="messages">
               <td>Messages</td>
-              <td>
-                <table class="table">
-                  <tbody>
-                    <tr dir-paginate="message in ( messages | itemsPerPage: state.pagination_count)">
-                      <td>{{ message.Name }}:</td>
-                      <td ng-if="messages">
-                        <table class="table">
-                          <tbody>
-                            <tr dir-paginate="messageEntry in ( message.Messages | itemsPerPage: state.pagination_count)">
-                              <td>{{ messageEntry }}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </td>
+              <td ng-if="messages.length > 0" ng-repeat="message in messages track by $index">{{ message.Name }}:<div ng-if="message.Messages == '' || message.Messages == []">None</div><div ng-repeat="messageEntry in message.Messages track by $index"> {{ messageEntry }}</div></td>
+              <td ng-if="messages.length == 0">None</td>
             </tr>
             <tr ng-if="errors">
               <td>Errors</td>
-              <td>
-                <table class="table">
-                  <tbody>
-                    <tr dir-paginate="error in ( errors | itemsPerPage: state.pagination_count)">
-                      <td>{{ error.Name }}:</td>
-                      <td ng-if="errors">
-                        <table class="table">
-                          <tbody>
-                            <tr dir-paginate="errorEntry in ( error.Errors | itemsPerPage: state.pagination_count)">
-                              <td>{{ errorEntry }}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </td>
+              <td ng-if="messages.length > 0" ng-repeat="message in messages track by $index">{{ message.Name }}:<div ng-if="message.Errors == '' || message.Errors == []">None</div><div ng-repeat="errorEntry in message.Errors track by $index"> {{ errorEntry }}</div></td>
+              <td ng-if="messages.length == 0">None</td>
             </tr>
           </tbody>
         </table>
