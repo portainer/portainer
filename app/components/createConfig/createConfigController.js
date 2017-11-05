@@ -1,10 +1,9 @@
 angular.module('createConfig', [])
-.controller('CreateConfigController', ['$scope', '$state', 'Notifications', 'ConfigService', 'Authentication', 'FormValidator', 'ResourceControlService',
-function ($scope, $state, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
+.controller('CreateConfigController', ['$scope', '$state', '$document', 'Notifications', 'ConfigService', 'Authentication', 'FormValidator', 'ResourceControlService', 'CodeMirrorService',
+function ($scope, $state, $document, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService, CodeMirrorService) {
 
   $scope.formValues = {
     Name: '',
-    Data: '',
     Labels: [],
     AccessControlData: new AccessControlFormData()
   };
@@ -32,7 +31,10 @@ function ($scope, $state, Notifications, ConfigService, Authentication, FormVali
   }
 
   function prepareConfigData(config) {
-    config.Data = btoa(unescape(encodeURIComponent($scope.formValues.Data)));
+    // The codemirror editor does not work with ng-model so we need to retrieve
+    // the value directly from the editor.
+    var configData = $scope.editor.getValue();
+    config.Data = btoa(unescape(encodeURIComponent(configData)));
   }
 
   function prepareConfiguration() {
@@ -86,4 +88,15 @@ function ($scope, $state, Notifications, ConfigService, Authentication, FormVali
       $('#createResourceSpinner').hide();
     });
   };
+
+  function initView() {
+    $document.ready(function() {
+      var webEditorElement = $document[0].getElementById('config-editor', false);
+      if (webEditorElement) {
+        $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement);
+      }
+    });
+  }
+
+  initView();
 }]);
