@@ -53,6 +53,9 @@
             <!-- !labels-input-list -->
           </div>
           <!-- !labels-->
+          <!-- access-control -->
+          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions
@@ -61,7 +64,7 @@
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.Data" ng-click="create()">Create config</button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="configs">Cancel</a>
-              <i id="createConfigSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
           <!-- !actions -->

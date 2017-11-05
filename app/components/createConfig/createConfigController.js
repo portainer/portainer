@@ -1,10 +1,16 @@
 angular.module('createConfig', [])
-.controller('CreateConfigController', ['$scope', '$state', 'Notifications', 'ConfigService',
-function ($scope, $state, Notifications, ConfigService) {
+.controller('CreateConfigController', ['$scope', '$state', 'Notifications', 'ConfigService', 'Authentication', 'FormValidator', 'ResourceControlService',
+function ($scope, $state, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
+
   $scope.formValues = {
     Name: '',
     Data: '',
-    Labels: []
+    Labels: [],
+    AccessControlData: new AccessControlFormData()
+  };
+
+  $scope.state = {
+    formValidationError: ''
   };
 
   $scope.addLabel = function() {
@@ -37,10 +43,39 @@ function ($scope, $state, Notifications, ConfigService) {
     return config;
   }
 
-  function createConfig(config) {
-    $('#createConfigSpinner').show();
+  function validateForm(accessControlData, isAdmin) {
+    $scope.state.formValidationError = '';
+    var error = '';
+    error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+
+    if (error) {
+      $scope.state.formValidationError = error;
+      return false;
+    }
+    return true;
+  }
+
+  $scope.create = function () {
+    $('#createResourceSpinner').show();
+
+    var accessControlData = $scope.formValues.AccessControlData;
+    var userDetails = Authentication.getUserDetails();
+    var isAdmin = userDetails.role === 1 ? true : false;
+
+    if (!validateForm(accessControlData, isAdmin)) {
+      $('#createResourceSpinner').hide();
+      return;
+    }
+
+    var config = prepareConfiguration();
+
     ConfigService.create(config)
     .then(function success(data) {
+      var configIdentifier = data.ID;
+      var userId = userDetails.ID;
+      return ResourceControlService.applyResourceControl('config', configIdentifier, userId, accessControlData, []);
+    })
+    .then(function success() {
       Notifications.success('Config successfully created');
       $state.go('configs', {}, {reload: true});
     })
@@ -48,12 +83,7 @@ function ($scope, $state, Notifications, ConfigService) {
       Notifications.error('Failure', err, 'Unable to create config');
     })
     .finally(function final() {
-      $('#createConfigSpinner').hide();
+      $('#createResourceSpinner').hide();
     });
-  }
-
-  $scope.create = function () {
-    var config = prepareConfiguration();
-    createConfig(config);
   };
 }]);

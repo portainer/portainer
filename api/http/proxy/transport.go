@@ -67,18 +67,18 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 func (p *proxyTransport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/configs/create":
-		return p.administratorOperation(request)
+		return p.executeDockerRequest(request)
 
 	case "/configs":
 		return p.rewriteOperation(request, configListOperation)
 
 	default:
-		// assume /secrets/{id}
+		// assume /configs/{id}
 		if request.Method == http.MethodGet {
 			return p.rewriteOperation(request, configInspectOperation)
 		}
-		secretID := path.Base(requestPath)
-		return p.restrictedOperation(request, secretID)
+		configID := path.Base(requestPath)
+		return p.restrictedOperation(request, configID)
 	}
 }
 

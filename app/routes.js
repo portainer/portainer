@@ -186,7 +186,7 @@ function configureRoutes($stateProvider) {
      url: '/config',
      views: {
        'content@': {
-         templateUrl: 'app/components/createConfig/createConfig.html',
+         templateUrl: 'app/components/createConfig/createconfig.html',
          controller: 'CreateConfigController'
        },
        'sidebar@': {
