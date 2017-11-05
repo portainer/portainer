@@ -10,7 +10,7 @@
 
 <div class="row" >
 
-  <div class="col-sm-12" ng-if="state.selectedTemplate && state.deployment === 'stack'">
+  <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'stack'">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Title">
         <div class="pull-right">
@@ -74,7 +74,7 @@
     </rd-widget>
   </div>
 
-  <div class="col-sm-12" ng-if="state.selectedTemplate && state.deployment === 'container'">
+  <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'container'">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Image">
         <div class="pull-right">
