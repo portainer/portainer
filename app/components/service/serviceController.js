@@ -59,7 +59,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'EnvironmentVariables', service.EnvironmentVariables);
     }
   };
-  $scope.addConfig = function addSecret(service, config) {
+  $scope.addConfig = function addConfig(service, config) {
     if (config && service.ServiceConfigs.filter(function(serviceConfig) { return serviceConfig.Id === config.Id;}).length === 0) {
       service.ServiceConfigs.push({ Id: config.Id, Name: config.Name, FileName: config.Name, Uid: '0', Gid: '0', Mode: 292 });
       updateServiceArray(service, 'ServiceConfigs', service.ServiceConfigs);
