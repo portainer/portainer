@@ -11,9 +11,11 @@ angular.module('portainer.services')
         var template;
         if (key === 'linuxserver.io') {
           template = new TemplateLSIOViewModel(tpl);
-        } else if (key === 'stacks') {
-          template = new StackTemplateViewModel(tpl);
-        } else {
+        }
+        // else if (key === 'stacks') {
+        //   template = new StackTemplateViewModel(tpl);
+        // } 
+        else {
           template = new TemplateViewModel(tpl);
         }
         template.index = idx;

@@ -6,9 +6,11 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     showAdvancedOptions: false,
     hideDescriptions: $transition$.params().hide_descriptions,
     formValidationError: '',
+    showDeploymentSelector: false,
     filters: {
       Categories: '!',
-      Platform: '!'
+      Platform: '!',
+      Type: 'container'
     }
   };
 
@@ -190,10 +192,22 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     return containerMapping;
   }
 
-  function initContainerTemplates(templatesKey) {
-    var provider = $scope.applicationState.endpoint.mode.provider;
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+  $scope.updateCategories = function(templates, type) {
+    $scope.state.filters.Categories = '!';
+    updateCategories(templates, type);
+  };
 
+  function updateCategories(templates, type) {
+    var availableCategories = [];
+    angular.forEach(templates, function(template) {
+      if (template.Type === type) {
+        availableCategories = availableCategories.concat(template.Categories);
+      }
+    });
+    $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
+  }
+
+  function initTemplates(templatesKey, type, provider, apiVersion) {
     $q.all({
       templates: TemplateService.getTemplates(templatesKey),
       containers: ContainerService.containers(0),
@@ -206,12 +220,15 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
-      $scope.templates = data.templates;
-      var availableCategories = [];
-      angular.forEach($scope.templates, function(template) {
-        availableCategories = availableCategories.concat(template.Categories);
-      });
-      $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
+      var templates =  data.templates;
+      // var availableCategories = [];
+      // angular.forEach($scope.templates, function(template) {
+      //   availableCategories = availableCategories.concat(template.Categories);
+      // });
+      //
+      // $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
+      updateCategories(templates, type);
+      $scope.templates = templates;
       $scope.runningContainers = data.containers;
       $scope.availableVolumes = data.volumes.Volumes;
       var networks = data.networks;
@@ -229,38 +246,51 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     });
   }
 
-  function initStackTemplates(templatesKey) {
-    TemplateService.getTemplates(templatesKey)
-    .then(function success(data) {
-      $scope.templates = data;
-      var availableCategories = [];
-      angular.forEach($scope.templates, function(template) {
-        availableCategories = availableCategories.concat(template.Categories);
-      });
-      $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
-    })
-    .catch(function error(err) {
-      $scope.templates = [];
-      Notifications.error('Failure', err, 'Unable to retrieve stack templates.');
-    })
-    .finally(function final(){
-      $('#loadingViewSpinner').hide();
-    });
-  }
+  // function initStackTemplates(templatesKey) {
+  //   TemplateService.getTemplates(templatesKey)
+  //   .then(function success(data) {
+  //     $scope.templates = data;
+  //     var availableCategories = [];
+  //     angular.forEach($scope.templates, function(template) {
+  //       availableCategories = availableCategories.concat(template.Categories);
+  //     });
+  //     $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
+  //   })
+  //   .catch(function error(err) {
+  //     $scope.templates = [];
+  //     Notifications.error('Failure', err, 'Unable to retrieve stack templates.');
+  //   })
+  //   .finally(function final(){
+  //     $('#loadingViewSpinner').hide();
+  //   });
+  // }
 
-  function initTemplates() {
+  function initView() {
     var templatesKey = $transition$.params().key;
     $scope.templatesKey = templatesKey;
 
     var userDetails = Authentication.getUserDetails();
     $scope.isAdmin = userDetails.role === 1 ? true : false;
 
-    if (templatesKey === 'stacks') {
-      initStackTemplates(templatesKey);
-    } else {
-      initContainerTemplates(templatesKey);
+    var endpointMode = $scope.applicationState.endpoint.mode;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+
+    if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
+      $scope.state.filters.Type = 'stack';
+      $scope.state.showDeploymentSelector = true;
     }
+    // ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
+
+
+    // if (templatesKey === 'stacks') {
+    //   $scope.state.deployment = 'stack';
+    //   initStackTemplates(templatesKey);
+    // } else {
+    //   initContainerTemplates(templatesKey);
+    // }
+
+    initTemplates(templatesKey, $scope.state.filters.Type, endpointMode.provider, apiVersion);
   }
 
-  initTemplates();
+  initView();
 }]);
