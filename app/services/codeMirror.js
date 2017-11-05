@@ -14,11 +14,17 @@ angular.module('portainer.services')
 
   var service = {};
 
-  service.applyCodeMirrorOnElement = function(element, yamlLint) {
+  service.applyCodeMirrorOnElement = function(element, yamlLint, readOnly) {
     var options = codeMirrorGenericOptions;
+
     if (yamlLint) {
       options = codeMirrorYAMLOptions;
     }
+
+    if (readOnly) {
+      options.readOnly = true;
+    }
+
     var cm = CodeMirror.fromTextArea(element, options);
     cm.setSize('100%', 500);
     return cm;

@@ -53,8 +53,8 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.create = function(configConfig) {
-    return Config.create(configConfig).$promise;
+  service.create = function(config) {
+    return Config.create(config).$promise;
   };
 
   return service;

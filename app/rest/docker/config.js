@@ -4,9 +4,9 @@ angular.module('portainer.rest')
   return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/configs/:id/:action', {
     endpointId: EndpointProvider.endpointID
   }, {
-    get: { method: 'GET', params: {id: '@id'} },
+    get: { method: 'GET', params: { id: '@id' } },
     query: { method: 'GET', isArray: true },
-    create: { method: 'POST', params: {action: 'create'} },
-    remove: { method: 'DELETE', params: {id: '@id'} }
+    create: { method: 'POST', params: { action: 'create' } },
+    remove: { method: 'DELETE', params: { id: '@id' } }
   });
 }]);

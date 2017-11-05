@@ -63,12 +63,18 @@
 </por-access-control-panel>
 <!-- !access-control-panel -->
 
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
+<div class="row" ng-if="config">
+  <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-file-code-o" title="Config file contents"></rd-widget-header>
+      <rd-widget-header icon="fa-file-code-o" title="Config content"></rd-widget-header>
       <rd-widget-body>
-        <textarea class="form-control" rows="5" ng-model="config.Data" ng-disabled="true"></textarea>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-12">
+              <textarea id="config-editor" ng-model="config.Data" class="form-control"></textarea>
+            </div>
+          </div>
+        </form>
       </rd-widget-body>
     </rd-widget>
   </div>

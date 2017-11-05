@@ -1,6 +1,6 @@
 angular.module('config', [])
-.controller('ConfigController', ['$scope', '$stateParams', '$state', 'ConfigService', 'Notifications',
-function ($scope, $stateParams, $state, ConfigService, Notifications) {
+.controller('ConfigController', ['$scope', '$transition$', '$state',  '$document', 'ConfigService', 'Notifications', 'CodeMirrorService',
+function ($scope, $transition$, $state, $document, ConfigService, Notifications, CodeMirrorService) {
 
   $scope.removeConfig = function removeConfig(configId) {
     $('#loadingViewSpinner').show();
@@ -17,11 +17,21 @@ function ($scope, $stateParams, $state, ConfigService, Notifications) {
     });
   };
 
+  function initEditor() {
+    $document.ready(function() {
+      var webEditorElement = $document[0].getElementById('config-editor');
+      if (webEditorElement) {
+        $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement, false, true);
+      }
+    });
+  }
+
   function initView() {
     $('#loadingViewSpinner').show();
-    ConfigService.config($stateParams.id)
+    ConfigService.config($transition$.params().id)
     .then(function success(data) {
       $scope.config = data;
+      initEditor();
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve config details');

@@ -93,7 +93,7 @@ function ($scope, $state, $document, Notifications, ConfigService, Authenticatio
     $document.ready(function() {
       var webEditorElement = $document[0].getElementById('config-editor', false);
       if (webEditorElement) {
-        $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement);
+        $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement, false, false);
       }
     });
   }
