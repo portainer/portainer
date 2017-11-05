@@ -1,4 +1,5 @@
 function StackTemplateViewModel(data) {
+  this.Type = data.type;
   this.Title = data.title;
   this.Description = data.description;
   this.Note = data.note;

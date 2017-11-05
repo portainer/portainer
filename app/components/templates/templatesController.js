@@ -133,7 +133,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     var template = $scope.state.selectedTemplate;
     var templatesKey = $scope.templatesKey;
 
-    if (templatesKey === 'stacks') {
+    if (template.Type === 'stack') {
       createStackFromTemplate(template, userId, accessControlData);
     } else {
       createContainerFromTemplate(template, userId, accessControlData);
