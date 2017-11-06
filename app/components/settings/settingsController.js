@@ -1,6 +1,6 @@
 angular.module('settings', [])
-.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_CONTAINER_TEMPLATES_URL',
-function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_CONTAINER_TEMPLATES_URL) {
+.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_TEMPLATES_URL',
+function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_TEMPLATES_URL) {
 
   $scope.formValues = {
     customLogo: false,
@@ -38,7 +38,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     }
 
     if (!$scope.formValues.customTemplates) {
-      settings.TemplatesURL = DEFAULT_CONTAINER_TEMPLATES_URL;
+      settings.TemplatesURL = DEFAULT_TEMPLATES_URL;
     }
 
     settings.DisplayExternalContributors = !$scope.formValues.externalContributions;
@@ -82,7 +82,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
       if (settings.LogoURL !== '') {
         $scope.formValues.customLogo = true;
       }
-      if (settings.TemplatesURL !== DEFAULT_CONTAINER_TEMPLATES_URL) {
+      if (settings.TemplatesURL !== DEFAULT_TEMPLATES_URL) {
         $scope.formValues.customTemplates = true;
       }
       $scope.formValues.externalContributions = !settings.DisplayExternalContributors;

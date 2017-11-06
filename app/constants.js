@@ -10,5 +10,5 @@ angular.module('portainer')
 .constant('API_ENDPOINT_TEAMS', 'api/teams')
 .constant('API_ENDPOINT_TEAM_MEMBERSHIPS', 'api/team_memberships')
 .constant('API_ENDPOINT_TEMPLATES', 'api/templates')
-.constant('DEFAULT_CONTAINER_TEMPLATES_URL', 'https://raw.githubusercontent.com/portainer/templates/master/templates.json')
+.constant('DEFAULT_TEMPLATES_URL', 'https://raw.githubusercontent.com/portainer/templates/master/templates.json')
 .constant('PAGINATION_MAX_ITEMS', 10);
