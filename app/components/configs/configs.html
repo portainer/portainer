@@ -1,22 +1,22 @@
 <rd-header>
-  <rd-header-title title="Secrets list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="secrets" ui-sref-opts="{reload: true}">
+  <rd-header-title title="Configs list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="configs" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
-  <rd-header-content>Secrets</rd-header-content>
+  <rd-header-content>Configs</rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-user-secret" title="Secrets">
+      <rd-widget-header icon="fa-file-code-o" title="Configs">
       </rd-widget-header>
       <rd-widget-taskbar classes="col-lg-12 col-md-12 col-xs-12">
         <div class="pull-left">
           <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-          <a class="btn btn-primary" type="button" ui-sref="actions.create.secret"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add secret</a>
+          <a class="btn btn-primary" type="button" ui-sref="actions.create.config"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add config</a>
         </div>
         <div class="pull-right">
           <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
@@ -52,30 +52,30 @@
               </th>
             </thead>
             <tbody>
-              <tr dir-paginate="secret in (state.filteredSecrets = ( secrets | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
-                <td><input type="checkbox" ng-model="secret.Checked" ng-change="selectItem(secret)"/></td>
-                <td><a ui-sref="secret({id: secret.Id})">{{ secret.Name }}</a></td>
-                <td>{{ secret.CreatedAt | getisodate }}</td>
+              <tr dir-paginate="config in (state.filteredConfigs = ( configs | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+                <td><input type="checkbox" ng-model="config.Checked" ng-change="selectItem(config)"/></td>
+                <td><a ui-sref="config({id: config.Id})">{{ config.Name }}</a></td>
+                <td>{{ config.CreatedAt | getisodate }}</td>
                 <td ng-if="applicationState.application.authentication">
                   <span>
-                    <i ng-class="secret.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
-                    {{ secret.ResourceControl.Ownership ? secret.ResourceControl.Ownership : secret.ResourceControl.Ownership = 'public' }}
+                    <i ng-class="config.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
+                    {{ config.ResourceControl.Ownership ? config.ResourceControl.Ownership : config.ResourceControl.Ownership = 'public' }}
                   </span>
                 </td>
               </tr>
-              <tr ng-if="!secrets">
+              <tr ng-if="!configs">
                 <td colspan="4" class="text-center text-muted">Loading...</td>
               </tr>
-              <tr ng-if="secrets.length == 0">
-                <td colspan="4" class="text-center text-muted">No secrets available.</td>
+              <tr ng-if="configs.length == 0">
+                <td colspan="4" class="text-center text-muted">No configs available.</td>
               </tr>
             </tbody>
           </table>
-          <div ng-if="secrets" class="pull-left pagination-controls">
+          <div ng-if="configs" class="pull-left pagination-controls">
             <dir-pagination-controls></dir-pagination-controls>
           </div>
         </div>
       </rd-widget-body>
-    </rd-widget>
+    <rd-widget>
   </div>
 </div>

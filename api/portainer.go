@@ -452,4 +452,6 @@ const (
 	SecretResourceControl
 	// StackResourceControl represents a resource control associated to a stack composed of Docker services
 	StackResourceControl
+	// ConfigResourceControl represents a resource control associated to a Docker config
+	ConfigResourceControl
 )

@@ -1,4 +1,4 @@
-function ServiceViewModel(data, runningTasks, nodes) {
+function ServiceViewModel(data, runningTasks, allTasks, nodes) {
   this.Model = data;
   this.Id = data.ID;
   this.Tasks = [];
@@ -12,8 +12,8 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.Replicas = data.Spec.Mode.Replicated.Replicas;
   } else {
     this.Mode = 'global';
-    if (nodes) {
-      this.Replicas = nodes.length;
+    if (allTasks) {
+      this.Replicas = allTasks.length;
     }
   }
   if (runningTasks) {
@@ -69,6 +69,7 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.Hosts = containerSpec.Hosts;
     this.DNSConfig = containerSpec.DNSConfig;
     this.Secrets = containerSpec.Secrets;
+    this.Configs = containerSpec.Configs;
   }
   if (data.Endpoint) {
     this.Ports = data.Endpoint.Ports;
