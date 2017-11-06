@@ -8,8 +8,8 @@
   <rd-header-content>Templates</rd-header-content>
 </rd-header>
 
-<div class="row" >
-
+<div class="row">
+  <!-- stack-form -->
   <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'stack'">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Title">
@@ -73,7 +73,8 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-
+  <!-- !stack-form -->
+  <!-- container-form -->
   <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'container'">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Image">
@@ -302,21 +303,11 @@
       </rd-widget-body>
     </rd-widget>
   </div>
+  <!-- container-form -->
+</div>
 
-  </div>
 
-  <!-- <div class="row">
-    <rd-widget>
-      <rd-widget-body classes="padding">
-        <form class="form-horizontal">
-
-        </form>
-      </rd-widget-body>
-    </rd-widget>
-  </div> -->
-
-  <div class="row">
-
+<div class="row">
   <div class="col-sm-12" style="height: 100%">
     <rd-template-widget>
       <rd-widget-header icon="fa-rocket" title="Templates">
@@ -386,54 +377,53 @@
             <div class="form-group"></div>
           </div>
 
-        <div class="template-list">
-          <!-- template -->
-          <div ng-repeat="tpl in templates | filter:state.filters:true" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
-            <div class="template-main">
-              <!-- template-image -->
-              <span class="">
-                <img class="template-logo" ng-src="{{ tpl.Logo }}" />
-              </span>
-              <!-- !template-image -->
-              <!-- template-details -->
-              <span class="col-sm-12">
-                <!-- template-line1 -->
-                <div class="template-line">
-                  <span class="template-title">
-                    {{ tpl.Title }}
-                  </span>
-                  <span>
-                    <i class="fa fa-windows" aria-hidden="true" ng-if="tpl.Platform === 'windows'"></i>
-                    <i class="fa fa-linux" aria-hidden="true" ng-if="tpl.Platform === 'linux'"></i>
-                    <!-- Arch / Platform -->
-                  </span>
-                </div>
-                <!-- !template-line1 -->
-                <!-- template-line2 -->
-                <div class="template-line">
-                  <span class="template-description">
-                    {{ tpl.Description }}
-                  </span>
-                  <span class="small text-muted" ng-if="tpl.Categories.length > 0">
-                    {{ tpl.Categories.join(', ') }}
-                  </span>
-                </div>
-                <!-- !template-line2 -->
-              </span>
-              <!-- !template-details -->
+          <div class="template-list">
+            <!-- template -->
+            <div ng-repeat="tpl in templates | filter:state.filters:true" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
+              <div class="template-main">
+                <!-- template-image -->
+                <span class="">
+                  <img class="template-logo" ng-src="{{ tpl.Logo }}" />
+                </span>
+                <!-- !template-image -->
+                <!-- template-details -->
+                <span class="col-sm-12">
+                  <!-- template-line1 -->
+                  <div class="template-line">
+                    <span class="template-title">
+                      {{ tpl.Title }}
+                    </span>
+                    <span>
+                      <i class="fa fa-windows" aria-hidden="true" ng-if="tpl.Platform === 'windows'"></i>
+                      <i class="fa fa-linux" aria-hidden="true" ng-if="tpl.Platform === 'linux'"></i>
+                      <!-- Arch / Platform -->
+                    </span>
+                  </div>
+                  <!-- !template-line1 -->
+                  <!-- template-line2 -->
+                  <div class="template-line">
+                    <span class="template-description">
+                      {{ tpl.Description }}
+                    </span>
+                    <span class="small text-muted" ng-if="tpl.Categories.length > 0">
+                      {{ tpl.Categories.join(', ') }}
+                    </span>
+                  </div>
+                  <!-- !template-line2 -->
+                </span>
+                <!-- !template-details -->
+              </div>
+              <!-- !template -->
             </div>
-            <!-- !template -->
+            <div ng-if="!templates" class="text-center text-muted">
+              Loading...
+            </div>
+            <div ng-if="(templates | filter:state.filters:true).length == 0" class="text-center text-muted">
+              No templates available.
+            </div>
           </div>
-          <div ng-if="!templates" class="text-center text-muted">
-            Loading...
-          </div>
-          <div ng-if="(templates | filter:state.filters:true).length == 0" class="text-center text-muted">
-            No templates available.
-          </div>
-        </div>
-      </form>
+        </form>
       </rd-widget-body>
     </rd-template-widget>
   </div>
-
 </div>
