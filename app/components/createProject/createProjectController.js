@@ -1,6 +1,14 @@
 angular.module('createProject', [])
-.controller('CreateProjectController', ['$scope', '$state', '$document', 'ProjectService', 'CodeMirrorService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService',
-function ($scope, $state, $document, ProjectService, CodeMirrorService, Authentication, Notifications, FormValidator, ResourceControlService) {
+.controller('CreateProjectController', ['$scope', '$state', '$document', 'OrcaProjectService', 'ProjectService', 'CodeMirrorService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService',
+function ($scope, $state, $document, OrcaProjectService, ProjectService, CodeMirrorService, Authentication, Notifications, FormValidator, ResourceControlService) {
+
+  $scope.formValues = {
+    Name: ''
+  };
+
+  $scope.config = {
+    Driver: ''
+  };
 
   // TODO: Use Orca API call for project drivers...
   $scope.availableProjectDrivers = ['Demo Voting App', 'Demo Security App', 'CENX 7.1.1', 'CENX 7.2'];
@@ -32,39 +40,25 @@ function ($scope, $state, $document, ProjectService, CodeMirrorService, Authenti
   $scope.saveProject = function () {
     $('#createResourceSpinner').show();
 
-    /*
     var name = $scope.formValues.Name;
+    var driver = $scope.config.Driver;
 
-    var accessControlData = $scope.formValues.AccessControlData;
-    var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
-    var userId = userDetails.ID;
+    // console.log("Saving " + name + " for new driver " + driver)
 
-    if (!validateForm(accessControlData, isAdmin)) {
-      $('#createResourceSpinner').hide();
-      return;
-    }
-
-    createStack(name)
+    OrcaProjectService.create(name, driver)
     .then(function success(data) {
-      Notifications.success('Stack successfully deployed');
-    })
-    .catch(function error(err) {
-      Notifications.warning('Deployment error', err.err.data.err);
-    })
-    .then(function success(data) {
-      return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, []);
+      console.log("Running task to create new project...")
     })
     .then(function success() {
-      $state.go('stacks');
+      Notifications.success('Project creation successfully launched...');
+      $state.go('projects', {}, {reload: true});
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to apply resource control on the stack');
+      Notifications.error('Failure', err, 'An error occured during project creation');
     })
     .finally(function final() {
       $('#createResourceSpinner').hide();
     });
-    */
 
     $('#createResourceSpinner').hide();
   };
