@@ -1,11 +1,10 @@
 angular.module('settings', [])
-.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_CONTAINER_TEMPLATES_URL', 'DEFAULT_STACK_TEMPLATES_URL',
-function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_CONTAINER_TEMPLATES_URL, DEFAULT_STACK_TEMPLATES_URL) {
+.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_CONTAINER_TEMPLATES_URL',
+function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_CONTAINER_TEMPLATES_URL) {
 
   $scope.formValues = {
     customLogo: false,
-    customContainerTemplates: false,
-    customStackTemplates: false,
+    customTemplates: false,
     externalContributions: false,
     restrictBindMounts: false,
     restrictPrivilegedMode: false,
@@ -38,12 +37,8 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
       settings.LogoURL = '';
     }
 
-    if (!$scope.formValues.customContainerTemplates) {
+    if (!$scope.formValues.customTemplates) {
       settings.TemplatesURL = DEFAULT_CONTAINER_TEMPLATES_URL;
-    }
-
-    if (!$scope.formValues.customStackTemplates) {
-      settings.StackTemplatesURL = DEFAULT_STACK_TEMPLATES_URL;
     }
 
     settings.DisplayExternalContributors = !$scope.formValues.externalContributions;
@@ -88,10 +83,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
         $scope.formValues.customLogo = true;
       }
       if (settings.TemplatesURL !== DEFAULT_CONTAINER_TEMPLATES_URL) {
-        $scope.formValues.customContainerTemplates = true;
-      }
-      if (settings.StackTemplatesURL !== DEFAULT_STACK_TEMPLATES_URL) {
-        $scope.formValues.customStackTemplates = true;
+        $scope.formValues.customTemplates = true;
       }
       $scope.formValues.externalContributions = !settings.DisplayExternalContributors;
       $scope.formValues.restrictBindMounts = !settings.AllowBindMountsForRegularUsers;

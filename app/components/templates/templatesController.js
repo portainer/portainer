@@ -221,12 +221,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     })
     .then(function success(data) {
       var templates =  data.templates;
-      // var availableCategories = [];
-      // angular.forEach($scope.templates, function(template) {
-      //   availableCategories = availableCategories.concat(template.Categories);
-      // });
-      //
-      // $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
       updateCategories(templates, type);
       $scope.templates = templates;
       $scope.runningContainers = data.containers;
@@ -246,25 +240,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     });
   }
 
-  // function initStackTemplates(templatesKey) {
-  //   TemplateService.getTemplates(templatesKey)
-  //   .then(function success(data) {
-  //     $scope.templates = data;
-  //     var availableCategories = [];
-  //     angular.forEach($scope.templates, function(template) {
-  //       availableCategories = availableCategories.concat(template.Categories);
-  //     });
-  //     $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
-  //   })
-  //   .catch(function error(err) {
-  //     $scope.templates = [];
-  //     Notifications.error('Failure', err, 'Unable to retrieve stack templates.');
-  //   })
-  //   .finally(function final(){
-  //     $('#loadingViewSpinner').hide();
-  //   });
-  // }
-
   function initView() {
     var templatesKey = $transition$.params().key;
     $scope.templatesKey = templatesKey;
@@ -279,15 +254,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       $scope.state.filters.Type = 'stack';
       $scope.state.showDeploymentSelector = true;
     }
-    // ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
-
-
-    // if (templatesKey === 'stacks') {
-    //   $scope.state.deployment = 'stack';
-    //   initStackTemplates(templatesKey);
-    // } else {
-    //   initContainerTemplates(templatesKey);
-    // }
 
     initTemplates(templatesKey, $scope.state.filters.Type, endpointMode.provider, apiVersion);
   }
