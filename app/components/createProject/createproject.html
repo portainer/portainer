@@ -25,6 +25,20 @@
               This project will be used to define a stack, once rendered.
             </span>
           </div>
+          <!-- !subnet-gateway-inputs -->
+          <div class="col-sm-12 form-section-title">
+            Configuration
+          </div>
+          <!-- driver-input -->
+          <div class="form-group">
+            <label for="project_driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
+            <div class="col-sm-11">
+              <select class="form-control" ng-options="driver for driver in availableProjectDrivers" ng-model="config.Driver" ng-if="availableProjectDrivers.length > 0">
+                <option disabled hidden value="">Select a project type</option>
+              </select>
+              <input type="text" class="form-control" ng-model="config.Driver" id="project_driver" placeholder="e.g. projectTypeName" ng-if="availableProjectDrivers.length === 0">
+            </div>
+          </div>
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions

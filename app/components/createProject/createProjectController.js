@@ -2,8 +2,19 @@ angular.module('createProject', [])
 .controller('CreateProjectController', ['$scope', '$state', '$document', 'ProjectService', 'CodeMirrorService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService',
 function ($scope, $state, $document, ProjectService, CodeMirrorService, Authentication, Notifications, FormValidator, ResourceControlService) {
 
+  // TODO: Use Orca API call for project drivers...
+  $scope.availableProjectDrivers = ['Demo Voting App', 'Demo Security App', 'CENX 7.1.1', 'CENX 7.2'];
+
   $scope.state = {
     formValidationError: ''
+  };
+
+  $scope.addDriverOption = function() {
+    $scope.formValues.DriverOptions.push({ name: '', value: '' });
+  };
+
+  $scope.removeDriverOption = function(index) {
+    $scope.formValues.DriverOptions.splice(index, 1);
   };
 
   function validateForm(accessControlData, isAdmin) {
