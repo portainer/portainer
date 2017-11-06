@@ -142,7 +142,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		if *flags.Templates != "" {
 			settings.TemplatesURL = *flags.Templates
 		} else {
-			settings.TemplatesURL = portainer.DefaultContainerTemplatesURL
+			settings.TemplatesURL = portainer.DefaultTemplatesURL
 		}
 
 		if *flags.Labels != nil {
