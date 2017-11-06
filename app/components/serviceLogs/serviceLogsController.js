@@ -1,6 +1,6 @@
 angular.module('serviceLogs', [])
-.controller('ServiceLogsController', ['$scope', '$transition$', '$anchorScroll', 'ServiceLogs', 'Service',
-function ($scope, $transition$, $anchorScroll, ServiceLogs, Service) {
+.controller('ServiceLogsController', ['$scope', '$transition$', '$anchorScroll', 'ServiceService',
+function ($scope, $transition$, $anchorScroll, ServiceService) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
@@ -13,43 +13,44 @@ function ($scope, $transition$, $anchorScroll, ServiceLogs, Service) {
     getLogsStderr();
   }
 
+  function parseLogResults(data) {
+    // Replace carriage returns with newlines to clean up output
+    data = data.replace(/[\r]/g, '\n');
+    // Strip 8 byte header from each line of output
+    data = data.substring(8);
+    data = data.replace(/\n(.{8})/g, '\n');
+    return data;
+  }
+
   function getLogsStderr() {
-    ServiceLogs.get($transition$.params().id, {
+    ServiceService.logs({
+      id: $transition$.params().id,
       stdout: 0,
       stderr: 1,
-      timestamps: $scope.state.displayTimestampsErr,
+      timestamps: $scope.state.displayTimestampsOut,
       tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-      // Replace carriage returns with newlines to clean up output
-      data = data.replace(/[\r]/g, '\n');
-      // Strip 8 byte header from each line of output
-      data = data.substring(8);
-      data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stderr = data;
+     }).then(function(data) {
+      $scope.stderr = parseLogResults(data);
     });
   }
 
   function getLogsStdout() {
-    ServiceLogs.get($transition$.params().id, {
+    ServiceService.logs({
+      id: $transition$.params().id,
       stdout: 1,
       stderr: 0,
       timestamps: $scope.state.displayTimestampsOut,
       tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-      // Replace carriage returns with newlines to clean up output
-      data = data.replace(/[\r]/g, '\n');
-      // Strip 8 byte header from each line of output
-      data = data.substring(8);
-      data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stdout = data;
+    }).then(function(data) {
+      $scope.stdout = parseLogResults(data);
     });
   }
 
   function getService() {
-    Service.get({id: $transition$.params().id}, function (d) {
-      $scope.service = d;
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to retrieve service info');
+    ServiceService.service($transition$.params().id).then(function(service) {
+        $scope.service = service;
+    }).catch(function(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve service info');
     });
   }
 

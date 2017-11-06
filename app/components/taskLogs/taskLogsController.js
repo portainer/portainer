@@ -1,6 +1,6 @@
 angular.module('taskLogs', [])
-.controller('TaskLogsController', ['$scope', '$stateParams', 'ServiceService', 'TaskService', 'TaskLogs', 'Task', 'Notifications',
-function ($scope, $stateParams, ServiceService, TaskService, TaskLogs, Task, Notifications) {
+.controller('TaskLogsController', ['$scope', '$stateParams', 'ServiceService', 'TaskService', 'Notifications',
+function ($scope, $stateParams, ServiceService, TaskService, Notifications) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
@@ -25,23 +25,25 @@ function ($scope, $stateParams, ServiceService, TaskService, TaskLogs, Task, Not
   }
 
   function getLogsStderr() {
-    TaskLogs.get($stateParams.id, {
+    TaskService.logs({
+      id: $transition$.params().id,
       stdout: 0,
       stderr: 1,
-      timestamps: $scope.state.displayTimestampsErr,
+      timestamps: $scope.state.displayTimestampsOut,
       tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-        $scope.stderr = parseLogResults(data);
+     }).then(function(data) {
+      $scope.stderr = parseLogResults(data);
     });
   }
 
   function getLogsStdout() {
-    TaskLogs.get($stateParams.id, {
+    TaskService.logs({
+      id: $transition$.params().id,
       stdout: 1,
       stderr: 0,
       timestamps: $scope.state.displayTimestampsOut,
       tail: $scope.tailLines
-    }, function (data, status, headers, config) {
+    }).then(function(data) {
       $scope.stdout = parseLogResults(data);
     });
   }

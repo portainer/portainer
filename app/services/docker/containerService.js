@@ -154,5 +154,19 @@ angular.module('portainer.services')
     return Container.inspect({id: id}).$promise;
   };
 
+  service.logs = function(opts) {
+      var deferred = $q.defer();
+
+      Container.logs(opts).$promise
+      .then(function success(data) {
+        deferred.resolve(service);
+      })
+      .catch(function error(err) {
+        deferred.reject({ msg: 'Unable to retrieve container logs', err: err });
+      });
+
+      return deferred.promise;
+  };
+
   return service;
 }]);

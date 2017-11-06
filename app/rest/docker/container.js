@@ -44,6 +44,17 @@ angular.module('portainer.rest')
     },
     inspect: {
       method: 'GET', params: { id: '@id', action: 'json' }
+    },
+    logs: {
+        method: 'GET',
+        params: {
+            action: 'logs',
+            isArray: true,
+            stdout: params.stdout || 0,
+            stderr: params.stderr || 0,
+            timestamps: params.timestamps || 0,
+            tail: params.tail || 'all'
+        }
     }
   });
 }]);

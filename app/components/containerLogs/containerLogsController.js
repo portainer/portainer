@@ -1,6 +1,6 @@
 angular.module('containerLogs', [])
-.controller('ContainerLogsController', ['$scope', '$transition$', '$anchorScroll', 'ContainerLogs', 'Container', 'Notifications',
-function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notifications) {
+.controller('ContainerLogsController', ['$scope', '$transition$', '$anchorScroll', 'ContainerService',
+function ($scope, $transition$, $anchorScroll, ContainerService) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
@@ -8,63 +8,75 @@ function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notific
   $scope.stderr = '';
   $scope.tailLines = 2000;
 
-  Container.get({id: $transition$.params().id}, function (d) {
-    $scope.container = d;
-  }, function (e) {
-    Notifications.error('Failure', e, 'Unable to retrieve container info');
-  });
-
   function getLogs() {
     getLogsStdout();
     getLogsStderr();
   }
 
+  function parseLogResults(data) {
+    // Replace carriage returns with newlines to clean up output
+    data = data.replace(/[\r]/g, '\n');
+    // Strip 8 byte header from each line of output
+    data = data.substring(8);
+    data = data.replace(/\n(.{8})/g, '\n');
+    return data;
+  }
+
   function getLogsStderr() {
-    ContainerLogs.get($transition$.params().id, {
+    ContainerService.logs({
+      id: $transition$.params().id,
       stdout: 0,
       stderr: 1,
-      timestamps: $scope.state.displayTimestampsErr,
+      timestamps: $scope.state.displayTimestampsOut,
       tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-      // Replace carriage returns with newlines to clean up output
-      data = data.replace(/[\r]/g, '\n');
-      // Strip 8 byte header from each line of output
-      data = data.substring(8);
-      data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stderr = data;
+     }).then(function(data) {
+      $scope.stderr = parseLogResults(data);
     });
   }
 
   function getLogsStdout() {
-    ContainerLogs.get($transition$.params().id, {
+    ContainerService.logs({
+      id: $transition$.params().id,
       stdout: 1,
       stderr: 0,
       timestamps: $scope.state.displayTimestampsOut,
       tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-      // Replace carriage returns with newlines to clean up output
-      data = data.replace(/[\r]/g, '\n');
-      // Strip 8 byte header from each line of output
-      data = data.substring(8);
-      data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stdout = data;
+    }).then(function(data) {
+      $scope.stdout = parseLogResults(data);
     });
   }
 
-  // initial call
-  getLogs();
-  var logIntervalId = window.setInterval(getLogs, 5000);
+  function getContainer() {
+    $('#loadingViewSpinner').show();
+    ContainerService.container($transition$.params().id).then(function(container) {
+      $scope.container = container;
+    }).catch(function(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve container info');
+    }).finally(function() {
+      $('#loadingViewSpinner').hide();
+    });
+  }
 
-  $scope.$on('$destroy', function () {
-    // clearing interval when view changes
-    clearInterval(logIntervalId);
-  });
+  function initView() {
+    getContainer();
+    getLogs();
 
-  $scope.toggleTimestampsOut = function () {
-    getLogsStdout();
-  };
+    var logIntervalId = window.setInterval(getLogs, 5000);
 
-  $scope.toggleTimestampsErr = function () {
-    getLogsStderr();
-  };
+    $scope.$on('$destroy', function () {
+      // clearing interval when view changes
+      clearInterval(logIntervalId);
+    });
+
+    $scope.toggleTimestampsOut = function () {
+      getLogsStdout();
+    };
+
+    $scope.toggleTimestampsErr = function () {
+      getLogsStderr();
+    };
+  }
+
+  initView();
+
 }]);

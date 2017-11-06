@@ -13,6 +13,16 @@ angular.module('portainer.rest')
       ignoreLoadingBar: true
     },
     update: { method: 'POST', params: {id: '@id', action: 'update', version: '@version'} },
-    remove: { method: 'DELETE', params: {id: '@id'} }
+    remove: { method: 'DELETE', params: {id: '@id'} },
+    logs: {
+        method: 'GET',
+        params: {
+            action: 'logs',
+            stdout: params.stdout || 0,
+            stderr: params.stderr || 0,
+            timestamps: params.timestamps || 0,
+            tail: params.tail || 'all'
+        }
+    }
   });
 }]);
