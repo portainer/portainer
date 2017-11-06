@@ -1,0 +1,45 @@
+<rd-header>
+  <rd-header-title title="Create project">
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="display: none;"></i>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="projects">Projects</a> > Add project
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="project_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="formValues.Name" id="project_name" placeholder="e.g. myProject" auto-focus>
+            </div>
+          </div>
+          <!-- !name-input -->
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              This project will be used to define a stack, once rendered.
+            </span>
+          </div>
+          <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ng-click="saveProject()">Save</button>
+              <a type="button" class="btn btn-default btn-sm" ui-sref="projects">Cancel</a>
+              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

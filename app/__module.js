@@ -30,6 +30,7 @@ angular.module('portainer', [
   'createService',
   'createVolume',
   'createStack',
+  'createProject',
   'engine',
   'endpoint',
   'endpointAccess',

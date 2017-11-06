@@ -1,6 +1,6 @@
 angular.module('project', [])
-.controller('ProjectController', ['$q', '$http', '$window', '$interval', '$scope', '$state', '$transition$', 'StackCreateService', 'LabelHelper', 'ProjectService', 'Pagination', 'Notifications',
-function ($q, $http, $window, $interval, $scope, $state, $transition$, StackCreateService, LabelHelper, ProjectService, Pagination, Notifications) {
+.controller('ProjectController', ['$q', '$http', '$window', '$interval', '$scope', '$state', '$transition$', 'SwarmService', 'StackService', 'StackCreateService', 'LabelHelper', 'ProjectService', 'Pagination', 'Notifications',
+function ($q, $http, $window, $interval, $scope, $state, $transition$, SwarmService, StackService, StackCreateService, LabelHelper, ProjectService, Pagination, Notifications) {
 
   $scope.state = {};
   $scope.loading = true;
@@ -19,7 +19,6 @@ function ($q, $http, $window, $interval, $scope, $state, $transition$, StackCrea
         url: content,
         cache: true
     }).success(function (response) {
-        console.log("Data: " + response)
         deferred.resolve(response);
     }).error(function (msg) {
         deferred.reject(msg);
@@ -33,7 +32,15 @@ function ($q, $http, $window, $interval, $scope, $state, $transition$, StackCrea
       $scope.getStackContent(content)
       .then(function(data) {
         StackCreateService.setStackFileContent(data);
-        $window.location.href = '/#/actions/create/stack'
+        $window.location.href = '/#/actions/create/stack';
+      });
+  };
+
+  $scope.updateStack = function(id, content) {
+      $scope.getStackContent(content)
+      .then(function(data) {
+        StackCreateService.setStackFileContent(data);
+        $window.location.href = '/#/stacks/' + id + '/' + 'true/';
       });
   };
 
@@ -113,6 +120,21 @@ function ($q, $http, $window, $interval, $scope, $state, $transition$, StackCrea
         })
         .catch(function error(err) {
             console.error("Unable to find project image to load");
+        });
+
+        SwarmService.swarm()
+        .then(function success(data) {
+            var swarm = data;
+            StackService.stack($transition$.params().id+"_"+swarm.Id)
+            .then(function success(stackdata) {
+                $scope.stack = stackdata;
+            })
+            .catch(function error(err) {
+                console.log("No stack found with this ID");
+            });
+        })
+        .catch(function error(err) {
+            console.log("No swarm data found");
         });
 
         $scope.statusAction()

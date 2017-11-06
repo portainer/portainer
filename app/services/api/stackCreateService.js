@@ -19,6 +19,10 @@ function StackCreateServiceFactory($sce, $http, $q, ResourceControlService) {
     StackFileContent = content;
   };
 
+  service.getStackFileContent = function() {
+    return StackFileContent;
+  };
+
   service.formValues = function() {
     return {
         Name: Name,

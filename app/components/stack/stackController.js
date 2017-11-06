@@ -1,6 +1,6 @@
 angular.module('stack', [])
-.controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications',
-function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications) {
+.controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackCreateService', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications',
+function ($q, $scope, $state, $stateParams, $document, StackCreateService, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications) {
 
   $scope.deployStack = function () {
     $('#createResourceSpinner').show();
@@ -25,6 +25,7 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
   function initView() {
     $('#loadingViewSpinner').show();
     var stackId = $stateParams.id;
+    var useCache = $stateParams.usecache;
 
     StackService.stack(stackId)
     .then(function success(data) {
@@ -70,6 +71,10 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
       Notifications.error('Failure', err, 'Unable to retrieve tasks details');
     })
     .finally(function final() {
+      if (useCache == 'true') {
+        $scope.stackFileContent = StackCreateService.getStackFileContent();
+      }
+
       $('#loadingViewSpinner').hide();
     });
   }

@@ -701,6 +701,19 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('actions.create.project', {
+    url: '/project',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/createProject/createproject.html',
+        controller: 'CreateProjectController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('projects', {
     url: '/projects/',
     views: {
@@ -742,6 +755,19 @@ function configureRoutes($stateProvider) {
   })
   .state('stack', {
     url: '^/stacks/:id/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/stack/stack.html',
+        controller: 'StackController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('cachedstack', {
+    url: '^/stacks/:id/:usecache/',
     views: {
       'content@': {
         templateUrl: 'app/components/stack/stack.html',

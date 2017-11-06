@@ -17,7 +17,7 @@
         <div class="btn-group" role="group" aria-label="...">
           <button type="button" class="btn btn-primary btn-responsive" ng-click="render()"><i class="fa space-right" aria-hidden="true"></i>Render</button>
           <button type="button" class="btn btn-primary btn-responsive" ng-click="createStack(project.Id, project.Content)"><i class="fa space-right" aria-hidden="true"></i>Create Stack</button>
-          <button type="button" class="btn btn-primary btn-responsive" ng-click="updateStack(project.Id, project.Content)"><i class="fa space-right" aria-hidden="true"></i>Update Stack</button>
+          <button ng-if="stack" type="button" class="btn btn-primary btn-responsive" ng-click="updateStack(stack.Id, project.Content)"><i class="fa space-right" aria-hidden="true"></i>Update Stack</button>
         </div>
       </div>
     </rd-widget-taskbar>
