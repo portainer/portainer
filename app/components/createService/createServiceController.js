@@ -198,10 +198,32 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     config.TaskTemplate.ContainerSpec.Labels = LabelHelper.fromKeyValueToLabelHash(input.ContainerLabels);
   }
 
+  function createMountObjectFromVolume(volumeObject, target, readonly) {
+    return {
+      Target: target,
+      Source: volumeObject.Id,
+      Type: 'volume',
+      ReadOnly: readonly,
+      VolumeOptions: {
+        Labels: volumeObject.Labels,
+        DriverConfig: {
+          Name: volumeObject.Driver,
+          Options: volumeObject.Options
+        }
+      }
+    };
+  }
+
   function prepareVolumes(config, input) {
     input.Volumes.forEach(function (volume) {
       if (volume.Source && volume.Target) {
-        config.TaskTemplate.ContainerSpec.Mounts.push(volume);
+        if (volume.Type !== 'volume') {
+          config.TaskTemplate.ContainerSpec.Mounts.push(volume);
+        } else {
+          var volumeObject = volume.Source;
+          var mount = createMountObjectFromVolume(volumeObject, volume.Target, volume.ReadOnly);
+          config.TaskTemplate.ContainerSpec.Mounts.push(mount);
+        }
       }
     });
   }
