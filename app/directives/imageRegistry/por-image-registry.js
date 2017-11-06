@@ -4,6 +4,6 @@ angular.module('portainer').component('porImageRegistry', {
   bindings: {
     'image': '=',
     'registry': '=',
-    'autoComplete': '='
+    'autoComplete': '<'
   }
 });
