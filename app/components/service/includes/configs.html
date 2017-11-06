@@ -16,7 +16,7 @@
         <thead>
           <tr>
             <th>Name</th>
-            <th>File name</th>
+            <th>Path in container</th>
             <th>UID</th>
             <th>GID</th>
             <th>Mode</th>
@@ -27,7 +27,7 @@
           <tr ng-repeat="config in service.ServiceConfigs">
             <td><a ui-sref="config({id: config.Id})">{{ config.Name }}</a></td>
             <td>
-              <input class="form-control" ng-model="config.FileName" ng-change="updateConfig(service)" required />
+              <input class="form-control" ng-model="config.FileName" ng-change="updateConfig(service)" placeholder="e.g. /path/in/container" required />
             </td>
             <td>{{ config.Uid }}</td>
             <td>{{ config.Gid }}</td>
