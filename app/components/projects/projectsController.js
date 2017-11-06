@@ -9,6 +9,8 @@ function ($scope, Notifications, Pagination, ProjectService, ModalService) {
   $scope.state.DisplayInformationPanel = false;
   $scope.state.DisplayExternalProjects = true;
 
+  var statusPromise;
+
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('projects', $scope.state.pagination_count);
   };

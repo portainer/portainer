@@ -51,7 +51,7 @@ function ($scope, $state, $document, OrcaProjectService, ProjectService, CodeMir
     })
     .then(function success() {
       Notifications.success('Project creation successfully launched...');
-      $state.go('projects', {}, {reload: true});
+      $state.go('project', {id: name, content: ''}, {reload: true});
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'An error occured during project creation');
