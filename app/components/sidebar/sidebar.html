@@ -29,9 +29,6 @@
     <li class="sidebar-list" ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="stacks" ui-sref-active="active">Stacks <span class="menu-icon fa fa-th-list"></span></a>
     </li>
-    <!-- <li class="sidebar-list" ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
-      <a ui-sref="templates_stacks" ui-sref-active="active">Stack templates <span class="menu-icon fa fa-rocket"></span></a>
-    </li> -->
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="services" ui-sref-active="active">Services <span class="menu-icon fa fa-list-alt"></span></a>
     </li>
