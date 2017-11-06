@@ -597,23 +597,6 @@ function configureRoutes($stateProvider) {
       }
     }
   })
-  .state('templates_stacks', {
-    url: '/templates/stacks',
-    params: {
-      key: 'stacks',
-      hide_descriptions: false
-    },
-    views: {
-      'content@': {
-        templateUrl: 'app/components/templates/templates.html',
-        controller: 'TemplatesController'
-      },
-      'sidebar@': {
-        templateUrl: 'app/components/sidebar/sidebar.html',
-        controller: 'SidebarController'
-      }
-    }
-  })
   .state('volumes', {
     url: '/volumes/',
     views: {
