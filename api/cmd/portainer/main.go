@@ -126,9 +126,8 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 	_, err := settingsService.Settings()
 	if err == portainer.ErrSettingsNotFound {
 		settings := &portainer.Settings{
-			StackTemplatesURL:           portainer.DefaultStackTemplatesURL,
 			LogoURL:                     *flags.Logo,
-			DisplayExternalContributors: true,
+			DisplayExternalContributors: false,
 			AuthenticationMethod:        portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
 				TLSConfig: portainer.TLSConfiguration{},

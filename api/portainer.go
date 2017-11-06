@@ -71,7 +71,6 @@ type (
 	// Settings represents the application settings.
 	Settings struct {
 		TemplatesURL                       string               `json:"TemplatesURL"`
-		StackTemplatesURL                  string               `json:"StackTemplatesURL"`
 		LogoURL                            string               `json:"LogoURL"`
 		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
 		DisplayExternalContributors        bool                 `json:"DisplayExternalContributors"`
@@ -395,8 +394,6 @@ const (
 	DBVersion = 7
 	// DefaultContainerTemplatesURL represents the default URL for the container templates definitions.
 	DefaultContainerTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
-	// DefaultStackTemplatesURL represents the default URL for the stack templates definitions.
-	DefaultStackTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/stack_templates.json"
 )
 
 const (
