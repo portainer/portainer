@@ -44,6 +44,9 @@
     <li class="sidebar-list">
       <a ui-sref="volumes" ui-sref-active="active">Volumes <span class="menu-icon fa fa-cubes"></span></a>
     </li>
+    <li class="sidebar-list" ng-if="applicationState.endpoint.apiVersion >= 1.30 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
+      <a ui-sref="configs" ui-sref-active="active">Configs <span class="menu-icon fa fa-file-code-o"></span></a>
+    </li>
     <li class="sidebar-list" ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="secrets" ui-sref-active="active">Secrets <span class="menu-icon fa fa-user-secret"></span></a>
     </li>

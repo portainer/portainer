@@ -133,6 +133,7 @@
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
           <li class="interactive" ng-if="applicationState.endpoint.apiVersion >= 1.25"><a data-target="#secrets" data-toggle="tab">Secrets</a></li>
+          <li class="interactive"><a data-target="#configs" data-toggle="tab" ng-if="applicationState.endpoint.apiVersion >= 1.30">Configs</a></li>
           <li class="interactive"><a data-target="#resources-placement" data-toggle="tab" ng-click="refreshSlider()">Resources & Placement</a></li>
         </ul>
         <!-- tab-content -->
@@ -442,6 +443,9 @@
           <!-- tab-secrets -->
           <div class="tab-pane" id="secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25" ng-include="'app/components/createService/includes/secret.html'"></div>
           <!-- !tab-secrets -->
+          <!-- tab-configs -->
+          <div class="tab-pane" id="configs" ng-if="applicationState.endpoint.apiVersion >= 1.30" ng-include="'app/components/createService/includes/config.html'"></div>
+          <!-- !tab-configs -->
           <!-- tab-resources-placement -->
           <div class="tab-pane" id="resources-placement" ng-include="'app/components/createService/includes/resources-placement.html'"></div>
           <!-- !tab-resources-placement -->

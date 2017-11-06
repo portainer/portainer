@@ -57,7 +57,7 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
       $document.ready(function() {
         var webEditorElement = $document[0].getElementById('web-editor');
         if (webEditorElement) {
-          $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement);
+          $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement, true, false);
         }
       });
 

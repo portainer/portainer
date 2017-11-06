@@ -101,7 +101,7 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
     $document.ready(function() {
       var webEditorElement = $document[0].getElementById('web-editor');
       if (webEditorElement) {
-        $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement);
+        $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement, true, false);
         if (value) {
           $scope.editor.setValue(value);
         }

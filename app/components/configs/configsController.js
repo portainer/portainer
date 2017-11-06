@@ -1,9 +1,9 @@
-angular.module('secrets', [])
-.controller('SecretsController', ['$scope', '$state', 'SecretService', 'Notifications', 'Pagination',
-function ($scope, $state, SecretService, Notifications, Pagination) {
+angular.module('configs', [])
+.controller('ConfigsController', ['$scope', '$stateParams', '$state', 'ConfigService', 'Notifications', 'Pagination',
+function ($scope, $stateParams, $state, ConfigService, Notifications, Pagination) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
-  $scope.state.pagination_count = Pagination.getPaginationCount('secrets');
+  $scope.state.pagination_count = Pagination.getPaginationCount('configs');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
 
@@ -13,10 +13,10 @@ function ($scope, $state, SecretService, Notifications, Pagination) {
   };
 
   $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredSecrets, function (secret) {
-      if (secret.Checked !== allSelected) {
-        secret.Checked = allSelected;
-        $scope.selectItem(secret);
+    angular.forEach($scope.state.filteredConfigs, function (config) {
+      if (config.Checked !== allSelected) {
+        config.Checked = allSelected;
+        $scope.selectItem(config);
       }
     });
   };
@@ -38,17 +38,17 @@ function ($scope, $state, SecretService, Notifications, Pagination) {
         $('#loadingViewSpinner').hide();
       }
     };
-    angular.forEach($scope.secrets, function (secret) {
-      if (secret.Checked) {
+    angular.forEach($scope.configs, function (config) {
+      if (config.Checked) {
         counter = counter + 1;
-        SecretService.remove(secret.Id)
+        ConfigService.remove(config.Id)
         .then(function success() {
-          Notifications.success('Secret deleted', secret.Id);
-          var index = $scope.secrets.indexOf(secret);
-          $scope.secrets.splice(index, 1);
+          Notifications.success('Config deleted', config.Id);
+          var index = $scope.configs.indexOf(config);
+          $scope.configs.splice(index, 1);
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove secret');
+          Notifications.error('Failure', err, 'Unable to remove config');
         })
         .finally(function final() {
           complete();
@@ -59,13 +59,13 @@ function ($scope, $state, SecretService, Notifications, Pagination) {
 
   function initView() {
     $('#loadingViewSpinner').show();
-    SecretService.secrets()
+    ConfigService.configs()
     .then(function success(data) {
-      $scope.secrets = data;
+      $scope.configs = data;
     })
     .catch(function error(err) {
-      $scope.secrets = [];
-      Notifications.error('Failure', err, 'Unable to retrieve secrets');
+      $scope.configs = [];
+      Notifications.error('Failure', err, 'Unable to retrieve configs');
     })
     .finally(function final() {
       $('#loadingViewSpinner').hide();
