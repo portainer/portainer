@@ -26,6 +26,32 @@ function configureRoutes($stateProvider) {
       requiresLogin: false
     }
   })
+  .state('configs', {
+     url: '^/configs/',
+     views: {
+       'content@': {
+         templateUrl: 'app/components/configs/configs.html',
+         controller: 'ConfigsController'
+       },
+       'sidebar@': {
+         templateUrl: 'app/components/sidebar/sidebar.html',
+         controller: 'SidebarController'
+       }
+     }
+   })
+   .state('config', {
+     url: '^/config/:id/',
+     views: {
+       'content@': {
+         templateUrl: 'app/components/config/config.html',
+         controller: 'ConfigController'
+       },
+       'sidebar@': {
+         templateUrl: 'app/components/sidebar/sidebar.html',
+         controller: 'SidebarController'
+       }
+     }
+   })
   .state('containers', {
     parent: 'root',
     url: '/containers/',
@@ -105,6 +131,19 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('inspect', {
+    url: '^/containers/:id/inspect',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/containerInspect/containerInspect.html',
+        controller: 'ContainerInspectController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('dashboard', {
     parent: 'root',
     url: '/dashboard',
@@ -143,6 +182,19 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('actions.create.config', {
+     url: '/config',
+     views: {
+       'content@': {
+         templateUrl: 'app/components/createConfig/createconfig.html',
+         controller: 'CreateConfigController'
+       },
+       'sidebar@': {
+         templateUrl: 'app/components/sidebar/sidebar.html',
+         controller: 'SidebarController'
+       }
+     }
+   })
   .state('actions.create.container', {
     url: '/container/:from',
     views: {
@@ -655,6 +707,45 @@ function configureRoutes($stateProvider) {
       'content@': {
         templateUrl: 'app/components/swarmVisualizer/swarmVisualizer.html',
         controller: 'SwarmVisualizerController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('actions.create.stack', {
+    url: '/stack',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/createStack/createstack.html',
+        controller: 'CreateStackController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('stacks', {
+    url: '/stacks/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/stacks/stacks.html',
+        controller: 'StacksController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('stack', {
+    url: '^/stacks/:id/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/stack/stack.html',
+        controller: 'StackController'
       },
       'sidebar@': {
         templateUrl: 'app/components/sidebar/sidebar.html',

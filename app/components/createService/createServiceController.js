@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService',
-function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService, SettingsService) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigService', 'ConfigHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService',
+function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, ConfigHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService, SettingsService) {
 
   $scope.formValues = {
     Name: '',
@@ -28,6 +28,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
     UpdateOrder: 'stop-first',
     FailureAction: 'pause',
     Secrets: [],
+    Configs: [],
     AccessControlData: new AccessControlFormData(),
     CpuLimit: 0,
     CpuReservation: 0,
@@ -69,6 +70,14 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
 
   $scope.removeVolume = function(index) {
     $scope.formValues.Volumes.splice(index, 1);
+  };
+
+  $scope.addConfig = function() {
+    $scope.formValues.Configs.push({});
+  };
+
+  $scope.removeConfig = function(index) {
+    $scope.formValues.Configs.splice(index, 1);
   };
 
   $scope.addSecret = function() {
@@ -189,10 +198,32 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
     config.TaskTemplate.ContainerSpec.Labels = LabelHelper.fromKeyValueToLabelHash(input.ContainerLabels);
   }
 
+  function createMountObjectFromVolume(volumeObject, target, readonly) {
+    return {
+      Target: target,
+      Source: volumeObject.Id,
+      Type: 'volume',
+      ReadOnly: readonly,
+      VolumeOptions: {
+        Labels: volumeObject.Labels,
+        DriverConfig: {
+          Name: volumeObject.Driver,
+          Options: volumeObject.Options
+        }
+      }
+    };
+  }
+
   function prepareVolumes(config, input) {
     input.Volumes.forEach(function (volume) {
       if (volume.Source && volume.Target) {
-        config.TaskTemplate.ContainerSpec.Mounts.push(volume);
+        if (volume.Type !== 'volume') {
+          config.TaskTemplate.ContainerSpec.Mounts.push(volume);
+        } else {
+          var volumeObject = volume.Source;
+          var mount = createMountObjectFromVolume(volumeObject, volume.Target, volume.ReadOnly);
+          config.TaskTemplate.ContainerSpec.Mounts.push(mount);
+        }
       }
     });
   }
@@ -220,6 +251,20 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
   function preparePlacementConfig(config, input) {
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(input.PlacementConstraints);
     config.TaskTemplate.Placement.Preferences = ServiceHelper.translateKeyValueToPlacementPreferences(input.PlacementPreferences);
+  }
+
+  function prepareConfigConfig(config, input) {
+    if (input.Configs) {
+      var configs = [];
+      angular.forEach(input.Configs, function(config) {
+        if (config.model) {
+          var s = ConfigHelper.configConfig(config.model);
+          s.File.Name = config.FileName || s.File.Name;
+          configs.push(s);
+        }
+      });
+      config.TaskTemplate.ContainerSpec.Configs = configs;
+    }
   }
 
   function prepareSecretConfig(config, input) {
@@ -294,6 +339,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
     prepareVolumes(config, input);
     prepareNetworks(config, input);
     prepareUpdateConfig(config, input);
+    prepareConfigConfig(config, input);
     prepareSecretConfig(config, input);
     preparePlacementConfig(config, input);
     prepareResourcesCpuConfig(config, input);
@@ -352,6 +398,29 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
     createNewService(config, accessControlData);
   };
 
+  function initSlidersMaxValuesBasedOnNodeData(nodes) {
+    var maxCpus = 0;
+    var maxMemory = 0;
+    for (var n in nodes) {
+      if (nodes[n].CPUs && nodes[n].CPUs > maxCpus) {
+        maxCpus = nodes[n].CPUs;
+      }
+      if (nodes[n].Memory && nodes[n].Memory > maxMemory) {
+        maxMemory = nodes[n].Memory;
+      }
+    }
+    if (maxCpus > 0) {
+      $scope.state.sliderMaxCpu = maxCpus / 1000000000;
+    } else {
+      $scope.state.sliderMaxCpu = 32;
+    }
+    if (maxMemory > 0) {
+      $scope.state.sliderMaxMemory = Math.floor(maxMemory / 1000 / 1000);
+    } else {
+      $scope.state.sliderMaxMemory = 32768;
+    }
+  }
+
   function initView() {
     $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
@@ -359,8 +428,9 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
 
     $q.all({
       volumes: VolumeService.volumes(),
-      secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
       networks: NetworkService.networks(true, true, false, false),
+      secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
+      configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
       nodes: NodeService.nodes(),
       settings: SettingsService.publicSettings()
     })
@@ -368,18 +438,9 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
       $scope.availableVolumes = data.volumes;
       $scope.availableNetworks = data.networks;
       $scope.availableSecrets = data.secrets;
-      // Set max cpu value
-      var maxCpus = 0;
-      for (var n in data.nodes) {
-        if (data.nodes[n].CPUs && data.nodes[n].CPUs > maxCpus) {
-          maxCpus = data.nodes[n].CPUs;
-        }
-      }
-      if (maxCpus > 0) {
-        $scope.state.sliderMaxCpu = maxCpus / 1000000000;
-      } else {
-        $scope.state.sliderMaxCpu = 32;
-      }
+      $scope.availableConfigs = data.configs;
+      var nodes = data.nodes;
+      initSlidersMaxValuesBasedOnNodeData(nodes);
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();

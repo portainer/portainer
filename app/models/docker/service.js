@@ -1,6 +1,7 @@
-function ServiceViewModel(data, runningTasks, nodes) {
+function ServiceViewModel(data, runningTasks, allTasks, nodes) {
   this.Model = data;
   this.Id = data.ID;
+  this.Tasks = [];
   this.Name = data.Spec.Name;
   this.CreatedAt = data.CreatedAt;
   this.UpdatedAt = data.UpdatedAt;
@@ -11,8 +12,8 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.Replicas = data.Spec.Mode.Replicated.Replicas;
   } else {
     this.Mode = 'global';
-    if (nodes) {
-      this.Replicas = nodes.length;
+    if (allTasks) {
+      this.Replicas = allTasks.length;
     }
   }
   if (runningTasks) {
@@ -44,6 +45,9 @@ function ServiceViewModel(data, runningTasks, nodes) {
   this.Preferences = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Preferences || [] : [];
   this.Platforms = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Platforms || [] : [];
   this.Labels = data.Spec.Labels;
+  if (this.Labels && this.Labels['com.docker.stack.namespace']) {
+    this.StackName = this.Labels['com.docker.stack.namespace'];
+  }
 
   var containerSpec = data.Spec.TaskTemplate.ContainerSpec;
   if (containerSpec) {
@@ -65,6 +69,7 @@ function ServiceViewModel(data, runningTasks, nodes) {
     this.Hosts = containerSpec.Hosts;
     this.DNSConfig = containerSpec.DNSConfig;
     this.Secrets = containerSpec.Secrets;
+    this.Configs = containerSpec.Configs;
   }
   if (data.Endpoint) {
     this.Ports = data.Endpoint.Ports;

@@ -28,7 +28,7 @@
           <div ng-if="formValues.Registry || !fromContainer">
             <!-- image-and-registry -->
             <div class="form-group">
-              <por-image-registry image="config.Image" registry="formValues.Registry" ng-if="formValues.Registry"></por-image-registry>
+              <por-image-registry image="config.Image" registry="formValues.Registry" ng-if="formValues.Registry" auto-complete="true"></por-image-registry>
             </div>
             <!-- !image-and-registry -->
             <!-- always-pull -->
@@ -141,7 +141,7 @@
           <li class="interactive"><a data-target="#env" data-toggle="tab">Env</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#restart-policy" data-toggle="tab">Restart policy</a></li>
-          <li class="interactive"><a data-target="#runtime" data-toggle="tab">Runtime</a></li>
+          <li class="interactive"><a data-target="#runtime-resources" ng-click="refreshSlider()" data-toggle="tab">Runtime & Resources</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -466,9 +466,12 @@
             </form>
           </div>
           <!-- !tab-restart-policy -->
-          <!-- tab-runtime -->
-          <div class="tab-pane" id="runtime">
+          <!-- tab-runtime-resources -->
+          <div class="tab-pane" id="runtime-resources">
             <form class="form-horizontal" style="margin-top: 15px;">
+              <div class="col-sm-12 form-section-title">
+                Runtime
+              </div>
               <!-- privileged-mode -->
               <div class="form-group" ng-if="isAdmin || allowPrivilegedMode">
                 <div class="col-sm-12">
@@ -510,10 +513,63 @@
                 <!-- !devices-input-list -->
               </div>
               <!-- !devices-->
+              <div class="col-sm-12 form-section-title">
+                Resources
+              </div>
+              <!-- memory-reservation-input -->
+              <div class="form-group">
+                <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                  Memory reservation
+                </label>
+                <div class="col-sm-3">
+                  <por-slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
+                </div>
+                <div class="col-sm-2">
+                  <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation">
+                </div>
+                <div class="col-sm-4">
+                  <p class="small text-muted" style="margin-top: 7px;">
+                    Memory soft limit (<b>MB</b>)
+                  </p>
+                </div>
+              </div>
+              <!-- !memory-reservation-input -->
+              <!-- memory-limit-input -->
+              <div class="form-group">
+                <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                  Memory limit
+                </label>
+                <div class="col-sm-3">
+                  <por-slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
+                </div>
+                <div class="col-sm-2">
+                  <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit">
+                </div>
+                <div class="col-sm-4">
+                  <p class="small text-muted" style="margin-top: 7px;">
+                    Memory limit (<b>MB</b>)
+                  </p>
+                </div>
+              </div>
+              <!-- !memory-limit-input -->
+              <!-- cpu-limit-input -->
+              <div class="form-group">
+                <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                  CPU limit
+                </label>
+                <div class="col-sm-5">
+                  <por-slider model="formValues.CpuLimit" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="state.sliderMaxCpu"></por-slider>
+                </div>
+                <div class="col-sm-4" style="margin-top: 20px;">
+                  <p class="small text-muted">
+                    Maximum CPU usage
+                  </p>
+                </div>
+              </div>
+              <!-- !cpu-limit-input -->
             </form>
-
           </div>
-          <!-- !tab-runtime -->
+          <!-- !tab-runtime-resources -->
         </div>
       </rd-widget-body>
     </rd-widget>

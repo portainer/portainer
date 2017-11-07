@@ -128,6 +128,19 @@ type (
 		Role     UserRole
 	}
 
+	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier).
+	StackID string
+
+	// Stack represents a Docker stack created via docker stack deploy.
+	Stack struct {
+		ID          StackID `json:"Id"`
+		Name        string  `json:"Name"`
+		EntryPoint  string  `json:"EntryPoint"`
+		SwarmID     string  `json:"SwarmId"`
+		ProjectPath string
+		Env         []Pair `json:"Env"`
+	}
+
 	// RegistryID represents a registry identifier.
 	RegistryID int
 
@@ -193,7 +206,7 @@ type (
 		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
 	}
 
-	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service).
+	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service...).
 	ResourceControlType int
 
 	// UserResourceAccess represents the level of control on a resource for a specific user.
@@ -286,6 +299,16 @@ type (
 		DeleteRegistry(ID RegistryID) error
 	}
 
+	// StackService represents a service for managing stack data.
+	StackService interface {
+		Stack(ID StackID) (*Stack, error)
+		Stacks() ([]Stack, error)
+		StacksBySwarmID(ID string) ([]Stack, error)
+		CreateStack(stack *Stack) error
+		UpdateStack(ID StackID, stack *Stack) error
+		DeleteStack(ID StackID) error
+	}
+
 	// DockerHubService represents a service for managing the DockerHub object.
 	DockerHubService interface {
 		DockerHub() (*DockerHub, error)
@@ -328,10 +351,20 @@ type (
 
 	// FileService represents a service for managing files.
 	FileService interface {
+		GetFileContent(filePath string) (string, error)
+		RemoveDirectory(directoryPath string) error
 		StoreTLSFile(folder string, fileType TLSFileType, r io.Reader) error
 		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
+		GetStackProjectPath(stackIdentifier string) string
+		StoreStackFileFromString(stackIdentifier string, stackFileContent string) (string, error)
+		StoreStackFileFromReader(stackIdentifier string, r io.Reader) (string, error)
+	}
+
+	// GitService represents a service for managing Git.
+	GitService interface {
+		CloneRepository(url, destination string) error
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.
@@ -344,11 +377,19 @@ type (
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
 	}
+
+	// StackManager represents a service to manage stacks.
+	StackManager interface {
+		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint) error
+		Logout(endpoint *Endpoint) error
+		Deploy(stack *Stack, endpoint *Endpoint) error
+		Remove(stack *Stack, endpoint *Endpoint) error
+	}
 )
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.14.3"
+	APIVersion = "1.15.0"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 6
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
@@ -406,4 +447,8 @@ const (
 	NetworkResourceControl
 	// SecretResourceControl represents a resource control associated to a Docker secret
 	SecretResourceControl
+	// StackResourceControl represents a resource control associated to a stack composed of Docker services
+	StackResourceControl
+	// ConfigResourceControl represents a resource control associated to a Docker config
+	ConfigResourceControl
 )

@@ -6,7 +6,9 @@ import (
 	"github.com/portainer/portainer/cli"
 	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/exec"
 	"github.com/portainer/portainer/file"
+	"github.com/portainer/portainer/git"
 	"github.com/portainer/portainer/http"
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
@@ -54,6 +56,10 @@ func initStore(dataStorePath string) *bolt.Store {
 	return store
 }
 
+func initStackManager(assetsPath string) portainer.StackManager {
+	return exec.NewStackManager(assetsPath)
+}
+
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
 	if authenticationEnabled {
 		jwtService, err := jwt.NewService()
@@ -71,6 +77,10 @@ func initCryptoService() portainer.CryptoService {
 
 func initLDAPService() portainer.LDAPService {
 	return &ldap.Service{}
+}
+
+func initGitService() portainer.GitService {
+	return &git.Service{}
 }
 
 func initEndpointWatcher(endpointService portainer.EndpointService, externalEnpointFile string, syncInterval string) bool {
@@ -117,7 +127,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 	if err == portainer.ErrSettingsNotFound {
 		settings := &portainer.Settings{
 			LogoURL:                     *flags.Logo,
-			DisplayExternalContributors: true,
+			DisplayExternalContributors: false,
 			AuthenticationMethod:        portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
 				TLSConfig: portainer.TLSConfiguration{},
@@ -165,11 +175,15 @@ func main() {
 	store := initStore(*flags.Data)
 	defer store.Close()
 
+	stackManager := initStackManager(*flags.Assets)
+
 	jwtService := initJWTService(!*flags.NoAuth)
 
 	cryptoService := initCryptoService()
 
 	ldapService := initLDAPService()
+
+	gitService := initGitService()
 
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
@@ -186,7 +200,6 @@ func main() {
 	applicationStatus := initStatus(authorizeEndpointMgmt, flags)
 
 	if *flags.Endpoint != "" {
-		var endpoints []portainer.Endpoint
 		endpoints, err := store.EndpointService.Endpoints()
 		if err != nil {
 			log.Fatal(err)
@@ -216,7 +229,7 @@ func main() {
 
 	adminPasswordHash := ""
 	if *flags.AdminPasswordFile != "" {
-		content, err := file.GetStringFromFile(*flags.AdminPasswordFile)
+		content, err := fileService.GetFileContent(*flags.AdminPasswordFile)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -229,16 +242,24 @@ func main() {
 	}
 
 	if adminPasswordHash != "" {
-
-		log.Printf("Creating admin user with password hash %s", adminPasswordHash)
-		user := &portainer.User{
-			Username: "admin",
-			Role:     portainer.AdministratorRole,
-			Password: adminPasswordHash,
-		}
-		err := store.UserService.CreateUser(user)
+		users, err := store.UserService.UsersByRole(portainer.AdministratorRole)
 		if err != nil {
 			log.Fatal(err)
+		}
+
+		if len(users) == 0 {
+			log.Printf("Creating admin user with password hash %s", adminPasswordHash)
+			user := &portainer.User{
+				Username: "admin",
+				Role:     portainer.AdministratorRole,
+				Password: adminPasswordHash,
+			}
+			err := store.UserService.CreateUser(user)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			log.Println("Instance already has an administrator user defined. Skipping admin password related flags.")
 		}
 	}
 
@@ -256,10 +277,13 @@ func main() {
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,
 		DockerHubService:       store.DockerHubService,
+		StackService:           store.StackService,
+		StackManager:           stackManager,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,
 		LDAPService:            ldapService,
+		GitService:             gitService,
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,

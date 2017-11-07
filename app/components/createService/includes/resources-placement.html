@@ -4,42 +4,36 @@
   </div>
   <!-- memory-reservation-input -->
   <div class="form-group">
-    <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left">
+    <label for="memory-reservation" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
       Memory reservation
     </label>
     <div class="col-sm-3">
-      <input type="number" step="0.125" min="0" class="form-control" ng-model="formValues.MemoryReservation" id="memory-reservation" placeholder="e.g. 64">
+      <por-slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
     </div>
     <div class="col-sm-2">
-      <select class="form-control" ng-model="formValues.MemoryReservationUnit">
-        <option value="MB">MB</option>
-        <option value="GB">GB</option>
-      </select>
+      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation">
     </div>
     <div class="col-sm-4">
-      <p class="small text-muted">
-        Minimum memory available on a node to run a task
+      <p class="small text-muted" style="margin-top: 7px;">
+        Minimum memory available on a node to run a task (<b>MB</b>)
       </p>
     </div>
   </div>
   <!-- !memory-reservation-input -->
   <!-- memory-limit-input -->
   <div class="form-group">
-    <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left">
+    <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
       Memory limit
     </label>
     <div class="col-sm-3">
-      <input type="number" step="0.125" min="0" class="form-control" ng-model="formValues.MemoryLimit" id="memory-limit" placeholder="e.g. 128">
+      <por-slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></por-slider>
     </div>
     <div class="col-sm-2">
-      <select class="form-control" ng-model="formValues.MemoryLimitUnit">
-        <option value="MB">MB</option>
-        <option value="GB">GB</option>
-      </select>
+      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit">
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-4" style="margin-top: 7px;">
       <p class="small text-muted">
-        Maximum memory usage per task (set to 0 for unlimited)
+        Maximum memory usage per task (<b>MB</b>)
       </p>
     </div>
   </div>

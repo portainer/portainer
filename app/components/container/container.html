@@ -83,6 +83,7 @@
                   <a class="btn btn-outline-secondary" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i>Stats</a>
                   <a class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
                   <a class="btn btn-outline-secondary" type="button" ui-sref="console({id: container.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
+                  <a class="btn btn-outline-secondary" type="button" ui-sref="inspect({id: container.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Inspect</a>
                 </div>
               </td>
             </tr>
@@ -240,7 +241,7 @@
   </div>
 </div>
 
-<div class="row" ng-if="container.HostConfig.Binds.length > 0">
+<div class="row" ng-if="container.Mounts.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-cubes" title="Volumes"></rd-widget-header>
@@ -248,14 +249,15 @@
         <table class="table">
           <thead>
             <tr>
-              <th>Host</th>
-              <th>Container</th>
+              <th>Host/volume</th>
+              <th>Path in container</th>
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="vol in container.HostConfig.Binds">
-              <td>{{ vol|key: ':' }}</td>
-              <td>{{ vol|value: ':' }}</td>
+            <tr ng-repeat="vol in container.Mounts">
+              <td ng-if="vol.Type === 'bind'">{{ vol.Source }}</td>
+              <td ng-if="vol.Type === 'volume'"><a ui-sref="volume({id: vol.Name})">{{ vol.Name }}</a></td>
+              <td>{{ vol.Destination }}</td>
             </tr>
           </tbody>
         </table>

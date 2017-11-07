@@ -30,7 +30,7 @@ func NewUploadHandler(bouncer *security.RequestBouncer) *UploadHandler {
 	return h
 }
 
-// handlePostUploadTLS handles POST requests on /upload/tls/{certificate:(?:ca|cert|key)}?folder=folder
+// handlePostUploadTLS handles POST requests on /upload/tls/{certificate:(?:ca|cert|key)}?folder=<folder>
 func (handler *UploadHandler) handlePostUploadTLS(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	certificate := vars["certificate"]

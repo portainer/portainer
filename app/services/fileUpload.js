@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('FileUploadService', ['$q', 'Upload', function FileUploadFactory($q, Upload) {
+.factory('FileUploadService', ['$q', 'Upload', 'EndpointProvider', function FileUploadFactory($q, Upload, EndpointProvider) {
   'use strict';
 
   var service = {};
@@ -7,6 +7,11 @@ angular.module('portainer.services')
   function uploadFile(url, file) {
     return Upload.upload({ url: url, data: { file: file }});
   }
+
+  service.createStack = function(stackName, swarmId, file, env) {
+    var endpointID = EndpointProvider.endpointID();
+    return Upload.upload({ url: 'api/endpoints/' + endpointID + '/stacks?method=file', data: { file: file, Name: stackName, SwarmID: swarmId, Env: Upload.json(env) } });
+  };
 
   service.uploadLDAPTLSFiles = function(TLSCAFile, TLSCertFile, TLSKeyFile) {
     var queue = [];
