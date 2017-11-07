@@ -14,12 +14,13 @@ function ($cacheFactory, $q, $http, $window, $interval, $scope, $state, $transit
   $scope.getStackContent = function(content) {
     var deferred = $q.defer();
     var $httpDefaultCache = $cacheFactory.get('$http');
-    $httpDefaultCache.remove(content);
+    var key = content + "?" + Date.now();
+    $httpDefaultCache.remove(key);
 
     $http({
         method: 'GET',
-        url: content,
-        cache: true
+        url: key,
+        cache: $httpDefaultCache
     }).success(function (response) {
         deferred.resolve(response);
     }).error(function (msg) {

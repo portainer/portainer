@@ -6,17 +6,6 @@ function ($scope, $state, $document, StackCreateService, StackService, CodeMirro
   var editorContent = '';
   var editorEnabled = true;
 
-  /*
-  $scope.formValues = {
-    Name: '',
-    StackFileContent: '# Define or paste the content of your docker-compose file here',
-    StackFile: null,
-    RepositoryURL: '',
-    RepositoryPath: 'docker-compose.yml',
-    AccessControlData: new AccessControlFormData()
-  };
-  */
-
   $scope.state = {
     Method: 'editor',
     formValidationError: ''

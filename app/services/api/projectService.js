@@ -48,14 +48,15 @@ function ProjectServiceFactory($cacheFactory, $sce, $http, $q, Project, OrcaStat
   }
 
   service.getProjectImage = function(id, parentdir) {
-    var key = "projectroot/" + parentdir + "/" + id + "/target/docker-compose.png";
+    var key = "projectroot/" + parentdir + "/" + id + "/target/docker-compose.png?" + Date.now();
     var $httpDefaultCache = $cacheFactory.get('$http');
     $httpDefaultCache.remove(key);
 
     return $http({
         method: 'GET',
         url: key,
-        responseType: 'arraybuffer'
+        responseType: 'arraybuffer',
+        cache: $httpDefaultCache
       }).then(function(response) {
         var str = _arrayBufferToBase64(response.data);
         return str;
