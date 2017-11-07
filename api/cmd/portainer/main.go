@@ -171,6 +171,10 @@ func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService
 func main() {
 	flags := initCLI()
 
+	if *flags.CheckHealth {
+		http.GetHealth("localhost" + *flags.Addr)
+	}
+
 	fileService := initFileService(*flags.Data)
 
 	store := initStore(*flags.Data)
