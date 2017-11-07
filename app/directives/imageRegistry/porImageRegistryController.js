@@ -1,16 +1,21 @@
 angular.module('portainer')
-.controller('porImageRegistryController', ['$q', 'RegistryService', 'DockerHubService', 'Notifications',
-function ($q, RegistryService, DockerHubService, Notifications) {
+.controller('porImageRegistryController', ['$q', 'RegistryService', 'DockerHubService', 'ImageService', 'Notifications',
+function ($q, RegistryService, DockerHubService, ImageService, Notifications) {
   var ctrl = this;
-
+  ctrl.availableImages = [];
+  
   function initComponent() {
     $q.all({
       registries: RegistryService.registries(),
-      dockerhub: DockerHubService.dockerhub()
+      dockerhub: DockerHubService.dockerhub(),
+      availableImages: ctrl.autoComplete ? ImageService.images() : []
     })
     .then(function success(data) {
       var dockerhub = data.dockerhub;
       var registries = data.registries;
+      ctrl.availableImages = _.flatten(_.map(data.availableImages, function (image) {
+        return image.RepoTags ? image.RepoTags : [];
+      }));
       ctrl.availableRegistries = [dockerhub].concat(registries);
       if (!ctrl.registry.Id) {
         ctrl.registry = dockerhub;
