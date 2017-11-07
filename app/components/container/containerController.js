@@ -197,10 +197,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   $scope.duplicate = function() {
-    ModalService.confirmExperimentalFeature(function (experimental) {
-      if(!experimental) { return; }
-      $state.go('actions.create.container', {from: $transition$.params().id}, {reload: true});
-    });
+    $state.go('actions.create.container', {from: $transition$.params().id}, {reload: true});
   };
 
   $scope.confirmRemove = function () {
@@ -264,17 +261,13 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   }
 
   $scope.recreate = function() {
-    ModalService.confirmExperimentalFeature(function (experimental) {
-      if(!experimental) { return; }
-
-      ModalService.confirmContainerRecreation(function (result) {
-        if(!result) { return; }
-        var pullImage = false;
-        if (result[0]) {
-          pullImage = true;
-        }
-        recreateContainer(pullImage);
-      });
+    ModalService.confirmContainerRecreation(function (result) {
+      if(!result) { return; }
+      var pullImage = false;
+      if (result[0]) {
+        pullImage = true;
+      }
+      recreateContainer(pullImage);
     });
   };
 
