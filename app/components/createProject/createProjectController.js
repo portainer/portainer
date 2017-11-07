@@ -43,15 +43,13 @@ function ($scope, $state, $document, OrcaProjectService, ProjectService, CodeMir
     var name = $scope.formValues.Name;
     var driver = $scope.config.Driver;
 
-    // console.log("Saving " + name + " for new driver " + driver)
-
     OrcaProjectService.create(name, driver)
     .then(function success(data) {
-      console.log("Running task to create new project...")
+      // console.log("Running task to create new project...")
     })
     .then(function success() {
       Notifications.success('Project creation successfully launched...');
-      $state.go('project', {id: name, content: ''}, {reload: true});
+      $state.go('project', {id: name, version: driver, content: ''}, {reload: true});
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'An error occured during project creation');

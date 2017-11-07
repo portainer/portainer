@@ -1,6 +1,6 @@
 angular.module('portainer.services')
-.factory('ProjectService', ['$sce', '$http', '$q', 'Project', 'OrcaStatusService', 'OperationService', 'DeploymentService', 'ResourceControlService', 'FileUploadService', 'ProjectHelper', 'ServiceService', 'SwarmService',
-function ProjectServiceFactory($sce, $http, $q, Project, OrcaStatusService, OperationService, DeploymentService, ResourceControlService, FileUploadService, ProjectHelper, ServiceService, SwarmService) {
+.factory('ProjectService', ['$cacheFactory', '$sce', '$http', '$q', 'Project', 'OrcaStatusService', 'OperationService', 'DeploymentService', 'ResourceControlService', 'FileUploadService', 'ProjectHelper', 'ServiceService', 'SwarmService',
+function ProjectServiceFactory($cacheFactory, $sce, $http, $q, Project, OrcaStatusService, OperationService, DeploymentService, ResourceControlService, FileUploadService, ProjectHelper, ServiceService, SwarmService) {
   'use strict';
   var service = {};
 
@@ -48,9 +48,13 @@ function ProjectServiceFactory($sce, $http, $q, Project, OrcaStatusService, Oper
   }
 
   service.getProjectImage = function(id, parentdir) {
+    var key = "projectroot/" + parentdir + "/" + id + "/target/docker-compose.png";
+    var $httpDefaultCache = $cacheFactory.get('$http');
+    $httpDefaultCache.remove(key);
+
     return $http({
         method: 'GET',
-        url: "projectroot/" + parentdir + "/" + id + "/target/docker-compose.png",
+        url: key,
         responseType: 'arraybuffer'
       }).then(function(response) {
         var str = _arrayBufferToBase64(response.data);

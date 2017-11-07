@@ -1,6 +1,6 @@
 <rd-header>
   <rd-header-title title="Project details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="project({id: project.Id, content: project.Content})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="project({id: project.Id, content: project.Content, version: project.Release})" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
     <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
@@ -73,7 +73,7 @@
       <rd-widget-header icon="fa-hdd-o" title="Operations"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <br/>
-        <div>Active Operations: <span class="label label-{{ operationStatus.Name|containerstatusbadge }}">{{ operationStatus.Name }}</span></div>
+        <div>Active Operations: <span ng-if="operationStatus.Name == 'No active operations'">{{ operationStatus.Name }}</span><span ng-if="operationStatus.Name != 'No active operations'" class="label label-{{ operationStatus.Name|containerstatusbadge }}"><i id="operationsLoadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i> {{ operationStatus.Name }}</span></div>
         <hr/>
         <div ng-if="!messages">Messages:  None</div>
         <div ng-if="messages">Messages:

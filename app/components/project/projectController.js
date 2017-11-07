@@ -1,6 +1,6 @@
 angular.module('project', [])
-.controller('ProjectController', ['$q', '$http', '$window', '$interval', '$scope', '$state', '$transition$', 'SwarmService', 'StackService', 'StackCreateService', 'LabelHelper', 'ProjectService', 'Pagination', 'Notifications',
-function ($q, $http, $window, $interval, $scope, $state, $transition$, SwarmService, StackService, StackCreateService, LabelHelper, ProjectService, Pagination, Notifications) {
+.controller('ProjectController', ['$cacheFactory', '$q', '$http', '$window', '$interval', '$scope', '$state', '$transition$', 'SwarmService', 'StackService', 'StackCreateService', 'LabelHelper', 'ProjectService', 'Pagination', 'Notifications',
+function ($cacheFactory, $q, $http, $window, $interval, $scope, $state, $transition$, SwarmService, StackService, StackCreateService, LabelHelper, ProjectService, Pagination, Notifications) {
 
   $scope.state = {};
   $scope.loading = true;
@@ -13,6 +13,8 @@ function ($q, $http, $window, $interval, $scope, $state, $transition$, SwarmServ
 
   $scope.getStackContent = function(content) {
     var deferred = $q.defer();
+    var $httpDefaultCache = $cacheFactory.get('$http');
+    $httpDefaultCache.remove(content);
 
     $http({
         method: 'GET',
@@ -66,7 +68,9 @@ function ($q, $http, $window, $interval, $scope, $state, $transition$, SwarmServ
         .then(function success(data) {
           if (data.Name == $transition$.params().id + ": ") {
             $scope.operationStatus = {Name: "No active operations"};
+            $('#operationsLoadingViewSpinner').hide();
           } else {
+            $('#operationsLoadingViewSpinner').show();
             $scope.operationStatus = data;
           }
           ProjectService.messageStatus($transition$.params().id)
@@ -143,7 +147,11 @@ function ($q, $http, $window, $interval, $scope, $state, $transition$, SwarmServ
       Notifications.error('Failure', err, 'Unable to retrieve project');
     })
     .finally(function final() {
+      if ($scope.project.Name == "") {
+        $scope.project = new ProjectViewModel({ Name: $transition$.params().id, Release: $transition$.params().version, Content: $transition$.params().content, External: true });
+      }
       $scope.loading = false;
+      $('#operationsLoadingViewSpinner').hide();
       statusPromise = $interval($scope.statusAction, 5000);
     });
   }
