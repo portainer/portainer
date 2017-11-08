@@ -7,5 +7,6 @@ angular.module('portainer.rest')
   {
     get: { method: 'GET', isArray: true, params: { id: '@id', action: 'status' } },
     create: { method: 'GET', params: { id: '@id', action: 'create', driver: '@driver' } },
+    remove: { method: 'GET', params: { id: '@id', action: 'remove' } },
   });
 }]);

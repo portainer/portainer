@@ -38,13 +38,13 @@ function ($scope, Notifications, Pagination, ProjectService, ModalService) {
   };
 
   $scope.removeAction = function () {
-    ModalService.confirmDeletion(
-      'Do you want to remove the selected project(s)? Associated stack/services will be removed as well.',
-      function onConfirm(confirmed) {
-        if(!confirmed) { return; }
-        deleteSelectedProjects();
-      }
-    );
+    //ModalService.confirmDeletion(
+    // 'Do you want to remove the selected project(s)? Associated stack/services will be removed as well.',
+    //  function onConfirm(confirmed) {
+    //    if(!confirmed) { return; }
+    deleteSelectedProjects();
+    //  }
+    //);
   };
 
   function deleteSelectedProjects() {

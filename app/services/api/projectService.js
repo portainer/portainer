@@ -1,6 +1,6 @@
 angular.module('portainer.services')
-.factory('ProjectService', ['$cacheFactory', '$sce', '$http', '$q', 'Project', 'OrcaStatusService', 'OperationService', 'DeploymentService', 'ResourceControlService', 'FileUploadService', 'ProjectHelper', 'ServiceService', 'SwarmService',
-function ProjectServiceFactory($cacheFactory, $sce, $http, $q, Project, OrcaStatusService, OperationService, DeploymentService, ResourceControlService, FileUploadService, ProjectHelper, ServiceService, SwarmService) {
+.factory('ProjectService', ['$cacheFactory', '$sce', '$http', '$q', 'OrcaProject', 'Project', 'OrcaStatusService', 'OperationService', 'DeploymentService', 'ResourceControlService', 'FileUploadService', 'ProjectHelper', 'ServiceService', 'SwarmService',
+function ProjectServiceFactory($cacheFactory, $sce, $http, $q, OrcaProject, Project, OrcaStatusService, OperationService, DeploymentService, ResourceControlService, FileUploadService, ProjectHelper, ServiceService, SwarmService) {
   'use strict';
   var service = {};
 
@@ -164,10 +164,10 @@ function ProjectServiceFactory($cacheFactory, $sce, $http, $q, Project, OrcaStat
     return deferred.promise;
   };
 
-  service.remove = function(stack) {
+  service.remove = function(project) {
     var deferred = $q.defer();
 
-    Project.remove({ id: project.Id }).$promise
+    OrcaProject.remove({ id: project.Id }).$promise
     .then(function success(data) {
       if (project.ResourceControl && project.ResourceControl.Id) {
         return ResourceControlService.deleteResourceControl(project.ResourceControl.Id);
