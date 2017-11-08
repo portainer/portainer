@@ -3,14 +3,79 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="templates" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
-    <i id="loadTemplatesSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Templates</rd-header-content>
 </rd-header>
 
-<div class="row" style="height: 90%">
+<div class="row">
+  <!-- stack-form -->
+  <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'stack'">
+    <rd-widget>
+      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Title">
+        <div class="pull-right">
+          <button type="button" class="btn btn-sm btn-primary" ng-click="unselectTemplate()">Hide</button>
+        </div>
+      </rd-widget-custom-header>
+      <rd-widget-body classes="padding">
 
-  <div class="col-sm-12" ng-if="state.selectedTemplate">
+        <form class="form-horizontal">
+          <!-- description -->
+          <div ng-if="state.selectedTemplate.Note">
+            <div class="col-sm-12 form-section-title">
+              Information
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <div class="template-note" ng-if="state.selectedTemplate.Note" ng-bind-html="state.selectedTemplate.Note"></div>
+              </div>
+            </div>
+          </div>
+          <!-- !description -->
+          <div class="col-sm-12 form-section-title">
+            Configuration
+          </div>
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
+            <div class="col-sm-10">
+              <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. myStack" required>
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- env -->
+          <div ng-repeat="var in state.selectedTemplate.Env" ng-if="var.label && !var.set" class="form-group">
+            <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}<portainer-tooltip ng-if="var.description" position="bottom" message="{{ var.description }}"></portainer-tooltip></label>
+            <div class="col-sm-10">
+              <!-- <input ng-if="!var.values && (!var.type || !var.type === 'container')" type="text" class="form-control" ng-model="var.value" id="field_{{ $index }}"> -->
+              <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}">
+              <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
+                <option selected disabled hidden value="">Select value</option>
+                <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.text }}</option>
+              </select>
+            </div>
+          </div>
+          <!-- !env -->
+          <!-- access-control -->
+          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <!-- !access-control -->
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.name" ng-click="createTemplate()">Create</button>
+              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <!-- !stack-form -->
+  <!-- container-form -->
+  <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'container'">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Image">
         <div class="pull-right">
@@ -195,19 +260,39 @@
               </div>
             </div>
             <!-- !volume-mapping -->
+            <!-- extra-host -->
+            <div class="form-group" >
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Hosts file entries</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addExtraHost()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add additional entry
+                </span>
+              </div>
+              <!-- extra-host-input-list -->
+              <div class="col-sm-12">
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="(idx, host) in state.selectedTemplate.Hosts track by $index" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="state.selectedTemplate.Hosts[idx]" placeholder="e.g. host:IP">
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeExtraHost($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- !extra-host -->
           </div>
           <!-- !advanced-options -->
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
-              <i id="createContainerSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               <span class="small text-muted" style="margin-left: 10px" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM' && !state.formValidationError">
                 When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref="networks">networks view</a> to create one.
-              </span>
-              <span ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && !state.formValidationError" style="margin-left: 10px">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                <span class="small text-muted" style="margin-left: 5px;">App templates cannot be deployed as Swarm Mode services for the moment. You can still use them to quickly deploy containers on the Docker host.</span>
               </span>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
@@ -218,7 +303,11 @@
       </rd-widget-body>
     </rd-widget>
   </div>
+  <!-- container-form -->
+</div>
 
+
+<div class="row">
   <div class="col-sm-12" style="height: 100%">
     <rd-template-widget>
       <rd-widget-header icon="fa-rocket" title="Templates">
@@ -249,53 +338,92 @@
         </div>
       </rd-widget-taskbar>
       <rd-widget-body classes="padding template-widget-body">
-        <div class="template-list">
-          <!-- template -->
-          <div ng-repeat="tpl in templates | filter:state.filters:true" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
-            <div class="template-main">
-              <!-- template-image -->
-              <span class="">
-                <img class="template-logo" ng-src="{{ tpl.Logo }}" />
-              </span>
-              <!-- !template-image -->
-              <!-- template-details -->
-              <span class="col-sm-12">
-                <!-- template-line1 -->
-                <div class="template-line">
-                  <span class="template-title">
-                    {{ tpl.Title }}
-                  </span>
-                  <span>
-                    <i class="fa fa-windows" aria-hidden="true" ng-if="tpl.Platform === 'windows'"></i>
-                    <i class="fa fa-linux" aria-hidden="true" ng-if="tpl.Platform === 'linux'"></i>
-                    <!-- Arch / Platform -->
-                  </span>
-                </div>
-                <!-- !template-line1 -->
-                <!-- template-line2 -->
-                <div class="template-line">
-                  <span class="template-description">
-                    {{ tpl.Description }}
-                  </span>
-                  <span class="small text-muted" ng-if="tpl.Categories.length > 0">
-                    {{ tpl.Categories.join(', ') }}
-                  </span>
-                </div>
-                <!-- !template-line2 -->
-              </span>
-              <!-- !template-details -->
+        <form class="form-horizontal">
+          <div ng-if="templatesKey !== 'linuxserver.io' && state.showDeploymentSelector">
+            <div class="col-sm-12 form-section-title">
+              Deployment method
             </div>
-            <!-- !template -->
+            <div class="form-group"></div>
+            <div class="form-group" style="margin-bottom: 0">
+              <div class="boxselector_wrapper">
+                <div ng-click="updateCategories(templates, state.filters.Type)">
+                  <input type="radio" id="registry_quay" ng-model="state.filters.Type" value="stack">
+                  <label for="registry_quay">
+                    <div class="boxselector_header">
+                      <i class="fa fa-th-list" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Stack
+                    </div>
+                    <p>Multi-containers deployment</p>
+                  </label>
+                </div>
+                <div ng-click="updateCategories(templates, state.filters.Type)">
+                  <input type="radio" id="registry_custom" ng-model="state.filters.Type" value="container">
+                  <label for="registry_custom">
+                    <div class="boxselector_header">
+                      <i class="fa fa-server" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Container
+                    </div>
+                    <p>Single container deployment</p>
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
-          <div ng-if="!templates" class="text-center text-muted">
-            Loading...
+
+          <div ng-if="templatesKey !== 'linuxserver.io' && state.showDeploymentSelector">
+            <div class="col-sm-12 form-section-title">
+              Templates
+            </div>
+            <div class="form-group"></div>
           </div>
-          <div ng-if="(templates | filter:state.filters:true).length == 0" class="text-center text-muted">
-            No templates available.
+
+          <div class="template-list">
+            <!-- template -->
+            <div ng-repeat="tpl in templates | filter:state.filters:true" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
+              <div class="template-main">
+                <!-- template-image -->
+                <span class="">
+                  <img class="template-logo" ng-src="{{ tpl.Logo }}" />
+                </span>
+                <!-- !template-image -->
+                <!-- template-details -->
+                <span class="col-sm-12">
+                  <!-- template-line1 -->
+                  <div class="template-line">
+                    <span class="template-title">
+                      {{ tpl.Title }}
+                    </span>
+                    <span>
+                      <i class="fa fa-windows" aria-hidden="true" ng-if="tpl.Platform === 'windows'"></i>
+                      <i class="fa fa-linux" aria-hidden="true" ng-if="tpl.Platform === 'linux'"></i>
+                      <!-- Arch / Platform -->
+                    </span>
+                  </div>
+                  <!-- !template-line1 -->
+                  <!-- template-line2 -->
+                  <div class="template-line">
+                    <span class="template-description">
+                      {{ tpl.Description }}
+                    </span>
+                    <span class="small text-muted" ng-if="tpl.Categories.length > 0">
+                      {{ tpl.Categories.join(', ') }}
+                    </span>
+                  </div>
+                  <!-- !template-line2 -->
+                </span>
+                <!-- !template-details -->
+              </div>
+              <!-- !template -->
+            </div>
+            <div ng-if="!templates" class="text-center text-muted">
+              Loading...
+            </div>
+            <div ng-if="(templates | filter:state.filters:true).length == 0" class="text-center text-muted">
+              No templates available.
+            </div>
           </div>
-        </div>
+        </form>
       </rd-widget-body>
     </rd-template-widget>
   </div>
-
 </div>

@@ -125,10 +125,7 @@
                 <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
                 <td>
                   <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a>
-                  <span style="margin-left: 10px;" class="label label-warning image-tag"
-                    ng-if="::image.ContainerCount === 0">
-                    Unused
-                  </span>
+                  <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="::image.ContainerCount === 0">Unused</span>
                 </td>
                 <td>
                   <span class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>

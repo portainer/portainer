@@ -7,6 +7,7 @@ function ContainerViewModel(data) {
   if (data.NetworkSettings && !_.isEmpty(data.NetworkSettings.Networks)) {
     this.IP = data.NetworkSettings.Networks[Object.keys(data.NetworkSettings.Networks)[0]].IPAddress;
   }
+  this.NetworkSettings = data.NetworkSettings;
   this.Image = data.Image;
   this.ImageID = data.ImageID;
   this.Command = data.Command;

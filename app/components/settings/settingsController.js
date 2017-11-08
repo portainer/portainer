@@ -40,6 +40,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     if (!$scope.formValues.customTemplates) {
       settings.TemplatesURL = DEFAULT_TEMPLATES_URL;
     }
+
     settings.DisplayExternalContributors = !$scope.formValues.externalContributions;
     settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
     settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;

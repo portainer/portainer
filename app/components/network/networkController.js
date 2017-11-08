@@ -40,12 +40,14 @@ function ($scope, $state, $transition$, $filter, Network, NetworkService, Contai
     var containersInNetwork = [];
     containers.forEach(function(container) {
       var containerInNetwork = network.Containers[container.Id];
-      containerInNetwork.Id = container.Id;
-      // Name is not available in Docker 1.9
-      if (!containerInNetwork.Name) {
-        containerInNetwork.Name = $filter('trimcontainername')(container.Names[0]);
+      if (containerInNetwork) {
+        containerInNetwork.Id = container.Id;
+        // Name is not available in Docker 1.9
+        if (!containerInNetwork.Name) {
+          containerInNetwork.Name = $filter('trimcontainername')(container.Names[0]);
+        }
+        containersInNetwork.push(containerInNetwork);
       }
-      containersInNetwork.push(containerInNetwork);
     });
     $scope.containersInNetwork = containersInNetwork;
   }
@@ -68,7 +70,7 @@ function ($scope, $state, $transition$, $filter, Network, NetworkService, Contai
         });
       } else {
         Container.query({
-          filters: {network: [$transition$.params().id]}
+          filters: { network: [$transition$.params().id] }
         }, function success(data) {
           filterContainersInNetwork(network, data);
           $('#loadingViewSpinner').hide();

@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/http/security"
 
 	"net/http"
+	"path/filepath"
 )
 
 // Server implements the portainer.Server interface
@@ -42,7 +43,7 @@ func (server *Server) Start() error {
 	requestBouncer := security.NewRequestBouncer(server.JWTService, server.TeamMembershipService, server.AuthDisabled)
 	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamMembershipService, server.SettingsService)
 
-	var fileHandler = handler.NewFileHandler(server.AssetsPath)
+	var fileHandler = handler.NewFileHandler(filepath.Join(server.AssetsPath, "public"))
 	var authHandler = handler.NewAuthHandler(requestBouncer, server.AuthDisabled)
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
@@ -93,6 +94,8 @@ func (server *Server) Start() error {
 	stackHandler.ResourceControlService = server.ResourceControlService
 	stackHandler.StackManager = server.StackManager
 	stackHandler.GitService = server.GitService
+	stackHandler.RegistryService = server.RegistryService
+	stackHandler.DockerHubService = server.DockerHubService
 
 	server.Handler = &handler.Handler{
 		AuthHandler:           authHandler,

@@ -7,10 +7,6 @@ html, body, #content-wrapper, .page-content, #view {
   white-space: normal !important;
 }
 
-.btn-group button {
-  margin: 3px;
-}
-
 .messages {
   max-height: 50px;
   overflow-x: hidden;
@@ -282,11 +278,17 @@ a[ng-click]{
 }
 
 ul.sidebar {
-  bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 ul.sidebar .sidebar-title {
   height: auto;
+}
+
+ul.sidebar .sidebar-list a {
+  font-size: 14px;
 }
 
 ul.sidebar .sidebar-list a.active {
@@ -296,7 +298,32 @@ ul.sidebar .sidebar-list a.active {
   background: #2d3e63;
 }
 
-.sidebar-footer .logo {
+.sidebar-header {
+  height: 60px;
+  list-style: none;
+  text-indent: 20px;
+  font-size: 18px;
+  background: #2d3e63;
+}
+
+.sidebar-header a { color: #fff; }
+.sidebar-header a:hover {text-decoration: none; }
+
+.sidebar-header .menu-icon {
+  float: right;
+  padding-right: 28px;
+  line-height: 60px;
+}
+
+#page-wrapper:not(.open) .sidebar-footer-content {
+    display: none;
+}
+
+.sidebar-footer-content {
+  text-align: center;
+}
+
+.sidebar-footer-content .logo {
   width: 100%;
   max-width: 100px;
   height: 100%;
@@ -304,10 +331,24 @@ ul.sidebar .sidebar-list a.active {
   margin: 2px 0 2px 20px;
 }
 
-.sidebar-footer .version {
+.sidebar-footer-content .version {
   font-size: 11px;
   margin: 11px 20px 0 7px;
   color: #fff;
+}
+
+#sidebar-wrapper {
+  display: flex;
+  flex-flow: column;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
 }
 
 #image-layers .btn{
@@ -329,6 +370,46 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   color: #fff;
   border-left: 3px solid #fff;
   background: #2d3e63;
+}
+
+@media (max-height: 683px) {
+  ul.sidebar .sidebar-title {
+    line-height: 28px;
+  }
+  ul.sidebar .sidebar-title .form-control {
+    height: 28px;
+    padding: 4px 8px;
+  }
+  ul.sidebar .sidebar-list {
+    height: 28px;
+  }
+  ul.sidebar .sidebar-list a, ul.sidebar .sidebar-list .sidebar-sublist a {
+    font-size: 12px;
+    line-height: 28px;
+  }
+  ul.sidebar .sidebar-list .menu-icon {
+    line-height: 28px;
+  }
+}
+
+@media(min-height: 684px) and (max-height: 850px) {
+  ul.sidebar .sidebar-title {
+    line-height: 30px;
+  }
+  ul.sidebar .sidebar-title .form-control {
+    height: 30px;
+    padding: 5px 10px;
+  }
+  ul.sidebar .sidebar-list {
+    height: 30px;
+  }
+  ul.sidebar .sidebar-list a, ul.sidebar .sidebar-list .sidebar-sublist a {
+    font-size: 12px;
+    line-height: 30px;
+  }
+  ul.sidebar .sidebar-list .menu-icon {
+    line-height: 30px;
+  }
 }
 
 @media(min-width: 768px) and (max-width: 992px) {
@@ -614,4 +695,21 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .monospaced {
   font-family: monospace;
   font-weight: 600;
+}
+
+/* json-tree */
+
+json-tree {
+  font-size: 13px;
+  color: #30426a;
+}
+json-tree .key {
+  color: #738bc0;
+  padding-right: 5px;
+}
+
+json-tree .branch-preview {
+  font-style: normal;
+  font-size: 11px;
+  opacity: .5;
 }

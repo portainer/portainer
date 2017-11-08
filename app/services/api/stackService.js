@@ -100,13 +100,19 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.createStackFromFileContent = function(name, stackFileContent) {
+  service.createStackFromFileContent = function(name, stackFileContent, env) {
     var deferred = $q.defer();
 
     SwarmService.swarm()
     .then(function success(data) {
       var swarm = data;
-      return Stack.create({ method: 'string' }, { Name: name, SwarmID: swarm.Id, StackFileContent: stackFileContent }).$promise;
+      var payload = {
+        Name: name,
+        SwarmID: swarm.Id,
+        StackFileContent: stackFileContent,
+        Env: env
+      };
+      return Stack.create({ method: 'string' }, payload).$promise;
     })
     .then(function success(data) {
       deferred.resolve(data);
@@ -118,13 +124,20 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.createStackFromGitRepository = function(name, gitRepository, pathInRepository) {
+  service.createStackFromGitRepository = function(name, gitRepository, pathInRepository, env) {
     var deferred = $q.defer();
 
     SwarmService.swarm()
     .then(function success(data) {
       var swarm = data;
-      return Stack.create({ method: 'repository' }, { Name: name, SwarmID: swarm.Id, GitRepository: gitRepository, PathInRepository: pathInRepository }).$promise;
+      var payload = {
+        Name: name,
+        SwarmID: swarm.Id,
+        GitRepository: gitRepository,
+        PathInRepository: pathInRepository,
+        Env: env
+      };
+      return Stack.create({ method: 'repository' }, payload).$promise;
     })
     .then(function success(data) {
       deferred.resolve(data);
@@ -136,13 +149,13 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.createStackFromFileUpload = function(name, stackFile) {
+  service.createStackFromFileUpload = function(name, stackFile, env) {
     var deferred = $q.defer();
 
     SwarmService.swarm()
     .then(function success(data) {
       var swarm = data;
-      return FileUploadService.createStack(name, swarm.Id, stackFile);
+      return FileUploadService.createStack(name, swarm.Id, stackFile, env);
     })
     .then(function success(data) {
       deferred.resolve(data.data);
@@ -154,8 +167,8 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.updateStack = function(id, stackFile) {
-    return Stack.update({ id: id, StackFileContent: stackFile }).$promise;
+  service.updateStack = function(id, stackFile, env) {
+    return Stack.update({ id: id, StackFileContent: stackFile, Env: env }).$promise;
   };
 
   return service;
