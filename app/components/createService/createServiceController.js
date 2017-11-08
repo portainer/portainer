@@ -274,6 +274,9 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
         if (secret.model) {
           var s = SecretHelper.secretConfig(secret.model);
           s.File.Name = s.SecretName;
+          if (secret.target && secret.target != "") {
+            s.File.Name = secret.target;
+          }
           secrets.push(s);
         }
       });

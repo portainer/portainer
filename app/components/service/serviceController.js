@@ -74,9 +74,13 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updateConfig = function updateConfig(service) {
     updateServiceArray(service, 'ServiceConfigs', service.ServiceConfigs);
   };
-  $scope.addSecret = function addSecret(service, secret) {
-    if (secret && service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === secret.Id;}).length === 0) {
-      service.ServiceSecrets.push({ Id: secret.Id, Name: secret.Name, FileName: secret.Name, Uid: '0', Gid: '0', Mode: 444 });
+  $scope.addSecret = function addSecret(service, secret, secretTarget) {
+    var filename = secret.Name;
+    if (secretTarget && secretTarget !== "") {
+      filename = secretTarget;
+    }
+    if (secret && service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === secret.Id && serviceSecret.FileName === filename;}).length === 0) {
+      service.ServiceSecrets.push({ Id: secret.Id, Name: secret.Name, FileName: filename, Uid: '0', Gid: '0', Mode: 444 });
       updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
     }
   };
