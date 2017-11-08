@@ -76,7 +76,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   };
   $scope.addSecret = function addSecret(service, secret, secretTarget) {
     var filename = secret.Name;
-    if (secretTarget && secretTarget !== "") {
+    if (secretTarget && secretTarget !== '') {
       filename = secretTarget;
     }
     if (secret && service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === secret.Id && serviceSecret.FileName === filename;}).length === 0) {
