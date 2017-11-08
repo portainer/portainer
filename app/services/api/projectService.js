@@ -132,11 +132,11 @@ function ProjectServiceFactory($cacheFactory, $sce, $http, $q, OrcaProject, Proj
       for (var i = 0; i < deployments.length; i++) {
           var deployment = deployments[i];
           // TODO: VERIFY
-          deploymentEntries.push({ Name: deployment.Name, Content: "projectroot/" + deployment.ParentDirName + "/" + deployment.Name + "/target/docker-compose.yml"});
+          deploymentEntries.push({ Name: deployment.Name, Content: "projectroot/" + deployment.ParentDirName + "/" + deployment.Name + "/target/docker-compose.yml", StackType: deployment.StackType});
       }
 
       var projects = deploymentEntries.map(function (item) {
-        return new ProjectViewModel({ Name: item.Name, Content: item.Content, External: true });
+        return new ProjectViewModel({ Name: item.Name, Content: item.Content, StackType: item.StackType, External: true });
       });
       deferred.resolve(projects);
     })

@@ -32,11 +32,17 @@ function ($cacheFactory, $q, $http, $window, $interval, $scope, $state, $transit
 
   $scope.createStack = function(id, content) {
       StackCreateService.setName(id);
-      $scope.getStackContent(content)
-      .then(function(data) {
-        StackCreateService.setStackFileContent(data);
+      if (content && content != "undefined") {
+          $scope.getStackContent(content)
+          .then(function(data) {
+            // TODO: validate data returned...
+            StackCreateService.setStackFileContent(data);
+            $window.location.href = '/#/actions/create/stack';
+          });
+      } else {
+        StackCreateService.setStackFileContent('');
         $window.location.href = '/#/actions/create/stack';
-      });
+      }
   };
 
   $scope.updateStack = function(id, content) {
@@ -116,10 +122,25 @@ function ($cacheFactory, $q, $http, $window, $interval, $scope, $state, $transit
     ProjectService.externalProject($transition$.params().id)
     .then(function success(data) {
         $scope.project = data;
-        $scope.project.Content = $transition$.params().content;
+        if ($transition$.params().content != '') {
+            $scope.project.Content = $transition$.params().content;
+        }
+
+        console.log("Refreshing view with ID: " + $transition$.params().id)
+
+        dataId = data.Id;
+        if (!dataId || dataId == "") {
+            dataId = $transition$.params().id;
+        }
+        dataParentDirName = data.ParentDirName;
+        if (!dataParentDirName || dataParentDirName == "") {
+            // Default...
+            // TODO: hack
+            dataParentDirName = 'envs';
+        }
 
         // Load image from Orca UI directly
-        ProjectService.getProjectImage(data.Id, data.ParentDirName)
+        ProjectService.getProjectImage(dataId, dataParentDirName)
         .then(function success(imgdata) {
             $scope.projectImg = imgdata;
         })

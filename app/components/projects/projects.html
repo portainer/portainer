@@ -46,6 +46,13 @@
                   <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th>
+                <a ng-click="order('Type')">
+                  Type
+                  <span ng-show="sortType == 'Type' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortType == 'Type' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
               <th ng-if="applicationState.application.authentication">
                 <a ng-click="order('ResourceControl.Ownership')">
                   Ownership
@@ -63,6 +70,14 @@
                   </span>
                   <span ng-if="!project.Id">
                     {{ project.Name }} <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true"></i>
+                  </span>
+                </td>
+                <td>
+                  <span ng-if="project.StackType">
+                    {{ project.StackType }}
+                  </span>
+                  <span ng-if="!project.StackType">
+                    Unknown <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true"></i>
                   </span>
                 </td>
                 <td ng-if="applicationState.application.authentication">

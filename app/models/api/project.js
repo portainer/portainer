@@ -17,4 +17,10 @@ function ProjectViewModel(data) {
   if (data.Content) {
     this.Content = data.Content;
   }
+
+  if (data.StackType) {
+    this.StackType = data.StackType
+  } else {
+    this.StackType = "Unknown"
+  }
 }
