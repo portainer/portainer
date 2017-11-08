@@ -11,7 +11,7 @@ function ($scope, $state, $document, OrcaProjectService, ProjectService, CodeMir
   };
 
   // TODO: Use Orca API call for project drivers...
-  $scope.availableProjectDrivers = ['Demo Voting App', 'Demo Security App', 'CENX 8.0'];
+  $scope.availableProjectDrivers = ['Swarm Visualizer', 'Demo Voting App', 'Demo Security App', 'CENX 8.0'];
 
   $scope.state = {
     formValidationError: ''
