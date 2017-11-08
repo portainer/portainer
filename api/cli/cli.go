@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer"
 
 	"os"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -54,6 +55,15 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 	}
 
 	kingpin.Parse()
+
+	if !filepath.IsAbs(*flags.Assets) {
+		ex, err := os.Executable()
+		if err != nil {
+			panic(err)
+		}
+		*flags.Assets = filepath.Join(filepath.Dir(ex), *flags.Assets)
+	}
+
 	return flags, nil
 }
 

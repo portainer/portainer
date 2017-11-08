@@ -9,6 +9,7 @@ function ContainerDetailsViewModel(data) {
   this.Image = data.Image;
   this.Config = data.Config;
   this.HostConfig = data.HostConfig;
+  this.Mounts = data.Mounts;
   if (data.Portainer) {
     if (data.Portainer.ResourceControl) {
       this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);

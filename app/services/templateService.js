@@ -9,7 +9,9 @@ angular.module('portainer.services')
     .then(function success(data) {
       var templates = data.map(function (tpl, idx) {
         var template;
-        if (key === 'linuxserver.io') {
+        if (tpl.type === 'stack') {
+          template = new StackTemplateViewModel(tpl);
+        } else if (tpl.type === 'container' && key === 'linuxserver.io') {
           template = new TemplateLSIOViewModel(tpl);
         } else {
           template = new TemplateViewModel(tpl);
@@ -40,6 +42,7 @@ angular.module('portainer.services')
     configuration.HostConfig.NetworkMode = network.Name;
     configuration.HostConfig.Privileged = template.Privileged;
     configuration.HostConfig.RestartPolicy = { Name: template.RestartPolicy };
+    configuration.HostConfig.ExtraHosts = template.Hosts ? template.Hosts : [];
     configuration.name = containerName;
     configuration.Hostname = containerName;
     configuration.Image = template.Image;

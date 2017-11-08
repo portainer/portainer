@@ -5,6 +5,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
@@ -22,6 +23,8 @@ import (
 
 // StackHandler represents an HTTP API handler for managing Stack.
 type StackHandler struct {
+	stackCreationMutex *sync.Mutex
+	stackDeletionMutex *sync.Mutex
 	*mux.Router
 	Logger                 *log.Logger
 	FileService            portainer.FileService
@@ -29,17 +32,21 @@ type StackHandler struct {
 	StackService           portainer.StackService
 	EndpointService        portainer.EndpointService
 	ResourceControlService portainer.ResourceControlService
+	RegistryService        portainer.RegistryService
+	DockerHubService       portainer.DockerHubService
 	StackManager           portainer.StackManager
 }
 
 // NewStackHandler returns a new instance of StackHandler.
 func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 	h := &StackHandler{
-		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		Router:             mux.NewRouter(),
+		stackCreationMutex: &sync.Mutex{},
+		stackDeletionMutex: &sync.Mutex{},
+		Logger:             log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/{endpointId}/stacks",
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostStacks))).Methods(http.MethodPost)
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handlePostStacks))).Methods(http.MethodPost)
 	h.Handle("/{endpointId}/stacks",
 		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetStacks))).Methods(http.MethodGet)
 	h.Handle("/{endpointId}/stacks/{id}",
@@ -55,11 +62,12 @@ func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 
 type (
 	postStacksRequest struct {
-		Name             string `valid:"required"`
-		SwarmID          string `valid:"required"`
-		StackFileContent string `valid:""`
-		GitRepository    string `valid:""`
-		PathInRepository string `valid:""`
+		Name             string           `valid:"required"`
+		SwarmID          string           `valid:"required"`
+		StackFileContent string           `valid:""`
+		GitRepository    string           `valid:""`
+		PathInRepository string           `valid:""`
+		Env              []portainer.Pair `valid:""`
 	}
 	postStacksResponse struct {
 		ID string `json:"Id"`
@@ -68,7 +76,8 @@ type (
 		StackFileContent string `json:"StackFileContent"`
 	}
 	putStackRequest struct {
-		StackFileContent string `valid:"required"`
+		StackFileContent string           `valid:"required"`
+		Env              []portainer.Pair `valid:""`
 	}
 )
 
@@ -158,6 +167,7 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		Name:       stackName,
 		SwarmID:    swarmID,
 		EntryPoint: file.ComposeFileDefaultName,
+		Env:        req.Env,
 	}
 
 	projectPath, err := handler.FileService.StoreStackFileFromString(string(stack.ID), stackFileContent)
@@ -173,7 +183,31 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		return
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	dockerhub, err := handler.DockerHubService.DockerHub()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredRegistries, err := security.FilterRegistries(registries, securityContext)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -251,6 +285,7 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		Name:       stackName,
 		SwarmID:    swarmID,
 		EntryPoint: req.PathInRepository,
+		Env:        req.Env,
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(string(stack.ID))
@@ -275,7 +310,31 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		return
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	dockerhub, err := handler.DockerHubService.DockerHub()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredRegistries, err := security.FilterRegistries(registries, securityContext)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -314,6 +373,13 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		return
 	}
 
+	envParam := r.FormValue("Env")
+	var env []portainer.Pair
+	if err = json.Unmarshal([]byte(envParam), &env); err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
 	stackFile, _, err := r.FormFile("file")
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
@@ -339,6 +405,7 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		Name:       stackName,
 		SwarmID:    swarmID,
 		EntryPoint: file.ComposeFileDefaultName,
+		Env:        env,
 	}
 
 	projectPath, err := handler.FileService.StoreStackFileFromReader(string(stack.ID), stackFile)
@@ -354,7 +421,31 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		return
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	dockerhub, err := handler.DockerHubService.DockerHub()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredRegistries, err := security.FilterRegistries(registries, securityContext)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -508,6 +599,7 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
+	stack.Env = req.Env
 
 	_, err = handler.FileService.StoreStackFileFromString(string(stack.ID), req.StackFileContent)
 	if err != nil {
@@ -515,7 +607,37 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	err = handler.StackService.UpdateStack(stack.ID, stack)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	dockerhub, err := handler.DockerHubService.DockerHub()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredRegistries, err := security.FilterRegistries(registries, securityContext)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -589,11 +711,13 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	handler.stackDeletionMutex.Lock()
 	err = handler.StackManager.Remove(stack, endpoint)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+	handler.stackDeletionMutex.Unlock()
 
 	err = handler.StackService.DeleteStack(portainer.StackID(stackID))
 	if err != nil {
@@ -606,4 +730,29 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+}
+
+func (handler *StackHandler) deployStack(endpoint *portainer.Endpoint, stack *portainer.Stack, dockerhub *portainer.DockerHub, registries []portainer.Registry) error {
+	handler.stackCreationMutex.Lock()
+
+	err := handler.StackManager.Login(dockerhub, registries, endpoint)
+	if err != nil {
+		handler.stackCreationMutex.Unlock()
+		return err
+	}
+
+	err = handler.StackManager.Deploy(stack, endpoint)
+	if err != nil {
+		handler.stackCreationMutex.Unlock()
+		return err
+	}
+
+	err = handler.StackManager.Logout(endpoint)
+	if err != nil {
+		handler.stackCreationMutex.Unlock()
+		return err
+	}
+
+	handler.stackCreationMutex.Unlock()
+	return nil
 }

@@ -15,7 +15,8 @@ angular.module('portainer.helpers')
         },
         PortBindings: {},
         Binds: [],
-        Privileged: false
+        Privileged: false,
+        ExtraHosts: []
       },
       Volumes: {}
     };

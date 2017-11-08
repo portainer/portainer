@@ -1,11 +1,15 @@
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
 var loadGruntTasks = require('load-grunt-tasks');
+var os = require('os');
+var arch = os.arch();
+if ( arch === 'x64' ) arch = 'amd64';
 
 module.exports = function (grunt) {
 
-  loadGruntTasks(grunt);
-  grunt.loadNpmTasks('gruntify-eslint');
+  loadGruntTasks(grunt, {
+    pattern: ['grunt-*', 'gruntify-*']
+  });
 
   grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('before-copy', [
@@ -33,8 +37,8 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'config:dev',
     'clean:app',
-    'shell:buildBinary:linux:amd64',
-    'shell:downloadDockerBinary:linux:amd64',
+    'shell:buildBinary:linux:' + arch,
+    'shell:downloadDockerBinary:linux:' + arch,
     'vendor:regular',
     'html2js',
     'useminPrepare:dev',
@@ -53,7 +57,7 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    distdir: 'dist',
+    distdir: 'dist/public',
     shippedDockerVersion: '17.09.0-ce',
     pkg: grunt.file.readJSON('package.json'),
     config: {
@@ -68,8 +72,8 @@ module.exports = function (grunt) {
       css: ['assets/css/app.css']
     },
     clean: {
-      all: ['<%= distdir %>/*'],
-      app: ['<%= distdir %>/*', '!<%= distdir %>/portainer*', '!<%= distdir %>/docker*'],
+      all: ['<%= distdir %>/../*'],
+      app: ['<%= distdir %>/*', '!<%= distdir %>/../portainer*', '!<%= distdir %>/../docker*'],
       tmpl: ['<%= distdir %>/templates'],
       tmp: ['<%= distdir %>/js/*', '!<%= distdir %>/js/app.*.js', '<%= distdir %>/css/*', '!<%= distdir %>/css/app.*.css']
     },
@@ -89,7 +93,8 @@ module.exports = function (grunt) {
       release: {
         src: '<%= src.html %>',
         options: {
-          root: '<%= distdir %>'
+          root: '<%= distdir %>',
+          dest: '<%= distdir %>'
         }
       }
     },
@@ -183,7 +188,7 @@ module.exports = function (grunt) {
       run: {
         command: [
           'docker rm -f portainer',
-          'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer-linux-amd64 --no-analytics -a /app'
+          'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer-linux-' + arch + ' --no-analytics'
         ].join(';')
       },
       downloadDockerBinary: {

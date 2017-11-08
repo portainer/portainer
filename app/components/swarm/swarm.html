@@ -224,8 +224,8 @@
           <tbody>
             <tr dir-paginate="node in (state.filteredNodes = (nodes | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
               <td>
-                <a ui-sref="node({id: node.Id})" ng-if="isAdmin">{{ node.Hostname }}</a>
-                <span ng-if="!isAdmin">{{ node.Hostname }}</span>
+                <a ui-sref="node({id: node.Id})" ng-if="!applicationState.application.authentication || isAdmin">{{ node.Hostname }}</a>
+                <span ng-if="applicationState.application.authentication && !isAdmin">{{ node.Hostname }}</span>
               </td>
               <td>{{ node.Role }}</td>
               <td>{{ node.CPUs / 1000000000 }}</td>

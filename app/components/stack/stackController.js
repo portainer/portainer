@@ -1,6 +1,6 @@
 angular.module('stack', [])
-.controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications',
-function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications) {
+.controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications', 'FormHelper',
+function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper) {
 
   $scope.deployStack = function () {
     $('#createResourceSpinner').show();
@@ -8,8 +8,9 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
     // The codemirror editor does not work with ng-model so we need to retrieve
     // the value directly from the editor.
     var stackFile = $scope.editor.getValue();
+    var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
 
-    StackService.updateStack($scope.stack.Id, stackFile)
+    StackService.updateStack($scope.stack.Id, stackFile, env)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
       $state.reload();
@@ -20,6 +21,14 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
     .finally(function final() {
       $('#createResourceSpinner').hide();
     });
+  };
+
+  $scope.addEnvironmentVariable = function() {
+    $scope.stack.Env.push({ name: '', value: ''});
+  };
+
+  $scope.removeEnvironmentVariable = function(index) {
+    $scope.stack.Env.splice(index, 1);
   };
 
   function initView() {
@@ -48,7 +57,7 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
       $document.ready(function() {
         var webEditorElement = $document[0].getElementById('web-editor');
         if (webEditorElement) {
-          $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement);
+          $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement, true, false);
         }
       });
 

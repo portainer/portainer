@@ -1,0 +1,17 @@
+[Unit]
+Description=Portainer.io management ui
+After=docker.service
+Wants=docker.service
+Wants=docker-latest.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=3
+Environment=ASSETS=/usr/share/portainer
+Environment=DBFILES=/var/lib/portainer
+EnvironmentFile=-/etc/sysconfig/%p
+ExecStart=/usr/sbin/portainer -a $ASSETS -d $DBFILES
+
+[Install]
+WantedBy=multi-user.target
