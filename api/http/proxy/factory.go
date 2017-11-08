@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"time"
 
+	"github.com/Microsoft/go-winio"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
 )
@@ -35,7 +37,7 @@ func (factory *proxyFactory) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpo
 }
 
 func (factory *proxyFactory) newSocketProxy(path string) http.Handler {
-	proxy := &socketProxy{}
+	proxy := &localProxy{}
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
@@ -58,6 +60,18 @@ func (factory *proxyFactory) createReverseProxy(u *url.URL) *httputil.ReversePro
 	return proxy
 }
 
+func (factory *proxyFactory) newNamedPipeProxy(path string) http.Handler {
+	proxy := &localProxy{}
+	transport := &proxyTransport{
+		ResourceControlService: factory.ResourceControlService,
+		TeamMembershipService:  factory.TeamMembershipService,
+		SettingsService:        factory.SettingsService,
+		dockerTransport:        newNamedPipeTransport(path),
+	}
+	proxy.Transport = transport
+	return proxy
+}
+
 func newSocketTransport(socketPath string) *http.Transport {
 	return &http.Transport{
 		Dial: func(proto, addr string) (conn net.Conn, err error) {
@@ -68,4 +82,22 @@ func newSocketTransport(socketPath string) *http.Transport {
 
 func newHTTPTransport() *http.Transport {
 	return &http.Transport{}
+}
+
+func newNamedPipeTransport(namedPipePath string) *http.Transport {
+	return &http.Transport{
+		Dial: func(proto, addr string) (conn net.Conn, err error) {
+			attempts := 3
+			for {
+				attempts--
+				conn, err = winio.DialPipe(namedPipePath, nil)
+				if attempts > 0 && err != nil {
+					time.Sleep(10 * time.Millisecond)
+				} else {
+					break
+				}
+			}
+			return conn, err
+		},
+	}
 }

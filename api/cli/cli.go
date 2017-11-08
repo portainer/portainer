@@ -17,13 +17,13 @@ import (
 type Service struct{}
 
 const (
-	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
 	errSocketNotFound                = portainer.Error("Unable to locate Unix socket")
 	errEndpointsFileNotFound         = portainer.Error("Unable to locate external endpoints file")
 	errInvalidSyncInterval           = portainer.Error("Invalid synchronization interval")
 	errEndpointExcludeExternal       = portainer.Error("Cannot use the -H flag mutually with --external-endpoints")
 	errNoAuthExcludeAdminPassword    = portainer.Error("Cannot use --no-auth with --admin-password or --admin-password-file")
 	errAdminPassExcludeAdminPassFile = portainer.Error("Cannot use --admin-password with --admin-password-file")
+	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
 )
 
 // ParseFlags parse the CLI flags and return a portainer.Flags struct
@@ -104,7 +104,7 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 
 func validateEndpoint(endpoint string) error {
 	if endpoint != "" {
-		if !strings.HasPrefix(endpoint, "unix://") && !strings.HasPrefix(endpoint, "tcp://") {
+		if !strings.HasPrefix(endpoint, "unix://") && !strings.HasPrefix(endpoint, "tcp://") && !strings.HasPrefix(endpoint, "npipe://") {
 			return errInvalidEndpointProtocol
 		}
 

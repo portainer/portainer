@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Microsoft/go-winio"
 	"github.com/gorilla/mux"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
@@ -65,7 +66,7 @@ func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
 	var host string
 	if endpointURL.Scheme == "tcp" {
 		host = endpointURL.Host
-	} else if endpointURL.Scheme == "unix" {
+	} else if endpointURL.Scheme == "unix" || endpointURL.Scheme == "npipe" {
 		host = endpointURL.Path
 	}
 
@@ -122,7 +123,11 @@ func hijack(addr, scheme, method, path string, tlsConfig *tls.Config, setRawTerm
 	)
 
 	if tlsConfig == nil {
-		dial, dialErr = net.Dial(scheme, addr)
+		if scheme == "npipe" {
+			dial, dialErr = winio.DialPipe(addr, nil)
+		} else {
+			dial, dialErr = net.Dial(scheme, addr)
+		}
 	} else {
 		dial, dialErr = tls.Dial(scheme, addr, tlsConfig)
 	}

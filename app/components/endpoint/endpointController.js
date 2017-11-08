@@ -54,7 +54,7 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications)
     EndpointService.endpoint($transition$.params().id)
     .then(function success(data) {
       var endpoint = data;
-      if (endpoint.URL.indexOf('unix://') === 0) {
+      if (endpoint.URL.indexOf('unix://') === 0 || endpoint.URL.indexOf('npipe://') === 0) {
         $scope.endpointType = 'local';
       } else {
         $scope.endpointType = 'remote';
