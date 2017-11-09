@@ -41,6 +41,20 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
           }
         });
       }
+
+      $q.all({img: ImageService.image($scope.container.Image)})
+      .then(function success(data) {
+        var r = data.img.RepoTags;
+        $scope.state.RepoTags = 'Tags: ' + ((r.length > 0) ? r : '<none>');
+        $scope.state.ChangedTag = true;
+        var img = $scope.container.Config.Image.replace(':latest', '');
+        for (var x=0; x < r.length; x++) {
+          if ( r[x].replace(':latest', '') === img ) { $scope.state.ChangedTag = false; break; }
+        }
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve image details');
+      });
     }, function (e) {
       Notifications.error('Failure', e, 'Unable to retrieve container info');
     });
