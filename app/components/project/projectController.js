@@ -126,7 +126,7 @@ function ($cacheFactory, $q, $http, $window, $interval, $scope, $state, $transit
             $scope.project.Content = $transition$.params().content;
         }
 
-        console.log("Refreshing view with ID: " + $transition$.params().id)
+        // console.log("Refreshing view with ID: " + $transition$.params().id)
 
         dataId = data.Id;
         if (!dataId || dataId == "") {

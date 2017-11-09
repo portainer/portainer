@@ -39,7 +39,7 @@ function ($scope, Notifications, Pagination, ProjectService, ModalService) {
 
   $scope.removeAction = function () {
     ModalService.confirmDeletion(
-     'Are you sure you want to remove the selected project(s)? Note: related stacks/services will be unaffected.',
+     'Are you sure you want to remove the selected project(s)?  Derived stacks/services will be unaffected.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
             deleteSelectedProjects();
