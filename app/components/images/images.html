@@ -68,20 +68,7 @@
             </ul>
           </div>
         </div>
-        <div class="pull-right">
-          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
-        </div>
-        <span class="btn-group btn-group-sm pull-right" style="margin-right: 20px;">
-          <label class="btn btn-primary" ng-model="state.containersCountFilter" uib-btn-radio="undefined">
-            All
-          </label>
-          <label class="btn btn-primary" ng-model="state.containersCountFilter" uib-btn-radio="'!' + 0">
-            Used
-          </label>
-          <label class="btn btn-primary" ng-model="state.containersCountFilter" uib-btn-radio="0">
-            Unused
-          </label>
-        </span>
+        <select ng-model="state.containersCountFilter" ng-options="key for (key , value) in state.containersCountOptions"></select>
       </rd-widget-taskbar>
       <rd-widget-body classes="no-padding">
         <div class="table-responsive">
