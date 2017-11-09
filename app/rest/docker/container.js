@@ -40,6 +40,9 @@ angular.module('portainer.rest')
     exec: {
       method: 'POST', params: {id: '@id', action: 'exec'},
       transformResponse: genericHandler
+    },
+    inspect: {
+      method: 'GET', params: { id: '@id', action: 'json' }
     }
   });
 }]);

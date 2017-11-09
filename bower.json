@@ -1,6 +1,6 @@
 {
   "name": "portainer",
-  "version": "1.14.1",
+  "version": "1.15.1",
   "homepage": "https://github.com/portainer/portainer",
   "authors": [
     "Anthony Lapenna <anthony.lapenna at gmail dot com>"
@@ -34,6 +34,7 @@
     "angular-utils-pagination": "~0.11.1",
     "angular-local-storage": "~0.5.2",
     "angular-jwt": "~0.1.8",
+    "angular-json-tree": "1.0.1",
     "angular-google-analytics": "~1.1.9",
     "bootstrap": "~3.3.6",
     "filesize": "~3.3.0",
@@ -51,7 +52,8 @@
     "chart.js": "~2.6.0",
     "angularjs-slider": "^6.4.0",
     "angular-ui-router": "~1.0.6",
-    "angular-loading-bar": "~0.9.0"
+    "codemirror": "~5.30.0",
+    "js-yaml": "~3.10.0"
   },
   "resolutions": {
     "angular": "1.5.11"

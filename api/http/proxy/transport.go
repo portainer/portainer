@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"net"
 	"net/http"
 	"path"
 	"strings"
@@ -30,18 +29,6 @@ type (
 	restrictedOperationRequest func(*http.Request, *http.Response, *operationExecutor) error
 )
 
-func newSocketTransport(socketPath string) *http.Transport {
-	return &http.Transport{
-		Dial: func(proto, addr string) (conn net.Conn, err error) {
-			return net.Dial("unix", socketPath)
-		},
-	}
-}
-
-func newHTTPTransport() *http.Transport {
-	return &http.Transport{}
-}
-
 func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error) {
 	return p.proxyDockerRequest(request)
 }
@@ -54,6 +41,8 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 	path := request.URL.Path
 
 	switch {
+	case strings.HasPrefix(path, "/configs"):
+		return p.proxyConfigRequest(request)
 	case strings.HasPrefix(path, "/containers"):
 		return p.proxyContainerRequest(request)
 	case strings.HasPrefix(path, "/services"):
@@ -72,6 +61,24 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxyTaskRequest(request)
 	default:
 		return p.executeDockerRequest(request)
+	}
+}
+
+func (p *proxyTransport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
+	switch requestPath := request.URL.Path; requestPath {
+	case "/configs/create":
+		return p.executeDockerRequest(request)
+
+	case "/configs":
+		return p.rewriteOperation(request, configListOperation)
+
+	default:
+		// assume /configs/{id}
+		if request.Method == http.MethodGet {
+			return p.rewriteOperation(request, configInspectOperation)
+		}
+		configID := path.Base(requestPath)
+		return p.restrictedOperation(request, configID)
 	}
 }
 
@@ -202,7 +209,13 @@ func (p *proxyTransport) proxyNodeRequest(request *http.Request) (*http.Response
 }
 
 func (p *proxyTransport) proxySwarmRequest(request *http.Request) (*http.Response, error) {
-	return p.administratorOperation(request)
+	switch requestPath := request.URL.Path; requestPath {
+	case "/swarm":
+		return p.executeDockerRequest(request)
+	default:
+		// assume /swarm/{action}
+		return p.administratorOperation(request)
+	}
 }
 
 func (p *proxyTransport) proxyTaskRequest(request *http.Request) (*http.Response, error) {

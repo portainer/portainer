@@ -27,8 +27,7 @@ func secretListOperation(request *http.Request, response *http.Response, executo
 	if executor.operationContext.isAdmin {
 		responseArray, err = decorateSecretList(responseArray, executor.operationContext.resourceControls)
 	} else {
-		responseArray, err = filterSecretList(responseArray, executor.operationContext.resourceControls,
-			executor.operationContext.userID, executor.operationContext.userTeamIDs)
+		responseArray, err = filterSecretList(responseArray, executor.operationContext)
 	}
 	if err != nil {
 		return err
@@ -51,17 +50,58 @@ func secretInspectOperation(request *http.Request, response *http.Response, exec
 	if responseObject[secretIdentifier] == nil {
 		return ErrDockerSecretIdentifierNotFound
 	}
-	secretID := responseObject[secretIdentifier].(string)
 
-	resourceControl := getResourceControlByResourceID(secretID, executor.operationContext.resourceControls)
-	if resourceControl != nil {
-		if executor.operationContext.isAdmin || canUserAccessResource(executor.operationContext.userID,
-			executor.operationContext.userTeamIDs, resourceControl) {
-			responseObject = decorateObject(responseObject, resourceControl)
-		} else {
-			return rewriteAccessDeniedResponse(response)
-		}
+	secretID := responseObject[secretIdentifier].(string)
+	responseObject, access := applyResourceAccessControl(responseObject, secretID, executor.operationContext)
+	if !access {
+		return rewriteAccessDeniedResponse(response)
 	}
 
 	return rewriteResponse(response, responseObject, http.StatusOK)
+}
+
+// decorateSecretList loops through all secrets and decorates any secret with an existing resource control.
+// Resource controls checks are based on: resource identifier.
+// Secret object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/SecretList
+func decorateSecretList(secretData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+	decoratedSecretData := make([]interface{}, 0)
+
+	for _, secret := range secretData {
+
+		secretObject := secret.(map[string]interface{})
+		if secretObject[secretIdentifier] == nil {
+			return nil, ErrDockerSecretIdentifierNotFound
+		}
+
+		secretID := secretObject[secretIdentifier].(string)
+		secretObject = decorateResourceWithAccessControl(secretObject, secretID, resourceControls)
+
+		decoratedSecretData = append(decoratedSecretData, secretObject)
+	}
+
+	return decoratedSecretData, nil
+}
+
+// filterSecretList loops through all secrets and filters public secrets (no associated resource control)
+// as well as authorized secrets (access granted to the user based on existing resource control).
+// Authorized secrets are decorated during the process.
+// Resource controls checks are based on: resource identifier.
+// Secret object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/SecretList
+func filterSecretList(secretData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+	filteredSecretData := make([]interface{}, 0)
+
+	for _, secret := range secretData {
+		secretObject := secret.(map[string]interface{})
+		if secretObject[secretIdentifier] == nil {
+			return nil, ErrDockerSecretIdentifierNotFound
+		}
+
+		secretID := secretObject[secretIdentifier].(string)
+		secretObject, access := applyResourceAccessControl(secretObject, secretID, context)
+		if access {
+			filteredSecretData = append(filteredSecretData, secretObject)
+		}
+	}
+
+	return filteredSecretData, nil
 }

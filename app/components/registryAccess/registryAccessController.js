@@ -1,14 +1,14 @@
 angular.module('registryAccess', [])
-.controller('RegistryAccessController', ['$scope', '$uiRouterGlobals', 'RegistryService', 'Notifications',
-function ($scope, $uiRouterGlobals, RegistryService, Notifications) {
+.controller('RegistryAccessController', ['$scope', '$transition$', 'RegistryService', 'Notifications',
+function ($scope, $transition$, RegistryService, Notifications) {
 
   $scope.updateAccess = function(authorizedUsers, authorizedTeams) {
-    return RegistryService.updateAccess($uiRouterGlobals.params.id, authorizedUsers, authorizedTeams);
+    return RegistryService.updateAccess($transition$.params().id, authorizedUsers, authorizedTeams);
   };
 
   function initView() {
     $('#loadingViewSpinner').show();
-    RegistryService.registry($uiRouterGlobals.params.id)
+    RegistryService.registry($transition$.params().id)
     .then(function success(data) {
       $scope.registry = data;
     })

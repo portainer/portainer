@@ -1,6 +1,6 @@
 angular.module('serviceLogs', [])
-.controller('ServiceLogsController', ['$scope', '$uiRouterGlobals', '$anchorScroll', 'ServiceLogs', 'Service',
-function ($scope, $uiRouterGlobals, $anchorScroll, ServiceLogs, Service) {
+.controller('ServiceLogsController', ['$scope', '$transition$', '$anchorScroll', 'ServiceLogs', 'Service',
+function ($scope, $transition$, $anchorScroll, ServiceLogs, Service) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
@@ -16,7 +16,7 @@ function ($scope, $uiRouterGlobals, $anchorScroll, ServiceLogs, Service) {
   }
 
   function getLogsStderr() {
-    ServiceLogs.get($uiRouterGlobals.params.id, {
+    ServiceLogs.get($transition$.params().id, {
       stdout: 0,
       stderr: 1,
       timestamps: $scope.state.displayTimestampsErr,
@@ -32,7 +32,7 @@ function ($scope, $uiRouterGlobals, $anchorScroll, ServiceLogs, Service) {
   }
 
   function getLogsStdout() {
-    ServiceLogs.get($uiRouterGlobals.params.id, {
+    ServiceLogs.get($transition$.params().id, {
       stdout: 1,
       stderr: 0,
       timestamps: $scope.state.displayTimestampsOut,
@@ -49,7 +49,7 @@ function ($scope, $uiRouterGlobals, $anchorScroll, ServiceLogs, Service) {
 
   function getService() {
     $('#loadingViewSpinner').show();
-    Service.get({id: $uiRouterGlobals.params.id}, function (d) {
+    Service.get({id: $transition$.params().id}, function (d) {
       $scope.service = d;
       $('#loadingViewSpinner').hide();
     }, function (e) {

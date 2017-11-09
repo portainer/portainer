@@ -1,6 +1,6 @@
 angular.module('services', [])
-.controller('ServicesController', ['$q', '$scope', '$uiRouterGlobals', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $uiRouterGlobals, $state, Service, ServiceService, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, ModalService, ResourceControlService) {
+.controller('ServicesController', ['$q', '$scope', '$transition$', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'Pagination', 'Task', 'Node', 'NodeHelper', 'ModalService', 'ResourceControlService',
+function ($q, $scope, $transition$, $state, Service, ServiceService, ServiceHelper, Notifications, Pagination, Task, Node, NodeHelper, ModalService, ResourceControlService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = Pagination.getPaginationCount('services');
@@ -97,19 +97,22 @@ function ($q, $scope, $uiRouterGlobals, $state, Service, ServiceService, Service
     $('#loadServicesSpinner').show();
     $q.all({
       services: Service.query({}).$promise,
-      tasks: Task.query({filters: {'desired-state': ['running']}}).$promise,
+      tasks: Task.query({filters: {'desired-state': ['running','accepted']}}).$promise,
       nodes: Node.query({}).$promise
     })
     .then(function success(data) {
       $scope.swarmManagerIP = NodeHelper.getManagerIP(data.nodes);
       $scope.services = data.services.map(function (service) {
-        var serviceTasks = data.tasks.filter(function (task) {
+        var runningTasks = data.tasks.filter(function (task) {
           return task.ServiceID === service.ID && task.Status.State === 'running';
+        });
+        var allTasks = data.tasks.filter(function (task) {
+          return task.ServiceID === service.ID;
         });
         var taskNodes = data.nodes.filter(function (node) {
           return node.Spec.Availability === 'active' && node.Status.State === 'ready';
         });
-        return new ServiceViewModel(service, serviceTasks, taskNodes);
+        return new ServiceViewModel(service, runningTasks, allTasks, taskNodes);
       });
     })
     .catch(function error(err) {

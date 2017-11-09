@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/http/security"
 
 	"net/http"
+	"path/filepath"
 )
 
 // Server implements the portainer.Server interface
@@ -27,7 +28,10 @@ type Server struct {
 	FileService            portainer.FileService
 	RegistryService        portainer.RegistryService
 	DockerHubService       portainer.DockerHubService
+	StackService           portainer.StackService
+	StackManager           portainer.StackManager
 	LDAPService            portainer.LDAPService
+	GitService             portainer.GitService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
@@ -39,6 +43,7 @@ func (server *Server) Start() error {
 	requestBouncer := security.NewRequestBouncer(server.JWTService, server.TeamMembershipService, server.AuthDisabled)
 	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamMembershipService, server.SettingsService)
 
+	var fileHandler = handler.NewFileHandler(filepath.Join(server.AssetsPath, "public"))
 	var authHandler = handler.NewAuthHandler(requestBouncer, server.AuthDisabled)
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
@@ -82,7 +87,15 @@ func (server *Server) Start() error {
 	resourceHandler.ResourceControlService = server.ResourceControlService
 	var uploadHandler = handler.NewUploadHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
-	var fileHandler = handler.NewFileHandler(server.AssetsPath)
+	var stackHandler = handler.NewStackHandler(requestBouncer)
+	stackHandler.FileService = server.FileService
+	stackHandler.StackService = server.StackService
+	stackHandler.EndpointService = server.EndpointService
+	stackHandler.ResourceControlService = server.ResourceControlService
+	stackHandler.StackManager = server.StackManager
+	stackHandler.GitService = server.GitService
+	stackHandler.RegistryService = server.RegistryService
+	stackHandler.DockerHubService = server.DockerHubService
 
 	server.Handler = &handler.Handler{
 		AuthHandler:           authHandler,
@@ -95,6 +108,7 @@ func (server *Server) Start() error {
 		ResourceHandler:       resourceHandler,
 		SettingsHandler:       settingsHandler,
 		StatusHandler:         statusHandler,
+		StackHandler:          stackHandler,
 		TemplatesHandler:      templatesHandler,
 		DockerHandler:         dockerHandler,
 		WebSocketHandler:      websocketHandler,

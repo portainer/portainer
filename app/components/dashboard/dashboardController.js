@@ -1,6 +1,6 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$scope', '$q', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'Notifications',
-function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, SystemService, Notifications) {
+.controller('DashboardController', ['$scope', '$q', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'ServiceService', 'StackService', 'Notifications',
+function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications) {
 
   $scope.containerData = {
     total: 0
@@ -14,6 +14,9 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
   $scope.volumeData = {
     total: 0
   };
+
+  $scope.serviceCount = 0;
+  $scope.stackCount = 0;
 
   function prepareContainerData(d) {
     var running = 0;
@@ -63,18 +66,26 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
 
   function initView() {
     $('#loadingViewSpinner').show();
+
+    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+    var endpointRole = $scope.applicationState.endpoint.mode.role;
+
     $q.all([
       Container.query({all: 1}).$promise,
       Image.query({}).$promise,
       Volume.query({}).$promise,
       Network.query({}).$promise,
-      SystemService.info()
+      SystemService.info(),
+      endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? ServiceService.services() : [],
+      endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? StackService.stacks(true) : []
     ]).then(function (d) {
       prepareContainerData(d[0]);
       prepareImageData(d[1]);
       prepareVolumeData(d[2]);
       prepareNetworkData(d[3]);
       prepareInfoData(d[4]);
+      $scope.serviceCount = d[5].length;
+      $scope.stackCount = d[6].length;
       $('#loadingViewSpinner').hide();
     }, function(e) {
       $('#loadingViewSpinner').hide();

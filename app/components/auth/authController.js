@@ -1,6 +1,6 @@
 angular.module('auth', [])
-.controller('AuthenticationController', ['$scope', '$state', '$uiRouterGlobals', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'UserService', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'SettingsService',
-function ($scope, $state, $uiRouterGlobals, $window, $timeout, $sanitize, Authentication, Users, UserService, EndpointService, StateManager, EndpointProvider, Notifications, SettingsService) {
+.controller('AuthenticationController', ['$scope', '$state', '$transition$', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'UserService', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'SettingsService',
+function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentication, Users, UserService, EndpointService, StateManager, EndpointProvider, Notifications, SettingsService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -88,9 +88,9 @@ function ($scope, $state, $uiRouterGlobals, $window, $timeout, $sanitize, Authen
   };
 
   function initView() {
-    if ($uiRouterGlobals.params.logout || $uiRouterGlobals.params.error) {
+    if ($transition$.params().logout || $transition$.params().error) {
       Authentication.logout();
-      $scope.state.AuthenticationError = $uiRouterGlobals.params.error;
+      $scope.state.AuthenticationError = $transition$.params().error;
       return;
     }
 

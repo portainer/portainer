@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createContainer', [])
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$uiRouterGlobals', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService',
-function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService',
+function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -13,11 +13,20 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerHel
     ExtraHosts: [],
     IPv4: '',
     IPv6: '',
-    AccessControlData: new AccessControlFormData()
+    AccessControlData: new AccessControlFormData(),
+    CpuLimit: 0,
+    MemoryLimit: 0,
+    MemoryReservation: 0
   };
 
   $scope.state = {
     formValidationError: ''
+  };
+
+  $scope.refreshSlider = function () {
+    $timeout(function () {
+      $scope.$broadcast('rzSliderForceRender');
+    });
   };
 
   $scope.config = {
@@ -221,6 +230,25 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerHel
     config.HostConfig.Devices = path;
   }
 
+  function prepareResources(config) {
+    // Memory Limit - Round to 0.125
+    var memoryLimit = (Math.round($scope.formValues.MemoryLimit * 8) / 8).toFixed(3);
+    memoryLimit *= 1024 * 1024;
+    if (memoryLimit > 0) {
+      config.HostConfig.Memory = memoryLimit;
+    }
+    // Memory Resevation - Round to 0.125
+    var memoryReservation = (Math.round($scope.formValues.MemoryReservation * 8) / 8).toFixed(3);
+    memoryReservation *= 1024 * 1024;
+    if (memoryReservation > 0) {
+      config.HostConfig.MemoryReservation = memoryReservation;
+    }
+    // CPU Limit
+    if ($scope.formValues.CpuLimit > 0) {
+      config.HostConfig.NanoCpus = $scope.formValues.CpuLimit * 1000000000;
+    }
+  }
+
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
     config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
@@ -232,6 +260,7 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerHel
     prepareVolumes(config);
     prepareLabels(config);
     prepareDevices(config);
+    prepareResources(config);
     return config;
   }
 
@@ -416,9 +445,21 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerHel
     });
   }
 
+  function loadFromContainerResources(d) {
+    if (d.HostConfig.NanoCpus) {
+      $scope.formValues.CpuLimit = d.HostConfig.NanoCpus / 1000000000;
+    }
+    if (d.HostConfig.Memory) {
+      $scope.formValues.MemoryLimit = d.HostConfig.Memory / 1024 / 1024;
+    }
+    if (d.HostConfig.MemoryReservation) {
+      $scope.formValues.MemoryReservation = d.HostConfig.MemoryReservation / 1024 / 1024;
+    }
+  }
+
   function loadFromContainerSpec() {
     // Get container
-    Container.get({ id: $uiRouterGlobals.params.from }).$promise
+    Container.get({ id: $transition$.params().from }).$promise
     .then(function success(d) {
       var fromContainer = new ContainerDetailsViewModel(d);
       if (!fromContainer.ResourceControl) {
@@ -435,6 +476,7 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerHel
       loadFromContainerConsole(d);
       loadFromContainerDevices(d);
       loadFromContainerImageConfig(d);
+      loadFromContainerResources(d);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve container');
@@ -472,7 +514,7 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerHel
     Container.query({}, function (d) {
       var containers = d;
       $scope.runningContainers = containers;
-      if ($uiRouterGlobals.params.from !== '') {
+      if ($transition$.params().from !== '') {
         loadFromContainerSpec();
       } else {
         $scope.fromContainer = {};
@@ -482,6 +524,32 @@ function ($q, $scope, $state, $uiRouterGlobals, $filter, Container, ContainerHel
       Notifications.error('Failure', e, 'Unable to retrieve running containers');
     });
 
+    SystemService.info()
+    .then(function success(data) {
+      $scope.state.sliderMaxCpu = 32;
+      if (data.NCPU) {
+        $scope.state.sliderMaxCpu = data.NCPU;
+      }
+      $scope.state.sliderMaxMemory = 32768;
+      if (data.MemTotal) {
+        $scope.state.sliderMaxMemory = Math.floor(data.MemTotal / 1000 / 1000);
+      }
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve engine details');
+    });
+
+    SettingsService.publicSettings()
+    .then(function success(data) {
+      $scope.allowBindMounts = data.AllowBindMountsForRegularUsers;
+      $scope.allowPrivilegedMode = data.AllowPrivilegedModeForRegularUsers;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve application settings');
+    });
+
+    var userDetails = Authentication.getUserDetails();
+    $scope.isAdmin = userDetails.role === 1 ? true : false;
   }
 
   function validateForm(accessControlData, isAdmin) {
