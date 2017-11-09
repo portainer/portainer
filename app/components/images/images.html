@@ -68,7 +68,6 @@
             </ul>
           </div>
         </div>
-        <select ng-model="state.containersCountFilter" ng-options="key for (key , value) in state.containersCountOptions"></select>
       </rd-widget-taskbar>
       <rd-widget-body classes="no-padding">
         <div class="table-responsive">
@@ -84,6 +83,9 @@
                     <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
+                </th>
+                <th>
+                  <select ng-model="state.containersCountFilter" ng-options="key for (key , value) in state.containersCountOptions"></select>
                 </th>
                 <th>
                   <a ui-sref="images" ng-click="order('RepoTags')">
@@ -113,6 +115,8 @@
                 <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
                 <td>
                   <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id.slice(7)|truncate:13}}</a>
+                </td>
+                <td>
                   <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="::image.ContainerCount === 0">Unused</span>
                 </td>
                 <td>
