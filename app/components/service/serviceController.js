@@ -72,9 +72,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     }
   };
   $scope.addConfig = function addConfig(service, config) {
-
-    console.log("Add config: " + config)
-
     if (config && service.ServiceConfigs.filter(function(serviceConfig) { return serviceConfig.Id === config.Id;}).length === 0) {
       service.ServiceConfigs.push({ Id: config.Id, Name: config.Name, FileName: config.Name, Uid: '0', Gid: '0', Mode: 444 });
       updateServiceArray(service, 'ServiceConfigs', service.ServiceConfigs);
