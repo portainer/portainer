@@ -27,7 +27,7 @@ RUN mv /code/dist/portainer-$(uname -s | tr '[:upper:]' '[:lower:]')-$(dpkg --pr
 
 FROM alpine:3.4
 
-ENV VERSION 1.15.0-1-SNAPSHOT
+ENV VERSION 2.0.0-SNAPSHOT
 RUN apk --no-cache --update upgrade && apk --no-cache add ca-certificates && update-ca-certificates && apk add bash
 COPY --from=nodebuilder /code/dist /
 VOLUME /data
