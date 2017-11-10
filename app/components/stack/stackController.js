@@ -3,7 +3,8 @@ angular.module('stack', [])
 function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper) {
 
   $scope.deployStack = function () {
-    $('#createResourceSpinner').show();
+    $('#createResourceHint').show();
+    $('#deployButton').prop('disabled', true);
 
     // The codemirror editor does not work with ng-model so we need to retrieve
     // the value directly from the editor.
@@ -19,7 +20,8 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
       Notifications.error('Failure', err, 'Unable to create stack');
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $('#createResourceHint').hide();
+      $('#deployButton').prop('disabled', false);
     });
   };
 

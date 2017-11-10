@@ -62,7 +62,8 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
   }
 
   $scope.deployStack = function () {
-    $('#createResourceSpinner').show();
+    $('#createResourceHint').show();
+    $('#deployButton').prop('disabled', true);
 
     var name = $scope.formValues.Name;
 
@@ -72,7 +73,8 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
     var userId = userDetails.ID;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createResourceSpinner').hide();
+      $('#createResourceHint').hide();
+      $('#deployButton').prop('disabled', false);
       return;
     }
 
@@ -93,7 +95,8 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
       Notifications.error('Failure', err, 'Unable to apply resource control on the stack');
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $('#createResourceHint').hide();
+      $('#deployButton').prop('disabled', false);
     });
   };
 

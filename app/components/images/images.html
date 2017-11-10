@@ -29,8 +29,11 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Image" ng-click="pullImage()">Pull</button>
-              <i id="pullImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button id="deployButton" type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Image" ng-click="pullImage()">Pull the image</button>
+              <span id="createResourceHint" class="createResource" style="display: none;">
+                Download in progress...
+                <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
+              </span>
             </div>
           </div>
         </form>

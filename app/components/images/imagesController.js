@@ -39,7 +39,9 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
   };
 
   $scope.pullImage = function() {
-    $('#pullImageSpinner').show();
+    $('#createResourceHint').show();
+    $('#deployButton').prop('disabled', true);
+
     var image = $scope.formValues.Image;
     var registry = $scope.formValues.Registry;
     ImageService.pullImage(image, registry, false)
@@ -51,7 +53,8 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
       Notifications.error('Failure', err, 'Unable to pull image');
     })
     .finally(function final() {
-      $('#pullImageSpinner').hide();
+      $('#createResourceHint').hide();
+      $('#deployButton').prop('disabled', false);
     });
   };
 

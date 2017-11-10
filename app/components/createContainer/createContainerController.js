@@ -570,13 +570,15 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       if (!confirm) {
         return false;
       }
-      $('#createContainerSpinner').show();
+      $('#createResourceHint').show();
+      $('#deployButton').prop('disabled', true);
       var accessControlData = $scope.formValues.AccessControlData;
       var userDetails = Authentication.getUserDetails();
       var isAdmin = userDetails.role === 1 ? true : false;
 
       if (!validateForm(accessControlData, isAdmin)) {
-        $('#createContainerSpinner').hide();
+        $('#createResourceHint').hide();
+        $('#deployButton').prop('disabled', false);
         return;
       }
 
@@ -605,7 +607,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         Notifications.error('Failure', err, 'Unable to create container');
       })
       .finally(function final() {
-        $('#createContainerSpinner').hide();
+        $('#createResourceHint').hide();
+        $('#deployButton').prop('disabled', false);
       });
     });
   }

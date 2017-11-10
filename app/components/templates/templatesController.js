@@ -85,7 +85,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       Notifications.error('Failure', err, err.msg);
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $('#createResourceHint').hide();
+      $('#deployButton').prop('disabled', false);
     });
   }
 
@@ -113,12 +114,14 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       $state.go('stacks', {}, {reload: true});
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $('#createResourceHint').hide();
+      $('#deployButton').prop('disabled', false);
     });
   }
 
   $scope.createTemplate = function() {
-    $('#createResourceSpinner').show();
+    $('#createResourceHint').show();
+    $('#deployButton').prop('disabled', true);
 
     var userDetails = Authentication.getUserDetails();
     var userId = userDetails.ID;
@@ -126,7 +129,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     var isAdmin = userDetails.role === 1 ? true : false;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createResourceSpinner').hide();
+      $('#createResourceHint').hide();
+      $('#deployButton').prop('disabled', false);
       return;
     }
 

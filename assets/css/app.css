@@ -363,6 +363,11 @@ ul.sidebar .sidebar-list a.active {
   padding-right: 0;
 }
 
+.createResource {
+  margin-left: 5px;
+  font-size: 90%;
+}
+
 ul.sidebar .sidebar-list .sidebar-sublist a {
   text-indent: 35px;
   font-size: 12px;

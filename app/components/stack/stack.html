@@ -73,8 +73,11 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-sm btn-primary" ng-click="deployStack()">Update stack</button>
-              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button id="deployButton" type="button" class="btn btn-sm btn-primary" ng-click="deployStack()">Update stack</button>
+              <span id="createResourceHint" class="createResource" style="display: none;">
+                Deployment in progress...
+                <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
+              </span>
             </div>
           </div>
         </form>
