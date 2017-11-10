@@ -132,6 +132,20 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('infradashboard', {
+    parent: 'root',
+    url: '/infradashboard',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/infraDashboard/infradashboard.html',
+        controller: 'InfraDashboardController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('actions', {
     abstract: true,
     url: '/actions',

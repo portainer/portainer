@@ -5,6 +5,7 @@ angular.module('portainer.services')
   var manager = {};
 
   var state = {
+    infra: true,
     loading: true,
     application: {},
     endpoint: {},

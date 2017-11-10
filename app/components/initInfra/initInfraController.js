@@ -1,0 +1,81 @@
+angular.module('initInfra', [])
+.controller('InitInfraController', ['$scope', '$state', 'InfraService', 'StateManager', 'InfraProvider', 'Notifications',
+function ($scope, $state, InfraService, StateManager, InfraProvider, Notifications) {
+
+  if (!_.isEmpty($scope.applicationState.endpoint)) {
+    $state.go('dashboard');
+  }
+
+  $scope.logo = StateManager.getState().application.logo;
+
+  $scope.state = {
+    uploadInProgress: false
+  };
+
+  $scope.formValues = {
+    InfraType: 'remote',
+    Name: '',
+    URL: '',
+    TLS: false,
+    TLSSkipVerify: false,
+    TLSSKipClientVerify: false,
+    TLSCACert: null,
+    TLSCert: null,
+    TLSKey: null
+  };
+
+  $scope.createLocalInfra = function() {
+    $('#createResourceSpinner').show();
+    var name = 'local';
+    var URL = 'unix:///var/run/docker.sock';
+
+    var endpointID = 1;
+    InfraService.createLocalInfra(name, URL, false, true)
+    .then(function success(data) {
+      endpointID = data.Id;
+      InfraProvider.setInfraID(endpointID);
+      return StateManager.updateInfraState(false);
+    })
+    .then(function success(data) {
+      $state.go('dashboard');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
+      InfraService.deleteInfra(endpointID);
+    })
+    .finally(function final() {
+      $('#createResourceSpinner').hide();
+    });
+  };
+
+  $scope.createRemoteInfra = function() {
+    $('#createResourceSpinner').show();
+    var name = $scope.formValues.Name;
+    var URL = $scope.formValues.URL;
+    var PublicURL = URL.split(':')[0];
+    var TLS = $scope.formValues.TLS;
+    var TLSSkipVerify = TLS && $scope.formValues.TLSSkipVerify;
+    var TLSSKipClientVerify = TLS && $scope.formValues.TLSSKipClientVerify;
+    var TLSCAFile = TLSSkipVerify ? null : $scope.formValues.TLSCACert;
+    var TLSCertFile = TLSSKipClientVerify ? null : $scope.formValues.TLSCert;
+    var TLSKeyFile = TLSSKipClientVerify ? null : $scope.formValues.TLSKey;
+
+    var endpointID = 1;
+    InfraService.createRemoteInfra(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    .then(function success(data) {
+      endpointID = data.Id;
+      InfraProvider.setInfraID(endpointID);
+      return StateManager.updateInfraState(false);
+    })
+    .then(function success(data) {
+      $state.go('dashboard');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
+      InfraService.deleteInfra(endpointID);
+    })
+    .finally(function final() {
+      $('#createResourceSpinner').hide();
+    });
+  };
+}]);

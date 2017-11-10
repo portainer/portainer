@@ -18,6 +18,7 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     if (!endpointID) {
       EndpointProvider.setEndpointID(endpoint.Id);
     }
+    /*
     StateManager.updateEndpointState(true)
     .then(function success(data) {
       $state.go('dashboard');
@@ -25,6 +26,8 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
     });
+    */
+    $state.go('infradashboard');
   }
 
   function unauthenticatedFlow() {
@@ -95,7 +98,7 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     }
 
     if (Authentication.isAuthenticated()) {
-      $state.go('dashboard');
+      $state.go('infradashboard');
     }
 
     var authenticationEnabled = $scope.applicationState.application.authentication;
