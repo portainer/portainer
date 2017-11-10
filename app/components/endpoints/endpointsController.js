@@ -73,32 +73,20 @@ function ($scope, $state, $filter, EndpointService, EndpointProvider, Notificati
   };
 
   $scope.removeAction = function () {
-    $('#loadEndpointsSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadEndpointsSpinner').hide();
-      }
-    };
     angular.forEach($scope.endpoints, function (endpoint) {
       if (endpoint.Checked) {
-        counter = counter + 1;
         EndpointService.deleteEndpoint(endpoint.Id).then(function success(data) {
           Notifications.success('Endpoint deleted', endpoint.Name);
           var index = $scope.endpoints.indexOf(endpoint);
           $scope.endpoints.splice(index, 1);
-          complete();
         }, function error(err) {
           Notifications.error('Failure', err, 'Unable to remove endpoint');
-          complete();
         });
       }
     });
   };
 
   function fetchEndpoints() {
-    $('#loadEndpointsSpinner').show();
     EndpointService.endpoints()
     .then(function success(data) {
       $scope.endpoints = data;
@@ -106,9 +94,6 @@ function ($scope, $state, $filter, EndpointService, EndpointProvider, Notificati
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoints');
       $scope.endpoints = [];
-    })
-    .finally(function final() {
-      $('#loadEndpointsSpinner').hide();
     });
   }
 

@@ -238,9 +238,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     .catch(function error(err) {
       $scope.templates = [];
       Notifications.error('Failure', err, 'An error occured during apps initialization.');
-    })
-    .finally(function final(){
-      $('#loadingViewSpinner').hide();
     });
   }
 

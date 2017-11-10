@@ -19,7 +19,6 @@ function ($scope, $state, $transition$, $filter, RegistryService, Notifications)
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var registryID = $transition$.params().id;
     RegistryService.registry(registryID)
     .then(function success(data) {
@@ -27,9 +26,6 @@ function ($scope, $state, $transition$, $filter, RegistryService, Notifications)
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve registry details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

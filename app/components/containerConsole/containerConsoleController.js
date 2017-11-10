@@ -19,21 +19,17 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
     $scope.container = d;
     if (d.message) {
       Notifications.error('Error', d, 'Unable to retrieve container details');
-      $('#loadingViewSpinner').hide();
     } else {
       Image.get({id: d.Image}, function(imgData) {
         $scope.imageOS = imgData.Os;
         $scope.formValues.command = imgData.Os === 'windows' ? 'powershell' : 'bash';
         $scope.state.loaded = true;
-        $('#loadingViewSpinner').hide();
       }, function (e) {
         Notifications.error('Failure', e, 'Unable to retrieve image details');
-        $('#loadingViewSpinner').hide();
       });
     }
   }, function (e) {
     Notifications.error('Failure', e, 'Unable to retrieve container details');
-    $('#loadingViewSpinner').hide();
   });
 
   $scope.connect = function() {

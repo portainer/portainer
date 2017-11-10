@@ -24,7 +24,6 @@ angular.module('containers', [])
   $scope.cleanAssociatedVolumes = false;
 
   var update = function (data) {
-    $('#loadContainersSpinner').show();
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
@@ -45,34 +44,20 @@ angular.module('containers', [])
         return model;
       });
       updateSelectionFlags();
-      $('#loadContainersSpinner').hide();
     }, function (e) {
-      $('#loadContainersSpinner').hide();
       Notifications.error('Failure', e, 'Unable to retrieve containers');
       $scope.containers = [];
     });
   };
 
   var batch = function (items, action, msg) {
-    $('#loadContainersSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadContainersSpinner').hide();
-        update({all: $scope.state.displayAll ? 1 : 0});
-      }
-    };
     angular.forEach(items, function (c) {
       if (c.Checked) {
-        counter = counter + 1;
         if (action === Container.start) {
           action({id: c.Id}, {}, function (d) {
             Notifications.success('Container ' + msg, c.Id);
-            complete();
           }, function (e) {
             Notifications.error('Failure', e, 'Unable to start container');
-            complete();
           });
         }
         else if (action === Container.remove) {
@@ -82,9 +67,6 @@ angular.module('containers', [])
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove container');
-          })
-          .finally(function final() {
-            complete();
           });
         }
         else if (action === Container.pause) {
@@ -94,27 +76,19 @@ angular.module('containers', [])
             } else {
               Notifications.success('Container ' + msg, c.Id);
             }
-            complete();
           }, function (e) {
             Notifications.error('Failure', e, 'Unable to pause container');
-            complete();
           });
         }
         else {
           action({id: c.Id}, function (d) {
             Notifications.success('Container ' + msg, c.Id);
-            complete();
           }, function (e) {
             Notifications.error('Failure', e, 'An error occured');
-            complete();
           });
-
         }
       }
     });
-    if (counter === 0) {
-      $('#loadContainersSpinner').hide();
-    }
   };
 
   $scope.selectItems = function (allSelected) {

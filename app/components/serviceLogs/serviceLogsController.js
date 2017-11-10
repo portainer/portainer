@@ -9,10 +9,8 @@ function ($scope, $transition$, $anchorScroll, ServiceLogs, Service) {
   $scope.tailLines = 2000;
 
   function getLogs() {
-    $('#loadingViewSpinner').show();
     getLogsStdout();
     getLogsStderr();
-    $('#loadingViewSpinner').hide();
   }
 
   function getLogsStderr() {
@@ -48,13 +46,10 @@ function ($scope, $transition$, $anchorScroll, ServiceLogs, Service) {
   }
 
   function getService() {
-    $('#loadingViewSpinner').show();
     Service.get({id: $transition$.params().id}, function (d) {
       $scope.service = d;
-      $('#loadingViewSpinner').hide();
     }, function (e) {
       Notifications.error('Failure', e, 'Unable to retrieve service info');
-      $('#loadingViewSpinner').hide();
     });
   }
 

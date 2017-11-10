@@ -69,7 +69,6 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     if (endpointProvider !== 'DOCKER_SWARM') {
@@ -79,9 +78,6 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
-      })
-      .finally(function final() {
-        $('#loadingViewSpinner').hide();
       });
     }
   }

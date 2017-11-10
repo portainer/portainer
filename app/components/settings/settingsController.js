@@ -54,8 +54,6 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
   }
 
   function updateSettings(settings, resetForm) {
-    $('#loadingViewSpinner').show();
-
     SettingsService.update(settings)
     .then(function success(data) {
       Notifications.success('Settings updated');
@@ -67,14 +65,10 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update settings');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     SettingsService.settings()
     .then(function success(data) {
       var settings = data;
@@ -91,9 +85,6 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

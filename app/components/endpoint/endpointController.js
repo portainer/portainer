@@ -50,7 +50,6 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications)
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     EndpointService.endpoint($transition$.params().id)
     .then(function success(data) {
       var endpoint = data;
@@ -64,9 +63,6 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications)
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

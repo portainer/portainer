@@ -80,17 +80,8 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
   };
 
   function deleteSelectedUsers() {
-    $('#loadUsersSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadUsersSpinner').hide();
-      }
-    };
     angular.forEach($scope.users, function (user) {
       if (user.Checked) {
-        counter = counter + 1;
         UserService.deleteUser(user.Id)
         .then(function success(data) {
           var index = $scope.users.indexOf(user);
@@ -99,9 +90,6 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove user');
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
@@ -133,7 +121,6 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
   }
 
   function initView() {
-    $('#loadUsersSpinner').show();
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true: false;
     $scope.isAdmin = isAdmin;
@@ -154,9 +141,6 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
       Notifications.error('Failure', err, 'Unable to retrieve users and teams');
       $scope.users = [];
       $scope.teams = [];
-    })
-    .finally(function final() {
-      $('#loadUsersSpinner').hide();
     });
   }
 

@@ -1,6 +1,5 @@
 <rd-header>
   <rd-header-title title="Container details">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
   </rd-header-title>
   <rd-header-content>
     <a ui-sref="containers">Containers</a> &gt; <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a>
@@ -163,7 +162,6 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="commit()">Create</button>
-              <i id="createImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
         </form>

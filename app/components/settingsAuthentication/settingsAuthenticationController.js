@@ -73,7 +73,6 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     SettingsService.settings()
     .then(function success(data) {
       var settings = data;
@@ -83,9 +82,6 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

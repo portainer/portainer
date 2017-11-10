@@ -76,17 +76,8 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
   };
 
   function deleteSelectedTeams() {
-    $('#loadingViewSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadingViewSpinner').hide();
-      }
-    };
     angular.forEach($scope.teams, function (team) {
       if (team.Checked) {
-        counter = counter + 1;
         TeamService.deleteTeam(team.Id)
         .then(function success(data) {
           var index = $scope.teams.indexOf(team);
@@ -95,9 +86,6 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove team');
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
@@ -114,7 +102,6 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true: false;
     $scope.isAdmin = isAdmin;
@@ -130,9 +117,6 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
       $scope.teams = [];
       $scope.users = [];
       Notifications.error('Failure', err, 'Unable to retrieve teams');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

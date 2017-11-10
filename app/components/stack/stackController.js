@@ -34,7 +34,6 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var stackId = $stateParams.id;
 
     StackService.stack(stackId)
@@ -79,9 +78,6 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve tasks details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

@@ -67,17 +67,8 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
 
   $scope.removeAction = function (force) {
     force = !!force;
-    $('#loadImagesSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadImagesSpinner').hide();
-      }
-    };
     angular.forEach($scope.images, function (i) {
       if (i.Checked) {
-        counter = counter + 1;
         ImageService.deleteImage(i.Id, force)
         .then(function success(data) {
           Notifications.success('Image deleted', i.Id);
@@ -86,16 +77,12 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove image');
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
   };
 
   function fetchImages() {
-    $('#loadImagesSpinner').show();
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     ImageService.images(true)
@@ -105,9 +92,6 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve images');
       $scope.images = [];
-    })
-    .finally(function final() {
-      $('#loadImagesSpinner').hide();
     });
   }
 

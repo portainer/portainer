@@ -422,7 +422,6 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     var provider = $scope.applicationState.endpoint.mode.provider;
 
@@ -448,9 +447,6 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
