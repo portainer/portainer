@@ -211,6 +211,19 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('actions.create.config', {
+    url: '/config',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/createConfig/createconfig.html',
+        controller: 'CreateConfigController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('actions.create.service', {
     url: '/service',
     views: {
@@ -465,6 +478,32 @@ function configureRoutes($stateProvider) {
       'content@': {
         templateUrl: 'app/components/secret/secret.html',
         controller: 'SecretController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('configs', {
+    url: '^/configs/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/configs/configs.html',
+        controller: 'ConfigsController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('config', {
+    url: '^/config/:id/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/config/config.html',
+        controller: 'ConfigController'
       },
       'sidebar@': {
         templateUrl: 'app/components/sidebar/sidebar.html',

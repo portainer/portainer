@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService',
-function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService, SettingsService) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigHelper', 'ConfigService', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService',
+function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigHelper, ConfigService, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService, SettingsService) {
 
   $scope.formValues = {
     Name: '',
@@ -28,6 +28,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
     UpdateOrder: 'stop-first',
     FailureAction: 'pause',
     Secrets: [],
+    Configs: [],
     AccessControlData: new AccessControlFormData(),
     CpuLimit: 0,
     CpuReservation: 0,
@@ -77,6 +78,14 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
 
   $scope.removeSecret = function(index) {
     $scope.formValues.Secrets.splice(index, 1);
+  };
+
+  $scope.addConfig = function() {
+    $scope.formValues.Configs.push({});
+  };
+
+  $scope.removeConfig = function(index) {
+    $scope.formValues.Configs.splice(index, 1);
   };
 
   $scope.addEnvironmentVariable = function() {
@@ -236,6 +245,20 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
     }
   }
 
+  function prepareConfigConfig(config, input) {
+    if (input.Configs) {
+      var configs = [];
+      angular.forEach(input.Configs, function(config) {
+        if (config.model) {
+          var s = ConfigHelper.configConfig(config.model);
+          s.File.Name = s.ConfigName;
+          configs.push(s);
+        }
+      });
+      config.TaskTemplate.ContainerSpec.Configs = configs;
+    }
+  }
+
   function prepareResourcesCpuConfig(config, input) {
     // CPU Limit
     if (input.CpuLimit > 0) {
@@ -295,6 +318,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
     prepareNetworks(config, input);
     prepareUpdateConfig(config, input);
     prepareSecretConfig(config, input);
+    prepareConfigConfig(config, input);
     preparePlacementConfig(config, input);
     prepareResourcesCpuConfig(config, input);
     prepareResourcesMemoryConfig(config, input);
@@ -383,6 +407,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
     $q.all({
       volumes: VolumeService.volumes(),
       secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
+      configs: apiVersion >= 1.25 ? ConfigService.secrets() : [],
       networks: NetworkService.networks(true, true, false, false),
       nodes: NodeService.nodes(),
       settings: SettingsService.publicSettings()
@@ -391,6 +416,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, SecretHelper, Se
       $scope.availableVolumes = data.volumes;
       $scope.availableNetworks = data.networks;
       $scope.availableSecrets = data.secrets;
+      $scope.availableConfigs = data.configs;
       var nodes = data.nodes;
       initSlidersMaxValuesBasedOnNodeData(nodes);
       var settings = data.settings;

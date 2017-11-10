@@ -444,6 +444,8 @@ const (
 	NetworkResourceControl
 	// SecretResourceControl represents a resource control associated to a Docker secret
 	SecretResourceControl
+	// ConfigResourceControl represents a resource control associated to a Docker config
+	ConfigResourceControl
 	// StackResourceControl represents a resource control associated to a stack composed of Docker services
 	StackResourceControl
 )

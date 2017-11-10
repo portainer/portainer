@@ -84,6 +84,8 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 		resourceControlType = portainer.NetworkResourceControl
 	case "secret":
 		resourceControlType = portainer.SecretResourceControl
+	case "config":
+		resourceControlType = portainer.ConfigResourceControl
 	case "stack":
 		resourceControlType = portainer.StackResourceControl
 	default:

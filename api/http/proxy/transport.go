@@ -51,6 +51,8 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxyNetworkRequest(request)
 	case strings.HasPrefix(path, "/secrets"):
 		return p.proxySecretRequest(request)
+	case strings.HasPrefix(path, "/configs"):
+		return p.proxyConfigRequest(request)
 	case strings.HasPrefix(path, "/swarm"):
 		return p.proxySwarmRequest(request)
 	case strings.HasPrefix(path, "/nodes"):
@@ -174,6 +176,24 @@ func (p *proxyTransport) proxySecretRequest(request *http.Request) (*http.Respon
 		}
 		secretID := path.Base(requestPath)
 		return p.restrictedOperation(request, secretID)
+	}
+}
+
+func (p *proxyTransport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
+	switch requestPath := request.URL.Path; requestPath {
+	case "/configs/create":
+		return p.executeDockerRequest(request)
+
+	case "/configs":
+		return p.rewriteOperation(request, configListOperation)
+
+	default:
+		// assume /configs/{id}
+		if request.Method == http.MethodGet {
+			return p.rewriteOperation(request, configInspectOperation)
+		}
+		configID := path.Base(requestPath)
+		return p.restrictedOperation(request, configID)
 	}
 }
 

@@ -1,0 +1,28 @@
+<form class="form-horizontal" style="margin-top: 15px;">
+  <div class="form-group">
+    <div class="col-sm-12 small text-muted">
+      Configs will be available under <code>/$CONFIG_NAME</code> in containers.
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12" style="margin-top: 5px;">
+      <label class="control-label text-left">Configs</label>
+      <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addConfig()">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> add a config
+      </span>
+    </div>
+    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+      <div ng-repeat="config in formValues.Configs" style="margin-top: 2px;">
+        <div class="input-group col-sm-4 input-group-sm">
+          <span class="input-group-addon">config</span>
+          <select class="form-control" ng-model="config.model" ng-options="config.Name for config in availableConfigs">
+            <option value="" selected="selected">Select a config</option>
+          </select>
+        </div>
+        <button class="btn btn-sm btn-danger" type="button" ng-click="removeConfig($index)">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

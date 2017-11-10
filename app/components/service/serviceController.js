@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
@@ -69,6 +69,21 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     var removedElement = service.ServiceSecrets.splice(index, 1);
     if (removedElement !== null) {
       updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
+    }
+  };
+  $scope.addConfig = function addConfig(service, config) {
+
+    console.log("Add config: " + config)
+
+    if (config && service.ServiceConfigs.filter(function(serviceConfig) { return serviceConfig.Id === config.Id;}).length === 0) {
+      service.ServiceConfigs.push({ Id: config.Id, Name: config.Name, FileName: config.Name, Uid: '0', Gid: '0', Mode: 444 });
+      updateServiceArray(service, 'ServiceConfigs', service.ServiceConfigs);
+    }
+  };
+  $scope.removeConfig = function removeConfig(service, index) {
+    var removedElement = service.ServiceConfigs.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'ServiceConfigs', service.ServiceConfigs);
     }
   };
   $scope.addLabel = function addLabel(service) {
@@ -193,6 +208,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.ContainerSpec.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceContainerLabels);
     config.TaskTemplate.ContainerSpec.Image = service.Image;
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
+    config.TaskTemplate.ContainerSpec.Configs = service.ServiceConfigs ? service.ServiceConfigs.map(ConfigHelper.configConfig) : [];
 
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
@@ -289,6 +305,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
   function translateServiceArrays(service) {
     service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
+    service.ServiceConfigs = service.Configs ? service.Configs.map(ConfigHelper.flattenConfig) : [];
     service.EnvironmentVariables = ServiceHelper.translateEnvironmentVariables(service.Env);
     service.ServiceLabels = LabelHelper.fromLabelHashToKeyValue(service.Labels);
     service.ServiceContainerLabels = LabelHelper.fromLabelHashToKeyValue(service.ContainerLabels);
@@ -323,13 +340,15 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       return $q.all({
         tasks: TaskService.tasks({ service: [service.Name] }),
         nodes: NodeService.nodes(),
-        secrets: apiVersion >= 1.25 ? SecretService.secrets() : []
+        secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
+        configs: apiVersion >= 1.25 ? ConfigService.configs() : []
       });
     })
     .then(function success(data) {
       $scope.tasks = data.tasks;
       $scope.nodes = data.nodes;
       $scope.secrets = data.secrets;
+      $scope.configs = data.configs;
 
       // Set max cpu value
       var maxCpus = 0;
@@ -350,6 +369,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     })
     .catch(function error(err) {
       $scope.secrets = [];
+      $scope.configs = [];
       Notifications.error('Failure', err, 'Unable to retrieve service details');
     })
     .finally(function final() {
