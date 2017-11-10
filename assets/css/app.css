@@ -311,7 +311,10 @@ ul.sidebar .sidebar-list a.active {
   background: #2d3e63;
 }
 
-.sidebar-header a { color: #fff; }
+.sidebar-header a,
+.sidebar-header span {
+  color: #fff;
+}
 .sidebar-header a:hover {text-decoration: none; }
 
 .sidebar-header .menu-icon {
