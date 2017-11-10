@@ -31,18 +31,21 @@ function ($cacheFactory, $q, $http, $window, $interval, $scope, $state, $transit
   }
 
   $scope.createStack = function(id, content) {
+      if (!content || content == "undefined") {
+        // Take a while guess...
+        content = '/projectroot/envs/' + id + '/target/docker-compose.yml'
+      }
+
       StackCreateService.setName(id);
-      if (content && content != "undefined") {
-          $scope.getStackContent(content)
-          .then(function(data) {
+      $scope.getStackContent(content)
+      .then(function(data) {
             // TODO: validate data returned...
             StackCreateService.setStackFileContent(data);
             $window.location.href = '/#/actions/create/stack';
-          });
-      } else {
-        StackCreateService.setStackFileContent('');
-        $window.location.href = '/#/actions/create/stack';
-      }
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Missing project definition YAML (render first)');
+      });
   };
 
   $scope.updateStack = function(id, content) {
