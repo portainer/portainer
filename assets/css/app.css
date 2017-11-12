@@ -702,8 +702,13 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 /*!toaster override*/
 
 /*angular-loading-bar override*/
+#loadingbar-placeholder {
+  margin-bottom: 0;
+  height: 3px;
+}
+
 #loading-bar .bar {
-  position: absolute;
+  position: relative;
   height: 3px;
   background: #738bc0;
 }
@@ -731,23 +736,6 @@ json-tree .branch-preview {
   opacity: .5;
 }
 
-/*.viewcontent {
-  padding-top: 65px;
+.row.header .meta .page {
+  padding-top: 7px;
 }
-
-.headercontent {
-  width: 100%;
-}
-
-.fixed-header {
-  transition: all .4s ease 0s;
-  position: fixed;
-  left: 70px;
-  right: 0;
-  width: inherit;
-  z-index: 999;
-}
-
-.fixed-header.open {
-  left: 250px;
-}*/
