@@ -80,7 +80,6 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
   };
 
   function startChartUpdate(networkChart, cpuChart, memoryChart) {
-    $('#loadingViewSpinner').show();
     $q.all({
       stats: ContainerService.containerStats($transition$.params().id),
       top: ContainerService.containerTop($transition$.params().id)
@@ -99,9 +98,6 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
     .catch(function error(err) {
       stopRepeater();
       Notifications.error('Failure', err, 'Unable to retrieve container statistics');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
@@ -143,17 +139,12 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
-
     ContainerService.container($transition$.params().id)
     .then(function success(data) {
       $scope.container = data;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve container information');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
 
     $document.ready(function() {

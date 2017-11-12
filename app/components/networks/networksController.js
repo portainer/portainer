@@ -51,17 +51,8 @@ function ($scope, $state, Network, NetworkService, Notifications, PaginationServ
   };
 
   $scope.removeAction = function () {
-    $('#loadNetworksSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $state.reload();
-      }
-    };
     angular.forEach($scope.networks, function (network) {
       if (network.Checked) {
-        counter = counter + 1;
         Network.remove({id: network.Id}, function (d) {
           if (d.message) {
             Notifications.error('Error', d, 'Unable to remove network');
@@ -70,18 +61,14 @@ function ($scope, $state, Network, NetworkService, Notifications, PaginationServ
             var index = $scope.networks.indexOf(network);
             $scope.networks.splice(index, 1);
           }
-          complete();
         }, function (e) {
           Notifications.error('Failure', e, 'Unable to remove network');
-          complete();
         });
       }
     });
   };
 
   function initView() {
-    $('#loadNetworksSpinner').show();
-
     NetworkService.networks(true, true, true, true)
     .then(function success(data) {
       $scope.networks = data;
@@ -89,9 +76,6 @@ function ($scope, $state, Network, NetworkService, Notifications, PaginationServ
     .catch(function error(err) {
       $scope.networks = [];
       Notifications.error('Failure', err, 'Unable to retrieve networks');
-    })
-    .finally(function final() {
-      $('#loadNetworksSpinner').hide();
     });
   }
 

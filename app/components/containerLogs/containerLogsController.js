@@ -8,20 +8,15 @@ function ($scope, $transition$, $anchorScroll, ContainerLogs, Container) {
   $scope.stderr = '';
   $scope.tailLines = 2000;
 
-  $('#loadingViewSpinner').show();
   Container.get({id: $transition$.params().id}, function (d) {
     $scope.container = d;
-    $('#loadingViewSpinner').hide();
   }, function (e) {
-    $('#loadingViewSpinner').hide();
     Notifications.error('Failure', e, 'Unable to retrieve container info');
   });
 
   function getLogs() {
-    $('#loadingViewSpinner').show();
     getLogsStdout();
     getLogsStderr();
-    $('#loadingViewSpinner').hide();
   }
 
   function getLogsStderr() {

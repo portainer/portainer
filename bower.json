@@ -1,6 +1,6 @@
 {
   "name": "portainer",
-  "version": "1.15.0",
+  "version": "1.15.1",
   "homepage": "https://github.com/portainer/portainer",
   "authors": [
     "Anthony Lapenna <anthony.lapenna at gmail dot com>"
@@ -53,7 +53,8 @@
     "angularjs-slider": "^6.4.0",
     "angular-ui-router": "~1.0.6",
     "codemirror": "~5.30.0",
-    "js-yaml": "~3.10.0"
+    "js-yaml": "~3.10.0",
+    "angular-loading-bar": "~0.9.0"
   },
   "resolutions": {
     "angular": "1.5.11"

@@ -3,7 +3,10 @@ angular.module('users', [])
 function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Authentication, SettingsService) {
   $scope.state = {
     userCreationError: '',
-    validUsername: false
+    // selectedItemCount: 0,
+    validUsername: false,
+    // pagination_count: Pagination.getPaginationCount('users'),
+    deploymentInProgress: false
   };
 
   $scope.formValues = {
@@ -47,7 +50,7 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
   };
 
   $scope.addUser = function() {
-    $('#createUserSpinner').show();
+    $scope.state.deploymentInProgress = true;
     $scope.state.userCreationError = '';
     var username = $sanitize($scope.formValues.Username);
     var password = $sanitize($scope.formValues.Password);
@@ -65,33 +68,23 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
       Notifications.error('Failure', err, 'Unable to create user');
     })
     .finally(function final() {
-      $('#createUserSpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   };
 
-  function deleteSelectedUsers(users) {
-    $('#loadUsersSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $state.reload();
+  function deleteSelectedUsers() {
+    angular.forEach($scope.users, function (user) {
+      if (user.Checked) {
+        UserService.deleteUser(user.Id)
+        .then(function success(data) {
+          var index = $scope.users.indexOf(user);
+          $scope.users.splice(index, 1);
+          Notifications.success('User successfully deleted', user.Username);
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to remove user');
+        });
       }
-    };
-    angular.forEach(users, function (user) {
-      counter = counter + 1;
-      UserService.deleteUser(user.Id)
-      .then(function success(data) {
-        var index = $scope.users.indexOf(user);
-        $scope.users.splice(index, 1);
-        Notifications.success('User successfully deleted', user.Username);
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to remove user');
-      })
-      .finally(function final() {
-        complete();
-      });
     });
   }
 
@@ -121,7 +114,6 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
   }
 
   function initView() {
-    $('#loadUsersSpinner').show();
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true: false;
     $scope.isAdmin = isAdmin;
@@ -142,9 +134,6 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
       Notifications.error('Failure', err, 'Unable to retrieve users and teams');
       $scope.users = [];
       $scope.teams = [];
-    })
-    .finally(function final() {
-      $('#loadUsersSpinner').hide();
     });
   }
 

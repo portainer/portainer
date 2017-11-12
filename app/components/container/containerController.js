@@ -7,15 +7,22 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
     Image: '',
     Registry: ''
   };
+<<<<<<< HEAD
   $scope.state = {};
   $scope.state.pagination_count = PaginationService.getPaginationCount('container_networks');
+=======
+  $scope.state = {
+    joinNetworkInProgress: false,
+    leaveNetworkInProgress: false,
+    pagination_count: Pagination.getPaginationCount('container_networks')
+  };
+>>>>>>> develop
 
   $scope.changePaginationCount = function() {
     PaginationService.setPaginationCount('container_networks', $scope.state.pagination_count);
   };
 
   var update = function () {
-    $('#loadingViewSpinner').show();
     Container.get({id: $transition$.params().id}, function (d) {
       var container = new ContainerDetailsViewModel(d);
       $scope.container = container;
@@ -41,15 +48,12 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
           }
         });
       }
-      $('#loadingViewSpinner').hide();
     }, function (e) {
-      $('#loadingViewSpinner').hide();
       Notifications.error('Failure', e, 'Unable to retrieve container info');
     });
   };
 
   $scope.start = function () {
-    $('#loadingViewSpinner').show();
     Container.start({id: $scope.container.Id}, {}, function (d) {
       update();
       Notifications.success('Container started', $transition$.params().id);
@@ -60,7 +64,6 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   $scope.stop = function () {
-    $('#loadingViewSpinner').show();
     Container.stop({id: $transition$.params().id}, function (d) {
       update();
       Notifications.success('Container stopped', $transition$.params().id);
@@ -71,7 +74,6 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   $scope.kill = function () {
-    $('#loadingViewSpinner').show();
     Container.kill({id: $transition$.params().id}, function (d) {
       update();
       Notifications.success('Container killed', $transition$.params().id);
@@ -82,23 +84,19 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   $scope.commit = function () {
-    $('#createImageSpinner').show();
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;
     var imageConfig = ImageHelper.createImageConfigForCommit(image, registry.URL);
     ContainerCommit.commit({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
-      $('#createImageSpinner').hide();
       update();
       Notifications.success('Container commited', $transition$.params().id);
     }, function (e) {
-      $('#createImageSpinner').hide();
       update();
       Notifications.error('Failure', e, 'Unable to commit container');
     });
   };
 
   $scope.pause = function () {
-    $('#loadingViewSpinner').show();
     Container.pause({id: $transition$.params().id}, function (d) {
       update();
       Notifications.success('Container paused', $transition$.params().id);
@@ -109,7 +107,6 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   $scope.unpause = function () {
-    $('#loadingViewSpinner').show();
     Container.unpause({id: $transition$.params().id}, function (d) {
       update();
       Notifications.success('Container unpaused', $transition$.params().id);
@@ -138,7 +135,6 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   $scope.remove = function(cleanAssociatedVolumes) {
-    $('#loadingViewSpinner').show();
     ContainerService.remove($scope.container, cleanAssociatedVolumes)
     .then(function success() {
       Notifications.success('Container successfully removed');
@@ -146,14 +142,10 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to remove container');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
   $scope.restart = function () {
-    $('#loadingViewSpinner').show();
     Container.restart({id: $transition$.params().id}, function (d) {
       update();
       Notifications.success('Container restarted', $transition$.params().id);
@@ -180,27 +172,23 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
-    $('#loadingViewSpinner').show();
+    $scope.state.leaveNetworkInProgress = true;
     Network.disconnect({id: networkId}, { Container: $transition$.params().id, Force: false }, function (d) {
       if (container.message) {
-        $('#loadingViewSpinner').hide();
         Notifications.error('Error', d, 'Unable to disconnect container from network');
       } else {
-        $('#loadingViewSpinner').hide();
         Notifications.success('Container left network', $transition$.params().id);
         $state.go('container', {id: $transition$.params().id}, {reload: true});
       }
+      $scope.state.leaveNetworkInProgress = false;
     }, function (e) {
-      $('#loadingViewSpinner').hide();
       Notifications.error('Failure', e, 'Unable to disconnect container from network');
+      $scope.state.leaveNetworkInProgress = false;
     });
   };
 
   $scope.duplicate = function() {
-    ModalService.confirmExperimentalFeature(function (experimental) {
-      if(!experimental) { return; }
-      $state.go('actions.create.container', {from: $transition$.params().id}, {reload: true});
-    });
+    $state.go('actions.create.container', {from: $transition$.params().id}, {reload: true});
   };
 
   $scope.confirmRemove = function () {
@@ -222,7 +210,6 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   function recreateContainer(pullImage) {
-    $('#loadingViewSpinner').show();
     var container = $scope.container;
     var config = ContainerHelper.configFromContainer(container.Model);
     ContainerService.remove(container, true)
@@ -257,41 +244,33 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to re-create container');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
   $scope.recreate = function() {
-    ModalService.confirmExperimentalFeature(function (experimental) {
-      if(!experimental) { return; }
-
-      ModalService.confirmContainerRecreation(function (result) {
-        if(!result) { return; }
-        var pullImage = false;
-        if (result[0]) {
-          pullImage = true;
-        }
-        recreateContainer(pullImage);
-      });
+    ModalService.confirmContainerRecreation(function (result) {
+      if(!result) { return; }
+      var pullImage = false;
+      if (result[0]) {
+        pullImage = true;
+      }
+      recreateContainer(pullImage);
     });
   };
 
   $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
-    $('#joinNetworkSpinner').show();
+    $scope.state.joinNetworkInProgress = true;
     Network.connect({id: networkId}, { Container: $transition$.params().id }, function (d) {
       if (container.message) {
-        $('#joinNetworkSpinner').hide();
         Notifications.error('Error', d, 'Unable to connect container to network');
       } else {
-        $('#joinNetworkSpinner').hide();
         Notifications.success('Container joined network', $transition$.params().id);
         $state.go('container', {id: $transition$.params().id}, {reload: true});
       }
+      $scope.state.joinNetworkInProgress = false;
     }, function (e) {
-      $('#joinNetworkSpinner').hide();
       Notifications.error('Failure', e, 'Unable to connect container to network');
+      $scope.state.joinNetworkInProgress = false;
     });
   };
 

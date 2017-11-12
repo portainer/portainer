@@ -1,7 +1,5 @@
 <rd-header>
-  <rd-header-title title="Create service">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
-  </rd-header-title>
+  <rd-header-title title="Create service"></rd-header-title>
   <rd-header-content>
     <a ui-sref="services">Services</a> &gt; Add service
   </rd-header-content>
@@ -109,9 +107,10 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Image" ng-click="create()">Create service</button>
-              <a type="button" class="btn btn-default btn-sm" ui-sref="services">Cancel</a>
-              <i id="createServiceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || !formValues.Image" ng-click="create()" button-spinner="state.deploymentInProgress">
+                <span ng-hide="state.deploymentInProgress">Create the service</span>
+                <span ng-show="state.deploymentInProgress">Creating service...</span>
+              </button>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
@@ -133,6 +132,7 @@
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
           <li class="interactive" ng-if="applicationState.endpoint.apiVersion >= 1.25"><a data-target="#secrets" data-toggle="tab">Secrets</a></li>
+          <li class="interactive"><a data-target="#configs" data-toggle="tab" ng-if="applicationState.endpoint.apiVersion >= 1.30">Configs</a></li>
           <li class="interactive"><a data-target="#resources-placement" data-toggle="tab" ng-click="refreshSlider()">Resources & Placement</a></li>
         </ul>
         <!-- tab-content -->
@@ -240,9 +240,8 @@
                         <!-- volume -->
                         <div class="input-group input-group-sm col-sm-6" ng-if="volume.Type === 'volume'">
                           <span class="input-group-addon">volume</span>
-                          <select class="form-control" ng-model="volume.Source">
+                          <select class="form-control" ng-model="volume.Source" ng-options="vol.Id|truncate:30 for vol in availableVolumes">
                             <option selected disabled hidden value="">Select a volume</option>
-                            <option ng-repeat="vol in availableVolumes" ng-value="vol.Id">{{ vol.Id|truncate:30 }}</option>
                           </select>
                         </div>
                         <!-- !volume -->
@@ -442,6 +441,9 @@
           <!-- tab-secrets -->
           <div class="tab-pane" id="secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25" ng-include="'app/components/createService/includes/secret.html'"></div>
           <!-- !tab-secrets -->
+          <!-- tab-configs -->
+          <div class="tab-pane" id="configs" ng-if="applicationState.endpoint.apiVersion >= 1.30" ng-include="'app/components/createService/includes/config.html'"></div>
+          <!-- !tab-configs -->
           <!-- tab-resources-placement -->
           <div class="tab-pane" id="resources-placement" ng-include="'app/components/createService/includes/resources-placement.html'"></div>
           <!-- !tab-resources-placement -->

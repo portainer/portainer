@@ -48,6 +48,7 @@ css:
   - bower_components/codemirror/lib/codemirror.css
   - bower_components/codemirror/addon/lint/lint.css
   - bower_components/angular-json-tree/dist/angular-json-tree.css
+  - bower_components/angular-loading-bar/build/loading-bar.css
   minified:
   - bower_components/bootstrap/dist/css/bootstrap.min.css
   - bower_components/rdash-ui/dist/css/rdash.min.css
@@ -60,6 +61,7 @@ css:
   - bower_components/codemirror/lib/codemirror.css
   - bower_components/codemirror/addon/lint/lint.css
   - bower_components/angular-json-tree/dist/angular-json-tree.css
+  - bower_components/angular-loading-bar/build/loading-bar.min.css
 angular:
   regular:
   - bower_components/angular/angular.js
@@ -77,6 +79,7 @@ angular:
   - bower_components/angularjs-slider/dist/rzslider.js
   - bower_components/angular-multi-select/isteven-multi-select.js
   - bower_components/angular-json-tree/dist/angular-json-tree.js
+  - bower_components/angular-loading-bar/build/loading-bar.js
   minified:
   - bower_components/angular/angular.min.js
   - bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js
@@ -93,3 +96,4 @@ angular:
   - bower_components/angularjs-slider/dist/rzslider.min.js
   - bower_components/angular-multi-select/isteven-multi-select.js
   - bower_components/angular-json-tree/dist/angular-json-tree.min.js
+  - bower_components/angular-loading-bar/build/loading-bar.min.js

@@ -1,7 +1,5 @@
 <rd-header>
-  <rd-header-title title="Create volume">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
+  <rd-header-title title="Create volume"></rd-header-title>
   <rd-header-content>
     <a ui-sref="volumes">Volumes</a> &gt; Add volume
   </rd-header-content>
@@ -73,9 +71,10 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="create()">Create volume</button>
-              <a type="button" class="btn btn-default btn-sm" ui-sref="volumes">Cancel</a>
-              <i id="createVolumeSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="create()" ng-disabled="state.deploymentInProgress" button-spinner="state.deploymentInProgress">
+                <span ng-hide="state.deploymentInProgress">Create the volume</span>
+                <span ng-show="state.deploymentInProgress">Creating volume...</span>
+              </button>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>

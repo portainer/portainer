@@ -44,7 +44,6 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
   };
 
   $scope.promoteToLeader = function(user) {
-    $('#loadingViewSpinner').show();
     TeamMembershipService.updateMembership(user.MembershipId, user.Id, $scope.team.Id, 1)
     .then(function success(data) {
       $scope.leaderCount++;
@@ -53,14 +52,10 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update user role');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
   $scope.demoteToMember = function(user) {
-    $('#loadingViewSpinner').show();
     TeamMembershipService.updateMembership(user.MembershipId, user.Id, $scope.team.Id, 2)
     .then(function success(data) {
       user.TeamRole = 'Member';
@@ -69,14 +64,10 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update user role');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
   $scope.addAllUsers = function() {
-    $('#loadingViewSpinner').show();
     var teamMembershipQueries = [];
     angular.forEach($scope.users, function (user) {
       teamMembershipQueries.push(TeamMembershipService.createMembership(user.Id, $scope.team.Id, 2));
@@ -95,14 +86,10 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update team members');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
   $scope.addUser = function(user) {
-    $('#loadingViewSpinner').show();
     TeamMembershipService.createMembership(user.Id, $scope.team.Id, 2)
     .then(function success(data) {
       removeUserFromArray(user.Id, $scope.users);
@@ -113,14 +100,10 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update team members');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
   $scope.removeAllUsers = function() {
-    $('#loadingViewSpinner').show();
     var teamMembershipQueries = [];
     angular.forEach($scope.teamMembers, function (user) {
       teamMembershipQueries.push(TeamMembershipService.deleteMembership(user.MembershipId));
@@ -133,14 +116,10 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update team members');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
   $scope.removeUser = function(user) {
-    $('#loadingViewSpinner').show();
     TeamMembershipService.deleteMembership(user.MembershipId)
     .then(function success() {
       removeUserFromArray(user.Id, $scope.teamMembers);
@@ -149,14 +128,10 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update team members');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
   function deleteTeam() {
-    $('#loadingViewSpinner').show();
     TeamService.deleteTeam($scope.team.Id)
     .then(function success(data) {
       Notifications.success('Team successfully deleted', $scope.team.Name);
@@ -164,9 +139,6 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to remove team');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
@@ -205,7 +177,6 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     $scope.isAdmin = Authentication.getUserDetails().role === 1 ? true: false;
     $q.all({
       team: TeamService.team($transition$.params().id),
@@ -219,9 +190,6 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve team details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

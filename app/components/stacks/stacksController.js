@@ -46,19 +46,8 @@ function ($scope, Notifications, PaginationService, StackService, ModalService) 
   };
 
   function deleteSelectedStacks() {
-    $('#loadingViewSpinner').show();
-    var counter = 0;
-
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadingViewSpinner').hide();
-      }
-    };
-
     angular.forEach($scope.stacks, function (stack) {
       if (stack.Checked) {
-        counter = counter + 1;
         StackService.remove(stack)
         .then(function success() {
           Notifications.success('Stack deleted', stack.Name);
@@ -67,17 +56,12 @@ function ($scope, Notifications, PaginationService, StackService, ModalService) 
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove stack ' + stack.Name);
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
-
     StackService.stacks(true)
     .then(function success(data) {
       var stacks = data;
@@ -93,9 +77,6 @@ function ($scope, Notifications, PaginationService, StackService, ModalService) 
     .catch(function error(err) {
       $scope.stacks = [];
       Notifications.error('Failure', err, 'Unable to retrieve stacks');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

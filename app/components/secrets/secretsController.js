@@ -1,6 +1,6 @@
 angular.module('secrets', [])
-.controller('SecretsController', ['$scope', '$transition$', '$state', 'SecretService', 'Notifications', 'PaginationService',
-function ($scope, $transition$, $state, SecretService, Notifications, PaginationService) {
+.controller('SecretsController', ['$scope', '$state', 'SecretService', 'Notifications', 'PaginationService',
+function ($scope, $state, SecretService, Notifications, PaginationService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
   $scope.state.pagination_count = PaginationService.getPaginationCount('secrets');
@@ -30,17 +30,8 @@ function ($scope, $transition$, $state, SecretService, Notifications, Pagination
   };
 
   $scope.removeAction = function () {
-    $('#loadingViewSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadingViewSpinner').hide();
-      }
-    };
     angular.forEach($scope.secrets, function (secret) {
       if (secret.Checked) {
-        counter = counter + 1;
         SecretService.remove(secret.Id)
         .then(function success() {
           Notifications.success('Secret deleted', secret.Id);
@@ -49,16 +40,12 @@ function ($scope, $transition$, $state, SecretService, Notifications, Pagination
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove secret');
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     SecretService.secrets()
     .then(function success(data) {
       $scope.secrets = data;
@@ -66,9 +53,6 @@ function ($scope, $transition$, $state, SecretService, Notifications, Pagination
     .catch(function error(err) {
       $scope.secrets = [];
       Notifications.error('Failure', err, 'Unable to retrieve secrets');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

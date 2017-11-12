@@ -62,19 +62,8 @@ function ($q, $scope, $state, $filter, VolumeService, Notifications, PaginationS
   };
 
   $scope.removeAction = function () {
-    $('#loadVolumesSpinner').show();
-    var counter = 0;
-
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $state.reload();
-      }
-    };
-
     angular.forEach($scope.volumes, function (volume) {
       if (volume.Checked) {
-        counter = counter + 1;
         VolumeService.remove(volume)
         .then(function success() {
           Notifications.success('Volume deleted', volume.Id);
@@ -83,16 +72,12 @@ function ($q, $scope, $state, $filter, VolumeService, Notifications, PaginationS
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove volume');
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
   };
 
   function initView() {
-    $('#loadVolumesSpinner').show();
 
     $q.all({
       attached: VolumeService.volumes({
@@ -116,9 +101,6 @@ function ($q, $scope, $state, $filter, VolumeService, Notifications, PaginationS
       }));
     }).catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve volumes');
-    })
-    .finally(function final() {
-      $('#loadVolumesSpinner').hide();
     });
   }
   initView();

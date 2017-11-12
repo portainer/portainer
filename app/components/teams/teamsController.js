@@ -3,7 +3,10 @@ angular.module('teams', [])
 function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Authentication) {
   $scope.state = {
     userGroupGroupCreationError: '',
-    validName: false
+    // selectedItemCount: 0,
+    validName: false,
+    // pagination_count: Pagination.getPaginationCount('teams'),
+    deploymentInProgress: false
   };
 
   $scope.formValues = {
@@ -24,7 +27,7 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
   };
 
   $scope.addTeam = function() {
-    $('#createTeamSpinner').show();
+    $scope.state.deploymentInProgress = true;
     $scope.state.teamCreationError = '';
     var teamName = $scope.formValues.Name;
     var leaderIds = [];
@@ -41,33 +44,23 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
       Notifications.error('Failure', err, 'Unable to create team');
     })
     .finally(function final() {
-      $('#createTeamSpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   };
 
-  function deleteSelectedTeams(teams) {
-    $('#loadingViewSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $state.reload();
+  function deleteSelectedTeams() {
+    angular.forEach($scope.teams, function (team) {
+      if (team.Checked) {
+        TeamService.deleteTeam(team.Id)
+        .then(function success(data) {
+          var index = $scope.teams.indexOf(team);
+          $scope.teams.splice(index, 1);
+          Notifications.success('Team successfully deleted', team.Name);
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to remove team');
+        });
       }
-    };
-    angular.forEach(teams, function (team) {
-      counter = counter + 1;
-      TeamService.deleteTeam(team.Id)
-      .then(function success(data) {
-        var index = $scope.teams.indexOf(team);
-        $scope.teams.splice(index, 1);
-        Notifications.success('Team successfully deleted', team.Name);
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to remove team');
-      })
-      .finally(function final() {
-        complete();
-      });
     });
   }
 
@@ -82,7 +75,6 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true: false;
     $scope.isAdmin = isAdmin;
@@ -98,9 +90,6 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
       $scope.teams = [];
       $scope.users = [];
       Notifications.error('Failure', err, 'Unable to retrieve teams');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

@@ -47,7 +47,6 @@ function ($q, $scope, $document, NodeService, ServiceService, TaskService, Notif
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     $q.all({
       nodes: NodeService.nodes(),
       services: ServiceService.services(),
@@ -64,9 +63,6 @@ function ($q, $scope, $document, NodeService, ServiceService, TaskService, Notif
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize cluster visualizer');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
