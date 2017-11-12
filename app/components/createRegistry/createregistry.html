@@ -102,6 +102,9 @@
             <!-- !credentials-password -->
           </div>
           <!-- !authentication-credentials -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || !formValues.Name || !formValues.URL || (formValues.Authentication && (!formValues.Username || !formValues.Password))" ng-click="addRegistry()" button-spinner="state.deploymentInProgress">

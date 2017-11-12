@@ -116,7 +116,6 @@
                 <span ng-hide="state.deploymentInProgress">Deploy the container</span>
                 <span ng-show="state.deploymentInProgress">Deployment in progress...</span>
               </button>
-              <a type="button" class="btn btn-default btn-sm" ui-sref="containers">Cancel</a>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
               <span ng-if="fromContainerMultipleNetworks" style="margin-left: 10px">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
