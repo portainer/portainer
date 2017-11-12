@@ -20,6 +20,10 @@ angular.module('portainer.services')
     return System.info({}).$promise;
   };
 
+  service.infraInfo = function(id) {
+    return System.info({endpointId: id}, {}).$promise;
+  };
+
   service.version = function() {
     return System.version({}).$promise;
   };

@@ -26,6 +26,15 @@
     <li ng-if="applicationState.infra" class="sidebar-list">
       <a ui-sref="infradashboard" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
     </li>
+    <li ng-if="applicationState.infra" class="sidebar-list">
+      <a ui-sref="infrasummary" ui-sref-active="active">Infrastructure <span class="menu-icon fa fa-snowflake-o"></span></a>
+    </li>
+    <li ng-if="applicationState.infra" class="sidebar-list">
+      <a ui-sref="providers" ui-sref-active="inactive">Providers <span class="menu-icon fa fa-industry"></span></a>
+    </li>
+    <li ng-if="applicationState.infra" class="sidebar-list">
+      <a ui-sref="templates" ui-sref-active="inactive">Templates <span class="menu-icon fa fa-map"></span></a>
+    </li>
     <!--
     <li class="sidebar-list">
       <a ui-sref="templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket"></span></a>

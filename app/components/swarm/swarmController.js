@@ -90,6 +90,7 @@ function ($q, $scope, SystemService, NodeService, Pagination, Notifications, Sta
       $scope.docker = data.version;
       $scope.info = data.info;
       if (provider === 'DOCKER_SWARM_MODE') {
+        // TODO: This is very inefficient -- latest Swarm status info already provides total CPU/mem, etc
         var nodes = data.nodes;
         processTotalCPUAndMemory(nodes);
         $scope.nodes = nodes;

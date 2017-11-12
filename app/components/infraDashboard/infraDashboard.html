@@ -6,171 +6,81 @@
 </rd-header>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'">
-    <rd-widget>
-      <rd-widget-header icon="fa-tachometer" title="Node info"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-            <tr>
-              <td>Name</td>
-              <td>{{ infoData.Name }}</td>
-            </tr>
-            <tr>
-              <td>Docker version</td>
-              <td>{{ infoData.ServerVersion }}</td>
-            </tr>
-            <tr>
-              <td>CPU</td>
-              <td>{{ infoData.NCPU }}</td>
-            </tr>
-            <tr>
-              <td>Memory</td>
-              <td>{{ infoData.MemTotal|humansize }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
+  <div class="col-xs-12 col-md-6" ng-if="stats.ActiveSwarms">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon yellow pull-left">
+            <i class="fa fa-play"></i>
+          </div>
+          <div class="title">{{ stats.ActiveSwarms }}</div>
+          <div class="comment">Active Swarms</div>
+        </rd-widget-body>
+      </rd-widget>
   </div>
-  <div class="col-lg-12 col-md-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
-    <rd-widget>
-      <rd-widget-header icon="fa-tachometer" title="Cluster info"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-            <tr>
-              <td>Nodes</td>
-              <td>{{ infoData.SystemStatus[0][1] == 'primary' ? infoData.SystemStatus[3][1] : infoData.SystemStatus[4][1] }}</td>
-            </tr>
-            <tr>
-              <td>Swarm version</td>
-              <td>{{ infoData.ServerVersion|swarmversion }}</td>
-            </tr>
-            <tr>
-              <td>Total CPU</td>
-              <td>{{ infoData.NCPU }}</td>
-            </tr>
-            <tr>
-              <td>Total memory</td>
-              <td>{{ infoData.MemTotal|humansize: 2 }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-md-6" ng-if="stats.ManagerCount">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon blue pull-left">
+            <i class="fa fa-star"></i>
+          </div>
+          <div class="pull-right">
+            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ stats.ActiveManagerCount }} running</div>
+          </div>
+          <div class="title">{{ stats.ManagerCount }}</div>
+          <div class="comment">Managers</div>
+        </rd-widget-body>
+      </rd-widget>
   </div>
-  <div class="col-lg-12 col-md-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-    <rd-widget>
-      <rd-widget-header icon="fa-tachometer" title="Swarm info"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-            <tr>
-              <td colspan="2"><span class="small text-muted">This node is part of a Swarm cluster</span></td>
-            </tr>
-            <tr >
-              <td>Node role</td>
-              <td>{{ infoData.Swarm.ControlAvailable ? 'Manager' : 'Worker' }}</td>
-            </tr>
-            <tr ng-if="infoData.Swarm.ControlAvailable">
-              <td>Nodes in the cluster</td>
-              <td>{{ infoData.Swarm.Nodes }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
+  <div class="col-xs-12 col-md-6" ng-if="stats.WorkerCount">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon blue pull-left">
+            <i class="fa fa-user"></i>
+          </div>
+          <div class="pull-right">
+            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ stats.ActiveWorkerCount }} running</div>
+          </div>
+          <div class="title">{{ stats.WorkerCount }}</div>
+          <div class="comment">Workers</div>
+        </rd-widget-body>
+      </rd-widget>
   </div>
 </div>
 
 <div class="row">
-  <div class="col-xs-12 col-md-6" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-    <a ui-sref="stacks">
+    <div class="col-xs-12 col-md-6" ng-if="stats.OSLinuxCount">
       <rd-widget>
         <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-th-list"></i>
+          <div class="widget-icon green pull-left">
+            <i class="fa fa-linux"></i>
           </div>
-          <div class="title">{{ stackCount }}</div>
-          <div class="comment">Stacks</div>
+          <div class="title">{{ stats.OSLinuxCount }}</div>
+          <div class="comment">Linux Systems</div>
         </rd-widget-body>
       </rd-widget>
-    </a>
-  </div>
-  <div class="col-xs-12 col-md-6" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-    <a ui-sref="services">
+    </div>
+    <div class="col-xs-12 col-md-6" ng-if="stats.OSWindowsCount">
       <rd-widget>
         <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-list-alt"></i>
+          <div class="widget-icon green pull-left">
+            <i class="fa fa-windows"></i>
           </div>
-          <div class="title">{{ serviceCount }}</div>
-          <div class="comment">Services</div>
+          <div class="title">{{ stats.OSWindowsCount }}</div>
+          <div class="comment">Windows Systems</div>
         </rd-widget-body>
       </rd-widget>
-    </a>
-  </div>
-  <div class="col-xs-12 col-md-6">
-    <a ui-sref="containers">
+    </div>
+    <div class="col-xs-12 col-md-6" ng-if="stats.OSOtherCount">
       <rd-widget>
         <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-server"></i>
+          <div class="widget-icon green pull-left">
+            <i class="fa fa-question-circle-o"></i>
           </div>
-          <div class="pull-right">
-            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containerData.running }} running</div>
-            <div><i class="fa fa-heartbeat space-right red-icon"></i>{{ containerData.stopped }} stopped</div>
-          </div>
-          <div class="title">{{ containerData.total }}</div>
-          <div class="comment">Containers</div>
+          <div class="title">{{ stats.OSOtherCount }}</div>
+          <div class="comment">Other OS</div>
         </rd-widget-body>
       </rd-widget>
-    </a>
-  </div>
-  <div class="col-xs-12 col-md-6">
-    <a ui-sref="images">
-      <rd-widget>
-        <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-clone"></i>
-          </div>
-          <div class="pull-right">
-            <div><i class="fa fa-pie-chart space-right"></i>{{ imageData.size|humansize }}</div>
-          </div>
-          <div class="title">{{ imageData.total }}</div>
-          <div class="comment">Images</div>
-        </rd-widget-body>
-      </rd-widget>
-    </a>
-  </div>
-  <div class="col-xs-12 col-md-6">
-    <a ui-sref="volumes">
-      <rd-widget>
-        <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-cubes"></i>
-          </div>
-          <div class="title">{{ volumeData.total }}</div>
-          <div class="comment">Volumes</div>
-        </rd-widget-body>
-      </rd-widget>
-    </a>
-  </div>
-  <div class="col-xs-12 col-md-6">
-    <a ui-sref="networks">
-      <rd-widget>
-        <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-sitemap"></i>
-          </div>
-          <div class="title">{{ networkData.total }}</div>
-          <div class="comment">Networks</div>
-        </rd-widget-body>
-      </rd-widget>
-    </a>
-  </div>
-</div>
-
-<div class="row">
+    </div>
 </div>
