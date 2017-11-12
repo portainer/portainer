@@ -10,13 +10,32 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
 
-  $scope.state.containersListOptions={All:undefined, Used:'!', Unused:''};
-  $scope.state.tagListOptions={All:undefined, Tagged:'', Untagged:'!'};
-  $scope.state.childrenListOptions={All:undefined, WithChildren:'', NoChildren:'!'};
+  function NewUsageFilter(text,icon) {
+    var o = {};
+    o.All =      { value:undefined, icon:'circle-o', class:'' };
+    o[text[0]] = { value:'!',       icon:icon,       class:'' };
+    o[text[1]] = { value:'',        icon:icon,       class:'emptylist' };
+    return o;
+  }
 
-  $scope.state.containersListFilter = undefined;
-  $scope.state.tagListFilter = '';
-  $scope.state.childrenListFilter = undefined;
+  $scope.UsageFilters = {
+    Containers : {
+      Options: NewUsageFilter(['Used','Unused'],'server'),
+      Selected: 'All'
+    },
+    Children : {
+      Options: NewUsageFilter(['HasChildren','NoChildren'],'clone'),
+      Selected: 'All'
+    },
+    Tags : {
+      Options: {
+        All:      { value:undefined, icon:'circle-o', class:''          },
+        Tagged:   { value:'',        icon:'tag',      class:''          },
+        Untagged: { value:'!',       icon:'tag',      class:'emptylist' }
+      },
+      Selected: 'Tagged'
+    }
+  };
 
   $scope.formValues = {
     Image: '',

@@ -740,6 +740,48 @@ json-tree .branch-preview {
   opacity: .5;
 }
 
+/* Custom dropdown checklist */
+
+.popover-no-margin,
+.popover-no-margin .popover-content {
+  padding: 0;
+}
+
+.popover-no-margin .dropdown-menu {
+  position: relative;
+  margin: 0;
+  border: 0;
+  border-radius: 6px;
+}
+
+.dropdown-select-label {
+  width:18px;
+  margin:0;
+  padding-left:2.5px;
+  padding-right:2.5px;
+}
+
+.dropdown-select > ul {
+  min-width: unset;
+}
+
+.dropdown-select > ul > li > a {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.dropdown-select > ul > li > a > i {
+  width: 14px;
+  text-align: center;
+}
+
+.dropdown-select > .dropdown-menu > .active > a,
+.dropdown-select > .dropdown-menu > .active > a:hover,
+.dropdown-select > .dropdown-menu > .active > a:focus {
+  color: orange;
+  background-color: #fff;
+}
+
 /**/
 
 .row.header .meta .page {
