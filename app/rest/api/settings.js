@@ -4,7 +4,7 @@ angular.module('portainer.rest')
   return $resource(API_ENDPOINT_SETTINGS + '/:subResource/:action', {}, {
     get: { method: 'GET' },
     update: { method: 'PUT', ignoreLoadingBar: true },
-    publicSettings: { method: 'GET', params: { subResource: 'public' } },
+    publicSettings: { method: 'GET', params: { subResource: 'public' }, ignoreLoadingBar: true },
     checkLDAPConnectivity: { method: 'PUT', params: { subResource: 'authentication', action: 'checkLDAP' } }
   });
 }]);
