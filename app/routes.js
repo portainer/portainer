@@ -793,6 +793,19 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('infra', {
+    url: '/infra/',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/infra/infra.html',
+        controller: 'InfraController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('stacks', {
     url: '/stacks/',
     views: {

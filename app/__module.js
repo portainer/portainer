@@ -34,6 +34,7 @@ angular.module('portainer', [
   'createStack',
   'createProject',
   'engine',
+  'infra',
   'endpoint',
   'endpointAccess',
   'endpoints',
