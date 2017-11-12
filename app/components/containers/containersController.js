@@ -63,6 +63,8 @@ angular.module('containers', [])
         else if (action === Container.remove) {
           ContainerService.remove(c, $scope.cleanAssociatedVolumes)
           .then(function success() {
+            var index = items.indexOf(c);
+            items.splice(index, 1);
             Notifications.success('Container successfully removed');
           })
           .catch(function error(err) {

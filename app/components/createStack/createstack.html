@@ -167,15 +167,14 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button id="deployButton" type="button" class="btn btn-primary btn-sm" ng-disabled="(state.Method === 'editor' && !formValues.StackFileContent)
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || (state.Method === 'editor' && !formValues.StackFileContent)
               || (state.Method === 'upload' && !formValues.StackFile)
               || (state.Method === 'repository' && (!formValues.RepositoryURL || !formValues.RepositoryPath))
-              || !formValues.Name" ng-click="deployStack()">Deploy the stack</button>
+              || !formValues.Name" ng-click="deployStack()" button-spinner="state.deploymentInProgress">
+                <span ng-hide="state.deploymentInProgress">Deploy the stack</span>
+                <span ng-show="state.deploymentInProgress">Deployment in progress...</span>
+              </button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="stacks">Cancel</a>
-              <span id="createResourceHint" class="createResource" style="display: none;">
-                Deployment in progress...
-                <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
-              </span>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>

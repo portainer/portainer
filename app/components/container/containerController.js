@@ -7,8 +7,11 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
     Image: '',
     Registry: ''
   };
-  $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('container_networks');
+  $scope.state = {
+    joinNetworkInProgress: false,
+    leaveNetworkInProgress: false,
+    pagination_count: Pagination.getPaginationCount('container_networks')
+  };
 
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('container_networks', $scope.state.pagination_count);
@@ -164,6 +167,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
+    $scope.state.leaveNetworkInProgress = true;
     Network.disconnect({id: networkId}, { Container: $transition$.params().id, Force: false }, function (d) {
       if (container.message) {
         Notifications.error('Error', d, 'Unable to disconnect container from network');
@@ -171,8 +175,10 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
         Notifications.success('Container left network', $transition$.params().id);
         $state.go('container', {id: $transition$.params().id}, {reload: true});
       }
+      $scope.state.leaveNetworkInProgress = false;
     }, function (e) {
       Notifications.error('Failure', e, 'Unable to disconnect container from network');
+      $scope.state.leaveNetworkInProgress = false;
     });
   };
 
@@ -248,19 +254,18 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
-    $('#joinNetworkSpinner').show();
+    $scope.state.joinNetworkInProgress = true;
     Network.connect({id: networkId}, { Container: $transition$.params().id }, function (d) {
       if (container.message) {
-        $('#joinNetworkSpinner').hide();
         Notifications.error('Error', d, 'Unable to connect container to network');
       } else {
-        $('#joinNetworkSpinner').hide();
         Notifications.success('Container joined network', $transition$.params().id);
         $state.go('container', {id: $transition$.params().id}, {reload: true});
       }
+      $scope.state.joinNetworkInProgress = false;
     }, function (e) {
-      $('#joinNetworkSpinner').hide();
       Notifications.error('Failure', e, 'Unable to connect container to network');
+      $scope.state.joinNetworkInProgress = false;
     });
   };
 

@@ -2,6 +2,10 @@ angular.module('settings', [])
 .controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_TEMPLATES_URL',
 function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_TEMPLATES_URL) {
 
+  $scope.state = {
+    deploymentInProgress: false
+  };
+
   $scope.formValues = {
     customLogo: false,
     customTemplates: false,
@@ -45,6 +49,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
     settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
 
+    $scope.state.deploymentInProgress = true;
     updateSettings(settings, false);
   };
 
@@ -65,6 +70,9 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update settings');
+    })
+    .finally(function final() {
+      $scope.state.deploymentInProgress = false;
     });
   }
 

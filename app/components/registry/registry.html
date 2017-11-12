@@ -64,9 +64,11 @@
           <!-- !authentication-credentials -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!registry.Name || !registry.URL || (registry.Authentication && (!registry.Username || !registry.Password))" ng-click="updateRegistry()">Update registry</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || !registry.Name || !registry.URL || (registry.Authentication && (!registry.Username || !registry.Password))" ng-click="updateRegistry()" button-spinner="state.deploymentInProgress">
+                <span ng-hide="state.deploymentInProgress">Update registry</span>
+                <span ng-show="state.deploymentInProgress">Updating registry...</span>
+              </button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="registries">Cancel</a>
-              <i id="updateRegistrySpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
         </form>

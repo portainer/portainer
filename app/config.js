@@ -34,7 +34,7 @@ angular.module('portainer')
     });
 
     cfpLoadingBarProvider.includeSpinner = false;
-    cfpLoadingBarProvider.parentSelector = '#view';
+    cfpLoadingBarProvider.parentSelector = '#loadingbar-placeholder';
 
     $urlRouterProvider.otherwise('/auth');
     configureRoutes($stateProvider);

@@ -27,7 +27,8 @@ angular.module('portainer.rest')
     },
     create: {
       method: 'POST', params: {action: 'create'},
-      transformResponse: genericHandler
+      transformResponse: genericHandler,
+      ignoreLoadingBar: true
     },
     remove: {
       method: 'DELETE', params: {id: '@id', v: '@v', force: '@force'},
@@ -39,7 +40,7 @@ angular.module('portainer.rest')
     },
     exec: {
       method: 'POST', params: {id: '@id', action: 'exec'},
-      transformResponse: genericHandler
+      transformResponse: genericHandler, ignoreLoadingBar: true
     },
     inspect: {
       method: 'GET', params: { id: '@id', action: 'json' }

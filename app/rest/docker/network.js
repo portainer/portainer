@@ -8,7 +8,7 @@ angular.module('portainer.rest')
   {
     query: {method: 'GET', isArray: true},
     get: {method: 'GET'},
-    create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler},
+    create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler, ignoreLoadingBar: true},
     remove: { method: 'DELETE', transformResponse: genericHandler },
     connect: {method: 'POST', params: {action: 'connect'}},
     disconnect: {method: 'POST', params: {action: 'disconnect'}}

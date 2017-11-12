@@ -1,9 +1,11 @@
 angular.module('containerConsole', [])
 .controller('ContainerConsoleController', ['$scope', '$transition$', 'Container', 'Image', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ContainerService', 'ExecService',
 function ($scope, $transition$, Container, Image, EndpointProvider, Notifications, ContainerHelper, ContainerService, ExecService) {
-  $scope.state = {};
-  $scope.state.loaded = false;
-  $scope.state.connected = false;
+  $scope.state = {
+    loaded: false,
+    connected: false
+  };
+
   $scope.formValues = {};
 
   var socket, term;
@@ -33,7 +35,6 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
   });
 
   $scope.connect = function() {
-    $('#loadConsoleSpinner').show();
     var termWidth = Math.floor(($('#terminal-container').width() - 20) / 8.39);
     var termHeight = 30;
     var command = $scope.formValues.isCustomCommand ?
@@ -63,9 +64,6 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to exec into container');
-    })
-    .finally(function final() {
-      $('#loadConsoleSpinner').hide();
     });
   };
 
@@ -84,7 +82,6 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
 
     $scope.state.connected = true;
     socket.onopen = function(evt) {
-      $('#loadConsoleSpinner').hide();
       term = new Terminal();
 
       term.on('data', function (data) {

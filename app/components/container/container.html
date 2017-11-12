@@ -6,323 +6,329 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-cogs" title="Actions"></rd-widget-header>
-      <rd-widget-body classes="padding">
-        <div class="btn-group" role="group" aria-label="...">
-          <button class="btn btn-success" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
-          <button class="btn btn-danger" ng-click="stop()" ng-disabled="!container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
-          <button class="btn btn-danger" ng-click="kill()" ng-disabled="!container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
-          <button class="btn btn-primary" ng-click="restart()" ng-disabled="!container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
-          <button class="btn btn-primary" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
-          <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
-          <button class="btn btn-danger" ng-click="confirmRemove()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-          <button class="btn btn-danger" ng-click="recreate()" ng-if="!container.Config.Labels['com.docker.swarm.service.id']"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Recreate</button>
-          <button class="btn btn-primary" ng-click="duplicate()" ng-if="!container.Config.Labels['com.docker.swarm.service.id']"><i class="fa fa-files-o space-right" aria-hidden="true"></i>Duplicate/Edit</button>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-server" title="Container status"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-            <tr>
-              <td>ID</td>
-              <td>{{ container.Id }}</td>
-            </tr>
-            <tr>
-              <td>Name</td>
-              <td ng-if="!container.edit">
-                {{ container.Name|trimcontainername }}
-                <a href="" data-toggle="tooltip" title="Edit container name" ng-click="container.edit = true;"><i class="fa fa-edit"></i></a>
-              </td>
-              <td ng-if="container.edit">
-                <form ng-submit="renameContainer()">
-                  <input type="text" class="containerNameInput" ng-model="container.newContainerName">
-                  <a href="" ng-click="container.edit = false;"><i class="fa fa-times"></i></a>
-                  <a href="" ng-click="renameContainer()"><i class="fa fa-check-square-o"></i></a>
-                </form>
-              </td>
-            </tr>
-            <tr ng-if="container.NetworkSettings.IPAddress">
-              <td>IP address</td>
-              <td>{{ container.NetworkSettings.IPAddress }}</td>
-            </tr>
-            <tr>
-              <td>Status</td>
-              <td>
-                <i class="fa fa-heartbeat space-right green-icon" ng-if="container.State.Running"></i>
-                <i class="fa fa-heartbeat space-right red-icon" ng-if="!container.State.Running && container.State.Status !== 'created'"></i>
-                {{ container.State|getstatetext }} since {{ activityTime }}<span ng-if="!container.State.Running && container.State.Status !== 'created'"> with exit code {{ container.State.ExitCode }}</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Created</td>
-              <td>{{ container.Created|getisodate }}</td>
-            </tr>
-            <tr ng-if="container.State.Running">
-              <td>Start time</td>
-              <td>{{ container.State.StartedAt|getisodate }}</td>
-            </tr>
-            <tr ng-if="!container.State.Running && container.State.Status !== 'created'">
-              <td>Finished</td>
-              <td>{{ container.State.FinishedAt|getisodate }}</td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <div class="btn-group" role="group" aria-label="...">
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i>Stats</a>
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="console({id: container.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="inspect({id: container.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Inspect</a>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<!-- access-control-panel -->
-<por-access-control-panel
-  ng-if="container && applicationState.application.authentication"
-  resource-id="container.Id"
-  resource-control="container.ResourceControl"
-  resource-type="'container'">
-</por-access-control-panel>
-<!-- !access-control-panel -->
-
-<div ng-if="container.State.Health" class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-server" title="Container health"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-            <tr>
-              <td>Status</td>
-              <td>
-                <i ng-class="{'healthy': 'fa fa-heartbeat space-right green-icon', 'unhealthy': 'fa fa-heartbeat space-right red-icon', 'starting': 'fa fa-heartbeat space-right orange-icon'}[container.State.Health.Status]"></i>
-                {{ container.State.Health.Status }}
-              </td>
-            </tr>
-            <tr>
-              <td>Failure count</td>
-              <td>{{ container.State.Health.FailingStreak }}</td>
-            </tr>
-            <tr>
-              <td>Last output</td>
-              <td>{{ container.State.Health.Log[container.State.Health.Log.length - 1].Output }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Create image"></rd-widget-header>
-      <rd-widget-body>
-        <form class="form-horizontal">
-          <!-- tag-description -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <span class="small text-muted">
-                You can create an image from this container, this allows you to backup important data or save
-                helpful configurations. You'll be able to spin up another container based on this image afterward.
-              </span>
-            </div>
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-cogs" title="Actions"></rd-widget-header>
+        <rd-widget-body classes="padding">
+          <div class="btn-group" role="group" aria-label="...">
+            <button class="btn btn-success" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
+            <button class="btn btn-danger" ng-click="stop()" ng-disabled="!container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
+            <button class="btn btn-danger" ng-click="kill()" ng-disabled="!container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
+            <button class="btn btn-primary" ng-click="restart()" ng-disabled="!container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
+            <button class="btn btn-primary" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
+            <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
+            <button class="btn btn-danger" ng-click="confirmRemove()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+            <button class="btn btn-danger" ng-click="recreate()" ng-if="!container.Config.Labels['com.docker.swarm.service.id']"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Recreate</button>
+            <button class="btn btn-primary" ng-click="duplicate()" ng-if="!container.Config.Labels['com.docker.swarm.service.id']"><i class="fa fa-files-o space-right" aria-hidden="true"></i>Duplicate/Edit</button>
           </div>
-          <!-- !tag-description -->
-          <!-- image-and-registry -->
-          <div class="form-group">
-            <por-image-registry image="config.Image" registry="config.Registry"></por-image-registry>
-          </div>
-          <!-- !image-and-registry -->
-          <!-- tag-note -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <span class="small text-muted">Note: if you don't specify the tag in the image name, <span class="label label-default">latest</span> will be used.</span>
-            </div>
-          </div>
-          <!-- !tag-note -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="commit()">Create</button>
-            </div>
-          </div>
-        </form>
-      </rd-widget-body>
-    </rd-widget>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
   </div>
-</div>
 
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-server" title="Container details"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-            <tr>
-              <td>Image</td>
-              <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
-            </tr>
-            <tr ng-if="portBindings.length > 0">
-              <td>Port configuration</td>
-              <td>
-                <div ng-repeat="portMapping in portBindings">
-                  {{ portMapping.container }} <i class="fa fa-long-arrow-right"></i> {{ portMapping.host }}
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>CMD</td>
-              <td><code>{{ container.Config.Cmd|command }}</code></td>
-            </tr>
-            <tr>
-              <td>ENV</td>
-              <td>
-                <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="var in container.Config.Env track by $index">
-                    <td>{{ var|key: '=' }}</td>
-                    <td>{{ var|value: '=' }}</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr ng-if="!(container.Config.Labels | emptyobject)">
-              <td>Labels</td>
-              <td>
-                <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="(k, v) in container.Config.Labels">
-                    <td>{{ k }}</td>
-                    <td>{{ v }}</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr ng-if="container.HostConfig.RestartPolicy.Name !== 'no'">
-              <td>Restart policies</td>
-              <td>
-                <table class="table table-bordered table-condensed">
-                  <tr>
-                    <td class="col-md-3">Name</td>
-                    <td>{{ container.HostConfig.RestartPolicy.Name }}</td>
-                  </tr>
-                  <tr>
-                    <td class="col-md-3">MaximumRetryCount</td>
-                    <td>
-                      {{ container.HostConfig.RestartPolicy.MaximumRetryCount }}
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-server" title="Container status"></rd-widget-header>
+        <rd-widget-body classes="no-padding">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>ID</td>
+                <td>{{ container.Id }}</td>
+              </tr>
+              <tr>
+                <td>Name</td>
+                <td ng-if="!container.edit">
+                  {{ container.Name|trimcontainername }}
+                  <a href="" data-toggle="tooltip" title="Edit container name" ng-click="container.edit = true;"><i class="fa fa-edit"></i></a>
+                </td>
+                <td ng-if="container.edit">
+                  <form ng-submit="renameContainer()">
+                    <input type="text" class="containerNameInput" ng-model="container.newContainerName">
+                    <a href="" ng-click="container.edit = false;"><i class="fa fa-times"></i></a>
+                    <a href="" ng-click="renameContainer()"><i class="fa fa-check-square-o"></i></a>
+                  </form>
+                </td>
+              </tr>
+              <tr ng-if="container.NetworkSettings.IPAddress">
+                <td>IP address</td>
+                <td>{{ container.NetworkSettings.IPAddress }}</td>
+              </tr>
+              <tr>
+                <td>Status</td>
+                <td>
+                  <i class="fa fa-heartbeat space-right green-icon" ng-if="container.State.Running"></i>
+                  <i class="fa fa-heartbeat space-right red-icon" ng-if="!container.State.Running && container.State.Status !== 'created'"></i>
+                  {{ container.State|getstatetext }} since {{ activityTime }}<span ng-if="!container.State.Running && container.State.Status !== 'created'"> with exit code {{ container.State.ExitCode }}</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Created</td>
+                <td>{{ container.Created|getisodate }}</td>
+              </tr>
+              <tr ng-if="container.State.Running">
+                <td>Start time</td>
+                <td>{{ container.State.StartedAt|getisodate }}</td>
+              </tr>
+              <tr ng-if="!container.State.Running && container.State.Status !== 'created'">
+                <td>Finished</td>
+                <td>{{ container.State.FinishedAt|getisodate }}</td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <div class="btn-group" role="group" aria-label="...">
+                    <a class="btn btn-outline-secondary" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i>Stats</a>
+                    <a class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
+                    <a class="btn btn-outline-secondary" type="button" ui-sref="console({id: container.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
+                    <a class="btn btn-outline-secondary" type="button" ui-sref="inspect({id: container.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Inspect</a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
   </div>
-</div>
 
-<div class="row" ng-if="container.Mounts.length > 0">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-cubes" title="Volumes"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Host/volume</th>
-              <th>Path in container</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="vol in container.Mounts">
-              <td ng-if="vol.Type === 'bind'">{{ vol.Source }}</td>
-              <td ng-if="vol.Type === 'volume'"><a ui-sref="volume({id: vol.Name})">{{ vol.Name }}</a></td>
-              <td>{{ vol.Destination }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
+  <!-- access-control-panel -->
+  <por-access-control-panel
+    ng-if="container && applicationState.application.authentication"
+    resource-id="container.Id"
+    resource-control="container.ResourceControl"
+    resource-type="'container'">
+  </por-access-control-panel>
+  <!-- !access-control-panel -->
+
+  <div ng-if="container.State.Health" class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-server" title="Container health"></rd-widget-header>
+        <rd-widget-body classes="no-padding">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>Status</td>
+                <td>
+                  <i ng-class="{'healthy': 'fa fa-heartbeat space-right green-icon', 'unhealthy': 'fa fa-heartbeat space-right red-icon', 'starting': 'fa fa-heartbeat space-right orange-icon'}[container.State.Health.Status]"></i>
+                  {{ container.State.Health.Status }}
+                </td>
+              </tr>
+              <tr>
+                <td>Failure count</td>
+                <td>{{ container.State.Health.FailingStreak }}</td>
+              </tr>
+              <tr>
+                <td>Last output</td>
+                <td>{{ container.State.Health.Log[container.State.Health.Log.length - 1].Output }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
   </div>
-</div>
 
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-sitemap" title="Connected networks">
-        <div class="pull-right">
-          Items per page:
-          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-            <option value="0">All</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <thead>
-            <th>Network Name</th>
-            <th>IP Address</th>
-            <th>Gateway</th>
-            <th>MacAddress</th>
-            <th>Actions</th>
-          </thead>
-          <tbody>
-            <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: state.pagination_count">
-              <td><a ui-sref="network({id: value.NetworkID})">{{ key }}</a></td>
-              <td>{{ value.IPAddress || '-' }}</td>
-              <td>{{ value.Gateway || '-' }}</td>
-              <td>{{ value.MacAddress || '-' }}</td>
-              <td>
-                <button type="button" class="btn btn-xs btn-danger" ng-click="containerLeaveNetwork(container, value.NetworkID)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Leave Network</button>
-              </td>
-            </tr>
-            <tr ng-if="(container.NetworkSettings.Networks | emptyobject)">
-              <td colspan="5" class="text-center text-muted">No networks connected.</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="pagination-controls">
-          <dir-pagination-controls></dir-pagination-controls>
-        </div>
-        <hr />
-        <form class="form-horizontal">
-          <!-- network-input -->
-          <div class="row">
-            <label for="container_network" class="col-sm-3 col-lg-2 control-label text-left">Join a Network</label>
-            <div class="col-sm-5 col-lg-4">
-              <select class="form-control" ng-model="selectedNetwork" id="container_network">
-                <option selected disabled hidden value="">Select a network</option>
-                <option ng-repeat="net in availableNetworks" ng-value="net.Id">{{ net.Name }}</option>
-              </select>
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-clone" title="Create image"></rd-widget-header>
+        <rd-widget-body>
+          <form class="form-horizontal">
+            <!-- tag-description -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="small text-muted">
+                  You can create an image from this container, this allows you to backup important data or save
+                  helpful configurations. You'll be able to spin up another container based on this image afterward.
+                </span>
+              </div>
             </div>
-            <div class="col-sm-1">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!selectedNetwork" ng-click="containerJoinNetwork(container, selectedNetwork)">Join Network</button>
+            <!-- !tag-description -->
+            <!-- image-and-registry -->
+            <div class="form-group">
+              <por-image-registry image="config.Image" registry="config.Registry"></por-image-registry>
             </div>
+            <!-- !image-and-registry -->
+            <!-- tag-note -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="small text-muted">Note: if you don't specify the tag in the image name, <span class="label label-default">latest</span> will be used.</span>
+              </div>
+            </div>
+            <!-- !tag-note -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="commit()">Create</button>
+              </div>
+            </div>
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-server" title="Container details"></rd-widget-header>
+        <rd-widget-body classes="no-padding">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>Image</td>
+                <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
+              </tr>
+              <tr ng-if="portBindings.length > 0">
+                <td>Port configuration</td>
+                <td>
+                  <div ng-repeat="portMapping in portBindings">
+                    {{ portMapping.container }} <i class="fa fa-long-arrow-right"></i> {{ portMapping.host }}
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>CMD</td>
+                <td><code>{{ container.Config.Cmd|command }}</code></td>
+              </tr>
+              <tr>
+                <td>ENV</td>
+                <td>
+                  <table class="table table-bordered table-condensed">
+                    <tr ng-repeat="var in container.Config.Env track by $index">
+                      <td>{{ var|key: '=' }}</td>
+                      <td>{{ var|value: '=' }}</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr ng-if="!(container.Config.Labels | emptyobject)">
+                <td>Labels</td>
+                <td>
+                  <table class="table table-bordered table-condensed">
+                    <tr ng-repeat="(k, v) in container.Config.Labels">
+                      <td>{{ k }}</td>
+                      <td>{{ v }}</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr ng-if="container.HostConfig.RestartPolicy.Name !== 'no'">
+                <td>Restart policies</td>
+                <td>
+                  <table class="table table-bordered table-condensed">
+                    <tr>
+                      <td class="col-md-3">Name</td>
+                      <td>{{ container.HostConfig.RestartPolicy.Name }}</td>
+                    </tr>
+                    <tr>
+                      <td class="col-md-3">MaximumRetryCount</td>
+                      <td>
+                        {{ container.HostConfig.RestartPolicy.MaximumRetryCount }}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+
+  <div class="row" ng-if="container.Mounts.length > 0">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-cubes" title="Volumes"></rd-widget-header>
+        <rd-widget-body classes="no-padding">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Host/volume</th>
+                <th>Path in container</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="vol in container.Mounts">
+                <td ng-if="vol.Type === 'bind'">{{ vol.Source }}</td>
+                <td ng-if="vol.Type === 'volume'"><a ui-sref="volume({id: vol.Name})">{{ vol.Name }}</a></td>
+                <td>{{ vol.Destination }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-xs-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-sitemap" title="Connected networks">
+          <div class="pull-right">
+            Items per page:
+            <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+              <option value="0">All</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
           </div>
-        </form>
-      </rd-widget-body>
-    </rd-widget>
+        </rd-widget-header>
+        <rd-widget-body classes="no-padding">
+          <table class="table">
+            <thead>
+              <th>Network Name</th>
+              <th>IP Address</th>
+              <th>Gateway</th>
+              <th>MacAddress</th>
+              <th>Actions</th>
+            </thead>
+            <tbody>
+              <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: state.pagination_count">
+                <td><a ui-sref="network({id: value.NetworkID})">{{ key }}</a></td>
+                <td>{{ value.IPAddress || '-' }}</td>
+                <td>{{ value.Gateway || '-' }}</td>
+                <td>{{ value.MacAddress || '-' }}</td>
+                <td>
+                  <button type="button" class="btn btn-xs btn-danger" ng-disabled="state.leaveNetworkInProgress" button-spinner="state.leaveNetworkInProgress" ng-click="containerLeaveNetwork(container, value.NetworkID)">
+                    <span ng-hide="state.leaveNetworkInProgress"><i class="fa fa-trash space-right" aria-hidden="true"></i> Leave network</span>
+                    <span ng-show="state.leaveNetworkInProgress">Leaving network...</span>
+                  </button>
+                </td>
+              </tr>
+              <tr ng-if="(container.NetworkSettings.Networks | emptyobject)">
+                <td colspan="5" class="text-center text-muted">No networks connected.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
+          <hr />
+          <form class="form-horizontal">
+            <!-- network-input -->
+            <div class="row">
+              <label for="container_network" class="col-sm-3 col-lg-2 control-label text-left">Join a Network</label>
+              <div class="col-sm-5 col-lg-4">
+                <select class="form-control" ng-model="selectedNetwork" id="container_network">
+                  <option selected disabled hidden value="">Select a network</option>
+                  <option ng-repeat="net in availableNetworks" ng-value="net.Id">{{ net.Name }}</option>
+                </select>
+              </div>
+              <div class="col-sm-1">
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.joinNetworkInProgress || !selectedNetwork" ng-click="containerJoinNetwork(container, selectedNetwork)" button-spinner="state.joinNetworkInProgress">
+                  <span ng-hide="state.joinNetworkInProgress">Join network</span>
+                  <span ng-show="state.joinNetworkInProgress">Joining network...</span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
   </div>
-</div>

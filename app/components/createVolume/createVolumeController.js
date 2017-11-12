@@ -9,7 +9,8 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
   };
 
   $scope.state = {
-    formValidationError: ''
+    formValidationError: '',
+    deploymentInProgress: false
   };
 
   $scope.availableVolumeDrivers = [];
@@ -35,7 +36,6 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
   }
 
   $scope.create = function () {
-    $('#createVolumeSpinner').show();
 
     var name = $scope.formValues.Name;
     var driver = $scope.formValues.Driver;
@@ -46,10 +46,10 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     var isAdmin = userDetails.role === 1 ? true : false;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createVolumeSpinner').hide();
       return;
     }
 
+    $scope.state.deploymentInProgress = true;
     VolumeService.createVolume(volumeConfiguration)
     .then(function success(data) {
       var volumeIdentifier = data.Id;
@@ -64,7 +64,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
       Notifications.error('Failure', err, 'An error occured during volume creation');
     })
     .finally(function final() {
-      $('#createVolumeSpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   };
 

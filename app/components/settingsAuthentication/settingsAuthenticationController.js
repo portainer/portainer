@@ -5,7 +5,9 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
   $scope.state = {
     successfulConnectivityCheck: false,
     failedConnectivityCheck: false,
-    uploadInProgress: false
+    uploadInProgress: false,
+    connectivityCheckInProgress: false,
+    deploymentInProgress: false
   };
 
   $scope.formValues = {
@@ -21,13 +23,13 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
   };
 
   $scope.LDAPConnectivityCheck = function() {
-    $('#connectivityCheckSpinner').show();
     var settings = $scope.settings;
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
 
     var uploadRequired = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
     $scope.state.uploadInProgress = uploadRequired;
 
+    $scope.state.connectivityCheckInProgress = true;
     $q.when(!uploadRequired || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, null, null))
     .then(function success(data) {
       return SettingsService.checkLDAPConnectivity(settings);
@@ -44,18 +46,18 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     })
     .finally(function final() {
       $scope.state.uploadInProgress = false;
-      $('#connectivityCheckSpinner').hide();
+      $scope.state.connectivityCheckInProgress = false;
     });
   };
 
   $scope.saveSettings = function() {
-    $('#updateSettingsSpinner').show();
     var settings = $scope.settings;
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
 
     var uploadRequired = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
     $scope.state.uploadInProgress = uploadRequired;
 
+    $scope.state.deploymentInProgress = true;
     $q.when(!uploadRequired || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, null, null))
     .then(function success(data) {
       return SettingsService.update(settings);
@@ -68,7 +70,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     })
     .finally(function final() {
       $scope.state.uploadInProgress = false;
-      $('#updateSettingsSpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   };
 

@@ -98,8 +98,10 @@
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-disabled="!LDAPSettings.URL || !LDAPSettings.ReaderDN || !LDAPSettings.Password" ng-click="LDAPConnectivityCheck()">Test connectivity</button>
-                <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.connectivityCheckInProgress || !LDAPSettings.URL || !LDAPSettings.ReaderDN || !LDAPSettings.Password" ng-click="LDAPConnectivityCheck()" button-spinner="state.connectivityCheckInProgress">
+                  <span ng-hide="state.connectivityCheckInProgress">Test connectivity</span>
+                  <span ng-show="state.connectivityCheckInProgress">Testing connectivity...</span>
+                </button>
               </div>
             </div>
 
@@ -238,9 +240,10 @@
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="saveSettings()">Save</button>
-              <i id="updateSettingsSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
-              <!-- <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span> -->
+              <button type="button" class="btn btn-primary btn-sm" ng-click="saveSettings()" ng-disabled="state.deploymentInProgress" button-spinner="state.deploymentInProgress">
+                <span ng-hide="state.deploymentInProgress">Save settings</span>
+                <span ng-show="state.deploymentInProgress">Saving...</span>
+              </button>
             </div>
           </div>
           <!-- !actions -->

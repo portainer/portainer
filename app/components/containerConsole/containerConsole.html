@@ -8,11 +8,7 @@
 <div class="row" ng-if="state.loaded">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-terminal" title="Console">
-        <div class="pull-right">
-          <i id="loadConsoleSpinner" class="fa fa-cog fa-2x fa-spin" style="margin-top: 5px; display: none;"></i>
-        </div>
-      </rd-widget-header>
+      <rd-widget-header icon="fa-terminal" title="Console"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div ng-if="!state.connected">
@@ -52,8 +48,11 @@
               </div>
             </div>
             <div class="form-group">
-              <div class="col-lg-offset-1 col-sm-offset-2 col-lg-11 col-sm-10">
-                <button type="button" class="btn btn-primary" ng-click="connect()">Connect</button>
+              <div class="col-sm-12">
+                <button type="button" class="btn btn-primary" ng-disabled="state.connected" button-spinner="state.connected" ng-click="connect()">
+                  <span ng-hide="state.leaveNetworkInProgress">Connect</span>
+                  <span ng-show="state.leaveNetworkInProgress">Connecting...</span>
+                </button>
               </div>
             </div>
           </div>

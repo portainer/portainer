@@ -11,7 +11,8 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
   };
 
   $scope.state = {
-    formValidationError: ''
+    formValidationError: '',
+    deploymentInProgress: false
   };
 
   $scope.availableNetworkDrivers = [];
@@ -89,18 +90,16 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
   }
 
   $scope.create = function () {
-    $('#createResourceSpinner').show();
-
     var networkConfiguration = prepareConfiguration();
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true : false;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createResourceSpinner').hide();
       return;
     }
 
+    $scope.state.deploymentInProgress = true;
     NetworkService.create(networkConfiguration)
     .then(function success(data) {
       var networkIdentifier = data.Id;
@@ -115,7 +114,7 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
       Notifications.error('Failure', err, 'An error occured during network creation');
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   };
 

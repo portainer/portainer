@@ -2,9 +2,13 @@ angular.module('registry', [])
 .controller('RegistryController', ['$scope', '$state', '$transition$', '$filter', 'RegistryService', 'Notifications',
 function ($scope, $state, $transition$, $filter, RegistryService, Notifications) {
 
+  $scope.state = {
+    deploymentInProgress: false
+  };
+
   $scope.updateRegistry = function() {
-    $('#updateRegistrySpinner').show();
     var registry = $scope.registry;
+    $scope.state.deploymentInProgress = true;
     RegistryService.updateRegistry(registry)
     .then(function success(data) {
       Notifications.success('Registry successfully updated');
@@ -14,7 +18,7 @@ function ($scope, $state, $transition$, $filter, RegistryService, Notifications)
       Notifications.error('Failure', err, 'Unable to update registry');
     })
     .finally(function final() {
-      $('#updateRegistrySpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   };
 

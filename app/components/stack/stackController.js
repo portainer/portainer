@@ -2,15 +2,17 @@ angular.module('stack', [])
 .controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications', 'FormHelper',
 function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper) {
 
-  $scope.deployStack = function () {
-    $('#createResourceHint').show();
-    $('#deployButton').prop('disabled', true);
+  $scope.state = {
+    deploymentInProgress: false
+  };
 
+  $scope.deployStack = function () {
     // The codemirror editor does not work with ng-model so we need to retrieve
     // the value directly from the editor.
     var stackFile = $scope.editor.getValue();
     var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
 
+    $scope.state.deploymentInProgress = true;
     StackService.updateStack($scope.stack.Id, stackFile, env)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
@@ -20,8 +22,7 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
       Notifications.error('Failure', err, 'Unable to create stack');
     })
     .finally(function final() {
-      $('#createResourceHint').hide();
-      $('#deployButton').prop('disabled', false);
+      $scope.state.deploymentInProgress = false;
     });
   };
 

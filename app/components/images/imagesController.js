@@ -1,11 +1,14 @@
 angular.module('images', [])
 .controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'Pagination', 'ModalService',
 function ($scope, $state, ImageService, Notifications, Pagination, ModalService) {
-  $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('images');
+  $scope.state = {
+    pagination_count: Pagination.getPaginationCount('images'),
+    deploymentInProgress: false,
+    selectedItemCount: 0
+  };
+
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
-  $scope.state.selectedItemCount = 0;
 
   $scope.formValues = {
     Image: '',
@@ -39,11 +42,10 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
   };
 
   $scope.pullImage = function() {
-    $('#createResourceHint').show();
-    $('#deployButton').prop('disabled', true);
-
     var image = $scope.formValues.Image;
     var registry = $scope.formValues.Registry;
+
+    $scope.state.deploymentInProgress = true;
     ImageService.pullImage(image, registry, false)
     .then(function success(data) {
       Notifications.success('Image successfully pulled', image);
@@ -53,8 +55,7 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
       Notifications.error('Failure', err, 'Unable to pull image');
     })
     .finally(function final() {
-      $('#createResourceHint').hide();
-      $('#deployButton').prop('disabled', false);
+      $scope.state.deploymentInProgress = false;
     });
   };
 

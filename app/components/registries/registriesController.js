@@ -4,14 +4,15 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
 
   $scope.state = {
     selectedItemCount: 0,
-    pagination_count: Pagination.getPaginationCount('registries')
+    pagination_count: Pagination.getPaginationCount('registries'),
+    deploymentInProgress: false
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
 
   $scope.updateDockerHub = function() {
-    $('#updateDockerhubSpinner').show();
     var dockerhub = $scope.dockerhub;
+    $scope.state.deploymentInProgress = true;
     DockerHubService.update(dockerhub)
     .then(function success(data) {
       Notifications.success('DockerHub registry updated');
@@ -20,7 +21,7 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
       Notifications.error('Failure', err, 'Unable to update DockerHub details');
     })
     .finally(function final() {
-      $('#updateDockerhubSpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   };
 

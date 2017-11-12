@@ -20,7 +20,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   };
 
   $scope.state = {
-    formValidationError: ''
+    formValidationError: '',
+    deploymentInProgress: false
   };
 
   $scope.refreshSlider = function () {
@@ -570,18 +571,16 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       if (!confirm) {
         return false;
       }
-      $('#createResourceHint').show();
-      $('#deployButton').prop('disabled', true);
+
       var accessControlData = $scope.formValues.AccessControlData;
       var userDetails = Authentication.getUserDetails();
       var isAdmin = userDetails.role === 1 ? true : false;
 
       if (!validateForm(accessControlData, isAdmin)) {
-        $('#createResourceHint').hide();
-        $('#deployButton').prop('disabled', false);
         return;
       }
 
+      $scope.state.deploymentInProgress = true;
       var config = prepareConfiguration();
       createContainer(config, accessControlData);
     })
@@ -607,8 +606,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         Notifications.error('Failure', err, 'Unable to create container');
       })
       .finally(function final() {
-        $('#createResourceHint').hide();
-        $('#deployButton').prop('disabled', false);
+        $scope.state.deploymentInProgress = false;
       });
     });
   }
