@@ -1,6 +1,6 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
-  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
+  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
+  function ($q, $scope, $state, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = LocalStorage.getFilterContainerShowAll();
@@ -51,13 +51,23 @@ angular.module('containers', [])
   };
 
   var batch = function (items, action, msg) {
+    var counter = 0;
+    var complete = function () {
+      counter = counter - 1;
+      if (counter === 0) {
+        update({all: $scope.state.displayAll ? 1 : 0});
+      }
+    };
     angular.forEach(items, function (c) {
       if (c.Checked) {
+        counter = counter + 1;
         if (action === Container.start) {
           action({id: c.Id}, {}, function (d) {
             Notifications.success('Container ' + msg, c.Id);
+            complete();
           }, function (e) {
             Notifications.error('Failure', e, 'Unable to start container');
+            complete();
           });
         }
         else if (action === Container.remove) {
@@ -66,9 +76,11 @@ angular.module('containers', [])
             var index = items.indexOf(c);
             items.splice(index, 1);
             Notifications.success('Container successfully removed');
+            complete();
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove container');
+            complete();
           });
         }
         else if (action === Container.pause) {
@@ -78,15 +90,19 @@ angular.module('containers', [])
             } else {
               Notifications.success('Container ' + msg, c.Id);
             }
+            complete();
           }, function (e) {
             Notifications.error('Failure', e, 'Unable to pause container');
+            complete();
           });
         }
         else {
           action({id: c.Id}, function (d) {
             Notifications.success('Container ' + msg, c.Id);
+            complete();
           }, function (e) {
             Notifications.error('Failure', e, 'An error occured');
+            complete();
           });
         }
       }
