@@ -223,7 +223,7 @@ function ($scope, $q, SwarmService, InfoHelper, SystemService, NodeService, Endp
       .finally(function final() {
         //console.log("Complete swarm stats check");
       });
-      $('#loadEndpointsSpinner').hide();
+      $('#loadingViewSpinner').hide();
     });
   }
 
