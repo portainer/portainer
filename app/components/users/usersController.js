@@ -6,7 +6,7 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
     selectedItemCount: 0,
     validUsername: false,
     pagination_count: Pagination.getPaginationCount('users'),
-    deploymentInProgress: false
+    actionInProgress: false
   };
   $scope.sortType = 'RoleName';
   $scope.sortReverse = false;
@@ -58,7 +58,7 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
   };
 
   $scope.addUser = function() {
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     $scope.state.userCreationError = '';
     var username = $sanitize($scope.formValues.Username);
     var password = $sanitize($scope.formValues.Password);
@@ -76,7 +76,7 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
       Notifications.error('Failure', err, 'Unable to create user');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 

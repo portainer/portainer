@@ -40,7 +40,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
   $scope.state = {
     formValidationError: '',
-    deploymentInProgress: false
+    actionInProgress: false
   };
 
   $scope.refreshSlider = function () {
@@ -367,7 +367,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       Notifications.error('Failure', err, 'Unable to create service');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   }
 
@@ -393,7 +393,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       return;
     }
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     var config = prepareConfiguration();
     createNewService(config, accessControlData);
   };

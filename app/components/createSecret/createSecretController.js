@@ -12,7 +12,7 @@ function ($scope, $state, Notifications, SecretService, LabelHelper, Authenticat
 
   $scope.state = {
     formValidationError: '',
-    deploymentInProgress: false
+    actionInProgress: false
   };
 
   $scope.addLabel = function() {
@@ -65,7 +65,7 @@ function ($scope, $state, Notifications, SecretService, LabelHelper, Authenticat
       return;
     }
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     var secretConfiguration = prepareConfiguration();
     SecretService.create(secretConfiguration)
     .then(function success(data) {
@@ -81,7 +81,7 @@ function ($scope, $state, Notifications, SecretService, LabelHelper, Authenticat
       Notifications.error('Failure', err, 'Unable to create secret');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 }]);

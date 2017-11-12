@@ -56,9 +56,9 @@
           <!-- !authentication-credentials -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || dockerhub.Authentication && (!dockerhub.Username || !dockerhub.Password)" ng-click="updateDockerHub()" button-spinner="state.deploymentInProgress">
-                <span ng-hide="state.deploymentInProgress">Update</span>
-                <span ng-show="state.deploymentInProgress">Updating DockerHub settings...</span>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || dockerhub.Authentication && (!dockerhub.Username || !dockerhub.Password)" ng-click="updateDockerHub()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Update</span>
+                <span ng-show="state.actionInProgress">Updating DockerHub settings...</span>
               </button>
             </div>
           </div>

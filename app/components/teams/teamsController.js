@@ -6,7 +6,7 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
     selectedItemCount: 0,
     validName: false,
     pagination_count: Pagination.getPaginationCount('teams'),
-    deploymentInProgress: false
+    actionInProgress: false
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
@@ -55,7 +55,7 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
   };
 
   $scope.addTeam = function() {
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     $scope.state.teamCreationError = '';
     var teamName = $scope.formValues.Name;
     var leaderIds = [];
@@ -72,7 +72,7 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
       Notifications.error('Failure', err, 'Unable to create team');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 

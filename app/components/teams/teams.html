@@ -49,9 +49,9 @@
           <!-- !team-leaders -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || !state.validName || formValues.Name === ''" ng-click="addTeam()" button-spinner="state.deploymentInProgress">
-                <span ng-hide="state.deploymentInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create team</span>
-                <span ng-show="state.deploymentInProgress">Creating team...</span>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !state.validName || formValues.Name === ''" ng-click="addTeam()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create team</span>
+                <span ng-show="state.actionInProgress">Creating team...</span>
               </button>
               <span class="text-danger" ng-if="state.teamCreationError" style="margin: 5px;">
                 <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.teamCreationError }}

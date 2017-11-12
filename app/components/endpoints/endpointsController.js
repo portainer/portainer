@@ -5,7 +5,7 @@ function ($scope, $state, $filter, EndpointService, EndpointProvider, Notificati
     uploadInProgress: false,
     selectedItemCount: 0,
     pagination_count: Pagination.getPaginationCount('endpoints'),
-    deploymentInProgress: false
+    actionInProgress: false
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
@@ -60,13 +60,13 @@ function ($scope, $state, $filter, EndpointService, EndpointProvider, Notificati
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
       Notifications.success('Endpoint created', name);
       $state.reload();
     }, function error(err) {
       $scope.state.uploadInProgress = false;
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
       Notifications.error('Failure', err, 'Unable to create endpoint');
     }, function update(evt) {
       if (evt.upload) {

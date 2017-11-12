@@ -4,7 +4,7 @@ function ($scope, $state, RegistryService, Notifications) {
 
   $scope.state = {
     RegistryType: 'quay',
-    deploymentInProgress: false
+    actionInProgress: false
   };
 
   $scope.formValues = {
@@ -34,7 +34,7 @@ function ($scope, $state, RegistryService, Notifications) {
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     RegistryService.createRegistry(registryName, registryURL, authentication, username, password)
     .then(function success(data) {
       Notifications.success('Registry successfully created');
@@ -44,7 +44,7 @@ function ($scope, $state, RegistryService, Notifications) {
       Notifications.error('Failure', err, 'Unable to create registry');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 }]);

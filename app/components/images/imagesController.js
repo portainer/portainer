@@ -3,7 +3,7 @@ angular.module('images', [])
 function ($scope, $state, ImageService, Notifications, Pagination, ModalService) {
   $scope.state = {
     pagination_count: Pagination.getPaginationCount('images'),
-    deploymentInProgress: false,
+    actionInProgress: false,
     selectedItemCount: 0
   };
 
@@ -45,7 +45,7 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
     var image = $scope.formValues.Image;
     var registry = $scope.formValues.Registry;
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     ImageService.pullImage(image, registry, false)
     .then(function success(data) {
       Notifications.success('Image successfully pulled', image);
@@ -55,7 +55,7 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
       Notifications.error('Failure', err, 'Unable to pull image');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 
