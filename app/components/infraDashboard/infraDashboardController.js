@@ -78,7 +78,6 @@ function ($scope, $q, SwarmService, InfoHelper, SystemService, NodeService, Endp
       var nodes = [];
       if (endpointMode.role == "MANAGER") {
         infoData = data.info;
-        foundLeader = false;
 
         //var dataInfoStr = JSON.stringify(infoData);
         //console.log("MANAGER DATA: " + dataInfoStr);
@@ -86,6 +85,8 @@ function ($scope, $q, SwarmService, InfoHelper, SystemService, NodeService, Endp
         NodeService.nodesByEndpointId(endpointId)
         .then(function success(data) {
             nodes = [];
+            var foundLeader = false;
+
             for (var i = 0; i < data.length; i++) {
                 var nodeEntry = data[i];
                 var node = {};
@@ -107,6 +108,9 @@ function ($scope, $q, SwarmService, InfoHelper, SystemService, NodeService, Endp
 
                 if (nodeEntry.Model.ManagerStatus && nodeEntry.Model.ManagerStatus.Leader && nodeEntry.Model.ManagerStatus.Leader == true) {
                     if (infoData.Name == node.Hostname) {
+
+                        //console.log("COMPARING: " + infoData.Name + " WITH: " + node.Hostname);
+
                         foundLeader = true;
                     }
                 }
@@ -177,23 +181,26 @@ function ($scope, $q, SwarmService, InfoHelper, SystemService, NodeService, Endp
             $scope.stats.WorkerCount += 1;
         }
 
-        for (var k = 0; k < swarmEntry.nodes.length; k++) {
-            var node = swarmEntry.nodes[k];
+        // Only get stats from leaders
+        if (swarmEntry.provider == "DOCKER_SWARM_MODE" && swarmEntry.leader == true) {
+            for (var k = 0; k < swarmEntry.nodes.length; k++) {
+                var node = swarmEntry.nodes[k];
 
-            if (node) {
-                if (node.OS == "linux") {
-                    $scope.stats.OSLinuxCount += 1;
-                } else if (node.OS == "windows") {
-                    $scope.stats.OSWindowsCount += 1;
-                } else {
-                    $scope.stats.OSOtherCount += 1;
-                }
-
-                if (node.Availability == "active") {
-                    if (node.Role == "manager") {
-                        $scope.stats.ActiveManagerCount += 1;
+                if (node) {
+                    if (node.OS == "linux") {
+                        $scope.stats.OSLinuxCount += 1;
+                    } else if (node.OS == "windows") {
+                        $scope.stats.OSWindowsCount += 1;
                     } else {
-                        $scope.stats.ActiveWorkerCount += 1;
+                        $scope.stats.OSOtherCount += 1;
+                    }
+
+                    if (node.Availability == "active") {
+                        if (node.Role == "manager") {
+                            $scope.stats.ActiveManagerCount += 1;
+                        } else {
+                            $scope.stats.ActiveWorkerCount += 1;
+                        }
                     }
                 }
             }
@@ -206,6 +213,17 @@ function ($scope, $q, SwarmService, InfoHelper, SystemService, NodeService, Endp
 
     $scope.applicationState.infra = true;
     $scope.swarms = [];
+
+    $scope.stats = {
+        ActiveSwarms: 0,
+        ManagerCount: 0,
+        ActiveManagerCount: 0,
+        WorkerCount: 0,
+        ActiveWorkerCount: 0,
+        OSWindowsCount: 0,
+        OSLinuxCount: 0,
+        OSOtherCount: 0
+    };
 
     EndpointService.endpoints()
     .then(function success(data) {
