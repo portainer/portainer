@@ -39,7 +39,8 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   };
 
   $scope.state = {
-    formValidationError: ''
+    formValidationError: '',
+    deploymentInProgress: false
   };
 
   $scope.refreshSlider = function () {
@@ -366,7 +367,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       Notifications.error('Failure', err, 'Unable to create service');
     })
     .finally(function final() {
-      $('#createServiceSpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   }
 
@@ -383,17 +384,16 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   }
 
   $scope.create = function createService() {
-    $('#createServiceSpinner').show();
 
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true : false;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createServiceSpinner').hide();
       return;
     }
 
+    $scope.state.deploymentInProgress = true;
     var config = prepareConfiguration();
     createNewService(config, accessControlData);
   };
@@ -422,7 +422,6 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     var provider = $scope.applicationState.endpoint.mode.provider;
 
@@ -448,9 +447,6 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

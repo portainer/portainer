@@ -1,7 +1,5 @@
 <rd-header>
-  <rd-header-title title="Endpoint details">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
+  <rd-header-title title="Endpoint details"></rd-header-title>
   <rd-header-content>
     <a ui-sref="endpoints">Endpoints</a> &gt; <a ui-sref="endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a>
   </rd-header-content>
@@ -55,9 +53,11 @@
           <!-- !endpoint-security -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!endpoint.Name || !endpoint.URL || (endpoint.TLS && ((endpoint.TLSVerify && !formValues.TLSCACert) || (endpoint.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="updateEndpoint()">Update endpoint</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || !endpoint.Name || !endpoint.URL || (endpoint.TLS && ((endpoint.TLSVerify && !formValues.TLSCACert) || (endpoint.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="updateEndpoint()" button-spinner="state.deploymentInProgress">
+                <span ng-hide="state.deploymentInProgress">Update endpoint</span>
+                <span ng-show="state.deploymentInProgress">Updating endpoint...</span>
+              </button>
               <a type="button" class="btn btn-default btn-sm" ui-sref="endpoints">Cancel</a>
-              <i id="updateResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
         </form>

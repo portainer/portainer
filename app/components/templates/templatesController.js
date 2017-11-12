@@ -7,6 +7,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     hideDescriptions: $transition$.params().hide_descriptions,
     formValidationError: '',
     showDeploymentSelector: false,
+    deploymentInProgress: false,
     filters: {
       Categories: '!',
       Platform: '!',
@@ -85,7 +86,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       Notifications.error('Failure', err, err.msg);
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   }
 
@@ -113,26 +114,24 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       $state.go('stacks', {}, {reload: true});
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   }
 
   $scope.createTemplate = function() {
-    $('#createResourceSpinner').show();
-
     var userDetails = Authentication.getUserDetails();
     var userId = userDetails.ID;
     var accessControlData = $scope.formValues.AccessControlData;
     var isAdmin = userDetails.role === 1 ? true : false;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createResourceSpinner').hide();
       return;
     }
 
     var template = $scope.state.selectedTemplate;
     var templatesKey = $scope.templatesKey;
 
+    $scope.state.deploymentInProgress = true;
     if (template.Type === 'stack') {
       createStackFromTemplate(template, userId, accessControlData);
     } else {
@@ -234,9 +233,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     .catch(function error(err) {
       $scope.templates = [];
       Notifications.error('Failure', err, 'An error occured during apps initialization.');
-    })
-    .finally(function final(){
-      $('#loadingViewSpinner').hide();
     });
   }
 

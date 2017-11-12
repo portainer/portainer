@@ -3,7 +3,6 @@ angular.module('volume', [])
 function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications) {
 
   $scope.removeVolume = function removeVolume() {
-    $('#loadingViewSpinner').show();
     VolumeService.remove($scope.volume)
     .then(function success(data) {
       Notifications.success('Volume successfully removed', $transition$.params().id);
@@ -11,9 +10,6 @@ function ($scope, $state, $transition$, VolumeService, ContainerService, Notific
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to remove volume');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
@@ -24,7 +20,6 @@ function ($scope, $state, $transition$, VolumeService, ContainerService, Notific
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     VolumeService.volume($transition$.params().id)
     .then(function success(data) {
       var volume = data;
@@ -41,9 +36,6 @@ function ($scope, $state, $transition$, VolumeService, ContainerService, Notific
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve volume details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

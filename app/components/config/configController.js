@@ -3,7 +3,6 @@ angular.module('config', [])
 function ($scope, $transition$, $state, $document, ConfigService, Notifications, CodeMirrorService) {
 
   $scope.removeConfig = function removeConfig(configId) {
-    $('#loadingViewSpinner').show();
     ConfigService.remove(configId)
     .then(function success(data) {
       Notifications.success('Config successfully removed');
@@ -11,9 +10,6 @@ function ($scope, $transition$, $state, $document, ConfigService, Notifications,
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to remove config');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
@@ -27,7 +23,6 @@ function ($scope, $transition$, $state, $document, ConfigService, Notifications,
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     ConfigService.config($transition$.params().id)
     .then(function success(data) {
       $scope.config = data;
@@ -35,9 +30,6 @@ function ($scope, $transition$, $state, $document, ConfigService, Notifications,
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve config details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

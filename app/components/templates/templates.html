@@ -3,7 +3,6 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="templates" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Templates</rd-header-content>
 </rd-header>
@@ -60,10 +59,15 @@
           <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.name" ng-click="createTemplate()">Create</button>
-              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || !formValues.name" ng-click="createTemplate()" button-spinner="state.deploymentInProgress">
+                <span ng-hide="state.deploymentInProgress">Deploy the stack</span>
+                <span ng-show="state.deploymentInProgress">Deployment in progress...</span>
+              </button>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
@@ -287,10 +291,15 @@
           </div>
           <!-- !advanced-options -->
           <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.network" ng-click="createTemplate()">Create</button>
-              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || !formValues.network" ng-click="createTemplate()" button-spinner="state.deploymentInProgress">
+                <span ng-hide="state.deploymentInProgress">Deploy the container</span>
+                <span ng-show="state.deploymentInProgress">Deployment in progress...</span>
+              </button>
               <span class="small text-muted" style="margin-left: 10px" ng-if="globalNetworkCount === 0 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM' && !state.formValidationError">
                 When using Swarm, we recommend deploying containers in a shared network. Looks like you don't have any shared network, head over the <a ui-sref="networks">networks view</a> to create one.
               </span>

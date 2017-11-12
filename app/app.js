@@ -1,5 +1,5 @@
 angular.module('portainer')
-.run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics) {
+.run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'cfpLoadingBar', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, cfpLoadingBar) {
   'use strict';
 
   EndpointProvider.initialize();
@@ -18,6 +18,15 @@ angular.module('portainer')
   });
 
   $rootScope.$state = $state;
+
+  // Workaround to prevent the loading bar from going backward
+  // https://github.com/chieffancypants/angular-loading-bar/issues/273
+  var originalSet = cfpLoadingBar.set;
+  cfpLoadingBar.set = function overrideSet(n) {
+    if (n > cfpLoadingBar.status()) {
+      originalSet.apply(cfpLoadingBar, arguments);
+    }
+  };
 }]);
 
 

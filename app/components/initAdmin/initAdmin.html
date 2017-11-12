@@ -64,8 +64,10 @@
             <!-- actions -->
             <div class="form-group">
               <div class="col-sm-12">
-                <button type="submit" class="btn btn-primary btn-sm" ng-disabled="formValues.Password.length < 8 || formValues.Password !== formValues.ConfirmPassword" ng-click="createAdminUser()"><i class="fa fa-user-plus" aria-hidden="true"></i> Create user</button>
-                <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+                <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || formValues.Password.length < 8 || formValues.Password !== formValues.ConfirmPassword" ng-click="createAdminUser()" button-spinner="state.deploymentInProgress">                  
+                  <span ng-hide="state.deploymentInProgress"><i class="fa fa-user-plus" aria-hidden="true"></i> Create user</span>
+                  <span ng-show="state.deploymentInProgress">Creating user...</span>
+                </button>
               </div>
             </div>
             <!-- !actions -->

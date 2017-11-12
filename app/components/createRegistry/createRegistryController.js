@@ -3,7 +3,8 @@ angular.module('createRegistry', [])
 function ($scope, $state, RegistryService, Notifications) {
 
   $scope.state = {
-    RegistryType: 'quay'
+    RegistryType: 'quay',
+    deploymentInProgress: false
   };
 
   $scope.formValues = {
@@ -27,13 +28,13 @@ function ($scope, $state, RegistryService, Notifications) {
   };
 
   $scope.addRegistry = function() {
-    $('#createRegistrySpinner').show();
     var registryName = $scope.formValues.Name;
     var registryURL = $scope.formValues.URL.replace(/^https?\:\/\//i, '');
     var authentication = $scope.formValues.Authentication;
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
 
+    $scope.state.deploymentInProgress = true;
     RegistryService.createRegistry(registryName, registryURL, authentication, username, password)
     .then(function success(data) {
       Notifications.success('Registry successfully created');
@@ -43,7 +44,7 @@ function ($scope, $state, RegistryService, Notifications) {
       Notifications.error('Failure', err, 'Unable to create registry');
     })
     .finally(function final() {
-      $('#createRegistrySpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   };
 }]);

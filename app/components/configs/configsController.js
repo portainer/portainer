@@ -30,17 +30,8 @@ function ($scope, $stateParams, $state, ConfigService, Notifications, Pagination
   };
 
   $scope.removeAction = function () {
-    $('#loadingViewSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadingViewSpinner').hide();
-      }
-    };
     angular.forEach($scope.configs, function (config) {
       if (config.Checked) {
-        counter = counter + 1;
         ConfigService.remove(config.Id)
         .then(function success() {
           Notifications.success('Config deleted', config.Id);
@@ -49,16 +40,12 @@ function ($scope, $stateParams, $state, ConfigService, Notifications, Pagination
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove config');
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     ConfigService.configs()
     .then(function success(data) {
       $scope.configs = data;
@@ -66,9 +53,6 @@ function ($scope, $stateParams, $state, ConfigService, Notifications, Pagination
     .catch(function error(err) {
       $scope.configs = [];
       Notifications.error('Failure', err, 'Unable to retrieve configs');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

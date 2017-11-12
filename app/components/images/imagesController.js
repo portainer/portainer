@@ -1,11 +1,14 @@
 angular.module('images', [])
 .controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'Pagination', 'ModalService',
 function ($scope, $state, ImageService, Notifications, Pagination, ModalService) {
-  $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('images');
+  $scope.state = {
+    pagination_count: Pagination.getPaginationCount('images'),
+    deploymentInProgress: false,
+    selectedItemCount: 0
+  };
+
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
-  $scope.state.selectedItemCount = 0;
 
   $scope.formValues = {
     Image: '',
@@ -39,9 +42,10 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
   };
 
   $scope.pullImage = function() {
-    $('#pullImageSpinner').show();
     var image = $scope.formValues.Image;
     var registry = $scope.formValues.Registry;
+
+    $scope.state.deploymentInProgress = true;
     ImageService.pullImage(image, registry, false)
     .then(function success(data) {
       Notifications.success('Image successfully pulled', image);
@@ -51,7 +55,7 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
       Notifications.error('Failure', err, 'Unable to pull image');
     })
     .finally(function final() {
-      $('#pullImageSpinner').hide();
+      $scope.state.deploymentInProgress = false;
     });
   };
 
@@ -64,17 +68,8 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
 
   $scope.removeAction = function (force) {
     force = !!force;
-    $('#loadImagesSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadImagesSpinner').hide();
-      }
-    };
     angular.forEach($scope.images, function (i) {
       if (i.Checked) {
-        counter = counter + 1;
         ImageService.deleteImage(i.Id, force)
         .then(function success(data) {
           Notifications.success('Image deleted', i.Id);
@@ -83,16 +78,12 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove image');
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
   };
 
   function fetchImages() {
-    $('#loadImagesSpinner').show();
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     ImageService.images(true)
@@ -102,9 +93,6 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve images');
       $scope.images = [];
-    })
-    .finally(function final() {
-      $('#loadImagesSpinner').hide();
     });
   }
 
