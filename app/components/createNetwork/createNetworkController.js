@@ -12,7 +12,7 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
 
   $scope.state = {
     formValidationError: '',
-    deploymentInProgress: false
+    actionInProgress: false
   };
 
   $scope.availableNetworkDrivers = [];
@@ -99,7 +99,7 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
       return;
     }
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     NetworkService.create(networkConfiguration)
     .then(function success(data) {
       var networkIdentifier = data.Id;
@@ -114,7 +114,7 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
       Notifications.error('Failure', err, 'An error occured during network creation');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 

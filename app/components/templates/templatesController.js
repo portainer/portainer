@@ -7,7 +7,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     hideDescriptions: $transition$.params().hide_descriptions,
     formValidationError: '',
     showDeploymentSelector: false,
-    deploymentInProgress: false,
+    actionInProgress: false,
     filters: {
       Categories: '!',
       Platform: '!',
@@ -86,7 +86,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       Notifications.error('Failure', err, err.msg);
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   }
 
@@ -114,7 +114,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       $state.go('stacks', {}, {reload: true});
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   }
 
@@ -131,7 +131,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     var template = $scope.state.selectedTemplate;
     var templatesKey = $scope.templatesKey;
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     if (template.Type === 'stack') {
       createStackFromTemplate(template, userId, accessControlData);
     } else {

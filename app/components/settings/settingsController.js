@@ -3,7 +3,7 @@ angular.module('settings', [])
 function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_TEMPLATES_URL) {
 
   $scope.state = {
-    deploymentInProgress: false
+    actionInProgress: false
   };
 
   $scope.formValues = {
@@ -49,7 +49,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
     settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     updateSettings(settings, false);
   };
 
@@ -72,7 +72,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
       Notifications.error('Failure', err, 'Unable to update settings');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   }
 

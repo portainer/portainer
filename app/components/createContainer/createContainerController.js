@@ -21,7 +21,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
   $scope.state = {
     formValidationError: '',
-    deploymentInProgress: false
+    actionInProgress: false
   };
 
   $scope.refreshSlider = function () {
@@ -580,7 +580,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         return;
       }
 
-      $scope.state.deploymentInProgress = true;
+      $scope.state.actionInProgress = true;
       var config = prepareConfiguration();
       createContainer(config, accessControlData);
     })
@@ -606,7 +606,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         Notifications.error('Failure', err, 'Unable to create container');
       })
       .finally(function final() {
-        $scope.state.deploymentInProgress = false;
+        $scope.state.actionInProgress = false;
       });
     });
   }

@@ -7,7 +7,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     failedConnectivityCheck: false,
     uploadInProgress: false,
     connectivityCheckInProgress: false,
-    deploymentInProgress: false
+    actionInProgress: false
   };
 
   $scope.formValues = {
@@ -57,7 +57,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     var uploadRequired = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
     $scope.state.uploadInProgress = uploadRequired;
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     $q.when(!uploadRequired || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, null, null))
     .then(function success(data) {
       return SettingsService.update(settings);
@@ -70,7 +70,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     })
     .finally(function final() {
       $scope.state.uploadInProgress = false;
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 

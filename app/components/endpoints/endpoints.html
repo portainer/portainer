@@ -65,9 +65,9 @@
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || !formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addEndpoint()" button-spinner="state.deploymentInProgress">
-                <span ng-hide="state.deploymentInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
-                <span ng-show="state.deploymentInProgress">Creating endpoint...</span>  
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addEndpoint()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
+                <span ng-show="state.actionInProgress">Creating endpoint...</span>  
               </button>
 
           </div>

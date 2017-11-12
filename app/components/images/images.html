@@ -28,9 +28,9 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || !formValues.Image" ng-click="pullImage()" button-spinner="state.deploymentInProgress">
-                <span ng-hide="state.deploymentInProgress">Pull the image</span>
-                <span ng-show="state.deploymentInProgress">Download in progress...</span>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Image" ng-click="pullImage()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Pull the image</span>
+                <span ng-show="state.actionInProgress">Download in progress...</span>
               </button>
             </div>
           </div>
