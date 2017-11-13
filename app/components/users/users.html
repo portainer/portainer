@@ -3,7 +3,6 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="users" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
-    <i id="loadUsersSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>User management</rd-header-content>
 </rd-header>
@@ -98,8 +97,10 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!state.validUsername || formValues.Username === '' || (AuthenticationMethod === 1 && formValues.Password === '') || (AuthenticationMethod === 1 && formValues.Password !== formValues.ConfirmPassword)" ng-click="addUser()"><i class="fa fa-user-plus" aria-hidden="true"></i> Add user</button>
-              <i id="createUserSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !state.validUsername || formValues.Username === '' || (AuthenticationMethod === 1 && formValues.Password === '') || (AuthenticationMethod === 1 && formValues.Password !== formValues.ConfirmPassword)" ng-click="addUser()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create user</span>
+                <span ng-show="state.actionInProgress">Creating user...</span>
+              </button>
               <span class="text-danger" ng-if="state.userCreationError" style="margin: 5px;">
                 <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.userCreationError }}
               </span>

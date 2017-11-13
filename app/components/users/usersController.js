@@ -5,7 +5,8 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
     userCreationError: '',
     selectedItemCount: 0,
     validUsername: false,
-    pagination_count: Pagination.getPaginationCount('users')
+    pagination_count: Pagination.getPaginationCount('users'),
+    actionInProgress: false
   };
   $scope.sortType = 'RoleName';
   $scope.sortReverse = false;
@@ -57,7 +58,7 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
   };
 
   $scope.addUser = function() {
-    $('#createUserSpinner').show();
+    $scope.state.actionInProgress = true;
     $scope.state.userCreationError = '';
     var username = $sanitize($scope.formValues.Username);
     var password = $sanitize($scope.formValues.Password);
@@ -75,22 +76,13 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
       Notifications.error('Failure', err, 'Unable to create user');
     })
     .finally(function final() {
-      $('#createUserSpinner').hide();
+      $scope.state.actionInProgress = false;
     });
   };
 
   function deleteSelectedUsers() {
-    $('#loadUsersSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadUsersSpinner').hide();
-      }
-    };
     angular.forEach($scope.users, function (user) {
       if (user.Checked) {
-        counter = counter + 1;
         UserService.deleteUser(user.Id)
         .then(function success(data) {
           var index = $scope.users.indexOf(user);
@@ -99,9 +91,6 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove user');
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
@@ -133,7 +122,6 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
   }
 
   function initView() {
-    $('#loadUsersSpinner').show();
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true: false;
     $scope.isAdmin = isAdmin;
@@ -154,9 +142,6 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
       Notifications.error('Failure', err, 'Unable to retrieve users and teams');
       $scope.users = [];
       $scope.teams = [];
-    })
-    .finally(function final() {
-      $('#loadUsersSpinner').hide();
     });
   }
 

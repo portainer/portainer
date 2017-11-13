@@ -5,6 +5,6 @@ angular.module('portainer.rest')
     endpointId: EndpointProvider.endpointID
   },
   {
-    commit: {method: 'POST', params: {container: '@id', repo: '@repo', tag: '@tag'}}
+    commit: {method: 'POST', params: {container: '@id', repo: '@repo', tag: '@tag'}, ignoreLoadingBar: true}
   });
 }]);

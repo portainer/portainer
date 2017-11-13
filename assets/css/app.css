@@ -1,6 +1,10 @@
-html, body, #content-wrapper, .page-content, #view {
+html, body, #page-wrapper, #content-wrapper, .page-content, #view {
   height: 100%;
   width: 100%;
+}
+
+#view {
+  position: relative;
 }
 
 .white-space-normal {
@@ -359,6 +363,11 @@ ul.sidebar .sidebar-list a.active {
   padding-right: 0;
 }
 
+.createResource {
+  margin-left: 5px;
+  font-size: 90%;
+}
+
 ul.sidebar .sidebar-list .sidebar-sublist a {
   text-indent: 35px;
   font-size: 12px;
@@ -692,6 +701,19 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 }
 /*!toaster override*/
 
+/*angular-loading-bar override*/
+#loadingbar-placeholder {
+  margin-bottom: 0;
+  height: 3px;
+}
+
+#loading-bar .bar {
+  position: relative;
+  height: 3px;
+  background: #738bc0;
+}
+/*!angular-loading-bar override*/
+
 .monospaced {
   font-family: monospace;
   font-weight: 600;
@@ -712,4 +734,8 @@ json-tree .branch-preview {
   font-style: normal;
   font-size: 11px;
   opacity: .5;
+}
+
+.row.header .meta .page {
+  padding-top: 7px;
 }

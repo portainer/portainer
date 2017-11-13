@@ -68,11 +68,9 @@ function ($scope, $state, $transition$, LabelHelper, Node, NodeHelper, Task, Pag
     config.Labels = LabelHelper.fromKeyValueToLabelHash(node.Labels);
 
     Node.update({ id: node.Id, version: node.Version }, config, function (data) {
-      $('#loadServicesSpinner').hide();
       Notifications.success('Node successfully updated', 'Node updated');
       $state.go('node', {id: node.Id}, {reload: true});
     }, function (e) {
-      $('#loadServicesSpinner').hide();
       Notifications.error('Failure', e, 'Failed to update node');
     });
   };

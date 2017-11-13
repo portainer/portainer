@@ -9,7 +9,8 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
   $scope.logo = StateManager.getState().application.logo;
 
   $scope.state = {
-    uploadInProgress: false
+    uploadInProgress: false,
+    actionInProgress: false
   };
 
   $scope.formValues = {
@@ -25,11 +26,11 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
   };
 
   $scope.createLocalEndpoint = function() {
-    $('#createResourceSpinner').show();
     var name = 'local';
     var URL = 'unix:///var/run/docker.sock';
-
     var endpointID = 1;
+
+    $scope.state.actionInProgress = true;
     EndpointService.createLocalEndpoint(name, URL, false, true)
     .then(function success(data) {
       endpointID = data.Id;
@@ -44,12 +45,11 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
       EndpointService.deleteEndpoint(endpointID);
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $scope.state.actionInProgress = false;
     });
   };
 
   $scope.createRemoteEndpoint = function() {
-    $('#createResourceSpinner').show();
     var name = $scope.formValues.Name;
     var URL = $scope.formValues.URL;
     var PublicURL = URL.split(':')[0];
@@ -59,8 +59,9 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var TLSCAFile = TLSSkipVerify ? null : $scope.formValues.TLSCACert;
     var TLSCertFile = TLSSKipClientVerify ? null : $scope.formValues.TLSCert;
     var TLSKeyFile = TLSSKipClientVerify ? null : $scope.formValues.TLSKey;
-
     var endpointID = 1;
+
+    $scope.state.actionInProgress = true;
     EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       endpointID = data.Id;
@@ -75,7 +76,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
       EndpointService.deleteEndpoint(endpointID);
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $scope.state.actionInProgress = false;
     });
   };
 }]);

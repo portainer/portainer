@@ -4,14 +4,15 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
 
   $scope.state = {
     selectedItemCount: 0,
-    pagination_count: Pagination.getPaginationCount('registries')
+    pagination_count: Pagination.getPaginationCount('registries'),
+    actionInProgress: false
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
 
   $scope.updateDockerHub = function() {
-    $('#updateDockerhubSpinner').show();
     var dockerhub = $scope.dockerhub;
+    $scope.state.actionInProgress = true;
     DockerHubService.update(dockerhub)
     .then(function success(data) {
       Notifications.success('DockerHub registry updated');
@@ -20,7 +21,7 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
       Notifications.error('Failure', err, 'Unable to update DockerHub details');
     })
     .finally(function final() {
-      $('#updateDockerhubSpinner').hide();
+      $scope.state.actionInProgress = false;
     });
   };
 
@@ -61,19 +62,9 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
   };
 
   function removeRegistries() {
-    $('#loadingViewSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadingViewSpinner').hide();
-      }
-    };
-
     var registries = $scope.registries;
     angular.forEach(registries, function (registry) {
       if (registry.Checked) {
-        counter = counter + 1;
         RegistryService.deleteRegistry(registry.Id)
         .then(function success(data) {
           var index = registries.indexOf(registry);
@@ -82,16 +73,12 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove registry');
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     $q.all({
       registries: RegistryService.registries(),
       dockerhub: DockerHubService.dockerhub()
@@ -103,9 +90,6 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
     .catch(function error(err) {
       $scope.registries = [];
       Notifications.error('Failure', err, 'Unable to retrieve registries');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

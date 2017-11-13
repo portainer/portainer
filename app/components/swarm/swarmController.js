@@ -72,8 +72,6 @@ function ($q, $scope, SystemService, NodeService, Pagination, Notifications, Sta
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
-
     if (StateManager.getState().application.authentication) {
       var userDetails = Authentication.getUserDetails();
       var isAdmin = userDetails.role === 1 ? true: false;
@@ -99,9 +97,6 @@ function ($q, $scope, SystemService, NodeService, Pagination, Notifications, Sta
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve cluster details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

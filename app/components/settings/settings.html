@@ -1,7 +1,5 @@
 <rd-header>
-  <rd-header-title title="Settings">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
-  </rd-header-title>
+  <rd-header-title title="Settings"></rd-header-title>
   <rd-header-content>Settings</rd-header-content>
 </rd-header>
 
@@ -133,9 +131,10 @@
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" disabled ng-click="saveApplicationSettings()">Save</button>
-              <i id="updateSettingsSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
-              <!-- <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span> -->
+              <button type="button" class="btn btn-primary btn-sm" ng-click="saveApplicationSettings()" ng-disabled="state.actionInProgress" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Save settings</span>
+                <span ng-show="state.actionInProgress">Saving...</span>
+              </button>
             </div>
           </div>
           <!-- !actions -->

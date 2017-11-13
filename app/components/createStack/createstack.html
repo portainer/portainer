@@ -1,7 +1,5 @@
 <rd-header>
-  <rd-header-title title="Create stack">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="display: none;"></i>
-  </rd-header-title>
+  <rd-header-title title="Create stack"></rd-header-title>
   <rd-header-content>
     <a ui-sref="stacks">Stacks</a> > Add stack
   </rd-header-content>
@@ -169,12 +167,13 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="(state.Method === 'editor' && !formValues.StackFileContent)
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || (state.Method === 'editor' && !formValues.StackFileContent)
               || (state.Method === 'upload' && !formValues.StackFile)
               || (state.Method === 'repository' && (!formValues.RepositoryURL || !formValues.RepositoryPath))
-              || !formValues.Name" ng-click="deployStack()">Deploy the stack</button>
-              <a type="button" class="btn btn-default btn-sm" ui-sref="stacks">Cancel</a>
-              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              || !formValues.Name" ng-click="deployStack()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Deploy the stack</span>
+                <span ng-show="state.actionInProgress">Deployment in progress...</span>
+              </button>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>

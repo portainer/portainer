@@ -25,15 +25,12 @@ function ($q, $scope, $transition$, $state, Service, ServiceService, ServiceHelp
   };
 
   $scope.scaleService = function scaleService(service) {
-    $('#loadServicesSpinner').show();
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Mode.Replicated.Replicas = service.Replicas;
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
-      $('#loadServicesSpinner').hide();
       Notifications.success('Service successfully scaled', 'New replica count: ' + service.Replicas);
       $state.reload();
     }, function (e) {
-      $('#loadServicesSpinner').hide();
       service.Scale = false;
       service.Replicas = service.ReplicaCount;
       Notifications.error('Failure', e, 'Unable to scale service');
@@ -51,17 +48,8 @@ function ($q, $scope, $transition$, $state, Service, ServiceService, ServiceHelp
   };
 
   function removeServices() {
-    $('#loadServicesSpinner').show();
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        $('#loadServicesSpinner').hide();
-      }
-    };
     angular.forEach($scope.services, function (service) {
       if (service.Checked) {
-        counter = counter + 1;
         ServiceService.remove(service)
         .then(function success(data) {
           Notifications.success('Service successfully deleted');
@@ -70,9 +58,6 @@ function ($q, $scope, $transition$, $state, Service, ServiceService, ServiceHelp
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove service');
-        })
-        .finally(function final() {
-          complete();
         });
       }
     });
@@ -94,7 +79,6 @@ function ($q, $scope, $transition$, $state, Service, ServiceService, ServiceHelp
   }
 
   function initView() {
-    $('#loadServicesSpinner').show();
     $q.all({
       services: Service.query({}).$promise,
       tasks: Task.query({filters: {'desired-state': ['running','accepted']}}).$promise,
@@ -118,9 +102,6 @@ function ($q, $scope, $transition$, $state, Service, ServiceService, ServiceHelp
     .catch(function error(err) {
       $scope.services = [];
       Notifications.error('Failure', err, 'Unable to retrieve services');
-    })
-    .finally(function final() {
-      $('#loadServicesSpinner').hide();
     });
   }
 

@@ -65,8 +65,6 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
-
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var endpointRole = $scope.applicationState.endpoint.mode.role;
 
@@ -86,9 +84,7 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
       prepareInfoData(d[4]);
       $scope.serviceCount = d[5].length;
       $scope.stackCount = d[6].length;
-      $('#loadingViewSpinner').hide();
     }, function(e) {
-      $('#loadingViewSpinner').hide();
       Notifications.error('Failure', e, 'Unable to load dashboard data');
     });
   }

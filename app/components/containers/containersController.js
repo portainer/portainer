@@ -1,6 +1,6 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
-  function ($q, $scope, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
+  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
+  function ($q, $scope, $state, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('containers');
   $scope.state.displayAll = LocalStorage.getFilterContainerShowAll();
@@ -24,7 +24,6 @@ angular.module('containers', [])
   $scope.cleanAssociatedVolumes = false;
 
   var update = function (data) {
-    $('#loadContainersSpinner').show();
     $scope.state.selectedItemCount = 0;
     Container.query(data, function (d) {
       var containers = d;
@@ -45,21 +44,17 @@ angular.module('containers', [])
         return model;
       });
       updateSelectionFlags();
-      $('#loadContainersSpinner').hide();
     }, function (e) {
-      $('#loadContainersSpinner').hide();
       Notifications.error('Failure', e, 'Unable to retrieve containers');
       $scope.containers = [];
     });
   };
 
   var batch = function (items, action, msg) {
-    $('#loadContainersSpinner').show();
     var counter = 0;
     var complete = function () {
       counter = counter - 1;
       if (counter === 0) {
-        $('#loadContainersSpinner').hide();
         update({all: $scope.state.displayAll ? 1 : 0});
       }
     };
@@ -78,12 +73,13 @@ angular.module('containers', [])
         else if (action === Container.remove) {
           ContainerService.remove(c, $scope.cleanAssociatedVolumes)
           .then(function success() {
+            var index = items.indexOf(c);
+            items.splice(index, 1);
             Notifications.success('Container successfully removed');
+            complete();
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to remove container');
-          })
-          .finally(function final() {
             complete();
           });
         }
@@ -108,13 +104,9 @@ angular.module('containers', [])
             Notifications.error('Failure', e, 'An error occured');
             complete();
           });
-
         }
       }
     });
-    if (counter === 0) {
-      $('#loadContainersSpinner').hide();
-    }
   };
 
   $scope.selectItems = function (allSelected) {
