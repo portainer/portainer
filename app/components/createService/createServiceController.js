@@ -387,7 +387,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
       return;
@@ -443,7 +443,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
-      $scope.isAdmin = userDetails.role === 1 ? true : false;
+      $scope.isAdmin = userDetails.role === 1;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');
