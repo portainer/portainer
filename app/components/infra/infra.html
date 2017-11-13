@@ -28,17 +28,25 @@
           <thead>
             <tr>
               <th>
-                <a ui-sref="swarm" ng-click="order('name')">
+                <a ui-sref="infra" ng-click="order('name')">
                   Name
                   <span ng-show="sortType == 'name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                   <span ng-show="sortType == 'name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th>
+                Total node count
+              </th>
+              <th>
+                Manager count
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="swarm in (state.filteredSwarms = (swarms.Status | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-              <td>{{ swarm.name }}</td>
+            <tr dir-paginate="swarm in swarms | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count">
+              <td ng-if="swarm.swarmId != ''"><a ui-sref="dashboard({endpointid: swarm.id})">{{ swarm.swarmId }}</a></td>
+              <td ng-if="swarm.swarmId != ''">{{ swarm.data.Swarm.Nodes }}</td>
+              <td ng-if="swarm.swarmId != ''">{{ swarm.data.Swarm.Managers }}</td>
             </tr>
           </tbody>
         </table>

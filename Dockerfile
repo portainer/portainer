@@ -12,7 +12,7 @@ RUN wget -O /docker-binaries.tgz https://download.docker.com/$(uname -s | tr '[:
     && tar -xf /docker-binaries.tgz -C /dist docker/docker \
     && rm /docker-binaries.tgz
 
-FROM node:8.7.0  as nodebuilder
+FROM node:8.7.0 as nodebuilder
 
 # build portainer web ui
 WORKDIR /code

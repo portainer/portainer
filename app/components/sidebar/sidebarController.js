@@ -46,6 +46,21 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
   }
 
   function initView() {
+
+    $scope.applicationState.loading = false;
+
+    /*
+    if (StateManager.getState().application.authentication) {
+        var userDetails = Authentication.getUserDetails();
+        var isAdmin = userDetails.role === 1 ? true: false;
+        $scope.isAdmin = isAdmin;
+        $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : [])
+        .then(function success(data) {
+            checkPermissions(data);
+        });
+    }
+    */
+
     EndpointService.endpoints()
     .then(function success(data) {
       var endpoints = data;
@@ -65,6 +80,7 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoints');
     });
+
   }
 
   initView();

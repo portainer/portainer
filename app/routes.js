@@ -120,7 +120,7 @@ function configureRoutes($stateProvider) {
   })
   .state('dashboard', {
     parent: 'root',
-    url: '/dashboard',
+    url: '/dashboard/:endpointid',
     views: {
       'content@': {
         templateUrl: 'app/components/dashboard/dashboard.html',

@@ -21,6 +21,9 @@
     <li ng-if="!applicationState.infra" class="sidebar-title"><span>Endpoint actions</span></li>
     <li ng-if="applicationState.infra" class="sidebar-title"><span>Infra actions</span></li>
     <li ng-if="!applicationState.infra" class="sidebar-list">
+      <a ui-sref="infradashboard" ui-sref-active="active">Infrastructure<span class="menu-icon fa fa-chevron-left"></span></a>
+    </li>
+    <li ng-if="!applicationState.infra" class="sidebar-list">
       <a ui-sref="dashboard" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
     </li>
     <li ng-if="applicationState.infra" class="sidebar-list">
@@ -30,10 +33,10 @@
       <a ui-sref="infra" ui-sref-active="active">Infrastructure <span class="menu-icon fa fa-snowflake-o"></span></a>
     </li>
     <li ng-if="applicationState.infra" class="sidebar-list">
-      <a ui-sref="providers" ui-sref-active="inactive">Providers <span class="menu-icon fa fa-industry"></span></a>
+      <a ui-sref="infraproviders" ui-sref-active="inactive">Providers <span class="menu-icon fa fa-industry"></span></a>
     </li>
     <li ng-if="applicationState.infra" class="sidebar-list">
-      <a ui-sref="templates" ui-sref-active="inactive">Templates <span class="menu-icon fa fa-map"></span></a>
+      <a ui-sref="infratemplates" ui-sref-active="inactive">Templates <span class="menu-icon fa fa-map"></span></a>
     </li>
     <!--
     <li class="sidebar-list">

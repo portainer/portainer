@@ -1,6 +1,6 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$scope', '$q', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'ServiceService', 'StackService', 'Notifications',
-function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications) {
+.controller('DashboardController', ['$transition$', '$scope', '$q', 'EndpointProvider', 'StateManager', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'ServiceService', 'StackService', 'Notifications',
+function ($transition$, $scope, $q, EndpointProvider, StateManager, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications) {
 
   $scope.containerData = {
     total: 0
@@ -67,29 +67,68 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
   function initView() {
     $('#loadingViewSpinner').show();
 
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+    $scope.applicationState.infra = false;
 
-    $q.all([
-      Container.query({all: 1}).$promise,
-      Image.query({}).$promise,
-      Volume.query({}).$promise,
-      Network.query({}).$promise,
-      SystemService.info(),
-      endpointProvider === 'DOCKER_SWARM_MODE' ? ServiceService.services() : [],
-      endpointProvider === 'DOCKER_SWARM_MODE' ? StackService.stacks(true) : []
-    ]).then(function (d) {
-      prepareContainerData(d[0]);
-      prepareImageData(d[1]);
-      prepareVolumeData(d[2]);
-      prepareNetworkData(d[3]);
-      prepareInfoData(d[4]);
-      $scope.serviceCount = d[5].length;
-      $scope.stackCount = d[6].length;
-      $('#loadingViewSpinner').hide();
-    }, function(e) {
-      $('#loadingViewSpinner').hide();
-      Notifications.error('Failure', e, 'Unable to load dashboard data');
-    });
+    if ($transition$.params().endpointid) {
+        EndpointProvider.setEndpointID($transition$.params().endpointid);
+
+        StateManager.updateEndpointState(false)
+        .then(function success(data) {
+            var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+
+            $q.all([
+              Container.query({all: 1}).$promise,
+              Image.query({}).$promise,
+              Volume.query({}).$promise,
+              Network.query({}).$promise,
+              SystemService.info(),
+              endpointProvider === 'DOCKER_SWARM_MODE' ? ServiceService.services() : [],
+              endpointProvider === 'DOCKER_SWARM_MODE' ? StackService.stacks(true) : []
+            ]).then(function (d) {
+              $scope.applicationState.application.loading = false;
+              prepareContainerData(d[0]);
+              prepareImageData(d[1]);
+              prepareVolumeData(d[2]);
+              prepareNetworkData(d[3]);
+              prepareInfoData(d[4]);
+              $scope.serviceCount = d[5].length;
+              $scope.stackCount = d[6].length;
+              $scope.applicationState.loading = false;
+              $('#loadingViewSpinner').hide();
+            }, function(e) {
+              $('#loadingViewSpinner').hide();
+              Notifications.error('Failure', e, 'Unable to load dashboard data');
+            });
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
+        });
+    } else {
+        var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+
+        $q.all([
+          Container.query({all: 1}).$promise,
+          Image.query({}).$promise,
+          Volume.query({}).$promise,
+          Network.query({}).$promise,
+          SystemService.info(),
+          endpointProvider === 'DOCKER_SWARM_MODE' ? ServiceService.services() : [],
+          endpointProvider === 'DOCKER_SWARM_MODE' ? StackService.stacks(true) : []
+        ]).then(function (d) {
+          $scope.applicationState.application.loading = false;
+          prepareContainerData(d[0]);
+          prepareImageData(d[1]);
+          prepareVolumeData(d[2]);
+          prepareNetworkData(d[3]);
+          prepareInfoData(d[4]);
+          $scope.serviceCount = d[5].length;
+          $scope.stackCount = d[6].length;
+          $('#loadingViewSpinner').hide();
+        }, function(e) {
+          $('#loadingViewSpinner').hide();
+          Notifications.error('Failure', e, 'Unable to load dashboard data');
+        });
+    }
   }
 
   initView();

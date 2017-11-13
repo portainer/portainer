@@ -1,12 +1,12 @@
 angular.module('infra', [])
-.controller('InfraController', ['$interval', '$q', '$scope', 'SystemService', 'NodeService', 'Pagination', 'Notifications', 'StateManager', 'Authentication',
-function ($interval, $q, $scope, SystemService, NodeService, Pagination, Notifications, StateManager, Authentication) {
+.controller('InfraController', ['$interval', '$q', '$scope', 'EndpointService', 'InfraService', 'SystemService', 'NodeService', 'Pagination', 'Notifications', 'StateManager', 'Authentication',
+function ($interval, $q, $scope, EndpointService, InfraService, SystemService, NodeService, Pagination, Notifications, StateManager, Authentication) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('swarms');
   $scope.state.selectedItemCount = 0;
   $scope.sortType = 'Spec.Role';
   $scope.sortReverse = false;
-  $scope.swarms = [];
+  //$scope.swarms = [];
 
   var statePromise;
 
@@ -39,47 +39,35 @@ function ($interval, $q, $scope, SystemService, NodeService, Pagination, Notific
   function initView() {
     $('#loadingViewSpinner').show();
 
-    /*
-    if (StateManager.getState().application.authentication) {
-      var userDetails = Authentication.getUserDetails();
-      var isAdmin = userDetails.role === 1 ? true: false;
-      $scope.isAdmin = isAdmin;
+    $scope.applicationState.infra = true;
+
+    // TODO: add re-discover or refresh option later
+    var tmpSwarms = InfraService.getSwarms();
+    if (tmpSwarms.length == 0) {
+        EndpointService.endpoints()
+        .then(function success(data) {
+          $scope.endpoints = data;
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+          $scope.endpoints = [];
+        })
+        .finally(function final() {
+          InfraService.getEndpointStates($scope.endpoints)
+          .then(function success(data) {
+            $scope.swarms = data;
+            InfraService.setSwarms(data);
+          });
+        });
+    } else {
+
+        //console.log("Swarms: " + JSON.stringify(tmpSwarms, null, 2));
+
+        $scope.swarms = tmpSwarms;
     }
-
-    var provider = $scope.applicationState.endpoint.mode.provider;
-    $q.all({
-      version: SystemService.version(),
-      info: SystemService.info(),
-      nodes: provider !== 'DOCKER_SWARM_MODE' || NodeService.nodes()
-    })
-    .then(function success(data) {
-      $scope.docker = data.version;
-      $scope.info = data.info;
-      if (provider === 'DOCKER_SWARM_MODE') {
-        var nodes = data.nodes;
-        processTotalCPUAndMemory(nodes);
-        $scope.nodes = nodes;
-      } else {
-        extractSwarmInfo(data.info);
-      }
-
-      $scope.stateAction()
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve cluster details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
-      statePromise = $interval($scope.stateAction, 5000);
-    });
-    */
 
     $('#loadingViewSpinner').hide();
   }
-
-  //$scope.$on('$destroy', function() {
-  //    $interval.cancel(statePromise);
-  //});
 
   initView();
 }]);
