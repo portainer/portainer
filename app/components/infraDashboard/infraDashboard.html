@@ -6,6 +6,19 @@
 </rd-header>
 
 <div class="row">
+  <div class="col-xs-12 col-md-6" ng-if="!stats.ActiveSwarms">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon yellow pull-left">
+            <i class="fa fa-exclamation-triangle"></i>
+          </div>
+          <div class="title">Discovering swarms...</div>
+          <div class="comment">Please wait a few moments, or check connection to provider VPC</div>
+        </rd-widget-body>
+      </rd-widget>
+  </div>
+</div>
+<div class="row">
   <div class="col-xs-12 col-md-6" ng-if="stats.ActiveSwarms">
     <a ui-sref="infra">
       <rd-widget>
