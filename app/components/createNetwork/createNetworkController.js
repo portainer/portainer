@@ -11,7 +11,8 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
   };
 
   $scope.state = {
-    formValidationError: ''
+    formValidationError: '',
+    actionInProgress: false
   };
 
   $scope.availableNetworkDrivers = [];
@@ -89,18 +90,16 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
   }
 
   $scope.create = function () {
-    $('#createResourceSpinner').show();
-
     var networkConfiguration = prepareConfiguration();
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true : false;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createResourceSpinner').hide();
       return;
     }
 
+    $scope.state.actionInProgress = true;
     NetworkService.create(networkConfiguration)
     .then(function success(data) {
       var networkIdentifier = data.Id;
@@ -115,12 +114,11 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
       Notifications.error('Failure', err, 'An error occured during network creation');
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $scope.state.actionInProgress = false;
     });
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     if(endpointProvider !== 'DOCKER_SWARM') {
@@ -130,9 +128,6 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to retrieve network drivers');
-      })
-      .finally(function final() {
-        $('#loadingViewSpinner').hide();
       });
     }
   }

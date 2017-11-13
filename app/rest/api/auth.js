@@ -3,7 +3,7 @@ angular.module('portainer.rest')
   'use strict';
   return $resource(API_ENDPOINT_AUTH, {}, {
     login: {
-      method: 'POST'
+      method: 'POST', ignoreLoadingBar: true
     }
   });
 }]);

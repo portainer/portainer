@@ -23,7 +23,6 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
   };
 
   $scope.updatePermissions = function() {
-    $('#loadingViewSpinner').show();
     var role = $scope.formValues.Administrator ? 1 : 2;
     UserService.updateUser($scope.user.Id, undefined, role)
     .then(function success(data) {
@@ -33,14 +32,10 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update user permissions');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
   $scope.updatePassword = function() {
-    $('#loadingViewSpinner').show();
     UserService.updateUser($scope.user.Id, $scope.formValues.newPassword, undefined)
     .then(function success(data) {
       Notifications.success('Password successfully updated');
@@ -48,14 +43,10 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update user password');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   };
 
   function deleteUser() {
-    $('#loadingViewSpinner').show();
     UserService.deleteUser($scope.user.Id)
     .then(function success(data) {
       Notifications.success('User successfully deleted', $scope.user.Username);
@@ -63,14 +54,10 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to remove user');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     $q.all({
       user: UserService.user($transition$.params().id),
       settings: SettingsService.publicSettings()
@@ -83,9 +70,6 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve user information');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

@@ -11,7 +11,8 @@ angular.module('portainer.rest')
           'stderr': params.stderr || 0,
           'timestamps': params.timestamps || 0,
           'tail': params.tail || 'all'
-        }
+        },
+        ignoreLoadingBar: true
       }).success(callback).error(function (data, status, headers, config) {
         console.log(data);
       });

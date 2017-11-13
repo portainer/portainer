@@ -9,7 +9,8 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
   };
 
   $scope.state = {
-    formValidationError: ''
+    formValidationError: '',
+    actionInProgress: false
   };
 
   $scope.availableVolumeDrivers = [];
@@ -35,7 +36,6 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
   }
 
   $scope.create = function () {
-    $('#createVolumeSpinner').show();
 
     var name = $scope.formValues.Name;
     var driver = $scope.formValues.Driver;
@@ -46,10 +46,10 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     var isAdmin = userDetails.role === 1 ? true : false;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createVolumeSpinner').hide();
       return;
     }
 
+    $scope.state.actionInProgress = true;
     VolumeService.createVolume(volumeConfiguration)
     .then(function success(data) {
       var volumeIdentifier = data.Id;
@@ -64,12 +64,11 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
       Notifications.error('Failure', err, 'An error occured during volume creation');
     })
     .finally(function final() {
-      $('#createVolumeSpinner').hide();
+      $scope.state.actionInProgress = false;
     });
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     if (endpointProvider !== 'DOCKER_SWARM') {
@@ -79,9 +78,6 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
-      })
-      .finally(function final() {
-        $('#loadingViewSpinner').hide();
       });
     }
   }

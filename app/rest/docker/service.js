@@ -9,7 +9,8 @@ angular.module('portainer.rest')
     query: { method: 'GET', isArray: true, params: {filters: '@filters'} },
     create: {
       method: 'POST', params: {action: 'create'},
-      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader }
+      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader },
+      ignoreLoadingBar: true
     },
     update: { method: 'POST', params: {id: '@id', action: 'update', version: '@version'} },
     remove: { method: 'DELETE', params: {id: '@id'} }
