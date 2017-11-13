@@ -66,8 +66,10 @@
               <!-- actions -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <button type="submit" class="btn btn-primary btn-sm" ng-click="createLocalEndpoint()"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</button>
-                  <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress" ng-click="createLocalEndpoint()" button-spinner="state.actionInProgress">
+                    <span ng-hide="state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
+                    <span ng-show="state.actionInProgress">Connecting...</span>
+                  </button>
                 </div>
               </div>
               <!-- !actions -->
@@ -184,8 +186,10 @@
               <!-- actions -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (!formValues.TLSSKipClientVerify && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="createRemoteEndpoint()"><i class="fa fa-plug" aria-hidden="true"></i> Connect</button>
-                  <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (!formValues.TLSSKipClientVerify && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="createRemoteEndpoint()" button-spinner="state.actionInProgress">
+                    <span ng-hide="state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
+                    <span ng-show="state.actionInProgress">Connecting...</span>
+                  </button>
                 </div>
               </div>
               <!-- !actions -->

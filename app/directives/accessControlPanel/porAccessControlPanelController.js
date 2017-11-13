@@ -71,8 +71,6 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
   }
 
   function updateOwnership() {
-    $('#loadingViewSpinner').show();
-
     var resourceId = ctrl.resourceId;
     var ownershipParameters = processOwnershipFormValues();
 
@@ -84,15 +82,10 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update access control');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
   function initComponent() {
-    $('#loadingViewSpinner').show();
-
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true: false;
     var userId = userDetails.ID;
@@ -146,9 +139,6 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve access control information');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

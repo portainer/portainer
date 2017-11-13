@@ -3,7 +3,6 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="registries" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Registry management</rd-header-content>
 </rd-header>
@@ -57,8 +56,10 @@
           <!-- !authentication-credentials -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="dockerhub.Authentication && (!dockerhub.Username || !dockerhub.Password)" ng-click="updateDockerHub()">Update</button>
-              <i id="updateDockerhubSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || dockerhub.Authentication && (!dockerhub.Username || !dockerhub.Password)" ng-click="updateDockerHub()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Update</span>
+                <span ng-show="state.actionInProgress">Updating DockerHub settings...</span>
+              </button>
             </div>
           </div>
         </form>

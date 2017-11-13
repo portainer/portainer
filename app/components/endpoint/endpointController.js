@@ -7,7 +7,8 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications,
   }
 
   $scope.state = {
-    uploadInProgress: false
+    uploadInProgress: false,
+    actionInProgress: false
   };
 
   $scope.formValues = {
@@ -35,7 +36,7 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications,
       type: $scope.endpointType
     };
 
-    $('updateResourceSpinner').show();
+    $scope.state.actionInProgress = true;
     EndpointService.updateEndpoint(endpoint.Id, endpointParams)
     .then(function success(data) {
       Notifications.success('Endpoint updated', $scope.endpoint.Name);
@@ -44,6 +45,7 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications,
       $state.go('endpoints');
     }, function error(err) {
       Notifications.error('Failure', err, 'Unable to update endpoint');
+      $scope.state.actionInProgress = false;
     }, function update(evt) {
       if (evt.upload) {
         $scope.state.uploadInProgress = evt.upload;
@@ -52,7 +54,6 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications,
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
     EndpointService.endpoint($transition$.params().id)
     .then(function success(data) {
       var endpoint = data;
@@ -66,9 +67,6 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications,
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

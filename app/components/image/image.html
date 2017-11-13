@@ -1,7 +1,5 @@
 <rd-header>
-  <rd-header-title title="Image details">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin"></i>
-  </rd-header-title>
+  <rd-header-title title="Image details"></rd-header-title>
   <rd-header-content>
     <a ui-sref="images">Images</a> &gt; <a ui-sref="image({id: image.Id})">{{ image.Id }}</a>
   </rd-header-content>
@@ -41,6 +39,16 @@
                 or on the trash icon <span class="fa fa-trash-o" aria-hidden="true"></span> to delete a tag.
               </span>
             </div>
+            <div class="col-sm-12">
+              <span id="downloadResourceHint" class="createResource" style="display: none; margin-left: 0;">
+                Download in progress...
+                <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
+              </span>
+              <span id="uploadResourceHint" class="createResource" style="display: none; margin-left: 0;">
+                Upload in progress...
+                <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
+              </span>
+            </div>
           </div>
         </form>
       </rd-widget-body>
@@ -69,7 +77,6 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Image" ng-click="tagImage()">Tag</button>
-              <i id="pullImageSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
         </form>

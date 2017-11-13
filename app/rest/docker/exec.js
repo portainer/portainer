@@ -7,7 +7,7 @@ angular.module('portainer.rest')
   {
     resize: {
       method: 'POST', params: {id: '@id', action: 'resize', h: '@height', w: '@width'},
-      transformResponse: genericHandler
+      transformResponse: genericHandler, ignoreLoadingBar: true
     }
   });
 }]);

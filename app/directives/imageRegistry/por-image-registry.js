@@ -3,7 +3,6 @@ angular.module('portainer').component('porImageRegistry', {
   controller: 'porImageRegistryController',
   bindings: {
     'image': '=',
-    'registry': '=',
-    'autoComplete': '<'
+    'registry': '='
   }
 });
