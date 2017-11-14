@@ -75,6 +75,7 @@ function ($transition$, $scope, $q, EndpointProvider, StateManager, Container, C
         StateManager.updateEndpointState(false)
         .then(function success(data) {
             var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+            var endpointRole = $scope.applicationState.endpoint.mode.role;
 
             $q.all([
               Container.query({all: 1}).$promise,
@@ -82,8 +83,8 @@ function ($transition$, $scope, $q, EndpointProvider, StateManager, Container, C
               Volume.query({}).$promise,
               Network.query({}).$promise,
               SystemService.info(),
-              endpointProvider === 'DOCKER_SWARM_MODE' ? ServiceService.services() : [],
-              endpointProvider === 'DOCKER_SWARM_MODE' ? StackService.stacks(true) : []
+              endpointProvider === 'DOCKER_SWARM_MODE' && endpointRole === 'MANAGER' ? ServiceService.services() : [],
+              endpointProvider === 'DOCKER_SWARM_MODE' && endpointRole === 'MANAGER' ? StackService.stacks(true) : []
             ]).then(function (d) {
               $scope.applicationState.application.loading = false;
               prepareContainerData(d[0]);
@@ -105,6 +106,7 @@ function ($transition$, $scope, $q, EndpointProvider, StateManager, Container, C
         });
     } else {
         var endpointProvider = $scope.applicationState.endpoint.mode.provider;
+        var endpointRole = $scope.applicationState.endpoint.mode.role;
 
         $q.all([
           Container.query({all: 1}).$promise,
@@ -112,8 +114,8 @@ function ($transition$, $scope, $q, EndpointProvider, StateManager, Container, C
           Volume.query({}).$promise,
           Network.query({}).$promise,
           SystemService.info(),
-          endpointProvider === 'DOCKER_SWARM_MODE' ? ServiceService.services() : [],
-          endpointProvider === 'DOCKER_SWARM_MODE' ? StackService.stacks(true) : []
+          endpointProvider === 'DOCKER_SWARM_MODE' && endpointRole === 'MANAGER' ? ServiceService.services() : [],
+          endpointProvider === 'DOCKER_SWARM_MODE' && endpointRole === 'MANAGER' ? StackService.stacks(true) : []
         ]).then(function (d) {
           $scope.applicationState.application.loading = false;
           prepareContainerData(d[0]);

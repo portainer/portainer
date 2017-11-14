@@ -14,7 +14,8 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
     StateManager.updateEndpointState(true)
     .then(function success() {
-      $state.go('dashboard');
+      $scope.activeEndpoint = endpoint;
+      $state.go('idashboard');
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
@@ -28,7 +29,7 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
   function setActiveEndpoint(endpoints) {
     var activeEndpointID = EndpointProvider.endpointID();
     angular.forEach(endpoints, function (endpoint) {
-      if (endpoint.Id === activeEndpointID) {
+      if (endpoint.Id == activeEndpointID) {
         $scope.activeEndpoint = endpoint;
         EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
       }
@@ -46,20 +47,7 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
   }
 
   function initView() {
-
     $scope.applicationState.loading = false;
-
-    /*
-    if (StateManager.getState().application.authentication) {
-        var userDetails = Authentication.getUserDetails();
-        var isAdmin = userDetails.role === 1 ? true: false;
-        $scope.isAdmin = isAdmin;
-        $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : [])
-        .then(function success(data) {
-            checkPermissions(data);
-        });
-    }
-    */
 
     EndpointService.endpoints()
     .then(function success(data) {

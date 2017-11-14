@@ -37,8 +37,7 @@ function ($interval, $q, $scope, EndpointService, InfraService, SystemService, N
   };
 
   function initView() {
-    $('#loadingViewSpinner').show();
-
+    $scope.spinner = true;
     $scope.applicationState.infra = true;
 
     // TODO: add re-discover or refresh option later
@@ -60,13 +59,10 @@ function ($interval, $q, $scope, EndpointService, InfraService, SystemService, N
           });
         });
     } else {
-
-        //console.log("Swarms: " + JSON.stringify(tmpSwarms, null, 2));
-
         $scope.swarms = tmpSwarms;
     }
 
-    $('#loadingViewSpinner').hide();
+    $scope.spinner = false;
   }
 
   initView();

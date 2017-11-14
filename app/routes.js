@@ -118,6 +118,20 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('idashboard', {
+    parent: 'root',
+    url: '/dashboard',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/dashboard/dashboard.html',
+        controller: 'DashboardController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('dashboard', {
     parent: 'root',
     url: '/dashboard/:endpointid',

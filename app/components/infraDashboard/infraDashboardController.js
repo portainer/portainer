@@ -3,7 +3,7 @@ angular.module('infradashboard', [])
 function ($scope, $q, InfraService, SwarmService, InfoHelper, SystemService, NodeService, EndpointProvider, EndpointService, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications) {
 
   function initView() {
-    $('#loadingViewSpinner').show();
+    $scope.spinner = true;
 
     $scope.applicationState.infra = true;
 
@@ -35,15 +35,18 @@ function ($scope, $q, InfraService, SwarmService, InfoHelper, SystemService, Nod
             $scope.swarms = data;
             InfraService.setSwarms(data);
             $scope.stats = InfraService.determineSwarmStats($scope.swarms);
+          })
+          .finally(function final() {
+            $scope.spinner = false;
           });
         });
     } else {
         // Just re-calc stats
         $scope.swarms = tmpSwarms;
         $scope.stats = InfraService.determineSwarmStats($scope.swarms);
+        $scope.spinner = false;
     }
 
-    $('#loadingViewSpinner').hide();
   }
 
   initView();

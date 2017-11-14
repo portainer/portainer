@@ -21,10 +21,10 @@
     <li ng-if="!applicationState.infra" class="sidebar-title"><span>Endpoint actions</span></li>
     <li ng-if="applicationState.infra" class="sidebar-title"><span>Infra actions</span></li>
     <li ng-if="!applicationState.infra" class="sidebar-list">
-      <a ui-sref="infradashboard" ui-sref-active="active">Infrastructure<span class="menu-icon fa fa-chevron-left"></span></a>
+      <a ui-sref="infra" ui-sref-active="active">Infrastructure<span class="menu-icon fa fa-chevron-left"></span></a>
     </li>
     <li ng-if="!applicationState.infra" class="sidebar-list">
-      <a ui-sref="dashboard" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
+      <a ui-sref="idashboard" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
     </li>
     <li ng-if="applicationState.infra" class="sidebar-list">
       <a ui-sref="infradashboard" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer"></span></a>
@@ -46,19 +46,19 @@
       </div>
     </li>
     -->
-    <li ng-if="!applicationState.infra" class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
+    <li class="sidebar-list" ng-if="!applicationState.infra && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="projects" ui-sref-active="active">Projects <span class="menu-icon fa fa-superpowers"></span></a>
     </li>
-    <li ng-if="!applicationState.infra" class="sidebar-list" ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
+    <li class="sidebar-list" ng-if="!applicationState.infra && applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="stacks" ui-sref-active="active">Stacks <span class="menu-icon fa fa-th-list"></span></a>
     </li>
-    <li ng-if="!applicationState.infra" class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
+    <li class="sidebar-list" ng-if="!applicationState.infra && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="services" ui-sref-active="active">Services <span class="menu-icon fa fa-list-alt"></span></a>
     </li>
     <li ng-if="!applicationState.infra" class="sidebar-list">
       <a ui-sref="containers" ui-sref-active="active">Containers <span class="menu-icon fa fa-server"></span></a>
     </li>
-    <li ng-if="!applicationState.infra" class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
+    <li class="sidebar-list" ng-if="!applicationState.infra && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="nodes" ui-sref-active="active">Nodes <span class="menu-icon fa fa-microchip"></span></a>
     </li>
     <li ng-if="!applicationState.infra" class="sidebar-list">
@@ -70,19 +70,19 @@
     <li ng-if="!applicationState.infra" class="sidebar-list">
       <a ui-sref="volumes" ui-sref-active="active">Volumes <span class="menu-icon fa fa-cubes"></span></a>
     </li>
-    <li ng-if="!applicationState.infra" class="sidebar-list" ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
+    <li class="sidebar-list" ng-if="!applicationState.infra && applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="secrets" ui-sref-active="active">Secrets <span class="menu-icon fa fa-user-secret"></span></a>
     </li>
-    <li ng-if="!applicationState.infra" class="sidebar-list" ng-if="applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
+    <li class="sidebar-list" ng-if="!applicationState.infra && applicationState.endpoint.apiVersion >= 1.25 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="configs" ui-sref-active="active">Configs <span class="menu-icon fa fa-ship"></span></a>
     </li>
-    <li ng-if="!applicationState.infra" class="sidebar-list" ng-if="(applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC') && isAdmin">
+    <li class="sidebar-list" ng-if="!applicationState.infra && (applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC') && isAdmin">
       <a ui-sref="events" ui-sref-active="active">Events <span class="menu-icon fa fa-history"></span></a>
     </li>
-    <li ng-if="!applicationState.infra" class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || (applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER')">
+    <li class="sidebar-list" ng-if="!applicationState.infra && (applicationState.endpoint.mode.provider === 'DOCKER_SWARM' || (applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'))">
       <a ui-sref="swarm" ui-sref-active="active">Swarm <span class="menu-icon fa fa-object-group"></span></a>
     </li>
-    <li ng-if="!applicationState.infra" class="sidebar-list" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'">
+    <li class="sidebar-list" ng-if="!applicationState.infra && applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'">
       <a ui-sref="engine" ui-sref-active="active">Engine <span class="menu-icon fa fa-th"></span></a>
     </li>
     <!--
