@@ -151,13 +151,13 @@ function ProjectServiceFactory($cacheFactory, $sce, $http, $q, OrcaProject, Proj
     var deferred = $q.defer();
 
     return $q.all({
-          externalProjects: includeExternalProjects ? service.externalProjects() : []
-      })
-      .then(function success(data) {
+        externalProjects: includeExternalProjects ? service.externalProjects() : []
+    })
+    .then(function success(data) {
         var externalProjects = data.externalProjects;
         return externalProjects;
-      })
-      .catch(function error(err) {
+    })
+    .catch(function error(err) {
         deferred.reject({ msg: 'Unable to retrieve projects', err: err });
     });
 
