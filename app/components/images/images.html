@@ -92,8 +92,8 @@
                     <ul class="dropdown-menu"><li class="interactive" ng-model="item.Selected" ng-repeat="(k , v) in item.Options" uib-btn-radio="'{{k}}'"><a><i class="fa fa-{{v.icon}} {{v.class}}"></i>&nbsp;{{k}}</a></li></ul>
                   </div>
                 </script>
-                <th width="60px">
-                  <i ng-repeat="item in [ UsageFilters.Containers, UsageFilters.Children]"><label class="fa fa-plus-square-o interactive dropdown-select-label" popover-append-to-body="true" popover-trigger="'click outsideClick'" popover-class="popover-no-margin" popover-placement="bottom" uib-popover-template="'tpl_lists_select.html'"></label></i>
+                <th width="60px" ng-repeat="item in [ UsageFilters.Containers, UsageFilters.Children]" style="text-align:center;">
+                  <span class="interactive dropdown-select-label" popover-append-to-body="true" popover-trigger="'click outsideClick'" popover-class="popover-no-margin" popover-placement="bottom" uib-popover-template="'tpl_lists_select.html'"><i class="fa fa-plus-square-o"></i> <a>{{item.Descriptor}}</a></span>
                 </th>
                 <th>
                   <span ng-repeat="item in [ UsageFilters.Tags ]"><span class="interactive dropdown-select-label" popover-trigger="'click outsideClick'" popover-class="popover-no-margin" popover-placement="bottom" uib-popover-template="'tpl_lists_select.html'"><i class="fa fa-plus-square-o"></i></span></span>
@@ -128,8 +128,10 @@
                 <td>
                   <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id.slice(7)|truncate:13}}</a>
                 </td>
-                <td>
+                <td style="text-align:center;">
                   <portainer-tooltip icon="server" ng-class=" image.ContainersList === 'None' ? 'emptylist' : ''" message="{{prettyList(image.ContainersList)}}" position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                </td>
+                <td style="text-align:center;">
                   <portainer-tooltip icon="clone" ng-class="image.ChildrenList === 'None' ? 'emptylist' : ''" message="{{prettyList(image.ChildrenList)}}" position="bottom" style="margin-left: -3px;"></portainer-tooltip>
                 </td>
                 <td>

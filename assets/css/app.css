@@ -740,12 +740,10 @@ json-tree .branch-preview {
   opacity: .5;
 }
 
-/* Custom dropdown checklist */
+/* Popover dropdown menu */
 
 .popover-no-margin,
-.popover-no-margin .popover-content {
-  padding: 0;
-}
+.popover-no-margin .popover-content { padding: 0; }
 
 .popover-no-margin .dropdown-menu {
   position: relative;
@@ -754,21 +752,9 @@ json-tree .branch-preview {
   border-radius: 6px;
 }
 
-.dropdown-select-label {
-  width:18px;
-  margin:0;
-  padding-left:2.5px;
-  padding-right:2.5px;
-}
+.dropdown-select-label { margin:0; white-space: nowrap; }
 
-.dropdown-select > ul {
-  min-width: unset;
-}
-
-.dropdown-select > ul > li > a {
-  padding-left: 5px;
-  padding-right: 5px;
-}
+.dropdown-select > ul { min-width: unset; }
 
 .dropdown-select > ul > li > a > i {
   width: 14px;

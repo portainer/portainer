@@ -21,11 +21,13 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
   $scope.UsageFilters = {
     Containers : {
       Options: NewUsageFilter(['Used','Unused'],'server'),
-      Selected: 'All'
+      Selected: 'All',
+      Descriptor: 'Usage'
     },
     Children : {
       Options: NewUsageFilter(['HasChildren','NoChildren'],'clone'),
-      Selected: 'All'
+      Selected: 'All',
+      Descriptor: 'Children'
     },
     Tags : {
       Options: {
