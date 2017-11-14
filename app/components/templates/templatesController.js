@@ -122,7 +122,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     var userDetails = Authentication.getUserDetails();
     var userId = userDetails.ID;
     var accessControlData = $scope.formValues.AccessControlData;
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
       return;
@@ -241,7 +241,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     $scope.templatesKey = templatesKey;
 
     var userDetails = Authentication.getUserDetails();
-    $scope.isAdmin = userDetails.role === 1 ? true : false;
+    $scope.isAdmin = userDetails.role === 1;
 
     var endpointMode = $scope.applicationState.endpoint.mode;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;

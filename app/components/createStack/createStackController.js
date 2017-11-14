@@ -67,7 +67,7 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
 
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
     var userId = userDetails.ID;
 
     if (!validateForm(accessControlData, isAdmin)) {
