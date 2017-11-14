@@ -159,7 +159,7 @@ angular.module('portainer.services')
 
       Container.logs(opts).$promise
       .then(function success(data) {
-        deferred.resolve(service);
+        deferred.resolve(data.message || '');
       })
       .catch(function error(err) {
         deferred.reject({ msg: 'Unable to retrieve container logs', err: err });

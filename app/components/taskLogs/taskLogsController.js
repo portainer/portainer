@@ -1,6 +1,6 @@
 angular.module('taskLogs', [])
-.controller('TaskLogsController', ['$scope', '$stateParams', 'ServiceService', 'TaskService', 'Notifications',
-function ($scope, $stateParams, ServiceService, TaskService, Notifications) {
+.controller('TaskLogsController', ['$scope', '$transition$', 'ServiceService', 'TaskService', 'Notifications',
+function ($scope, $transition$, ServiceService, TaskService, Notifications) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
@@ -49,8 +49,7 @@ function ($scope, $stateParams, ServiceService, TaskService, Notifications) {
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
-    TaskService.task($stateParams.id).then(function(task) {
+    TaskService.task($transition$.params().id).then(function(task) {
         $scope.task = task;
         return ServiceService.service(task.ServiceId).then(function(service) {
             $scope.service = service;
@@ -58,8 +57,6 @@ function ($scope, $stateParams, ServiceService, TaskService, Notifications) {
         });
     }).catch(function(err) {
       Notifications.error('Failure', err, 'Unable to retrieve task info');
-    }).finally(function() {
-      $('#loadingViewSpinner').hide();
     });
 
     var logIntervalId = window.setInterval(getLogs, 5000);

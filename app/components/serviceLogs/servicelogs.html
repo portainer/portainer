@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title="Service logs"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="services">Services</a> > <a ui-sref="service({id: service.ID})">{{ service.Spec.Name }}</a> > Logs
+    <a ui-sref="services">Services</a> &gt; <a ui-sref="service({id: service.Id})">{{ service.Name }}</a> &gt; Logs
   </rd-header-content>
 </rd-header>
 
@@ -12,7 +12,7 @@
         <div class="widget-icon grey pull-left">
           <i class="fa fa-list-alt"></i>
         </div>
-        <div class="title">{{ service.Spec.Name }}</div>
+        <div class="title">{{ service.Name }}</div>
         <div class="comment">Name</div>
       </rd-widget-body>
     </rd-widget>

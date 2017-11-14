@@ -125,8 +125,8 @@ function configureRoutes($stateProvider) {
     url: '^/tasks/:id/logs',
     views: {
       'content@': {
-        templateUrl: 'app/components/taskLogs/tasklogs.html',
-        controller: 'ServiceLogsController'
+        templateUrl: 'app/components/taskLogs/taskLogs.html',
+        controller: 'TaskLogsController'
       },
       'sidebar@': {
         templateUrl: 'app/components/sidebar/sidebar.html',

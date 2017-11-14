@@ -18,11 +18,12 @@ angular.module('portainer.rest')
         method: 'GET',
         params: {
             action: 'logs',
-            stdout: params.stdout || 0,
-            stderr: params.stderr || 0,
-            timestamps: params.timestamps || 0,
-            tail: params.tail || 'all'
-        }
+            stdout: '@stdout' || 0,
+            stderr: '@stderr' || 0,
+            timestamps: '@timestamps' || 0,
+            tail: '@tail' || 'all'
+        },
+        transformResponse: genericHandler
     }
   });
 }]);
