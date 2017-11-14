@@ -35,20 +35,6 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.logs = function(opts) {
-      var deferred = $q.defer();
-
-      Service.logs(opts).$promise
-      .then(function success(data) {
-        deferred.resolve(data.message || '');
-      })
-      .catch(function error(err) {
-        deferred.reject({ msg: 'Unable to retrieve service logs', err: err });
-      });
-
-      return deferred.promise;
-  };
-
   service.remove = function(service) {
     var deferred = $q.defer();
 

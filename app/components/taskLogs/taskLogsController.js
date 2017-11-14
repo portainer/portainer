@@ -1,12 +1,11 @@
 angular.module('taskLogs', [])
-.controller('TaskLogsController', ['$scope', '$transition$', 'ServiceService', 'TaskService', 'Notifications',
-function ($scope, $transition$, ServiceService, TaskService, Notifications) {
+.controller('TaskLogsController', ['$scope', '$transition$', 'ServiceService', 'TaskService', 'LogsService', 'Notifications',
+function ($scope, $transition$, ServiceService, TaskService, LogsService, Notifications) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
   $scope.stdout = '';
   $scope.stderr = '';
-  $scope.tailLines = 2000;
 
   function getLogs() {
     $('#loadingViewSpinner').show();
@@ -15,36 +14,19 @@ function ($scope, $transition$, ServiceService, TaskService, Notifications) {
     $('#loadingViewSpinner').hide();
   }
 
-  function parseLogResults(data) {
-    // Replace carriage returns with newlines to clean up output
-    data = data.replace(/[\r]/g, '\n');
-    // Strip 8 byte header from each line of output
-    data = data.substring(8);
-    data = data.replace(/\n(.{8})/g, '\n');
-    return data;
-  }
-
   function getLogsStderr() {
-    TaskService.logs({
-      id: $transition$.params().id,
-      stdout: 0,
-      stderr: 1,
-      timestamps: $scope.state.displayTimestampsOut,
-      tail: $scope.tailLines
+    LogsService.taskLogsStdErr($transition$.params().id, {
+      timestamps: $scope.state.displayTimestampsErr
      }).then(function(data) {
-      $scope.stderr = parseLogResults(data);
+      $scope.stderr = data;
     });
   }
 
   function getLogsStdout() {
-    TaskService.logs({
-      id: $transition$.params().id,
-      stdout: 1,
-      stderr: 0,
-      timestamps: $scope.state.displayTimestampsOut,
-      tail: $scope.tailLines
+    LogsService.taskLogsStdOut($transition$.params().id, {
+      timestamps: $scope.state.displayTimestampsOut
     }).then(function(data) {
-      $scope.stdout = parseLogResults(data);
+      $scope.stdout = data;
     });
   }
 

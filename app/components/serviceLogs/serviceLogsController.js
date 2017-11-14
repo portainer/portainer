@@ -1,48 +1,30 @@
 angular.module('serviceLogs', [])
-.controller('ServiceLogsController', ['$scope', '$transition$', '$anchorScroll', 'ServiceService',
-function ($scope, $transition$, $anchorScroll, ServiceService) {
+.controller('ServiceLogsController', ['$scope', '$transition$', '$anchorScroll', 'ServiceService', 'LogsService', 'Notifications',
+function ($scope, $transition$, $anchorScroll, ServiceService, LogsService, Notifications) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
   $scope.stdout = '';
   $scope.stderr = '';
-  $scope.tailLines = 2000;
 
   function getLogs() {
     getLogsStdout();
     getLogsStderr();
   }
 
-  function parseLogResults(data) {
-    // Replace carriage returns with newlines to clean up output
-    data = data.replace(/[\r]/g, '\n');
-    // Strip 8 byte header from each line of output
-    data = data.substring(8);
-    data = data.replace(/\n(.{8})/g, '\n');
-    return data;
-  }
-
   function getLogsStderr() {
-    ServiceService.logs({
-      id: $transition$.params().id,
-      stdout: 0,
-      stderr: 1,
-      timestamps: $scope.state.displayTimestampsOut,
-      tail: $scope.tailLines
+    LogsService.serviceLogsStdErr($transition$.params().id, {
+      timestamps: $scope.state.displayTimestampsErr
      }).then(function(data) {
-      $scope.stderr = parseLogResults(data);
+      $scope.stderr = data;
     });
   }
 
   function getLogsStdout() {
-    ServiceService.logs({
-      id: $transition$.params().id,
-      stdout: 1,
-      stderr: 0,
-      timestamps: $scope.state.displayTimestampsOut,
-      tail: $scope.tailLines
+    LogsService.serviceLogsStdOut($transition$.params().id, {
+      timestamps: $scope.state.displayTimestampsOut
     }).then(function(data) {
-      $scope.stdout = parseLogResults(data);
+      $scope.stdout = data;
     });
   }
 
