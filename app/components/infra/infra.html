@@ -108,21 +108,15 @@
 </div>
 
 <div class="row" ng-if="newEndpoints">
-  <div class="col-sm-12">
+  <div class="col-xs-12 col-md-6">
     <rd-widget>
       <rd-widget-header icon="fa-info-circle" title="Information"></rd-widget-header>
       <rd-widget-body>
-        <div class="col-xs-12 col-md-6">
-          <rd-widget>
-            <rd-widget-body>
-              <div class="widget-icon green pull-left">
-                <i class="fa fa-sun-o"></i>
-              </div>
-              <div class="title">{{ newEndpoints.length }}</div>
-              <div class="comment">Added Endpoints</div>
-            </rd-widget-body>
-          </rd-widget>
-        </div>
+          <div class="widget-icon green pull-left">
+            <i class="fa fa-sun-o"></i>
+          </div>
+          <div class="title">{{ newEndpoints.length }}</div>
+          <div class="comment">Added Endpoints</div>
       </rd-widget-body>
     </rd-widget>
   </div>

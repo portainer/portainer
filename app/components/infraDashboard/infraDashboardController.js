@@ -32,8 +32,15 @@ function ($scope, $q, InfraService, SwarmService, InfoHelper, SystemService, Nod
         .finally(function final() {
           InfraService.getEndpointStates($scope.endpoints)
           .then(function success(data) {
-            $scope.swarms = data;
-            InfraService.setSwarms(data);
+            var foundSwarms = [];
+            for (var i = 0; i < data.length; i++) {
+                var epEntry = data[i];
+                if (epEntry.provider == "DOCKER_SWARM_MODE") {
+                    foundSwarms.push(epEntry)
+                }
+            }
+            $scope.swarms = foundSwarms;
+            InfraService.setSwarms(foundSwarms);
             $scope.stats = InfraService.determineSwarmStats($scope.swarms);
           })
           .finally(function final() {

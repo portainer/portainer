@@ -93,13 +93,13 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
                             foundNewEndpoints.push(ep);
                             $scope.newEndpoints = foundNewEndpoints;
                             Notifications.success('Endpoint created', ep.Name);
-                            $state.reload();
+                            //$state.reload();
                         });
                     }
                 }
           });
       }
-      $scope.newEndpoints = foundNewEndpoints;
+      //$scope.newEndpoints = foundNewEndpoints;
     })
     .catch(function error(err) {
       $scope.newEndpoints = [];
@@ -180,8 +180,15 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
         .finally(function final() {
           InfraService.getEndpointStates($scope.endpoints)
           .then(function success(data) {
-            $scope.swarms = data;
-            InfraService.setSwarms(data);
+            var foundSwarms = [];
+            for (var i = 0; i < data.length; i++) {
+                var epEntry = data[i];
+                if (epEntry.provider == "DOCKER_SWARM_MODE") {
+                    foundSwarms.push(epEntry)
+                }
+            }
+            $scope.swarms = foundSwarms;
+            InfraService.setSwarms(foundSwarms);
           });
         });
     } else {
