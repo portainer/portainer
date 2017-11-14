@@ -129,10 +129,10 @@
                   <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id.slice(7)|truncate:13}}</a>
                 </td>
                 <td style="text-align:center;">
-                  <portainer-tooltip icon="server" ng-class=" image.ContainersList === 'None' ? 'emptylist' : ''" message="{{prettyList(image.ContainersList)}}" position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                  <portainer-tooltip icon="server" ui-sref="{{(image.ContainersList === 'None') ? '.' : 'image({id: image.Id, \'#\':\'containers\'})' }}" ng-class=" image.ContainersList === 'None' ? 'emptylist' : ''" message="{{prettyList(image.ContainersList)}}" position="bottom" style="margin-left: -3px;"></portainer-tooltip>
                 </td>
                 <td style="text-align:center;">
-                  <portainer-tooltip icon="clone" ng-class="image.ChildrenList === 'None' ? 'emptylist' : ''" message="{{prettyList(image.ChildrenList)}}" position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                  <portainer-tooltip icon="clone" ui-sref="{{(image.ChildrenList === 'None') ? '.' : 'image({id: image.Id, \'#\':\'children\'})' }}" ng-class="image.ChildrenList === 'None' ? 'emptylist' : ''" message="{{prettyList(image.ChildrenList)}}" position="bottom" style="margin-left: -3px;"></portainer-tooltip>
                 </td>
                 <td>
                   <a ui-sref="image({id: image.Id})" class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>
