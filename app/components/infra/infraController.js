@@ -180,7 +180,8 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
     // TODO: add re-discover or refresh option later
     var tmpSwarms = InfraService.getSwarms();
     var tmpNonSwarms = InfraService.getNonSwarms();
-    if (tmpSwarms.length == 0) {
+    if (tmpSwarms.length == 0 && InfraService.getDataLoading() == false) {
+        InfraService.setDataLoading(true);
         EndpointService.endpoints()
         .then(function success(data) {
           $scope.endpoints = data;
@@ -216,6 +217,8 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
             $scope.nonswarms = foundNonSwarms;
             InfraService.setSwarms(foundSwarms);
             InfraService.setNonSwarms(foundNonSwarms);
+            InfraService.setDataLoading(false);
+            $state.reload();
           });
         });
     } else {

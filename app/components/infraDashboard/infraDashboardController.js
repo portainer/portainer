@@ -1,6 +1,6 @@
 angular.module('infradashboard', [])
-.controller('InfraDashboardController', ['$scope', '$q', 'InfraService', 'SwarmService', 'InfoHelper', 'SystemService', 'NodeService', 'EndpointProvider', 'EndpointService', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'ServiceService', 'StackService', 'Notifications',
-function ($scope, $q, InfraService, SwarmService, InfoHelper, SystemService, NodeService, EndpointProvider, EndpointService, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications) {
+.controller('InfraDashboardController', ['$scope', '$q', '$state', 'InfraService', 'SwarmService', 'InfoHelper', 'SystemService', 'NodeService', 'EndpointProvider', 'EndpointService', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'ServiceService', 'StackService', 'Notifications',
+function ($scope, $q, $state, InfraService, SwarmService, InfoHelper, SystemService, NodeService, EndpointProvider, EndpointService, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications) {
 
   function initView() {
     $scope.spinner = true;
@@ -21,7 +21,8 @@ function ($scope, $q, InfraService, SwarmService, InfoHelper, SystemService, Nod
     // TODO: add re-discover or refresh option later
     var tmpSwarms = InfraService.getSwarms();
     var tmpNonSwarms = InfraService.getNonSwarms();
-    if (tmpSwarms.length == 0) {
+    if (tmpSwarms.length == 0 && InfraService.getDataLoading() == false) {
+        InfraService.setDataLoading(true);
         EndpointService.endpoints()
         .then(function success(data) {
           $scope.endpoints = data;
@@ -58,6 +59,8 @@ function ($scope, $q, InfraService, SwarmService, InfoHelper, SystemService, Nod
             InfraService.setSwarms(foundSwarms);
             InfraService.setNonSwarms(foundNonSwarms);
             $scope.stats = InfraService.determineSwarmStats($scope.swarms);
+            InfraService.setDataLoading(false);
+            $state.reload();
           })
           .finally(function final() {
             $scope.spinner = false;

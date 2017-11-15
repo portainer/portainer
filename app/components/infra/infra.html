@@ -8,6 +8,33 @@
   <rd-header-content>Swarm</rd-header-content>
 </rd-header>
 
+<div class="row">
+  <div class="col-xs-12 col-md-6" ng-if="(!swarms && !nonswarms) || (swarms.length == 0 && nonswarms.length == 0)">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon yellow pull-left">
+            <i class="fa fa-exclamation-triangle"></i>
+          </div>
+          <div class="title">Discovering swarms...</div>
+          <div class="comment">Please wait a few moments, or check connection to provider VPC</div>
+        </rd-widget-body>
+      </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="swarms.length > 0">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+     <rd-widget-taskbar classes="col-lg-12">
+      <div class="pull-left">
+        <div class="btn-group" role="group" aria-label="...">
+          <button type="button" class="btn btn-primary btn-responsive" ng-click="discoverEndpoints()"><i class="fa space-right" aria-hidden="true"></i>Discover Endpoints</button>
+          <button type="button" class="btn btn-primary btn-responsive" ng-click="reloadEndpoints()"><i class="fa space-right" aria-hidden="true"></i>Reload Endpoints</button>
+        </div>
+      </div>
+    </rd-widget-taskbar>
+  </div>
+</div>
+
 <div class="row" ng-if="operationStatus != '' && operationStatus.Name != 'No active operations'">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
@@ -49,30 +76,8 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-xs-12 col-md-6" ng-if="swarms.length == 0 && nonswarms.length == 0">
-      <rd-widget>
-        <rd-widget-body>
-          <div class="widget-icon yellow pull-left">
-            <i class="fa fa-exclamation-triangle"></i>
-          </div>
-          <div class="title">Discovering swarms...</div>
-          <div class="comment">Please wait a few moments, or check connection to provider VPC</div>
-        </rd-widget-body>
-      </rd-widget>
-  </div>
-</div>
-
 <div class="row" ng-if="swarms.length > 0">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-     <rd-widget-taskbar classes="col-lg-12">
-      <div class="pull-left">
-        <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-primary btn-responsive" ng-click="discoverEndpoints()"><i class="fa space-right" aria-hidden="true"></i>Discover Endpoints</button>
-          <button type="button" class="btn btn-primary btn-responsive" ng-click="reloadEndpoints()"><i class="fa space-right" aria-hidden="true"></i>Reload Endpoints</button>
-        </div>
-      </div>
-    </rd-widget-taskbar>
     <rd-widget>
       <rd-widget-header icon="fa-hdd-o" title="Swarm summary">
         <div class="pull-right">

@@ -6,6 +6,7 @@ angular.module('portainer.services')
   var epStates = [];
   var swarms = [];
   var nonswarms = [];
+  var loadingState = false;
 
   var stats = {
     ActiveSwarms: 0,
@@ -149,6 +150,14 @@ angular.module('portainer.services')
 
   service.setNonSwarms = function(nonSwarmList) {
     nonswarms = nonSwarmList;
+  };
+
+  service.getDataLoading = function() {
+    return loadingState;
+  };
+
+  service.setDataLoading = function(value) {
+    loadingState = value;
   };
 
   service.determineSwarmStats = function() {
