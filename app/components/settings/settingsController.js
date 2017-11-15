@@ -2,6 +2,10 @@ angular.module('settings', [])
 .controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_TEMPLATES_URL',
 function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_TEMPLATES_URL) {
 
+  $scope.state = {
+    actionInProgress: false
+  };
+
   $scope.formValues = {
     customLogo: false,
     customTemplates: false,
@@ -45,6 +49,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
     settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
 
+    $scope.state.actionInProgress = true;
     updateSettings(settings, false);
   };
 
@@ -54,8 +59,6 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
   }
 
   function updateSettings(settings, resetForm) {
-    $('#loadingViewSpinner').show();
-
     SettingsService.update(settings)
     .then(function success(data) {
       Notifications.success('Settings updated');
@@ -69,12 +72,11 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
       Notifications.error('Failure', err, 'Unable to update settings');
     })
     .finally(function final() {
-      $('#loadingViewSpinner').hide();
+      $scope.state.actionInProgress = false;
     });
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     SettingsService.settings()
     .then(function success(data) {
       var settings = data;
@@ -91,9 +93,6 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

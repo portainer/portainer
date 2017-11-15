@@ -39,7 +39,8 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   };
 
   $scope.state = {
-    formValidationError: ''
+    formValidationError: '',
+    actionInProgress: false
   };
 
   $scope.refreshSlider = function () {
@@ -369,7 +370,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       Notifications.error('Failure', err, 'Unable to create service');
     })
     .finally(function final() {
-      $('#createServiceSpinner').hide();
+      $scope.state.actionInProgress = false;
     });
   }
 
@@ -386,17 +387,16 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   }
 
   $scope.create = function createService() {
-    $('#createServiceSpinner').show();
 
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createServiceSpinner').hide();
       return;
     }
 
+    $scope.state.actionInProgress = true;
     var config = prepareConfiguration();
     createNewService(config, accessControlData);
   };
@@ -425,7 +425,6 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     var provider = $scope.applicationState.endpoint.mode.provider;
 
@@ -447,13 +446,10 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
-      $scope.isAdmin = userDetails.role === 1 ? true : false;
+      $scope.isAdmin = userDetails.role === 1;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

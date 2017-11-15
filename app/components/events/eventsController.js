@@ -19,16 +19,12 @@ function ($scope, Notifications, SystemService, Pagination) {
     var from = moment().subtract(24, 'hour').unix();
     var to = moment().unix();
 
-    $('#loadEventsSpinner').show();
     SystemService.events(from, to)
     .then(function success(data) {
       $scope.events = data;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to load events');
-    })
-    .finally(function final() {
-      $('#loadEventsSpinner').hide();
     });
   }
 

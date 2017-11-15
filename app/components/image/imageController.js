@@ -21,7 +21,6 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 	};
 
 	$scope.tagImage = function() {
-		$('#loadingViewSpinner').show();
 		var image = $scope.formValues.Image;
 		var registry = $scope.formValues.Registry;
 
@@ -32,14 +31,11 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		})
 		.catch(function error(err) {
 			Notifications.error('Failure', err, 'Unable to tag image');
-		})
-		.finally(function final() {
-			$('#loadingViewSpinner').hide();
 		});
 	};
 
 	$scope.pushTag = function(repository) {
-		$('#loadingViewSpinner').show();
+		$('#uploadResourceHint').show();
 		RegistryService.retrieveRegistryFromRepository(repository)
 		.then(function success(data) {
 			var registry = data;
@@ -52,12 +48,12 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 			Notifications.error('Failure', err, 'Unable to push image to repository');
 		})
 		.finally(function final() {
-			$('#loadingViewSpinner').hide();
+			$('#uploadResourceHint').hide();
 		});
 	};
 
 	$scope.pullTag = function(repository) {
-		$('#loadingViewSpinner').show();
+		$('#downloadResourceHint').show();
 		RegistryService.retrieveRegistryFromRepository(repository)
 		.then(function success(data) {
 			var registry = data;
@@ -70,12 +66,11 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 			Notifications.error('Failure', err, 'Unable to pull image');
 		})
 		.finally(function final() {
-			$('#loadingViewSpinner').hide();
+			$('#downloadResourceHint').hide();
 		});
 	};
 
 	$scope.removeTag = function(repository) {
-		$('#loadingViewSpinner').show();
 		ImageService.deleteImage(repository, false)
 		.then(function success() {
 			if ($scope.image.RepoTags.length === 1) {
@@ -88,14 +83,10 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		})
 		.catch(function error(err) {
 			Notifications.error('Failure', err, 'Unable to remove image');
-		})
-		.finally(function final() {
-			$('#loadingViewSpinner').hide();
 		});
 	};
 
 	$scope.removeImage = function (id) {
-		$('#loadingViewSpinner').show();
 		ImageService.deleteImage(id, false)
 		.then(function success() {
 			Notifications.success('Image successfully deleted', id);
@@ -103,14 +94,10 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		})
 		.catch(function error(err) {
 			Notifications.error('Failure', err, 'Unable to remove image');
-		})
-		.finally(function final() {
-			$('#loadingViewSpinner').hide();
 		});
 	};
 
 	function initView() {
-		$('#loadingViewSpinner').show();
 		var endpointProvider = $scope.applicationState.endpoint.mode.provider;
 		$q.all({
 			image: ImageService.image($transition$.params().id),
@@ -123,9 +110,6 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		.catch(function error(err) {
 			Notifications.error('Failure', err, 'Unable to retrieve image details');
 			$state.go('images');
-		})
-		.finally(function final() {
-			$('#loadingViewSpinner').hide();
 		});
 	}
 

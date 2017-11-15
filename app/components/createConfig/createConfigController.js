@@ -58,14 +58,11 @@ function ($scope, $state, $document, Notifications, ConfigService, Authenticatio
   }
 
   $scope.create = function () {
-    $('#createResourceSpinner').show();
-
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createResourceSpinner').hide();
       return;
     }
 
@@ -83,9 +80,6 @@ function ($scope, $state, $document, Notifications, ConfigService, Authenticatio
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to create config');
-    })
-    .finally(function final() {
-      $('#createResourceSpinner').hide();
     });
   };
 

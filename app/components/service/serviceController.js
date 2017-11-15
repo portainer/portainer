@@ -204,7 +204,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   };
 
   $scope.updateService = function updateService(service) {
-    $('#loadingViewSpinner').show();
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Name = service.Name;
     config.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceLabels);
@@ -268,7 +267,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     };
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
-      $('#loadingViewSpinner').hide();
       if (data.message && data.message.match(/^rpc error:/)) {
         Notifications.error(data.message, 'Error');
       } else {
@@ -277,7 +275,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.cancelChanges({});
       initView();
     }, function (e) {
-      $('#loadingViewSpinner').hide();
       Notifications.error('Failure', e, 'Unable to update service');
     });
   };
@@ -293,7 +290,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   };
 
   function removeService() {
-    $('#loadingViewSpinner').show();
     ServiceService.remove($scope.service)
     .then(function success(data) {
       Notifications.success('Service successfully deleted');
@@ -301,9 +297,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to remove service');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
@@ -326,7 +319,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     ServiceService.service($transition$.params().id)
     .then(function success(data) {
@@ -375,9 +367,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.secrets = [];
       $scope.configs = [];
       Notifications.error('Failure', err, 'Unable to retrieve service details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

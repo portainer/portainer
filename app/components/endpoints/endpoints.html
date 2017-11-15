@@ -3,7 +3,6 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="endpoints" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
-    <i id="loadEndpointsSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>Endpoint management</rd-header-content>
 </rd-header>
@@ -66,8 +65,11 @@
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addEndpoint()"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</button>
-              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addEndpoint()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
+                <span ng-show="state.actionInProgress">Creating endpoint...</span>  
+              </button>
+
           </div>
         </div>
         <!-- !actions -->

@@ -11,7 +11,8 @@ function ($scope, $state, Notifications, SecretService, LabelHelper, Authenticat
   };
 
   $scope.state = {
-    formValidationError: ''
+    formValidationError: '',
+    actionInProgress: false
   };
 
   $scope.addLabel = function() {
@@ -55,17 +56,16 @@ function ($scope, $state, Notifications, SecretService, LabelHelper, Authenticat
   }
 
   $scope.create = function () {
-    $('#createResourceSpinner').show();
 
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
-      $('#createResourceSpinner').hide();
       return;
     }
 
+    $scope.state.actionInProgress = true;
     var secretConfiguration = prepareConfiguration();
     SecretService.create(secretConfiguration)
     .then(function success(data) {
@@ -81,7 +81,7 @@ function ($scope, $state, Notifications, SecretService, LabelHelper, Authenticat
       Notifications.error('Failure', err, 'Unable to create secret');
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $scope.state.actionInProgress = false;
     });
   };
 }]);
