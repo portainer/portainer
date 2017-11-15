@@ -52,10 +52,11 @@ angular.module('portainer.services')
                 var nodeEntry = data[i];
                 var node = {};
 
-                //var dataStr = JSON.stringify(nodeEntry);
+                //var dataStr = JSON.stringify(nodeEntry, null, 2);
                 //console.log("ENTRY: " + dataStr);
 
                 node.Hostname = nodeEntry.Model.Description.Hostname;
+                node.Addr = nodeEntry.Addr;
                 if (nodeEntry.Model.Description.Platform.OS) {
                     node.OS = nodeEntry.Model.Description.Platform.OS;
                 } else {

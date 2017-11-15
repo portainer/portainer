@@ -1,6 +1,6 @@
 angular.module('sidebar', [])
-.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService',
-function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService) {
+.controller('SidebarController', ['$q', '$scope', '$state', 'InfraService', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService',
+function ($q, $scope, $state, InfraService, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService) {
 
   $scope.uiVersion = StateManager.getState().application.version;
   $scope.displayExternalContributors = StateManager.getState().application.displayExternalContributors;
@@ -28,12 +28,34 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
 
   function setActiveEndpoint(endpoints) {
     var activeEndpointID = EndpointProvider.endpointID();
+    var swarms = InfraService.getSwarms();
+    // Find any nodes, matched by IP vs. EP PublicURL, to determine the swarm EPs
+    eps = [];
+    for (var i = 0; i < swarms.length; i++) {
+        var swarmEntry = swarms[i];
+        if (swarmEntry.id == activeEndpointID) {
+            for (var j = 0; j < swarmEntry.nodes.length; j++) {
+                var node = swarmEntry.nodes[j];
+                for (var k = 0; k < endpoints.length; k++) {
+                    var ep = endpoints[k];
+                    if (ep.PublicURL == node.Addr) {
+                        eps.push(ep);
+                    }
+                }
+            }
+            break;
+        }
+    }
     angular.forEach(endpoints, function (endpoint) {
       if (endpoint.Id == activeEndpointID) {
         $scope.activeEndpoint = endpoint;
         EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+        if (eps.length == 0) {
+            eps.push(endpoint);
+        }
       }
     });
+    $scope.endpoints = _.sortBy(eps, ['Name']);
   }
 
   function checkPermissions(memberships) {
@@ -52,7 +74,7 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     EndpointService.endpoints()
     .then(function success(data) {
       var endpoints = data;
-      $scope.endpoints = _.sortBy(endpoints, ['Name']);
+      //$scope.endpoints = _.sortBy(endpoints, ['Name']);
       setActiveEndpoint(endpoints);
 
       if (StateManager.getState().application.authentication) {
