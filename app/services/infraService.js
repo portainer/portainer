@@ -3,7 +3,9 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
+  var epStates = [];
   var swarms = [];
+  var nonswarms = [];
 
   var stats = {
     ActiveSwarms: 0,
@@ -70,7 +72,7 @@ angular.module('portainer.services')
                 nodes.push(node);
             }
 
-            swarms.push({
+            epStates.push({
                 id:   endpointId,
                 role: endpointMode.role,
                 provider: endpointMode.provider,
@@ -83,7 +85,7 @@ angular.module('portainer.services')
             deferred.resolve();
         });
       } else {
-        swarms.push({
+        epStates.push({
             id:   endpointId,
             role: endpointMode.role,
             provider: endpointMode.provider,
@@ -105,7 +107,7 @@ angular.module('portainer.services')
   };
 
   service.getEndpointStates = function(endpoints) {
-    swarms = [];
+    epStates = [];
     var epPromises = [];
 
     for (var i = 0; i < endpoints.length; i++) {
@@ -115,13 +117,13 @@ angular.module('portainer.services')
 
     return $q.all(epPromises)
     .then(function success(data) {
-        return swarms;
+        return epStates;
     })
     .catch(function error(err) {
         //console.log("Error: " + JSON.stringify(err));
     })
     .finally(function final() {
-        return swarms;
+        return epStates;
     });
   };
 
@@ -137,6 +139,18 @@ angular.module('portainer.services')
     swarms = swarmList;
   };
 
+  service.resetNonSwarms = function() {
+    nonswarms = [];
+  };
+
+  service.getNonSwarms = function() {
+    return nonswarms;
+  };
+
+  service.setNonSwarms = function(nonSwarmList) {
+    nonswarms = nonSwarmList;
+  };
+
   service.determineSwarmStats = function() {
     stats = {
         ActiveSwarms: 0,
@@ -146,7 +160,8 @@ angular.module('portainer.services')
         ActiveWorkerCount: 0,
         OSWindowsCount: 0,
         OSLinuxCount: 0,
-        OSOtherCount: 0
+        OSOtherCount: 0,
+        NonSwarmEndpoints: nonswarms.length,
     };
     for (var j = 0; j < swarms.length; j++) {
         var swarmEntry = swarms[j];

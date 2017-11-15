@@ -3,10 +3,12 @@ angular.module('infra', [])
 function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, EndpointService, InfraService, SystemService, NodeService, Pagination, Notifications, StateManager, Authentication) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('swarms');
+  $scope.state.nonswarms_pagination_count = Pagination.getPaginationCount('nonswarms');
   $scope.state.selectedItemCount = 0;
-  $scope.sortType = 'Spec.Role';
+  $scope.sortType = 'name';
   $scope.sortReverse = false;
-  //$scope.swarms = [];
+  $scope.sortNonSwarmType = 'name';
+  $scope.sortNonSwarmReverse = false;
 
   var statePromise;
 
@@ -15,8 +17,17 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
     $scope.sortType = sortType;
   };
 
+  $scope.orderNonSwarm = function(sortType) {
+    $scope.sortNonSwarmReverse = ($scope.sortNonSwarmType === sortType) ? !$scope.sortNonSwarmReverse : false;
+    $scope.sortNonSwarmType = sortType;
+  };
+
   $scope.changePaginationCount = function() {
     Pagination.setPaginationCount('swarms', $scope.state.pagination_count);
+  };
+
+  $scope.changeNonSwarmsPaginationCount = function() {
+    Pagination.setPaginationCount('nonswarms', $scope.state.nonswarms_pagination_count);
   };
 
   $scope.selectItems = function (allSelected) {
@@ -168,6 +179,7 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
 
     // TODO: add re-discover or refresh option later
     var tmpSwarms = InfraService.getSwarms();
+    var tmpNonSwarms = InfraService.getNonSwarms();
     if (tmpSwarms.length == 0) {
         EndpointService.endpoints()
         .then(function success(data) {
@@ -181,18 +193,34 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
           InfraService.getEndpointStates($scope.endpoints)
           .then(function success(data) {
             var foundSwarms = [];
+            var foundNonSwarms = [];
             for (var i = 0; i < data.length; i++) {
                 var epEntry = data[i];
+
+                // TODO: improve this mapping, likely on initial EP setup...
+                for (var j = 0; j < $scope.endpoints.length; j++) {
+                    var oldEpEntry = $scope.endpoints[j];
+                    if (oldEpEntry.Id == epEntry.id) {
+                        epEntry.name = oldEpEntry.Name;
+                        break;
+                    }
+                }
+
                 if (epEntry.provider == "DOCKER_SWARM_MODE") {
-                    foundSwarms.push(epEntry)
+                    foundSwarms.push(epEntry);
+                } else {
+                    foundNonSwarms.push(epEntry);
                 }
             }
             $scope.swarms = foundSwarms;
+            $scope.nonswarms = foundNonSwarms;
             InfraService.setSwarms(foundSwarms);
+            InfraService.setNonSwarms(foundNonSwarms);
           });
         });
     } else {
         $scope.swarms = tmpSwarms;
+        $scope.nonswarms = tmpNonSwarms;
     }
 
     $scope.spinner = false;

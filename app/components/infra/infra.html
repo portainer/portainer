@@ -50,6 +50,20 @@
 </div>
 
 <div class="row">
+  <div class="col-xs-12 col-md-6" ng-if="swarms.length == 0 && nonswarms.length == 0">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon yellow pull-left">
+            <i class="fa fa-exclamation-triangle"></i>
+          </div>
+          <div class="title">Discovering swarms...</div>
+          <div class="comment">Please wait a few moments, or check connection to provider VPC</div>
+        </rd-widget-body>
+      </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="swarms.length > 0">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
      <rd-widget-taskbar classes="col-lg-12">
       <div class="pull-left">
@@ -92,7 +106,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="swarm in swarms | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count">
+            <tr dir-paginate="swarm in swarms | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count" pagination-id="swarm">
               <td ng-if="swarm.swarmId != ''"><a ui-sref="dashboard({endpointid: swarm.id})">{{ swarm.swarmId }}</a></td>
               <td ng-if="swarm.swarmId != ''">{{ swarm.data.Swarm.Nodes }}</td>
               <td ng-if="swarm.swarmId != ''">{{ swarm.data.Swarm.Managers }}</td>
@@ -100,7 +114,49 @@
           </tbody>
         </table>
         <div class="pagination-controls">
-          <dir-pagination-controls></dir-pagination-controls>
+          <dir-pagination-controls pagination-id="swarm"></dir-pagination-controls>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="nonswarms.length > 0">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-hdd-o" title="Non-Swarm summary">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.nonswarms_pagination_count" ng-change="changeNonSwarmsPaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>
+                <a ui-sref="infra" ng-click="orderNonSwarm('name')">
+                  Name
+                  <span ng-show="sortNonSwarmType == 'name' && !sortNonSwarmReverse" class="glyphicon glyphicon-chevron-down"></span>
+                  <span ng-show="sortNonSwarmType == 'name' && sortNonSwarmReverse" class="glyphicon glyphicon-chevron-up"></span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="nonswarm in nonswarms | filter:state.filter | orderBy:sortNonSwarmType:sortNonSwarmReverse | itemsPerPage: state.nonswarms_pagination_count" pagination-id="nonswarm">
+              <td ng-if="nonswarm.name != ''"><a ui-sref="dashboard({endpointid: nonswarm.id})">{{ nonswarm.name }}</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination-controls">
+          <dir-pagination-controls pagination-id="nonswarm"></dir-pagination-controls>
         </div>
       </rd-widget-body>
     </rd-widget>
