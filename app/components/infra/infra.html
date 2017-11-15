@@ -103,18 +103,30 @@
                 </a>
               </th>
               <th>
+                Current leader
+              </th>
+              <th>
                 Total node count
               </th>
               <th>
                 Manager count
+              </th>
+              <th>
+                Nodes
               </th>
             </tr>
           </thead>
           <tbody>
             <tr dir-paginate="swarm in swarms | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count" pagination-id="swarm">
               <td ng-if="swarm.swarmId != ''"><a ui-sref="dashboard({endpointid: swarm.id})">{{ swarm.swarmId }}</a></td>
+              <td ng-if="swarm.swarmId != ''">{{ swarm.name }}</td>
               <td ng-if="swarm.swarmId != ''">{{ swarm.data.Swarm.Nodes }}</td>
               <td ng-if="swarm.swarmId != ''">{{ swarm.data.Swarm.Managers }}</td>
+              <td ng-if="swarm.swarmId != ''">
+                <ul ng-repeat="node in swarm.nodes">
+                  <li>{{ node.Hostname }}</li>
+                </ul>
+              </td>
             </tr>
           </tbody>
         </table>
