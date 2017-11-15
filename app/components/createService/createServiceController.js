@@ -82,7 +82,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   };
 
   $scope.addSecret = function() {
-    $scope.formValues.Secrets.push({});
+    $scope.formValues.Secrets.push({ overrideTarget: false });
   };
 
   $scope.removeSecret = function(index) {
