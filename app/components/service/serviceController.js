@@ -7,6 +7,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.tasks = [];
   $scope.sortType = 'Updated';
   $scope.sortReverse = true;
+  $scope.secretOverrideTarget = false;
 
   $scope.lastVersion = 0;
 
@@ -75,6 +76,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     updateServiceArray(service, 'ServiceConfigs', service.ServiceConfigs);
   };
   $scope.addSecret = function addSecret(service, secret, secretTarget) {
+    console.log(secretTarget);
     var filename = secret.Name;
     if (secretTarget && secretTarget !== '') {
       filename = secretTarget;
