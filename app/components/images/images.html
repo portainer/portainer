@@ -88,15 +88,15 @@
                   </a>
                 </th>
                 <script type="text/ng-template" id="tpl_lists_select.html">
-                  <div class="open dropdown-select">
+                  <div class="open dropdown-select" ng-click="item.isOpen = !item.isOpen">
                     <ul class="dropdown-menu"><li class="interactive" ng-model="item.Selected" ng-repeat="(k , v) in item.Options" uib-btn-radio="'{{k}}'"><a><i class="fa fa-{{v.icon}} {{v.class}}"></i>&nbsp;{{k}}</a></li></ul>
                   </div>
                 </script>
                 <th width="60px" ng-repeat="item in [ UsageFilters.Containers, UsageFilters.Children]" style="text-align:center;">
-                  <span class="interactive dropdown-select-label" popover-append-to-body="true" popover-trigger="'click outsideClick'" popover-class="popover-no-margin" popover-placement="bottom" uib-popover-template="'tpl_lists_select.html'"><i class="fa fa-plus-square-o"></i> <a>{{item.Descriptor}}</a></span>
+                  <span class="interactive dropdown-select-label" popover-append-to-body="true" popover-trigger="'click outsideClick'" popover-class="popover-no-margin" popover-placement="bottom" uib-popover-template="'tpl_lists_select.html'" popover-is-open="item.isOpen"><i class="fa fa-plus-square-o"></i> <a>{{item.Descriptor}}</a></span>
                 </th>
                 <th>
-                  <span ng-repeat="item in [ UsageFilters.Tags ]"><span class="interactive dropdown-select-label" popover-trigger="'click outsideClick'" popover-class="popover-no-margin" popover-placement="bottom" uib-popover-template="'tpl_lists_select.html'"><i class="fa fa-plus-square-o"></i></span></span>
+                  <span ng-repeat="item in [ UsageFilters.Tags ]"><span class="interactive dropdown-select-label" popover-trigger="'click outsideClick'" popover-class="popover-no-margin" popover-placement="bottom" uib-popover-template="'tpl_lists_select.html'" popover-is-open="item.isOpen"><i class="fa fa-plus-square-o"></i></span></span>
                   <a ui-sref="images" ng-click="order('RepoTags')">
                     Tags
                     <span ng-show="sortType == 'RepoTags' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
