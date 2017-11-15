@@ -1,6 +1,6 @@
 angular.module('infra', [])
-.controller('InfraController', ['$interval', '$q', '$scope', '$state', 'OrcaEndpointService', 'ProjectService', 'EndpointService', 'InfraService', 'SystemService', 'NodeService', 'Pagination', 'Notifications', 'StateManager', 'Authentication',
-function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, EndpointService, InfraService, SystemService, NodeService, Pagination, Notifications, StateManager, Authentication) {
+.controller('InfraController', ['$interval', '$q', '$scope', '$state', 'EndpointProvider', 'OrcaEndpointService', 'ProjectService', 'EndpointService', 'InfraService', 'SystemService', 'NodeService', 'Pagination', 'Notifications', 'StateManager', 'Authentication',
+function ($interval, $q, $scope, $state, EndpointProvider, OrcaEndpointService, ProjectService, EndpointService, InfraService, SystemService, NodeService, Pagination, Notifications, StateManager, Authentication) {
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('swarms');
   $scope.state.nonswarms_pagination_count = Pagination.getPaginationCount('nonswarms');
@@ -180,6 +180,8 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
     $scope.applicationState.infra = true;
     $scope.operationStatus = "";
 
+    EndpointProvider.setSwitchedEndpointID("");
+
     // TODO: add re-discover or refresh option later
     var tmpSwarms = InfraService.getSwarms();
     var tmpNonSwarms = InfraService.getNonSwarms();
@@ -228,6 +230,9 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
         $scope.swarms = tmpSwarms;
         $scope.nonswarms = tmpNonSwarms;
     }
+
+    // Reset cached EP list
+    InfraService.setCachedSwarmEndpoints([]);
 
     $scope.spinner = false;
     statusPromise = $interval($scope.statusAction, 5000);

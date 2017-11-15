@@ -134,7 +134,7 @@ function configureRoutes($stateProvider) {
   })
   .state('dashboard', {
     parent: 'root',
-    url: '/dashboard/:endpointid',
+    url: '/dashboard/:endpointid/:frominfra',
     views: {
       'content@': {
         templateUrl: 'app/components/dashboard/dashboard.html',

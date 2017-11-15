@@ -118,7 +118,7 @@
           </thead>
           <tbody>
             <tr dir-paginate="swarm in swarms | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count" pagination-id="swarm">
-              <td ng-if="swarm.swarmId != ''"><a ui-sref="dashboard({endpointid: swarm.id})">{{ swarm.swarmId }}</a></td>
+              <td ng-if="swarm.swarmId != ''"><a ui-sref="dashboard({endpointid: swarm.id, frominfra: true})">{{ swarm.swarmId }}</a></td>
               <td ng-if="swarm.swarmId != ''">{{ swarm.name }}</td>
               <td ng-if="swarm.swarmId != ''">{{ swarm.data.Swarm.Nodes }}</td>
               <td ng-if="swarm.swarmId != ''">{{ swarm.data.Swarm.Managers }}</td>
@@ -168,7 +168,7 @@
           </thead>
           <tbody>
             <tr dir-paginate="nonswarm in nonswarms | filter:state.filter | orderBy:sortNonSwarmType:sortNonSwarmReverse | itemsPerPage: state.nonswarms_pagination_count" pagination-id="nonswarm">
-              <td ng-if="nonswarm.name != ''"><a ui-sref="dashboard({endpointid: nonswarm.id})">{{ nonswarm.name }}</a></td>
+              <td ng-if="nonswarm.name != ''"><a ui-sref="dashboard({endpointid: nonswarm.id, frominfra: true})">{{ nonswarm.name }}</a></td>
             </tr>
           </tbody>
         </table>

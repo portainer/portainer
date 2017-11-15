@@ -1,6 +1,6 @@
 angular.module('dashboard', [])
-.controller('DashboardController', ['$transition$', '$scope', '$q', 'EndpointProvider', 'StateManager', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'ServiceService', 'StackService', 'Notifications',
-function ($transition$, $scope, $q, EndpointProvider, StateManager, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications) {
+.controller('DashboardController', ['$transition$', '$scope', '$q', '$state',  'EndpointProvider', 'StateManager', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'ServiceService', 'StackService', 'Notifications',
+function ($transition$, $scope, $q, $state, EndpointProvider, StateManager, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications) {
 
   $scope.containerData = {
     total: 0
@@ -70,7 +70,12 @@ function ($transition$, $scope, $q, EndpointProvider, StateManager, Container, C
     $scope.applicationState.infra = false;
 
     if ($transition$.params().endpointid) {
-        EndpointProvider.setEndpointID($transition$.params().endpointid);
+        if (EndpointProvider.getSwitchedEndpointID() != "" && EndpointProvider.getSwitchedEndpointID() != $transition$.params().endpointid) {
+            activeEndpointID = EndpointProvider.getSwitchedEndpointID();
+            EndpointProvider.setEndpointID(activeEndpointID);
+        } else {
+            EndpointProvider.setEndpointID($transition$.params().endpointid);
+        }
 
         StateManager.updateEndpointState(false)
         .then(function success(data) {

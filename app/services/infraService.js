@@ -7,6 +7,7 @@ angular.module('portainer.services')
   var swarms = [];
   var nonswarms = [];
   var loadingState = false;
+  var cachedSwarmEndpoints = [];
 
   var stats = {
     ActiveSwarms: 0,
@@ -159,6 +160,14 @@ angular.module('portainer.services')
 
   service.setDataLoading = function(value) {
     loadingState = value;
+  };
+
+  service.getCachedSwarmEndpoints = function() {
+    return cachedSwarmEndpoints;
+  };
+
+  service.setCachedSwarmEndpoints = function(epList) {
+    cachedSwarmEndpoints = epList;
   };
 
   service.determineSwarmStats = function() {

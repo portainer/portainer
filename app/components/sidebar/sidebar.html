@@ -15,9 +15,10 @@
       <span>Active endpoint</span>
     </li>
     <li ng-if="!applicationState.infra" class="sidebar-title">
-      <select class="select-endpoint form-control" ng-options="endpoint.Name for endpoint in endpoints" ng-model="activeEndpoint" ng-change="switchEndpoint(activeEndpoint)">
+      <select class="select-endpoint form-control" ng-options="endpoint.Name as endpoint.Name for endpoint in endpoints" ng-model="activeEndpoint.Name" ng-change="switchEndpoint(activeEndpoint)">
       </select>
     </li>
+
     <li ng-if="!applicationState.infra" class="sidebar-title"><span>Endpoint actions</span></li>
     <li ng-if="applicationState.infra" class="sidebar-title"><span>Infra actions</span></li>
     <li ng-if="!applicationState.infra" class="sidebar-list">

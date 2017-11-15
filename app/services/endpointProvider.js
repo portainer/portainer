@@ -3,6 +3,7 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
   var endpoint = {};
+  var switchedEndpointID = "";
 
   service.initialize = function() {
     var endpointID = LocalStorage.getEndpointID();
@@ -26,6 +27,14 @@ angular.module('portainer.services')
   service.setEndpointID = function(id) {
     endpoint.ID = id;
     LocalStorage.storeEndpointID(id);
+  };
+
+  service.getSwitchedEndpointID = function() {
+    return switchedEndpointID;
+  };
+
+  service.setSwitchedEndpointID = function(id) {
+    switchedEndpointID = id;
   };
 
   service.endpointPublicURL = function() {
