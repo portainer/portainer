@@ -58,7 +58,7 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
       // console.log("Running task to create new project...")
     })
     .then(function success() {
-      Notifications.success('Endpoint discovery successfully launched...');
+      Notifications.success('Endpoint discovery successfully completed');
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'An error occured during endpoint discovery for provider ' + provider);
@@ -125,7 +125,7 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
     // TODO: hardcode to ec2-us-east-1 for now -- otherwise get/iterate list of available providers
     var provider = 'ec2-us-east-1'
 
-    $scope.spinner = false;
+    $scope.spinner = true;
 
     ProjectService.operationStatus(provider)
         .then(function success(data) {
@@ -136,33 +136,36 @@ function ($interval, $q, $scope, $state, OrcaEndpointService, ProjectService, En
             $scope.spinner = true;
             $scope.operationStatus = data;
           }
-          ProjectService.messageStatus(provider)
-            .then(function success(data) {
-              var messages = [];
-              var errors = [];
-              for (var i = 0; i < data.length; i++) {
-                  var entry = data[i];
-                  if (entry.Name != '' && entry.Messages != [] && entry.Messages != '') {
-                    messages.push({Name: entry.Name, Messages: entry.Messages});
+
+          if ($scope.operationStatus != "") {
+              ProjectService.messageStatus(provider)
+                .then(function success(data) {
+                  var messages = [];
+                  var errors = [];
+                  for (var i = 0; i < data.length; i++) {
+                      var entry = data[i];
+                      if (entry.Name != '' && entry.Messages != [] && entry.Messages != '') {
+                        messages.push({Name: entry.Name, Messages: entry.Messages});
+                      }
+                      if (entry.Name != '' && entry.Errors != [] && entry.Errors != '') {
+                        errors.push({Name: entry.Name, Errors: entry.Errors});
+                      }
                   }
-                  if (entry.Name != '' && entry.Errors != [] && entry.Errors != '') {
-                    errors.push({Name: entry.Name, Errors: entry.Errors});
+                  if (messages != [] && messages != '' && messages != null) {
+                    $scope.messages = messages;
+                  } else {
+                    delete $scope.messages;
                   }
-              }
-              if (messages != [] && messages != '' && messages != null) {
-                $scope.messages = messages;
-              } else {
-                delete $scope.messages;
-              }
-              if (errors != [] && errors != '' && errors != null) {
-                $scope.errors = errors;
-              } else {
-                delete $scope.errors;
-              }
-            })
-            .catch(function error(err) {
-              Notifications.error('Failure', err, 'Unable to get Orca message status');
-            });
+                  if (errors != [] && errors != '' && errors != null) {
+                    $scope.errors = errors;
+                  } else {
+                    delete $scope.errors;
+                  }
+                })
+                .catch(function error(err) {
+                  Notifications.error('Failure', err, 'Unable to get Orca message status');
+                });
+            }
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to get Orca operation status');
