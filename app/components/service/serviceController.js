@@ -345,7 +345,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.secrets = data.secrets;
       $scope.availableImages = _.flatten(_.map(data.availableImages, function (image) {
         _.remove(image.RepoTags, function(item){
-          return item.indexOf("<none>") != -1; 
+          return item.indexOf('<none>') !== -1; 
         });
         return image.RepoTags ? _.uniqWith(image.RepoTags, _.isEqual) : [];
       }));
