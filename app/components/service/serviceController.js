@@ -7,7 +7,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.tasks = [];
   $scope.sortType = 'Updated';
   $scope.sortReverse = true;
-  $scope.secretOverrideTarget = false;
 
   $scope.lastVersion = 0;
 
@@ -75,15 +74,16 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updateConfig = function updateConfig(service) {
     updateServiceArray(service, 'ServiceConfigs', service.ServiceConfigs);
   };
-  $scope.addSecret = function addSecret(service, secret, secretTarget) {
-    console.log(secretTarget);
-    var filename = secret.Name;
-    if (secretTarget && secretTarget !== '') {
-      filename = secretTarget;
-    }
-    if (secret && service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === secret.Id && serviceSecret.FileName === filename;}).length === 0) {
-      service.ServiceSecrets.push({ Id: secret.Id, Name: secret.Name, FileName: filename, Uid: '0', Gid: '0', Mode: 444 });
-      updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
+  $scope.addSecret = function addSecret(service, newSecret) {
+    if (newSecret.secret) {
+      var filename = newSecret.secret.Name;
+      if (newSecret.override) {
+        filename = newSecret.target;
+      }
+      if (service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === newSecret.secret.Id && serviceSecret.FileName === filename;}).length === 0) {
+        service.ServiceSecrets.push({ Id: newSecret.secret.Id, Name: newSecret.secret.Name, FileName: filename, Uid: '0', Gid: '0', Mode: 444 });
+        updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
+      }
     }
   };
   $scope.removeSecret = function removeSecret(service, index) {
@@ -360,6 +360,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       } else {
         $scope.state.sliderMaxCpu = 32;
       }
+
+      // Default values
+      $scope.state.addSecret = {override: false};
 
       $timeout(function() {
         $anchorScroll();
