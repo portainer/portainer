@@ -21,7 +21,6 @@ js:
   - bower_components/jquery/dist/jquery.min.js
   - bower_components/bootstrap/dist/js/bootstrap.min.js
   - bower_components/bootbox.js/bootbox.js
-  - bower_components/Chart.js/Chart.min.js
   - bower_components/filesize/lib/filesize.min.js
   - bower_components/lodash/dist/lodash.min.js
   - bower_components/moment/min/moment.min.js
