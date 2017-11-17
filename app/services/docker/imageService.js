@@ -159,7 +159,7 @@ angular.module('portainer.services')
       });
       return image.RepoTags ? _.uniqWith(image.RepoTags, _.isEqual) : [];
     }));
-  }
+  };
 
   return service;
 }]);
