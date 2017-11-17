@@ -343,7 +343,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.nodes = data.nodes;
       $scope.configs = data.configs;
       $scope.secrets = data.secrets;
-      $scope.availableImages = ImageService.parseAvailableImages(data.availableImages);
+      $scope.availableImages = ImageService.getUniqueTagListFromImages(data.availableImages);
 
       // Set max cpu value
       var maxCpus = 0;

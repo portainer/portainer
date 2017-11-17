@@ -152,7 +152,7 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.parseAvailableImages = function (availableImages) {
+  service.getUniqueTagListFromImages = function (availableImages) {
     return _.flatten(_.map(availableImages, function (image) {
       _.remove(image.RepoTags, function (item) {
         return item.indexOf('<none>') !== -1;
