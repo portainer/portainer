@@ -343,12 +343,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.nodes = data.nodes;
       $scope.configs = data.configs;
       $scope.secrets = data.secrets;
-      $scope.availableImages = _.flatten(_.map(data.availableImages, function (image) {
-        _.remove(image.RepoTags, function(item){
-          return item.indexOf('<none>') !== -1; 
-        });
-        return image.RepoTags ? _.uniqWith(image.RepoTags, _.isEqual) : [];
-      }));
+      $scope.availableImages = ImageService.parseAvailableImages(data.availableImages);
 
       // Set max cpu value
       var maxCpus = 0;

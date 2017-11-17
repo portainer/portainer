@@ -12,12 +12,7 @@ angular.module('portainer')
           .then(function success(data) {
             var dockerhub = data.dockerhub;
             var registries = data.registries;
-            ctrl.availableImages = _.flatten(_.map(data.availableImages, function (image) {
-              _.remove(image.RepoTags, function(item){
-                return item.indexOf('<none>') !== -1; 
-              });
-              return image.RepoTags ? _.uniqWith(image.RepoTags, _.isEqual) : [];
-            }));
+            ctrl.availableImages = ImageService.parseAvailableImages(data.availableImages);
             ctrl.availableRegistries = [dockerhub].concat(registries);
             if (!ctrl.registry.Id) {
               ctrl.registry = dockerhub;
