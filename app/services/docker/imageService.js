@@ -29,8 +29,8 @@ angular.module('portainer.services')
     })
     .then(function success(data) {
       var containers = data.containers;
-
       var images = data.images.map(function(item) {
+        item.ChildrenList = [];
         item.ContainersList = [];
         for (var i = 0; i < containers.length; i++) {
           var container = containers[i];
@@ -41,10 +41,25 @@ angular.module('portainer.services')
             });
           }
         }
-        if ( item.ContainersList.length === 0 ) {
+        if (item.ContainersList.length === 0) {
           item.ContainersList = 'None';
         }
         return new ImageViewModel(item);
+      });
+
+      images = images.map(function(item) {
+        for (var i = 0; i < images.length; i++) {
+          var img = data.images[i];
+          if (img.ParentId === item.Id) {
+            item.ChildrenList.push({
+              Id: img.Id
+            });
+          }
+        }
+        if (item.ChildrenList.length === 0) {
+          item.ChildrenList = 'None';
+        }
+        return item;
       });
 
       deferred.resolve(images);

@@ -12,9 +12,11 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
 
   $scope.state.containersListOptions={All:undefined, Used:'!', Unused:''};
   $scope.state.tagListOptions={All:undefined, Tagged:'', Untagged:'!'};
+  $scope.state.childrenListOptions={All:undefined, WithChildren:'', NoChildren:'!'};
 
   $scope.state.containersListFilter = undefined;
   $scope.state.tagListFilter = '';
+  $scope.state.childrenListFilter = undefined;
 
   $scope.formValues = {
     Image: '',
