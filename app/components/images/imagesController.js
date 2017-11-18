@@ -11,7 +11,10 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
   $scope.sortReverse = true;
 
   $scope.state.containersListOptions={All:undefined, Used:'!', Unused:''};
+  $scope.state.tagListOptions={All:undefined, Tagged:'', Untagged:'!'};
+
   $scope.state.containersListFilter = undefined;
+  $scope.state.tagListFilter = '';
 
   $scope.formValues = {
     Image: '',
