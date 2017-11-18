@@ -117,7 +117,7 @@
                   <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id.slice(7)|truncate:13}}</a>
                 </td>
                 <td>
-                  <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="::image.ContainerCount === 0">Unused</span>
+                  <span class="fa fa-server" ng-if="::image.ContainerCount != 0"></span>
                 </td>
                 <td>
                   <a ui-sref="image({id: image.Id})" class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>
