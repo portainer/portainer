@@ -2,11 +2,11 @@
   <rd-header-title title="Container details">
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="containers">Containers</a> &gt; <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a>
+    <a ui-sref="containers">Containers</a> &gt; <a ui-sref="container({id: container.Id})">{{ container.Name|trimcontainername }}</a> &gt; <rd-popover-menu class="interactive" object="state.Select" tpl="lists_select" ref-id="{{container.Id}}"></rd-popover-menu>
   </rd-header-content>
 </rd-header>
 
-  <div class="row">
+  <div class="row" ng-if="state.Select.Match('Actions')">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
         <rd-widget-header icon="fa-cogs" title="Actions"></rd-widget-header>
@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" ng-if="state.Select.Match('Status')">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
         <rd-widget-header icon="fa-server" title="Container status"></rd-widget-header>
@@ -100,14 +100,14 @@
 
   <!-- access-control-panel -->
   <por-access-control-panel
-    ng-if="container && applicationState.application.authentication"
+    ng-if="container && applicationState.application.authentication && state.Select.Match('Status')"
     resource-id="container.Id"
     resource-control="container.ResourceControl"
     resource-type="'container'">
   </por-access-control-panel>
   <!-- !access-control-panel -->
 
-  <div ng-if="container.State.Health" class="row">
+  <div ng-if="container.State.Health" class="row" ng-if="state.Select.Match('Status')">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
         <rd-widget-header icon="fa-server" title="Container health"></rd-widget-header>
@@ -136,7 +136,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" ng-if="state.Select.Match('Actions')">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
         <rd-widget-header icon="fa-clone" title="Create image"></rd-widget-header>
@@ -175,7 +175,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" ng-if="state.Select.Match('Details')">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
         <rd-widget-header icon="fa-server" title="Container details"></rd-widget-header>
@@ -244,7 +244,7 @@
     </div>
   </div>
 
-  <div class="row" ng-if="container.Mounts.length > 0">
+  <div class="row" ng-if="container.Mounts.length > 0 && state.Select.Match('Volumes')">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
         <rd-widget-header icon="fa-cubes" title="Volumes"></rd-widget-header>
@@ -269,7 +269,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" ng-if="state.Select.Match('Networks')">
     <div class="col-sm-12">
       <container-networks-datatable
       title="Connected networks" title-icon="fa-sitemap"

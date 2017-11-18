@@ -1,11 +1,11 @@
 <rd-header>
   <rd-header-title title="Image details"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="images">Images</a> &gt; <a ui-sref="image({id: image.Id})">{{ image.Id }}</a>
+    <a ui-sref="images">Images</a> &gt; <a ui-sref="image({id: image.Id})">{{ (image.Id||'').slice(7)|truncate:13 }}</a> &gt; <rd-popover-menu class="interactive" object="state.Select" tpl="lists_select"></rd-popover-menu>
   </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="image.RepoTags.length > 0">
+<div class="row" ng-if="(image.RepoTags.length > 0) && state.Select.Match('Tags')">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa fa-tags" title="Image tags"></rd-widget-header>
@@ -56,7 +56,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" ng-if="state.Select.Match('Tags')">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-tag" title="Tag the image"></rd-widget-header>
@@ -85,7 +85,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" ng-if="state.Select.Match('Details')">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-clone" title="Image details"></rd-widget-header>
@@ -126,14 +126,14 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" ng-if="state.Select.Match('Dockerfile')">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Dockerfile details"></rd-widget-header>
+      <rd-widget-header icon="fa-file-text-o" title="Dockerfile details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
-            <tr>
+            <tr ng-if="image.Command">
               <td>CMD</td>
               <td><code>{{ image.Command|command }}</code></td>
             </tr>
@@ -175,7 +175,7 @@
   </div>
 </div>
 
-<div class="row" ng-if="history.length > 0">
+<div class="row" ng-if="(history.length > 0) && state.Select.Match('Details')">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-clone" title="Image layers"></rd-widget-header>

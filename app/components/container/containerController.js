@@ -1,6 +1,6 @@
 angular.module('container', [])
-.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
-function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService) {
+.controller('ContainerController', ['$q', '$scope', '$state', '$stateParams', '$transition$', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
+function ($q, $scope, $state, $stateParams, $transition$, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, Pagination, ModalService, ResourceControlService, RegistryService, ImageService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
 
@@ -12,13 +12,77 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   $scope.state = {
     recreateContainerInProgress: false,
     joinNetworkInProgress: false,
-    leaveNetworkInProgress: false
+    leaveNetworkInProgress: false,
+    pagination_count: Pagination.getPaginationCount('container_networks')
   };
+
+  $scope.state.Select = {
+    Active: 'All',
+    Options: {
+      All: 'circle-o',
+      Status: 'server',
+      Actions: 'cogs',
+      Details: 'server',
+      Volumes: 'cubes',
+      Networks: 'sitemap'
+    },
+    Links: {
+      Console: { icon:'terminal',           ref:'console'       },
+      Logs:    { icon:'exclamation-circle', ref:'containerlogs' },
+      Stats:   { icon:'area-chart',         ref:'stats'         },
+      Inspect: { icon:'info-circle',        ref:'inspect'       }
+    },
+    Match: function(v) {
+      var c = this.Active;
+      return v.match(new RegExp((c === 'All') ? '.+' : c)) !== null;
+		},
+		Click: function() {
+/* To complement #1417
+      var s = $scope.state.Show.Vars;
+      switch ($scope.state.Select.Active) {
+        case 'Status':
+          s.Status = true;
+          s.Health = true;
+          s.Acess = true;
+          break;
+        case 'Actions':
+          s.Actions = true;
+          s.CreateImage = true;
+          break;
+        case 'Details':
+          s.Details = true;
+          break;
+        case 'Volumes':
+          s.Volumes = true;
+          break;
+        case 'Networks':
+          s.Networks = true;
+          break;
+        case 'All':
+          for (x in s) {
+            s[x] = false;
+          };
+          break;
+      }
+      $scope.state.Show.Vars = s;
+*/
+    }
+  };
+
+  $scope.state.Select.Active = ($scope.state.Select.Options[$stateParams.s]===undefined) ? 'All': $stateParams.s;
+
+// TODO make the URL coherent. Either remove the query, WITHOUT reloading the view, or change the query value when the section is changed.
+//  $location.url('/containers/' + $stateParams.id);
 
   var update = function () {
     Container.get({id: $transition$.params().id}, function (d) {
       var container = new ContainerDetailsViewModel(d);
       $scope.container = container;
+      if (container.Mounts.length === 0) {
+        delete $scope.state.Select.Options.Volumes;
+//        $scope.state.Select.Active = ($scope.state.Select.Active==='Volumes')?'All':$scope.state.Select.Active;
+      }
+
       $scope.container.edit = false;
       $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
 
