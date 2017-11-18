@@ -77,10 +77,10 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th>
+                <th width="30px">
                   <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
                 </th>
-                <th>
+                <th width="120px">
                   <a ui-sref="images" ng-click="order('Id')">
                     Id
                     <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -92,7 +92,7 @@
                     <ul class="dropdown-menu"><li class="interactive" ng-model="item.Selected" ng-repeat="(k , v) in item.Options" uib-btn-radio="'{{k}}'"><a><i class="fa fa-{{v.icon}} {{v.class}}"></i>&nbsp;{{k}}</a></li></ul>
                   </div>
                 </script>
-                <th>
+                <th width="60px">
                   <i ng-repeat="item in [ UsageFilters.Containers, UsageFilters.Children]"><label class="fa fa-plus-square-o interactive dropdown-select-label" popover-append-to-body="true" popover-trigger="'click outsideClick'" popover-class="popover-no-margin" popover-placement="bottom" uib-popover-template="'tpl_lists_select.html'"></label></i>
                 </th>
                 <th>
@@ -106,14 +106,14 @@
                     <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control" style="height: 22px; padding-top: 0px; padding-bottom: 0px; margin-top: -2px;"/>
                   </div>
                 </th>
-                <th>
+                <th width="90px">
                   <a ui-sref="images" ng-click="order('VirtualSize')">
                     Size
                     <span ng-show="sortType == 'VirtualSize' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                     <span ng-show="sortType == 'VirtualSize' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                   </a>
                 </th>
-                <th>
+                <th width="160px">
                   <a ui-sref="images" ng-click="order('Created')">
                     Created
                     <span ng-show="sortType == 'Created' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
