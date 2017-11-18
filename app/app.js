@@ -1,5 +1,5 @@
 angular.module('portainer')
-.run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'cfpLoadingBar', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, cfpLoadingBar) {
+.run(['$rootScope', '$state', '$location', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'cfpLoadingBar', function ($rootScope, $state, $location, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, cfpLoadingBar) {
   'use strict';
 
   EndpointProvider.initialize();
@@ -27,8 +27,13 @@ angular.module('portainer')
       originalSet.apply(cfpLoadingBar, arguments);
     }
   };
-}]);
 
+  $rootScope.$on('$viewContentLoaded', function(evt){
+    if ($location.hash()) window.setTimeout(function(){
+        $('html, body').animate({ scrollTop: $('#'+$location.hash()).offset().top }, 0);
+      }, 100);
+  });
+}]);
 
 function initAuthentication(authManager, Authentication, $rootScope) {
   authManager.checkAuthOnRefresh();
