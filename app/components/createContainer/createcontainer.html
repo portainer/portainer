@@ -36,7 +36,7 @@
               <div class="col-sm-12">
                 <label for="ownership" class="control-label text-left">
                   Always pull the image
-                  <portainer-tooltip position="bottom" message="When enabled, Portainer will automatically try to pull the specified image before creating the container."></portainer-tooltip>
+                  <portainer-tooltip icon="question-circle" position="bottom" message="When enabled, Portainer will automatically try to pull the specified image before creating the container."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" ng-model="formValues.alwaysPull"><i></i>
@@ -53,7 +53,7 @@
             <div class="col-sm-12">
               <label class="control-label text-left">
                 Publish all exposed ports
-                <portainer-tooltip position="bottom" message="When enabled, Portainer will let Docker automatically map a random port on the host to each one defined in the image Dockerfile."></portainer-tooltip>
+                <portainer-tooltip icon="question-circle" position="bottom" message="When enabled, Portainer will let Docker automatically map a random port on the host to each one defined in the image Dockerfile."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
                 <input type="checkbox" ng-model="config.HostConfig.PublishAllPorts"><i></i>

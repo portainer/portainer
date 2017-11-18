@@ -41,7 +41,7 @@
           <div class="form-group">
             <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
               Endpoint URL
-              <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
+              <portainer-tooltip icon="question-circle" position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
@@ -52,7 +52,7 @@
           <div class="form-group">
             <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
               Public IP
-              <portainer-tooltip position="bottom" message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."></portainer-tooltip>
+              <portainer-tooltip icon="question-circle" position="bottom" message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."></portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="endpoint_public_url" ng-model="formValues.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com">
