@@ -125,7 +125,7 @@
               <tr dir-paginate="image in (state.filteredImages = (images | filter:{ ContainerCount: state.containersCountFilter } | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: image.Checked}">
                 <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
                 <td>
-                  <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a>
+                  <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id.slice(7)|truncate:13}}</a>
                   <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="::image.ContainerCount === 0">Unused</span>
                 </td>
                 <td>
