@@ -94,7 +94,7 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
   function fetchImages() {
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    ImageService.images(true)
+    ImageService.images(true,'all')
     .then(function success(data) {
       $scope.images = data;
     })

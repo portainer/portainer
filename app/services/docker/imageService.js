@@ -11,7 +11,15 @@ angular.module('portainer.services')
         deferred.reject({ msg: data.message });
       } else {
         var image = new ImageDetailsViewModel(data);
-        deferred.resolve(image);
+        service.images(true,image.Id)
+        .then(function success(d) {
+          image.ContainersList = d[0].ContainersList;
+          image.ChildrenList = d[0].ChildrenList;
+          deferred.resolve(image);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to retrieve images', err: err });
+        });
       }
     })
     .catch(function error(err) {
@@ -20,7 +28,7 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.images = function(withUsage) {
+  service.images = function(withUsage,id) {
     var deferred = $q.defer();
 
     $q.all({
@@ -28,41 +36,63 @@ angular.module('portainer.services')
       images: Image.query({}).$promise
     })
     .then(function success(data) {
+      function InitMapFromArray(a) {
+        var m = {};
+        for (var i = 0; i < a.length; i++) {
+          a[i].ChildrenList = [];
+          a[i].ContainersList = [];
+          m[a[i].Id] = a[i];
+        }
+        return m;
+      }
+
+      function FillLists(images, src, id, list, namestags) {
+        for (var k in src) {
+          if (src.hasOwnProperty(k)) {
+            var v = src[k];
+            if (images[v[id]] !== undefined) {
+              images[v[id]][list].push({
+                Id: v.Id,
+                NamesTags: v[namestags]
+              });
+            }
+          }
+        }
+        return images;
+      }
+
+      function Map2ImageViewModelArray(m) {
+        var a = [];
+        var i = 0;
+        for (var k in m) {
+          if (m.hasOwnProperty(k)) {
+            a[i] = new ImageViewModel(m[k]);
+            i++;
+          }
+        }
+        return a;
+      }
+
       var containers = data.containers;
-      var images = data.images.map(function(item) {
-        item.ChildrenList = [];
-        item.ContainersList = [];
-        for (var i = 0; i < containers.length; i++) {
-          var container = containers[i];
-          if (container.ImageID === item.Id) {
-            item.ContainersList.push({
-              Id: container.Id,
-              Names: container.Names
-            });
-          }
-        }
-        if (item.ContainersList.length === 0) {
-          item.ContainersList = 'None';
-        }
-        return new ImageViewModel(item);
-      });
+      var images = InitMapFromArray(data.images);
 
-      images = images.map(function(item) {
-        for (var i = 0; i < images.length; i++) {
-          var img = data.images[i];
-          if (img.ParentId === item.Id) {
-            item.ChildrenList.push({
-              Id: img.Id
-            });
-          }
-        }
-        if (item.ChildrenList.length === 0) {
-          item.ChildrenList = 'None';
-        }
-        return item;
-      });
+      var img={};
+      img[id]=images[id];
+      // { [id] : images[id] } !!! NOT SUPPORTED BY UGLIFY
+      var work = ( id === 'all' ) ? images : img ;
 
-      deferred.resolve(images);
+      work = FillLists(work, containers, 'ImageID',  'ContainersList', 'Names');
+      work = FillLists(work, images,     'ParentId', 'ChildrenList',   'RepoTags');
+
+      for (var k in work) {
+        if (work[k].ChildrenList.length === 0) {
+          work[k].ChildrenList = 'None';
+        }
+        if (work[k].ContainersList.length === 0) {
+          work[k].ContainersList = 'None';
+        }
+      }
+      deferred.resolve(Map2ImageViewModelArray(work));
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve images', err: err });
