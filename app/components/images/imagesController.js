@@ -23,6 +23,12 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
     Registry: ''
   };
 
+  $scope.prettyList = function(obj) {
+    if ( obj === 'None' ) { return obj; }
+    var str = []; for ( var i=0; i < obj.length; i++ ) { str += (obj[i].NamesTags + '\x0A'); }
+    return str;
+  };
+
   $scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;

@@ -123,8 +123,8 @@
                   <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id.slice(7)|truncate:13}}</a>
                 </td>
                 <td>
-                  <span title="{{::image.ContainersList}}" ng-class=" ::image.ContainersList === 'None' ? 'emptylist' : ''" class="fa fa-server"></span>
-                  <span title="{{::image.ChildrenList}}"  ng-class="::image.ChildrenList === 'None' ? 'emptylist' : ''" class="fa fa-clone"></span>
+                  <portainer-tooltip icon="server" ng-class=" image.ContainersList === 'None' ? 'emptylist' : ''" message="{{prettyList(image.ContainersList)}}" position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                  <portainer-tooltip icon="clone" ng-class="image.ChildrenList === 'None' ? 'emptylist' : ''" message="{{prettyList(image.ChildrenList)}}" position="bottom" style="margin-left: -3px;"></portainer-tooltip>
                 </td>
                 <td>
                   <a ui-sref="image({id: image.Id})" class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>
