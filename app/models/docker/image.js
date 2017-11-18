@@ -6,5 +6,5 @@ function ImageViewModel(data) {
   this.Checked = false;
   this.RepoTags = data.RepoTags;
   this.VirtualSize = data.VirtualSize;
-  this.ContainerCount = data.ContainerCount;
+  this.ContainersList = data.ContainersList;
 }

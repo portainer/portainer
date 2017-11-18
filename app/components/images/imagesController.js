@@ -10,8 +10,8 @@ function ($scope, $state, ImageService, Notifications, Pagination, ModalService)
   $scope.sortType = 'RepoTags';
   $scope.sortReverse = true;
 
-  $scope.state.containersCountOptions={All:'', Used:'!0', Unused:'0'};
-  $scope.state.containersCountFilter = '';
+  $scope.state.containersListOptions={All:undefined, Used:'!', Unused:''};
+  $scope.state.containersListFilter = undefined;
 
   $scope.formValues = {
     Image: '',

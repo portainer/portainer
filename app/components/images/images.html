@@ -85,7 +85,7 @@
                   </a>
                 </th>
                 <th>
-                  <select ng-model="state.containersCountFilter" ng-options="key for (key , value) in state.containersCountOptions"></select>
+                  <select ng-model="state.containersListFilter" ng-options="key for (key , value) in state.containersListOptions"></select>
                 </th>
                 <th>
                   <a ui-sref="images" ng-click="order('RepoTags')">
@@ -111,13 +111,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="image in (state.filteredImages = (images | filter:{ ContainerCount: state.containersCountFilter } | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: image.Checked}">
+              <tr dir-paginate="image in (state.filteredImages = (images | filter:{ ContainersList: state.containersListFilter } | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))"  ng-class="{active: image.Checked}">
                 <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
                 <td>
                   <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id.slice(7)|truncate:13}}</a>
                 </td>
                 <td>
-                  <span class="fa fa-server" ng-if="::image.ContainerCount != 0"></span>
+                  <span ng-class=" ::image.ContainersList === 'None' ? 'emptylist' : ''" class="fa fa-server"></span>
                 </td>
                 <td>
                   <a ui-sref="image({id: image.Id})" class="label label-primary image-tag" ng-repeat="tag in (image|repotags)">{{ tag }}</span>

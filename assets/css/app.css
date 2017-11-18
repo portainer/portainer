@@ -740,6 +740,18 @@ json-tree .branch-preview {
   opacity: .5;
 }
 
+/**/
+
 .row.header .meta .page {
   padding-top: 7px;
+}
+
+.emptylist,
+.emptylist .fa.tooltip-icon {
+  opacity: 0.4;
+}
+
+.emptylist :not(.active),
+.emptylist .fa.tooltip-icon {
+  color: #000;
 }

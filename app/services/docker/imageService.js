@@ -31,12 +31,18 @@ angular.module('portainer.services')
       var containers = data.containers;
 
       var images = data.images.map(function(item) {
-        item.ContainerCount = 0;
+        item.ContainersList = [];
         for (var i = 0; i < containers.length; i++) {
           var container = containers[i];
           if (container.ImageID === item.Id) {
-            item.ContainerCount++;
+            item.ContainersList.push({
+              Id: container.Id,
+              Names: container.Names
+            });
           }
+        }
+        if ( item.ContainersList.length === 0 ) {
+          item.ContainersList = 'None';
         }
         return new ImageViewModel(item);
       });
