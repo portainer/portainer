@@ -84,7 +84,7 @@
               </th>
             </thead>
             <tbody>
-              <tr dir-paginate="stack in (state.filteredStacks = ( stacks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-if="state.DisplayExternalStacks || (!state.DisplayExternalStacks && !stack.External)">
+              <tr dir-paginate="stack in (state.filteredStacks = ( stacks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-if="state.DisplayExternalStacks || (!state.DisplayExternalStacks && !stack.External)" ng-class="{active: stacks.Checked}">
                 <td><input type="checkbox" ng-model="stack.Checked" ng-change="selectItem(stack)" ng-disabled="!stack.Id"/></td>
                 <td>
                   <span ng-if="stack.Id">
