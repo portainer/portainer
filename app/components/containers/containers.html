@@ -32,7 +32,7 @@
           <button type="button" class="btn btn-primary btn-responsive" ng-click="unpauseAction()" ng-disabled="!state.selectedItemCount || state.noPausedItemsSelected"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
           <button type="button" class="btn btn-danger btn-responsive" ng-click="confirmRemoveAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
         </div>
-        <a class="btn btn-primary" type="button" ui-sref="actions.create.container"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add container</a>
+        <a class="btn btn-primary btn-responsive" type="button" ui-sref="actions.create.container"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add container</a>
       </div>
       <div class="pull-right">
         <input type="checkbox" ng-model="state.displayAll" id="displayAll" ng-change="toggleGetAll()" style="margin-top: -2px; margin-right: 5px;"/><label for="displayAll">Show all containers</label>
