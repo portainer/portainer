@@ -251,9 +251,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
     config.TaskTemplate.RestartPolicy = {
       Condition: service.RestartCondition,
-      Delay: service.RestartDelay,
+      Delay: service.RestartDelay * 1000000000,
       MaxAttempts: service.RestartMaxAttempts,
-      Window: service.RestartWindow
+      Window: service.RestartWindow * 1000000000
     };
 
     if (service.Ports) {
@@ -320,6 +320,11 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.LimitMemoryBytes = service.LimitMemoryBytes / 1024 / 1024 || 0;
     service.ReservationMemoryBytes = service.ReservationMemoryBytes / 1024 / 1024 || 0;
   }
+  
+  function transformDurations(service) {
+    service.RestartDelay = service.RestartDelay / 1000000000 || 5;
+    service.RestartWindow = service.RestartWindow / 1000000000 || 0;
+  }
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
@@ -333,6 +338,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
       transformResources(service);
       translateServiceArrays(service);
+      transformDurations(service);
       $scope.service = service;
       originalService = angular.copy(service);
 
