@@ -82,7 +82,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   };
 
   $scope.addSecret = function() {
-    $scope.formValues.Secrets.push({});
+    $scope.formValues.Secrets.push({ overrideTarget: false });
   };
 
   $scope.removeSecret = function(index) {
@@ -275,6 +275,9 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
         if (secret.model) {
           var s = SecretHelper.secretConfig(secret.model);
           s.File.Name = s.SecretName;
+          if (secret.overrideTarget && secret.target && secret.target !== '') {
+            s.File.Name = secret.target;
+          }
           secrets.push(s);
         }
       });
