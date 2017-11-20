@@ -87,7 +87,7 @@
               </th>
             </thead>
             <tbody>
-              <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: service.Checked}">
                 <td><input type="checkbox" ng-model="service.Checked" ng-change="selectItem(service)"/></td>
                 <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
                 <td>{{ service.StackName ? service.StackName : '-' }}</td>
