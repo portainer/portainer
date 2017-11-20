@@ -1,12 +1,13 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
   $scope.tasks = [];
   $scope.sortType = 'Updated';
   $scope.sortReverse = true;
+  $scope.availableImages = [];
 
   $scope.lastVersion = 0;
 
@@ -333,7 +334,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         tasks: TaskService.tasks({ service: [service.Name] }),
         nodes: NodeService.nodes(),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
-        configs: apiVersion >= 1.30 ? ConfigService.configs() : []
+        configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
+        availableImages: ImageService.images()
       });
     })
     .then(function success(data) {
@@ -341,6 +343,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.nodes = data.nodes;
       $scope.configs = data.configs;
       $scope.secrets = data.secrets;
+      $scope.availableImages = ImageService.getUniqueTagListFromImages(data.availableImages);
 
       // Set max cpu value
       var maxCpus = 0;
