@@ -1,0 +1,213 @@
+.datatable .toolBar {
+  color: #767676;
+  background-color: #f6f6f6;
+  padding: 10px;
+  overflow: auto;
+}
+
+.datatable .actionBar {
+  color: #767676;
+  padding: 10px;
+}
+
+.datatable .toolBar .toolBarTitle {
+  float: left;
+  margin: 5px 0 0 10px;
+}
+
+.datatable .toolBar .settings {
+  float: right;
+  margin-right: 10px;
+}
+
+.datatable .toolBar .setting {
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.datatable .toolBar .setting-active {
+  color: #337ab7;
+}
+
+.datatable .searchBar {
+  padding: 10px;
+  border-top: 1px solid #f6f6f6;
+}
+
+.datatable .searchInput {
+  width: 95%;
+  border:none;
+  background:none;
+}
+
+.datatable .searchIcon {
+  margin-right: 5px;
+  color: #767676;
+}
+
+.datatable .searchInput:active, .datatable .searchInput:focus {
+  outline:none;
+}
+
+.datatable .pagination-controls {
+  margin-right: 15px;
+}
+
+.datatable .table {
+  margin-bottom: 0px;
+}
+
+.datatable .footer {
+  color: #767676;
+  background-color: #f6f6f6;
+  overflow: auto;
+}
+
+.datatable .footer .infoBar {
+  font-size: 12px;
+  float: left;
+  margin: 15px 0 0 10px;
+}
+
+.datatable .footer .paginationControls {
+  float: right;
+  margin: 10px 15px 5px 0;
+}
+
+.datatable .footer .paginationControls .limitSelector {
+  font-size: 12px;
+  margin-right: 15px;
+}
+
+.datatable .footer .paginationControls .pagination {
+  margin: 0;
+}
+
+.datatable .pagination > li > a, .pagination > li > span {
+  float: none;
+}
+
+.settingsMenu {
+  color: #767676;
+  padding: 10px;
+}
+
+.settingsMenu .settingsHeader {
+  font-size: 16px;
+}
+
+.settingsMenu .settingsContent {
+  font-size: 12px;
+  border-bottom: 1px solid #777;
+  margin-top: 10px;
+  max-height: 140px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.settingsMenu .settingsContent .md-radio:first-child {
+  margin: 0;
+}
+
+.md-checkbox {
+  position: relative;
+  margin: 1px 0;
+}
+
+.md-checkbox label {
+  cursor: pointer;
+}
+
+.md-checkbox label:before, .md-checkbox label:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.md-checkbox label:before {
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border: 2px solid rgba(0, 0, 0, 0.54);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background .3s;
+}
+
+.md-checkbox input[type="checkbox"] {
+  outline: 0;
+  margin-right: 10px;
+}
+
+.md-checkbox input[type="checkbox"]:checked + label:before {
+  background: #337ab7;
+  border: none;
+}
+
+.md-checkbox input[type="checkbox"]:checked + label:after {
+  transform: rotate(-45deg);
+  top: 5px;
+  left: 4px;
+  width: 9px;
+  height: 4px;
+  border: 2px solid #fff;
+  border-top-style: none;
+  border-right-style: none;
+}
+
+.md-radio {
+  margin: 6px 0;
+}
+
+.md-radio.md-radio-inline {
+  display: inline-block;
+}
+
+.md-radio input[type="radio"] {
+  display: none;
+}
+
+.md-radio input[type="radio"]:checked + label:before {
+  border-color: #337ab7;
+  animation: ripple 0.2s linear forwards;
+}
+
+.md-radio input[type="radio"]:checked + label:after {
+  transform: scale(1);
+}
+
+.md-radio label {
+  display: inline-block;
+  height: 16px;
+  position: relative;
+  padding: 0 22px;
+  margin-bottom: 0;
+  cursor: pointer;
+  vertical-align: bottom;
+}
+
+.md-radio label:before, .md-radio label:after {
+  position: absolute;
+  content: '';
+  border-radius: 50%;
+  transition: all .3s ease;
+  transition-property: transform, border-color;
+}
+
+.md-radio label:before {
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.54);
+}
+
+.md-radio label:after {
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  transform: scale(0);
+  background: #337ab7;
+}

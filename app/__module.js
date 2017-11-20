@@ -9,7 +9,7 @@ angular.module('portainer', [
   'LocalStorageModule',
   'angular-jwt',
   'angular-google-analytics',
-  'ui',
+  'uiv2',
   'angular-loading-bar',
   'portainer.templates',
   'portainer.filters',

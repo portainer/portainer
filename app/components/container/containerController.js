@@ -7,16 +7,11 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
     Image: '',
     Registry: ''
   };
-<<<<<<< HEAD
-  $scope.state = {};
-  $scope.state.pagination_count = PaginationService.getPaginationCount('container_networks');
-=======
   $scope.state = {
     joinNetworkInProgress: false,
     leaveNetworkInProgress: false,
-    pagination_count: Pagination.getPaginationCount('container_networks')
+    pagination_count: PaginationService.getPaginationCount('container_networks')
   };
->>>>>>> develop
 
   $scope.changePaginationCount = function() {
     PaginationService.setPaginationCount('container_networks', $scope.state.pagination_count);

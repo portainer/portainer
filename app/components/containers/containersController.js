@@ -1,6 +1,6 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
-  function ($q, $scope, $state, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
+  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'PaginationService', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
+  function ($q, $scope, $state, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, PaginationService, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
   $scope.state = {};
   // $scope.state.pagination_count = PaginationService.getPaginationCount('containers');
   $scope.state.displayAll = LocalStorage.getFilterContainerShowAll();
@@ -48,9 +48,10 @@ angular.module('containers', [])
 
   $scope.renderFieldStatus = function(item, value) {
     var statusBadge = containerStatusBadge(value);
-    if (['starting','healthy','unhealthy'].indexOf(value) !== -1) {
-      return '<span class="label label-' + statusBadge + ' interactive" uib-tooltip="This container has a health check">' + value + '</span>';
-    }
+    // uib-tooltip not recognized
+    // if (['starting','healthy','unhealthy'].indexOf(value) !== -1) {
+    //   return '<span class="label label-' + statusBadge + ' interactive" uib-tooltip="This container has a health check">' + value + '</span>';
+    // }
     return '<span class="label label-' + statusBadge + '">' + value + '</span>';
   };
 
@@ -80,11 +81,15 @@ angular.module('containers', [])
         break;
       }
       var port = value[i];
-      render += '<a class="image-tag" ng-href="http://' + (publicURL || port.host) + ':' + port.public + '" target="_blank"><i class="fa fa-external-link" aria-hidden="true" style="margin-right: 2px;"></i>' + port.public + ':' + port.private + '</a>';
+      render += '<a class="image-tag" href="http://' + (publicURL || port.host) + ':' + port.public + '" target="_blank"><i class="fa fa-external-link" aria-hidden="true" style="margin-right: 2px;"></i>' + port.public + ':' + port.private + '</a>';
     }
     return render;
   };
 
+  $scope.goToImageDetails = function(id) {
+    console.log('cliclick');
+    $state.go('image', {id: id});
+  };
 
   $scope.goToContainerCreation = function() {
     $state.go('actions.create.container');

@@ -5,7 +5,7 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
     userGroupGroupCreationError: '',
     // selectedItemCount: 0,
     validName: false,
-    // pagination_count: Pagination.getPaginationCount('teams'),
+    // pagination_count: PaginationService.getPaginationCount('teams'),
     deploymentInProgress: false
   };
 

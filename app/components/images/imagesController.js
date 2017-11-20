@@ -1,9 +1,9 @@
 angular.module('images', [])
-.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'Pagination', 'ModalService',
-function ($scope, $state, ImageService, Notifications, Pagination, ModalService) {
+.controller('ImagesController', ['$scope', '$state', '$filter', 'ImageService', 'Notifications', 'PaginationService', 'ModalService',
+function ($scope, $state, $filter, ImageService, Notifications, PaginationService, ModalService) {
   $scope.state = {
-    // pagination_count: Pagination.getPaginationCount('images'),
-    deploymentInProgress: false,
+    // pagination_count: PaginationService.getPaginationCount('images'),
+    deploymentInProgress: false
     // selectedItemCount: 0
   };
 

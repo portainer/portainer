@@ -1,9 +1,9 @@
 angular.module('configs', [])
-.controller('ConfigsController', ['$scope', '$stateParams', '$state', 'ConfigService', 'Notifications', 'Pagination',
-function ($scope, $stateParams, $state, ConfigService, Notifications, Pagination) {
+.controller('ConfigsController', ['$scope', '$stateParams', '$state', 'ConfigService', 'Notifications', 'PaginationService',
+function ($scope, $stateParams, $state, ConfigService, Notifications, PaginationService) {
   $scope.state = {};
   $scope.state.selectedItemCount = 0;
-  $scope.state.pagination_count = Pagination.getPaginationCount('configs');
+  $scope.state.pagination_count = PaginationService.getPaginationCount('configs');
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
 

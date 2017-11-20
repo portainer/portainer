@@ -42,6 +42,7 @@
         { property: 'Status', label: 'State', excludeFromSelector: true },
         { property: 'StackName', label: 'Stack', show: true },
         { property: 'Image', label: 'Image', show: true },
+        { property: 'IP', label: 'IP address', show: true },
         { property: 'Ports', label: 'Ports', show: true },
         { property: 'ResourceControl.Ownership', label: 'Ownership', show: true }
       ]"
@@ -50,6 +51,7 @@
         { property: 'Status', renderFunc: renderFieldStatus },
         { property: 'StackName' },
         { property: 'Image', renderFunc: renderFieldImage },
+        { property: 'IP' },
         { property: 'Ports', renderFunc: renderFieldPorts },
         { property: 'ResourceControl.Ownership', renderFunc: renderFieldOwnership }
       ]"
@@ -69,6 +71,7 @@
       </datatable-settings>
       <datatable-actions>
         <datatable-action btn-style="btn-danger" btn-icon="fa-trash" btn-title="Remove" require-selection="true" action="removeAction(items)"></datatable-action>
+        <datatable-action btn-style="btn-primary" btn-icon="fa-plus" btn-title="Add container" action="goToContainerCreation()"></datatable-action>
       </datatable-actions>
     </datatable>
   </div>

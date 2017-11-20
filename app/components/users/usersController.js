@@ -5,7 +5,7 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
     userCreationError: '',
     // selectedItemCount: 0,
     validUsername: false,
-    // pagination_count: Pagination.getPaginationCount('users'),
+    // pagination_count: PaginationService.getPaginationCount('users'),
     deploymentInProgress: false
   };
 

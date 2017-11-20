@@ -4,7 +4,7 @@ function ($scope, $state, $filter, EndpointService, EndpointProvider, Notificati
   $scope.state = {
     uploadInProgress: false,
     // selectedItemCount: 0,
-    // pagination_count: Pagination.getPaginationCount('endpoints'),
+    // pagination_count: PaginationService.getPaginationCount('endpoints'),
     deploymentInProgress: false
   };
   // $scope.sortType = 'Name';
