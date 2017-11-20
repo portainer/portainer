@@ -24,14 +24,14 @@ angular.module('containers', [])
   };
 
   $scope.quickAccessExpandAction = function () {
-    $scope.QuickAccess.Expand = !$scope.QuickAccess.Expand
+    $scope.QuickAccess.Expand = !$scope.QuickAccess.Expand;
     LocalStorage.storeQuickAccessOptions($scope.QuickAccess.Expand);
-  }
+  };
 
   $scope.quickAccessItemAction = function(k) {
-    $scope.QuickAccess.Active[k] = !$scope.QuickAccess.Active[k]
+    $scope.QuickAccess.Active[k] = !$scope.QuickAccess.Active[k];
     LocalStorage.storeQuickAccessItems($scope.QuickAccess.Active);
-  }
+  };
 
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
