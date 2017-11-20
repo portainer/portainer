@@ -54,17 +54,11 @@ angular.module('portainer.services')
       }
       return filter;
     },
-    storeQuickAccessItems: function(items) {
-      localStorageService.set('quickAccessItems', items);
+    storeQuickAccessConfig: function(items) {
+      localStorageService.set('quickAccessConfig', items);
     },
-    getQuickAccessItems: function() {
-      return localStorageService.get('quickAccessItems');
-    },
-    storeQuickAccessOptions: function(options) {
-      localStorageService.set('quickAccessOptions', options);
-    },
-    getQuickAccessOptions: function() {
-      return localStorageService.get('quickAccessOptions');
+    getQuickAccessConfig: function() {
+      return localStorageService.get('quickAccessConfig');
     }
   };
 }]);
