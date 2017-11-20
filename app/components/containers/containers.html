@@ -165,9 +165,9 @@
 <script type="text/ng-template" id="tpl_quickaccess_config.html">
   <div class="open dropdown-select" ng-click="QuickAccess.isConfigOpen = !QuickAccess.isConfigOpen">
     <ul class="dropdown-menu">
-      <li class="interactive" ng-click="quickAccessExpandAction()"><a><i class="fa fa-{{(QuickAccess.Expand)?'':'check-'}}square-o" style="margin-right:10px;"></i> </i>&nbsp;Collapsed</a>
+      <li class="interactive" ng-click="QuickAccess.ExpandAction()"><a><i class="fa fa-{{(QuickAccess.Expand)?'':'check-'}}square-o" style="margin-right:10px;"></i> </i>&nbsp;Collapsed</a>
       <li role="separator" class="divider"></li>
-      <li class="interactive" ng-repeat="(k , v) in QuickAccess.Options" ng-click="quickAccessItemAction(k)"><a><i class="fa fa-{{(QuickAccess.Active[k])?'check-':''}}square-o fa-fw" style="margin-right:10px;"></i> <i class="fa fa-{{v.icon}} fa-fw"></i>&nbsp;{{k}}</a>
+      <li class="interactive" ng-repeat="(k , v) in QuickAccess.Options" ng-click="QuickAccess.ItemAction(k)"><a><i class="fa fa-{{(QuickAccess.Active[k])?'check-':''}}square-o fa-fw" style="margin-right:10px;"></i> <i class="fa fa-{{v.icon}} fa-fw"></i>&nbsp;{{k}}</a>
       </li>
     </ul>
   </div>

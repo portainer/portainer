@@ -20,17 +20,14 @@ angular.module('containers', [])
     },
     isConfigOpen: false,
     Active: LocalStorage.getQuickAccessItems() || { Console:true, Logs:true, Stats:true, Inspect:true },
-    Expand: LocalStorage.getQuickAccessOptions() || false
-  };
-
-  $scope.quickAccessExpandAction = function () {
-    $scope.QuickAccess.Expand = !$scope.QuickAccess.Expand;
-    LocalStorage.storeQuickAccessOptions($scope.QuickAccess.Expand);
-  };
-
-  $scope.quickAccessItemAction = function(k) {
-    $scope.QuickAccess.Active[k] = !$scope.QuickAccess.Active[k];
-    LocalStorage.storeQuickAccessItems($scope.QuickAccess.Active);
+    Expand: LocalStorage.getQuickAccessOptions() || false,
+    ExpandAction: function () {
+      LocalStorage.storeQuickAccessOptions( this.Expand = !this.Expand );
+    },
+    ItemAction: function(k) {
+      this.Active[k] = !this.Active[k]
+      LocalStorage.storeQuickAccessItems( this.Active );
+    }
   };
 
   $scope.order = function (sortType) {
