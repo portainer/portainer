@@ -243,7 +243,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   function prepareUpdateConfig(config, input) {
     config.UpdateConfig = {
       Parallelism: input.Parallelism || 0,
-      Delay: input.UpdateDelay || 0,
+      Delay: input.UpdateDelay * 1000000000 || 0,
       FailureAction: input.FailureAction,
       Order: input.UpdateOrder
     };
