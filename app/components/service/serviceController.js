@@ -244,7 +244,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
     config.UpdateConfig = {
       Parallelism: service.UpdateParallelism,
-      Delay: service.UpdateDelay,
+      Delay: service.UpdateDelay * 1000000000,
       FailureAction: service.UpdateFailureAction,
       Order: service.UpdateOrder
     };
@@ -324,6 +324,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   function transformDurations(service) {
     service.RestartDelay = service.RestartDelay / 1000000000 || 5;
     service.RestartWindow = service.RestartWindow / 1000000000 || 0;
+    service.UpdateDelay = service.UpdateDelay / 1000000000 || 0;
   }
 
   function initView() {
