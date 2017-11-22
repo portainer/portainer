@@ -368,6 +368,10 @@ ul.sidebar .sidebar-list a.active {
   font-size: 90%;
 }
 
+ul.sidebar .sidebar-list a.active .menu-icon {
+  text-indent: 25px;
+}
+
 ul.sidebar .sidebar-list .sidebar-sublist a {
   text-indent: 35px;
   font-size: 12px;
