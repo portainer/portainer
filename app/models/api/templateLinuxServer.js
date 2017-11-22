@@ -1,4 +1,5 @@
 function TemplateLSIOViewModel(data) {
+  this.Type = data.type;
   this.Title = data.title;
   this.Note = data.description;
   this.Categories = data.category ? data.category : [];

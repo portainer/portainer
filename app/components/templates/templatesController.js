@@ -246,7 +246,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     var endpointMode = $scope.applicationState.endpoint.mode;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
-    if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
+    if (templatesKey !== 'linuxserver.io'
+      && endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
       $scope.state.filters.Type = 'stack';
       $scope.state.showDeploymentSelector = true;
     }
