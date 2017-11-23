@@ -740,6 +740,26 @@ json-tree .branch-preview {
   opacity: .5;
 }
 
+/* Heartbeat animation */
+/* https://gist.github.com/gubi/8483199 */
+
+.heartbeat {
+    display: inline-block;
+    position: relative;
+    animation: heartbeat 1s infinite linear;
+}
+
+@keyframes heartbeat {
+  0%   { transform: scale(  .75 ); }
+  20%  { transform: scale( 1    ); }
+  40%  { transform: scale(  .75 ); }
+  60%  { transform: scale( 1.25 ); }
+  80%  { transform: scale(  .75 ); }
+  100% { transform: scale(  .75 ); }
+}
+
+/**/
+
 .row.header .meta .page {
   padding-top: 7px;
 }
