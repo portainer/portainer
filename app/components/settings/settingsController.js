@@ -9,6 +9,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
   $scope.formValues = {
     customLogo: false,
     customTemplates: false,
+    donationHeader: true,
     externalContributions: false,
     restrictBindMounts: false,
     restrictPrivilegedMode: false,
@@ -64,6 +65,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
     .then(function success(data) {
       Notifications.success('Settings updated');
       StateManager.updateLogo(settings.LogoURL);
+      StateManager.updateDonationHeader(settings.DisplayDonationHeader);
       StateManager.updateExternalContributions(settings.DisplayExternalContributors);
       if (resetForm) {
         resetFormValues();

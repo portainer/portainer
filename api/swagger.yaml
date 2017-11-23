@@ -1880,6 +1880,10 @@ definitions:
         description: "URL to a logo that will be displayed on the login page as well\
           \ as on top of the sidebar. Will use default Portainer logo when value is\
           \ empty string"
+      DisplayDonationHeader:
+        type: "boolean"
+        example: true
+        description: "Whether to display or not the donation message in the header."\
       DisplayExternalContributors:
         type: "boolean"
         example: false
@@ -1983,6 +1987,10 @@ definitions:
           \ when querying containers"
         items:
           $ref: "#/definitions/Settings_BlackListedLabels"
+      DisplayDonationHeader:
+        type: "boolean"
+        example: true
+        description: "Whether to display or not the donation message in the header."
       DisplayExternalContributors:
         type: "boolean"
         example: false
@@ -2398,6 +2406,10 @@ definitions:
           \ when querying containers"
         items:
           $ref: "#/definitions/Settings_BlackListedLabels"
+      DisplayDonationHeader:
+        type: "boolean"
+        example: true
+        description: "Whether to display or not the donation message in the header."
       DisplayExternalContributors:
         type: "boolean"
         example: false
