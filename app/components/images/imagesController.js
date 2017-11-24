@@ -2,8 +2,8 @@ angular.module('images', [])
 .controller('ImagesController', ['$scope', '$state', '$filter', 'ImageService', 'Notifications', 'PaginationService', 'ModalService',
 function ($scope, $state, $filter, ImageService, Notifications, PaginationService, ModalService) {
   $scope.state = {
-    // pagination_count: PaginationService.getPaginationCount('images'),
-    deploymentInProgress: false
+    // pagination_count: Pagination.getPaginationCount('images'),
+    actionInProgress: false
     // selectedItemCount: 0
   };
 
@@ -74,7 +74,7 @@ function ($scope, $state, $filter, ImageService, Notifications, PaginationServic
     var image = $scope.formValues.Image;
     var registry = $scope.formValues.Registry;
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     ImageService.pullImage(image, registry, false)
     .then(function success(data) {
       Notifications.success('Image successfully pulled', image);
@@ -84,7 +84,7 @@ function ($scope, $state, $filter, ImageService, Notifications, PaginationServic
       Notifications.error('Failure', err, 'Unable to pull image');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 

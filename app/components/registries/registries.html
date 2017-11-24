@@ -56,9 +56,9 @@
           <!-- !authentication-credentials -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || dockerhub.Authentication && (!dockerhub.Username || !dockerhub.Password)" ng-click="updateDockerHub()" button-spinner="state.deploymentInProgress">
-                <span ng-hide="state.deploymentInProgress">Update</span>
-                <span ng-show="state.deploymentInProgress">Updating DockerHub settings...</span>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || dockerhub.Authentication && (!dockerhub.Username || !dockerhub.Password)" ng-click="updateDockerHub()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Update</span>
+                <span ng-show="state.actionInProgress">Updating DockerHub settings...</span>
               </button>
             </div>
           </div>
@@ -148,7 +148,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="registry in (state.filteredRegistries = (registries | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <tr dir-paginate="registry in (state.filteredRegistries = (registries | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: registry.Checked}">
                 <td><input type="checkbox" ng-model="registry.Checked" ng-change="selectItem(registry)" /></td>
                 <td>
                   <a ui-sref="registry({id: registry.Id})">{{ registry.Name }}</a>

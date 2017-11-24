@@ -11,14 +11,14 @@ function ($scope, $state, $sanitize, Notifications, Authentication, StateManager
   };
 
   $scope.state = {
-    deploymentInProgress: false
+    actionInProgress: false
   };
 
   $scope.createAdminUser = function() {
     var username = $sanitize($scope.formValues.Username);
     var password = $sanitize($scope.formValues.Password);
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     UserService.initAdministrator(username, password)
     .then(function success() {
       return Authentication.login(username, password);
@@ -45,7 +45,7 @@ function ($scope, $state, $sanitize, Notifications, Authentication, StateManager
       Notifications.error('Failure', err, 'Unable to create administrator user');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 

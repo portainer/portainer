@@ -51,7 +51,7 @@
               </th>
             </thead>
             <tbody>
-              <tr dir-paginate="config in (state.filteredConfigs = ( configs | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))">
+              <tr dir-paginate="config in (state.filteredConfigs = ( configs | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: pagination_count))" ng-class="{active: config.Checked}">
                 <td><input type="checkbox" ng-model="config.Checked" ng-change="selectItem(config)"/></td>
                 <td><a ui-sref="config({id: config.Id})">{{ config.Name }}</a></td>
                 <td>{{ config.CreatedAt | getisodate }}</td>

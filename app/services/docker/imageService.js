@@ -152,5 +152,14 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.getUniqueTagListFromImages = function (availableImages) {
+    return _.flatten(_.map(availableImages, function (image) {
+      _.remove(image.RepoTags, function (item) {
+        return item.indexOf('<none>') !== -1;
+      });
+      return image.RepoTags ? _.uniqWith(image.RepoTags, _.isEqual) : [];
+    }));
+  };
+
   return service;
 }]);

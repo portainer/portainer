@@ -1,12 +1,13 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'PaginationService', 'ModalService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, PaginationService, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'PaginationService', 'ModalService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, PaginationService, ModalService) {
 
   $scope.state = {};
   $scope.state.pagination_count = PaginationService.getPaginationCount('service_tasks');
   $scope.tasks = [];
   $scope.sortType = 'Updated';
   $scope.sortReverse = true;
+  $scope.availableImages = [];
 
   $scope.lastVersion = 0;
 
@@ -74,10 +75,16 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updateConfig = function updateConfig(service) {
     updateServiceArray(service, 'ServiceConfigs', service.ServiceConfigs);
   };
-  $scope.addSecret = function addSecret(service, secret) {
-    if (secret && service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === secret.Id;}).length === 0) {
-      service.ServiceSecrets.push({ Id: secret.Id, Name: secret.Name, FileName: secret.Name, Uid: '0', Gid: '0', Mode: 444 });
-      updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
+  $scope.addSecret = function addSecret(service, newSecret) {
+    if (newSecret.secret) {
+      var filename = newSecret.secret.Name;
+      if (newSecret.override) {
+        filename = newSecret.target;
+      }
+      if (service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === newSecret.secret.Id && serviceSecret.FileName === filename;}).length === 0) {
+        service.ServiceSecrets.push({ Id: newSecret.secret.Id, Name: newSecret.secret.Name, FileName: filename, Uid: '0', Gid: '0', Mode: 444 });
+        updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
+      }
     }
   };
   $scope.removeSecret = function removeSecret(service, index) {
@@ -237,16 +244,16 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
     config.UpdateConfig = {
       Parallelism: service.UpdateParallelism,
-      Delay: service.UpdateDelay,
+      Delay: service.UpdateDelay * 1000000000,
       FailureAction: service.UpdateFailureAction,
       Order: service.UpdateOrder
     };
 
     config.TaskTemplate.RestartPolicy = {
       Condition: service.RestartCondition,
-      Delay: service.RestartDelay,
+      Delay: service.RestartDelay * 1000000000,
       MaxAttempts: service.RestartMaxAttempts,
-      Window: service.RestartWindow
+      Window: service.RestartWindow * 1000000000
     };
 
     if (service.Ports) {
@@ -314,6 +321,12 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.ReservationMemoryBytes = service.ReservationMemoryBytes / 1024 / 1024 || 0;
   }
 
+  function transformDurations(service) {
+    service.RestartDelay = service.RestartDelay / 1000000000 || 5;
+    service.RestartWindow = service.RestartWindow / 1000000000 || 0;
+    service.UpdateDelay = service.UpdateDelay / 1000000000 || 0;
+  }
+
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     ServiceService.service($transition$.params().id)
@@ -326,6 +339,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
       transformResources(service);
       translateServiceArrays(service);
+      transformDurations(service);
       $scope.service = service;
       originalService = angular.copy(service);
 
@@ -333,7 +347,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         tasks: TaskService.tasks({ service: [service.Name] }),
         nodes: NodeService.nodes(),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
-        configs: apiVersion >= 1.30 ? ConfigService.configs() : []
+        configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
+        availableImages: ImageService.images()
       });
     })
     .then(function success(data) {
@@ -341,6 +356,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.nodes = data.nodes;
       $scope.configs = data.configs;
       $scope.secrets = data.secrets;
+      $scope.availableImages = ImageService.getUniqueTagListFromImages(data.availableImages);
 
       // Set max cpu value
       var maxCpus = 0;
@@ -354,6 +370,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       } else {
         $scope.state.sliderMaxCpu = 32;
       }
+
+      // Default values
+      $scope.state.addSecret = {override: false};
 
       $timeout(function() {
         $anchorScroll();

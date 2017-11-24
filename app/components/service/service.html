@@ -68,7 +68,8 @@
             <tr>
               <td>Image</td>
               <td>
-                <input type="text" class="form-control" ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" ng-disabled="isUpdating" />
+                  <input type="text" class="form-control" uib-typeahead="image for image in availableImages | filter:$viewValue | limitTo:5"
+                    ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" id="image_name" ng-disabled="isUpdating">
               </td>
             </tr>
             <tr ng-if="applicationState.endpoint.apiVersion >= 1.30">

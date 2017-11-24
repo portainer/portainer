@@ -28,9 +28,9 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.deploymentInProgress || !formValues.Image" ng-click="pullImage()" button-spinner="state.deploymentInProgress">
-                <span ng-hide="state.deploymentInProgress">Pull the image</span>
-                <span ng-show="state.deploymentInProgress">Download in progress...</span>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Image" ng-click="pullImage()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Pull the image</span>
+                <span ng-show="state.actionInProgress">Download in progress...</span>
               </button>
             </div>
           </div>
@@ -160,7 +160,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="image in (state.filteredImages = (images | filter:{ ContainerCount: state.containersCountFilter } | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <tr dir-paginate="image in (state.filteredImages = (images | filter:{ ContainerCount: state.containersCountFilter } | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: image.Checked}">
                 <td><input type="checkbox" ng-model="image.Checked" ng-change="selectItem(image)" /></td>
                 <td>
                   <a class="monospaced" ui-sref="image({id: image.Id})">{{ image.Id|truncate:20}}</a>

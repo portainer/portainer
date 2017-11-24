@@ -7,7 +7,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     hideDescriptions: $transition$.params().hide_descriptions,
     formValidationError: '',
     showDeploymentSelector: false,
-    deploymentInProgress: false,
+    actionInProgress: false,
     filters: {
       Categories: '!',
       Platform: '!',
@@ -86,7 +86,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       Notifications.error('Failure', err, err.msg);
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   }
 
@@ -114,7 +114,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       $state.go('stacks', {}, {reload: true});
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   }
 
@@ -122,7 +122,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     var userDetails = Authentication.getUserDetails();
     var userId = userDetails.ID;
     var accessControlData = $scope.formValues.AccessControlData;
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
       return;
@@ -131,7 +131,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     var template = $scope.state.selectedTemplate;
     var templatesKey = $scope.templatesKey;
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     if (template.Type === 'stack') {
       createStackFromTemplate(template, userId, accessControlData);
     } else {
@@ -241,12 +241,13 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     $scope.templatesKey = templatesKey;
 
     var userDetails = Authentication.getUserDetails();
-    $scope.isAdmin = userDetails.role === 1 ? true : false;
+    $scope.isAdmin = userDetails.role === 1;
 
     var endpointMode = $scope.applicationState.endpoint.mode;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
-    if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
+    if (templatesKey !== 'linuxserver.io'
+      && endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
       $scope.state.filters.Type = 'stack';
       $scope.state.showDeploymentSelector = true;
     }

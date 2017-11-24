@@ -10,7 +10,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
 
   $scope.state = {
     uploadInProgress: false,
-    deploymentInProgress: false
+    actionInProgress: false
   };
 
   $scope.formValues = {
@@ -30,7 +30,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var URL = 'unix:///var/run/docker.sock';
     var endpointID = 1;
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     EndpointService.createLocalEndpoint(name, URL, false, true)
     .then(function success(data) {
       endpointID = data.Id;
@@ -45,7 +45,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
       EndpointService.deleteEndpoint(endpointID);
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 
@@ -61,7 +61,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var TLSKeyFile = TLSSKipClientVerify ? null : $scope.formValues.TLSKey;
     var endpointID = 1;
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       endpointID = data.Id;
@@ -76,7 +76,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
       EndpointService.deleteEndpoint(endpointID);
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 }]);

@@ -55,6 +55,29 @@ module.exports = function (grunt) {
   grunt.registerTask('run-dev', ['build', 'shell:run', 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
 
+  // Load content of `vendor.yml` to src.jsVendor, src.cssVendor and src.angularVendor
+  grunt.registerTask('vendor', 'vendor:<minified|regular>', function(min) {
+      // Argument `min` defaults to 'minified'
+      var minification = (min === '') ? 'minified' : min;
+      var vendorFile = grunt.file.readYAML('vendor.yml');
+      for (var filelist in vendorFile) {
+          if (vendorFile.hasOwnProperty(filelist)) {
+              var list = vendorFile[filelist][minification];
+              // Check if any of the files is missing
+              for (var itemIndex in list) {
+                  if (list.hasOwnProperty(itemIndex)) {
+                      var item = list[itemIndex];
+                      if (!grunt.file.exists(item)) {
+                          grunt.fail.warn('Dependency file ' + item + ' not found.');
+                      }
+                  }
+              }
+              // If none is missing, save the list
+              grunt.config('src.' + filelist + 'Vendor', list);
+          }
+      }
+  });
+
   // Project configuration.
   grunt.initConfig({
     distdir: 'dist/public',
@@ -232,13 +255,4 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('vendor', 'vendor:<min|reg>', function(min) {
-    // The content of `vendor.yml` is loaded to src.jsVendor, src.cssVendor and src.angularVendor
-    // Argument `min` selects between the 'regular' or 'minified' sets
-    var m = ( min === '' ) ? 'minified' : min;
-    var v = grunt.file.readYAML('vendor.yml');
-    for (type in v) { if (v.hasOwnProperty(type)) {
-      grunt.config('src.'+type+'Vendor',v[type][m]);
-    }}
-  });
 };

@@ -19,7 +19,7 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
   $scope.state = {
     Method: 'editor',
     formValidationError: '',
-    deploymentInProgress: false
+    actionInProgress: false
   };
 
   $scope.addEnvironmentVariable = function() {
@@ -67,14 +67,14 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
 
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
     var userId = userDetails.ID;
 
     if (!validateForm(accessControlData, isAdmin)) {
       return;
     }
 
-    $scope.state.deploymentInProgress = true;
+    $scope.state.actionInProgress = true;
     createStack(name)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
@@ -92,7 +92,7 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
       Notifications.error('Failure', err, 'Unable to apply resource control on the stack');
     })
     .finally(function final() {
-      $scope.state.deploymentInProgress = false;
+      $scope.state.actionInProgress = false;
     });
   };
 
