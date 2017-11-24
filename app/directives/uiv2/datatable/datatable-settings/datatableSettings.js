@@ -3,7 +3,7 @@ angular.module('uiv2').component('datatableSettings', {
     filter: '?datatableFilter',
     columnSelector: '?datatableSettingColumnSelector'
   },
-  templateUrl: 'app/directives/ui/datatablev2/datatable-settings/datatableSettings.html',
+  templateUrl: 'app/directives/uiv2/datatable/datatable-settings/datatableSettings.html',
   controller: function() {
     this.state = {
       isOpen: false

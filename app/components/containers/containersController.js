@@ -1,15 +1,15 @@
 angular.module('containers', [])
   .controller('ContainersController', ['$q', '$scope', '$state', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'PaginationService', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
   function ($q, $scope, $state, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, PaginationService, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
-  $scope.state = {};
+  // $scope.state = {};
   // $scope.state.pagination_count = PaginationService.getPaginationCount('containers');
-  $scope.state.displayAll = LocalStorage.getFilterContainerShowAll();
-  $scope.state.displayIP = false;
+  // $scope.state.displayAll = LocalStorage.getFilterContainerShowAll();
+  // $scope.state.displayIP = false;
   // $scope.sortType = 'State';
   // $scope.sortReverse = false;
   // $scope.state.selectedItemCount = 0;
-  $scope.truncate_size = 40;
-  $scope.showMore = true;
+  // $scope.truncate_size = 40;
+  // $scope.showMore = true;
 
   // $scope.order = function (sortType) {
   //   $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;

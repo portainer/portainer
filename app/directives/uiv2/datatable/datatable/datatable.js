@@ -1,10 +1,9 @@
-angular.module('uiv2').component('datatablev2', {
+angular.module('uiv2').component('datatable', {
   transclude: {
     actions: '?datatableActions',
-    settings: '?datatableSettings',
-    content: 'td'
+    settings: '?datatableSettings'
   },
-  templateUrl: 'app/directives/ui/datatablev2/datatable/datatable.html',
+  templateUrl: 'app/directives/uiv2/datatable/datatable/datatable.html',
   controller: 'DatatableController',
   bindings: {
     title: '@',

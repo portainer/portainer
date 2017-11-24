@@ -38,7 +38,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.filter | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))">
+            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.filter | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
               <td ng-repeat="prop in $ctrl.datasetProperties track by $index" ng-if="$ctrl.headers | isVisibleHeader:prop.property">
                 <span ng-if="prop.property === $ctrl.identifierProperty">
                   <span class="md-checkbox" ng-if="$ctrl.selectableRows">
