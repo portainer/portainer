@@ -1,5 +1,6 @@
 ---
-engines:
+version: "2"
+plugins:
   gofmt:
     enabled: true
   golint:
@@ -8,6 +9,8 @@ engines:
     enabled: true
   csslint:
     enabled: true
+#  structure:
+#    enabled: false
   duplication:
     enabled: true
     config:
@@ -20,10 +23,12 @@ engines:
       config: .eslintrc.yml
   fixme:
     enabled: true
-ratings:
-  paths:
-  - "**.css"
-  - "**.js"
-  - "**.go"
-exclude_paths:
+exclude_patterns:
 - test/
+- node_modules/
+- bower_components/
+#ratings:
+#  paths:
+#  - "**.css"
+#  - "**.js"
+#  - "**.go"

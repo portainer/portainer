@@ -276,6 +276,18 @@ gruntfile_cfg.replace = {
   }
 };
 
+function shell_codeclimate(arg) {
+  return [
+    'docker run -t --rm',
+    '-e CODECLIMATE_CODE="'+host_dwork+'"',
+    '-e CONTAINER_TIMEOUT_SECONDS=1800',
+    '-v "'+host_dwork+'":/code',
+    '-v //var/run/docker.sock://var/run/docker.sock',
+    '-v //tmp/cc://tmp/cc',
+    'codeclimate/codeclimate '+arg
+  ].join(' ');
+}
+
 function shell_buildBinary(p, a) {
   var binfile = 'dist/portainer-'+p+'-'+a;
   return [
@@ -309,6 +321,7 @@ function shell_downloadDockerBinary(p, a) {
 }
 
 gruntfile_cfg.shell = {
+  codeclimate: { command: shell_codeclimate },
   gofmt: { command: 'docker run --rm -tv '+host_dwork+':/api portainer/golang-builder gofmt -w /api' },
   buildBinary: { command: shell_buildBinary },
   run: { command: shell_run },
