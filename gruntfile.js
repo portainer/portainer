@@ -179,14 +179,14 @@ gruntfile_cfg.eslint = {
   nofix: {
     src: ['gruntfile.js', '<%= src.js %>'],
     options: {
-      configFile: '.eslintrc.yml',
+      configFile: '.eslintrc_default.yml',
       fix: false
     }
   },
   fix: {
     src: ['<%= src.js %>'],
     options: {
-      configFile: '.eslintrc.yml',
+      configFile: '.eslintrc_default.yml',
       fix: true
     }
   }

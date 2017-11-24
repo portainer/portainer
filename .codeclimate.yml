@@ -20,7 +20,7 @@ plugins:
   eslint:
     enabled: true
     config:
-      config: .eslintrc.yml
+      config: .eslintrc_default.yml
   fixme:
     enabled: true
 exclude_patterns:
