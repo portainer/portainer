@@ -107,7 +107,7 @@
                   </span>
                 </td>
                 <td>
-                  <a ng-if="service.Ports && service.Ports.length > 0 && swarmManagerIP" ng-repeat="p in service.Ports" class="image-tag" ng-href="http://{{swarmManagerIP}}:{{p.PublishedPort}}" target="_blank">
+                  <a ng-if="service.Ports && service.Ports.length > 0 && swarmManagerIP && p.PublishedPort" ng-repeat="p in service.Ports" class="image-tag" ng-href="http://{{swarmManagerIP}}:{{p.PublishedPort}}" target="_blank">
                     <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
                   </a>
                   <span ng-if="!service.Ports || service.Ports.length === 0 || !swarmManagerIP" >-</span>
