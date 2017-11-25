@@ -5,24 +5,16 @@ angular.module('portainer.helpers')
   var helper = {};
 
   helper.extractImageAndRegistryFromRepository = function(repository) {
-    var slashCount = _.countBy(repository)['/'];
-    var registry = null;
-    var image = repository;
-    if (slashCount >= 1) {
-      // assume something/something[/...]
-      registry = repository.substr(0, repository.indexOf('/'));
-      // assume valid DNS name or IP (contains at least one '.')
-      if (_.countBy(registry)['.'] > 0) {
-        image = repository.substr(repository.indexOf('/') + 1);
-      } else {
-        registry = null;
+    return (_.countBy(repository)['/'] > 1) ?
+      { // assume <registry>/[<repo>/<name>:<tag>]
+        registry: repository.substr(0, repository.indexOf('/')),
+        image: repository.substr(repository.indexOf('/') + 1)
       }
-    }
-
-    return {
-      registry: registry,
-      image: image
-    };
+    :
+      {
+        registry: null,
+        image: repository
+      };
   };
 
   function extractNameAndTag(imageName, registry) {
