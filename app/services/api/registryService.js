@@ -88,5 +88,36 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.matchTypedRegistry = function(typedRegistry, activeRegistry) {
+    // assume valid DNS name or IP (contains at least one '.')
+    var field = (_.countBy(typedRegistry)['.'] === 0) ? 'Name' : 'URL';
+    //Does the typed registry match the selected option in the registry select box?
+    var msg = '';
+    if (typedRegistry!==activeRegistry[field]) {
+      msg = 'Warning: unknown typed registry, defaulting to select box';
+
+      var registries = {};
+
+      $q.all({ registries: service.registries() })
+      .then(function success(data) {
+        registries = data;
+      })
+      .catch(function error(err) {
+        console.log(err);
+        //Notifications.error('Failure', err, 'Unable to retrieve registries');
+      });
+
+      for (var k in registries) {
+        if (registries.hasOwnProperty(k)) {
+          if (registries[k][field]===typedRegistry) {
+            msg = 'Warning: typed registry does not match the one in the select box';
+            return { registry:registries[k], msg:msg };
+          }
+        }
+      }
+    }
+    return { registry:activeRegistry, msg:msg };
+  };
+
   return service;
 }]);

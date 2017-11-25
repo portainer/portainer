@@ -121,6 +121,16 @@ angular.module('portainer.services')
 
   service.pullImage = function(image, registry, ignoreErrors) {
     var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(image);
+
+    // Did the user type any registry?
+    if (imageDetails.registry!==null) {
+      var matchResp = RegistryService.matchTypedRegistry(imageDetails.registry, registry);
+      registry = matchResp.registry;
+    }
+
+//if msg!='' show notification
+//if msg includes 'does not match' then Change select box option automatically
+
     var imageConfiguration = ImageHelper.createImageConfigForContainer(imageDetails.image, registry.URL);
     var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
