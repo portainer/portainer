@@ -541,8 +541,7 @@ function configureRoutes($stateProvider) {
     url: '^/settings/about',
     views: {
       'content@': {
-        templateUrl: 'app/components/about/about.html',
-        controller: 'AboutController'
+        templateUrl: 'app/components/about/about.html'
       },
       'sidebar@': {
         templateUrl: 'app/components/sidebar/sidebar.html',
