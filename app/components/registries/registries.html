@@ -118,7 +118,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="registry in (state.filteredRegistries = (registries | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <tr dir-paginate="registry in (state.filteredRegistries = (registries | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: registry.Checked}">
                 <td><input type="checkbox" ng-model="registry.Checked" ng-change="selectItem(registry)" /></td>
                 <td>
                   <a ui-sref="registry({id: registry.Id})">{{ registry.Name }}</a>

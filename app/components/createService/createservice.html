@@ -9,7 +9,7 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" autocomplete="off">
           <!-- name-input -->
           <div class="form-group">
             <label for="service_name" class="col-sm-1 control-label text-left">Name</label>
@@ -23,7 +23,7 @@
           </div>
           <!-- image-and-registry -->
           <div class="form-group">
-            <por-image-registry image="formValues.Image" registry="formValues.Registry"></por-image-registry>
+            <por-image-registry image="formValues.Image" registry="formValues.Registry" auto-complete="true"></por-image-registry>
           </div>
           <!-- !image-and-registry -->
           <div class="col-sm-12 form-section-title">
@@ -395,7 +395,7 @@
                 </div>
                 <div class="col-sm-5">
                   <p class="small text-muted">
-                    Amount of time between updates.
+                    Amount of time between updates. Time in seconds.
                   </p>
                 </div>
               </div>

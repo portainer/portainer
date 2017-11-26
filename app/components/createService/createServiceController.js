@@ -82,7 +82,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   };
 
   $scope.addSecret = function() {
-    $scope.formValues.Secrets.push({});
+    $scope.formValues.Secrets.push({ overrideTarget: false });
   };
 
   $scope.removeSecret = function(index) {
@@ -243,7 +243,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   function prepareUpdateConfig(config, input) {
     config.UpdateConfig = {
       Parallelism: input.Parallelism || 0,
-      Delay: input.UpdateDelay || 0,
+      Delay: input.UpdateDelay * 1000000000 || 0,
       FailureAction: input.FailureAction,
       Order: input.UpdateOrder
     };
@@ -275,6 +275,9 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
         if (secret.model) {
           var s = SecretHelper.secretConfig(secret.model);
           s.File.Name = s.SecretName;
+          if (secret.overrideTarget && secret.target && secret.target !== '') {
+            s.File.Name = secret.target;
+          }
           secrets.push(s);
         }
       });
@@ -387,7 +390,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
       return;
@@ -443,7 +446,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
-      $scope.isAdmin = userDetails.role === 1 ? true : false;
+      $scope.isAdmin = userDetails.role === 1;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');

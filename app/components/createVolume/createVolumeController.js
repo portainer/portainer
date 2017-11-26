@@ -43,7 +43,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     var volumeConfiguration = VolumeService.createVolumeConfiguration(name, driver, driverOptions);
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
       return;

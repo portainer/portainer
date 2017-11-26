@@ -29,6 +29,11 @@ angular.module('portainer.services')
     LocalStorage.storeApplicationState(state.application);
   };
 
+  manager.updateDonationHeader = function(displayDonationHeader) {
+    state.application.displayDonationHeader = displayDonationHeader;
+    LocalStorage.storeApplicationState(state.application);
+  };
+
   manager.initialize = function () {
     var deferred = $q.defer();
 
@@ -55,6 +60,7 @@ angular.module('portainer.services')
         state.application.endpointManagement = status.EndpointManagement;
         state.application.version = status.Version;
         state.application.logo = settings.LogoURL;
+        state.application.displayDonationHeader = settings.DisplayDonationHeader;
         state.application.displayExternalContributors = settings.DisplayExternalContributors;
         LocalStorage.storeApplicationState(state.application);
         deferred.resolve(state);

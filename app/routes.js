@@ -537,6 +537,18 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('settings_about', {
+    url: '^/settings/about',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/about/about.html'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('settings_authentication', {
     url: '^/settings/authentication',
     views: {
