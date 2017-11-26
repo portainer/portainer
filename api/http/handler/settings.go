@@ -46,6 +46,7 @@ func NewSettingsHandler(bouncer *security.RequestBouncer) *SettingsHandler {
 type (
 	publicSettingsResponse struct {
 		LogoURL                            string                         `json:"LogoURL"`
+		DisplayDonationHeader              bool                           `json:"DisplayDonationHeader"`
 		DisplayExternalContributors        bool                           `json:"DisplayExternalContributors"`
 		AuthenticationMethod               portainer.AuthenticationMethod `json:"AuthenticationMethod"`
 		AllowBindMountsForRegularUsers     bool                           `json:"AllowBindMountsForRegularUsers"`
@@ -56,6 +57,7 @@ type (
 		TemplatesURL                       string                 `valid:"required"`
 		LogoURL                            string                 `valid:""`
 		BlackListedLabels                  []portainer.Pair       `valid:""`
+		DisplayDonationHeader              bool                   `valid:""`
 		DisplayExternalContributors        bool                   `valid:""`
 		AuthenticationMethod               int                    `valid:"required"`
 		LDAPSettings                       portainer.LDAPSettings `valid:""`
@@ -90,6 +92,7 @@ func (handler *SettingsHandler) handleGetPublicSettings(w http.ResponseWriter, r
 
 	publicSettings := &publicSettingsResponse{
 		LogoURL:                            settings.LogoURL,
+		DisplayDonationHeader:              settings.DisplayDonationHeader,
 		DisplayExternalContributors:        settings.DisplayExternalContributors,
 		AuthenticationMethod:               settings.AuthenticationMethod,
 		AllowBindMountsForRegularUsers:     settings.AllowBindMountsForRegularUsers,
@@ -118,6 +121,7 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 		TemplatesURL:                       req.TemplatesURL,
 		LogoURL:                            req.LogoURL,
 		BlackListedLabels:                  req.BlackListedLabels,
+		DisplayDonationHeader:              req.DisplayDonationHeader,
 		DisplayExternalContributors:        req.DisplayExternalContributors,
 		LDAPSettings:                       req.LDAPSettings,
 		AllowBindMountsForRegularUsers:     req.AllowBindMountsForRegularUsers,

@@ -9,6 +9,43 @@
       <rd-widget-header icon="fa-cogs" title="Application settings"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_donation" class="control-label text-left">
+                Disable donation header
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_donation" ng-model="formValues.donationHeader"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- logo -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_logo" class="control-label text-left">
+                Use custom logo
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_logo" ng-model="formValues.customLogo"><i></i>
+              </label>
+            </div>
+          </div>
+          <div ng-if="formValues.customLogo">
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                You can specify the URL to your logo here. For an optimal display, logo dimensions should be 155px by 55px.
+              </span>
+            </div>
+            <div class="form-group">
+              <label for="logo_url" class="col-sm-1 control-label text-left">
+                URL
+              </label>
+              <div class="col-sm-11">
+                <input type="text" class="form-control" ng-model="settings.LogoURL" id="logo_url" placeholder="https://mycompany.com/logo.png">
+              </div>
+            </div>
+          </div>
+          <!-- !logo -->
           <!-- security -->
           <div class="col-sm-12 form-section-title">
             Security
@@ -36,36 +73,6 @@
             </div>
           </div>
           <!-- security -->
-          <!-- logo -->
-          <div class="col-sm-12 form-section-title">
-            Logo
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_logo" class="control-label text-left">
-                Use custom logo
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_logo" ng-model="formValues.customLogo"><i></i>
-              </label>
-            </div>
-          </div>
-          <div ng-if="formValues.customLogo">
-            <div class="form-group">
-              <span class="col-sm-12 text-muted small">
-                You can specify the URL to your logo here. For an optimal display, logo dimensions should be 155px by 55px.
-              </span>
-            </div>
-            <div class="form-group">
-              <label for="logo_url" class="col-sm-1 control-label text-left">
-                URL
-              </label>
-              <div class="col-sm-11">
-                <input type="text" class="form-control" ng-model="settings.LogoURL" id="logo_url" placeholder="https://mycompany.com/logo.png">
-              </div>
-            </div>
-          </div>
-          <!-- !logo -->
           <!-- app-templates -->
           <div class="col-sm-12 form-section-title">
             App Templates
