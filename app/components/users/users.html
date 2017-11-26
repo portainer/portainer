@@ -168,7 +168,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="user in (state.filteredUsers = (users | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <tr dir-paginate="user in (state.filteredUsers = (users | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: user.Checked}">
                 <td ng-if="isAdmin"><input type="checkbox" ng-model="user.Checked" ng-change="selectItem(user)" /></td>
                 <td>{{ user.Username }}</td>
                 <td>

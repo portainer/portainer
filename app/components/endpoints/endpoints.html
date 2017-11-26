@@ -128,7 +128,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="endpoint in (state.filteredEndpoints = (endpoints | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <tr dir-paginate="endpoint in (state.filteredEndpoints = (endpoints | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: endpoint.Checked}">
                 <td ng-if="applicationState.application.endpointManagement"><input type="checkbox" ng-model="endpoint.Checked" ng-change="selectItem(endpoint)" /></td>
                 <td><i class="fa fa-star" aria-hidden="true" ng-if="endpoint.Id === activeEndpoint.Id"></i> {{ endpoint.Name }}</td>
                 <td>{{ endpoint.URL | stripprotocol }}</td>

@@ -60,7 +60,7 @@ function ($scope, $state, $document, Notifications, ConfigService, Authenticatio
   $scope.create = function () {
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
       return;

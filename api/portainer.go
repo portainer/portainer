@@ -73,6 +73,7 @@ type (
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		LogoURL                            string               `json:"LogoURL"`
 		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
+		DisplayDonationHeader              bool                 `json:"DisplayDonationHeader"`
 		DisplayExternalContributors        bool                 `json:"DisplayExternalContributors"`
 		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
 		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
@@ -389,7 +390,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.15.2"
+	APIVersion = "1.15.3"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 6
 	// DefaultTemplatesURL represents the default URL for the templates definitions.

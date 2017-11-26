@@ -9,7 +9,7 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" autocomplete="off">
           <!-- name-input -->
           <div class="form-group">
             <label for="container_name" class="col-sm-1 control-label text-left">Name</label>
@@ -28,7 +28,7 @@
           <div ng-if="formValues.Registry || !fromContainer">
             <!-- image-and-registry -->
             <div class="form-group">
-              <por-image-registry image="config.Image" registry="formValues.Registry" ng-if="formValues.Registry"></por-image-registry>
+              <por-image-registry image="config.Image" registry="formValues.Registry" ng-if="formValues.Registry" auto-complete="true"></por-image-registry>
             </div>
             <!-- !image-and-registry -->
             <!-- always-pull -->
@@ -296,7 +296,7 @@
               <div class="form-group">
                 <label for="container_network" class="col-sm-2 col-lg-1 control-label text-left">Network</label>
                 <div class="col-sm-9">
-                  <select class="form-control" ng-model="config.HostConfig.NetworkMode" id="container_network">
+                  <select class="form-control" ng-model="config.HostConfig.NetworkMode" id="container_network" ng-change="resetNetworkConfig()">
                     <option selected disabled hidden value="">Select a network</option>
                     <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
