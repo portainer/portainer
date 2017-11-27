@@ -1,10 +1,22 @@
-var gruntfile_cfg = {};
 var loadGruntTasks = require('load-grunt-tasks');
+var gruntfile_cfg = {};
 var os = require('os');
-var arch = os.arch();
-if ( arch === 'x64' ) arch = 'amd64';
+var harch = os.arch();
+var harchs = {
+    'arm': 'armhf',
+    'arm64': 'aarch64',
+    'ppc64': 'ppc64le',
+    's390x': 's390x',
+    'x64': 'x86_64'
+};
 
 module.exports = function (grunt) {
+
+  var hostarch = harchs[harch];
+  if (hostarch === 'undefined') {
+    grunt.fail.warn('Platform ' + harch + ' not supported for backend development.');
+    hostarch = harch;
+  }
 
   loadGruntTasks(grunt, {
     pattern: ['grunt-*', 'gruntify-*']
@@ -36,9 +48,9 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'config:dev',
     'clean:app',
-    'shell:buildBinary:linux:' + arch,
-    'shell:downloadDockerBinary:linux:' + arch,
-    'vendor',
+    'shell:buildBinary:linux:' + hostarch,
+    'shell:downloadDockerBinary:linux:' + hostarch,
+    'vendor:regular',
     'html2js',
     'useminPrepare:dev',
     'concat',
@@ -48,10 +60,10 @@ module.exports = function (grunt) {
     'after-copy'
   ]);
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
-    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'shell:downloadDockerBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy' ]);
+    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'shell:downloadDockerBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy']);
   });
   grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('run-dev', ['build', 'shell:run:'+arch, 'watch:build']);
+  grunt.registerTask('run-dev', ['build', 'shell:run:'+hostarch, 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
 
   // Load content of `vendor.yml` to src.jsVendor, src.cssVendor and src.angularVendor
@@ -104,7 +116,6 @@ module.exports = function (grunt) {
 
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
-var fs = require('fs');
 
 gruntfile_cfg.config = {
   dev:  { options: { variables: { 'environment': 'development' }}},
