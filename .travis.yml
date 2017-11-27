@@ -1,0 +1,55 @@
+branches:
+  except:
+    - gh-pages
+
+language: generic
+os: linux
+sudo: required
+services: docker
+before_install:
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+install: sudo apt-get install -y dos2unix realpath
+git:
+  depth: 10
+#Please note that if you use a depth of 1 and have a queue of jobs, Travis CI won’t build commits that are in the queue when you push a new commit.
+
+script:
+  - ./build/travis.sh
+
+cache:
+  directories:
+    - .cache
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: ./build/travis.sh deploy
+    on:
+      all_branches: true
+#      branch: develop
+#  - provider: releases
+#    skip_cleanup: true
+#    overwrite: true
+#    api_key:
+#      secure:
+#    file_glob: true
+#    file: "*.tar.gz"
+#    on:
+#      tags: true
+#      all_branches: true
+
+env:
+  global:
+    - secure: "lHpyx83tIk7nvPxTjB/8fl3XdxEjv+TpvN94t5+VFIMj1lNAK9LWWUve3DmrNTHIM+VRfYIq+Z2pUJNMc/g/20W0UxqCzBPkmGnoGedGwc/hkbvFHMk57aJme00uyoEN7Jwz+BguaB4JML1cOkymz+f0amlBjIUJ/LaQRnvah+Z13XR1pYgmPpjiaHTauRvl/oHI3yA+JsgfhS1Gp0JcaScOSppL7oaBl+r62FGHv+z6n4yEpw7jTYQDfywfjuqMYlraWVpAs0X+bQQF+r9sNu7bO+B2ye/A8GBfRr//Uv1iJNgEN1kyjw9Ve5nOB5hTQcXcZXXckOG4QcH87yj/qcg9ZTIT/KIfzJg2sQ3dYJrTAX1+UGNmChMJKYl7J2C7bAa0f2teoFCrHdlpFRMHYApWGqze8zxXR9Sn/fAhlYj84Hblg2g2y99TNc6nVkYjBbOeXzEVoDHbsadaVMuUbiMwfI16Bg2vrY6ZwvP60hXX2gtUEQuPxWj7Hjv0el7nv6uqziGF3HxShKsxhkXTCgXk5CB6q3vgrmpzSx011rugOsqTamhDl2589Dh7ZBxkYwys32j7TIcjFuAG6/mV4n/cKvumGIdBTEM9ChU8ADzbdy4EAvCtsOe/ge5wQfJwWKB5ZRBjYwnUjszVVuEOsYAO5kJADwXIMziju71CjSw=" #U
+    - secure: "sHHj6PaJlDj4Gzi59RTAA340KfHyrzKoRms2BB35ouN2KS43PqsbaaiuEos0qkWa7LlUbB1ByKuT5fB/yXJ9uDB7sCOPHV+ZfHAzRNmc+bZia7a/Sc/C+q7jdy7tarwPHr1vEMdUIJnySF1JbYBaf806bF26uB/RaGSzrb4oH4xzHIHO765xdpYXfJbPIylpTj91qPCQ8tjgJJIMcjrcelnj1y5VvUjiEIvr/5ZqQhWSuGkw20pf98gqeOCnpSqSJ3yc/TBi+rTCzYufx04wTAsjIzz7cRYZNK7pixa0FAKRRohzq+HIylQgAOYU+leqityxDXU/iUTGsLpta9UeyqG2e0r4FkmaJo5/lZepjCkm8UppsVxSFtZH2wWNncYjWXIekGI1g0jRkbgi//p4GiRCc7VyXxb3xBxpzWu+0MtkrYeXCozYnLb/y34y9E0LyEufy6DldfeNSKPbG79f/02dxtEnc4j2s7s1CDnsFSdsvt51lnVpFyAM0/x7eqRniR82ZYARcKWHmjqCezygSyMOGKU1aYE49r9GbI18UefMDHVgS5T3+5IbiVk54YO4fBQXjwSGb6vVyNNOrX0hqkuoYrKQcPYJAkNWW2v3lp781GIMLFBtiLbI0Qo6Bbdw6NzRv8lbPhLir+qiUAtxOxS1p2UuUKWpkKhFHRadfRo=" #P
+
+#---
+
+#- Build and push an image when the develop branch is pushed to.
+#- Build and push an image to the hub when a PR is created or pushed to.
+#- Delete an image when a PR is closed.
+
+#---
+
+#Do you think there would be a way to pass parameters to `grunt run-dev` that'd passed to the Portainer image? Something like `grunt run-dev --no-auth` for example.
