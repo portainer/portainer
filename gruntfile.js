@@ -1,5 +1,6 @@
 var gruntfile_cfg = {};
 var loadGruntTasks = require('load-grunt-tasks');
+var host_dwork = ( process.env.HOST_WORKDIR === '' ) ? '/$(pwd)/' : process.env.HOST_WORKDIR; //Must be absolute and must include trailing slash
 var os = require('os');
 var arch = os.arch();
 if ( arch === 'x64' ) arch = 'amd64';
@@ -10,7 +11,15 @@ module.exports = function (grunt) {
     pattern: ['grunt-*', 'gruntify-*']
   });
 
-  grunt.registerTask('default', ['eslint', 'build']);
+  grunt.registerTask('default', ['lint', 'build']);
+  grunt.registerTask('lint', ['eslint:nofix']);
+  grunt.registerTask('clear', ['clean:app']);
+
+  grunt.task.registerTask('fmt', 'build:app|api', function(a) {
+    if (a!=='app') { grunt.task.run(['shell:gofmt']); }
+    if (a!=='api') { grunt.task.run(['eslint:fix']); }
+  });
+
   grunt.registerTask('before-copy', [
     'vendor',
     'html2js',
@@ -50,9 +59,19 @@ module.exports = function (grunt) {
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
     grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'shell:downloadDockerBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy' ]);
   });
-  grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('run-dev', ['build', 'shell:run:'+arch, 'watch:build']);
-  grunt.registerTask('clear', ['clean:app']);
+  grunt.registerTask('run-dev', ['build', 'shell:run'+arch, 'watch:build']);
+
+  // Check if any of the files is missing in each of the vendors lists
+  var checkVendorList = function(list) {
+    for (var itemIndex in list) {
+        if (list.hasOwnProperty(itemIndex)) {
+            var item = list[itemIndex];
+            if (!grunt.file.exists(item)) {
+                grunt.fail.warn('Dependency file ' + item + ' not found.');
+            }
+        }
+    }
+  };
 
   // Load content of `vendor.yml` to src.jsVendor, src.cssVendor and src.angularVendor
   grunt.registerTask('vendor', function() {
@@ -60,16 +79,7 @@ module.exports = function (grunt) {
       for (var filelist in vendorFile) {
           if (vendorFile.hasOwnProperty(filelist)) {
               var list = vendorFile[filelist];
-              // Check if any of the files is missing
-              for (var itemIndex in list) {
-                  if (list.hasOwnProperty(itemIndex)) {
-                      var item = 'node_modules/'+list[itemIndex];
-                      if (!grunt.file.exists(item)) {
-                          grunt.fail.warn('Dependency file ' + item + ' not found.');
-                      }
-                      list[itemIndex] = item;
-                  }
-              }
+              checkVendorList(list);
               // If none is missing, save the list
               grunt.config('src.' + filelist + 'Vendor', list);
           }
@@ -104,7 +114,6 @@ module.exports = function (grunt) {
 
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
-var fs = require('fs');
 
 gruntfile_cfg.config = {
   dev:  { options: { variables: { 'environment': 'development' }}},
@@ -167,8 +176,20 @@ gruntfile_cfg.copy = {
 };
 
 gruntfile_cfg.eslint = {
-  src: ['gruntfile.js', '<%= src.js %>'],
-  options: { configFile: '.eslintrc.yml' }
+  nofix: {
+    src: ['gruntfile.js', '<%= src.js %>'],
+    options: {
+      configFile: '.eslintrc.yml',
+      fix: false
+    }
+  },
+  fix: {
+    src: ['<%= src.js %>'],
+    options: {
+      configFile: '.eslintrc.yml',
+      fix: true
+    }
+  }
 };
 
 gruntfile_cfg.html2js = {
@@ -288,6 +309,7 @@ function shell_downloadDockerBinary(p, a) {
 }
 
 gruntfile_cfg.shell = {
+  gofmt: { command: 'docker run --rm -tv '+host_dwork+':/api portainer/golang-builder gofmt -w /api' },
   buildBinary: { command: shell_buildBinary },
   run: { command: shell_run },
   downloadDockerBinary: { command: shell_downloadDockerBinary }
