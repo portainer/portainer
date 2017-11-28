@@ -79,7 +79,7 @@ angular.module('portainer.services')
       var img={};
       img[id]=images[id];
       // { [id] : images[id] } !!! NOT SUPPORTED BY UGLIFY
-      var work = ( id === 'all' ) ? images : img ;
+      var work = ( id === undefined ) ? images : img ;
 
       work = FillLists(work, containers, 'ImageID',  'ContainersList', 'Names');
       work = FillLists(work, images,     'ParentId', 'ChildrenList',   'RepoTags');
