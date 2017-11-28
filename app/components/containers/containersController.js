@@ -11,8 +11,6 @@ angular.module('containers', [])
   $scope.truncate_size = 40;
   $scope.showMore = true;
 
-  var InitialConfig = LocalStorage.getQuickAccessConfig() || { Active:{ Console:true, Logs:true, Stats:true, Inspect:true } , Expand:false };
-
   $scope.QuickAccess = {
     Options: {
       Console: { icon:'terminal',           ref:'console'       },
@@ -21,11 +19,8 @@ angular.module('containers', [])
       Inspect: { icon:'info-circle',        ref:'inspect'       }
     },
     isConfigOpen: false,
-    Active: InitialConfig.Active,
-    Expand: InitialConfig.Expand,
-    Action: function () {
-      LocalStorage.storeQuickAccessConfig( { Active: this.Active, Expand: this.Expand } );
-    }
+    Active: LocalStorage.getQuickAccessConfig() || { Console:true, Logs:true, Stats:true, Inspect:true },
+    Action: LocalStorage.storeQuickAccessConfig( this.Active )
   };
 
   $scope.order = function (sortType) {
