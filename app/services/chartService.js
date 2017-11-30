@@ -9,9 +9,7 @@ angular.module('portainer.services')
 
   function defaultChartOptions(pos, tooltipCallback, scalesCallback) {
     return {
-        animation: {
-          duration: 0
-        },
+        animation: { duration: 0 },
         responsiveAnimationDuration: 0,
         responsive: true,
         tooltips: {
@@ -25,18 +23,14 @@ angular.module('portainer.services')
             }
           }
         },
-        hover: {
-          animationDuration: 0
-        },
+        hover: { animationDuration: 0 },
         scales: {
-          yAxes: [
-            {
+          yAxes: [{
               ticks: {
                 beginAtZero: true,
                 callback: scalesCallback
               }
-            }
-          ]
+          }]
         }
       };
   }
