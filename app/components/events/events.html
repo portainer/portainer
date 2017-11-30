@@ -9,21 +9,12 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <datatable title="Events" title-icon="fa-history"
-      dataset="events" table-key="events"
-      headers="[
-        { property: 'Time', label: 'Date', excludeFromSelector: true },
-        { property: 'Type', label: 'Category', show: true },
-        { property: 'Details', label: 'Details', show: true }
-      ]"
-      dataset-properties="[
-        { property: 'Time', filter: 'getisodatefromtimestamp' },
-        { property: 'Type' },
-        { property: 'Details' }
-      ]"
-      order-by="Time" reverse-order="true"
-      show-text-filter="true">
-    </datatable>
+    <events-datatable
+    title="Events" title-icon="fa-history"
+    dataset="events" table-key="events"
+    order-by="Time" reverse-order="true"
+    show-text-filter="true"
+    ></events-datatable>
   </div>
 </div>
 

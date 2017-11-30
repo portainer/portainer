@@ -3,9 +3,7 @@ angular.module('users', [])
 function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Authentication, SettingsService) {
   $scope.state = {
     userCreationError: '',
-    // selectedItemCount: 0,
     validUsername: false,
-    // pagination_count: Pagination.getPaginationCount('users'),
     actionInProgress: false
   };
 
@@ -15,26 +13,6 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
     ConfirmPassword: '',
     Administrator: false,
     Teams: []
-  };
-
-  $scope.renderFieldRoleName = function(item, value) {
-    var icon = '';
-    if (item.Role === 1) {
-      icon = '<i class="fa fa-user-circle-o" aria-hidden="true" style="margin-right: 5px;"></i>';
-    } else if (item.Role !== 1 && item.isTeamLeader) {
-      icon = '<i class="fa fa-user-plus" aria-hidden="true" style="margin-right: 5px;"></i>';
-    } else {
-      icon = '<i class="fa fa-user" aria-hidden="true" style="margin-right: 5px;"></i>';
-    }
-    return icon + value;
-  };
-
-  $scope.renderFieldAuthentication = function(item, value) {
-    var authenticationMethod = $scope.AuthenticationMethod;
-    if (item.Id !== 1 && authenticationMethod === 2) {
-      return 'LDAP';
-    }
-    return 'Internal';
   };
 
   $scope.checkUsernameValidity = function() {
@@ -72,28 +50,33 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
     });
   };
 
-  function deleteSelectedUsers() {
-    angular.forEach($scope.users, function (user) {
-      if (user.Checked) {
-        UserService.deleteUser(user.Id)
-        .then(function success(data) {
-          var index = $scope.users.indexOf(user);
-          $scope.users.splice(index, 1);
-          Notifications.success('User successfully deleted', user.Username);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove user');
-        });
-      }
+  function deleteSelectedUsers(selectedItems) {
+    var actionCount = selectedItems.length;
+    angular.forEach(selectedItems, function (user) {
+      UserService.deleteUser(user.Id)
+      .then(function success() {
+        Notifications.success('User successfully removed', user.Username);
+        var index = $scope.users.indexOf(user);
+        $scope.users.splice(index, 1);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to remove user');
+      })
+      .finally(function final() {
+        --actionCount;
+        if (actionCount === 0) {
+          $state.reload();
+        }
+      });
     });
   }
 
-  $scope.removeAction = function (items) {
+  $scope.removeAction = function (selectedItems) {
     ModalService.confirmDeletion(
       'Do you want to remove the selected users? They will not be able to login into Portainer anymore.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
-        deleteSelectedUsers(items);
+        deleteSelectedUsers(selectedItems);
       }
     );
   };

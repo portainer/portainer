@@ -9,42 +9,13 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <datatable title="Volumes" title-icon="fa-cubes"
-      dataset="volumes" table-key="volumes"
-      headers="[
-        { property: 'Id', label: 'Name', excludeFromSelector: true },
-        { property: 'StackName', label: 'Stack', show: true },
-        { property: 'Driver', label: 'Driver', show: true },
-        { property: 'Mountpoint', label: 'Mountpoint', show: false },
-        { property: 'ResourceControl.Ownership', label: 'Ownership', show: true }
-      ]"
-      dataset-properties="[
-        { property: 'Id', renderFunc: renderFieldId },
-        { property: 'StackName' },
-        { property: 'Driver' },
-        { property: 'Mountpoint', filter: 'truncatelr' },
-        { property: 'ResourceControl.Ownership', renderFunc: renderFieldOwnership }
-      ]"
-      order-by="Id"
-      identifier="Id" identifier-property="Id" state-details="volume"
-      label-on="Id" render-label="renderLabel"
-      show-text-filter="true" selectable-rows="true">
-      <datatable-settings>
-        <datatable-filter
-          filters="[
-            { label: 'Show all volumes', value: undefined },
-            { label: 'Show used volumes only', value: false },
-            { label: 'Show unused volumes only', value: true },
-          ]"
-          property="dangling">
-        </datatable-filter>
-        <datatable-setting-column-selector></datatable-setting-column-selector>
-      </datatable-settings>
-      <datatable-actions>
-        <datatable-action btn-style="btn-danger" btn-icon="fa-trash" btn-title="Remove" require-selection="true" action="removeAction(items)"></datatable-action>
-        <datatable-action btn-style="btn-primary" btn-icon="fa-plus" btn-title="Add volume" action="goToVolumeCreation()"></datatable-action>
-      </datatable-actions>
-    </datatable>
+    <volumes-datatable
+    title="Volumes" title-icon="fa-cubes"
+    dataset="volumes" table-key="volumes"
+    order-by="Id" show-text-filter="true"
+    remove-action="removeAction"
+    show-ownership-column="applicationState.application.authentication"
+    ></volumes-datatable>
   </div>
 </div>
 

@@ -66,7 +66,14 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <datatable title="Teams" title-icon="fa-users"
+    <teams-datatable
+    title="Teams" title-icon="fa-users"
+    dataset="teams" table-key="teams"
+    order-by="Name" show-text-filter="true"
+    remove-action="removeAction"
+    ></teams-datatable>
+
+    <!-- <datatable title="Teams" title-icon="fa-users"
       dataset="teams" table-key="teams"
       headers="[{ property: 'Name', label: 'Name', excludeFromSelector: true }]"
       dataset-properties="[{ property: 'Name' }]"
@@ -76,6 +83,6 @@
       <datatable-actions>
         <datatable-action btn-style="btn-danger" btn-icon="fa-trash" btn-title="Remove" require-selection="true" action="removeAction(items)"></datatable-action>
       </datatable-actions>
-    </datatable>
+    </datatable> -->
   </div>
 </div>

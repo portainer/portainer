@@ -1,1 +1,0 @@
-angular.module('uiv2', []);

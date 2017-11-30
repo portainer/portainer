@@ -31,7 +31,6 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-
   service.networks = function(localNetworks, swarmNetworks, swarmAttachableNetworks, globalNetworks) {
     var deferred = $q.defer();
 
@@ -63,6 +62,10 @@ angular.module('portainer.services')
     });
 
     return deferred.promise;
+  };
+
+  service.remove = function(id) {
+    return Network.remove({ id: id }).$promise;
   };
 
   return service;

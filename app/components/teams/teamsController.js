@@ -1,11 +1,9 @@
 angular.module('teams', [])
-.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Authentication',
-function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, ModalService, Notifications, Authentication) {
+.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Authentication',
+function ($q, $scope, $state, TeamService, UserService, ModalService, Notifications, Authentication) {
   $scope.state = {
     userGroupGroupCreationError: '',
-    // selectedItemCount: 0,
     validName: false,
-    // pagination_count: Pagination.getPaginationCount('teams'),
     actionInProgress: false
   };
 
@@ -48,31 +46,36 @@ function ($q, $scope, $state, TeamService, UserService, TeamMembershipService, M
     });
   };
 
-  function deleteSelectedTeams() {
-    angular.forEach($scope.teams, function (team) {
-      if (team.Checked) {
-        TeamService.deleteTeam(team.Id)
-        .then(function success(data) {
-          var index = $scope.teams.indexOf(team);
-          $scope.teams.splice(index, 1);
-          Notifications.success('Team successfully deleted', team.Name);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove team');
-        });
-      }
-    });
-  }
-
-  $scope.removeAction = function (items) {
+  $scope.removeAction = function (selectedItems) {
     ModalService.confirmDeletion(
       'Do you want to delete the selected team(s)? Users in the team(s) will not be deleted.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
-        deleteSelectedTeams(items);
+        deleteSelectedTeams(selectedItems);
       }
     );
   };
+
+  function deleteSelectedTeams(selectedItems) {
+    var actionCount = selectedItems.length;
+    angular.forEach(selectedItems, function (team) {
+      TeamService.deleteTeam(team.Id)
+      .then(function success() {
+        Notifications.success('Team successfully removed', team.Name);
+        var index = $scope.teams.indexOf(team);
+        $scope.teams.splice(index, 1);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to remove team');
+      })
+      .finally(function final() {
+        --actionCount;
+        if (actionCount === 0) {
+          $state.reload();
+        }
+      });
+    });
+  }
 
   function initView() {
     var userDetails = Authentication.getUserDetails();

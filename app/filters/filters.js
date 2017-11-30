@@ -67,20 +67,20 @@ angular.module('portainer.filters')
     return 'success';
   };
 })
-// .filter('containerstatusbadge', function () {
-//   'use strict';
-//   return function (text) {
-//     var status = _.toLower(text);
-//     if (includeString(status, ['paused', 'starting'])) {
-//       return 'warning';
-//     } else if (includeString(status, ['created'])) {
-//       return 'info';
-//     } else if (includeString(status, ['stopped', 'unhealthy', 'dead', 'exited'])) {
-//       return 'danger';
-//     }
-//     return 'success';
-//   };
-// })
+.filter('containerstatusbadge', function () {
+  'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (includeString(status, ['paused', 'starting'])) {
+      return 'warning';
+    } else if (includeString(status, ['created'])) {
+      return 'info';
+    } else if (includeString(status, ['stopped', 'unhealthy', 'dead', 'exited'])) {
+      return 'danger';
+    }
+    return 'success';
+  };
+})
 .filter('containerstatus', function () {
   'use strict';
   return function (text) {

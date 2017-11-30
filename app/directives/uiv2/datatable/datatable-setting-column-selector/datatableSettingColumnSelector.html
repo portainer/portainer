@@ -1,9 +1,0 @@
-<div class="settingsHeader">
-  Columns
-</div>
-<div class="settingsContent">
-  <div class="md-checkbox" ng-repeat="header in $ctrl.datatable.headers track by $index" ng-if="!header.excludeFromSelector">
-    <input id="show_{{ $index }}" type="checkbox" ng-model="header.show" ng-change="$ctrl.datatable.storeColumnFilters()"/>
-    <label for="show_{{ $index }}">{{ header.label }}</label>
-  </div>
-</div>

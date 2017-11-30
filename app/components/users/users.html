@@ -114,27 +114,11 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <datatable title="Users" title-icon="fa-user"
-      dataset="users" table-key="users"
-      headers="[
-        { property: 'Username', label: 'Name', excludeFromSelector: true },
-        { property: 'RoleName', label: 'Role', show: true },
-        { property: 'AuthenticationMethod', label: 'Authentication', show: true }
-      ]"
-      dataset-properties="[
-        { property: 'Username' },
-        { property: 'RoleName', renderFunc: renderFieldRoleName },
-        { property: 'AuthenticationMethod', renderFunc: renderFieldAuthentication }
-      ]"
-      order-by="Username"
-      identifier="Id" identifier-property="Username" state-details="user"
-      show-text-filter="true" selectable-rows="true">
-      <datatable-settings>
-        <datatable-setting-column-selector></datatable-setting-column-selector>
-      </datatable-settings>
-      <datatable-actions>
-        <datatable-action btn-style="btn-danger" btn-icon="fa-trash" btn-title="Remove" require-selection="true" action="removeAction(items)"></datatable-action>
-      </datatable-actions>
-    </datatable>
+    <users-datatable
+    title="Users" title-icon="fa-user"
+    dataset="users" table-key="users"
+    order-by="Username" show-text-filter="true"
+    remove-action="removeAction"
+    ></users-datatable>
   </div>
 </div>

@@ -9,58 +9,15 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <datatable title="Networks" title-icon="fa-sitemap"
-      dataset="networks" table-key="networks"
-      headers="[
-        { property: 'Name', label: 'Name', excludeFromSelector: true },
-        { property: 'StackName', label: 'Stack', show: true },
-        { property: 'Driver', label: 'Driver', show: true },
-        { property: 'Scope', label: 'Scope', show: false },
-        { property: 'IPAM.Config[0].Subnet', label: 'Subnet', show: false },
-        { property: 'IPAM.Config[0].Gateway', label: 'Gateway', show: false },
-        { property: 'ResourceControl.Ownership', label: 'Ownership', show: true }
-      ]"
-      dataset-properties="[
-        { property: 'Name' },
-        { property: 'StackName' },
-        { property: 'Driver' },
-        { property: 'Scope' },
-        { property: 'IPAM.Config[0].Subnet' },
-        { property: 'IPAM.Config[0].Gateway' },
-        { property: 'ResourceControl.Ownership', renderFunc: renderFieldOwnership }
-      ]"
-      order-by="Name"
-      identifier="Id" identifier-property="Name" state-details="network"
-      show-text-filter="true" selectable-rows="true">
-      <datatable-settings>
-        <datatable-setting-column-selector></datatable-setting-column-selector>
-      </datatable-settings>
-      <datatable-actions>
-        <datatable-action btn-style="btn-danger" btn-icon="fa-trash" btn-title="Remove" require-selection="true" action="removeAction(items)"></datatable-action>
-        <datatable-action btn-style="btn-primary" btn-icon="fa-plus" btn-title="Add network" action="goToNetworkCreation()"></datatable-action>
-      </datatable-actions>
-    </datatable>
+    <networks-datatable
+    title="Networks" title-icon="fa-sitemap"
+    dataset="networks" table-key="networks"
+    order-by="Name" show-text-filter="true"
+    remove-action="removeAction"
+    show-ownership-column="applicationState.application.authentication"
+    ></networks-datatable>
   </div>
 </div>
-
-<!--
-<tr dir-paginate="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-  <td><input type="checkbox" ng-model="network.Checked" ng-change="selectItem(network)"/></td>
-  <td><a ui-sref="network({id: network.Id})">{{ network.Name | truncate:40 }}</a></td>
-  <td>{{ network.StackName ? network.StackName : '-' }}</td>
-  <td>{{ network.Scope }}</td>
-  <td>{{ network.Driver }}</td>
-  <td>{{ network.IPAM.Driver }}</td>
-  <td>{{ network.IPAM.Config[0].Subnet ? network.IPAM.Config[0].Subnet : '-' }}</td>
-  <td>{{ network.IPAM.Config[0].Gateway ? network.IPAM.Config[0].Gateway : '-' }}</td>
-  <td ng-if="applicationState.application.authentication">
-    <span>
-      <i ng-class="network.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
-      {{ network.ResourceControl.Ownership ? network.ResourceControl.Ownership : network.ResourceControl.Ownership = 'public' }}
-    </span>
-  </td>
-</tr> -->
-
 
 <!-- <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">

@@ -3,48 +3,7 @@ angular.module('registries', [])
 function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, PaginationService) {
 
   $scope.state = {
-    // selectedItemCount: 0,
-    // pagination_count: Pagination.getPaginationCount('registries'),
     actionInProgress: false
-  };
-  // $scope.sortType = 'Name';
-  // $scope.sortReverse = true;
-
-  // $scope.order = function(sortType) {
-  //   $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-  //   $scope.sortType = sortType;
-  // };
-  //
-  // $scope.changePaginationCount = function() {
-  //   PaginationService.setPaginationCount('endpoints', $scope.state.pagination_count);
-  // };
-  //
-  // $scope.selectItems = function (allSelected) {
-  //   angular.forEach($scope.state.filteredRegistries, function (registry) {
-  //     if (registry.Checked !== allSelected) {
-  //       registry.Checked = allSelected;
-  //       $scope.selectItem(registry);
-  //     }
-  //   });
-  // };
-  //
-  // $scope.selectItem = function (item) {
-  //   if (item.Checked) {
-  //     $scope.state.selectedItemCount++;
-  //   } else {
-  //     $scope.state.selectedItemCount--;
-  //   }
-  // };
-
-  $scope.renderLabel = function(item) {
-    if (item.Authentication) {
-      return '<span style="margin-left: 10px;" class="label label-info image-tag">authentication-enabled</span>';
-    }
-    return '';
-  };
-
-  $scope.goToRegistryCreation = function() {
-    $state.go('actions.create.registry');
   };
 
   $scope.updateDockerHub = function() {
@@ -62,30 +21,34 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
     });
   };
 
-  $scope.removeAction = function() {
+  $scope.removeAction = function(selectedItems) {
     ModalService.confirmDeletion(
       'Do you want to remove the selected registries?',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
-        removeRegistries();
+        deleteSelectedRegistries(selectedItems);
       }
     );
   };
 
-  function removeRegistries() {
-    var registries = $scope.registries;
-    angular.forEach(registries, function (registry) {
-      if (registry.Checked) {
-        RegistryService.deleteRegistry(registry.Id)
-        .then(function success(data) {
-          var index = registries.indexOf(registry);
-          registries.splice(index, 1);
-          Notifications.success('Registry deleted', registry.Name);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove registry');
-        });
-      }
+  function deleteSelectedRegistries(selectedItems) {
+    var actionCount = selectedItems.length;
+    angular.forEach(selectedItems, function (registry) {
+      RegistryService.deleteRegistry(registry.Id)
+      .then(function success() {
+        Notifications.success('Registry successfully removed', registry.Name);
+        var index = registries.indexOf(registry);
+        registries.splice(index, 1);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to remove registry');
+      })
+      .finally(function final() {
+        --actionCount;
+        if (actionCount === 0) {
+          $state.reload();
+        }
+      });
     });
   }
 

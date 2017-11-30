@@ -42,39 +42,13 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <datatable title="Images" title-icon="fa-clone"
-      dataset="images" table-key="images"
-      headers="[
-        { property: 'Id', label: 'ID', excludeFromSelector: true },
-        { property: 'RepoTags', label: 'Tags', show: true },
-        { property: 'VirtualSize', label: 'Size', show: true },
-        { property: 'Created', label: 'Creation date', show: false }
-      ]"
-      dataset-properties="[
-        { property: 'Id', renderFunc: renderFieldId },
-        { property: 'RepoTags', renderFunc: renderRepoTagsField },
-        { property: 'VirtualSize', filter: 'humansize' },
-        { property: 'Created', filter: 'getisodatefromtimestamp' },
-      ]"
-      order-by="RepoTags"
-      identifier="Id" identifier-property="Id" state-details="image"
-      label-on="Id" render-label="renderLabel"
-      show-text-filter="true" selectable-rows="true">
-      <datatable-settings>
-        <datatable-filter
-          filters="[
-            { label: 'Show all images', value: undefined },
-            { label: 'Show used images only', value: '!0' },
-            { label: 'Show unused images only', value: '0' },
-          ]"
-          property="ContainerCount">
-        </datatable-filter>
-        <datatable-setting-column-selector></datatable-setting-column-selector>
-      </datatable-settings>
-      <datatable-actions>
-        <datatable-action btn-style="btn-danger" btn-icon="fa-trash" btn-title="Remove" require-selection="true" action="removeAction(items)"></datatable-action>
-      </datatable-actions>
-    </datatable>
+    <images-datatable
+    title="Images" title-icon="fa-clone"
+    dataset="images" table-key="images"
+    order-by="RepoTags" show-text-filter="true"
+    remove-action="removeAction"
+    force-remove-action="confirmRemovalAction"
+    ></images-datatable>
   </div>
 </div>
 

@@ -1,14 +1,14 @@
 angular.module('containers', [])
   .controller('ContainersController', ['$q', '$scope', '$state', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'PaginationService', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
   function ($q, $scope, $state, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, PaginationService, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
-  // $scope.state = {};
+  $scope.state = {};
   // $scope.state.pagination_count = PaginationService.getPaginationCount('containers');
-  // $scope.state.displayAll = LocalStorage.getFilterContainerShowAll();
+  $scope.state.displayAll = LocalStorage.getFilterContainerShowAll();
   // $scope.state.displayIP = false;
   // $scope.sortType = 'State';
   // $scope.sortReverse = false;
   // $scope.state.selectedItemCount = 0;
-  // $scope.truncate_size = 40;
+  $scope.truncate_size = 40;
   // $scope.showMore = true;
 
   // $scope.order = function (sortType) {
@@ -20,80 +20,6 @@ angular.module('containers', [])
   // $scope.changePaginationCount = function() {
   //   PaginationService.setPaginationCount('containers', $scope.state.pagination_count);
   // };
-
-  $scope.renderFieldOwnership = function(item, value) {
-    switch (item.ResourceControl.Ownership) {
-      case 'private':
-        return '<span><i class="fa fa-eye-slash" aria-hidden="true" style="margin-right: 5px"></i>private</span>';
-      case 'administrators':
-        return '<span><i class="fa fa-eye-slash" aria-hidden="true" style="margin-right: 5px"></i>administrators</span>';
-      case 'restricted':
-        return '<span><i class="fa fa-users" aria-hidden="true" style="margin-right: 5px"></i>restricted</span>';
-      default:
-        return '<span><i class="fa fa-eye" aria-hidden="true" style="margin-right: 5px"></i>public</span>';
-    }
-  };
-
-  function containerStatusBadge(statusText) {
-    var status = _.toLower(statusText);
-    if (includeString(status, ['paused', 'starting'])) {
-      return 'warning';
-    } else if (includeString(status, ['created'])) {
-      return 'info';
-    } else if (includeString(status, ['stopped', 'unhealthy', 'dead', 'exited'])) {
-      return 'danger';
-    }
-    return 'success';
-  }
-
-  $scope.renderFieldStatus = function(item, value) {
-    var statusBadge = containerStatusBadge(value);
-    // uib-tooltip not recognized
-    // if (['starting','healthy','unhealthy'].indexOf(value) !== -1) {
-    //   return '<span class="label label-' + statusBadge + ' interactive" uib-tooltip="This container has a health check">' + value + '</span>';
-    // }
-    return '<span class="label label-' + statusBadge + '">' + value + '</span>';
-  };
-
-  $scope.renderFieldName = function(item, value) {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
-    if (endpointProvider === 'DOCKER_SWARM') {
-      return $filter('swarmcontainername')(item);
-    }
-    return $filter('containername')(item);
-  };
-
-  $scope.renderFieldImage = function(item, value) {
-    var imageName = $filter('hideshasum')(item.Image);
-    return '<a ng-click="goToImageDetails(' + item.ImageID + ')">' + imageName + '</a>';
-  };
-
-  $scope.renderFieldPorts = function(item, value) {
-    if (!value || value.length === 0) {
-      return '-';
-    }
-
-    var publicURL = EndpointProvider.endpointPublicURL();
-    var render = '';
-    for (var i = 0; i < value.length; i++) {
-      if (i > 1) {
-        render += '+' + (value.length - 2) + ' more';
-        break;
-      }
-      var port = value[i];
-      render += '<a class="image-tag" href="http://' + (publicURL || port.host) + ':' + port.public + '" target="_blank"><i class="fa fa-external-link" aria-hidden="true" style="margin-right: 2px;"></i>' + port.public + ':' + port.private + '</a>';
-    }
-    return render;
-  };
-
-  $scope.goToImageDetails = function(id) {
-    console.log('cliclick');
-    $state.go('image', {id: id});
-  };
-
-  $scope.goToContainerCreation = function() {
-    $state.go('actions.create.container');
-  };
 
   $scope.cleanAssociatedVolumes = false;
 

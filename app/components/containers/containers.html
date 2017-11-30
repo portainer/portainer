@@ -7,103 +7,19 @@
   <rd-header-content>Containers</rd-header-content>
 </rd-header>
 
-<!-- <tr dir-paginate="container in (state.filteredContainers = ( containers | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-  <td><input type="checkbox" ng-model="container.Checked" ng-change="selectItem(container)"/></td>
-  <td>
-    <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ container.Status }}</span>
-    <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) === -1" class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span>
-  </td>
-  <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: truncate_size}}</a></td>
-  <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: truncate_size}}</a></td>
-  <td>{{ container.StackName ? container.StackName : '-' }}</td>
-  <td><a ui-sref="image({id: container.Image})">{{ container.Image | hideshasum }}</a></td>
-  <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
-  <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">{{ container.hostIP }}</td>
-  <td>
-    <a ng-if="container.Ports.length > 0" ng-repeat="p in container.Ports" class="image-tag" ng-href="http://{{ PublicURL || p.host }}:{{p.public}}" target="_blank">
-      <i class="fa fa-external-link" aria-hidden="true"></i> {{p.public}}:{{ p.private }}
-    </a>
-    <span ng-if="container.Ports.length == 0" >-</span>
-  </td>
-  <td ng-if="applicationState.application.authentication">
-    <span>
-      <i ng-class="container.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
-      {{ container.ResourceControl.Ownership ? container.ResourceControl.Ownership : container.ResourceControl.Ownership = 'public' }}
-    </span>
-  </td>
-</tr> -->
-
 <div class="row">
   <div class="col-sm-12">
-    <!-- <datatable title="Containers" title-icon="fa-server"
+    <containers-datatable
+      title="Containers" title-icon="fa-server"
       dataset="containers" table-key="containers"
-      headers="[
-        { property: 'Names', label: 'Name', excludeFromSelector: true },
-        { property: 'Status', label: 'State', excludeFromSelector: true },
-        { property: 'StackName', label: 'Stack', show: true },
-        { property: 'Image', label: 'Image', show: true },
-        { property: 'IP', label: 'IP address', show: true },
-        { property: 'Ports', label: 'Ports', show: true },
-        { property: 'ResourceControl.Ownership', label: 'Ownership', show: true }
-      ]"
-      dataset-properties="[
-        { property: 'Names', renderFunc: renderFieldName },
-        { property: 'Status', renderFunc: renderFieldStatus },
-        { property: 'StackName' },
-        { property: 'Image', renderFunc: renderFieldImage },
-        { property: 'IP' },
-        { property: 'Ports', renderFunc: renderFieldPorts },
-        { property: 'ResourceControl.Ownership', renderFunc: renderFieldOwnership }
-      ]"
-      order-by="Names"
-      identifier="Id" identifier-property="Names" state-details="container"
-      show-text-filter="true" selectable-rows="true">
-      <datatable-settings>
-        <datatable-filter
-          filters="[
-            { label: 'Show all images', value: undefined },
-            { label: 'Show used images only', value: '!0' },
-            { label: 'Show unused images only', value: '0' },
-          ]"
-          property="ContainerCount">
-        </datatable-filter>
-        <datatable-setting-column-selector></datatable-setting-column-selector>
-      </datatable-settings>
-      <datatable-actions>
-        <datatable-action btn-style="btn-danger" btn-icon="fa-trash" btn-title="Remove" require-selection="true" action="removeAction(items)"></datatable-action>
-        <datatable-action btn-style="btn-primary" btn-icon="fa-plus" btn-title="Add container" action="goToContainerCreation()"></datatable-action>
-      </datatable-actions>
-    </datatable> -->
-    <datatable title="Containers" title-icon="fa-server"
-      dataset="containers" table-key="containers"
-      headers="[
-        { property: 'Names', label: 'Name', excludeFromSelector: true },
-        { property: 'Status', label: 'State', excludeFromSelector: true },
-        { property: 'StackName', label: 'Stack', show: true },
-        { property: 'Image', label: 'Image', show: true },
-        { property: 'IP', label: 'IP address', show: true },
-        { property: 'Ports', label: 'Ports', show: true },
-        { property: 'ResourceControl.Ownership', label: 'Ownership', show: true }
-      ]"
-      order-by="Names"
-      show-text-filter="true" selectable-rows="true">
-      <datatable-row></datatable-row>
-      <datatable-settings>
-        <datatable-filter
-          filters="[
-            { label: 'Show all images', value: undefined },
-            { label: 'Show used images only', value: '!0' },
-            { label: 'Show unused images only', value: '0' },
-          ]"
-          property="ContainerCount">
-        </datatable-filter>
-        <datatable-setting-column-selector></datatable-setting-column-selector>
-      </datatable-settings>
-      <datatable-actions>
-        <datatable-action btn-style="btn-danger" btn-icon="fa-trash" btn-title="Remove" require-selection="true" action="removeAction(items)"></datatable-action>
-        <datatable-action btn-style="btn-primary" btn-icon="fa-plus" btn-title="Add container" action="goToContainerCreation()"></datatable-action>
-      </datatable-actions>
-    </datatable>
+      order-by="Status" show-text-filter="true"
+      remove-action="removeAction"
+      show-ip-address-column="state.displayIP"
+      show-ownership-column="applicationState.application.authentication"
+      swarm-containers="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"
+      public-url="PublicURL"
+      container-name-truncate-size="truncate_size"
+    ></containers-datatable>
   </div>
 </div>
 
@@ -215,8 +131,12 @@
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ container.Status }}</span>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) === -1" class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span>
               </td>
-              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: truncate_size}}</a></td>
-              <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: truncate_size}}</a></td>
+              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
+                <a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: truncate_size}}</a>
+              </td>
+              <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'">
+                <a ui-sref="container({id: container.Id})">{{ container|containername|truncate: truncate_size}}</a>
+              </td>
               <td>{{ container.StackName ? container.StackName : '-' }}</td>
               <td><a ui-sref="image({id: container.Image})">{{ container.Image | hideshasum }}</a></td>
               <td ng-if="state.displayIP">{{ container.IP ? container.IP : '-' }}</td>
