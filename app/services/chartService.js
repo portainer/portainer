@@ -65,11 +65,11 @@ angular.module('portainer.services')
   }
 
   service.CreateCPUChart = function(context) {
-    CreateChart(context, 'CPU', percentageBasedTooltipLabel, percentageBasedAxisLabel);
+    return CreateChart(context, 'CPU', percentageBasedTooltipLabel, percentageBasedAxisLabel);
   };
 
   service.CreateMemoryChart = function(context) {
-    CreateChart(context, 'Memory', byteBasedTooltipLabel, byteBasedAxisLabel);
+    return  CreateChart(context, 'Memory', byteBasedTooltipLabel, byteBasedAxisLabel);
   };
 
   service.CreateNetworkChart = function(context) {
