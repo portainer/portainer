@@ -145,6 +145,11 @@
   border: none;
 }
 
+.md-checkbox input[type="checkbox"]:disabled + label:before {
+  background: #ececec;
+  border: 2px solid #ddd;
+}
+
 .md-checkbox input[type="checkbox"]:checked + label:after {
   transform: rotate(-45deg);
   top: 5px;

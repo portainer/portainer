@@ -41,19 +41,11 @@ function (PaginationService, FilterService) {
     PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
-  this.updatedisplayTextFilter = function() {
+  this.updateDisplayTextFilter = function() {
     this.state.displayTextFilter = !this.state.displayTextFilter;
     if (!this.state.displayTextFilter) {
       delete this.state.textFilter;
     }
-  };
-
-  this.storeColumnFilters = function() {
-    FilterService.setDataTableHeaders(this.tableKey, this.headers);
-  };
-
-  this.updateFilter = function(filter) {
-    this.state.filter = filter;
   };
 
   this.$onInit = function() {

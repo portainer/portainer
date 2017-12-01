@@ -12,19 +12,13 @@
         </div>
       </div>
       <div class="actionBar">
-        <div class="btn-group">
-          <button type="button" class="btn btn-sm btn-danger"
-            ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems, false)">
-            <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
-          </button>
-          <button type="button" class="btn btn-sm btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-disabled="$ctrl.state.selectedItemCount === 0">
-            <span class="caret"></span>
-            <span class="sr-only">Toggle Dropdown</span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a ng-click="$ctrl.forceRemoveAction($ctrl.state.selectedItems, true)" ng-disabled="$ctrl.state.selectedItemCount === 0">Force Remove</a></li>
-          </ul>
-        </div>
+        <button type="button" class="btn btn-sm btn-danger"
+          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+          <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
+        </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="actions.create.config">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add config
+        </button>
       </div>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -39,31 +33,24 @@
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
-                <a ng-click="$ctrl.changeOrderBy('Id')">
-                  Id
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Id' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Id' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('Name')">
+                  Name
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('RepoTags')">
-                  Tags
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RepoTags' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RepoTags' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('CreatedAt')">
+                  Creation Date
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('VirtualSize')">
-                  Size
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'VirtualSize' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'VirtualSize' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Created')">
-                  Created
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Created' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Created' && $ctrl.state.reverseOrder"></i>
+              <th ng-if="$ctrl.showOwnershipColumn">
+                <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
+                  Ownership
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
             </tr>
@@ -75,20 +62,21 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="image({id: item.Id})" class="monospaced">{{ item.Id | truncate:20 }}</a>
-                <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="::item.ContainerCount === 0">Unused</span>
+                <a ui-sref="config({id: item.Id})">{{ item.Name }}</a>
               </td>
-              <td>
-                <span class="label label-primary image-tag" ng-repeat="tag in (item | repotags)">{{ tag }}</span>
+              <td>{{ item.CreatedAt | getisodate }}</td>
+              <td ng-if="$ctrl.showOwnershipColumn">
+                <span>
+                  <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
+                  {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = 'public' }}
+                </span>
               </td>
-              <td>{{ item.VirtualSize | humansize }}</td>
-              <td>{{ item.Created | getisodatefromtimestamp }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="4" class="text-center text-muted">Loading...</td>
+              <td colspan="3" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.dataset.length === 0">
-              <td colspan="4" class="text-center text-muted">No image available.</td>
+              <td colspan="3" class="text-center text-muted">No config available.</td>
             </tr>
           </tbody>
         </table>

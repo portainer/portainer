@@ -17,7 +17,7 @@ function (PaginationService, FilterService) {
     FilterService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
   };
 
-  this.selectItem = function(item) {
+  this.toggleItemSelection = function(item) {
     if (item.Checked) {
       this.state.selectedItemCount++;
       this.state.selectedItems.push(item);
@@ -25,7 +25,11 @@ function (PaginationService, FilterService) {
       this.state.selectedItems.splice(this.state.selectedItems.indexOf(item), 1);
       this.state.selectedItemCount--;
     }
-    this.updateSelectionFlags();
+  };
+
+  this.selectItem = function(item) {
+    this.toggleItemSelection(item);
+    this.updateSelectionState();
   };
 
   this.selectAll = function() {
@@ -33,31 +37,26 @@ function (PaginationService, FilterService) {
       var item = this.state.filteredDataSet[i];
       if (item.Checked !== this.state.selectAll) {
         item.Checked = this.state.selectAll;
-        this.selectItem(item);
+        this.toggleItemSelection(item);
       }
     }
-    this.updateSelectionFlags();
+    this.updateSelectionState();
   };
 
-  this.updateSelectionFlags = function() {
+  this.updateSelectionState = function() {
     this.state.noStoppedItemsSelected = true;
     this.state.noRunningItemsSelected = true;
     this.state.noPausedItemsSelected = true;
 
     for (var i = 0; i < this.dataset.length; i++) {
       var item = this.dataset[i];
-      if (!item.Checked) {
-        return;
-      }
-
-      if (item.Status === 'paused') {
+      if (item.Checked && item.Status === 'paused') {
         this.state.noPausedItemsSelected = false;
-      } else if(item.Status === 'stopped' || item.Status === 'created') {
+      } else if (item.Checked && (item.Status === 'stopped' || item.Status === 'created')) {
         this.state.noStoppedItemsSelected = false;
-      } else if(item.Status === 'running') {
+      } else if (item.Checked && item.Status === 'running') {
         this.state.noRunningItemsSelected = false;
       }
-
     }
   };
 
@@ -65,28 +64,30 @@ function (PaginationService, FilterService) {
     PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
-  this.updatedisplayTextFilter = function() {
+  this.updateDisplayTextFilter = function() {
     this.state.displayTextFilter = !this.state.displayTextFilter;
     if (!this.state.displayTextFilter) {
       delete this.state.textFilter;
     }
   };
 
-  this.storeColumnFilters = function() {
-    FilterService.setDataTableHeaders(this.tableKey, this.headers);
-  };
-
-  this.updateFilter = function(filter) {
-    this.state.filter = filter;
-  };
-
   this.$onInit = function() {
     setDefaults(this);
+    this.setSelectedItems();
 
     var storedOrder = FilterService.getDataTableOrder(this.tableKey);
     if (storedOrder !== null) {
       this.state.reverseOrder = storedOrder.reverse;
       this.state.orderBy = storedOrder.orderBy;
+    }
+  };
+
+  this.setSelectedItems = function() {
+    for (var i = 0; i < this.dataset.length; i++) {
+      var item = this.dataset[i];
+      if (item.Checked) {
+        this.selectItem(item);
+      }
     }
   };
 

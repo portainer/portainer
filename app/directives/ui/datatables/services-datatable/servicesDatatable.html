@@ -12,38 +12,12 @@
         </div>
       </div>
       <div class="actionBar">
-        <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.startAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noStoppedItemsSelected">
-            <i class="fa fa-play space-right" aria-hidden="true"></i>Start
-          </button>
-          <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.stopAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noRunningItemsSelected">
-            <i class="fa fa-stop space-right" aria-hidden="true"></i>Stop
-          </button>
-          <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.killAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0">
-            <i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill
-          </button>
-          <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.restartAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0">
-            <i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart
-          </button>
-          <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.pauseAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noRunningItemsSelected">
-            <i class="fa fa-stop space-right" aria-hidden="true"></i>Pause
-          </button>
-          <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.resumeAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noPausedItemsSelected">
-            <i class="fa fa-stop space-right" aria-hidden="true"></i>Resume
-          </button>
-          <button type="button" class="btn btn-sm btn-danger"
-            ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-            <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
-          </button>
-        </div>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="actions.create.container">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add container
+        <button type="button" class="btn btn-sm btn-danger"
+          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+          <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
+        </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="actions.create.service">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add service
         </button>
       </div>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
@@ -59,17 +33,10 @@
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
-                <a ng-click="$ctrl.changeOrderBy('Names')">
+                <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Names' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Names' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Status')">
-                  State
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -87,17 +54,10 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('IP')">
-                  IP Address
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th ng-if="$ctrl.swarmContainers">
-                <a ng-click="$ctrl.changeOrderBy('Host')">
-                  Host IP
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Host' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Host' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('Mode')">
+                  Scheduling Mode
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Mode' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Mode' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -105,6 +65,13 @@
                   Published Ports
                   <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('UpdatedAt')">
+                  Last Update
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'UpdatedAt' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th ng-if="$ctrl.showOwnershipColumn">
@@ -123,23 +90,30 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="container({ id: item.Id })" ng-if="!$ctrl.swarmContainers">{{ item | containername | truncate: $ctrl.containerNameTruncateSize }}</a>
-                <a ui-sref="container({ id: item.Id })" ng-if="$ctrl.swarmContainers">{{ item | swarmcontainername | truncate: $ctrl.containerNameTruncateSize }}</a>
-              </td>
-              <td>
-                <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) !== -1" class="label label-{{ item.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ item.Status }}</span>
-                <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) === -1" class="label label-{{ item.Status|containerstatusbadge }}">{{ item.Status }}</span>
+                <a ui-sref="service({id: item.Id})">{{ item.Name }}</a>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
-              <td><a ui-sref="image({ id: item.Image })">{{ item.Image | hideshasum }}</a></td>
-              <td>{{ item.IP ? item.IP : '-' }}</td>
-              <td ng-if="$ctrl.swarmContainers">{{ item.hostIP }}</td>
+              <td>{{ item.Image | hideshasum }}</td>
               <td>
-                <a ng-if="item.Ports.length > 0" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.publicUrl || p.host }}:{{p.public}}" target="_blank">
-                  <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.public }}:{{ p.private }}
-                </a>
-                <span ng-if="item.Ports.length == 0" >-</span>
+                {{ item.Mode }} <code>{{ item.Running }}</code> / <code>{{ item.Replicas }}</code>
+                <span ng-if="item.Mode === 'replicated' && !item.Scale">
+                  <a class="interactive" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas;">
+                    <i class="fa fa-arrows-v" aria-hidden="true"></i> Scale
+                  </a>
+                </span>
+                <span ng-if="item.Mode === 'replicated' && item.Scale">
+                  <input class="input-sm" type="number" ng-model="item.Replicas" />
+                  <a class="interactive" ng-click="item.Scale = false;"><i class="fa fa-times"></i></a>
+                  <a class="interactive" ng-click="$ctrl.scaleAction(item)"><i class="fa fa-check-square-o"></i></a>
+                </span>
               </td>
+              <td>
+                <a ng-if="item.Ports && item.Ports.length > 0 && $ctrl.swarmManagerIp" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.swarmManagerIp }}:{{ p.PublishedPort }}" target="_blank">
+                  <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
+                </a>
+                <span ng-if="!item.Ports || item.Ports.length === 0 || !$ctrl.swarmManagerIp" >-</span>
+              </td>
+              <td>{{ item.UpdatedAt | getisodate }}</td>
               <td ng-if="$ctrl.showOwnershipColumn">
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
@@ -148,10 +122,10 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="8" class="text-center text-muted">Loading...</td>
+              <td colspan="7" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.dataset.length === 0">
-              <td colspan="8" class="text-center text-muted">No container available.</td>
+              <td colspan="7" class="text-center text-muted">No service available.</td>
             </tr>
           </tbody>
         </table>

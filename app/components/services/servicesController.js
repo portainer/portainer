@@ -1,80 +1,50 @@
 angular.module('services', [])
-.controller('ServicesController', ['$q', '$scope', '$transition$', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'PaginationService', 'Task', 'Node', 'NodeHelper', 'ModalService', 'ResourceControlService',
-function ($q, $scope, $transition$, $state, Service, ServiceService, ServiceHelper, Notifications, PaginationService, Task, Node, NodeHelper, ModalService, ResourceControlService) {
-  $scope.state = {};
-  $scope.state.selectedItemCount = 0;
-  $scope.state.pagination_count = PaginationService.getPaginationCount('services');
-  $scope.sortType = 'Name';
-  $scope.sortReverse = false;
+.controller('ServicesController', ['$q', '$scope', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'Task', 'Node', 'NodeHelper', 'ModalService',
+function ($q, $scope, $state, Service, ServiceService, ServiceHelper, Notifications, Task, Node, NodeHelper, ModalService) {
 
-  $scope.changePaginationCount = function() {
-    PaginationService.setPaginationCount('services', $scope.state.pagination_count);
-  };
-
-  $scope.order = function (sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
-  };
-
-  $scope.scaleService = function scaleService(service) {
+  $scope.scaleAction = function scaleService(service) {
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Mode.Replicated.Replicas = service.Replicas;
-    Service.update({ id: service.Id, version: service.Version }, config, function (data) {
+    ServiceService.update(service, config)
+    .then(function success(data) {
       Notifications.success('Service successfully scaled', 'New replica count: ' + service.Replicas);
       $state.reload();
-    }, function (e) {
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to scale service');
       service.Scale = false;
       service.Replicas = service.ReplicaCount;
-      Notifications.error('Failure', e, 'Unable to scale service');
     });
   };
 
-  $scope.removeAction = function() {
+  $scope.removeAction = function(selectedItems) {
     ModalService.confirmDeletion(
       'Do you want to remove the selected service(s)? All the containers associated to the selected service(s) will be removed too.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
-        removeServices();
+        removeServices(selectedItems);
       }
     );
   };
 
-  function removeServices() {
-    angular.forEach($scope.services, function (service) {
-      if (service.Checked) {
-        ServiceService.remove(service)
-        .then(function success(data) {
-          Notifications.success('Service successfully deleted');
-          var index = $scope.services.indexOf(service);
-          $scope.services.splice(index, 1);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove service');
-        });
-      }
-    });
-  }
-
-  function mapUsersToServices(users) {
-    angular.forEach($scope.services, function (service) {
-      if (service.Metadata) {
-        var serviceRC = service.Metadata.ResourceControl;
-        if (serviceRC && serviceRC.OwnerId !== $scope.user.ID) {
-          angular.forEach(users, function (user) {
-            if (serviceRC.OwnerId === user.Id) {
-              service.Owner = user.Username;
-            }
-          });
+  function removeServices(services) {
+    var actionCount = services.length;
+    angular.forEach(services, function (service) {
+      ServiceService.remove(service)
+      .then(function success() {
+        Notifications.success('Service successfully removed', service.Name);
+        var index = $scope.services.indexOf(service);
+        $scope.services.splice(index, 1);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to remove service');
+      })
+      .finally(function final() {
+        --actionCount;
+        if (actionCount === 0) {
+          $state.reload();
         }
-      }
+      });
     });
   }
 

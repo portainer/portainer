@@ -9,11 +9,16 @@ angular.module('ui').component('containersDatatable', {
     orderBy: '@',
     reverseOrder: '<',
     showTextFilter: '<',
-    removeAction: '<',
-    showIpAddressColumn: '<',
     showOwnershipColumn: '<',
     swarmContainers: '<',
     publicUrl: '<',
-    containerNameTruncateSize: '<'
+    containerNameTruncateSize: '<',
+    startAction: '<',
+    stopAction: '<',
+    killAction: '<',
+    restartAction: '<',
+    pauseAction: '<',
+    resumeAction: '<',
+    removeAction: '<'
   }
 });

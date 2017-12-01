@@ -8,133 +8,15 @@
 </rd-header>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-list-alt" title="Services">
-        <div class="pull-right">
-          Items per page:
-          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-            <option value="0">All</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </rd-widget-header>
-      <rd-widget-taskbar classes="col-lg-12 col-md-12 col-xs-12">
-        <div class="pull-left">
-          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-          <a class="btn btn-primary" type="button" ui-sref="actions.create.service"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add service</a>
-        </div>
-        <div class="pull-right">
-          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
-        </div>
-      </rd-widget-taskbar>
-      <rd-widget-body classes="no-padding">
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <th></th>
-              <th>
-                <a ng-click="order('Name')">
-                  Name
-                  <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ng-click="order('StackName')">
-                  Stack
-                  <span ng-show="sortType == 'StackName' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'StackName' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ng-click="order('Image')">
-                  Image
-                  <span ng-show="sortType == 'Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ng-click="order('Mode')">
-                  Scheduling mode
-                  <span ng-show="sortType == 'Mode' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Mode' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ng-click="order('Ports')">
-                  Published Ports
-                  <span ng-show="sortType == 'Ports' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Ports' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ng-click="order('UpdatedAt')">
-                  Updated at
-                  <span ng-show="sortType == 'UpdatedAt' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'UpdatedAt' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th ng-if="applicationState.application.authentication">
-                <a ng-click="order('ResourceControl.Ownership')">
-                  Ownership
-                  <span ng-show="sortType == 'ResourceControl.Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'ResourceControl.Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-            </thead>
-            <tbody>
-              <tr dir-paginate="service in (state.filteredServices = ( services | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: service.Checked}">
-                <td><input type="checkbox" ng-model="service.Checked" ng-change="selectItem(service)"/></td>
-                <td><a ui-sref="service({id: service.Id})">{{ service.Name }}</a></td>
-                <td>{{ service.StackName ? service.StackName : '-' }}</td>
-                <td>{{ service.Image | hideshasum }}</td>
-                <td>
-                  {{ service.Mode }}
-                  <code data-toggle="tooltip" title="Replicas">{{ service.Running }}</code>
-                  /
-                  <code data-toggle="tooltip" title="Replicas">{{ service.Replicas }}</code>
-                  <span ng-if="service.Mode === 'replicated' && !service.Scale">
-                    <a class="interactive" ng-click="service.Scale = true; service.ReplicaCount = service.Replicas;"><i class="fa fa-arrows-v" aria-hidden="true"></i> Scale</a>
-                  </span>
-                  <span ng-if="service.Mode === 'replicated' && service.Scale">
-                    <input class="input-sm" type="number" ng-model="service.Replicas" />
-                    <a class="interactive" ng-click="service.Scale = false;"><i class="fa fa-times"></i></a>
-                    <a class="interactive" ng-click="scaleService(service)"><i class="fa fa-check-square-o"></i></a>
-                  </span>
-                </td>
-                <td>
-                  <a ng-if="service.Ports && service.Ports.length > 0 && swarmManagerIP" ng-repeat="p in service.Ports" class="image-tag" ng-href="http://{{swarmManagerIP}}:{{p.PublishedPort}}" target="_blank">
-                    <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
-                  </a>
-                  <span ng-if="!service.Ports || service.Ports.length === 0 || !swarmManagerIP" >-</span>
-                </td>
-                <td>
-                  {{ service.UpdatedAt|getisodate }}
-                </td>
-                <td ng-if="applicationState.application.authentication">
-                  <span>
-                    <i ng-class="service.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
-                    {{ service.ResourceControl.Ownership ? service.ResourceControl.Ownership : service.ResourceControl.Ownership = 'public' }}
-                  </span>
-                </td>
-              </tr>
-              <tr ng-if="!services">
-                <td colspan="7" class="text-center text-muted">Loading...</td>
-              </tr>
-              <tr ng-if="services.length == 0">
-                <td colspan="7" class="text-center text-muted">No services available.</td>
-              </tr>
-            </tbody>
-          </table>
-          <div ng-if="services" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
-          </div>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
+  <div class="col-sm-12">
+    <services-datatable
+    title="Services" title-icon="fa-list-alt"
+    dataset="services" table-key="services"
+    order-by="Name" show-text-filter="true"
+    show-ownership-column="applicationState.application.authentication"
+    remove-action="removeAction"
+    scale-action="scaleAction"
+    swarm-manager-ip="swarmManagerIP"
+    ></services-datatable>
   </div>
 </div>

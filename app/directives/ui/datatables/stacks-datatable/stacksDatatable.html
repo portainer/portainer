@@ -16,8 +16,8 @@
           ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="actions.create.registry">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add registry
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="actions.create.stack">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add stack
         </button>
       </div>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
@@ -39,40 +39,39 @@
                   <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('URL')">
-                  URL
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && $ctrl.state.reverseOrder"></i>
+              <th ng-if="$ctrl.showOwnershipColumn">
+                <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
+                  Ownership
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.filter | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
+            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.filter | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-if="$ctrl.displayExternalStacks || (!$ctrl.displayExternalStacks && !item.External)" ng-class="{active: item.Checked}">
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)" ng-disabled="!item.Id"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="registry({id: item.Id})">{{ item.Name }}</a>
-                <span ng-if="item.Authentication" style="margin-left: 5px;" class="label label-info image-tag">authentication-enabled</span>
+                <a ng-if="item.Id" ui-sref="stack({ id: item.Id })">{{ item.Name }}</a>
+                <span ng-if="!item.Id">
+                  {{ item.Name }} <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true"></i>
+                </span>
               </td>
-              <td>
-                {{ item.URL }}
-              </td>
-              <td>
-                <a ui-sref="registry.access({id: item.Id})" ng-if="$ctrl.accessManagement">
-                  <i class="fa fa-users" aria-hidden="true"></i> Manage access
-                </a>
+              <td ng-if="$ctrl.showOwnershipColumn">
+                <span>
+                  <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
+                  {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = 'public' }}
+                </span>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="3" class="text-center text-muted">Loading...</td>
+              <td colspan="2" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.dataset.length === 0">
-              <td colspan="3" class="text-center text-muted">No registry available.</td>
+              <td colspan="2" class="text-center text-muted">No stack available.</td>
             </tr>
           </tbody>
         </table>
