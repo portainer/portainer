@@ -20,7 +20,7 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  servicePlugins = function(systemOnly, pluginType, pluginVersion) {
+  function servicePlugins(systemOnly, pluginType, pluginVersion) {
     var deferred = $q.defer();
 
     $q.all({
@@ -50,14 +50,14 @@ angular.module('portainer.services')
     });
 
     return deferred.promise;
-  };
+  }
 
   service.volumePlugins = function(systemOnly) {
-    servicePlugins(systemOnly, 'Volume', 'docker.volumedriver/1.0');
+    return servicePlugins(systemOnly, 'Volume', 'docker.volumedriver/1.0');
   };
 
   service.networkPlugins = function(systemOnly) {
-    servicePlugins(systemOnly, 'Network', 'docker.networkdriver/1.0');
+    return servicePlugins(systemOnly, 'Network', 'docker.networkdriver/1.0');
   };
 
   return service;
