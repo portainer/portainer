@@ -1,27 +1,14 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('node', [])
-.controller('NodeController', ['$scope', '$state', '$transition$', 'LabelHelper', 'Node', 'NodeHelper', 'Task', 'PaginationService', 'Notifications',
-function ($scope, $state, $transition$, LabelHelper, Node, NodeHelper, Task, PaginationService, Notifications) {
+.controller('NodeController', ['$scope', '$state', '$transition$', 'LabelHelper', 'Node', 'NodeHelper', 'Task', 'Notifications',
+function ($scope, $state, $transition$, LabelHelper, Node, NodeHelper, Task, Notifications) {
 
-  $scope.state = {};
-  $scope.state.pagination_count = PaginationService.getPaginationCount('node_tasks');
   $scope.loading = true;
   $scope.tasks = [];
-  $scope.sortType = 'Status';
-  $scope.sortReverse = false;
 
   var originalNode = {};
   var editedKeys = [];
-
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    PaginationService.setPaginationCount('node_tasks', $scope.state.pagination_count);
-  };
 
   $scope.updateNodeAttribute = function updateNodeAttribute(node, key) {
     editedKeys.push(key);
