@@ -81,6 +81,7 @@ func (server *Server) Start() error {
 	endpointHandler.ProxyManager = proxyManager
 	var registryHandler = handler.NewRegistryHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
+	registryHandler.ProxyManager = proxyManager
 	var dockerHubHandler = handler.NewDockerHubHandler(requestBouncer)
 	dockerHubHandler.DockerHubService = server.DockerHubService
 	var resourceHandler = handler.NewResourceHandler(requestBouncer)
