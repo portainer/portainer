@@ -51,7 +51,7 @@
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search...">
       </div>
       <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-hover table-filters">
           <thead>
             <tr>
               <th>
@@ -65,12 +65,32 @@
                   <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Names' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
                 <a ng-click="$ctrl.changeOrderBy('Status')">
                   State
                   <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
                 </a>
+                <div class="table-filter" uib-dropdown-toggle>
+                  Filter <i class="fa fa-filter" aria-hidden="true"></i>
+                </div>
+                <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+                  <div class="tableMenu">
+                    <div class="menuHeader">
+                      Filter by state
+                    </div>
+                    <div class="menuContent">
+                      <div class="md-checkbox" ng-repeat="filter in $ctrl.filters.state.values track by $index">
+                        <input id="filter_state_{{ $index }}" type="checkbox" ng-model="filter.filter" ng-change="$ctrl.datatable.storeColumnFilters()"/>
+                        <label for="filter_state_{{ $index }}">{{ filter.value }}</label>
+                      </div>
+                    </div>
+
+                    <div>
+                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.closeSettings()">Close</a>
+                    </div>
+                  </div>
+                </div>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('StackName')">
@@ -78,6 +98,9 @@
                   <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
                 </a>
+                <div class="table-filter filter-active">
+                  Filter <i class="fa fa-check" aria-hidden="true"></i>
+                </div>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Image')">

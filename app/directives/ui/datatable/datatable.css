@@ -87,16 +87,16 @@
   float: none;
 }
 
-.settingsMenu {
+.tableMenu {
   color: #767676;
   padding: 10px;
 }
 
-.settingsMenu .settingsHeader {
+.tableMenu .menuHeader {
   font-size: 16px;
 }
 
-.settingsMenu .settingsContent {
+.tableMenu .menuContent {
   font-size: 12px;
   border-bottom: 1px solid #777;
   margin-top: 10px;
@@ -105,8 +105,31 @@
   margin-bottom: 10px;
 }
 
-.settingsMenu .settingsContent .md-radio:first-child {
+.tableMenu .menuContent .md-radio:first-child {
   margin: 0;
+}
+
+.datatable .table-filters thead tr > th {
+  height: 32px;
+  vertical-align: middle;
+}
+
+.widget .widget-body table thead th > .table-filter {
+  font-size: 12px !important;
+  color: #767676;
+  cursor: pointer;
+}
+
+.widget .widget-body table thead th > .filter-active {
+  /*font-size: 12px !important;*/
+  color: #f0ad4e;
+  /*cursor: pointer;*/
+}
+
+.datatable .filterbar > th {
+  padding: 0;
+  border: none;
+  font-size: 12px !important;
 }
 
 .md-checkbox {

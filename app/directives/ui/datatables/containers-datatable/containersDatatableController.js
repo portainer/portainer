@@ -11,6 +11,13 @@ function (PaginationService, FilterService) {
     selectedItems: []
   };
 
+  this.filters = {
+    state: {
+      open: false,
+      values: []
+    }
+  };
+
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
@@ -73,7 +80,7 @@ function (PaginationService, FilterService) {
 
   this.$onInit = function() {
     setDefaults(this);
-    this.setSelectedItems();
+    this.prepareTableFromDataset();
 
     var storedOrder = FilterService.getDataTableOrder(this.tableKey);
     if (storedOrder !== null) {
@@ -82,14 +89,26 @@ function (PaginationService, FilterService) {
     }
   };
 
-  this.setSelectedItems = function() {
+  this.prepareTableFromDataset = function() {
+    var availableStates = [];
     for (var i = 0; i < this.dataset.length; i++) {
       var item = this.dataset[i];
       if (item.Checked) {
         this.selectItem(item);
       }
+      availableStates.push({ value: item.Status, filter: true });
     }
+    this.filters.state.values = _.uniqBy(availableStates, 'value');
   };
+
+  // this.setSelectedItems = function() {
+  //   for (var i = 0; i < this.dataset.length; i++) {
+  //     var item = this.dataset[i];
+  //     if (item.Checked) {
+  //       this.selectItem(item);
+  //     }
+  //   }
+  // };
 
   function setDefaults(ctrl) {
     ctrl.showTextFilter = ctrl.showTextFilter ? ctrl.showTextFilter : false;
