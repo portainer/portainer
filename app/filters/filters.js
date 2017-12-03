@@ -55,16 +55,18 @@ angular.module('portainer.filters', [])
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (includeString(status, ['new', 'allocated', 'assigned', 'accepted'])) {
+    if (includeString(status, ['new', 'allocated', 'assigned', 'accepted', 'preparing', 'ready', 'starting', 'remove'])) {
       return 'info';
     } else if (includeString(status, ['pending'])) {
       return 'warning';
-    } else if (includeString(status, ['shutdown', 'failed', 'rejected'])) {
+    } else if (includeString(status, ['shutdown', 'failed', 'rejected', 'orphaned'])) {
       return 'danger';
     } else if (includeString(status, ['complete'])) {
       return 'primary';
-    }
-    return 'success';
+    } else if (includeString(status, ['running'])) {
+      return 'success';
+    }    
+    return 'default';
   };
 })
 .filter('containerstatusbadge', function () {
