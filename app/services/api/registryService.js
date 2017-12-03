@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper) {
+.factory('RegistryService', ['$q', 'Registries', 'RegistryCatalog', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, RegistryCatalog, DockerHubService, RegistryHelper, ImageHelper) {
   'use strict';
   var service = {};
 
@@ -30,6 +30,20 @@ angular.module('portainer.services')
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve registry details', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+  service.catalog = function(id) {
+    var deferred = $q.defer();
+
+    RegistryCatalog.get({id: id}).$promise
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve registry catalog', err: err});
     });
 
     return deferred.promise;
@@ -86,6 +100,10 @@ angular.module('portainer.services')
     });
 
     return deferred.promise;
+  };
+
+  service.getCatalog = function() {
+    
   };
 
   return service;

@@ -61,7 +61,7 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 func (manager *Manager) CreateAndRegisterRegistryProxy(registry *portainer.Registry) (http.Handler, error) {
 	var proxy http.Handler
 
-	registryURL, err := url.Parse(registry.URL)
+	registryURL, err := url.Parse("http://" + registry.URL)
 	if err != nil {
 		return nil, err
 	}

@@ -24,6 +24,14 @@ function ($scope, $state, $transition$, $filter, RegistryService, Notifications)
 
   function initView() {
     var registryID = $transition$.params().id;
+    RegistryService.catalog(registryID)
+    .then(function success(data) {
+      //$scope.registry = data;
+      console.log(data);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve registry details');
+    });
     RegistryService.registry(registryID)
     .then(function success(data) {
       $scope.registry = data;
