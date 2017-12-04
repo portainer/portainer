@@ -174,12 +174,15 @@ angular.module('portainer.filters', [])
 })
 .filter('humansize', function () {
   'use strict';
-  return function (bytes, round) {
+  return function (bytes, round, base) {
     if (!round) {
       round = 1;
     }
+    if (!base) {
+      base = 10;
+    }
     if (bytes || bytes === 0) {
-      return filesize(bytes, {base: 10, round: round});
+      return filesize(bytes, {base: base, round: round});
     }
   };
 })
