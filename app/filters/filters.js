@@ -55,16 +55,19 @@ angular.module('portainer.filters')
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (includeString(status, ['new', 'allocated', 'assigned', 'accepted'])) {
-      return 'info';
+    var labelStyle = 'default';
+    if (includeString(status, ['new', 'allocated', 'assigned', 'accepted', 'preparing', 'ready', 'starting', 'remove'])) {
+      labelStyle = 'info';
     } else if (includeString(status, ['pending'])) {
-      return 'warning';
-    } else if (includeString(status, ['shutdown', 'failed', 'rejected'])) {
-      return 'danger';
+      labelStyle = 'warning';
+    } else if (includeString(status, ['shutdown', 'failed', 'rejected', 'orphaned'])) {
+      labelStyle = 'danger';
     } else if (includeString(status, ['complete'])) {
-      return 'primary';
-    }
-    return 'success';
+      labelStyle = 'primary';
+    } else if (includeString(status, ['running'])) {
+      labelStyle = 'success';
+    }    
+    return labelStyle;
   };
 })
 .filter('containerstatusbadge', function () {
@@ -174,12 +177,15 @@ angular.module('portainer.filters')
 })
 .filter('humansize', function () {
   'use strict';
-  return function (bytes, round) {
+  return function (bytes, round, base) {
     if (!round) {
       round = 1;
     }
+    if (!base) {
+      base = 10;
+    }
     if (bytes || bytes === 0) {
-      return filesize(bytes, {base: 10, round: round});
+      return filesize(bytes, {base: base, round: round});
     }
   };
 })
