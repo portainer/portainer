@@ -78,7 +78,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
 
   // Add default port if :port is not defined in URL
   function addLDAPDefaultPort(settings, tlsEnabled) {
-    if (settings.LDAPSettings.URL.split(':').length === 1) {
+    if (settings.LDAPSettings.URL.indexOf(":") === -1) {      
       settings.LDAPSettings.URL += tlsEnabled ? ':636' : ':389';      
     }
   }
