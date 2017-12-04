@@ -116,7 +116,7 @@
 .widget .widget-body table thead th .table-filter {
   color: #767676;
   cursor: pointer;
-  font-size: 12px !important;
+  font-size: 12px;
 }
 
 .widget .widget-body table thead th .filter-active {
@@ -148,6 +148,7 @@
 
 .md-checkbox label:before {
   background: #fff;
+  border: 2px solid black;
   border: 2px solid rgba(0, 0, 0, 0.54);
   border-radius: 2px;
   cursor: pointer;
@@ -223,6 +224,7 @@
 }
 
 .md-radio label:before {
+  border: 2px solid black;
   border: 2px solid rgba(0, 0, 0, 0.54);
   height: 16px;
   left: 0;
