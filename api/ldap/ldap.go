@@ -54,23 +54,12 @@ func searchUser(username string, conn *ldap.Conn, settings []portainer.LDAPSearc
 
 func createConnection(settings *portainer.LDAPSettings) (*ldap.Conn, error) {
 
-	url := strings.Split(settings.URL, ":")
-
-	// Add default port to url if :port is not set
-	if len(url) == 1 {
-		if settings.TLSConfig.TLS {
-			settings.URL += ":636"
-		} else {
-			settings.URL += ":389"
-		}
-	}
-
 	if settings.TLSConfig.TLS || settings.StartTLS {
 		config, err := crypto.CreateTLSConfiguration(&settings.TLSConfig)
 		if err != nil {
 			return nil, err
 		}
-		config.ServerName = url[0]
+		config.ServerName = strings.Split(settings.URL, ":")[0]
 
 		if settings.TLSConfig.TLS {
 			return ldap.DialTLS("tcp", settings.URL, config)
