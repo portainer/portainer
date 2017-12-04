@@ -1,6 +1,8 @@
 angular.module('ui')
-.controller('ContainersDatatableController', ['PaginationService', 'FilterService',
-function (PaginationService, FilterService) {
+.controller('ContainersDatatableController', ['PaginationService', 'DatatableService',
+function (PaginationService, DatatableService) {
+
+  var ctrl = this;
 
   this.state = {
     selectAll: false,
@@ -11,9 +13,16 @@ function (PaginationService, FilterService) {
     selectedItems: []
   };
 
+  this.settings = {
+    open: false,
+    truncateContainerName: true,
+    containerNameTruncateSize: 40
+  };
+
   this.filters = {
     state: {
       open: false,
+      enabled: false,
       values: []
     }
   };
@@ -21,7 +30,7 @@ function (PaginationService, FilterService) {
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
-    FilterService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
+    DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
   };
 
   this.toggleItemSelection = function(item) {
@@ -78,37 +87,74 @@ function (PaginationService, FilterService) {
     }
   };
 
-  this.$onInit = function() {
-    setDefaults(this);
-    this.prepareTableFromDataset();
-
-    var storedOrder = FilterService.getDataTableOrder(this.tableKey);
-    if (storedOrder !== null) {
-      this.state.reverseOrder = storedOrder.reverse;
-      this.state.orderBy = storedOrder.orderBy;
+  this.applyFilters = function(value, index, array) {
+    var container = value;
+    var filters = ctrl.filters;
+    for (var i = 0; i < filters.state.values.length; i++) {
+      var filter = filters.state.values[i];
+      if (container.Status === filter.label && filter.display) {
+        return true;
+      }
     }
+    return false;
+  };
+
+  this.onStateFilterChange = function() {
+    var filters = this.filters.state.values;
+    var filtered = false;
+    for (var i = 0; i < filters.length; i++) {
+      var filter = filters[i];
+      if (!filter.display) {
+        filtered = true;
+      }
+    }
+    this.filters.state.enabled = filtered;
+    DatatableService.setDataTableFilters(this.tableKey, this.filters);
+  };
+
+  this.onSettingsContainerNameTruncateChange = function() {
+    if (this.settings.truncateContainerName) {
+      this.settings.containerNameTruncateSize = 40;
+    } else {
+      this.settings.containerNameTruncateSize = 256;
+    }
+    DatatableService.setDataTableSettings(this.tableKey, this.settings);
   };
 
   this.prepareTableFromDataset = function() {
-    var availableStates = [];
+    var availableStateFilters = [];
     for (var i = 0; i < this.dataset.length; i++) {
       var item = this.dataset[i];
       if (item.Checked) {
         this.selectItem(item);
       }
-      availableStates.push({ value: item.Status, filter: true });
+      availableStateFilters.push({ label: item.Status, display: true });
     }
-    this.filters.state.values = _.uniqBy(availableStates, 'value');
+    this.filters.state.values = _.uniqBy(availableStateFilters, 'label');
   };
 
-  // this.setSelectedItems = function() {
-  //   for (var i = 0; i < this.dataset.length; i++) {
-  //     var item = this.dataset[i];
-  //     if (item.Checked) {
-  //       this.selectItem(item);
-  //     }
-  //   }
-  // };
+  this.$onInit = function() {
+    setDefaults(this);
+    this.prepareTableFromDataset();
+
+    var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
+    if (storedOrder !== null) {
+      this.state.reverseOrder = storedOrder.reverse;
+      this.state.orderBy = storedOrder.orderBy;
+    }
+
+    var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
+    if (storedFilters !== null) {
+      this.filters = storedFilters;
+    }
+    this.filters.state.open = false;
+
+    var storedSettings = DatatableService.getDataTableSettings(this.tableKey);
+    if (storedSettings !== null) {
+      this.settings = storedSettings;
+    }
+    this.settings.open = false;
+  };
 
   function setDefaults(ctrl) {
     ctrl.showTextFilter = ctrl.showTextFilter ? ctrl.showTextFilter : false;

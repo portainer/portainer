@@ -1,6 +1,6 @@
 angular.module('ui')
-.controller('DatatableController', ['$state', '$filter', '$sce', 'PaginationService', 'FilterService',
-function ($state, $filter, $sce, PaginationService, FilterService) {
+.controller('DatatableController', ['$state', '$filter', '$sce', 'PaginationService', 'DatatableService',
+function ($state, $filter, $sce, PaginationService, DatatableService) {
 
   this.state = {
     selectAll: false,
@@ -14,7 +14,7 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
-    FilterService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
+    DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
   };
 
   this.selectItem = function(item) {
@@ -85,7 +85,7 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
   };
 
   this.storeColumnFilters = function() {
-    FilterService.setDataTableHeaders(this.tableKey, this.headers);
+    DatatableService.setDataTableHeaders(this.tableKey, this.headers);
   };
 
   this.updateFilter = function(filter) {
@@ -95,12 +95,12 @@ function ($state, $filter, $sce, PaginationService, FilterService) {
   this.$onInit = function() {
     setDefaults(this);
 
-    var storedHeaders = FilterService.getDataTableHeaders(this.tableKey);
+    var storedHeaders = DatatableService.getDataTableHeaders(this.tableKey);
     if (storedHeaders !== null) {
       this.headers = storedHeaders;
     }
 
-    var storedOrder = FilterService.getDataTableOrder(this.tableKey);
+    var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
     if (storedOrder !== null) {
       this.state.reverseOrder = storedOrder.reverse;
       this.state.orderBy = storedOrder.orderBy;

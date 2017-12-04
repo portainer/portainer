@@ -114,16 +114,15 @@
   vertical-align: middle;
 }
 
-.widget .widget-body table thead th > .table-filter {
+.widget .widget-body table thead th .table-filter {
   font-size: 12px !important;
   color: #767676;
   cursor: pointer;
 }
 
-.widget .widget-body table thead th > .filter-active {
-  /*font-size: 12px !important;*/
+.widget .widget-body table thead th .filter-active {
+  font-size: 12px !important;
   color: #f0ad4e;
-  /*cursor: pointer;*/
 }
 
 .datatable .filterbar > th {
@@ -160,7 +159,7 @@
 
 .md-checkbox input[type="checkbox"] {
   outline: 0;
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .md-checkbox input[type="checkbox"]:checked + label:before {

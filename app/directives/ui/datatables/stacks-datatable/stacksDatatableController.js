@@ -1,6 +1,6 @@
 angular.module('ui')
-.controller('StacksDatatableController', ['PaginationService', 'FilterService',
-function (PaginationService, FilterService) {
+.controller('StacksDatatableController', ['PaginationService', 'DatatableService',
+function (PaginationService, DatatableService) {
 
   this.state = {
     selectAll: false,
@@ -14,7 +14,7 @@ function (PaginationService, FilterService) {
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
-    FilterService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
+    DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
   };
 
   this.selectItem = function(item) {
@@ -51,7 +51,7 @@ function (PaginationService, FilterService) {
   this.$onInit = function() {
     setDefaults(this);
 
-    var storedOrder = FilterService.getDataTableOrder(this.tableKey);
+    var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
     if (storedOrder !== null) {
       this.state.reverseOrder = storedOrder.reverse;
       this.state.orderBy = storedOrder.orderBy;
