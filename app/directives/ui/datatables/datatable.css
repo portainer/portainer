@@ -116,7 +116,7 @@
 .widget .widget-body table thead th .table-filter {
   color: #767676;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 12px !important;
 }
 
 .widget .widget-body table thead th .filter-active {
