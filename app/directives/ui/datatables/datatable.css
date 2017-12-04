@@ -1,8 +1,8 @@
 .datatable .toolBar {
   background-color: #f6f6f6;
   color: #767676;
-  padding: 10px;
   overflow: auto;
+  padding: 10px;
 }
 
 .datatable .actionBar {
@@ -54,7 +54,7 @@
 }
 
 .datatable .table {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .datatable .footer {
@@ -120,8 +120,8 @@
 }
 
 .widget .widget-body table thead th .filter-active {
-  font-size: 12px !important;
   color: #f0ad4e;
+  font-size: 12px !important;
 }
 
 .datatable .filterbar > th {
@@ -173,8 +173,8 @@
 
 .md-checkbox input[type="checkbox"]:checked + label:after {
   border: 2px solid #fff;
-  border-top-style: none;
   border-right-style: none;
+  border-top-style: none;
   height: 4px;
   left: 4px;
   top: 5px;
@@ -187,7 +187,7 @@
   margin: 6px 0;
 }
 
-.md-radio.md-radio-inline {
+.md-radio .md-radio-inline {
   display: inline-block;
 }
 

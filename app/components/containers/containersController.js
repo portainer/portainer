@@ -5,14 +5,6 @@ angular.module('containers', [])
     publicURL: EndpointProvider.endpointPublicURL()
   };
 
-  // TODO: find a UX solution
-  $scope.truncate_size = 40;
-  $scope.showMore = true;
-  $scope.truncateMore = function(size) {
-    $scope.truncate_size = 80;
-    $scope.showMore = false;
-  };
-
   $scope.startAction = function(selectedItems) {
     var successMessage = 'Container successfully started';
     var errorMessage = 'Unable to start container';
