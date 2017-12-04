@@ -1,6 +1,6 @@
 .datatable .toolBar {
-  color: #767676;
   background-color: #f6f6f6;
+  color: #767676;
   padding: 10px;
   overflow: auto;
 }
@@ -30,23 +30,23 @@
 }
 
 .datatable .searchBar {
-  padding: 10px;
   border-top: 1px solid #f6f6f6;
+  padding: 10px;
 }
 
 .datatable .searchInput {
+  background: none;
+  border: none;
   width: 95%;
-  border:none;
-  background:none;
 }
 
 .datatable .searchIcon {
-  margin-right: 5px;
   color: #767676;
+  margin-right: 5px;
 }
 
 .datatable .searchInput:active, .datatable .searchInput:focus {
-  outline:none;
+  outline: none;
 }
 
 .datatable .pagination-controls {
@@ -58,14 +58,14 @@
 }
 
 .datatable .footer {
-  color: #767676;
   background-color: #f6f6f6;
+  color: #767676;
   overflow: auto;
 }
 
 .datatable .footer .infoBar {
-  font-size: 12px;
   float: left;
+  font-size: 12px;
   margin: 15px 0 0 10px;
 }
 
@@ -97,12 +97,11 @@
 }
 
 .tableMenu .menuContent {
-  font-size: 12px;
   border-bottom: 1px solid #777;
-  margin-top: 10px;
+  font-size: 12px;
+  margin: 10px 0;
   max-height: 140px;
   overflow-y: auto;
-  margin-bottom: 10px;
 }
 
 .tableMenu .menuContent .md-radio:first-child {
@@ -115,9 +114,9 @@
 }
 
 .widget .widget-body table thead th .table-filter {
-  font-size: 12px !important;
   color: #767676;
   cursor: pointer;
+  font-size: 12px !important;
 }
 
 .widget .widget-body table thead th .filter-active {
@@ -126,14 +125,14 @@
 }
 
 .datatable .filterbar > th {
-  padding: 0;
   border: none;
   font-size: 12px !important;
+  padding: 0;
 }
 
 .md-checkbox {
-  position: relative;
   margin: 1px 0;
+  position: relative;
 }
 
 .md-checkbox label {
@@ -142,24 +141,24 @@
 
 .md-checkbox label:before, .md-checkbox label:after {
   content: "";
-  position: absolute;
   left: 0;
+  position: absolute;
   top: 0;
 }
 
 .md-checkbox label:before {
-  width: 16px;
-  height: 16px;
   background: #fff;
   border: 2px solid rgba(0, 0, 0, 0.54);
   border-radius: 2px;
   cursor: pointer;
+  height: 16px;
   transition: background .3s;
+  width: 16px;
 }
 
 .md-checkbox input[type="checkbox"] {
-  outline: 0;
   margin-right: 5px;
+  outline: 0;
 }
 
 .md-checkbox input[type="checkbox"]:checked + label:before {
@@ -173,14 +172,15 @@
 }
 
 .md-checkbox input[type="checkbox"]:checked + label:after {
-  transform: rotate(-45deg);
-  top: 5px;
-  left: 4px;
-  width: 9px;
-  height: 4px;
   border: 2px solid #fff;
   border-top-style: none;
   border-right-style: none;
+  height: 4px;
+  left: 4px;
+  top: 5px;
+  transform: rotate(-45deg);
+  width: 9px;
+
 }
 
 .md-radio {
@@ -196,8 +196,8 @@
 }
 
 .md-radio input[type="radio"]:checked + label:before {
-  border-color: #337ab7;
   animation: ripple 0.2s linear forwards;
+  border-color: #337ab7;
 }
 
 .md-radio input[type="radio"]:checked + label:after {
@@ -205,36 +205,36 @@
 }
 
 .md-radio label {
+  cursor: pointer;
   display: inline-block;
   height: 16px;
-  position: relative;
-  padding: 0 22px;
   margin-bottom: 0;
-  cursor: pointer;
+  padding: 0 22px;
+  position: relative;
   vertical-align: bottom;
 }
 
 .md-radio label:before, .md-radio label:after {
-  position: absolute;
-  content: '';
   border-radius: 50%;
+  content: '';
+  position: absolute;
   transition: all .3s ease;
   transition-property: transform, border-color;
 }
 
 .md-radio label:before {
+  border: 2px solid rgba(0, 0, 0, 0.54);
+  height: 16px;
   left: 0;
   top: 0;
   width: 16px;
-  height: 16px;
-  border: 2px solid rgba(0, 0, 0, 0.54);
 }
 
 .md-radio label:after {
-  top: 4px;
-  left: 4px;
-  width: 8px;
-  height: 8px;
-  transform: scale(0);
   background: #337ab7;
+  height: 8px;
+  left: 4px;
+  top: 4px;
+  transform: scale(0);
+  width: 8px;
 }
