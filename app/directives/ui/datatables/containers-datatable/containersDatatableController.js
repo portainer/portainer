@@ -16,7 +16,7 @@ function (PaginationService, DatatableService) {
   this.settings = {
     open: false,
     truncateContainerName: true,
-    containerNameTruncateSize: 40,
+    containerNameTruncateSize: 32,
     showQuickActionStats: true,
     showQuickActionLogs: true,
     showQuickActionConsole: true,
@@ -118,7 +118,7 @@ function (PaginationService, DatatableService) {
 
   this.onSettingsContainerNameTruncateChange = function() {
     if (this.settings.truncateContainerName) {
-      this.settings.containerNameTruncateSize = 40;
+      this.settings.containerNameTruncateSize = 32;
     } else {
       this.settings.containerNameTruncateSize = 256;
     }
