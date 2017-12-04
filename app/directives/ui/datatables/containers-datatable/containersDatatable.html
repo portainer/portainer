@@ -7,10 +7,10 @@
         </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
-            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+            <i class="fa fa-search" aria-hidden="true"></i> Search
           </span>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <i class="fa fa-cog fa-2x" aria-hidden="true" uib-dropdown-toggle></i>
+            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader">
@@ -193,16 +193,16 @@
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) !== -1" class="label label-{{ item.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ item.Status }}</span>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) === -1" class="label label-{{ item.Status|containerstatusbadge }}">{{ item.Status }}</span>
               </td>
-              <td style="width: 132px;">
-                <div class="btn-group btn-group-xs" role="group" aria-label="...">
-                  <a ng-if="$ctrl.settings.showQuickActionStats" class="btn btn-outline-secondary" type="button" ui-sref="stats({id: item.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i></a>
-                  <a ng-if="$ctrl.settings.showQuickActionLogs" class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: item.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i></a>
-                  <a ng-if="$ctrl.settings.showQuickActionConsole" class="btn btn-outline-secondary" type="button" ui-sref="console({id: item.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
-                  <a ng-if="$ctrl.settings.showQuickActionInspect" class="btn btn-outline-secondary" type="button" ui-sref="inspect({id: item.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
+              <td>
+                <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:inline-flex;">
+                  <a ng-if="$ctrl.settings.showQuickActionStats" class="btn btn-outline-secondary" style="padding: 0 2px;" type="button" ui-sref="stats({id: item.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionLogs" class="btn btn-outline-secondary" style="padding: 0 2px;" type="button" ui-sref="containerlogs({id: item.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionConsole" class="btn btn-outline-secondary" style="padding: 0 2px;" type="button" ui-sref="console({id: item.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionInspect" class="btn btn-outline-secondary" style="padding: 0 2px;" type="button" ui-sref="inspect({id: item.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
                 </div>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
-              <td><a ui-sref="image({ id: item.Image })">{{ item.Image | hideshasum | truncate: 64 }}</a></td>
+              <td><a ui-sref="image({ id: item.Image })">{{ item.Image | hideshasum }}</a></td>
               <td>{{ item.IP ? item.IP : '-' }}</td>
               <td ng-if="$ctrl.swarmContainers">{{ item.hostIP }}</td>
               <td>
