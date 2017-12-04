@@ -4,8 +4,8 @@ function (AccessService, PaginationService, Notifications) {
   var ctrl = this;
 
   ctrl.state = {
-    pagination_count_accesses: PaginationService.getPaginationCount('access_management_accesses'),
-    pagination_count_authorizedAccesses: PaginationService.getPaginationCount('access_management_AuthorizedAccesses'),
+    pagination_count_accesses: PaginationService.getPaginationLimit('access_management_accesses'),
+    pagination_count_authorizedAccesses: PaginationService.getPaginationLimit('access_management_AuthorizedAccesses'),
     sortAccessesBy: 'Type',
     sortAccessesReverse: false,
     sortAuthorizedAccessesBy: 'Type',
@@ -23,11 +23,11 @@ function (AccessService, PaginationService, Notifications) {
   };
 
   ctrl.changePaginationCountAuthorizedAccesses = function() {
-    PaginationService.setPaginationCount('access_management_AuthorizedAccesses', ctrl.state.pagination_count_authorizedAccesses);
+    PaginationService.setPaginationLimit('access_management_AuthorizedAccesses', ctrl.state.pagination_count_authorizedAccesses);
   };
 
   ctrl.changePaginationCountAccesses = function() {
-    PaginationService.setPaginationCount('access_management_accesses', ctrl.state.pagination_count_accesses);
+    PaginationService.setPaginationLimit('access_management_accesses', ctrl.state.pagination_count_accesses);
   };
 
   function dispatchUserAndTeamIDs(accesses, users, teams) {

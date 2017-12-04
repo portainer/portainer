@@ -3,8 +3,8 @@ angular.module('team', [])
 function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMembershipService, ModalService, Notifications, PaginationService, Authentication) {
 
   $scope.state = {
-    pagination_count_users: PaginationService.getPaginationCount('team_available_users'),
-    pagination_count_members: PaginationService.getPaginationCount('team_members')
+    pagination_count_users: PaginationService.getPaginationLimit('team_available_users'),
+    pagination_count_members: PaginationService.getPaginationLimit('team_members')
   };
   $scope.sortTypeUsers = 'Username';
   $scope.sortReverseUsers = true;
@@ -18,7 +18,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
   };
 
   $scope.changePaginationCountUsers = function() {
-    PaginationService.setPaginationCount('team_available_users', $scope.state.pagination_count_users);
+    PaginationService.setPaginationLimit('team_available_users', $scope.state.pagination_count_users);
   };
 
   $scope.sortTypeGroupMembers = 'TeamRole';
@@ -30,7 +30,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
   };
 
   $scope.changePaginationCountGroupMembers = function() {
-    PaginationService.setPaginationCount('team_members', $scope.state.pagination_count_members);
+    PaginationService.setPaginationLimit('team_members', $scope.state.pagination_count_members);
   };
 
   $scope.deleteTeam = function() {

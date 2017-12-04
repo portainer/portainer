@@ -19,19 +19,5 @@ function PaginationServiceFactory(LocalStorage, PAGINATION_MAX_ITEMS) {
     LocalStorage.storePaginationLimit(key, limit);
   };
 
-  service.getPaginationCount = function(key) {
-    var paginationLimit = PAGINATION_MAX_ITEMS;
-
-    var storedLimit = LocalStorage.getPaginationLimit(key);
-    if (storedLimit !== null) {
-      paginationLimit = storedLimit;
-    }
-    return '' + paginationLimit;
-  };
-
-  service.setPaginationCount = function(key, limit) {
-    LocalStorage.storePaginationLimit(key, limit);
-  };
-
   return service;
 }]);

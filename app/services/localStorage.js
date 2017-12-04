@@ -41,12 +41,6 @@ angular.module('portainer.services')
     getPaginationLimit: function(key) {
       return localStorageService.cookie.get('pagination_' + key);
     },
-    getDataTableHeaders: function(key) {
-      return localStorageService.get('datatable_header_' + key);
-    },
-    storeDataTableHeaders: function(key, data) {
-      localStorageService.set('datatable_header_' + key, data);
-    },
     getDataTableOrder: function(key) {
       return localStorageService.get('datatable_order_' + key);
     },
@@ -67,16 +61,6 @@ angular.module('portainer.services')
     },
     clean: function() {
       localStorageService.clearAll();
-    },
-    storeFilterContainerShowAll: function(filter) {
-      localStorageService.cookie.set('filter_containerShowAll', filter);
-    },
-    getFilterContainerShowAll: function() {
-      var filter = localStorageService.cookie.get('filter_containerShowAll');
-      if (filter === null) {
-        filter = true;
-      }
-      return filter;
     }
   };
 }]);
