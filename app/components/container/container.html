@@ -267,70 +267,16 @@
   </div>
 
   <div class="row">
-    <div class="col-lg-12 col-md-12 col-xs-12">
-      <rd-widget>
-        <rd-widget-header icon="fa-sitemap" title="Connected networks">
-          <div class="pull-right">
-            Items per page:
-            <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-              <option value="0">All</option>
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </div>
-        </rd-widget-header>
-        <rd-widget-body classes="no-padding">
-          <table class="table">
-            <thead>
-              <th>Network Name</th>
-              <th>IP Address</th>
-              <th>Gateway</th>
-              <th>MacAddress</th>
-              <th>Actions</th>
-            </thead>
-            <tbody>
-              <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: state.pagination_count">
-                <td><a ui-sref="network({id: value.NetworkID})">{{ key }}</a></td>
-                <td>{{ value.IPAddress || '-' }}</td>
-                <td>{{ value.Gateway || '-' }}</td>
-                <td>{{ value.MacAddress || '-' }}</td>
-                <td>
-                  <button type="button" class="btn btn-xs btn-danger" ng-disabled="state.leaveNetworkInProgress" button-spinner="state.leaveNetworkInProgress" ng-click="containerLeaveNetwork(container, value.NetworkID)">
-                    <span ng-hide="state.leaveNetworkInProgress"><i class="fa fa-trash space-right" aria-hidden="true"></i> Leave network</span>
-                    <span ng-show="state.leaveNetworkInProgress">Leaving network...</span>
-                  </button>
-                </td>
-              </tr>
-              <tr ng-if="(container.NetworkSettings.Networks | emptyobject)">
-                <td colspan="5" class="text-center text-muted">No networks connected.</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
-          </div>
-          <hr />
-          <form class="form-horizontal">
-            <!-- network-input -->
-            <div class="row">
-              <label for="container_network" class="col-sm-3 col-lg-2 control-label text-left">Join a Network</label>
-              <div class="col-sm-5 col-lg-4">
-                <select class="form-control" ng-model="selectedNetwork" id="container_network">
-                  <option selected disabled hidden value="">Select a network</option>
-                  <option ng-repeat="net in availableNetworks" ng-value="net.Id">{{ net.Name }}</option>
-                </select>
-              </div>
-              <div class="col-sm-1">
-                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.joinNetworkInProgress || !selectedNetwork" ng-click="containerJoinNetwork(container, selectedNetwork)" button-spinner="state.joinNetworkInProgress">
-                  <span ng-hide="state.joinNetworkInProgress">Join network</span>
-                  <span ng-show="state.joinNetworkInProgress">Joining network...</span>
-                </button>
-              </div>
-            </div>
-          </form>
-        </rd-widget-body>
-      </rd-widget>
+    <div class="col-sm-12">
+      <container-networks-datatable
+      title="Connected networks" title-icon="fa-sitemap"
+      dataset="container.NetworkSettings.Networks" table-key="container-networks"
+      container="container"
+      available-networks="availableNetworks"
+      join-network-action="containerJoinNetwork"
+      join-network-action-in-progress="state.joinNetworkInProgress"
+      leave-network-action="containerLeaveNetwork"
+      leave-network-action-in-progress="state.leaveNetworkInProgress"
+      ></container-networks-datatable>
     </div>
   </div>

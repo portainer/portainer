@@ -16,7 +16,11 @@ function (PaginationService, DatatableService) {
   this.settings = {
     open: false,
     truncateContainerName: true,
-    containerNameTruncateSize: 40
+    containerNameTruncateSize: 40,
+    showQuickActionStats: true,
+    showQuickActionLogs: true,
+    showQuickActionConsole: true,
+    showQuickActionInspect: true
   };
 
   this.filters = {
@@ -118,6 +122,10 @@ function (PaginationService, DatatableService) {
     } else {
       this.settings.containerNameTruncateSize = 256;
     }
+    DatatableService.setDataTableSettings(this.tableKey, this.settings);
+  };
+
+  this.onSettingsQuickActionChange = function() {
     DatatableService.setDataTableSettings(this.tableKey, this.settings);
   };
 

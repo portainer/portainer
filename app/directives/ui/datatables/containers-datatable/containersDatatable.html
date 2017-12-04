@@ -22,6 +22,27 @@
                     <label for="setting_container_trunc">Truncate container name</label>
                   </div>
                 </div>
+                <div class="menuHeader">
+                  Quick actions
+                </div>
+                <div class="menuContent">
+                  <div class="md-checkbox">
+                    <input id="setting_show_stats" type="checkbox" ng-model="$ctrl.settings.showQuickActionStats" ng-change="$ctrl.onSettingsQuickActionChange()"/>
+                    <label for="setting_show_stats">Stats</label>
+                  </div>
+                  <div class="md-checkbox">
+                    <input id="setting_show_logs" type="checkbox" ng-model="$ctrl.settings.showQuickActionLogs" ng-change="$ctrl.onSettingsQuickActionChange()"/>
+                    <label for="setting_show_logs">Logs</label>
+                  </div>
+                  <div class="md-checkbox">
+                    <input id="setting_show_console" type="checkbox" ng-model="$ctrl.settings.showQuickActionConsole" ng-change="$ctrl.onSettingsQuickActionChange()"/>
+                    <label for="setting_show_console">Console</label>
+                  </div>
+                  <div class="md-checkbox">
+                    <input id="setting_show_inspect" type="checkbox" ng-model="$ctrl.settings.showQuickActionInspect" ng-change="$ctrl.onSettingsQuickActionChange()"/>
+                    <label for="setting_show_inspect">Inspect</label>
+                  </div>
+                </div>
                 <div>
                   <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
                 </div>
@@ -94,7 +115,7 @@
                   <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
                   <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.state.enabled">Filter <i class="fa fa-check" aria-hidden="true"></i></span>
                 </div>
-                <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+                <div class="dropdown-menu" uib-dropdown-menu>
                   <div class="tableMenu">
                     <div class="menuHeader">
                       Filter by state
@@ -110,6 +131,9 @@
                     </div>
                   </div>
                 </div>
+              </th>
+              <th>
+                Quick actions
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('StackName')">
@@ -168,6 +192,14 @@
               <td>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) !== -1" class="label label-{{ item.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ item.Status }}</span>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) === -1" class="label label-{{ item.Status|containerstatusbadge }}">{{ item.Status }}</span>
+              </td>
+              <td>
+                <div class="btn-group btn-group-xs" role="group" aria-label="...">
+                  <a ng-if="$ctrl.settings.showQuickActionStats" class="btn btn-outline-secondary" type="button" ui-sref="stats({id: item.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionLogs" class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: item.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionConsole" class="btn btn-outline-secondary" type="button" ui-sref="console({id: item.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionInspect" class="btn btn-outline-secondary" type="button" ui-sref="inspect({id: item.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
+                </div>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
               <td><a ui-sref="image({ id: item.Image })">{{ item.Image | hideshasum }}</a></td>

@@ -1,6 +1,6 @@
 angular.module('ui').component('volumesDatatable', {
   templateUrl: 'app/directives/ui/datatables/volumes-datatable/volumesDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'VolumesDatatableController',
   bindings: {
     title: '@',
     titleIcon: '@',

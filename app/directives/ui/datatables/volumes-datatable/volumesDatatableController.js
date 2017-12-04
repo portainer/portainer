@@ -1,6 +1,8 @@
 angular.module('ui')
-.controller('DatatableController', ['$state', '$filter', '$sce', 'PaginationService', 'DatatableService',
-function ($state, $filter, $sce, PaginationService, DatatableService) {
+.controller('VolumesDatatableController', ['PaginationService', 'DatatableService',
+function (PaginationService, DatatableService) {
+
+  var ctrl = this;
 
   this.state = {
     selectAll: false,
@@ -9,6 +11,15 @@ function ($state, $filter, $sce, PaginationService, DatatableService) {
     displayTextFilter: false,
     selectedItemCount: 0,
     selectedItems: []
+  };
+  
+  this.filters = {
+    usage: {
+      open: false,
+      enabled: false,
+      showUsedVolumes: true,
+      showUnusedVolumes: true
+    }
   };
 
   this.changeOrderBy = function(orderField) {
@@ -41,75 +52,51 @@ function ($state, $filter, $sce, PaginationService, DatatableService) {
     PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
-  this.goToDetails = function(item) {
-    $state.go(this.stateDetails, { id: item[this.identifier] });
-  };
-
-
-  function getPropertyByPath(obj, path) {
-    path = path.replace(/\[(\w+)\]/g, '.$1');
-    path = path.replace(/^\./, '');
-    var a = path.split('.');
-    for (var i = 0, n = a.length; i < n; ++i) {
-        var k = a[i];
-        if (k in obj) {
-            obj = obj[k];
-        } else {
-            return;
-        }
-    }
-    return obj;
-  }
-
-  this.renderField = function(prop, item) {
-    var value = item[prop.property];
-    if (!value) {
-      value = getPropertyByPath(item, prop.property);
-    }
-
-    if (prop.renderFunc) {
-      return $sce.trustAsHtml(prop.renderFunc(item, value));
-    }
-    if (prop.filter && value) {
-      return $filter(prop.filter)(value);
-    }
-
-    return value ? value : '-';
-  };
-
   this.updateDisplayTextFilter = function() {
     this.state.displayTextFilter = !this.state.displayTextFilter;
     if (!this.state.displayTextFilter) {
       delete this.state.textFilter;
     }
   };
-
-  this.storeColumnFilters = function() {
-    DatatableService.setDataTableHeaders(this.tableKey, this.headers);
+  
+  this.applyFilters = function(value, index, array) {
+    var volume = value;
+    var filters = ctrl.filters;
+    if ((volume.dangling && filters.usage.showUnusedVolumes) 
+      || (!volume.dangling && filters.usage.showUsedVolumes)) {
+      return true;
+    }
+    return false;
   };
-
-  this.updateFilter = function(filter) {
-    this.state.filter = filter;
+  
+  this.onUsageFilterChange = function() {
+    var filters = this.filters.usage;
+    var filtered = false;
+    if (!filters.showUsedVolumes || !filters.showUnusedVolumes) {
+      filtered = true;
+    }
+    this.filters.usage.enabled = filtered;
+    DatatableService.setDataTableFilters(this.tableKey, this.filters);
   };
 
   this.$onInit = function() {
     setDefaults(this);
-
-    var storedHeaders = DatatableService.getDataTableHeaders(this.tableKey);
-    if (storedHeaders !== null) {
-      this.headers = storedHeaders;
-    }
 
     var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
     if (storedOrder !== null) {
       this.state.reverseOrder = storedOrder.reverse;
       this.state.orderBy = storedOrder.orderBy;
     }
+    
+    var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
+    if (storedFilters !== null) {
+      this.filters = storedFilters;
+    }
+    this.filters.usage.open = false;
   };
 
   function setDefaults(ctrl) {
     ctrl.showTextFilter = ctrl.showTextFilter ? ctrl.showTextFilter : false;
-    ctrl.selectableRows = ctrl.selectableRows ? ctrl.selectableRows : false;
     ctrl.state.reverseOrder = ctrl.reverseOrder ? ctrl.reverseOrder : false;
   }
 }]);

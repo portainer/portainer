@@ -1,6 +1,6 @@
 angular.module('ui').component('imagesDatatable', {
   templateUrl: 'app/directives/ui/datatables/images-datatable/imagesDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'ImagesDatatableController',
   bindings: {
     title: '@',
     titleIcon: '@',

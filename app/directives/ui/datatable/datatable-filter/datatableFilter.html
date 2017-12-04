@@ -1,9 +1,0 @@
-<div class="settingsHeader">
-  Filter
-</div>
-<div class="settingsContent">
-  <div class="md-radio" ng-repeat="(idx, filter) in $ctrl.filters track by $index">
-    <input id="filter_{{ $index }}" type="radio" ng-model="$ctrl.filter" ng-value="filter.value" ng-change="$ctrl.updateFilter()"/>
-    <label for="filter_{{ $index }}">{{ filter.label }}</label>
-  </div>
-</div>
