@@ -129,6 +129,9 @@
                 <td>{{ registry.URL }}</td>
                 <td>
                   <span ng-if="applicationState.application.authentication">
+                    <a ui-sref="registry.browse({id: registry.Id})"><i class="fa fa-search" aria-hidden="true" style="margin-left: 7px;"></i> Browse</a>
+                  </span>
+                  <span ng-if="applicationState.application.authentication">
                     <a ui-sref="registry.access({id: registry.Id})"><i class="fa fa-users" aria-hidden="true" style="margin-left: 7px;"></i> Manage access</a>
                   </span>
                 </td>

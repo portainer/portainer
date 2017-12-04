@@ -1,0 +1,25 @@
+<rd-header>
+  <rd-header-title title="Registry Browse"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="registries">Registries</a> &gt; <a ui-sref="registry({id: registry.Id})">{{ registry.Name }}</a> &gt; Browse
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="repositories">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-files" title="Repositories"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr ng-repeat="repo in repositories">
+              <td>
+                <a ui-sref="registry.tags({id: registry.id, repository: repo})">{{ repo }}</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

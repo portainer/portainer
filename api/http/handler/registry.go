@@ -42,8 +42,8 @@ func NewRegistryHandler(bouncer *security.RequestBouncer) *RegistryHandler {
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutRegistryAccess))).Methods(http.MethodPut)
 	h.Handle("/registries/{id}",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteRegistry))).Methods(http.MethodDelete)
-        h.Handle("/registries/{id}/v2/_catalog",
-                bouncer.AdministratorAccess(http.HandlerFunc(h.proxyRequestsToRegistryAPI))).Methods(http.MethodGet)
+	h.PathPrefix("/registries/{id}/v2").Handler(
+		bouncer.AdministratorAccess(http.HandlerFunc(h.proxyRequestsToRegistryAPI)))
 
 	return h
 }

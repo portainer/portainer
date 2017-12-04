@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('RegistryService', ['$q', 'Registries', 'RegistryCatalog', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, RegistryCatalog, DockerHubService, RegistryHelper, ImageHelper) {
+.factory('RegistryService', ['$q', 'Registries', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, RegistryCatalog, RegistryTags, RegistryManifests, DockerHubService, RegistryHelper, ImageHelper) {
   'use strict';
   var service = {};
 
@@ -44,6 +44,34 @@ angular.module('portainer.services')
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve registry catalog', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+  service.tags = function(id, repository) {
+    var deferred = $q.defer();
+
+    RegistryTags.get({id: id, repository: repository}).$promise
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve repository tags', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+  service.manifests = function(id, repository, tag) {
+    var deferred = $q.defer();
+
+    RegistryManifests.get({id: id, repository: repository, tag: tag}).$promise
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve repository tag manifests', err: err});
     });
 
     return deferred.promise;

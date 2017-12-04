@@ -472,6 +472,32 @@ function configureRoutes($stateProvider) {
       }
     }
   })
+  .state('registry.browse', {
+    url: '^/registries/:id/browse',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/registryBrowse/registryBrowse.html',
+        controller: 'RegistryBrowseController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('registry.tags', {
+    url: '^/registries/:id/tags?repository',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/registryBrowseTags/registryBrowseTags.html',
+        controller: 'RegistryBrowseTagsController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
   .state('secrets', {
     url: '^/secrets/',
     views: {

@@ -50,6 +50,8 @@ angular.module('portainer', [
   'registries',
   'registry',
   'registryAccess',
+  'registryBrowse',
+  'registryBrowseTags',
   'secrets',
   'secret',
   'service',
