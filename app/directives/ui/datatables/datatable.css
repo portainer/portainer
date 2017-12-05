@@ -160,6 +160,7 @@
 .md-checkbox input[type="checkbox"] {
   margin-right: 5px;
   outline: 0;
+  opacity: 0;
 }
 
 .md-checkbox input[type="checkbox"]:checked + label:before {
