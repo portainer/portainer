@@ -120,6 +120,26 @@ angular.module('containers', [])
     return swarm_hosts;
   }
 
+  function assignContainers(containers, provider) {
+    var previouslySelectedContainers = $transition$.params().selectedContainers || [];
+    $scope.containers = containers.map(function (container) {
+      container.Status = $filter('containerstatus')(container.Status);
+      if (provider === 'DOCKER_SWARM') {
+        container.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
+      }
+
+      var previousContainer = _.find(previouslySelectedContainers, function(item) {
+        return item.Id === container.Id;
+      });
+
+      if (previousContainer && previousContainer.Checked) {
+        container.Checked = true;
+      }
+
+      return container;
+    });
+  }
+
   function initView() {
     var provider = $scope.applicationState.endpoint.mode.provider;
 
@@ -131,24 +151,7 @@ angular.module('containers', [])
       if (provider === 'DOCKER_SWARM') {
         $scope.swarm_hosts = retrieveSwarmHostsInfo(data.swarm);
       }
-
-      var previouslySelectedContainers = $transition$.params().selectedContainers || [];
-      $scope.containers = data.containers.map(function (container) {
-        container.Status = $filter('containerstatus')(container.Status);
-        if (provider === 'DOCKER_SWARM') {
-          container.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
-        }
-
-        var previousContainer = _.find(previouslySelectedContainers, function(item) {
-          return item.Id === container.Id;
-        });
-
-        if (previousContainer && previousContainer.Checked) {
-          container.Checked = true;
-        }
-
-        return container;
-      });
+      assignContainers(data.containers, provider);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve containers');
