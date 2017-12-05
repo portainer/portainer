@@ -115,7 +115,7 @@
             <tr ng-if="!$ctrl.dataset">
               <td colspan="8" class="text-center text-muted">Loading...</td>
             </tr>
-            <tr ng-if="$ctrl.dataset.length === 0">
+            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
               <td colspan="8" class="text-center text-muted">No network available.</td>
             </tr>
           </tbody>
