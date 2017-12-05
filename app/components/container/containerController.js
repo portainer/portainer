@@ -10,6 +10,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   $scope.state = {
+    recreateContainerInProgress: false,
     joinNetworkInProgress: false,
     leaveNetworkInProgress: false
   };
@@ -204,6 +205,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   function recreateContainer(pullImage) {
     var container = $scope.container;
     var config = ContainerHelper.configFromContainer(container.Model);
+    $scope.state.recreateContainerInProgress = true;
     ContainerService.remove(container, true)
     .then(function success() {
       return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
@@ -236,6 +238,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to re-create container');
+      $scope.state.recreateContainerInProgress = false;
     });
   }
 

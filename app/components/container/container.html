@@ -21,7 +21,10 @@
             <button class="btn btn-danger btn-sm" ng-click="confirmRemove()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
           </div>
           <div class="btn-group" role="group" aria-label="...">
-            <button class="btn btn-danger btn-sm" ng-click="recreate()" ng-if="!container.Config.Labels['com.docker.swarm.service.id']"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Recreate</button>
+            <button type="button" class="btn btn-danger btn-sm" ng-disabled="state.recreateContainerInProgress" ng-click="recreate()" button-spinner="state.recreateContainerInProgress" ng-if="!container.Config.Labels['com.docker.swarm.service.id']">
+              <span ng-hide="state.recreateContainerInProgress"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Recreate</span>
+              <span ng-show="state.recreateContainerInProgress">Recreation in progress...</span>
+            </button>
             <button class="btn btn-primary btn-sm" ng-click="duplicate()" ng-if="!container.Config.Labels['com.docker.swarm.service.id']"><i class="fa fa-files-o space-right" aria-hidden="true"></i>Duplicate/Edit</button>
           </div>
         </rd-widget-body>
