@@ -37,8 +37,8 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
       RegistryService.deleteRegistry(registry.Id)
       .then(function success() {
         Notifications.success('Registry successfully removed', registry.Name);
-        var index = registries.indexOf(registry);
-        registries.splice(index, 1);
+        var index = $scope.registries.indexOf(registry);
+        $scope.registries.splice(index, 1);
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to remove registry');
