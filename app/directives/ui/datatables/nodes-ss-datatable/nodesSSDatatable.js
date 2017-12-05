@@ -1,4 +1,4 @@
-angular.module('ui').component('nodesSSDatatable', {
+angular.module('ui').component('nodesSsDatatable', {
   templateUrl: 'app/directives/ui/datatables/nodes-ss-datatable/nodesSSDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
