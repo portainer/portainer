@@ -106,10 +106,6 @@ module.exports = function (grunt) {
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
 var fs = require('fs');
-var ifFileExists = function(file, exists, missing) {
-  try { fs.lstatSync(file).isFile(); }
-  catch(e) { return (e.code === 'ENOENT') ? missing : exists; }
-};
 
 gruntfile_cfg.config = {
   dev:  { options: { variables: { 'environment': 'development' }}},
@@ -255,11 +251,13 @@ gruntfile_cfg.replace = {
 
 function shell_buildBinary(p, a) {
   var binfile = 'dist/portainer-'+p+'-'+a;
-  return ifFileExists(
-    ( p === 'windows' ) ? binfile+'.exe' : binfile,
-    'echo "Portainer binary exists"',
-    'build/build_in_container.sh ' + p + ' ' + a
-  );
+  return [
+    'if [ -f '+(( p === 'windows' ) ? binfile+'.exe' : binfile)+' ]; then',
+      'echo "Portainer binary exists";',
+    'else',
+      'build/build_in_container.sh ' + p + ' ' + a + ';',
+    'fi'
+  ].join(' ');
 }
 
 function shell_run(arch) {
@@ -274,11 +272,13 @@ function shell_downloadDockerBinary(p, a) {
   var as = { 'amd64': 'x86_64', 'arm': 'armhf', 'arm64': 'aarch64' };
   var ip = ((ps[p] === undefined) ? p : ps[p]);
   var ia = ((as[a] === undefined) ? a : as[a]);
-  return ifFileExists(
-    ( p === 'win' ) ? 'dist/docker.exe' : 'dist/docker',
-    'echo "Docker binary exists"',
-    'build/download_docker_binary.sh ' + ip + ' ' + ia + ' <%= shippedDockerVersion %>'
-  );
+  return [
+    'if [ -f '+(( p === 'win' ) ? 'dist/docker.exe' : 'dist/docker')+' ]; then',
+      'echo "Docker binary exists";',
+    'else',
+      'build/download_docker_binary.sh ' + ip + ' ' + ia + ' <%= shippedDockerVersion %>;',
+    'fi'
+  ].join(' ');
 }
 
 gruntfile_cfg.shell = {
