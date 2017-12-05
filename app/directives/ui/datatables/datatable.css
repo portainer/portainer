@@ -171,6 +171,7 @@
 .md-checkbox input[type="checkbox"]:disabled + label:before {
   background: #ececec;
   border: 2px solid #ddd;
+  cursor: auto;
 }
 
 .md-checkbox input[type="checkbox"]:checked + label:after {
