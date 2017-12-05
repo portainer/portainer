@@ -48,6 +48,7 @@ const (
 const (
 	ErrRegistryNotFound      = Error("Registry not found")
 	ErrRegistryAlreadyExists = Error("A registry is already defined for this URL")
+	ErrRegistryInvalid       = Error("Invalid registry URL")
 )
 
 // Stack errors

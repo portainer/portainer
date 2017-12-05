@@ -3,18 +3,22 @@ package handler
 import (
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/security"
 	"github.com/portainer/portainer/http/proxy"
+	"github.com/portainer/portainer/http/security"
 
 	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 )
+
+const registryCheckTimeout = 3
 
 // RegistryHandler represents an HTTP API handler for managing Docker registries.
 type RegistryHandler struct {
@@ -122,6 +126,12 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 			httperror.WriteErrorResponse(w, portainer.ErrRegistryAlreadyExists, http.StatusConflict, handler.Logger)
 			return
 		}
+	}
+
+	err = validateRegistryURL(req.URL)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
 	}
 
 	registry := &portainer.Registry{
@@ -265,6 +275,12 @@ func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http
 		}
 	}
 
+	err = validateRegistryURL(req.URL)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
 	if req.Name != "" {
 		registry.Name = req.Name
 	}
@@ -322,19 +338,19 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 	id := vars["id"]
 
 	registryID, err := strconv.Atoi(id)
-        if err != nil {
-                httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-                return
-        }
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
 
 	registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
-        if err == portainer.ErrRegistryNotFound {
-                httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-                return
-        } else if err != nil {
-                httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-                return
-        }
+	if err == portainer.ErrRegistryNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
 
 	var proxy http.Handler
 	proxy = handler.ProxyManager.GetRegistryProxy(string(registryID))
@@ -347,4 +363,34 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 	}
 
 	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)
+}
+
+// validateRegistryURL validates wether given url is valid a docker registry url by
+// sending http get request to URL + /v2/. The url is considered as a valid docker registry url
+// if it returns 200 or 401. If there is an error during the check, it will be returned.
+func validateRegistryURL(url string) error {
+	if !strings.HasSuffix(url, "/") {
+		url += "/"
+	}
+
+	req, err := http.NewRequest("GET", "http://"+url+"v2/", nil)
+	if err != nil {
+		return err
+	}
+
+	client := &http.Client{
+		Timeout: registryCheckTimeout * time.Second,
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+	case http.StatusUnauthorized:
+	default:
+		return portainer.ErrRegistryInvalid
+	}
+	return nil
 }
