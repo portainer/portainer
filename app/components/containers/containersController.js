@@ -11,6 +11,18 @@ angular.module('containers', [])
   $scope.truncate_size = 40;
   $scope.showMore = true;
 
+  $scope.QuickAccess = {
+    Options: {
+      Console: { icon:'terminal',           ref:'console'       },
+      Logs:    { icon:'exclamation-circle', ref:'containerlogs' },
+      Stats:   { icon:'area-chart',         ref:'stats'         },
+      Inspect: { icon:'info-circle',        ref:'inspect'       }
+    },
+    isConfigOpen: false,
+    Active: LocalStorage.getQuickAccessConfig() || { Console:true, Logs:true, Stats:true, Inspect:true },
+    Action: LocalStorage.storeQuickAccessConfig( this.Active )
+  };
+
   $scope.order = function (sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;

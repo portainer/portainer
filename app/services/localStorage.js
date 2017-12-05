@@ -53,6 +53,12 @@ angular.module('portainer.services')
         filter = true;
       }
       return filter;
+    },
+    storeQuickAccessConfig: function(items) {
+      localStorageService.set('quickAccessConfig', items);
+    },
+    getQuickAccessConfig: function() {
+      return localStorageService.get('quickAccessConfig');
     }
   };
 }]);

@@ -54,6 +54,9 @@
                   <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
                 </a>
               </th>
+              <th style="text-align:center;">
+                <a class="interactive dropdown-select-label" popover-append-to-body="true" popover-trigger="'click outsideClick'" popover-class="popover-no-margin" popover-placement="bottom" uib-popover-template="'tpl_quickaccess_config.html'" popover-is-open="QuickAccess.isConfigOpen">Quick actions <i class="fa fa-caret-down"></i></a>
+              </th>
               <th>
                 <a ng-click="order('Names')">
                   Name
@@ -115,6 +118,11 @@
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) !== -1" class="label label-{{ container.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ container.Status }}</span>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(container.Status) === -1" class="label label-{{ container.Status|containerstatusbadge }}">{{ container.Status }}</span>
               </td>
+              <td style="text-align:center;">
+                <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:inline-flex;">
+                  <a ng-repeat="(k,v) in QuickAccess.Active" ng-if="v" title="{{k}}" ng-href="{{$state.href(QuickAccess.Options[k].ref, {id: container.Id})}}" class="btn btn-default" style="padding: 1px 2.5px;"><i class="fa fa-{{QuickAccess.Options[k].icon}} fa-fw"></i></a>
+                </div>
+              </td>
               <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|swarmcontainername|truncate: truncate_size}}</a></td>
               <td ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'"><a ui-sref="container({id: container.Id})">{{ container|containername|truncate: truncate_size}}</a></td>
               <td>{{ container.StackName ? container.StackName : '-' }}</td>
@@ -149,3 +157,11 @@
     </rd-widget-body>
   </rd-widget>
 </div>
+
+<script type="text/ng-template" id="tpl_quickaccess_config.html">
+  <div class="open dropdown-select" ng-click="QuickAccess.isConfigOpen = !QuickAccess.isConfigOpen">
+    <ul class="dropdown-menu" ng-click="QuickAccess.Action()">
+      <li class="interactive" ng-repeat="(k , v) in QuickAccess.Options" ng-click="QuickAccess.Active[k] = !QuickAccess.Active[k]"><a><i class="fa fa-{{(QuickAccess.Active[k])?'check-':''}}square-o fa-fw" style="margin-right:10px;"></i> <i class="fa fa-{{v.icon}} fa-fw"></i>&nbsp;{{k}}</a></li>
+    </ul>
+  </div>
+</script>
