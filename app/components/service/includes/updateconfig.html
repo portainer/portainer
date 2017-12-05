@@ -19,11 +19,11 @@
           <tr>
             <td>Update Delay</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.UpdateDelay" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="text" ng-model="service.UpdateDelay" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
-                Amount of time between updates. Time in seconds.
+                Amount of time between updates expressed by a number followed by unit (ns|us|ms|s|m|h) e.g: 1m.
               </p>
             </td>
           </tr>

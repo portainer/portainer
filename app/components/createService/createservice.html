@@ -389,13 +389,16 @@
               <!-- !parallelism-input -->
               <!-- delay-input -->
               <div class="form-group">
-                <label for="update-delay" class="col-sm-3 col-lg-1 control-label text-left">Delay</label>
+                <label for="update-delay" class="col-sm-3 col-lg-1 control-label text-left">
+                  Delay
+                  <portainer-tooltip position="bottom" message="Supported format examples: 1h, 5m, 10s, 1000ms, 15us, 60ns."></portainer-tooltip>
+                </label>                
                 <div class="col-sm-4 col-lg-3">
-                  <input type="number" class="form-control" ng-model="formValues.UpdateDelay" id="update-delay" placeholder="e.g. 10">
+                  <input type="text" class="form-control" ng-model="formValues.UpdateDelay" id="update-delay" placeholder="e.g. 1m" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i">
                 </div>
                 <div class="col-sm-5">
                   <p class="small text-muted">
-                    Amount of time between updates. Time in seconds.
+                    Amount of time between updates expressed by a number followed by unit (ns|us|ms|s|m|h) e.g: 1m.
                   </p>
                 </div>
               </div>
