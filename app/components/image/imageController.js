@@ -9,6 +9,11 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 	$scope.sortType = 'Size';
   $scope.sortReverse = true;
 
+	$scope.Lists = {
+		'Children' : {   id:'children' ,  icon:'clone',  names:'Tags',  title:'Children images' },
+		'Containers' : { id:'containers', icon:'server', names:'Names', title:'Containers using image' }
+	};
+
 	$scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;

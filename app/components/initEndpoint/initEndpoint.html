@@ -89,7 +89,7 @@
               <div class="form-group">
                 <label for="endpoint_url" class="col-sm-4 col-lg-3 control-label text-left">
                   Endpoint URL
-                  <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
+                  <portainer-tooltip icon="question-circle" position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
                 </label>
                 <div class="col-sm-8 col-lg-9">
                   <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
@@ -101,7 +101,7 @@
                 <div class="col-sm-12">
                   <label for="tls" class="control-label text-left">
                     TLS
-                    <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the Docker endpoint."></portainer-tooltip>
+                    <portainer-tooltip icon="question-circle" position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the Docker endpoint."></portainer-tooltip>
                   </label>
                   <label class="switch" style="margin-left: 20px;">
                     <input type="checkbox" ng-model="formValues.TLS"><i></i>
@@ -116,7 +116,7 @@
                   <div class="col-sm-10">
                     <label for="tls_verify" class="control-label text-left">
                       Skip server verification
-                      <portainer-tooltip position="bottom" message="Enable this option if you need to authenticate server based on given CA."></portainer-tooltip>
+                      <portainer-tooltip icon="question-circle" position="bottom" message="Enable this option if you need to authenticate server based on given CA."></portainer-tooltip>
                     </label>
                     <label class="switch" style="margin-left: 20px;">
                       <input type="checkbox" ng-model="formValues.TLSSkipVerify"><i></i>
@@ -129,7 +129,7 @@
                   <div class="col-sm-10">
                     <label for="tls_client_cert" class="control-label text-left">
                       Skip client verification
-                      <portainer-tooltip position="bottom" message="Enable this option if you need to authenticate with a client certificate."></portainer-tooltip>
+                      <portainer-tooltip icon="question-circle" position="bottom" message="Enable this option if you need to authenticate with a client certificate."></portainer-tooltip>
                     </label>
                     <label class="switch" style="margin-left: 20px;">
                       <input type="checkbox" ng-model="formValues.TLSSKipClientVerify"><i></i>

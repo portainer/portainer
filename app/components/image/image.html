@@ -229,3 +229,27 @@
     </rd-widget>
   </div>
 </div>
+
+<div class="row" ng-repeat="list in [ 'Children' , 'Containers' ]" ng-if="image[list+'List'] !== 'None'">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header id="{{Lists[list].id}}" icon="fa-{{Lists[list].icon}}" title="{{Lists[list].title}}"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <thead>
+            <th>ID</th>
+            <th>{{Lists[list].names}}</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="item in image[list+'List']">
+              <td ng-if="list==='Children'"><a  ui-sref="image({id: item.Id})">{{ item.Id.slice(7)|truncate:13 }}</a></td>
+              <td ng-if="list==='Children'"><a  ui-sref="image({id: item.Id})" ng-repeat="elem in item.NamesTags" class="label label-primary image-tag">{{ elem }}</a></td>
+              <td ng-if="list==='Containers'"><a  ui-sref="container({id: item.Id})">{{ item.Id|truncate:13 }}</a></td>
+              <td ng-if="list==='Containers'"><a  ui-sref="container({id: item.Id})" ng-repeat="elem in item.NamesTags">{{ elem|trimcontainername }}</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

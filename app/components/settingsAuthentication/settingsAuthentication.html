@@ -65,7 +65,7 @@
             <div class="form-group">
               <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left">
                 LDAP Server
-                <portainer-tooltip position="bottom" message="URL or IP address of the LDAP server."></portainer-tooltip>
+                <portainer-tooltip icon="question-circle" position="bottom" message="URL or IP address of the LDAP server."></portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
                 <input type="text" class="form-control" id="ldap_url" ng-model="LDAPSettings.URL" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389">
@@ -75,7 +75,7 @@
             <div class="form-group">
               <label for="ldap_username" class="col-sm-3 col-lg-2 control-label text-left">
                 Reader DN
-                <portainer-tooltip position="bottom" message="Account that will be used to search for users."></portainer-tooltip>
+                <portainer-tooltip icon="question-circle" position="bottom" message="Account that will be used to search for users."></portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
                 <input type="text" class="form-control" id="ldap_username" ng-model="LDAPSettings.ReaderDN" placeholder="cn=readonly-account,dc=ldap,dc=domain,dc=tld">
@@ -114,7 +114,7 @@
               <div class="col-sm-12">
                 <label for="tls" class="control-label text-left">
                   Use StartTLS
-                  <portainer-tooltip position="bottom" message="Enable this option if want to use StartTLS to secure the connection to the server. Ignored if Use TLS is selected."></portainer-tooltip>
+                  <portainer-tooltip icon="question-circle" position="bottom" message="Enable this option if want to use StartTLS to secure the connection to the server. Ignored if Use TLS is selected."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" ng-model="LDAPSettings.StartTLS"><i></i>
@@ -128,7 +128,7 @@
               <div class="col-sm-12">
                 <label for="tls" class="control-label text-left">
                   Use TLS
-                  <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the LDAP server."></portainer-tooltip>
+                  <portainer-tooltip icon="question-circle" position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the LDAP server."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" ng-model="LDAPSettings.TLSConfig.TLS"><i></i>
@@ -142,7 +142,7 @@
               <div class="col-sm-12">
                 <label for="tls" class="control-label text-left">
                   Skip verification of server certificate
-                  <portainer-tooltip position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
+                  <portainer-tooltip icon="question-circle" position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" ng-model="LDAPSettings.TLSConfig.TLSSkipVerify"><i></i>
@@ -198,7 +198,7 @@
               <div class="form-group">
                 <label for="ldap_basedn_{{$index}}" class="col-sm-4 col-md-2 control-label text-left">
                   Base DN
-                  <portainer-tooltip position="bottom" message="The distinguished name of the element from which the LDAP server will search for users."></portainer-tooltip>
+                  <portainer-tooltip icon="question-circle" position="bottom" message="The distinguished name of the element from which the LDAP server will search for users."></portainer-tooltip>
                 </label>
                 <div class="col-sm-8 col-md-4">
                   <input type="text" class="form-control" id="ldap_basedn_{{$index}}" ng-model="config.BaseDN" placeholder="dc=ldap,dc=domain,dc=tld">
@@ -206,7 +206,7 @@
 
                 <label for="ldap_username_att_{{$index}}" class="col-sm-4 col-md-3 col-lg-2 margin-sm-top control-label text-left">
                   Username attribute
-                  <portainer-tooltip position="bottom" message="LDAP attribute which denotes the username."></portainer-tooltip>
+                  <portainer-tooltip icon="question-circle" position="bottom" message="LDAP attribute which denotes the username."></portainer-tooltip>
                 </label>
                 <div class="col-sm-8 col-md-3 col-lg-4 margin-sm-top">
                   <input type="text" class="form-control" id="ldap_username_att_{{$index}}" ng-model="config.UserNameAttribute" placeholder="uid">
@@ -215,7 +215,7 @@
               <div class="form-group">
                 <label for="ldap_filter_{{$index}}" class="col-sm-4 col-md-2 control-label text-left">
                   Filter
-                  <portainer-tooltip position="bottom" message="The LDAP search filter used to select user elements, optional."></portainer-tooltip>
+                  <portainer-tooltip icon="question-circle" position="bottom" message="The LDAP search filter used to select user elements, optional."></portainer-tooltip>
                 </label>
                 <div class="col-sm-7 col-md-9">
                   <input type="text" class="form-control" id="ldap_filter_{{$index}}" ng-model="config.Filter" placeholder="(objectClass=account)">

@@ -7,7 +7,7 @@
     <div class="col-sm-12">
       <label for="ownership" class="control-label text-left">
         Enable access control
-        <portainer-tooltip position="bottom" message="When enabled, you can restrict the access and management of this resource."></portainer-tooltip>
+        <portainer-tooltip icon="question-circle" position="bottom" message="When enabled, you can restrict the access and management of this resource."></portainer-tooltip>
       </label>
       <label class="switch" style="margin-left: 20px;">
         <input name="ownership" type="checkbox" ng-model="$ctrl.formData.AccessControlEnabled"><i></i>
@@ -75,8 +75,8 @@
     <div class="col-sm-12">
       <label for="group-access" class="control-label text-left">
         Authorized teams
-        <portainer-tooltip ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length > 0" position="bottom" message="You can select which teams(s) will be able to manage this resource."></portainer-tooltip>
-        <portainer-tooltip ng-if="!$ctrl.isAdmin && $ctrl.availableTeams.length > 1" position="bottom" message="As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource."></portainer-tooltip>
+        <portainer-tooltip icon="question-circle" ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length > 0" position="bottom" message="You can select which teams(s) will be able to manage this resource."></portainer-tooltip>
+        <portainer-tooltip icon="question-circle" ng-if="!$ctrl.isAdmin && $ctrl.availableTeams.length > 1" position="bottom" message="As you are a member of multiple teams, you can select which teams(s) will be able to manage this resource."></portainer-tooltip>
       </label>
       <span ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length === 0" class="small text-muted" style="margin-left: 20px;">
         You have not yet created any team. Head over the <a ui-sref="teams">teams view</a> to manage user teams.
@@ -101,7 +101,7 @@
     <div class="col-sm-12">
       <label for="group-access" class="control-label text-left">
         Authorized users
-        <portainer-tooltip ng-if="$ctrl.isAdmin && $ctrl.availableUsers.length > 0" position="bottom" message="You can select which user(s) will be able to manage this resource."></portainer-tooltip>
+        <portainer-tooltip icon="question-circle" ng-if="$ctrl.isAdmin && $ctrl.availableUsers.length > 0" position="bottom" message="You can select which user(s) will be able to manage this resource."></portainer-tooltip>
       </label>
       <span ng-if="$ctrl.availableUsers.length === 0" class="small text-muted" style="margin-left: 20px;">
         You have not yet created any user. Head over the <a ui-sref="users">users view</a> to manage users.

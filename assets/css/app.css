@@ -740,6 +740,46 @@ json-tree .branch-preview {
   opacity: .5;
 }
 
+/* Popover dropdown menu */
+
+.popover-no-margin,
+.popover-no-margin .popover-content { padding: 0; }
+
+.popover-no-margin .dropdown-menu {
+  position: relative;
+  margin: 0;
+  border: 0;
+  border-radius: 6px;
+}
+
+.dropdown-select-label { margin:0; white-space: nowrap; }
+
+.dropdown-select > ul { min-width: unset; }
+
+.dropdown-select > ul > li > a > i {
+  width: 14px;
+  text-align: center;
+}
+
+.dropdown-select > .dropdown-menu > .active > a,
+.dropdown-select > .dropdown-menu > .active > a:hover,
+.dropdown-select > .dropdown-menu > .active > a:focus {
+  color: orange;
+  background-color: #fff;
+}
+
+/**/
+
 .row.header .meta .page {
   padding-top: 7px;
+}
+
+.emptylist,
+.emptylist .fa.tooltip-icon {
+  opacity: 0.4;
+}
+
+.emptylist :not(.active),
+.emptylist .fa.tooltip-icon {
+  color: #000;
 }
