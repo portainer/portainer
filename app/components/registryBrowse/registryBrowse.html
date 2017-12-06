@@ -14,7 +14,7 @@
           <tbody>
             <tr ng-repeat="repo in repositories">
               <td>
-                <a ui-sref="registry.tags({id: registry.id, repository: repo})">{{ repo }}</a>
+                <a ui-sref="registry.tags({id: registry.Id, repository: repo})" ui-sref-opts="{inherit: false}">{{ repo }}</a>
               </td>
             </tr>
           </tbody>
