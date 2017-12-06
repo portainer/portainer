@@ -71,11 +71,11 @@
           </button>
           <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.pauseAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noRunningItemsSelected">
-            <i class="fa fa-stop space-right" aria-hidden="true"></i>Pause
+            <i class="fa fa-pause space-right" aria-hidden="true"></i>Pause
           </button>
           <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.resumeAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noPausedItemsSelected">
-            <i class="fa fa-stop space-right" aria-hidden="true"></i>Resume
+            <i class="fa fa-play space-right" aria-hidden="true"></i>Resume
           </button>
           <button type="button" class="btn btn-sm btn-danger"
             ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
