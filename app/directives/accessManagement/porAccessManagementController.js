@@ -1,11 +1,11 @@
 angular.module('portainer')
-.controller('porAccessManagementController', ['AccessService', 'Pagination', 'Notifications',
-function (AccessService, Pagination, Notifications) {
+.controller('porAccessManagementController', ['AccessService', 'PaginationService', 'Notifications',
+function (AccessService, PaginationService, Notifications) {
   var ctrl = this;
 
   ctrl.state = {
-    pagination_count_accesses: Pagination.getPaginationCount('access_management_accesses'),
-    pagination_count_authorizedAccesses: Pagination.getPaginationCount('access_management_AuthorizedAccesses'),
+    pagination_count_accesses: PaginationService.getPaginationLimit('access_management_accesses'),
+    pagination_count_authorizedAccesses: PaginationService.getPaginationLimit('access_management_AuthorizedAccesses'),
     sortAccessesBy: 'Type',
     sortAccessesReverse: false,
     sortAuthorizedAccessesBy: 'Type',
@@ -23,11 +23,11 @@ function (AccessService, Pagination, Notifications) {
   };
 
   ctrl.changePaginationCountAuthorizedAccesses = function() {
-    Pagination.setPaginationCount('access_management_AuthorizedAccesses', ctrl.state.pagination_count_authorizedAccesses);
+    PaginationService.setPaginationLimit('access_management_AuthorizedAccesses', ctrl.state.pagination_count_authorizedAccesses);
   };
 
   ctrl.changePaginationCountAccesses = function() {
-    Pagination.setPaginationCount('access_management_accesses', ctrl.state.pagination_count_accesses);
+    PaginationService.setPaginationLimit('access_management_accesses', ctrl.state.pagination_count_accesses);
   };
 
   function dispatchUserAndTeamIDs(accesses, users, teams) {

@@ -1,21 +1,18 @@
 angular.module('container', [])
-.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
-function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, Pagination, ModalService, ResourceControlService, RegistryService, ImageService) {
+.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
+function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
+
   $scope.config = {
     Image: '',
     Registry: ''
   };
+
   $scope.state = {
     recreateContainerInProgress: false,
     joinNetworkInProgress: false,
-    leaveNetworkInProgress: false,
-    pagination_count: Pagination.getPaginationCount('container_networks')
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('container_networks', $scope.state.pagination_count);
+    leaveNetworkInProgress: false
   };
 
   var update = function () {

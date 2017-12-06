@@ -38,7 +38,7 @@
               </div>
             </td>
             <td>
-              <por-slider model="service.ReservationNanoCPUs" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="service && state.sliderMaxCpu" on-change="updateServiceAttribute(service, 'ReservationNanoCPUs')"></por-slider>
+              <slider model="service.ReservationNanoCPUs" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="service && state.sliderMaxCpu" on-change="updateServiceAttribute(service, 'ReservationNanoCPUs')"></slider>
             </td>
             <td style="vertical-align : middle;">
               <p class="small text-muted">
@@ -53,7 +53,7 @@
               </div>
             </td>
             <td>
-              <por-slider model="service.LimitNanoCPUs" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="service && state.sliderMaxCpu" on-change="updateServiceAttribute(service, 'LimitNanoCPUs')"></por-slider>
+              <slider model="service.LimitNanoCPUs" floor="0" ceil="state.sliderMaxCpu" step="0.25" precision="2" ng-if="service && state.sliderMaxCpu" on-change="updateServiceAttribute(service, 'LimitNanoCPUs')"></slider>
             </td>
             <td style="vertical-align : middle;">
               <p class="small text-muted">

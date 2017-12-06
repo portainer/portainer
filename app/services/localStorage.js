@@ -35,24 +35,32 @@ angular.module('portainer.services')
     deleteJWT: function() {
       localStorageService.remove('JWT');
     },
-    storePaginationCount: function(key, count) {
+    storePaginationLimit: function(key, count) {
       localStorageService.cookie.set('pagination_' + key, count);
     },
-    getPaginationCount: function(key) {
+    getPaginationLimit: function(key) {
       return localStorageService.cookie.get('pagination_' + key);
+    },
+    getDataTableOrder: function(key) {
+      return localStorageService.get('datatable_order_' + key);
+    },
+    storeDataTableOrder: function(key, data) {
+      localStorageService.set('datatable_order_' + key, data);
+    },
+    getDataTableFilters: function(key) {
+      return localStorageService.get('datatable_filters_' + key);
+    },
+    storeDataTableFilters: function(key, data) {
+      localStorageService.set('datatable_filters_' + key, data);
+    },
+    getDataTableSettings: function(key) {
+      return localStorageService.get('datatable_settings_' + key);
+    },
+    storeDataTableSettings: function(key, data) {
+      localStorageService.set('datatable_settings_' + key, data);
     },
     clean: function() {
       localStorageService.clearAll();
-    },
-    storeFilterContainerShowAll: function(filter) {
-      localStorageService.cookie.set('filter_containerShowAll', filter);
-    },
-    getFilterContainerShowAll: function() {
-      var filter = localStorageService.cookie.get('filter_containerShowAll');
-      if (filter === null) {
-        filter = true;
-      }
-      return filter;
     }
   };
 }]);

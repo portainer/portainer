@@ -55,6 +55,9 @@ function configureRoutes($stateProvider) {
   .state('containers', {
     parent: 'root',
     url: '/containers/',
+    params: {
+      selectedContainers: []
+    },
     views: {
       'content@': {
         templateUrl: 'app/components/containers/containers.html',

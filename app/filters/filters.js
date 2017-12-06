@@ -4,7 +4,7 @@ function includeString(text, values) {
   });
 }
 
-angular.module('portainer.filters', [])
+angular.module('portainer.filters')
 .filter('truncate', function () {
   'use strict';
   return function (text, length, end) {

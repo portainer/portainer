@@ -1,5 +1,5 @@
-angular.module('portainer')
-.controller('porSliderController', function () {
+angular.module('ui')
+.controller('SliderController', function () {
   var ctrl = this;
 
   ctrl.options = {
@@ -19,5 +19,4 @@ angular.module('portainer')
       ctrl.onChange();
     }
   };
-
 });

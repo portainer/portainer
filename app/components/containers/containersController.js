@@ -1,219 +1,108 @@
 angular.module('containers', [])
-  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', 'Container', 'ContainerService', 'ContainerHelper', 'SystemService', 'Notifications', 'Pagination', 'EntityListService', 'ModalService', 'ResourceControlService', 'EndpointProvider', 'LocalStorage',
-  function ($q, $scope, $state, $filter, Container, ContainerService, ContainerHelper, SystemService, Notifications, Pagination, EntityListService, ModalService, ResourceControlService, EndpointProvider, LocalStorage) {
-  $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('containers');
-  $scope.state.displayAll = LocalStorage.getFilterContainerShowAll();
-  $scope.state.displayIP = false;
-  $scope.sortType = 'State';
-  $scope.sortReverse = false;
-  $scope.state.selectedItemCount = 0;
-  $scope.truncate_size = 40;
-  $scope.showMore = true;
-
-  $scope.order = function (sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-  $scope.PublicURL = EndpointProvider.endpointPublicURL();
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('containers', $scope.state.pagination_count);
+  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', '$transition$', 'ContainerService', 'SystemService', 'Notifications', 'ModalService', 'EndpointProvider',
+  function ($q, $scope, $state, $filter, $transition$, ContainerService, SystemService, Notifications, ModalService, EndpointProvider) {
+  $scope.state = {
+    publicURL: EndpointProvider.endpointPublicURL()
   };
 
-  $scope.cleanAssociatedVolumes = false;
-
-  var update = function (data) {
-    $scope.state.selectedItemCount = 0;
-    Container.query(data, function (d) {
-      var containers = d;
-      $scope.containers = containers.map(function (container) {
-        var model = new ContainerViewModel(container);
-        model.Status = $filter('containerstatus')(model.Status);
-
-        EntityListService.rememberPreviousSelection($scope.containers, model, function onSelect(model){
-          $scope.selectItem(model);
-        });
-
-        if (model.IP) {
-          $scope.state.displayIP = true;
-        }
-        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
-          model.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
-        }
-        return model;
-      });
-      updateSelectionFlags();
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to retrieve containers');
-      $scope.containers = [];
-    });
+  $scope.startAction = function(selectedItems) {
+    var successMessage = 'Container successfully started';
+    var errorMessage = 'Unable to start container';
+    executeActionOnContainerList(selectedItems, ContainerService.startContainer, successMessage, errorMessage);
   };
 
-  var batch = function (items, action, msg) {
-    var counter = 0;
-    var complete = function () {
-      counter = counter - 1;
-      if (counter === 0) {
-        update({all: $scope.state.displayAll ? 1 : 0});
-      }
-    };
-    angular.forEach(items, function (c) {
-      if (c.Checked) {
-        counter = counter + 1;
-        if (action === Container.start) {
-          action({id: c.Id}, {}, function (d) {
-            Notifications.success('Container ' + msg, c.Id);
-            complete();
-          }, function (e) {
-            Notifications.error('Failure', e, 'Unable to start container');
-            complete();
-          });
-        }
-        else if (action === Container.remove) {
-          ContainerService.remove(c, $scope.cleanAssociatedVolumes)
-          .then(function success() {
-            var index = items.indexOf(c);
-            items.splice(index, 1);
-            Notifications.success('Container successfully removed');
-            complete();
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to remove container');
-            complete();
-          });
-        }
-        else if (action === Container.pause) {
-          action({id: c.Id}, function (d) {
-            if (d.message) {
-              Notifications.success('Container is already paused', c.Id);
-            } else {
-              Notifications.success('Container ' + msg, c.Id);
-            }
-            complete();
-          }, function (e) {
-            Notifications.error('Failure', e, 'Unable to pause container');
-            complete();
-          });
-        }
-        else {
-          action({id: c.Id}, function (d) {
-            Notifications.success('Container ' + msg, c.Id);
-            complete();
-          }, function (e) {
-            Notifications.error('Failure', e, 'An error occured');
-            complete();
-          });
-        }
-      }
-    });
+  $scope.stopAction = function(selectedItems) {
+    var successMessage = 'Container successfully stopped';
+    var errorMessage = 'Unable to stop container';
+    executeActionOnContainerList(selectedItems, ContainerService.stopContainer, successMessage, errorMessage);
   };
 
-  $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredContainers, function (container) {
-      if (container.Checked !== allSelected) {
-        container.Checked = allSelected;
-        toggleItemSelection(container);
-      }
-    });
-    updateSelectionFlags();
+  $scope.restartAction = function(selectedItems) {
+    var successMessage = 'Container successfully restarted';
+    var errorMessage = 'Unable to restart container';
+    executeActionOnContainerList(selectedItems, ContainerService.restartContainer, successMessage, errorMessage);
   };
 
-  $scope.selectItem = function (item) {
-    toggleItemSelection(item);
-    updateSelectionFlags();
+  $scope.killAction = function(selectedItems) {
+    var successMessage = 'Container successfully killed';
+    var errorMessage = 'Unable to kill container';
+    executeActionOnContainerList(selectedItems, ContainerService.killContainer, successMessage, errorMessage);
   };
 
-  $scope.toggleGetAll = function () {
-    LocalStorage.storeFilterContainerShowAll($scope.state.displayAll);
-    update({all: $scope.state.displayAll ? 1 : 0});
+  $scope.pauseAction = function(selectedItems) {
+    var successMessage = 'Container successfully paused';
+    var errorMessage = 'Unable to pause container';
+    executeActionOnContainerList(selectedItems, ContainerService.pauseContainer, successMessage, errorMessage);
   };
 
-  $scope.startAction = function () {
-    batch($scope.containers, Container.start, 'Started');
+  $scope.resumeAction = function(selectedItems) {
+    var successMessage = 'Container successfully resumed';
+    var errorMessage = 'Unable to resume container';
+    executeActionOnContainerList(selectedItems, ContainerService.resumeContainer, successMessage, errorMessage);
   };
 
-  $scope.stopAction = function () {
-    batch($scope.containers, Container.stop, 'Stopped');
-  };
-
-  $scope.restartAction = function () {
-    batch($scope.containers, Container.restart, 'Restarted');
-  };
-
-  $scope.killAction = function () {
-    batch($scope.containers, Container.kill, 'Killed');
-  };
-
-  $scope.pauseAction = function () {
-    batch($scope.containers, Container.pause, 'Paused');
-  };
-
-  $scope.unpauseAction = function () {
-    batch($scope.containers, Container.unpause, 'Unpaused');
-  };
-
-  $scope.removeAction = function () {
-    batch($scope.containers, Container.remove, 'Removed');
-  };
-
-
-  $scope.truncateMore = function(size) {
-    $scope.truncate_size = 80;
-    $scope.showMore = false;
-  };
-
-  $scope.confirmRemoveAction = function () {
+  $scope.confirmRemoveAction = function(selectedItems) {
     var isOneContainerRunning = false;
-    angular.forEach($scope.containers, function (c) {
-      if (c.Checked && c.State === 'running') {
+    for (var i = 0; i < selectedItems.length; i++) {
+      var container = selectedItems[i];
+      if (container.State === 'running') {
         isOneContainerRunning = true;
-        return;
+        break;
       }
-    });
+    }
+
     var title = 'You are about to remove one or more container.';
     if (isOneContainerRunning) {
-      title = 'You are about to remove one or more running containers.';
+      title = 'You are about to remove one or more running container.';
     }
-    ModalService.confirmContainerDeletion(
-      title,
-      function (result) {
+
+    ModalService.confirmContainerDeletion(title, function (result) {
         if(!result) { return; }
-        $scope.cleanAssociatedVolumes = false;
+        var cleanVolumes = false;
         if (result[0]) {
-          $scope.cleanAssociatedVolumes = true;
+          cleanVolumes = true;
         }
-        $scope.removeAction();
+        removeAction(selectedItems, cleanVolumes);
       }
     );
   };
 
-  function toggleItemSelection(item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
+  function executeActionOnContainerList(containers, action, successMessage, errorMessage) {
+    var actionCount = containers.length;
+    angular.forEach(containers, function (container) {
+      action(container.Id)
+      .then(function success() {
+        Notifications.success(successMessage, container.Names[0]);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, errorMessage);
+      })
+      .finally(function final() {
+        --actionCount;
+        if (actionCount === 0) {
+          $state.transitionTo($state.current, { selectedContainers: containers }, { reload: true });
+        }
+      });
+    });
   }
 
-  function updateSelectionFlags() {
-    $scope.state.noStoppedItemsSelected = true;
-    $scope.state.noRunningItemsSelected = true;
-    $scope.state.noPausedItemsSelected = true;
-    $scope.containers.forEach(function(container) {
-      if(!container.Checked) {
-        return;
-      }
-
-      if(container.Status === 'paused') {
-        $scope.state.noPausedItemsSelected = false;
-      } else if(container.Status === 'stopped' ||
-                container.Status === 'created') {
-        $scope.state.noStoppedItemsSelected = false;
-      } else if(container.Status === 'running') {
-        $scope.state.noRunningItemsSelected = false;
-      }
-    } );
+  function removeAction(containers, cleanVolumes) {
+    var actionCount = containers.length;
+    angular.forEach(containers, function (container) {
+      ContainerService.remove(container, cleanVolumes)
+      .then(function success() {
+        Notifications.success('Container successfully removed', container.Names[0]);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to remove container');
+      })
+      .finally(function final() {
+        --actionCount;
+        if (actionCount === 0) {
+          $state.reload();
+        }
+      });
+    });
   }
 
   function retrieveSwarmHostsInfo(data) {
@@ -231,17 +120,42 @@ angular.module('containers', [])
     return swarm_hosts;
   }
 
+  function assignContainers(containers, provider) {
+    var previouslySelectedContainers = $transition$.params().selectedContainers || [];
+    $scope.containers = containers.map(function (container) {
+      container.Status = $filter('containerstatus')(container.Status);
+      if (provider === 'DOCKER_SWARM') {
+        container.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
+      }
+
+      var previousContainer = _.find(previouslySelectedContainers, function(item) {
+        return item.Id === container.Id;
+      });
+
+      if (previousContainer && previousContainer.Checked) {
+        container.Checked = true;
+      }
+
+      return container;
+    });
+  }
+
   function initView() {
     var provider = $scope.applicationState.endpoint.mode.provider;
-    $q.when(provider !== 'DOCKER_SWARM' || SystemService.info())
+
+    $q.all({
+      swarm: provider !== 'DOCKER_SWARM' || SystemService.info(),
+      containers: ContainerService.containers(1)
+    })
     .then(function success(data) {
       if (provider === 'DOCKER_SWARM') {
-        $scope.swarm_hosts = retrieveSwarmHostsInfo(data);
+        $scope.swarm_hosts = retrieveSwarmHostsInfo(data.swarm);
       }
-      update({all: $scope.state.displayAll ? 1 : 0});
+      assignContainers(data.containers, provider);
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve cluster information');
+      Notifications.error('Failure', err, 'Unable to retrieve containers');
+      $scope.containers = [];
     });
   }
 
