@@ -24,7 +24,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     Parallelism: 1,
     PlacementConstraints: [],
     PlacementPreferences: [],
-    UpdateDelay: 0,
+    UpdateDelay: '0s',
     UpdateOrder: 'stop-first',
     FailureAction: 'pause',
     Secrets: [],
@@ -243,7 +243,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   function prepareUpdateConfig(config, input) {
     config.UpdateConfig = {
       Parallelism: input.Parallelism || 0,
-      Delay: input.UpdateDelay * 1000000000 || 0,
+      Delay: ServiceHelper.translateHumanDurationToNanos(input.UpdateDelay),
       FailureAction: input.FailureAction,
       Order: input.UpdateOrder
     };

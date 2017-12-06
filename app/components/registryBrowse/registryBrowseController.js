@@ -1,9 +1,8 @@
 angular.module('registryBrowse', [])
-.controller('RegistryBrowseController', ['$scope', '$transition$', 'RegistryService', 'Notifications', 'Pagination',
-function ($scope, $transition$, RegistryService, Notifications, Pagination) {
+.controller('RegistryBrowseController', ['$scope', '$transition$', 'RegistryService', 'Notifications',
+function ($scope, $transition$, RegistryService, Notifications) {
 
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('repositories');
 
   function initView() {
     var registryID = $transition$.params().id;

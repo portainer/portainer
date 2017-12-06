@@ -1,47 +1,25 @@
 angular.module('secrets', [])
-.controller('SecretsController', ['$scope', '$state', 'SecretService', 'Notifications', 'Pagination',
-function ($scope, $state, SecretService, Notifications, Pagination) {
-  $scope.state = {};
-  $scope.state.selectedItemCount = 0;
-  $scope.state.pagination_count = Pagination.getPaginationCount('secrets');
-  $scope.sortType = 'Name';
-  $scope.sortReverse = false;
+.controller('SecretsController', ['$scope', '$state', 'SecretService', 'Notifications',
+function ($scope, $state, SecretService, Notifications) {
 
-  $scope.order = function (sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredSecrets, function (secret) {
-      if (secret.Checked !== allSelected) {
-        secret.Checked = allSelected;
-        $scope.selectItem(secret);
-      }
-    });
-  };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
-  };
-
-  $scope.removeAction = function () {
-    angular.forEach($scope.secrets, function (secret) {
-      if (secret.Checked) {
-        SecretService.remove(secret.Id)
-        .then(function success() {
-          Notifications.success('Secret deleted', secret.Id);
-          var index = $scope.secrets.indexOf(secret);
-          $scope.secrets.splice(index, 1);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove secret');
-        });
-      }
+  $scope.removeAction = function (selectedItems) {
+    var actionCount = selectedItems.length;
+    angular.forEach(selectedItems, function (secret) {
+      SecretService.remove(secret.Id)
+      .then(function success() {
+        Notifications.success('Secret successfully removed', secret.Name);
+        var index = $scope.secrets.indexOf(secret);
+        $scope.secrets.splice(index, 1);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to remove secret');
+      })
+      .finally(function final() {
+        --actionCount;
+        if (actionCount === 0) {
+          $state.reload();
+        }
+      });
     });
   };
 

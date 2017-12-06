@@ -7,114 +7,14 @@
   <rd-header-content>Volumes</rd-header-content>
 </rd-header>
 
-<div class="col-lg-12">
-  <rd-widget>
-    <rd-widget-header icon="fa-cubes" title="Volumes">
-      <div class="pull-right">
-        Items per page:
-        <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-          <option value="0">All</option>
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-      </div>
-    </rd-widget-header>
-    <rd-widget-taskbar classes="col-lg-12">
-      <div class="pull-left">
-        <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-        <a class="btn btn-primary" type="button" ui-sref="actions.create.volume"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add volume</a>
-      </div>
-      <div class="pull-right">
-        <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
-      </div>
-      <span class="btn-group btn-group-sm pull-right" style="margin-right: 20px;">
-        <label class="btn btn-primary" ng-model="state.danglingVolumesOnly" uib-btn-radio="undefined">
-          All
-        </label>
-        <label class="btn btn-primary" ng-model="state.danglingVolumesOnly" uib-btn-radio="false">
-          Attached
-        </label>
-        <label class="btn btn-primary" ng-model="state.danglingVolumesOnly" uib-btn-radio="true">
-          Unused
-        </label>
-      </span>
-    </rd-widget-taskbar>
-    <rd-widget-body classes="no-padding">
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>
-                <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
-              </th>
-              <th>
-                <a ui-sref="volumes" ng-click="order('Id')">
-                  Name
-                  <span ng-show="sortType == 'Id' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Id' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="volumes" ng-click="order('StackName')">
-                  Stack
-                  <span ng-show="sortType == 'StackName' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'StackName' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="volumes" ng-click="order('Driver')">
-                  Driver
-                  <span ng-show="sortType == 'Driver' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Driver' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="volumes" ng-click="order('Mountpoint')">
-                  Mount point
-                  <span ng-show="sortType == 'Mountpoint' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Mountpoint' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th ng-if="applicationState.application.authentication">
-                <a ui-sref="volumes" ng-click="order('ResourceControl.Ownership')">
-                  Ownership
-                  <span ng-show="sortType == 'ResourceControl.Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'ResourceControl.Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr dir-paginate="volume in (state.filteredVolumes = (volumes | filter:{dangling: state.danglingVolumesOnly} | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: volume.Checked}">
-              <td><input type="checkbox" ng-model="volume.Checked" ng-change="selectItem(volume)"/></td>
-              <td>
-                <a ui-sref="volume({id: volume.Id})" class="monospaced">{{ volume.Id|truncate:25 }}</a>
-                <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="volume.dangling">Unused</span></td>
-              </td>
-              <td>{{ volume.StackName ? volume.StackName : '-' }}</td>
-              <td>{{ volume.Driver }}</td>
-              <td>{{ volume.Mountpoint | truncatelr }}</td>
-              <td ng-if="applicationState.application.authentication">
-                <span>
-                  <i ng-class="volume.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
-                  {{ volume.ResourceControl.Ownership ? volume.ResourceControl.Ownership : volume.ResourceControl.Ownership = 'public' }}
-                </span>
-              </td>
-            </tr>
-            <tr ng-if="!volumes">
-              <td colspan="5" class="text-center text-muted">Loading...</td>
-            </tr>
-            <tr ng-if="volumes.length === 0 || state.filteredVolumes.length === 0">
-              <td colspan="5" class="text-center text-muted">No volumes available.</td>
-            </tr>
-          </tbody>
-        </table>
-        <div ng-if="volumes" class="pull-left pagination-controls">
-          <dir-pagination-controls></dir-pagination-controls>
-        </div>
-      </div>
-    </rd-widget-body>
-  </rd-widget>
+<div class="row">
+  <div class="col-sm-12">
+    <volumes-datatable
+    title="Volumes" title-icon="fa-cubes"
+    dataset="volumes" table-key="volumes"
+    order-by="Id" show-text-filter="true"
+    remove-action="removeAction"
+    show-ownership-column="applicationState.application.authentication"
+    ></volumes-datatable>
+  </div>
 </div>

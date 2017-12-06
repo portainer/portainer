@@ -1,46 +1,16 @@
 angular.module('endpoints', [])
-.controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'EndpointProvider', 'Notifications', 'Pagination',
-function ($scope, $state, $filter, EndpointService, EndpointProvider, Notifications, Pagination) {
+.controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'Notifications',
+function ($scope, $state, $filter, EndpointService, Notifications) {
   $scope.state = {
     uploadInProgress: false,
-    selectedItemCount: 0,
-    pagination_count: Pagination.getPaginationCount('endpoints'),
     actionInProgress: false
   };
-  $scope.sortType = 'Name';
-  $scope.sortReverse = true;
 
   $scope.formValues = {
     Name: '',
     URL: '',
     PublicURL: '',
     SecurityFormData: new EndpointSecurityFormData()
-  };
-
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('endpoints', $scope.state.pagination_count);
-  };
-
-  $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredEndpoints, function (endpoint) {
-      if (endpoint.Checked !== allSelected) {
-        endpoint.Checked = allSelected;
-        $scope.selectItem(endpoint);
-      }
-    });
-  };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
   };
 
   $scope.addEndpoint = function() {
@@ -75,17 +45,24 @@ function ($scope, $state, $filter, EndpointService, EndpointProvider, Notificati
     });
   };
 
-  $scope.removeAction = function () {
-    angular.forEach($scope.endpoints, function (endpoint) {
-      if (endpoint.Checked) {
-        EndpointService.deleteEndpoint(endpoint.Id).then(function success(data) {
-          Notifications.success('Endpoint deleted', endpoint.Name);
-          var index = $scope.endpoints.indexOf(endpoint);
-          $scope.endpoints.splice(index, 1);
-        }, function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove endpoint');
-        });
-      }
+  $scope.removeAction = function (selectedItems) {
+    var actionCount = selectedItems.length;
+    angular.forEach(selectedItems, function (endpoint) {
+      EndpointService.deleteEndpoint(endpoint.Id)
+      .then(function success() {
+        Notifications.success('Endpoint successfully removed', endpoint.Name);
+        var index = $scope.endpoints.indexOf(endpoint);
+        $scope.endpoints.splice(index, 1);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to remove endpoint');
+      })
+      .finally(function final() {
+        --actionCount;
+        if (actionCount === 0) {
+          $state.reload();
+        }
+      });
     });
   };
 

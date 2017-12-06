@@ -1,17 +1,23 @@
 angular.module('portainer.services')
-.factory('Pagination', ['LocalStorage', 'PAGINATION_MAX_ITEMS', function PaginationFactory(LocalStorage, PAGINATION_MAX_ITEMS) {
+.factory('PaginationService', ['LocalStorage', 'PAGINATION_MAX_ITEMS',
+function PaginationServiceFactory(LocalStorage, PAGINATION_MAX_ITEMS) {
   'use strict';
-  return {
-    getPaginationCount: function(key) {
-      var storedCount = LocalStorage.getPaginationCount(key);
-      var paginationCount = PAGINATION_MAX_ITEMS;
-      if (storedCount !== null) {
-        paginationCount = storedCount;
-      }
-      return '' + paginationCount;
-    },
-    setPaginationCount: function(key, count) {
-      LocalStorage.storePaginationCount(key, count);
+
+  var service = {};
+
+  service.getPaginationLimit = function(key) {
+    var paginationLimit = PAGINATION_MAX_ITEMS;
+
+    var storedLimit = LocalStorage.getPaginationLimit(key);
+    if (storedLimit !== null) {
+      paginationLimit = storedLimit;
     }
+    return '' + paginationLimit;
   };
+
+  service.setPaginationLimit = function(key, limit) {
+    LocalStorage.storePaginationLimit(key, limit);
+  };
+
+  return service;
 }]);
