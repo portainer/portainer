@@ -26,7 +26,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     PlacementPreferences: [],
     UpdateDelay: '0s',
     UpdateOrder: 'stop-first',
-    FailureAction: 'pause',    
+    FailureAction: 'pause',
     Secrets: [],
     Configs: [],
     AccessControlData: new AccessControlFormData(),
