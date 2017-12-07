@@ -142,7 +142,7 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
   };
 
   helper.translateHumanDurationToNanos = function(humanDuration) {    
-    var nanos = 0;
+    var nanos;
     var regex = /^([0-9]+)(h|m|s|ms|us|ns)$/i;
     var matches = humanDuration.match(regex);
 
