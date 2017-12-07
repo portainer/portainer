@@ -232,16 +232,16 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
     config.UpdateConfig = {
       Parallelism: service.UpdateParallelism,
-      Delay: ServiceHelper.translateHumanDurationToNanos(service.UpdateDelay),
+      Delay: ServiceHelper.translateHumanDurationToNanos(service.UpdateDelay) || 0,
       FailureAction: service.UpdateFailureAction,
       Order: service.UpdateOrder
     };
 
     config.TaskTemplate.RestartPolicy = {
       Condition: service.RestartCondition,
-      Delay: service.RestartDelay * 1000000000,
+      Delay: ServiceHelper.translateHumanDurationToNanos(service.RestartDelay) || 5000000000,
       MaxAttempts: service.RestartMaxAttempts,
-      Window: service.RestartWindow * 1000000000
+      Window: ServiceHelper.translateHumanDurationToNanos(service.RestartWindow) || 0
     };
 
     if (service.Ports) {
@@ -310,8 +310,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   }
 
   function transformDurations(service) {
-    service.RestartDelay = service.RestartDelay / 1000000000 || 5;
-    service.RestartWindow = service.RestartWindow / 1000000000 || 0;
+    service.RestartDelay = ServiceHelper.translateNanosToHumanDuration(service.RestartDelay) || '5s';
+    service.RestartWindow = ServiceHelper.translateNanosToHumanDuration(service.RestartWindow) || '0s';
     service.UpdateDelay = ServiceHelper.translateNanosToHumanDuration(service.UpdateDelay) || '0s';
   }
 
