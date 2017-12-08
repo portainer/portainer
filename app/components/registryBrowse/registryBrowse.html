@@ -14,12 +14,25 @@
           <tbody>
             <tr ng-repeat="repo in repositories">
               <td>
-                <a ui-sref="registry.tags({id: registry.Id, repository: repo})" ui-sref-opts="{inherit: false}">{{ repo }}</a>
+                <a ui-sref="registry.tags({id: registry.Id, repository: repo.name})" ui-sref-opts="{inherit: false}">{{ repo.name }}</a>
               </td>
+              <td>{{ repo.tags.length }}</td>
             </tr>
           </tbody>
         </table>
       </rd-widget-body>
     </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <registry-repositories-datatable
+    title="Repositories" title-icon="fa-database"
+    dataset="repositories" table-key="repositories"
+    order-by="Name" show-text-filter="true"
+    access-management="applicationState.application.authentication"
+    remove-action="removeAction"
+    ></registry-repositories-datatable>
   </div>
 </div>

@@ -5,7 +5,7 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="tags">
+<!--<div class="row" ng-if="tags">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-files" title="Tags"></rd-widget-header>
@@ -28,5 +28,17 @@
         </table>
       </rd-widget-body>
     </rd-widget>
+  </div>
+</div>-->
+
+<div class="row">
+  <div class="col-sm-12">
+    <registry-tags-datatable
+    title="Tags" title-icon="fa-database"
+    dataset="tags" table-key="tags"
+    order-by="Name" show-text-filter="true"
+    access-management="applicationState.application.authentication"
+    remove-action="removeAction"
+    ></registry-tags-datatable>
   </div>
 </div>
