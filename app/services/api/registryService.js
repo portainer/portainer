@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('RegistryService', ['$q', 'Registries', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, RegistryCatalog, RegistryTags, RegistryManifests, DockerHubService, RegistryHelper, ImageHelper) {
+.factory('RegistryService', ['$q', 'Registries', 'RegistryBlobs', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, RegistryBlobs, RegistryCatalog, RegistryTags, RegistryManifests, DockerHubService, RegistryHelper, ImageHelper) {
   'use strict';
   var service = {};
 
@@ -72,6 +72,21 @@ angular.module('portainer.services')
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve repository tag manifests', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+
+  service.blobs = function(id, repository, reference) {
+    var deferred = $q.defer();
+
+    RegistryBlobs.head({id: id, repository: repository, reference: reference}).$promise
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve repository blob metadata', err: err});
     });
 
     return deferred.promise;
