@@ -33,17 +33,25 @@
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
+                <a ng-click="$ctrl.changeOrderBy('name')">
                   Name
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'name' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
-                Layers Count
+                <a ng-click="$ctrl.changeOrderBy('nb_layers')">
+                  Layers Count
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'nb_layers' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'nb_layers' && $ctrl.state.reverseOrder"></i>
+                </a>
               </th>
               <th>
-                Total Size (compressed)
+                <a ng-click="$ctrl.changeOrderBy('total_size')">
+                  Tota Size (compressed)
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'total_size' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'total_size' && $ctrl.state.reverseOrder"></i>
+                </a>
               </th>
               <!--<th>
                 <a ng-click="$ctrl.changeOrderBy('URL')">
