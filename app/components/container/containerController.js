@@ -1,20 +1,18 @@
 angular.module('container', [])
-.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'Pagination', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
-function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, Pagination, ModalService, ResourceControlService, RegistryService, ImageService) {
+.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
+function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
+
   $scope.config = {
     Image: '',
     Registry: ''
   };
-  $scope.state = {
-    joinNetworkInProgress: false,
-    leaveNetworkInProgress: false,
-    pagination_count: Pagination.getPaginationCount('container_networks')
-  };
 
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('container_networks', $scope.state.pagination_count);
+  $scope.state = {
+    recreateContainerInProgress: false,
+    joinNetworkInProgress: false,
+    leaveNetworkInProgress: false
   };
 
   var update = function () {
@@ -207,6 +205,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   function recreateContainer(pullImage) {
     var container = $scope.container;
     var config = ContainerHelper.configFromContainer(container.Model);
+    $scope.state.recreateContainerInProgress = true;
     ContainerService.remove(container, true)
     .then(function success() {
       return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
@@ -239,6 +238,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to re-create container');
+      $scope.state.recreateContainerInProgress = false;
     });
   }
 

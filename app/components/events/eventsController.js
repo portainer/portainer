@@ -1,19 +1,6 @@
 angular.module('events', [])
-.controller('EventsController', ['$scope', 'Notifications', 'SystemService', 'Pagination',
-function ($scope, Notifications, SystemService, Pagination) {
-  $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('events');
-  $scope.sortType = 'Time';
-  $scope.sortReverse = true;
-
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('events', $scope.state.pagination_count);
-  };
+.controller('EventsController', ['$scope', 'Notifications', 'SystemService',
+function ($scope, Notifications, SystemService) {
 
   function initView() {
     var from = moment().subtract(24, 'hour').unix();

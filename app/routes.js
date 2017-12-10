@@ -55,6 +55,9 @@ function configureRoutes($stateProvider) {
   .state('containers', {
     parent: 'root',
     url: '/containers/',
+    params: {
+      selectedContainers: []
+    },
     views: {
       'content@': {
         templateUrl: 'app/components/containers/containers.html',
@@ -530,6 +533,18 @@ function configureRoutes($stateProvider) {
       'content@': {
         templateUrl: 'app/components/settings/settings.html',
         controller: 'SettingsController'
+      },
+      'sidebar@': {
+        templateUrl: 'app/components/sidebar/sidebar.html',
+        controller: 'SidebarController'
+      }
+    }
+  })
+  .state('settings_about', {
+    url: '^/settings/about',
+    views: {
+      'content@': {
+        templateUrl: 'app/components/about/about.html'
       },
       'sidebar@': {
         templateUrl: 'app/components/sidebar/sidebar.html',

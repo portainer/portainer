@@ -51,19 +51,27 @@ angular.module('portainer.services')
   };
 
   service.startContainer = function(containerID) {
-    var deferred = $q.defer();
-    Container.start({ id: containerID }, {}).$promise
-    .then(function success(data) {
-      if (data.message) {
-        deferred.reject({ msg: data.message });
-      } else {
-        deferred.resolve(data);
-      }
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to start container', err: err });
-    });
-    return deferred.promise;
+    return Container.start({ id: containerID }, {}).$promise;
+  };
+
+  service.stopContainer = function(containerID) {
+    return Container.stop({ id: containerID }, {}).$promise;
+  };
+
+  service.restartContainer = function(containerID) {
+    return Container.restart({ id: containerID }, {}).$promise;
+  };
+
+  service.killContainer = function(containerID) {
+    return Container.kill({ id: containerID }, {}).$promise;
+  };
+
+  service.pauseContainer = function(containerID) {
+    return Container.pause({ id: containerID }, {}).$promise;
+  };
+
+  service.resumeContainer = function(containerID) {
+    return Container.unpause({ id: containerID }, {}).$promise;
   };
 
   service.createAndStartContainer = function(configuration) {

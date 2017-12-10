@@ -56,7 +56,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.15.2"
+  version: "1.15.4"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -1869,7 +1869,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.15.2"
+        example: "1.15.4"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -1880,6 +1880,10 @@ definitions:
         description: "URL to a logo that will be displayed on the login page as well\
           \ as on top of the sidebar. Will use default Portainer logo when value is\
           \ empty string"
+      DisplayDonationHeader:
+        type: "boolean"
+        example: true
+        description: "Whether to display or not the donation message in the header."\
       DisplayExternalContributors:
         type: "boolean"
         example: false
@@ -1983,6 +1987,10 @@ definitions:
           \ when querying containers"
         items:
           $ref: "#/definitions/Settings_BlackListedLabels"
+      DisplayDonationHeader:
+        type: "boolean"
+        example: true
+        description: "Whether to display or not the donation message in the header."
       DisplayExternalContributors:
         type: "boolean"
         example: false
@@ -2398,6 +2406,10 @@ definitions:
           \ when querying containers"
         items:
           $ref: "#/definitions/Settings_BlackListedLabels"
+      DisplayDonationHeader:
+        type: "boolean"
+        example: true
+        description: "Whether to display or not the donation message in the header."
       DisplayExternalContributors:
         type: "boolean"
         example: false

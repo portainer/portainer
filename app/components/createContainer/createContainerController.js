@@ -349,6 +349,12 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
+  $scope.resetNetworkConfig = function() {
+    $scope.config.NetworkingConfig = {
+      EndpointsConfig: {}
+    };
+  };
+
   function loadFromContainerNetworkConfig(d) {
     $scope.config.NetworkingConfig = {
       EndpointsConfig: {}

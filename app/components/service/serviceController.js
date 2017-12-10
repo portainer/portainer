@@ -1,27 +1,15 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService) {
 
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
   $scope.tasks = [];
-  $scope.sortType = 'Updated';
-  $scope.sortReverse = true;
   $scope.availableImages = [];
 
   $scope.lastVersion = 0;
 
   var originalService = {};
   var previousServiceValues = [];
-
-  $scope.order = function (sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('service_tasks', $scope.state.pagination_count);
-  };
 
   $scope.renameService = function renameService(service) {
     updateServiceAttribute(service, 'Name', service.newServiceName || service.name);
@@ -244,16 +232,16 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
     config.UpdateConfig = {
       Parallelism: service.UpdateParallelism,
-      Delay: service.UpdateDelay,
+      Delay: ServiceHelper.translateHumanDurationToNanos(service.UpdateDelay) || 0,
       FailureAction: service.UpdateFailureAction,
       Order: service.UpdateOrder
     };
 
     config.TaskTemplate.RestartPolicy = {
       Condition: service.RestartCondition,
-      Delay: service.RestartDelay,
+      Delay: ServiceHelper.translateHumanDurationToNanos(service.RestartDelay) || 5000000000,
       MaxAttempts: service.RestartMaxAttempts,
-      Window: service.RestartWindow
+      Window: ServiceHelper.translateHumanDurationToNanos(service.RestartWindow) || 0
     };
 
     if (service.Ports) {
@@ -321,6 +309,12 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.ReservationMemoryBytes = service.ReservationMemoryBytes / 1024 / 1024 || 0;
   }
 
+  function transformDurations(service) {
+    service.RestartDelay = ServiceHelper.translateNanosToHumanDuration(service.RestartDelay) || '5s';
+    service.RestartWindow = ServiceHelper.translateNanosToHumanDuration(service.RestartWindow) || '0s';
+    service.UpdateDelay = ServiceHelper.translateNanosToHumanDuration(service.UpdateDelay) || '0s';
+  }
+
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     ServiceService.service($transition$.params().id)
@@ -333,6 +327,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
       transformResources(service);
       translateServiceArrays(service);
+      transformDurations(service);
       $scope.service = service;
       originalService = angular.copy(service);
 
