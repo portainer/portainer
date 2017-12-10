@@ -1,0 +1,132 @@
+<form class="form-horizontal" style="margin-top: 15px;">
+  <div class="col-sm-12 form-section-title">
+      Update config
+  </div>
+  <!-- parallelism-input -->
+  <div class="form-group">
+    <label for="parallelism" class="col-sm-3 col-lg-2 control-label text-left">Update parallelism</label>
+    <div class="col-sm-4 col-lg-3">
+      <input type="number" class="form-control" ng-model="formValues.Parallelism" id="parallelism" placeholder="e.g. 1">
+    </div>
+    <div class="col-sm-5">
+      <p class="small text-muted">
+        Maximum number of tasks to be updated simultaneously (0 to update all at once).
+      </p>
+    </div>
+  </div>
+  <!-- !parallelism-input -->
+  <!-- delay-input -->
+  <div class="form-group">
+    <label for="update-delay" class="col-sm-3 col-lg-2 control-label text-left">
+      Update delay
+      <portainer-tooltip position="bottom" message="Supported format examples: 1h, 5m, 10s, 1000ms, 15us, 60ns."></portainer-tooltip>
+    </label>                
+    <div class="col-sm-4 col-lg-3">
+      <input type="text" class="form-control" ng-model="formValues.UpdateDelay" id="update-delay" placeholder="e.g. 1m" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i">
+    </div>
+    <div class="col-sm-5">
+      <p class="small text-muted">
+        Amount of time between updates expressed by a number followed by unit (ns|us|ms|s|m|h). Default value is 0s, 0 seconds.
+      </p>
+    </div>
+  </div>
+  <!-- !delay-input -->
+  <!-- failureAction-input -->
+  <div class="form-group">
+    <label for="failure-action" class="col-sm-3 col-lg-2 control-label text-left">Update failure action</label>
+    <div class="col-sm-4 col-lg-3">
+      <div class="btn-group btn-group-sm">
+        <label class="btn btn-primary" ng-model="formValues.FailureAction" uib-btn-radio="'continue'">Continue</label>
+        <label class="btn btn-primary" ng-model="formValues.FailureAction" uib-btn-radio="'pause'">Pause</label>
+      </div>
+    </div>
+    <div class="col-sm-5">
+      <p class="small text-muted">
+        Action taken on failure to start after update.
+      </p>
+    </div>
+  </div>
+  <!-- !failureAction-input -->
+  <!-- order-input -->
+  <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.29">
+    <label for="update-order" class="col-sm-3 col-lg-2 control-label text-left">Update order</label>
+    <div class="col-sm-4 col-lg-3">
+      <div class="btn-group btn-group-sm">
+        <label class="btn btn-primary" ng-model="formValues.UpdateOrder" uib-btn-radio="'start-first'">start-first</label>
+        <label class="btn btn-primary" ng-model="formValues.UpdateOrder" uib-btn-radio="'stop-first'">stop-first</label>
+      </div>
+    </div>
+    <div class="col-sm-5">
+      <p class="small text-muted">
+        Operation order on failure.
+      </p>
+    </div>
+  </div>
+  <!-- !order-input -->
+  
+  <div class="col-sm-12 form-section-title">
+      Restart policy
+  </div>
+  <!-- restartCondition-input -->
+  <div class="form-group">
+    <label for="restart-condition" class="col-sm-3 col-lg-2 control-label text-left">Restart condition</label>
+    <div class="col-sm-4 col-lg-3">
+      <div class="btn-group btn-group-sm">
+        <label class="btn btn-primary" ng-model="formValues.RestartCondition" uib-btn-radio="'none'">None</label>
+        <label class="btn btn-primary" ng-model="formValues.RestartCondition" uib-btn-radio="'on-failure'">On-failure</label>
+        <label class="btn btn-primary" ng-model="formValues.RestartCondition" uib-btn-radio="'any'">Any</label>
+      </div>
+    </div>
+    <div class="col-sm-5">
+      <p class="small text-muted">
+        Restart when condition is met (default condition "any"). 
+      </p>
+    </div>
+  </div>
+  <!-- !restartCondition-input -->
+  <!-- restartDelay-input -->
+  <div class="form-group">
+    <label for="restart-delay" class="col-sm-3 col-lg-2 control-label text-left">
+      Restart delay
+      <portainer-tooltip position="bottom" message="Supported format examples: 1h, 5m, 10s, 1000ms, 15us, 60ns."></portainer-tooltip>
+    </label>                
+    <div class="col-sm-4 col-lg-3">
+      <input type="text" class="form-control" ng-model="formValues.RestartDelay" id="restart-delay" placeholder="e.g. 1m" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i">
+    </div>
+    <div class="col-sm-5">
+      <p class="small text-muted">
+        Delay between restart attempts expressed by a number followed by unit (ns|us|ms|s|m|h). Default value is 5s, 5 seconds.
+      </p>
+    </div>
+  </div>
+  <!-- !restartDelay-input -->
+  <!-- restartMaxAttempts-input -->
+   <div class="form-group">
+    <label for="restart-max-attempts" class="col-sm-3 col-lg-2 control-label text-left">Restart max attempts</label>
+    <div class="col-sm-4 col-lg-3">
+      <input type="number" class="form-control" ng-model="formValues.RestartMaxAttempts" id="restart-max-attempts" placeholder="e.g. 0">
+    </div>
+    <div class="col-sm-5">
+      <p class="small text-muted">
+        Maximum attempts to restart a given task before giving up (default value is 0, which means unlimited).
+      </p>
+    </div>
+  </div>
+  <!-- !restartMaxAttempts-input -->
+  <!-- restartWindow-input -->
+  <div class="form-group">
+    <label for="restart-window" class="col-sm-3 col-lg-2 control-label text-left">
+      Restart window
+      <portainer-tooltip position="bottom" message="Supported format examples: 1h, 5m, 10s, 1000ms, 15us, 60ns."></portainer-tooltip>
+    </label>                
+    <div class="col-sm-4 col-lg-3">
+      <input type="text" class="form-control" ng-model="formValues.RestartWindow" id="restart-window" placeholder="e.g. 1m" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i">
+    </div>
+    <div class="col-sm-5">
+      <p class="small text-muted">
+        Time window to evaluate restart attempts expressed by a number followed by unit (ns|us|ms|s|m|h). Default value is 0 seconds, which is unbounded.
+      </p>
+    </div>
+  </div>
+  <!-- !restartWindow-input -->
+</form>

@@ -1,9 +1,10 @@
 angular.module('stack', [])
-.controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications', 'FormHelper',
-function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper) {
+.controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications', 'FormHelper', 'EndpointProvider',
+function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper, EndpointProvider) {
 
   $scope.state = {
-    actionInProgress: false
+    actionInProgress: false,
+    publicURL: EndpointProvider.endpointPublicURL()
   };
 
   $scope.deployStack = function () {

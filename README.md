@@ -26,6 +26,14 @@ You can try out the public demo instance: http://demo.portainer.io/ (login with 
 
 Please note that the public demo cluster is **reset every 15min**.
 
+Alternatively, you can deploy a copy of the demo stack inside a [play-with-docker (PWD)](https://labs.play-with-docker.com) playground:
+
+- Browse [PWD/?stack=portainer-demo/play-with-docker/docker-stack.yml](http://play-with-docker.com/?stack=https://raw.githubusercontent.com/portainer/portainer-demo/master/play-with-docker/docker-stack.yml)
+- Sign in with your [Docker ID](https://docs.docker.com/docker-id)
+- Follow [these](https://github.com/portainer/portainer-demo/blob/master/play-with-docker/docker-stack.yml#L5-L8) steps.
+
+Unlike the public demo, the playground sessions are deleted after 4 hours. Apart from that, all the settings are same, including default credentials.
+
 ## Getting started
 
 * [Deploy Portainer](https://portainer.readthedocs.io/en/latest/deployment.html)

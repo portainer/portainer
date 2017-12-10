@@ -130,7 +130,7 @@
           <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
-          <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
+          <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config & Restart</a></li>
           <li class="interactive" ng-if="applicationState.endpoint.apiVersion >= 1.25"><a data-target="#secrets" data-toggle="tab">Secrets</a></li>
           <li class="interactive"><a data-target="#configs" data-toggle="tab" ng-if="applicationState.endpoint.apiVersion >= 1.30">Configs</a></li>
           <li class="interactive"><a data-target="#resources-placement" data-toggle="tab" ng-click="refreshSlider()">Resources & Placement</a></li>
@@ -372,71 +372,7 @@
           </div>
           <!-- !tab-labels -->
           <!-- tab-update-config -->
-          <div class="tab-pane" id="update-config">
-            <form class="form-horizontal" style="margin-top: 15px;">
-              <!-- parallelism-input -->
-              <div class="form-group">
-                <label for="parallelism" class="col-sm-3 col-lg-1 control-label text-left">Parallelism</label>
-                <div class="col-sm-4 col-lg-3">
-                  <input type="number" class="form-control" ng-model="formValues.Parallelism" id="parallelism" placeholder="e.g. 1">
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Maximum number of tasks to be updated simultaneously (0 to update all at once).
-                  </p>
-                </div>
-              </div>
-              <!-- !parallelism-input -->
-              <!-- delay-input -->
-              <div class="form-group">
-                <label for="update-delay" class="col-sm-3 col-lg-1 control-label text-left">Delay</label>
-                <div class="col-sm-4 col-lg-3">
-                  <input type="number" class="form-control" ng-model="formValues.UpdateDelay" id="update-delay" placeholder="e.g. 10">
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Amount of time between updates. Time in seconds.
-                  </p>
-                </div>
-              </div>
-              <!-- !delay-input -->
-              <!-- failureAction-input -->
-              <div class="form-group">
-                <label for="failure-action" class="col-sm-3 col-lg-1 control-label text-left">Failure action</label>
-                <div class="col-sm-4 col-lg-3">
-                  <div class="btn-group btn-group-sm">
-                    <label class="btn btn-primary" ng-model="formValues.FailureAction" uib-btn-radio="'continue'">Continue</label>
-                    <label class="btn btn-primary" ng-model="formValues.FailureAction" uib-btn-radio="'pause'">Pause</label>
-                  </div>
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Action taken on failure to start after update.
-                  </p>
-                </div>
-
-              </div>
-              <!-- !failureAction-input -->
-              <!-- order-input -->
-              <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.29">
-
-                <label for="update-order" class="col-sm-3 col-lg-1 control-label text-left">Order</label>
-                <div class="col-sm-4 col-lg-3">
-                  <div class="btn-group btn-group-sm">
-                    <label class="btn btn-primary" ng-model="formValues.UpdateOrder" uib-btn-radio="'start-first'">start-first</label>
-                    <label class="btn btn-primary" ng-model="formValues.UpdateOrder" uib-btn-radio="'stop-first'">stop-first</label>
-                  </div>
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Operation order on failure.
-                  </p>
-                </div>
-
-              </div>
-              <!-- !order-input -->
-            </form>
-          </div>
+          <div class="tab-pane" id="update-config" ng-include="'app/components/createService/includes/update-restart.html'"></div>
           <!-- !tab-update-config -->
           <!-- tab-secrets -->
           <div class="tab-pane" id="secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25" ng-include="'app/components/createService/includes/secret.html'"></div>

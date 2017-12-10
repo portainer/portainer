@@ -7,14 +7,42 @@ angular.module('portainer.services')
 
   var service = {};
 
-  service.CreateCPUChart = function(context) {
+  function defaultChartOptions(pos, tooltipCallback, scalesCallback) {
+    return {
+        animation: { duration: 0 },
+        responsiveAnimationDuration: 0,
+        responsive: true,
+        tooltips: {
+          mode: 'index',
+          intersect: false,
+          position: pos,
+          callbacks: {
+            label: function(tooltipItem, data) {
+              var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
+              return tooltipCallback(datasetLabel, tooltipItem.yLabel);
+            }
+          }
+        },
+        hover: { animationDuration: 0 },
+        scales: {
+          yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                callback: scalesCallback
+              }
+          }]
+        }
+      };
+  }
+
+  function CreateChart (context, label, tooltipCallback, scalesCallback) {
     return new Chart(context, {
       type: 'line',
       data: {
         labels: [],
         datasets: [
           {
-            label: 'CPU',
+            label: label,
             data: [],
             fill: true,
             backgroundColor: 'rgba(151,187,205,0.4)',
@@ -26,91 +54,16 @@ angular.module('portainer.services')
           }
         ]
       },
-      options: {
-        animation: {
-          duration: 0
-        },
-        responsiveAnimationDuration: 0,
-        responsive: true,
-        tooltips: {
-          mode: 'index',
-          intersect: false,
-          position: 'nearest',
-          callbacks: {
-            label: function(tooltipItem, data) {
-              var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
-              return percentageBasedTooltipLabel(datasetLabel, tooltipItem.yLabel);
-            }
-          }
-        },
-        hover: {
-          animationDuration: 0
-        },
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-                callback: percentageBasedAxisLabel
-              }
-            }
-          ]
-        }
-      }
+      options: defaultChartOptions('nearest', tooltipCallback, scalesCallback)
     });
+  }
+
+  service.CreateCPUChart = function(context) {
+    return CreateChart(context, 'CPU', percentageBasedTooltipLabel, percentageBasedAxisLabel);
   };
 
   service.CreateMemoryChart = function(context) {
-    return new Chart(context, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: 'Memory',
-            data: [],
-            fill: true,
-            backgroundColor: 'rgba(151,187,205,0.4)',
-            borderColor: 'rgba(151,187,205,0.6)',
-            pointBackgroundColor: 'rgba(151,187,205,1)',
-            pointBorderColor: 'rgba(151,187,205,1)',
-            pointRadius: 2,
-            borderWidth: 2
-          }
-        ]
-      },
-      options: {
-        animation: {
-          duration: 0
-        },
-        responsiveAnimationDuration: 0,
-        responsive: true,
-        tooltips: {
-          mode: 'index',
-          intersect: false,
-          position: 'nearest',
-          callbacks: {
-            label: function(tooltipItem, data) {
-              var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
-              return byteBasedTooltipLabel(datasetLabel, tooltipItem.yLabel);
-            }
-          }
-        },
-        hover: {
-          animationDuration: 0
-        },
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-                callback: byteBasedAxisLabel
-              }
-            }
-          ]
-        }
-      }
-    });
+    return  CreateChart(context, 'Memory', byteBasedTooltipLabel, byteBasedAxisLabel);
   };
 
   service.CreateNetworkChart = function(context) {
@@ -143,39 +96,11 @@ angular.module('portainer.services')
           }
         ]
       },
-      options: {
-        animation: {
-          duration: 0
-        },
-        responsiveAnimationDuration: 0,
-        responsive: true,
-        tooltips: {
-          mode: 'index',
-          intersect: false,
-          position: 'average',
-          callbacks: {
-            label: function(tooltipItem, data) {
-              var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
-              return byteBasedTooltipLabel(datasetLabel, tooltipItem.yLabel);
-            }
-          }
-        },
-        hover: {
-          animationDuration: 0
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-              callback: byteBasedAxisLabel
-            }
-          }]
-        }
-      }
+      options: defaultChartOptions('average', byteBasedTooltipLabel, byteBasedAxisLabel)
     });
   };
 
-  service.UpdateMemoryChart = function(label, value, chart) {
+  function UpdateChart(label, value, chart) {
     chart.data.labels.push(label);
     chart.data.datasets[0].data.push(value);
 
@@ -185,19 +110,10 @@ angular.module('portainer.services')
     }
 
     chart.update(0);
-  };
+  }
 
-  service.UpdateCPUChart = function(label, value, chart) {
-    chart.data.labels.push(label);
-    chart.data.datasets[0].data.push(value);
-
-    if (chart.data.datasets[0].data.length > CHART_LIMIT) {
-      chart.data.labels.pop();
-      chart.data.datasets[0].data.pop();
-    }
-
-    chart.update(0);
-  };
+  service.UpdateMemoryChart = UpdateChart;
+  service.UpdateCPUChart = UpdateChart;
 
   service.UpdateNetworkChart = function(label, rx, tx, chart) {
     chart.data.labels.push(label);
