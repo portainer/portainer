@@ -146,6 +146,33 @@
 <div class="row" ng-if="node">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
+      <rd-widget-header icon="fa-object-group" title="Engine labels"></rd-widget-header>
+      <rd-widget-body ng-if="!node.EngineLabels || node.EngineLabels.length === 0">
+        <p>There are no engine labels for this node.</p>
+      </rd-widget-body>
+      <rd-widget-body classes="no-padding" ng-if="node.EngineLabels && node.EngineLabels.length > 0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="engineLabel in node.EngineLabels">
+              <td>{{ engineLabel.key }}</td>
+              <td>{{ engineLabel.value }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="node">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
       <rd-widget-header icon="fa-tasks" title="Node labels">
         <div class="nopadding">
           <a class="btn btn-default btn-sm pull-right" ng-click="addLabel(node)">
@@ -205,69 +232,12 @@
 </div>
 
 <div class="row" ng-if="node && tasks.length > 0">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-tasks" title="Associated tasks">
-        <div class="pull-right">
-          Items per page:
-          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-            <option value="0">All</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>
-                <a ui-sref="node" ng-click="order('Status')">
-                  Status
-                  <span ng-show="sortType == 'Status' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Status' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="node" ng-click="order('Slot')">
-                  Slot
-                  <span ng-show="sortType == 'Slot' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Slot' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="node" ng-click="order('Spec.ContainerSpec.Image')">
-                  Image
-                  <span ng-show="sortType == 'Spec.ContainerSpec.Image' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Spec.ContainerSpec.Image' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th>
-                <a ui-sref="node" ng-click="order('Updated')">
-                  Last update
-                  <span ng-show="sortType == 'Updated' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Updated' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr dir-paginate="task in (filteredTasks = ( tasks | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-              <td><a ui-sref="task({ id: task.Id })">{{ task.Id }}</a></td>
-              <td><span class="label label-{{ task.Status.State|taskstatusbadge }}">{{ task.Status.State }}</span></td>
-              <td>{{ task.Slot ? task.Slot : '-' }}</td>
-              <td>{{ task.Spec.ContainerSpec.Image | hideshasum }}</td>
-              <td>{{ task.Updated | getisodate }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div ng-if="tasks" class="pagination-controls">
-          <dir-pagination-controls></dir-pagination-controls>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
+  <div class="col-sm-12">
+    <node-tasks-datatable
+    title="Tasks" title-icon="fa-tasks"
+    dataset="tasks" table-key="node-tasks"
+    order-by="Updated" reverse-order="true"
+    show-text-filter="true"
+    ></node-tasks-datatable>
   </div>
 </div>

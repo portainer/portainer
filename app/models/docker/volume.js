@@ -14,5 +14,7 @@ function VolumeViewModel(data) {
     if (data.Portainer.ResourceControl) {
       this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
     }
+  } else {
+    this.ResourceControl = { Ownership: 'public' };
   }
 }

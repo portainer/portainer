@@ -24,7 +24,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     Parallelism: 1,
     PlacementConstraints: [],
     PlacementPreferences: [],
-    UpdateDelay: 0,
+    UpdateDelay: '0s',
     UpdateOrder: 'stop-first',
     FailureAction: 'pause',
     Secrets: [],
@@ -35,7 +35,11 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     MemoryLimit: 0,
     MemoryReservation: 0,
     MemoryLimitUnit: 'MB',
-    MemoryReservationUnit: 'MB'
+    MemoryReservationUnit: 'MB',
+    RestartCondition: 'any',
+    RestartDelay: '5s',
+    RestartMaxAttempts: 0,
+    RestartWindow: '0s'
   };
 
   $scope.state = {
@@ -243,10 +247,19 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   function prepareUpdateConfig(config, input) {
     config.UpdateConfig = {
       Parallelism: input.Parallelism || 0,
-      Delay: input.UpdateDelay * 1000000000 || 0,
+      Delay: ServiceHelper.translateHumanDurationToNanos(input.UpdateDelay) || 0,
       FailureAction: input.FailureAction,
       Order: input.UpdateOrder
     };
+  }
+
+  function prepareRestartPolicy(config, input) {
+    config.TaskTemplate.RestartPolicy = {
+      Condition: input.RestartCondition || 'any',
+      Delay: ServiceHelper.translateHumanDurationToNanos(input.RestartDelay) || 5000000000,
+      MaxAttempts: input.RestartMaxAttempts || 0,
+      Window: ServiceHelper.translateHumanDurationToNanos(input.RestartWindow) || 0
+    };    
   }
 
   function preparePlacementConfig(config, input) {
@@ -348,6 +361,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     preparePlacementConfig(config, input);
     prepareResourcesCpuConfig(config, input);
     prepareResourcesMemoryConfig(config, input);
+    prepareRestartPolicy(config, input);
     return config;
   }
 

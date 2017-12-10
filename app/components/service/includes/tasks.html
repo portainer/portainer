@@ -1,71 +1,10 @@
 <div ng-if="tasks.length > 0 && nodes" id="service-tasks">
-  <rd-widget>
-    <rd-widget-header icon="fa-tasks" title="Associated tasks">
-      <div class="pull-right">
-      Items per page:
-      <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-        <option value="0">All</option>
-        <option value="10">10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
-      </div>
-    </rd-widget-header>
-    <rd-widget-taskbar classes="col-lg-12">
-      <div class="pull-right">
-        <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
-      </div>
-    </rd-widget-taskbar>
-    <rd-widget-body classes="no-padding">
-      <table class="table">
-      <thead>
-        <tr>
-        <th>Id</th>
-        <th>
-          <a ng-click="order('Status.State')">
-          Status
-          <span ng-show="sortType == 'Status.State' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-          <span ng-show="sortType == 'Status.State' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-          </a>
-        </th>
-        <th ng-if="service.Mode !== 'global'">
-          <a ng-click="order('Slot')">
-          Slot
-          <span ng-show="sortType == 'Slot' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-          <span ng-show="sortType == 'Slot' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-          </a>
-        </th>
-        <th>
-          <a ng-click="order('NodeId')">
-          Node
-          <span ng-show="sortType == 'NodeId' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-          <span ng-show="sortType == 'NodeId' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-          </a>
-        </th>
-        <th>
-          <a ng-click="order('Updated')">
-          Last update
-          <span ng-show="sortType == 'Updated' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-          <span ng-show="sortType == 'Updated' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-          </a>
-        </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr dir-paginate="task in (filteredTasks = ( tasks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-        <td><a ui-sref="task({ id: task.Id })" class="monospaced">{{ task.Id }}</a></td>
-        <td><span class="label label-{{ task.Status.State|taskstatusbadge }}">{{ task.Status.State }}</span></td>
-        <td ng-if="service.Mode !== 'global'">{{ task.Slot }}</td>
-        <td>{{ task.NodeId | tasknodename: nodes }}</td>
-        <td>{{ task.Updated | getisodate }}</td>
-        </tr>
-      </tbody>
-      </table>
-      <div ng-if="tasks" class="pagination-controls" >
-      <dir-pagination-controls></dir-pagination-controls>
-      </div>
-    </rd-widget-body>
-  </rd-widget>
+  <tasks-datatable
+    title="Tasks" title-icon="fa-tasks"
+    dataset="tasks" table-key="service-tasks"
+    order-by="Updated" reverse-order="true"
+    nodes="nodes"
+    show-text-filter="true"
+    show-slot-column="service.Mode !== 'global'"
+  ></tasks-datatable>
 </div>
-

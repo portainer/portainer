@@ -17,13 +17,21 @@ function NodeViewModel(data) {
     this.Labels = [];
   }
 
+  var engineLabels = data.Description.Engine.Labels;
+  if (engineLabels) {
+    this.EngineLabels = Object.keys(engineLabels).map(function(key) {
+      return { key: key, value: engineLabels[key] };
+    });
+  } else {
+    this.EngineLabels = [];
+  }
+
   this.Hostname = data.Description.Hostname;
   this.PlatformArchitecture = data.Description.Platform.Architecture;
   this.PlatformOS = data.Description.Platform.OS;
   this.CPUs = data.Description.Resources.NanoCPUs;
   this.Memory = data.Description.Resources.MemoryBytes;
   this.EngineVersion = data.Description.Engine.EngineVersion;
-  this.EngineLabels = data.Description.Engine.Labels;
   this.Plugins = data.Description.Engine.Plugins;
   this.Status = data.Status.State;
 
