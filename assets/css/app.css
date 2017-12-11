@@ -124,6 +124,10 @@ a[ng-click]{
   font-size: 90% !important;
 }
 
+.widget .widget-body table thead th {
+  font-weight: normal;
+}
+
 .template-widget {
   height: 100%;
 }
