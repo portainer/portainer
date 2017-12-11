@@ -45,8 +45,20 @@ angular.module('portainer.services')
     var applicationState = LocalStorage.getApplicationState();
     if (applicationState) {
       state.application = applicationState;
-      state.loading = false;
-      deferred.resolve(state);
+      StatusService.status().then(function success(data) {
+        var status = data;
+        if (state.application.version !== status.Version) {
+          state.application.version = status.Version;
+          LocalStorage.storeApplicationState(state.application);
+        }
+        deferred.resolve(state);
+      })
+      .catch(function error() {
+        deferred.resolve(state);
+      })
+      .finally(function final() {
+        state.loading = false;
+      });
     } else {
       $q.all({
         settings: SettingsService.publicSettings(),
