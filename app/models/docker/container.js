@@ -37,4 +37,8 @@ function ContainerViewModel(data) {
   } else {
     this.ResourceControl = { Ownership: 'public' };
   }
+
+  if (data.PortainerAgent && data.PortainerAgent.Node) {
+    this.AgentNode = data.PortainerAgent.Node;
+  }
 }

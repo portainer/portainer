@@ -16,7 +16,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   var update = function () {
-    Container.get({id: $transition$.params().id}, function (d) {
+    Container.get({id: $transition$.params().id, agentNode: $transition$.params().agentNode}, function (d) {
       var container = new ContainerDetailsViewModel(d);
       $scope.container = container;
       $scope.container.edit = false;

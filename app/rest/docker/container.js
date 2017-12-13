@@ -6,8 +6,14 @@ angular.module('portainer.rest')
     endpointId: EndpointProvider.endpointID
   },
   {
-    query: {method: 'GET', params: {all: 0, action: 'json', filters: '@filters' }, isArray: true},
-    get: {method: 'GET', params: {action: 'json'}},
+    query: {
+      method: 'GET', params: { all: 0, action: 'json', filters: '@filters' },
+      isArray: true
+    },
+    get: {
+      method: 'GET', params: { action: 'json' },
+      headers: { 'agentNode': retrieveAgentNodeFromConfig }
+    },
     stop: {method: 'POST', params: {id: '@id', t: 5, action: 'stop'}},
     restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart'}},
     kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
@@ -47,3 +53,13 @@ angular.module('portainer.rest')
     }
   });
 }]);
+
+function retrieveAgentNodeFromConfig(requestConfig){
+  if (requestConfig.params.agentNode) {
+    return requestConfig.params.agentNode;
+  }
+  // console.log(JSON.stringify(requestConfig, null, 4));
+     // this function will be called every time the "get" action gets called
+     // the result will be used as value for the header item
+     // if it doesn't return a value, the key will not be present in the header
+}

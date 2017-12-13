@@ -80,6 +80,9 @@ function configureRoutes($stateProvider) {
         templateUrl: 'app/components/sidebar/sidebar.html',
         controller: 'SidebarController'
       }
+    },
+    params: {
+      agentNode: ''
     }
   })
   .state('stats', {
