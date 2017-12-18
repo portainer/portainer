@@ -1,6 +1,6 @@
 angular.module('containerLogs', [])
-.controller('ContainerLogsController', ['$scope', '$transition$', '$anchorScroll', 'ContainerLogs', 'Container',
-function ($scope, $transition$, $anchorScroll, ContainerLogs, Container) {
+.controller('ContainerLogsController', ['$scope', '$transition$', '$anchorScroll', 'ContainerLogs', 'Container', 'Notifications',
+function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notifications) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
