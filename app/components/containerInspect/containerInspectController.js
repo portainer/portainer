@@ -8,7 +8,7 @@ function ($scope, $transition$, Notifications, ContainerService) {
   $scope.containerInfo = {};
 
   function initView() {
-    ContainerService.inspect($transition$.params().id)
+    ContainerService.inspect($transition$.params().id, $transition$.params().nodeName)
     .then(function success(d) {
       $scope.containerInfo = d;
     })

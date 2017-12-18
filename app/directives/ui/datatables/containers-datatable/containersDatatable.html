@@ -205,7 +205,7 @@
                   <a ng-if="$ctrl.settings.showQuickActionStats" style="margin: 0 2.5px;" ui-sref="stats({id: item.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i></a>
                   <a ng-if="$ctrl.settings.showQuickActionLogs" style="margin: 0 2.5px;" ui-sref="containerlogs({id: item.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i></a>
                   <a ng-if="$ctrl.settings.showQuickActionConsole" style="margin: 0 2.5px;" ui-sref="console({id: item.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
-                  <a ng-if="$ctrl.settings.showQuickActionInspect" style="margin: 0 2.5px;" ui-sref="inspect({id: item.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionInspect" style="margin: 0 2.5px;" ui-sref="inspect({ id: item.Id, nodeName: item.NodeName })"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
                 </div>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>

@@ -70,7 +70,7 @@ function configureRoutes($stateProvider) {
     }
   })
   .state('container', {
-    url: '^/containers/:id',
+    url: '^/containers/:id?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/components/container/container.html',
@@ -80,9 +80,6 @@ function configureRoutes($stateProvider) {
         templateUrl: 'app/components/sidebar/sidebar.html',
         controller: 'SidebarController'
       }
-    },
-    params: {
-      nodeName: ''
     }
   })
   .state('stats', {
@@ -138,7 +135,7 @@ function configureRoutes($stateProvider) {
     }
   })
   .state('inspect', {
-    url: '^/containers/:id/inspect',
+    url: '^/containers/:id/inspect?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/components/containerInspect/containerInspect.html',

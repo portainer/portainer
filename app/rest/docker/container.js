@@ -18,21 +18,36 @@ angular.module('portainer.rest')
       method: 'POST', params: { id: '@id', t: 5, action: 'stop' },
       headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     },
-    restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart'}},
-    kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
-    pause: {method: 'POST', params: {id: '@id', action: 'pause'}},
-    unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
+    restart: {
+      method: 'POST', params: { id: '@id', t: 5, action: 'restart' },
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+    },
+    kill: {
+      method: 'POST', params: { id: '@id', action: 'kill' },
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+    },
+    pause: {
+      method: 'POST', params: { id: '@id', action: 'pause' },
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+    },
+    unpause: {
+      method: 'POST', params: { id: '@id', action: 'unpause' },
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+    },
     stats: {
       method: 'GET', params: { id: '@id', stream: false, action: 'stats' },
-      timeout: 4500, ignoreLoadingBar: true
+      timeout: 4500, ignoreLoadingBar: true,
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     },
     top: {
       method: 'GET', params: { id: '@id', action: 'top' },
-      timeout: 4500, ignoreLoadingBar: true
+      timeout: 4500, ignoreLoadingBar: true,
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     },
     start: {
       method: 'POST', params: {id: '@id', action: 'start'},
-      transformResponse: genericHandler
+      transformResponse: genericHandler,
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     },
     create: {
       method: 'POST', params: {action: 'create'},
@@ -46,7 +61,8 @@ angular.module('portainer.rest')
     },
     rename: {
       method: 'POST', params: {id: '@id', action: 'rename', name: '@name'},
-      transformResponse: genericHandler
+      transformResponse: genericHandler,
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     },
     exec: {
       method: 'POST', params: {id: '@id', action: 'exec'},
@@ -54,7 +70,8 @@ angular.module('portainer.rest')
       headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     },
     inspect: {
-      method: 'GET', params: { id: '@id', action: 'json' }
+      method: 'GET', params: { id: '@id', action: 'json' },
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     }
   });
 }]);

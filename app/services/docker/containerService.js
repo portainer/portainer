@@ -50,28 +50,28 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.startContainer = function(containerID) {
-    return Container.start({ id: containerID }, {}).$promise;
+  service.startContainer = function(container) {
+    return Container.start({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
   };
 
   service.stopContainer = function(container) {
     return Container.stop({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
   };
 
-  service.restartContainer = function(containerID) {
-    return Container.restart({ id: containerID }, {}).$promise;
+  service.restartContainer = function(container) {
+    return Container.restart({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
   };
 
-  service.killContainer = function(containerID) {
-    return Container.kill({ id: containerID }, {}).$promise;
+  service.killContainer = function(container) {
+    return Container.kill({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
   };
 
-  service.pauseContainer = function(containerID) {
-    return Container.pause({ id: containerID }, {}).$promise;
+  service.pauseContainer = function(container) {
+    return Container.pause({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
   };
 
-  service.resumeContainer = function(containerID) {
-    return Container.unpause({ id: containerID }, {}).$promise;
+  service.resumeContainer = function(container) {
+    return Container.unpause({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
   };
 
   service.createAndStartContainer = function(configuration) {
@@ -150,8 +150,8 @@ angular.module('portainer.services')
     return Container.top({id: id}).$promise;
   };
 
-  service.inspect = function(id) {
-    return Container.inspect({id: id}).$promise;
+  service.inspect = function(id, nodeName) {
+    return Container.inspect({ id: id, nodeName: nodeName }).$promise;
   };
 
   return service;
