@@ -54,8 +54,8 @@ angular.module('portainer.services')
     return Container.start({ id: containerID }, {}).$promise;
   };
 
-  service.stopContainer = function(containerID) {
-    return Container.stop({ id: containerID }, {}).$promise;
+  service.stopContainer = function(container) {
+    return Container.stop({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
   };
 
   service.restartContainer = function(containerID) {
@@ -94,7 +94,7 @@ angular.module('portainer.services')
   service.remove = function(container, removeVolumes) {
     var deferred = $q.defer();
 
-    Container.remove({id: container.Id, v: (removeVolumes) ? 1 : 0, force: true}).$promise
+    Container.remove({id: container.Id, v: (removeVolumes) ? 1 : 0, force: true, nodeName: container.NodeName}).$promise
     .then(function success(data) {
       if (data.message) {
         deferred.reject({ msg: data.message, err: data.message });

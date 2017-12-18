@@ -12,9 +12,12 @@ angular.module('portainer.rest')
     },
     get: {
       method: 'GET', params: { action: 'json' },
-      headers: { 'agentNode': retrieveAgentNodeFromConfig }
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     },
-    stop: {method: 'POST', params: {id: '@id', t: 5, action: 'stop'}},
+    stop: {
+      method: 'POST', params: { id: '@id', t: 5, action: 'stop' },
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+    },
     restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart'}},
     kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
     pause: {method: 'POST', params: {id: '@id', action: 'pause'}},
@@ -38,7 +41,8 @@ angular.module('portainer.rest')
     },
     remove: {
       method: 'DELETE', params: {id: '@id', v: '@v', force: '@force'},
-      transformResponse: genericHandler
+      transformResponse: genericHandler,
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     },
     rename: {
       method: 'POST', params: {id: '@id', action: 'rename', name: '@name'},
@@ -46,7 +50,8 @@ angular.module('portainer.rest')
     },
     exec: {
       method: 'POST', params: {id: '@id', action: 'exec'},
-      transformResponse: genericHandler, ignoreLoadingBar: true
+      transformResponse: genericHandler, ignoreLoadingBar: true,
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     },
     inspect: {
       method: 'GET', params: { id: '@id', action: 'json' }
@@ -54,12 +59,8 @@ angular.module('portainer.rest')
   });
 }]);
 
-function retrieveAgentNodeFromConfig(requestConfig){
-  if (requestConfig.params.agentNode) {
-    return requestConfig.params.agentNode;
+function retrieveNodeNameFromConfig(requestConfig){
+  if (requestConfig.params.nodeName) {
+    return requestConfig.params.nodeName;
   }
-  // console.log(JSON.stringify(requestConfig, null, 4));
-     // this function will be called every time the "get" action gets called
-     // the result will be used as value for the header item
-     // if it doesn't return a value, the key will not be present in the header
 }

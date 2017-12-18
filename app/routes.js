@@ -82,7 +82,7 @@ function configureRoutes($stateProvider) {
       }
     },
     params: {
-      agentNode: ''
+      nodeName: ''
     }
   })
   .state('stats', {

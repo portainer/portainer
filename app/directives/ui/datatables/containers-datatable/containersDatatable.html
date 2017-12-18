@@ -164,6 +164,13 @@
                 </a>
               </th>
               <th>
+                <a ng-click="$ctrl.changeOrderBy('NodeName')">
+                  Host
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('Ports')">
                   Published Ports
                   <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
@@ -186,8 +193,8 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="container({ id: item.Id, agentNode: item.AgentNode })" ng-if="!$ctrl.swarmContainers">{{ item | containername | truncate: $ctrl.settings.containerNameTruncateSize }}</a>
-                <a ui-sref="container({ id: item.Id, agentNode: item.AgentNode })" ng-if="$ctrl.swarmContainers">{{ item | swarmcontainername | truncate: $ctrl.settings.containerNameTruncateSize }}</a>
+                <a ui-sref="container({ id: item.Id, nodeName: item.NodeName })" ng-if="!$ctrl.swarmContainers">{{ item | containername | truncate: $ctrl.settings.containerNameTruncateSize }}</a>
+                <a ui-sref="container({ id: item.Id, nodeName: item.NodeName })" ng-if="$ctrl.swarmContainers">{{ item | swarmcontainername | truncate: $ctrl.settings.containerNameTruncateSize }}</a>
               </td>
               <td>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) !== -1" class="label label-{{ item.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ item.Status }}</span>
@@ -205,6 +212,7 @@
               <td><a ui-sref="image({ id: item.Image })">{{ item.Image | hideshasum }}</a></td>
               <td>{{ item.IP ? item.IP : '-' }}</td>
               <td ng-if="$ctrl.swarmContainers">{{ item.hostIP }}</td>
+              <td>{{ item.NodeName ? item.NodeName : '-' }}</td>
               <td>
                 <a ng-if="item.Ports.length > 0" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.publicUrl || p.host }}:{{p.public}}" target="_blank">
                   <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.public }}:{{ p.private }}
