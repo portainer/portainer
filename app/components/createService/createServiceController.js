@@ -492,11 +492,9 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       $scope.availableVolumes = data.volumes;
       $scope.availableNetworks = data.networks;
       $scope.availableSecrets = data.secrets;
-      $scope.availableConfigs = data.configs;
-      var nodes = data.nodes;
-      initSlidersMaxValuesBasedOnNodeData(nodes);
-      var settings = data.settings;
-      $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
+      $scope.availableConfigs = data.configs;      
+      initSlidersMaxValuesBasedOnNodeData(data.nodes);      
+      $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
       $scope.isAdmin = userDetails.role === 1;
       retrieveLoggingDrivers(apiVersion);
