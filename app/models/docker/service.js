@@ -65,7 +65,7 @@ function ServiceViewModel(data, runningTasks, allTasks, nodes) {
     this.Mounts = containerSpec.Mounts || [];
     this.StopSignal = containerSpec.StopSignal;
     this.StopGracePeriod = containerSpec.StopGracePeriod;
-    this.HealthCheck = containerSpec.HealthCheck || {};
+    this.Healthcheck = containerSpec.Healthcheck || {};
     this.Hosts = containerSpec.Hosts;
     this.DNSConfig = containerSpec.DNSConfig;
     this.Secrets = containerSpec.Secrets;
