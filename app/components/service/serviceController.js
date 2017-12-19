@@ -1,6 +1,6 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService', 'PluginService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService, PluginService) {
 
   $scope.state = {};
   $scope.tasks = [];
@@ -168,6 +168,26 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     }
   };
 
+  $scope.addLogDriverOpt = function addLogDriverOpt(service) {    
+    service.LogDriverOpts.push({ key: '', value: '', originalValue: '' });
+    updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
+  };
+  $scope.removeLogDriverOpt = function removeLogDriverOpt(service, index) {
+    var removedElement = service.LogDriverOpts.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
+    }
+  };
+  $scope.updateLogDriverOpt = function updateLogDriverOpt(service, variable) {
+    if (variable.value !== variable.originalValue || variable.key !== variable.originalKey) {
+      updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
+    }
+  };   
+  $scope.updateLogDriverName = function updateLogDriverName(service) {    
+    updateServiceArray(service, 'LogDriverName', service.LogDriverName);    
+  };    
+ 
+
   $scope.cancelChanges = function cancelChanges(service, keys) {
     if (keys) { // clean out the keys only from the list of modified keys
       keys.forEach(function(key) {
@@ -243,6 +263,17 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       MaxAttempts: service.RestartMaxAttempts,
       Window: ServiceHelper.translateHumanDurationToNanos(service.RestartWindow) || 0
     };
+    
+    config.TaskTemplate.LogDriver = null;
+    if (service.LogDriverName) {      
+      config.TaskTemplate.LogDriver = { Name: service.LogDriverName };
+      if (service.LogDriverName !== 'none') {
+        var logOpts = ServiceHelper.translateKeyValueToLogDriverOpts(service.LogDriverOpts);
+        if (Object.keys(logOpts).length !== 0 && logOpts.constructor === Object) {
+          config.TaskTemplate.LogDriver.Options = logOpts;
+        }
+      }      
+    }    
 
     if (service.Ports) {
       service.Ports.forEach(function (binding) {
@@ -295,6 +326,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
     service.ServiceConfigs = service.Configs ? service.Configs.map(ConfigHelper.flattenConfig) : [];
     service.EnvironmentVariables = ServiceHelper.translateEnvironmentVariables(service.Env);
+    service.LogDriverOpts = ServiceHelper.translateLogDriverOptsToKeyValue(service.LogDriverOpts);
     service.ServiceLabels = LabelHelper.fromLabelHashToKeyValue(service.Labels);
     service.ServiceContainerLabels = LabelHelper.fromLabelHashToKeyValue(service.ContainerLabels);
     service.ServiceMounts = angular.copy(service.Mounts);
@@ -317,6 +349,15 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+
+    PluginService.loggingPlugins(apiVersion < 1.25)
+    .then(function success(data){
+        $scope.availableLoggingDrivers = data;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve logging drivers');
+    });        
+
     ServiceService.service($transition$.params().id)
     .then(function success(data) {
       var service = data;
@@ -360,7 +401,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       }
 
       // Default values
-      $scope.state.addSecret = {override: false};
+      $scope.state.addSecret = {override: false};      
 
       $timeout(function() {
         $anchorScroll();

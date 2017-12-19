@@ -60,5 +60,9 @@ angular.module('portainer.services')
     return servicePlugins(systemOnly, 'Network', 'docker.networkdriver/1.0');
   };
 
+  service.loggingPlugins = function(systemOnly) {
+    return servicePlugins(systemOnly, 'Log', 'docker.logdriver/1.0');
+  };
+
   return service;
 }]);

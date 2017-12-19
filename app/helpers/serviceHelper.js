@@ -191,5 +191,33 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
     return humanDuration;
   };
 
+  helper.translateLogDriverOptsToKeyValue = function(logOptions) {
+    var options = [];
+    if (logOptions) {      
+      Object.keys(logOptions).forEach(function(key) {
+        options.push({
+          key: key,
+          value: logOptions[key],
+          originalKey: key,
+          originalValue: logOptions[key],
+          added: true
+        });
+      });            
+    }
+    return options;
+  };
+
+  helper.translateKeyValueToLogDriverOpts = function(keyValueLogDriverOpts) {
+    var options = {};
+    if (keyValueLogDriverOpts) {      
+      keyValueLogDriverOpts.forEach(function(option) {
+        if (option.key && option.key !== '' && option.value && option.value !== '') {
+          options[option.key] = option.value;
+        }
+      });
+    }
+    return options;    
+  };    
+
   return helper;
 }]);
