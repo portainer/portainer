@@ -466,10 +466,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     }
   }
 
-  function initView() {
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    var provider = $scope.applicationState.endpoint.mode.provider;
-
+  function retrieveLoggingDrivers(apiVersion) {
     PluginService.loggingPlugins(apiVersion < 1.25)
     .then(function success(data){
         $scope.availableLoggingDrivers = data;
@@ -477,6 +474,11 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve logging drivers');
     });    
+  }
+
+  function initView() {
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    var provider = $scope.applicationState.endpoint.mode.provider;   
 
     $q.all({
       volumes: VolumeService.volumes(),
@@ -497,6 +499,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
       $scope.isAdmin = userDetails.role === 1;
+      retrieveLoggingDrivers(apiVersion);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');
