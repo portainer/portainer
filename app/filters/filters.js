@@ -345,4 +345,15 @@ angular.module('portainer.filters')
   return function (createdBy) {
 	  return createdBy.replace('/bin/sh -c #(nop) ', '').replace('/bin/sh -c ', 'RUN ');
   };
-});
+})
+.filter('trimshasum', function () {
+  'use strict';
+  return function (imageName) {
+    if (imageName) {
+      var name = imageName.split('sha')[0];
+      return name ? name : imageName.substring(imageName.indexOf(':') + 1,imageName.indexOf(':') + 13);
+    }
+    return '';
+  };
+})
+;
