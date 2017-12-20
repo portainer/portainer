@@ -20,6 +20,17 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  function replaceEmptyTagsWhenPossible(item) {
+    if (!item.RepoTags && item.RepoDigests) {
+      item.RepoTags = [];
+      for (var iDigest = 0; iDigest < item.RepoDigests.length; iDigest++) {
+        var digest = item.RepoDigests[iDigest];
+        var repository = digest.substring(0, digest.indexOf('@'));
+        item.RepoTags.push(repository + ':<none>');
+      }
+    }
+  }
+  
   service.images = function(withUsage) {
     var deferred = $q.defer();
 
@@ -38,6 +49,7 @@ angular.module('portainer.services')
             item.ContainerCount++;
           }
         }
+        replaceEmptyTagsWhenPossible(item);
         return new ImageViewModel(item);
       });
 
