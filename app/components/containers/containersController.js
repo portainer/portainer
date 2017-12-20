@@ -70,7 +70,7 @@ angular.module('containers', [])
   function executeActionOnContainerList(containers, action, successMessage, errorMessage) {
     var actionCount = containers.length;
     angular.forEach(containers, function (container) {
-      action(container)
+      action(container.Id, container.NodeName)
       .then(function success() {
         Notifications.success(successMessage, container.Names[0]);
       })

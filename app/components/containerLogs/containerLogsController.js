@@ -8,7 +8,7 @@ function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notific
   $scope.stderr = '';
   $scope.tailLines = 2000;
 
-  Container.get({id: $transition$.params().id}, function (d) {
+  Container.get({ id: $transition$.params().id, nodeName: $transition$.params().nodeName }, function (d) {
     $scope.container = d;
   }, function (e) {
     Notifications.error('Failure', e, 'Unable to retrieve container info');
@@ -20,7 +20,7 @@ function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notific
   }
 
   function getLogsStderr() {
-    ContainerLogs.get($transition$.params().id, {
+    ContainerLogs.get($transition$.params().id, $transition$.params().nodeName, {
       stdout: 0,
       stderr: 1,
       timestamps: $scope.state.displayTimestampsErr,
@@ -36,7 +36,7 @@ function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notific
   }
 
   function getLogsStdout() {
-    ContainerLogs.get($transition$.params().id, {
+    ContainerLogs.get($transition$.params().id, $transition$.params().nodeName, {
       stdout: 1,
       stderr: 0,
       timestamps: $scope.state.displayTimestampsOut,

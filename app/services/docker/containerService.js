@@ -3,10 +3,10 @@ angular.module('portainer.services')
   'use strict';
   var service = {};
 
-  service.container = function(id) {
+  service.container = function(id, nodeName) {
     var deferred = $q.defer();
 
-    Container.get({ id: id }).$promise
+    Container.get({ id: id, nodeName: nodeName }).$promise
     .then(function success(data) {
       var container = new ContainerDetailsViewModel(data);
       deferred.resolve(container);
@@ -50,28 +50,28 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.startContainer = function(container) {
-    return Container.start({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
+  service.startContainer = function(id, nodeName) {
+    return Container.start({ id: id, nodeName: nodeName }, {}).$promise;
   };
 
-  service.stopContainer = function(container) {
-    return Container.stop({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
+  service.stopContainer = function(id, nodeName) {
+    return Container.stop({ id: id, nodeName: nodeName }, {}).$promise;
   };
 
-  service.restartContainer = function(container) {
-    return Container.restart({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
+  service.restartContainer = function(id, nodeName) {
+    return Container.restart({ id: id, nodeName: nodeName }, {}).$promise;
   };
 
-  service.killContainer = function(container) {
-    return Container.kill({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
+  service.killContainer = function(id, nodeName) {
+    return Container.kill({ id: id, nodeName: nodeName }, {}).$promise;
   };
 
-  service.pauseContainer = function(container) {
-    return Container.pause({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
+  service.pauseContainer = function(id, nodeName) {
+    return Container.pause({ id: id, nodeName: nodeName }, {}).$promise;
   };
 
-  service.resumeContainer = function(container) {
-    return Container.unpause({ id: container.Id, nodeName: container.NodeName }, {}).$promise;
+  service.resumeContainer = function(id, nodeName) {
+    return Container.unpause({ id: id, nodeName: nodeName }, {}).$promise;
   };
 
   service.createAndStartContainer = function(configuration) {
@@ -113,10 +113,10 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.createExec = function(execConfig) {
+  service.createExec = function(execConfig, nodeName) {
     var deferred = $q.defer();
 
-    Container.exec(execConfig).$promise
+    Container.exec({ nodeName: nodeName }, execConfig).$promise
     .then(function success(data) {
       if (data.message) {
         deferred.reject({ msg: data.message, err: data.message });
@@ -131,10 +131,10 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.containerStats = function(id) {
+  service.containerStats = function(id, nodeName) {
     var deferred = $q.defer();
 
-    Container.stats({id: id}).$promise
+    Container.stats({ id: id, nodeName: nodeName }).$promise
     .then(function success(data) {
       var containerStats = new ContainerStatsViewModel(data);
       deferred.resolve(containerStats);
@@ -146,8 +146,8 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.containerTop = function(id) {
-    return Container.top({id: id}).$promise;
+  service.containerTop = function(id, nodeName) {
+    return Container.top({ id: id, nodeName: nodeName }).$promise;
   };
 
   service.inspect = function(id, nodeName) {

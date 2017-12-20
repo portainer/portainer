@@ -68,8 +68,8 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
 
   function startChartUpdate(networkChart, cpuChart, memoryChart) {
     $q.all({
-      stats: ContainerService.containerStats($transition$.params().id),
-      top: ContainerService.containerTop($transition$.params().id)
+      stats: ContainerService.containerStats($transition$.params().id, $transition$.params().nodeName),
+      top: ContainerService.containerTop($transition$.params().id, $transition$.params().nodeName)
     })
     .then(function success(data) {
       var stats = data.stats;
@@ -92,8 +92,8 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
       $q.all({
-        stats: ContainerService.containerStats($transition$.params().id),
-        top: ContainerService.containerTop($transition$.params().id)
+        stats: ContainerService.containerStats($transition$.params().id, $transition$.params().nodeName),
+        top: ContainerService.containerTop($transition$.params().id, $transition$.params().nodeName)
       })
       .then(function success(data) {
         var stats = data.stats;
@@ -126,7 +126,7 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
   }
 
   function initView() {
-    ContainerService.container($transition$.params().id)
+    ContainerService.container($transition$.params().id, $transition$.params().nodeName)
     .then(function success(data) {
       $scope.container = data;
     })

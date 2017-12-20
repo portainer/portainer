@@ -83,7 +83,7 @@ function configureRoutes($stateProvider) {
     }
   })
   .state('stats', {
-    url: '^/containers/:id/stats',
+    url: '^/containers/:id/stats?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/components/containerStats/containerStats.html',
@@ -96,7 +96,7 @@ function configureRoutes($stateProvider) {
     }
   })
   .state('containerlogs', {
-    url: '^/containers/:id/logs',
+    url: '^/containers/:id/logs?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/components/containerLogs/containerlogs.html',
@@ -122,7 +122,7 @@ function configureRoutes($stateProvider) {
     }
   })
   .state('console', {
-    url: '^/containers/:id/console',
+    url: '^/containers/:id/console?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/components/containerConsole/containerConsole.html',

@@ -2,7 +2,7 @@ angular.module('portainer.rest')
 .factory('ContainerLogs', ['$http', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function ContainerLogsFactory($http, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
   return {
-    get: function (id, params, callback) {
+    get: function (id, nodeName, params, callback) {
       $http({
         method: 'GET',
         url: API_ENDPOINT_ENDPOINTS + '/' + EndpointProvider.endpointID() + '/docker/containers/' + id + '/logs',
@@ -11,6 +11,9 @@ angular.module('portainer.rest')
           'stderr': params.stderr || 0,
           'timestamps': params.timestamps || 0,
           'tail': params.tail || 'all'
+        },
+        headers: {
+          'X-PortainerAgent-Target': nodeName
         },
         ignoreLoadingBar: true
       }).success(callback).error(function (data, status, headers, config) {

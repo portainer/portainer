@@ -17,7 +17,7 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
     }
   });
 
-  Container.get({id: $transition$.params().id}, function(d) {
+  Container.get({ id: $transition$.params().id, nodeName: $transition$.params().nodeName}, function(d) {
     $scope.container = d;
     if (d.message) {
       Notifications.error('Error', d, 'Unable to retrieve container details');
@@ -50,7 +50,7 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
     };
 
     var execId;
-    ContainerService.createExec(execConfig)
+    ContainerService.createExec(execConfig, $transition$.params().nodeName)
     .then(function success(data) {
       execId = data.Id;
       var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
@@ -60,7 +60,7 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
         url = url.replace('http://', 'ws://');
       }
       initTerm(url, termHeight, termWidth);
-      return ExecService.resizeTTY(execId, termHeight, termWidth, 2000);
+      return ExecService.resizeTTY(execId, $transition$.params().nodeName, termHeight, termWidth, 2000);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to exec into container');

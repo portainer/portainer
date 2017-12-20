@@ -16,6 +16,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   };
 
   var update = function () {
+    $scope.nodeName = $transition$.params().nodeName;
     Container.get({id: $transition$.params().id, nodeName: $transition$.params().nodeName}, function (d) {
       var container = new ContainerDetailsViewModel(d);
       $scope.container = container;
