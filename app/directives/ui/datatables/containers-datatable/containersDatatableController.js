@@ -70,13 +70,19 @@ function (PaginationService, DatatableService) {
 
     for (var i = 0; i < this.dataset.length; i++) {
       var item = this.dataset[i];
-      if (item.Checked && item.Status === 'paused') {
-        this.state.noPausedItemsSelected = false;
-      } else if (item.Checked && (item.Status === 'stopped' || item.Status === 'created')) {
-        this.state.noStoppedItemsSelected = false;
-      } else if (item.Checked && item.Status === 'running') {
-        this.state.noRunningItemsSelected = false;
+      if (item.Checked) {
+        this.updateSelectionStateBasedOnItemStatus(item);
       }
+    }
+  };
+
+  this.updateSelectionStateBasedOnItemStatus = function(item) {
+    if (item.Status === 'paused') {
+      this.state.noPausedItemsSelected = false;
+    } else if (['stopped', 'created'].indexOf(item.Status) !== -1) {
+      this.state.noStoppedItemsSelected = false;
+    } else if (['running', 'healthy', 'unhealthy', 'starting'].indexOf(item.Status) !== -1) {
+      this.state.noRunningItemsSelected = false;
     }
   };
 
