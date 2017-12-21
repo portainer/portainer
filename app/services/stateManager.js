@@ -34,6 +34,18 @@ angular.module('portainer.services')
     LocalStorage.storeApplicationState(state.application);
   };
 
+
+ function assignStateFromStatusAndSettings(status, settings) {
+   state.application.authentication = status.Authentication;
+   state.application.analytics = status.Analytics;
+   state.application.endpointManagement = status.EndpointManagement;
+   state.application.version = status.Version;
+   state.application.logo = settings.LogoURL;
+   state.application.displayDonationHeader = settings.DisplayDonationHeader;
+   state.application.displayExternalContributors = settings.DisplayExternalContributors;
+   state.application.validity = moment().unix();
+ }
+
   function loadApplicationState() {
     var deferred = $q.defer();
 
@@ -44,14 +56,7 @@ angular.module('portainer.services')
     .then(function success(data) {
       var status = data.status;
       var settings = data.settings;
-      state.application.authentication = status.Authentication;
-      state.application.analytics = status.Analytics;
-      state.application.endpointManagement = status.EndpointManagement;
-      state.application.version = status.Version;
-      state.application.logo = settings.LogoURL;
-      state.application.displayDonationHeader = settings.DisplayDonationHeader;
-      state.application.displayExternalContributors = settings.DisplayExternalContributors;
-      state.application.validity = moment().unix();
+      assignStateFromStatusAndSettings(status, settings);
       LocalStorage.storeApplicationState(state.application);
       deferred.resolve(state);
     })
