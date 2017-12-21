@@ -9,6 +9,7 @@ angular.module('ui').component('usersDatatable', {
     orderBy: '@',
     reverseOrder: '<',
     showTextFilter: '<',
-    removeAction: '<'
+    removeAction: '<',
+    authenticationMethod: '<'
   }
 });
