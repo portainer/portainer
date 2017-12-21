@@ -20,6 +20,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     Volumes: [],
     Network: '',
     ExtraNetworks: [],
+    HostsEntries: [],
     Ports: [],
     Parallelism: 1,
     PlacementConstraints: [],
@@ -69,6 +70,14 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
   $scope.removeExtraNetwork = function(index) {
     $scope.formValues.ExtraNetworks.splice(index, 1);
+  };
+
+  $scope.addHostsEntry = function() {
+    $scope.formValues.HostsEntries.push({});
+  };
+
+  $scope.removeHostsEntry = function(index) {
+    $scope.formValues.HostsEntries.splice(index, 1);
   };
 
   $scope.addVolume = function() {
@@ -254,6 +263,22 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     config.Networks = _.uniqWith(networks, _.isEqual);
   }
 
+  function prepareHostsEntries(config, input) {
+    var hostsEntries = [];
+    if (input.HostsEntries) {      
+      input.HostsEntries.forEach(function (host_ip) {
+        if (host_ip.value && host_ip.value.indexOf(':') && host_ip.value.split(':').length === 2) {          
+          var keyVal = host_ip.value.split(':');
+          // Hosts file format, IP_address canonical_hostname
+          hostsEntries.push(keyVal[1] + ' ' + keyVal[0]);                  
+        }        
+      });
+      if (hostsEntries.length > 0) {
+        config.TaskTemplate.ContainerSpec.Hosts = hostsEntries;
+      }      
+    }       
+  }
+
   function prepareUpdateConfig(config, input) {
     config.UpdateConfig = {
       Parallelism: input.Parallelism || 0,
@@ -382,6 +407,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     prepareLabelsConfig(config, input);
     prepareVolumes(config, input);
     prepareNetworks(config, input);
+    prepareHostsEntries(config, input);
     prepareUpdateConfig(config, input);
     prepareConfigConfig(config, input);
     prepareSecretConfig(config, input);

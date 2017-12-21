@@ -186,7 +186,22 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updateLogDriverName = function updateLogDriverName(service) {    
     updateServiceArray(service, 'LogDriverName', service.LogDriverName);    
   };    
- 
+
+  $scope.addHostsEntry = function (service) {
+    if (!service.Hosts) {
+      service.Hosts = [];
+    }
+    service.Hosts.push({ hostname: '', ip: '' });    
+  };
+  $scope.removeHostsEntry = function(service, index) {
+    var removedElement = service.Hosts.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'Hosts', service.Hosts);
+    }
+  };
+  $scope.updateHostsEntry = function(service, entry) {  
+    updateServiceArray(service, 'Hosts', service.Hosts);
+  };  
 
   $scope.cancelChanges = function cancelChanges(service, keys) {
     if (keys) { // clean out the keys only from the list of modified keys
@@ -223,7 +238,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.ContainerSpec.Image = service.Image;
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
     config.TaskTemplate.ContainerSpec.Configs = service.ServiceConfigs ? service.ServiceConfigs.map(ConfigHelper.configConfig) : [];
-
+    config.TaskTemplate.ContainerSpec.Hosts = service.Hosts ? ServiceHelper.translateHostnameIPToHostsEntries(service.Hosts) : [];
+    
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
     }
@@ -332,6 +348,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.ServiceMounts = angular.copy(service.Mounts);
     service.ServiceConstraints = ServiceHelper.translateConstraintsToKeyValue(service.Constraints);
     service.ServicePreferences = ServiceHelper.translatePreferencesToKeyValue(service.Preferences);
+    service.Hosts = ServiceHelper.translateHostsEntriesToHostnameIP(service.Hosts);
   }
 
   function transformResources(service) {

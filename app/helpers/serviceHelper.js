@@ -219,5 +219,30 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
     return options;    
   };    
 
+  helper.translateHostsEntriesToHostnameIP = function(entries) {
+    var ipHostEntries = [];
+    if (entries) {      
+      entries.forEach(function(entry) {
+        if (entry.indexOf(' ') && entry.split(' ').length === 2) {
+          var keyValue = entry.split(' ');
+          ipHostEntries.push({ hostname: keyValue[1], ip: keyValue[0]});
+        }
+      });      
+    }
+    return ipHostEntries;    
+  };
+
+  helper.translateHostnameIPToHostsEntries = function(entries) {
+    var ipHostEntries = [];
+    if (entries) {   
+      entries.forEach(function(entry) {
+        if (entry.ip && entry.hostname) {          
+          ipHostEntries.push(entry.ip + ' ' + entry.hostname);
+        }
+      });           
+    }        
+    return ipHostEntries;   
+  };
+
   return helper;
 }]);

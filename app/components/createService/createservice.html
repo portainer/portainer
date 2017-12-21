@@ -364,6 +364,29 @@
                 <!-- !network-input-list -->
               </div>
               <!-- !extra-networks -->
+              <!-- extra-hosts-variables -->
+              <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.25">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                  <label class="control-label text-left">Hosts file entries</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addHostsEntry()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add additional entry
+                  </span>
+                </div>
+                <!-- hosts-input-list -->
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="variable in formValues.HostsEntries" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP">
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeHostsEntry($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- !hosts-input-list -->
+              </div>
+              <!-- !extra-hosts-variables -->
             </form>
           </div>
           <!-- !tab-network -->
