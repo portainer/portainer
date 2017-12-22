@@ -412,7 +412,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       }
 
       // Default values
-      $scope.state.addSecret = {override: false};      
+      $scope.state.addSecret = {override: false};
 
       $timeout(function() {
         $anchorScroll();
