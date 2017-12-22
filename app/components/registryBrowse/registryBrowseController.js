@@ -10,11 +10,10 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
 
     RegistryService.catalog(registryID)
     .then(function success(data) {
-      //$scope.repositories = data.repositories;
-      /*$scope.repositories = data.repositories.map(function (elem) {
-        return {"Name": elem};
-      });*/
-      var tagsPromises = data.repositories.map(function (repository) {
+      if (data.headers.link) {
+        Notifications.warning('We only retrieve the first ' + data.data.repositories.length + ' repositories of the registry');
+      }
+      var tagsPromises = data.data.repositories.map(function (repository) {
         return RegistryService.tags(registryID, repository);
       });
 

@@ -38,7 +38,7 @@ angular.module('portainer.services')
   service.catalog = function(id) {
     var deferred = $q.defer();
 
-    RegistryCatalog.get({id: id}).$promise
+    RegistryCatalog.get({id: id, limit: 200, last: ''}).$promise
     .then(function success(data) {
       deferred.resolve(data);
     })
