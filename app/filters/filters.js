@@ -349,11 +349,10 @@ angular.module('portainer.filters')
 .filter('trimshasum', function () {
   'use strict';
   return function (imageName) {
-    if (imageName) {
-      var name = imageName.split('sha256:')[0];
-      return name ? name : imageName.substring(7, 19);
+    if (imageName.indexOf('sha256:') === 0) {
+      return imageName.substring(7, 19);
     }
-    return '';
+    return imageName;
   };
 })
 ;
