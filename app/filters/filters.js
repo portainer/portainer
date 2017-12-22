@@ -350,8 +350,8 @@ angular.module('portainer.filters')
   'use strict';
   return function (imageName) {
     if (imageName) {
-      var name = imageName.split('sha')[0];
-      return name ? name : imageName.substring(imageName.indexOf(':') + 1,imageName.indexOf(':') + 13);
+      var name = imageName.split('sha256:')[0];
+      return name ? name : imageName.substring(7, 19);
     }
     return '';
   };
