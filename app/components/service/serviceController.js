@@ -365,15 +365,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   }
 
   function initView() {
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
-
-    PluginService.loggingPlugins(apiVersion < 1.25)
-    .then(function success(data){
-        $scope.availableLoggingDrivers = data;
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve logging drivers');
-    });        
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;  
 
     ServiceService.service($transition$.params().id)
     .then(function success(data) {
@@ -394,7 +386,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         nodes: NodeService.nodes(),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
-        availableImages: ImageService.images()
+        availableImages: ImageService.images(),
+        availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25)
       });
     })
     .then(function success(data) {
@@ -403,6 +396,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.configs = data.configs;
       $scope.secrets = data.secrets;
       $scope.availableImages = ImageService.getUniqueTagListFromImages(data.availableImages);
+      $scope.availableLoggingDrivers = data.availableLoggingDrivers;
 
       // Set max cpu value
       var maxCpus = 0;

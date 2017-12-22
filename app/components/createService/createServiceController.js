@@ -492,16 +492,6 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     }
   }
 
-  function retrieveLoggingDrivers(apiVersion) {
-    PluginService.loggingPlugins(apiVersion < 1.25)
-    .then(function success(data){
-        $scope.availableLoggingDrivers = data;
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve logging drivers');
-    });    
-  }
-
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     var provider = $scope.applicationState.endpoint.mode.provider;   
@@ -512,18 +502,19 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
       configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
       nodes: NodeService.nodes(),
-      settings: SettingsService.publicSettings()
+      settings: SettingsService.publicSettings(),
+      availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25)
     })
     .then(function success(data) {
       $scope.availableVolumes = data.volumes;
       $scope.availableNetworks = data.networks;
       $scope.availableSecrets = data.secrets;
       $scope.availableConfigs = data.configs;      
+      $scope.availableLoggingDrivers = data.availableLoggingDrivers;
       initSlidersMaxValuesBasedOnNodeData(data.nodes);      
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
-      $scope.isAdmin = userDetails.role === 1;
-      retrieveLoggingDrivers(apiVersion);
+      $scope.isAdmin = userDetails.role === 1;      
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');

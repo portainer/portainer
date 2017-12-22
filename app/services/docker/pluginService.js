@@ -61,7 +61,15 @@ angular.module('portainer.services')
   };
 
   service.loggingPlugins = function(systemOnly) {
-    return servicePlugins(systemOnly, 'Log', 'docker.logdriver/1.0');
+    var deferred = $q.defer();
+    servicePlugins(systemOnly, 'Log', 'docker.logdriver/1.0')    
+    .then(function success(data){    
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve logging drivers', err: err });
+    });    
+    return deferred.promise;
   };
 
   return service;
