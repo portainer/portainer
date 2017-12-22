@@ -494,7 +494,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    var provider = $scope.applicationState.endpoint.mode.provider;   
+    var provider = $scope.applicationState.endpoint.mode.provider;
 
     $q.all({
       volumes: VolumeService.volumes(),
@@ -514,7 +514,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       initSlidersMaxValuesBasedOnNodeData(data.nodes);      
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
-      $scope.isAdmin = userDetails.role === 1;      
+      $scope.isAdmin = userDetails.role === 1;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');
