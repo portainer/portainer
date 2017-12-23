@@ -1,26 +1,15 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'Pagination', 'ModalService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, Pagination, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService', 'PluginService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService, PluginService) {
 
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('service_tasks');
   $scope.tasks = [];
-  $scope.sortType = 'Updated';
-  $scope.sortReverse = true;
+  $scope.availableImages = [];
 
   $scope.lastVersion = 0;
 
   var originalService = {};
   var previousServiceValues = [];
-
-  $scope.order = function (sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('service_tasks', $scope.state.pagination_count);
-  };
 
   $scope.renameService = function renameService(service) {
     updateServiceAttribute(service, 'Name', service.newServiceName || service.name);
@@ -74,10 +63,16 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updateConfig = function updateConfig(service) {
     updateServiceArray(service, 'ServiceConfigs', service.ServiceConfigs);
   };
-  $scope.addSecret = function addSecret(service, secret) {
-    if (secret && service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === secret.Id;}).length === 0) {
-      service.ServiceSecrets.push({ Id: secret.Id, Name: secret.Name, FileName: secret.Name, Uid: '0', Gid: '0', Mode: 444 });
-      updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
+  $scope.addSecret = function addSecret(service, newSecret) {
+    if (newSecret.secret) {
+      var filename = newSecret.secret.Name;
+      if (newSecret.override) {
+        filename = newSecret.target;
+      }
+      if (service.ServiceSecrets.filter(function(serviceSecret) { return serviceSecret.Id === newSecret.secret.Id && serviceSecret.FileName === filename;}).length === 0) {
+        service.ServiceSecrets.push({ Id: newSecret.secret.Id, Name: newSecret.secret.Name, FileName: filename, Uid: '0', Gid: '0', Mode: 444 });
+        updateServiceArray(service, 'ServiceSecrets', service.ServiceSecrets);
+      }
     }
   };
   $scope.removeSecret = function removeSecret(service, index) {
@@ -173,6 +168,41 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     }
   };
 
+  $scope.addLogDriverOpt = function addLogDriverOpt(service) {    
+    service.LogDriverOpts.push({ key: '', value: '', originalValue: '' });
+    updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
+  };
+  $scope.removeLogDriverOpt = function removeLogDriverOpt(service, index) {
+    var removedElement = service.LogDriverOpts.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
+    }
+  };
+  $scope.updateLogDriverOpt = function updateLogDriverOpt(service, variable) {
+    if (variable.value !== variable.originalValue || variable.key !== variable.originalKey) {
+      updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
+    }
+  };   
+  $scope.updateLogDriverName = function updateLogDriverName(service) {    
+    updateServiceArray(service, 'LogDriverName', service.LogDriverName);    
+  };    
+
+  $scope.addHostsEntry = function (service) {
+    if (!service.Hosts) {
+      service.Hosts = [];
+    }
+    service.Hosts.push({ hostname: '', ip: '' });    
+  };
+  $scope.removeHostsEntry = function(service, index) {
+    var removedElement = service.Hosts.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'Hosts', service.Hosts);
+    }
+  };
+  $scope.updateHostsEntry = function(service, entry) {  
+    updateServiceArray(service, 'Hosts', service.Hosts);
+  };  
+
   $scope.cancelChanges = function cancelChanges(service, keys) {
     if (keys) { // clean out the keys only from the list of modified keys
       keys.forEach(function(key) {
@@ -208,7 +238,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.ContainerSpec.Image = service.Image;
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
     config.TaskTemplate.ContainerSpec.Configs = service.ServiceConfigs ? service.ServiceConfigs.map(ConfigHelper.configConfig) : [];
-
+    config.TaskTemplate.ContainerSpec.Hosts = service.Hosts ? ServiceHelper.translateHostnameIPToHostsEntries(service.Hosts) : [];
+    
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
     }
@@ -237,17 +268,28 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
     config.UpdateConfig = {
       Parallelism: service.UpdateParallelism,
-      Delay: service.UpdateDelay,
+      Delay: ServiceHelper.translateHumanDurationToNanos(service.UpdateDelay) || 0,
       FailureAction: service.UpdateFailureAction,
       Order: service.UpdateOrder
     };
 
     config.TaskTemplate.RestartPolicy = {
       Condition: service.RestartCondition,
-      Delay: service.RestartDelay,
+      Delay: ServiceHelper.translateHumanDurationToNanos(service.RestartDelay) || 5000000000,
       MaxAttempts: service.RestartMaxAttempts,
-      Window: service.RestartWindow
+      Window: ServiceHelper.translateHumanDurationToNanos(service.RestartWindow) || 0
     };
+    
+    config.TaskTemplate.LogDriver = null;
+    if (service.LogDriverName) {      
+      config.TaskTemplate.LogDriver = { Name: service.LogDriverName };
+      if (service.LogDriverName !== 'none') {
+        var logOpts = ServiceHelper.translateKeyValueToLogDriverOpts(service.LogDriverOpts);
+        if (Object.keys(logOpts).length !== 0 && logOpts.constructor === Object) {
+          config.TaskTemplate.LogDriver.Options = logOpts;
+        }
+      }      
+    }    
 
     if (service.Ports) {
       service.Ports.forEach(function (binding) {
@@ -300,11 +342,13 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
     service.ServiceConfigs = service.Configs ? service.Configs.map(ConfigHelper.flattenConfig) : [];
     service.EnvironmentVariables = ServiceHelper.translateEnvironmentVariables(service.Env);
+    service.LogDriverOpts = ServiceHelper.translateLogDriverOptsToKeyValue(service.LogDriverOpts);
     service.ServiceLabels = LabelHelper.fromLabelHashToKeyValue(service.Labels);
     service.ServiceContainerLabels = LabelHelper.fromLabelHashToKeyValue(service.ContainerLabels);
     service.ServiceMounts = angular.copy(service.Mounts);
     service.ServiceConstraints = ServiceHelper.translateConstraintsToKeyValue(service.Constraints);
     service.ServicePreferences = ServiceHelper.translatePreferencesToKeyValue(service.Preferences);
+    service.Hosts = ServiceHelper.translateHostsEntriesToHostnameIP(service.Hosts);
   }
 
   function transformResources(service) {
@@ -314,8 +358,15 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.ReservationMemoryBytes = service.ReservationMemoryBytes / 1024 / 1024 || 0;
   }
 
+  function transformDurations(service) {
+    service.RestartDelay = ServiceHelper.translateNanosToHumanDuration(service.RestartDelay) || '5s';
+    service.RestartWindow = ServiceHelper.translateNanosToHumanDuration(service.RestartWindow) || '0s';
+    service.UpdateDelay = ServiceHelper.translateNanosToHumanDuration(service.UpdateDelay) || '0s';
+  }
+
   function initView() {
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;  
+
     ServiceService.service($transition$.params().id)
     .then(function success(data) {
       var service = data;
@@ -326,6 +377,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
       transformResources(service);
       translateServiceArrays(service);
+      transformDurations(service);
       $scope.service = service;
       originalService = angular.copy(service);
 
@@ -333,7 +385,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         tasks: TaskService.tasks({ service: [service.Name] }),
         nodes: NodeService.nodes(),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
-        configs: apiVersion >= 1.30 ? ConfigService.configs() : []
+        configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
+        availableImages: ImageService.images(),
+        availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25)
       });
     })
     .then(function success(data) {
@@ -341,6 +395,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.nodes = data.nodes;
       $scope.configs = data.configs;
       $scope.secrets = data.secrets;
+      $scope.availableImages = ImageService.getUniqueTagListFromImages(data.availableImages);
+      $scope.availableLoggingDrivers = data.availableLoggingDrivers;
 
       // Set max cpu value
       var maxCpus = 0;
@@ -354,6 +410,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       } else {
         $scope.state.sliderMaxCpu = 32;
       }
+
+      // Default values
+      $scope.state.addSecret = {override: false};
 
       $timeout(function() {
         $anchorScroll();

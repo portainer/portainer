@@ -70,82 +70,12 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-database" title="Available registries">
-        <div class="pull-right">
-          Items per page:
-          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-            <option value="0">All</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </rd-widget-header>
-      <rd-widget-taskbar classes="col-lg-12">
-        <div class="pull-left">
-          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-          <a class="btn btn-primary" type="button" ui-sref="actions.create.registry"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add registry</a>
-        </div>
-        <div class="pull-right">
-          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
-        </div>
-      </rd-widget-taskbar>
-      <rd-widget-body classes="no-padding">
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>
-                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
-                </th>
-                <th>
-                  <a ui-sref="registries" ng-click="order('Name')">
-                    Name
-                    <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
-                </th>
-                <th>
-                  <a ui-sref="registries" ng-click="order('URL')">
-                    URL
-                    <span ng-show="sortType == 'URL' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'URL' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
-                </th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr dir-paginate="registry in (state.filteredRegistries = (registries | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td><input type="checkbox" ng-model="registry.Checked" ng-change="selectItem(registry)" /></td>
-                <td>
-                  <a ui-sref="registry({id: registry.Id})">{{ registry.Name }}</a>
-                  <span ng-if="registry.Authentication" style="margin-left: 5px;">
-                    <i class="fa fa-shield" aria-hidden="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Authentication is enabled for this registry."></i>
-                  </span>
-                </td>
-                <td>{{ registry.URL }}</td>
-                <td>
-                  <span ng-if="applicationState.application.authentication">
-                    <a ui-sref="registry.access({id: registry.Id})"><i class="fa fa-users" aria-hidden="true" style="margin-left: 7px;"></i> Manage access</a>
-                  </span>
-                </td>
-              </tr>
-              <tr ng-if="!registries">
-                <td colspan="4" class="text-center text-muted">Loading...</td>
-              </tr>
-              <tr ng-if="registries.length == 0">
-                <td colspan="4" class="text-center text-muted">No registries available.</td>
-              </tr>
-            </tbody>
-          </table>
-          <div ng-if="registries" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
-          </div>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
+    <registries-datatable
+    title="Registries" title-icon="fa-database"
+    dataset="registries" table-key="registries"
+    order-by="Name" show-text-filter="true"
+    access-management="applicationState.application.authentication"
+    remove-action="removeAction"
+    ></registries-datatable>
   </div>
 </div>

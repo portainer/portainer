@@ -93,7 +93,7 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
     var networkConfiguration = prepareConfiguration();
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
       return;

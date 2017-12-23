@@ -22,8 +22,8 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     $scope.LDAPSettings.SearchSettings.splice(index, 1);
   };
 
-  $scope.LDAPConnectivityCheck = function() {
-    var settings = $scope.settings;
+  $scope.LDAPConnectivityCheck = function() {    
+    var settings = $scope.settings;    
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
 
     var uploadRequired = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
@@ -32,6 +32,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     $scope.state.connectivityCheckInProgress = true;
     $q.when(!uploadRequired || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, null, null))
     .then(function success(data) {
+      addLDAPDefaultPort(settings, $scope.LDAPSettings.TLSConfig.TLS);
       return SettingsService.checkLDAPConnectivity(settings);
     })
     .then(function success(data) {
@@ -60,6 +61,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     $scope.state.actionInProgress = true;
     $q.when(!uploadRequired || FileUploadService.uploadLDAPTLSFiles(TLSCAFile, null, null))
     .then(function success(data) {
+      addLDAPDefaultPort(settings, $scope.LDAPSettings.TLSConfig.TLS);
       return SettingsService.update(settings);
     })
     .then(function success(data) {
@@ -73,6 +75,13 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
       $scope.state.actionInProgress = false;
     });
   };
+
+  // Add default port if :port is not defined in URL
+  function addLDAPDefaultPort(settings, tlsEnabled) {
+    if (settings.LDAPSettings.URL.indexOf(':') === -1) {      
+      settings.LDAPSettings.URL += tlsEnabled ? ':636' : ':389';      
+    }
+  }
 
   function initView() {
     SettingsService.settings()

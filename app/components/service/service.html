@@ -68,13 +68,14 @@
             <tr>
               <td>Image</td>
               <td>
-                <input type="text" class="form-control" ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" ng-disabled="isUpdating" />
+                  <input type="text" class="form-control" uib-typeahead="image for image in availableImages | filter:$viewValue | limitTo:5"
+                    ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" id="image_name" ng-disabled="isUpdating">
               </td>
             </tr>
             <tr ng-if="applicationState.endpoint.apiVersion >= 1.30">
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
-                  <a class="btn btn-outline-secondary" type="button" ui-sref="servicelogs({id: service.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
+                  <a class="btn" type="button" ui-sref="servicelogs({id: service.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
                 </div>
               </td>
             </tr>
@@ -115,6 +116,7 @@
           <li ng-if="applicationState.endpoint.apiVersion >= 1.30"><a href ng-click="goToItem('service-placement-preferences')">Placement preferences</a></li>
           <li><a href ng-click="goToItem('service-restart-policy')">Restart policy</a></li>
           <li><a href ng-click="goToItem('service-update-config')">Update configuration</a></li>
+          <li><a href ng-click="goToItem('service-logging')">Logging</a></li>
           <li><a href ng-click="goToItem('service-labels')">Service labels</a></li>
           <li><a href ng-click="goToItem('service-configs')">Configs</a></li>
           <li ng-if="applicationState.endpoint.apiVersion >= 1.25"><a href ng-click="goToItem('service-secrets')">Secrets</a></li>
@@ -151,6 +153,7 @@
     <h3 id="service-network-specs">Networks &amp; ports</h3>
     <div id="service-networks" class="padding-top" ng-include="'app/components/service/includes/networks.html'"></div>
     <div id="service-published-ports" class="padding-top" ng-include="'app/components/service/includes/ports.html'"></div>
+    <div id="service-hosts-entries" class="padding-top" ng-include="'app/components/service/includes/hosts.html'"></div>
   </div>
 </div>
 
@@ -163,6 +166,7 @@
     <div id="service-placement-preferences" ng-if="applicationState.endpoint.apiVersion >= 1.30" class="padding-top" ng-include="'app/components/service/includes/placementPreferences.html'"></div>
     <div id="service-restart-policy" class="padding-top" ng-include="'app/components/service/includes/restart.html'"></div>
     <div id="service-update-config" class="padding-top" ng-include="'app/components/service/includes/updateconfig.html'"></div>
+    <div id="service-logging" class="padding-top" ng-include="'app/components/service/includes/logging.html'"></div>
     <div id="service-labels" class="padding-top" ng-include="'app/components/service/includes/servicelabels.html'"></div>
     <div id="service-configs" class="padding-top" ng-include="'app/components/service/includes/configs.html'"></div>
     <div id="service-secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25" class="padding-top" ng-include="'app/components/service/includes/secrets.html'"></div>

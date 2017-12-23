@@ -12,15 +12,20 @@
         <rd-widget-header icon="fa-cogs" title="Actions"></rd-widget-header>
         <rd-widget-body classes="padding">
           <div class="btn-group" role="group" aria-label="...">
-            <button class="btn btn-success" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
-            <button class="btn btn-danger" ng-click="stop()" ng-disabled="!container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
-            <button class="btn btn-danger" ng-click="kill()" ng-disabled="!container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
-            <button class="btn btn-primary" ng-click="restart()" ng-disabled="!container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
-            <button class="btn btn-primary" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
-            <button class="btn btn-primary" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
-            <button class="btn btn-danger" ng-click="confirmRemove()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-            <button class="btn btn-danger" ng-click="recreate()" ng-if="!container.Config.Labels['com.docker.swarm.service.id']"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Recreate</button>
-            <button class="btn btn-primary" ng-click="duplicate()" ng-if="!container.Config.Labels['com.docker.swarm.service.id']"><i class="fa fa-files-o space-right" aria-hidden="true"></i>Duplicate/Edit</button>
+            <button class="btn btn-success btn-sm" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
+            <button class="btn btn-danger btn-sm" ng-click="stop()" ng-disabled="!container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
+            <button class="btn btn-danger btn-sm" ng-click="kill()" ng-disabled="!container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
+            <button class="btn btn-primary btn-sm" ng-click="restart()" ng-disabled="!container.State.Running"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart</button>
+            <button class="btn btn-primary btn-sm" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
+            <button class="btn btn-primary btn-sm" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
+            <button class="btn btn-danger btn-sm" ng-click="confirmRemove()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
+          </div>
+          <div class="btn-group" role="group" aria-label="...">
+            <button type="button" class="btn btn-danger btn-sm" ng-disabled="state.recreateContainerInProgress" ng-click="recreate()" button-spinner="state.recreateContainerInProgress" ng-if="!container.Config.Labels['com.docker.swarm.service.id']">
+              <span ng-hide="state.recreateContainerInProgress"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Recreate</span>
+              <span ng-show="state.recreateContainerInProgress">Recreation in progress...</span>
+            </button>
+            <button class="btn btn-primary btn-sm" ng-click="duplicate()" ng-if="!container.Config.Labels['com.docker.swarm.service.id']"><i class="fa fa-files-o space-right" aria-hidden="true"></i>Duplicate/Edit</button>
           </div>
         </rd-widget-body>
       </rd-widget>
@@ -79,10 +84,10 @@
               <tr>
                 <td colspan="2">
                   <div class="btn-group" role="group" aria-label="...">
-                    <a class="btn btn-outline-secondary" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i>Stats</a>
-                    <a class="btn btn-outline-secondary" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
-                    <a class="btn btn-outline-secondary" type="button" ui-sref="console({id: container.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
-                    <a class="btn btn-outline-secondary" type="button" ui-sref="inspect({id: container.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Inspect</a>
+                    <a class="btn" type="button" ui-sref="stats({id: container.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i>Stats</a>
+                    <a class="btn" type="button" ui-sref="containerlogs({id: container.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
+                    <a class="btn" type="button" ui-sref="console({id: container.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
+                    <a class="btn" type="button" ui-sref="inspect({id: container.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Inspect</a>
                   </div>
                 </td>
               </tr>
@@ -265,70 +270,16 @@
   </div>
 
   <div class="row">
-    <div class="col-lg-12 col-md-12 col-xs-12">
-      <rd-widget>
-        <rd-widget-header icon="fa-sitemap" title="Connected networks">
-          <div class="pull-right">
-            Items per page:
-            <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-              <option value="0">All</option>
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </div>
-        </rd-widget-header>
-        <rd-widget-body classes="no-padding">
-          <table class="table">
-            <thead>
-              <th>Network Name</th>
-              <th>IP Address</th>
-              <th>Gateway</th>
-              <th>MacAddress</th>
-              <th>Actions</th>
-            </thead>
-            <tbody>
-              <tr dir-paginate="(key, value) in container.NetworkSettings.Networks | itemsPerPage: state.pagination_count">
-                <td><a ui-sref="network({id: value.NetworkID})">{{ key }}</a></td>
-                <td>{{ value.IPAddress || '-' }}</td>
-                <td>{{ value.Gateway || '-' }}</td>
-                <td>{{ value.MacAddress || '-' }}</td>
-                <td>
-                  <button type="button" class="btn btn-xs btn-danger" ng-disabled="state.leaveNetworkInProgress" button-spinner="state.leaveNetworkInProgress" ng-click="containerLeaveNetwork(container, value.NetworkID)">
-                    <span ng-hide="state.leaveNetworkInProgress"><i class="fa fa-trash space-right" aria-hidden="true"></i> Leave network</span>
-                    <span ng-show="state.leaveNetworkInProgress">Leaving network...</span>
-                  </button>
-                </td>
-              </tr>
-              <tr ng-if="(container.NetworkSettings.Networks | emptyobject)">
-                <td colspan="5" class="text-center text-muted">No networks connected.</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
-          </div>
-          <hr />
-          <form class="form-horizontal">
-            <!-- network-input -->
-            <div class="row">
-              <label for="container_network" class="col-sm-3 col-lg-2 control-label text-left">Join a Network</label>
-              <div class="col-sm-5 col-lg-4">
-                <select class="form-control" ng-model="selectedNetwork" id="container_network">
-                  <option selected disabled hidden value="">Select a network</option>
-                  <option ng-repeat="net in availableNetworks" ng-value="net.Id">{{ net.Name }}</option>
-                </select>
-              </div>
-              <div class="col-sm-1">
-                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.joinNetworkInProgress || !selectedNetwork" ng-click="containerJoinNetwork(container, selectedNetwork)" button-spinner="state.joinNetworkInProgress">
-                  <span ng-hide="state.joinNetworkInProgress">Join network</span>
-                  <span ng-show="state.joinNetworkInProgress">Joining network...</span>
-                </button>
-              </div>
-            </div>
-          </form>
-        </rd-widget-body>
-      </rd-widget>
+    <div class="col-sm-12">
+      <container-networks-datatable
+      title="Connected networks" title-icon="fa-sitemap"
+      dataset="container.NetworkSettings.Networks" table-key="container-networks"
+      container="container"
+      available-networks="availableNetworks"
+      join-network-action="containerJoinNetwork"
+      join-network-action-in-progress="state.joinNetworkInProgress"
+      leave-network-action="containerLeaveNetwork"
+      leave-network-action-in-progress="state.leaveNetworkInProgress"
+      ></container-networks-datatable>
     </div>
   </div>

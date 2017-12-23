@@ -26,11 +26,8 @@ html, body, #page-wrapper, #content-wrapper, .page-content, #view {
 
 .logo {
   display: inline;
-  width: 100%;
   max-width: 155px;
-  height: 100%;
   max-height: 55px;
-  margin-bottom: 5px;
 }
 
 .containerNameInput {
@@ -129,6 +126,10 @@ a[ng-click]{
 
 .widget .widget-body table tbody .fit-text-size {
   font-size: 90% !important;
+}
+
+.widget .widget-body table thead th {
+  font-weight: normal;
 }
 
 .template-widget {
@@ -372,6 +373,10 @@ ul.sidebar .sidebar-list a.active {
   font-size: 90%;
 }
 
+ul.sidebar .sidebar-list a.active .menu-icon {
+  text-indent: 25px;
+}
+
 ul.sidebar .sidebar-list .sidebar-sublist a {
   text-indent: 35px;
   font-size: 12px;
@@ -490,6 +495,8 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   padding-right: 24px;
   transition: all ease 0.2s;
   -webkit-transition: all ease 0.2s;
+  -moz-transition: all ease 0.2s;
+  -o-transition: all ease 0.2s;
   border-radius: 24px;
   box-shadow: inset 0 0 1px 1px rgba(0,0,0,.5);
 }
@@ -508,6 +515,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   padding-right: 0;
   padding-left: 24px;
   -webkit-box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
+  -moz-box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
   box-shadow: inset 0 0 1px rgba(0,0,0,.5), inset 0 0 40px #337ab7;
 }
 

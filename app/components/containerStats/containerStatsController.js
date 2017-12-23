@@ -1,23 +1,10 @@
 angular.module('containerStats', [])
-.controller('ContainerStatsController', ['$q', '$scope', '$transition$', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'Pagination',
-function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications, Pagination) {
+.controller('ContainerStatsController', ['$q', '$scope', '$transition$', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications',
+function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications) {
 
   $scope.state = {
     refreshRate: '5',
     networkStatsUnavailable: false
-  };
-
-  $scope.state.pagination_count = Pagination.getPaginationCount('stats_processes');
-  $scope.sortType = 'CMD';
-  $scope.sortReverse = false;
-
-  $scope.order = function (sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('stats_processes', $scope.state.pagination_count);
   };
 
   $scope.$on('$destroy', function() {

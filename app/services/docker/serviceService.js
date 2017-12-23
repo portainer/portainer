@@ -54,5 +54,9 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
+  service.update = function(service, config) {
+    return Service.update({ id: service.Id, version: service.Version }, config).$promise;
+  };
+
   return service;
 }]);

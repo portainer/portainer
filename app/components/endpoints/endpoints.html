@@ -67,93 +67,26 @@
             <div class="col-sm-12">
               <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addEndpoint()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
-                <span ng-show="state.actionInProgress">Creating endpoint...</span>  
+                <span ng-show="state.actionInProgress">Creating endpoint...</span>
               </button>
-
+            </div>
           </div>
-        </div>
-        <!-- !actions -->
-      </form>
-    </rd-widget-body>
-  </rd-widget>
-</div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
 </div>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-plug" title="Endpoints">
-        <div class="pull-right">
-          Items per page:
-          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-            <option value="0">All</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </rd-widget-header>
-      <rd-widget-taskbar classes="col-lg-12">
-        <div class="pull-left" ng-if="applicationState.application.endpointManagement">
-          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-        </div>
-        <div class="pull-right">
-          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
-        </div>
-      </rd-widget-taskbar>
-      <rd-widget-body classes="no-padding">
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th ng-if="applicationState.application.endpointManagement">
-                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
-                </th>
-                <th>
-                  <a ui-sref="endpoints" ng-click="order('Name')">
-                    Name
-                    <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
-                </th>
-                <th>
-                  <a ui-sref="endpoints" ng-click="order('URL')">
-                    URL
-                    <span ng-show="sortType == 'URL' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'URL' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
-                </th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr dir-paginate="endpoint in (state.filteredEndpoints = (endpoints | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td ng-if="applicationState.application.endpointManagement"><input type="checkbox" ng-model="endpoint.Checked" ng-change="selectItem(endpoint)" /></td>
-                <td><i class="fa fa-star" aria-hidden="true" ng-if="endpoint.Id === activeEndpoint.Id"></i> {{ endpoint.Name }}</td>
-                <td>{{ endpoint.URL | stripprotocol }}</td>
-                <td>
-                  <span ng-if="applicationState.application.endpointManagement">
-                    <a ui-sref="endpoint({id: endpoint.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
-                  </span>
-                  <span ng-if="applicationState.application.authentication">
-                    <a ui-sref="endpoint.access({id: endpoint.Id})"><i class="fa fa-users" aria-hidden="true" style="margin-left: 7px;"></i> Manage access</a>
-                  </span>
-                </td>
-              </tr>
-              <tr ng-if="!endpoints">
-                <td colspan="5" class="text-center text-muted">Loading...</td>
-              </tr>
-              <tr ng-if="endpoints.length == 0">
-                <td colspan="5" class="text-center text-muted">No endpoints available.</td>
-              </tr>
-            </tbody>
-          </table>
-          <div ng-if="endpoints" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
-          </div>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
+  <div class="col-sm-12">
+    <endpoints-datatable
+    title="Endpoints" title-icon="fa-plug"
+    dataset="endpoints" table-key="endpoints"
+    order-by="Name" show-text-filter="true"
+    endpoint-management="applicationState.application.endpointManagement"
+    access-management="applicationState.application.authentication"
+    remove-action="removeAction"
+    ></endpoints-datatable>
   </div>
 </div>

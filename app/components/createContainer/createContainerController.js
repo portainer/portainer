@@ -349,6 +349,12 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
+  $scope.resetNetworkConfig = function() {
+    $scope.config.NetworkingConfig = {
+      EndpointsConfig: {}
+    };
+  };
+
   function loadFromContainerNetworkConfig(d) {
     $scope.config.NetworkingConfig = {
       EndpointsConfig: {}
@@ -550,7 +556,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     });
 
     var userDetails = Authentication.getUserDetails();
-    $scope.isAdmin = userDetails.role === 1 ? true : false;
+    $scope.isAdmin = userDetails.role === 1;
   }
 
   function validateForm(accessControlData, isAdmin) {
@@ -574,7 +580,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
       var accessControlData = $scope.formValues.AccessControlData;
       var userDetails = Authentication.getUserDetails();
-      var isAdmin = userDetails.role === 1 ? true : false;
+      var isAdmin = userDetails.role === 1;
 
       if (!validateForm(accessControlData, isAdmin)) {
         return;

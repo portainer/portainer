@@ -1,6 +1,6 @@
 angular.module('templates', [])
-.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'Pagination', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService',
-function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, Pagination, ResourceControlService, Authentication, FormValidator, SettingsService, StackService) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'PaginationService', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService',
+function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, PaginationService, ResourceControlService, Authentication, FormValidator, SettingsService, StackService) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
@@ -122,7 +122,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     var userDetails = Authentication.getUserDetails();
     var userId = userDetails.ID;
     var accessControlData = $scope.formValues.AccessControlData;
-    var isAdmin = userDetails.role === 1 ? true : false;
+    var isAdmin = userDetails.role === 1;
 
     if (!validateForm(accessControlData, isAdmin)) {
       return;
@@ -241,12 +241,13 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     $scope.templatesKey = templatesKey;
 
     var userDetails = Authentication.getUserDetails();
-    $scope.isAdmin = userDetails.role === 1 ? true : false;
+    $scope.isAdmin = userDetails.role === 1;
 
     var endpointMode = $scope.applicationState.endpoint.mode;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
-    if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
+    if (templatesKey !== 'linuxserver.io'
+      && endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
       $scope.state.filters.Type = 'stack';
       $scope.state.showDeploymentSelector = true;
     }

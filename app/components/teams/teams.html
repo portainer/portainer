@@ -65,67 +65,12 @@
 </div>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-users" title="Teams">
-        <div class="pull-right">
-          Items per page:
-          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-            <option value="0">All</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </rd-widget-header>
-      <rd-widget-taskbar classes="col-lg-12">
-        <div class="pull-left" ng-if="isAdmin">
-          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-        </div>
-        <div class="pull-right">
-          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
-        </div>
-      </rd-widget-taskbar>
-      <rd-widget-body classes="no-padding">
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th ng-if="isAdmin">
-                  <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
-                </th>
-                <th>
-                  <a ng-click="order('Name')">
-                    Name
-                    <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                    <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                  </a>
-                </th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr dir-paginate="team in (state.filteredTeams = (teams | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
-                <td ng-if="isAdmin"><input type="checkbox" ng-model="team.Checked" ng-change="selectItem(team)" /></td>
-                <td>{{ team.Name }}</td>
-                <td>
-                  <a ui-sref="team({id: team.Id})"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</a>
-                </td>
-              </tr>
-              <tr ng-if="!teams">
-                <td colspan="3" class="text-center text-muted">Loading...</td>
-              </tr>
-              <tr ng-if="teams.length == 0">
-                <td colspan="3" class="text-center text-muted">No teams available.</td>
-              </tr>
-            </tbody>
-          </table>
-          <div ng-if="teams" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
-          </div>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
+  <div class="col-sm-12">
+    <teams-datatable
+    title="Teams" title-icon="fa-users"
+    dataset="teams" table-key="teams"
+    order-by="Name" show-text-filter="true"
+    remove-action="removeAction"
+    ></teams-datatable>
   </div>
 </div>

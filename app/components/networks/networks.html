@@ -8,6 +8,18 @@
 </rd-header>
 
 <div class="row">
+  <div class="col-sm-12">
+    <networks-datatable
+    title="Networks" title-icon="fa-sitemap"
+    dataset="networks" table-key="networks"
+    order-by="Name" show-text-filter="true"
+    remove-action="removeAction"
+    show-ownership-column="applicationState.application.authentication"
+    ></networks-datatable>
+  </div>
+</div>
+
+<!-- <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-sitemap" title="Networks">
@@ -98,7 +110,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr dir-paginate="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
+              <tr dir-paginate="network in ( state.filteredNetworks = (networks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-class="{active: network.Checked}">
                 <td><input type="checkbox" ng-model="network.Checked" ng-change="selectItem(network)"/></td>
                 <td><a ui-sref="network({id: network.Id})">{{ network.Name | truncate:40 }}</a></td>
                 <td>{{ network.StackName ? network.StackName : '-' }}</td>
@@ -129,4 +141,4 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-</div>
+</div> -->

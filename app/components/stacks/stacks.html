@@ -7,7 +7,7 @@
   <rd-header-content>Stacks</rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="state.DisplayInformationPanel">
+<div class="row" ng-if="state.displayInformationPanel">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-info-circle" title="Information"></rd-widget-header>
@@ -27,7 +27,7 @@
                 Display external stacks
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="state.DisplayExternalStacks"><i></i>
+                <input type="checkbox" ng-model="state.displayExternalStacks"><i></i>
               </label>
             </div>
           </div>
@@ -39,81 +39,13 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-th-list" title="Stacks">
-        <div class="pull-right">
-          Items per page:
-          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
-            <option value="0">All</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </rd-widget-header>
-      <rd-widget-taskbar classes="col-lg-12 col-md-12 col-xs-12">
-        <div class="pull-left">
-          <button type="button" class="btn btn-danger" ng-click="removeAction()" ng-disabled="!state.selectedItemCount"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove</button>
-          <a class="btn btn-primary" type="button" ui-sref="actions.create.stack"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add stack</a>
-        </div>
-        <div class="pull-right">
-          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
-        </div>
-      </rd-widget-taskbar>
-      <rd-widget-body classes="no-padding">
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <th>
-                <input type="checkbox" ng-model="allSelected" ng-change="selectItems(allSelected)" />
-              </th>
-              <th>
-                <a ng-click="order('Name')">
-                  Name
-                  <span ng-show="sortType == 'Name' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'Name' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-              <th ng-if="applicationState.application.authentication">
-                <a ng-click="order('ResourceControl.Ownership')">
-                  Ownership
-                  <span ng-show="sortType == 'ResourceControl.Ownership' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                  <span ng-show="sortType == 'ResourceControl.Ownership' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
-                </a>
-              </th>
-            </thead>
-            <tbody>
-              <tr dir-paginate="stack in (state.filteredStacks = ( stacks | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))" ng-if="state.DisplayExternalStacks || (!state.DisplayExternalStacks && !stack.External)">
-                <td><input type="checkbox" ng-model="stack.Checked" ng-change="selectItem(stack)" ng-disabled="!stack.Id"/></td>
-                <td>
-                  <span ng-if="stack.Id">
-                    <a ui-sref="stack({ id: stack.Id })">{{ stack.Name }}</a>
-                  </span>
-                  <span ng-if="!stack.Id">
-                    {{ stack.Name }} <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true"></i>
-                  </span>
-                </td>
-                <td ng-if="applicationState.application.authentication">
-                  <span>
-                    <i ng-class="stack.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
-                    {{ stack.ResourceControl.Ownership ? stack.ResourceControl.Ownership : stack.ResourceControl.Ownership = 'public' }}
-                  </span>
-                </td>
-              </tr>
-              <tr ng-if="!stacks">
-                <td colspan="3" class="text-center text-muted">Loading...</td>
-              </tr>
-              <tr ng-if="stacks.length === 0">
-                <td colspan="3" class="text-center text-muted">No stacks available.</td>
-              </tr>
-            </tbody>
-          </table>
-          <div ng-if="stacks" class="pull-left pagination-controls">
-            <dir-pagination-controls></dir-pagination-controls>
-          </div>
-        </div>
-      </rd-widget-body>
-    <rd-widget>
+    <stacks-datatable
+    title="Stacks" title-icon="fa-th-list"
+    dataset="stacks" table-key="stacks"
+    order-by="Name" show-text-filter="true"
+    remove-action="removeAction"
+    show-ownership-column="applicationState.application.authentication"
+    display-external-stacks="state.displayExternalStacks"
+    ></stacks-datatable>
   </div>
 </div>

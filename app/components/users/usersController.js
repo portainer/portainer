@@ -1,15 +1,11 @@
 angular.module('users', [])
-.controller('UsersController', ['$q', '$scope', '$state', '$sanitize', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Pagination', 'Authentication', 'SettingsService',
-function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Pagination, Authentication, SettingsService) {
+.controller('UsersController', ['$q', '$scope', '$state', '$sanitize', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Authentication', 'SettingsService',
+function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Authentication, SettingsService) {
   $scope.state = {
     userCreationError: '',
-    selectedItemCount: 0,
     validUsername: false,
-    pagination_count: Pagination.getPaginationCount('users'),
     actionInProgress: false
   };
-  $scope.sortType = 'RoleName';
-  $scope.sortReverse = false;
 
   $scope.formValues = {
     Username: '',
@@ -17,32 +13,6 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
     ConfirmPassword: '',
     Administrator: false,
     Teams: []
-  };
-
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('endpoints', $scope.state.pagination_count);
-  };
-
-  $scope.selectItems = function (allSelected) {
-    angular.forEach($scope.state.filteredUsers, function (user) {
-      if (user.Checked !== allSelected) {
-        user.Checked = allSelected;
-        $scope.selectItem(user);
-      }
-    });
-  };
-
-  $scope.selectItem = function (item) {
-    if (item.Checked) {
-      $scope.state.selectedItemCount++;
-    } else {
-      $scope.state.selectedItemCount--;
-    }
   };
 
   $scope.checkUsernameValidity = function() {
@@ -80,28 +50,33 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
     });
   };
 
-  function deleteSelectedUsers() {
-    angular.forEach($scope.users, function (user) {
-      if (user.Checked) {
-        UserService.deleteUser(user.Id)
-        .then(function success(data) {
-          var index = $scope.users.indexOf(user);
-          $scope.users.splice(index, 1);
-          Notifications.success('User successfully deleted', user.Username);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove user');
-        });
-      }
+  function deleteSelectedUsers(selectedItems) {
+    var actionCount = selectedItems.length;
+    angular.forEach(selectedItems, function (user) {
+      UserService.deleteUser(user.Id)
+      .then(function success() {
+        Notifications.success('User successfully removed', user.Username);
+        var index = $scope.users.indexOf(user);
+        $scope.users.splice(index, 1);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to remove user');
+      })
+      .finally(function final() {
+        --actionCount;
+        if (actionCount === 0) {
+          $state.reload();
+        }
+      });
     });
   }
 
-  $scope.removeAction = function () {
+  $scope.removeAction = function (selectedItems) {
     ModalService.confirmDeletion(
       'Do you want to remove the selected users? They will not be able to login into Portainer anymore.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
-        deleteSelectedUsers();
+        deleteSelectedUsers(selectedItems);
       }
     );
   };

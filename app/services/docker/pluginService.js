@@ -20,7 +20,7 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.volumePlugins = function(systemOnly) {
+  function servicePlugins(systemOnly, pluginType, pluginVersion) {
     var deferred = $q.defer();
 
     $q.all({
@@ -28,60 +28,40 @@ angular.module('portainer.services')
       plugins: systemOnly ? [] : service.plugins()
     })
     .then(function success(data) {
-      var volumePlugins = [];
+      var aggregatedPlugins = [];
       var systemPlugins = data.system;
       var plugins = data.plugins;
 
-      if (systemPlugins.Volume) {
-        volumePlugins = volumePlugins.concat(systemPlugins.Volume);
+      if (systemPlugins[pluginType]) {
+        aggregatedPlugins = aggregatedPlugins.concat(systemPlugins[pluginType]);
       }
 
       for (var i = 0; i < plugins.length; i++) {
         var plugin = plugins[i];
-        if (plugin.Enabled && _.includes(plugin.Config.Interface.Types, 'docker.volumedriver/1.0')) {
-          volumePlugins.push(plugin.Name);
+        if (plugin.Enabled && _.includes(plugin.Config.Interface.Types, pluginVersion)) {
+          aggregatedPlugins.push(plugin.Name);
         }
       }
 
-      deferred.resolve(volumePlugins);
+      deferred.resolve(aggregatedPlugins);
     })
     .catch(function error(err) {
       deferred.reject({ msg: err.msg, err: err });
     });
 
     return deferred.promise;
+  }
+
+  service.volumePlugins = function(systemOnly) {
+    return servicePlugins(systemOnly, 'Volume', 'docker.volumedriver/1.0');
   };
 
   service.networkPlugins = function(systemOnly) {
-    var deferred = $q.defer();
+    return servicePlugins(systemOnly, 'Network', 'docker.networkdriver/1.0');
+  };
 
-    $q.all({
-      system: SystemService.plugins(),
-      plugins: systemOnly ? [] : service.plugins()
-    })
-    .then(function success(data) {
-      var networkPlugins = [];
-      var systemPlugins = data.system;
-      var plugins = data.plugins;
-
-      if (systemPlugins.Network) {
-        networkPlugins = networkPlugins.concat(systemPlugins.Network);
-      }
-
-      for (var i = 0; i < plugins.length; i++) {
-        var plugin = plugins[i];
-        if (plugin.Enabled && _.includes(plugin.Config.Interface.Types, 'docker.networkdriver/1.0')) {
-          networkPlugins.push(plugin.Name);
-        }
-      }
-
-      deferred.resolve(networkPlugins);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: err.msg, err: err });
-    });
-
-    return deferred.promise;
+  service.loggingPlugins = function(systemOnly) {
+    return servicePlugins(systemOnly, 'Log', 'docker.logdriver/1.0');        
   };
 
   return service;

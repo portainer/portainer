@@ -31,16 +31,25 @@ function ServiceViewModel(data, runningTasks, allTasks, nodes) {
   }
 
   if (data.Spec.TaskTemplate.RestartPolicy) {
-    this.RestartCondition = data.Spec.TaskTemplate.RestartPolicy.Condition;
-    this.RestartDelay = data.Spec.TaskTemplate.RestartPolicy.Delay;
-    this.RestartMaxAttempts = data.Spec.TaskTemplate.RestartPolicy.MaxAttempts;
-    this.RestartWindow = data.Spec.TaskTemplate.RestartPolicy.Window;
+    this.RestartCondition = data.Spec.TaskTemplate.RestartPolicy.Condition || 'any';
+    this.RestartDelay = data.Spec.TaskTemplate.RestartPolicy.Delay || 5000000000;
+    this.RestartMaxAttempts = data.Spec.TaskTemplate.RestartPolicy.MaxAttempts || 0;
+    this.RestartWindow = data.Spec.TaskTemplate.RestartPolicy.Window || 0;
   } else {
-    this.RestartCondition = 'none';
-    this.RestartDelay = 0;
+    this.RestartCondition = 'any';
+    this.RestartDelay = 5000000000;
     this.RestartMaxAttempts = 0;
     this.RestartWindow = 0;
   }
+
+  if (data.Spec.TaskTemplate.LogDriver) {
+    this.LogDriverName = data.Spec.TaskTemplate.LogDriver.Name || '';
+    this.LogDriverOpts = data.Spec.TaskTemplate.LogDriver.Options || [];
+  } else {
+    this.LogDriverName = '';
+    this.LogDriverOpts = [];
+  }
+    
   this.Constraints = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Constraints || [] : [];
   this.Preferences = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Preferences || [] : [];
   this.Platforms = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Platforms || [] : [];
