@@ -10,6 +10,7 @@ angular.module('ui').component('registryRepositoriesDatatable', {
     reverseOrder: '<',
     showTextFilter: '<',
     accessManagement: '<',
-    removeAction: '<'
+    removeAction: '<',
+    registryId: '<'
   }
 });

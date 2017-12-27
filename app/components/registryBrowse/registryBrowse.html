@@ -5,26 +5,6 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="repositories">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-files" title="Repositories"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-            <tr ng-repeat="repo in repositories">
-              <td>
-                <a ui-sref="registry.tags({id: registry.Id, repository: repo.name})" ui-sref-opts="{inherit: false}">{{ repo.name }}</a>
-              </td>
-              <td>{{ repo.tags.length }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
 <div class="row">
   <div class="col-sm-12">
     <registry-repositories-datatable
@@ -33,6 +13,7 @@
     order-by="name" show-text-filter="true"
     access-management="applicationState.application.authentication"
     remove-action="removeAction"
+    registry-id="registry.Id"
     ></registry-repositories-datatable>
   </div>
 </div>
