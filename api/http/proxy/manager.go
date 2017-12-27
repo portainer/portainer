@@ -10,15 +10,15 @@ import (
 
 // Manager represents a service used to manage Docker proxies.
 type Manager struct {
-	proxyFactory *proxyFactory
-	proxies      cmap.ConcurrentMap
+	proxyFactory    *proxyFactory
+	proxies         cmap.ConcurrentMap
 	registryProxies cmap.ConcurrentMap
 }
 
 // NewManager initializes a new proxy Service
 func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService, settingsService portainer.SettingsService) *Manager {
 	return &Manager{
-		proxies: cmap.New(),
+		proxies:         cmap.New(),
 		registryProxies: cmap.New(),
 		proxyFactory: &proxyFactory{
 			ResourceControlService: resourceControlService,
@@ -56,7 +56,7 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 	return proxy, nil
 }
 
-// CreateAndRegisterProxy creates a new HTTP reverse proxy and adds it to the registered proxies.
+// CreateAndRegisterRegistryProxy creates a new HTTP reverse proxy and adds it to the registered proxies.
 // It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
 func (manager *Manager) CreateAndRegisterRegistryProxy(registry *portainer.Registry) (http.Handler, error) {
 	var proxy http.Handler
@@ -67,17 +67,17 @@ func (manager *Manager) CreateAndRegisterRegistryProxy(registry *portainer.Regis
 	}
 
 	//if registryURL.Scheme == "tcp" {
-		/*if endpoint.TLSConfig.TLS {
-			proxy, err = manager.proxyFactory.newHTTPSProxy(endpointURL, endpoint)
-			if err != nil {
-				return nil, err
-			}
-		} else {*/
-			proxy = manager.proxyFactory.newHTTPProxy(registryURL)
-		//}
+	/*if endpoint.TLSConfig.TLS {
+		proxy, err = manager.proxyFactory.newHTTPSProxy(endpointURL, endpoint)
+		if err != nil {
+			return nil, err
+		}
+	} else {*/
+	proxy = manager.proxyFactory.newHTTPProxy(registryURL)
+	//}
 	//} else {
-		// Assume unix:// scheme
-		//proxy = manager.proxyFactory.newSocketProxy(endpointURL.Path)
+	// Assume unix:// scheme
+	//proxy = manager.proxyFactory.newSocketProxy(endpointURL.Path)
 	//}
 
 	manager.registryProxies.Set(string(registry.ID), proxy)

@@ -145,9 +145,5 @@ angular.module('portainer.services')
     return deferred.promise;
   };
 
-  service.getCatalog = function() {
-    
-  };
-
   return service;
 }]);
