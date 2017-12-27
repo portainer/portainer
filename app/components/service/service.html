@@ -38,6 +38,7 @@
               <td>ID</td>
               <td>
                 {{ service.Id }}
+                <button class="btn btn-xs btn-primary" ng-click="forceUpdateService(service)"><i class="fa fa-refresh space-right" aria-hidden="true" ng-disabled="isUpdating" ng-if="applicationState.endpoint.apiVersion >= 1.25"></i>Force update this service</button>
                 <button class="btn btn-xs btn-danger" ng-click="removeService()"><i class="fa fa-trash space-right" aria-hidden="true" ng-disabled="isUpdating"></i>Delete this service</button>
               </td>
             </tr>

@@ -10,8 +10,9 @@ angular.module('ui').component('servicesDatatable', {
     reverseOrder: '<',
     showTextFilter: '<',
     showOwnershipColumn: '<',
-    removeAction: '<',
+    removeAction: '<',    
     scaleAction: '<',
-    swarmManagerIp: '<'
+    swarmManagerIp: '<',
+    forceUpdateAction: '<'
   }
 });

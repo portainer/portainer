@@ -338,6 +338,32 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     });
   }
 
+  $scope.forceUpdateService = function(service) {
+    ModalService.confirmForceUpdate(
+      'Do you want to force update this service? All the tasks associated to the selected service(s) will be recreated.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        forceUpdateService(service);
+      }
+    );
+  };
+
+  function forceUpdateService(service) {
+    var config = ServiceHelper.serviceToConfig(service.Model);
+    // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
+    // value or an increment of the counter value to force an update.          
+    config.TaskTemplate.ForceUpdate++;
+    ServiceService.update(service, config)
+    .then(function success(data) {
+      Notifications.success('Service successfully updated with --force', service.Name);
+      $scope.cancelChanges({});
+      initView();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to force update service', service.Name);
+    });
+  }  
+
   function translateServiceArrays(service) {
     service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
     service.ServiceConfigs = service.Configs ? service.Configs.map(ConfigHelper.flattenConfig) : [];
