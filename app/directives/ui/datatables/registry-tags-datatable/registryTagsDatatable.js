@@ -8,8 +8,6 @@ angular.module('ui').component('registryTagsDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showTextFilter: '<',
-    accessManagement: '<',
-    removeAction: '<'
+    showTextFilter: '<'
   }
 });
