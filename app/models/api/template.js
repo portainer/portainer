@@ -15,6 +15,8 @@ function TemplateViewModel(data) {
   this.Interactive = data.interactive ? data.interactive : false;
   this.RestartPolicy = data.restart_policy ? data.restart_policy : 'always';
   this.Volumes = [];
+  this.Labels = [];
+
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
       // @DEPRECATED: New volume definition introduced
@@ -44,4 +46,11 @@ function TemplateViewModel(data) {
     });
   }
   this.Hosts = data.hosts ? data.hosts : [];
+  
+  for (var label in data.labels) {
+    if (label) {
+      this.Labels.push({name:label, value:data.labels[label]});
+    }
+  }
+    
 }
