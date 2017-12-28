@@ -253,7 +253,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     }
 
     config.EndpointSpec = {
-      Mode: config.EndpointSpec.Mode || 'vip',
+      Mode: (config.EndpointSpec && config.EndpointSpec.Mode) || 'vip',
       Ports: service.Ports
     };
 
