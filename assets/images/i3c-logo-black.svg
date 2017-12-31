@@ -1,0 +1,35 @@
+<svg id="i3cLogo" xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 250 145">
+<defs>
+	<style>.cls-1{fill:none;stroke:#03C;stroke-miterlimit:5;stroke-width:5px;}</style>
+    <filter id="dropshadow" height="130%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> 
+      <feOffset dx="2" dy="2" result="offsetblur"/> 
+  <feComponentTransfer>
+    <feFuncA type="linear" slope="0.5"/> <!-- slope is the opacity of the shadow -->
+  </feComponentTransfer>	  
+      <feMerge> 
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/> 
+      </feMerge>
+    </filter>	
+</defs>
+<title>i3c-logo-black</title>
+
+<path class="cls-1" d="M4.78,78.09h0A26.41,26.41,0,0,1,31.16,51.71H77.34A12.54,12.54,0,0,1,89.85,64.22h0A12.54,12.54,0,0,1,77.34,76.73h-15A26.31,26.31,0,0,1,36,50.45h0A26.41,26.41,0,0,1,62.4,24.06h69.06a40.11,40.11,0,0,1,40.16,40.06s0,.06,0,.1h0a40.11,40.11,0,0,1-40.06,40.16H31.16A26.33,26.33,0,0,1,4.78,78.11Z" transform="translate(-1.28 -0.09)" filter="url(#dropshadow)"/>
+
+<path class="cls-1" d="M142.52,85.08H181.8a18.88,18.88,0,0,1,18.91,18.84s0,.05,0,.08h0a18.88,18.88,0,0,1-18.84,18.91H142.52a18.88,18.88,0,0,1-18.91-18.84s0-.05,0-.08h0A19,19,0,0,1,142.52,85.08Z" transform="translate(-1.28 -0.09)" filter="url(#dropshadow)"/>
+
+<path class="cls-1" d="M94.31,3.6H133.6a18.88,18.88,0,0,1,18.91,18.84s0,.05,0,.08h0a18.88,18.88,0,0,1-18.84,18.92H94.31A18.88,18.88,0,0,1,75.4,22.59s0-.05,0-.08h0A18.88,18.88,0,0,1,94.23,3.6Z" transform="translate(-1.28 -0.09)" filter="url(#dropshadow)"/>
+
+<g style="overflow:hidden; text-anchor: middle; font-size:48px; font-weight: bold; font-family: Arial, Helvetica, sans-serif">
+<defs>
+<filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+<feGaussianBlur stdDeviation="2 2" result="shadow"/>
+<feOffset dx="6" dy="6"/>
+</filter>
+</defs>
+<text style="filter: url(#shadow); fill: black" x="180" y="70">i3c.Cloud</text>
+<text x="180" y="70" style="fill: white">i3c.Cloud</text>
+</g>
+
+</svg>

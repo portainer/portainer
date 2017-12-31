@@ -117,7 +117,7 @@ gruntfile_cfg.src = {
   jsTpl: ['<%= distdir %>/templates/**/*.js'],
   html: ['index.html'],
   tpl: ['app/components/**/*.html', 'app/directives/**/*.html'],
-  css: ['assets/css/app.css', 'app/**/*.css']
+  css: ['assets/css/app.css', 'assets/css/app.i3c.css', 'app/**/*.css']
 };
 
 gruntfile_cfg.clean = {
@@ -262,8 +262,8 @@ function shell_buildBinary(p, a) {
 
 function shell_run(arch) {
   return [
-    'docker rm -f portainer',
-    'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer-linux-' + arch + ' --no-analytics'
+    'docker rm -f i3c',
+    'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name i3c portainer/base /app/portainer-linux-' + arch + ' --no-analytics'
   ].join(';');
 }
 
