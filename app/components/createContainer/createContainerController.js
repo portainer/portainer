@@ -11,6 +11,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     NetworkContainer: '',
     Labels: [],
     ExtraHosts: [],
+    MacAddress: '',
     IPv4: '',
     IPv6: '',
     AccessControlData: new AccessControlFormData(),
@@ -34,6 +35,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     Image: '',
     Env: [],
     Cmd: '',
+    MacAddress: '',
     ExposedPorts: {},
     HostConfig: {
       RestartPolicy: {
@@ -253,6 +255,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
     config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
+    config.MacAddress = $scope.formValues.MacAddress;
     prepareNetworkConfig(config);
     prepareImageConfig(config);
     preparePortBindings(config);
@@ -396,6 +399,10 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
+  function loadFromContainerMacAddress(d) {
+    $scope.formValues.MacAddress = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].MacAddress;
+  }
+
   function loadFromContainerEnvrionmentVariables(d) {
     var envArr = [];
     for (var e in $scope.config.Env) {
@@ -478,6 +485,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       loadFromContainerPortBindings(d);
       loadFromContainerVolumes(d);
       loadFromContainerNetworkConfig(d);
+      loadFromContainerMacAddress(d);
       loadFromContainerEnvrionmentVariables(d);
       loadFromContainerLabels(d);
       loadFromContainerConsole(d);
