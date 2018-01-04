@@ -1,6 +1,6 @@
 angular.module('stack', [])
-.controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications', 'FormHelper', 'EndpointProvider',
-function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper, EndpointProvider) {
+.controller('StackController', ['$q', '$scope', '$state', '$transition$', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications', 'FormHelper', 'EndpointProvider',
+function ($q, $scope, $state, $transition$, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper, EndpointProvider) {
 
   $scope.state = {
     actionInProgress: false,
@@ -36,7 +36,7 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
   };
 
   function initView() {
-    var stackId = $stateParams.id;
+    var stackId = $transition$.params().id;
 
     StackService.stack(stackId)
     .then(function success(data) {
