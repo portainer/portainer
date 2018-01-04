@@ -1,9 +1,9 @@
 angular.module('extension.storidge')
-.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'Pagination', 'StoridgeClusterService', 'StoridgeNodeService', 'ModalService',
-function ($q, $scope, $state, Notifications, Pagination, StoridgeClusterService, StoridgeNodeService, ModalService) {
+.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'PaginationService', 'StoridgeClusterService', 'StoridgeNodeService', 'ModalService',
+function ($q, $scope, $state, Notifications, PaginationService, StoridgeClusterService, StoridgeNodeService, ModalService) {
 
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('storidge_nodes');
+  // $scope.state.pagination_count = PaginationService.getPaginationCount('storidge_nodes');
   $scope.sortType = 'Name';
   $scope.sortReverse = true;
 
@@ -13,7 +13,7 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeClusterService,
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('storidge_nodes', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('storidge_nodes', $scope.state.pagination_count);
   };
 
   $scope.rebootCluster = function() {

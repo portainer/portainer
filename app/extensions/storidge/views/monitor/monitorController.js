@@ -1,9 +1,9 @@
 angular.module('extension.storidge')
-.controller('StoridgeMonitorController', ['$q', '$scope', '$interval', '$document', 'Notifications', 'Pagination', 'StoridgeClusterService', 'StoridgeChartService', 'ModalService',
-function ($q, $scope, $interval, $document, Notifications, Pagination, StoridgeClusterService, StoridgeChartService, ModalService) {
+.controller('StoridgeMonitorController', ['$q', '$scope', '$interval', '$document', 'Notifications', 'PaginationService', 'StoridgeClusterService', 'StoridgeChartService', 'ModalService',
+function ($q, $scope, $interval, $document, Notifications, PaginationService, StoridgeClusterService, StoridgeChartService, ModalService) {
 
   $scope.state = {};
-  $scope.state.pagination_count = Pagination.getPaginationCount('storidge_events');
+  // $scope.state.pagination_count = PaginationService.getPaginationCount('storidge_events');
   $scope.sortType = 'Time';
   $scope.sortReverse = true;
 
@@ -13,7 +13,7 @@ function ($q, $scope, $interval, $document, Notifications, Pagination, StoridgeC
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('storidge_events', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('storidge_events', $scope.state.pagination_count);
   };
 
   $scope.$on('$destroy', function() {

@@ -1,10 +1,10 @@
 angular.module('extension.storidge')
-.controller('StoridgeProfilesController', ['$q', '$scope', '$state', 'Notifications', 'Pagination', 'StoridgeProfileService',
-function ($q, $scope, $state, Notifications, Pagination, StoridgeProfileService) {
+.controller('StoridgeProfilesController', ['$q', '$scope', '$state', 'Notifications', 'PaginationService', 'StoridgeProfileService',
+function ($q, $scope, $state, Notifications, PaginationService, StoridgeProfileService) {
 
   $scope.state = {
-    selectedItemCount: 0,
-    pagination_count: Pagination.getPaginationCount('storidge_profiles')
+    selectedItemCount: 0
+    // pagination_count: PaginationService.getPaginationCount('storidge_profiles')
   };
   $scope.sortType = 'Name';
   $scope.sortReverse = false;
@@ -19,7 +19,7 @@ function ($q, $scope, $state, Notifications, Pagination, StoridgeProfileService)
   };
 
   $scope.changePaginationCount = function() {
-    Pagination.setPaginationCount('storidge_profiles', $scope.state.pagination_count);
+    PaginationService.setPaginationCount('storidge_profiles', $scope.state.pagination_count);
   };
 
   $scope.selectItems = function (allSelected) {
