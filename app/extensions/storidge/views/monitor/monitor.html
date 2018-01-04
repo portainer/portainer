@@ -3,7 +3,6 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="storidge.events" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>
     <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.monitor">Cluster monitoring</a>
@@ -113,6 +112,16 @@
 </div>
 
 <div class="row">
+  <div class="col-sm-12">
+    <storidge-cluster-events-datatable
+    title="Cluster events" title-icon="fa-history"
+    dataset="events" table-key="storidge_cluster_events"
+    order-by="Time" show-text-filter="true" reverse-order="true"
+    ></storidge-cluster-events-datatable>
+  </div>
+</div>
+
+<!-- <div class="row">
   <div class="col-md-12">
     <rd-widget>
       <rd-widget-header icon="fa-history" title="Cluster events">
@@ -189,4 +198,4 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-</div>
+</div> -->

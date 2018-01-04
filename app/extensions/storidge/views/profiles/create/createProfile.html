@@ -129,9 +129,10 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!model.Name" ng-click="createProfile()">Create profile</button>
-              <a type="button" class="btn btn-default btn-sm" ui-sref="storidge.profiles">Cancel</a>
-              <i id="resourceCreationSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="create()" ng-disabled="state.actionInProgress || !model.Name" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Create the profile</span>
+                <span ng-show="state.actionInProgress">Creating profile...</span>
+              </button>
             </div>
           </div>
           <!-- !actions -->

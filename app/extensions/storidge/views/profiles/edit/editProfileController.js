@@ -1,11 +1,13 @@
 angular.module('extension.storidge')
-.controller('EditProfileController', ['$scope', '$state', '$stateParams', 'Notifications', 'StoridgeProfileService', 'ModalService',
-function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, ModalService) {
+.controller('EditProfileController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeProfileService', 'ModalService',
+function ($scope, $state, $transition$, Notifications, StoridgeProfileService, ModalService) {
 
   $scope.state = {
     NoLimit: true,
     LimitIOPS: false,
-    LimitBandwidth: false
+    LimitBandwidth: false,
+    updateInProgress: false,
+    deleteInProgress: false
   };
 
   $scope.RedundancyOptions = [
@@ -13,8 +15,7 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, M
     { value: 3, label: '3-copy' }
   ];
 
-  $scope.updateProfile = function() {
-    $('#createResourceSpinner').show();
+  $scope.update = function() {
 
     var profile = $scope.profile;
 
@@ -28,6 +29,7 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, M
       delete profile.MaxBandwidth;
     }
 
+    $scope.state.updateInProgress = true;
     StoridgeProfileService.update(profile)
     .then(function success(data) {
       Notifications.success('Profile successfully updated');
@@ -37,11 +39,11 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, M
       Notifications.error('Failure', err, 'Unable to update profile');
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $scope.state.updateInProgress = false;
     });
   };
 
-  $scope.deleteProfile = function() {
+  $scope.delete = function() {
     ModalService.confirmDeletion(
       'Do you want to remove this profile?',
       function onConfirm(confirmed) {
@@ -52,9 +54,9 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, M
   };
 
   function deleteProfile() {
-    $('#createResourceSpinner').show();
-
     var profile = $scope.profile;
+
+    $scope.state.deleteInProgress = true;
     StoridgeProfileService.delete(profile.Name)
     .then(function success(data) {
       Notifications.success('Profile successfully deleted');
@@ -64,14 +66,12 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, M
       Notifications.error('Failure', err, 'Unable to delete profile');
     })
     .finally(function final() {
-      $('#createResourceSpinner').hide();
+      $scope.state.deleteInProgress = false;
     });
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
-
-    StoridgeProfileService.profile($stateParams.id)
+    StoridgeProfileService.profile($transition$.params().id)
     .then(function success(data) {
       var profile = data;
       if ((profile.MinIOPS && profile.MinIOPS !== 0) || (profile.MaxIOPS && profile.MaxIOPS !== 0)) {
@@ -85,9 +85,6 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService, M
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve profile details');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 

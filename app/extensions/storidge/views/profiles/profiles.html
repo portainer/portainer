@@ -3,7 +3,6 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="storidge.profiles" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>
     <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.profiles">Profiles</a>
@@ -34,9 +33,10 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ng-click="createProfile()">Create</button>
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ui-sref="storidge.profiles.create({ profileName: formValues.Name })">Modify defaults...</button>
-              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="create()" ng-disabled="state.actionInProgress || !formValues.Name" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Create the profile</span>
+                <span ng-show="state.actionInProgress">Creating profile...</span>
+              </button>
             </div>
           </div>
         </form>
@@ -46,6 +46,18 @@
 </div>
 
 <div class="row">
+  <div class="col-sm-12">
+    <storidge-profiles-datatable
+    title="Profiles" title-icon="fa-sticky-note-o"
+    dataset="profiles" table-key="storidge_profiles"
+    order-by="Name" show-text-filter="true"
+    remove-action="removeAction"
+    ></storidge-profiles-datatable>
+  </div>
+</div>
+
+
+<!-- <div class="row">
   <div class="col-md-12">
     <rd-widget>
       <rd-widget-header icon="fa-sticky-note-o" title="Profiles">
@@ -107,4 +119,4 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-</div>
+</div> -->

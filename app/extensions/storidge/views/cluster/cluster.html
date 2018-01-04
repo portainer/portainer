@@ -3,7 +3,6 @@
     <a data-toggle="tooltip" title="Refresh" ui-sref="storidge.cluster" ui-sref-opts="{reload: true}">
       <i class="fa fa-refresh" aria-hidden="true"></i>
     </a>
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
   </rd-header-title>
   <rd-header-content>
     <a ui-sref="storidge.cluster">Storidge</a>
@@ -37,13 +36,14 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-danger btn-sm" ng-click="shutdownCluster()">
-                <i class="fa fa-power-off space-right" aria-hidden="true"></i> Shutdown cluster
+              <button type="button" class="btn btn-danger btn-sm" ng-click="shutdownCluster()" ng-disabled="state.shutdownInProgress" button-spinner="state.shutdownInProgress">
+                <span ng-hide="state.updateInProgress"><i class="fa fa-power-off space-right" aria-hidden="true"></i> Shutdown the cluster</span>
+                <span ng-show="state.updateInProgress">Shutting down cluster...</span>
               </button>
-              <button type="button" class="btn btn-danger btn-sm" ng-click="rebootCluster()">
-                <i class="fa fa-refresh space-right" aria-hidden="true"></i> Reboot cluster
+              <button type="button" class="btn btn-danger btn-sm" ng-click="rebootCluster()" ng-disabled="state.rebootInProgress" button-spinner="state.shutdownInProgress">
+                <span ng-hide="state.deleteInProgress"><i class="fa fa-refresh space-right" aria-hidden="true"></i> Reboot the cluster</span>
+                <span ng-show="state.deleteInProgress">Rebooting cluster...</span>
               </button>
-              <i id="clusterActionSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
             </div>
           </div>
         </form>
@@ -52,7 +52,17 @@
   </div>
 </div>
 
-<div class="row" ng-if="clusterInfo">
+<div class="row">
+  <div class="col-sm-12">
+    <storidge-nodes-datatable
+    title="Storage nodes" title-icon="fa-object-group"
+    dataset="clusterNodes" table-key="storidge_nodes"
+    order-by="Name" show-text-filter="true"
+    ></storidge-nodes-datatable>
+  </div>
+</div>
+
+<!-- <div class="row" ng-if="clusterInfo">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-object-group" title="Storage nodes">
@@ -132,4 +142,4 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-</div>
+</div> -->

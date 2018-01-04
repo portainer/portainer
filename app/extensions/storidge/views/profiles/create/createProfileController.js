@@ -1,16 +1,16 @@
 angular.module('extension.storidge')
-.controller('CreateProfileController', ['$scope', '$state', '$stateParams', 'Notifications', 'StoridgeProfileService',
-function ($scope, $state, $stateParams, Notifications, StoridgeProfileService) {
+.controller('CreateProfileController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeProfileService',
+function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
 
   $scope.state = {
     NoLimit: true,
     LimitIOPS: false,
     LimitBandwidth: false,
-    ManualInputDirectory: false
+    ManualInputDirectory: false,
+    actionInProgress: false
   };
 
   $scope.createProfile = function () {
-    $('#resourceCreationSpinner').show();
     var profile = $scope.model;
 
     if (!$scope.state.LimitIOPS) {
@@ -23,6 +23,7 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService) {
       delete profile.MaxBandwidth;
     }
 
+    $scope.state.actionInProgress = true;
     StoridgeProfileService.create(profile)
     .then(function success(data) {
       Notifications.success('Profile successfully created');
@@ -32,7 +33,7 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService) {
       Notifications.error('Failure', err, 'Unable to create profile');
     })
     .finally(function final() {
-      $('#resourceCreationSpinner').hide();
+      $scope.state.actionInProgress = false;
     });
   };
 
@@ -51,7 +52,7 @@ function ($scope, $state, $stateParams, Notifications, StoridgeProfileService) {
 
   function initView() {
     var profile = new StoridgeProfileDefaultModel();
-    profile.Name = $stateParams.profileName;
+    profile.Name = $transition$.params().profileName;
     profile.Directory = '/cio/' + profile.Name;
     $scope.model = profile;
   }

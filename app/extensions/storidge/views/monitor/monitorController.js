@@ -1,20 +1,6 @@
 angular.module('extension.storidge')
-.controller('StoridgeMonitorController', ['$q', '$scope', '$interval', '$document', 'Notifications', 'PaginationService', 'StoridgeClusterService', 'StoridgeChartService', 'ModalService',
-function ($q, $scope, $interval, $document, Notifications, PaginationService, StoridgeClusterService, StoridgeChartService, ModalService) {
-
-  $scope.state = {};
-  // $scope.state.pagination_count = PaginationService.getPaginationCount('storidge_events');
-  $scope.sortType = 'Time';
-  $scope.sortReverse = true;
-
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    PaginationService.setPaginationCount('storidge_events', $scope.state.pagination_count);
-  };
+.controller('StoridgeMonitorController', ['$q', '$scope', '$interval', '$document', 'Notifications', 'StoridgeClusterService', 'StoridgeChartService', 'ModalService',
+function ($q, $scope, $interval, $document, Notifications, StoridgeClusterService, StoridgeChartService, ModalService) {
 
   $scope.$on('$destroy', function() {
     stopRepeater();
@@ -72,7 +58,6 @@ function ($q, $scope, $interval, $document, Notifications, PaginationService, St
   }
 
   function startViewUpdate(iopsChart, bandwidthChart, capacityChart) {
-    $('#loadingViewSpinner').show();
     $q.all({
       events: StoridgeClusterService.events(),
       info: StoridgeClusterService.info()
@@ -89,9 +74,6 @@ function ($q, $scope, $interval, $document, Notifications, PaginationService, St
     .catch(function error(err) {
       stopRepeater();
       Notifications.error('Failure', err, 'Unable to retrieve cluster information');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
@@ -109,7 +91,6 @@ function ($q, $scope, $interval, $document, Notifications, PaginationService, St
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
 
     $document.ready(function() {
       initCharts();

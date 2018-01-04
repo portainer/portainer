@@ -1,7 +1,5 @@
 <rd-header>
-  <rd-header-title title="Profile details">
-    <i id="loadingViewSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
-  </rd-header-title>
+  <rd-header-title title="Profile details"></rd-header-title>
   <rd-header-content>
     <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.profiles">Profiles</a> &gt; {{ profile.Name }}
   </rd-header-content>
@@ -123,15 +121,20 @@
             </div>
           </div>
           <!-- !bandwidth -->
+          <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!profile.Name" ng-click="updateProfile()">Update profile</button>
-              <a type="button" class="btn btn-danger btn-sm" ng-click="deleteProfile()">Delete profile</a>
-              <a type="button" class="btn btn-default btn-sm" ui-sref="storidge.profiles">Cancel</a>
-              <i id="createResourceSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="update()" ng-disabled="state.updateInProgress || !profile.Name" button-spinner="state.updateInProgress">
+                <span ng-hide="state.updateInProgress">Update the profile</span>
+                <span ng-show="state.updateInProgress">Updating profile...</span>
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" ng-click="delete()" ng-disabled="state.deleteInProgress" button-spinner="state.deleteInProgress">
+                <span ng-hide="state.deleteInProgress">Delete the profile</span>
+                <span ng-show="state.deleteInProgress">Deleting profile...</span>
+              </button>
             </div>
           </div>
           <!-- !actions -->

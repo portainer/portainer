@@ -1,19 +1,10 @@
 angular.module('extension.storidge')
-.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'PaginationService', 'StoridgeClusterService', 'StoridgeNodeService', 'ModalService',
-function ($q, $scope, $state, Notifications, PaginationService, StoridgeClusterService, StoridgeNodeService, ModalService) {
+.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'StoridgeClusterService', 'StoridgeNodeService', 'ModalService',
+function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNodeService, ModalService) {
 
-  $scope.state = {};
-  // $scope.state.pagination_count = PaginationService.getPaginationCount('storidge_nodes');
-  $scope.sortType = 'Name';
-  $scope.sortReverse = true;
-
-  $scope.order = function(sortType) {
-    $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
-    $scope.sortType = sortType;
-  };
-
-  $scope.changePaginationCount = function() {
-    PaginationService.setPaginationCount('storidge_nodes', $scope.state.pagination_count);
+  $scope.state = {
+    shutdownInProgress: false,
+    rebootInProgress: false
   };
 
   $scope.rebootCluster = function() {
@@ -56,8 +47,7 @@ function ($q, $scope, $state, Notifications, PaginationService, StoridgeClusterS
   }
 
   function rebootCluster() {
-    $('#clusterActionSpinner').show();
-
+    $scope.state.rebootInProgress = true;
     StoridgeClusterService.reboot()
     .then(function success(data) {
       Notifications.success('Cluster successfully rebooted');
@@ -67,12 +57,11 @@ function ($q, $scope, $state, Notifications, PaginationService, StoridgeClusterS
       Notifications.error('Failure', err, 'Unable to reboot cluster');
     })
     .finally(function final() {
-      $('#clusterActionSpinner').show();
+      $scope.state.rebootInProgress = false;
     });
   }
 
   function initView() {
-    $('#loadingViewSpinner').show();
     $q.all({
       info: StoridgeClusterService.info(),
       version: StoridgeClusterService.version(),
@@ -85,9 +74,6 @@ function ($q, $scope, $state, Notifications, PaginationService, StoridgeClusterS
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve cluster information');
-    })
-    .finally(function final() {
-      $('#loadingViewSpinner').hide();
     });
   }
 
