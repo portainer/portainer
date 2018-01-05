@@ -37,6 +37,7 @@
                 <span ng-hide="state.actionInProgress">Create the profile</span>
                 <span ng-show="state.actionInProgress">Creating profile...</span>
               </button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ui-sref="storidge.profiles.create({ profileName: formValues.Name })">Modify defaults...</button>
             </div>
           </div>
         </form>

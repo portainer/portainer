@@ -10,7 +10,12 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
     actionInProgress: false
   };
 
-  $scope.createProfile = function () {
+  $scope.RedundancyOptions = [
+    { value: 2, label: '2-copy' },
+    { value: 3, label: '3-copy' }
+  ];
+
+  $scope.create = function () {
     var profile = $scope.model;
 
     if (!$scope.state.LimitIOPS) {
