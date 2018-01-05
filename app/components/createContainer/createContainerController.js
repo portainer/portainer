@@ -401,7 +401,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
-  function loadFromContainerEnvrionmentVariables(d) {
+  function loadFromContainerEnvironmentVariables(d) {
     var envArr = [];
     for (var e in $scope.config.Env) {
       if ({}.hasOwnProperty.call($scope.config.Env, e)) {
@@ -483,7 +483,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       loadFromContainerPortBindings(d);
       loadFromContainerVolumes(d);
       loadFromContainerNetworkConfig(d);
-      loadFromContainerEnvrionmentVariables(d);
+      loadFromContainerEnvironmentVariables(d);
       loadFromContainerLabels(d);
       loadFromContainerConsole(d);
       loadFromContainerDevices(d);
