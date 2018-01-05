@@ -66,7 +66,7 @@ angular.module('portainer.filters')
       labelStyle = 'primary';
     } else if (includeString(status, ['running'])) {
       labelStyle = 'success';
-    }    
+    }
     return labelStyle;
   };
 })
@@ -352,7 +352,6 @@ angular.module('portainer.filters')
     if (imageName.indexOf('sha256:') === 0) {
       return imageName.substring(7, 19);
     }
-    return imageName;
+    return _.split(imageName, '@sha256')[0];
   };
-})
-;
+});
