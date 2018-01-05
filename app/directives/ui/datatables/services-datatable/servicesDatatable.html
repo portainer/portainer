@@ -15,8 +15,8 @@
         <button type="button" class="btn btn-sm btn-danger"
           ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
-        </button>        
-        <button type="button" class="btn btn-sm btn-primary" 
+        </button>
+        <button ng-if="$ctrl.showForceUpdateButton" type="button" class="btn btn-sm btn-primary"
           ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.forceUpdateAction($ctrl.state.selectedItems)">
           <i class="fa fa-refresh space-right" aria-hidden="true"></i>Force update
         </button>

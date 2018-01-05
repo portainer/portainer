@@ -18,19 +18,13 @@ function ($q, $scope, $state, Service, ServiceService, ServiceHelper, Notificati
   };
 
   $scope.forceUpdateAction = function(selectedItems) {
-    if ($scope.applicationState.endpoint.apiVersion <= 1.24) {
-      var notSupported = 'Force update is not supported for API version <= 1.24';
-      var e = new Error(notSupported);
-      Notifications.error('Not supported', e, notSupported);        
-    } else {
-      ModalService.confirmForceUpdate(
-        'Do you want to force update of selected service(s)? All the tasks associated to the selected service(s) will be recreated.',
-        function onConfirm(confirmed) {
-          if(!confirmed) { return; }
-          forceUpdateServices(selectedItems);
-        }
-      );
-    }    
+    ModalService.confirmServiceForceUpdate(
+      'Do you want to force update of selected service(s)? All the tasks associated to the selected service(s) will be recreated.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        forceUpdateServices(selectedItems);
+      }
+    );
   };
 
   function forceUpdateServices(services) {
@@ -38,21 +32,21 @@ function ($q, $scope, $state, Service, ServiceService, ServiceHelper, Notificati
     angular.forEach(services, function (service) {
       var config = ServiceHelper.serviceToConfig(service.Model);
       // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
-      // value or an increment of the counter value to force an update.          
-      config.TaskTemplate.ForceUpdate++;      
+      // value or an increment of the counter value to force an update.
+      config.TaskTemplate.ForceUpdate++;
       ServiceService.update(service, config)
       .then(function success(data) {
-        Notifications.success('Service successfully updated with --force', service.Name);        
+        Notifications.success('Service successfully updated', service.Name);
       })
       .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to force update service', service.Name);        
+        Notifications.error('Failure', err, 'Unable to force update service', service.Name);
       })
       .finally(function final() {
         --actionCount;
         if (actionCount === 0) {
           $state.reload();
         }
-      });      
+      });
     });
   }
 

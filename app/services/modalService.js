@@ -156,7 +156,7 @@ angular.module('portainer.services')
     });
   };
 
-  service.confirmForceUpdate = function(message, callback) {
+  service.confirmServiceForceUpdate = function(message, callback) {
     service.confirm({
       title: 'Are you sure ?',
       message: message,
