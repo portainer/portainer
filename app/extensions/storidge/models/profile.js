@@ -1,7 +1,7 @@
 function StoridgeProfileDefaultModel() {
   this.Directory = '/cio/';
   this.Capacity = 20;
-  this.Redundancy = '2';
+  this.Redundancy = 2;
   this.Provisioning = 'thin';
   this.Type = 'ssd';
   this.MinIOPS = 100;

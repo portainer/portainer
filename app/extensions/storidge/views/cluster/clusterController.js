@@ -10,7 +10,7 @@ function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNod
   $scope.rebootCluster = function() {
     ModalService.confirm({
       title: 'Are you sure?',
-      message: 'Do you want to reboot the Storidge cluster?',
+      message: 'All the nodes in the cluster will reboot during the process. Do you want to reboot the Storidge cluster?',
       buttons: {
         confirm: {
           label: 'Reboot',
@@ -27,7 +27,7 @@ function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNod
   $scope.shutdownCluster = function() {
     ModalService.confirm({
       title: 'Are you sure?',
-      message: 'Do you want to shutdown the Storidge cluster?',
+      message: 'All the nodes in the cluster will shutdown. Do you want to shutdown the Storidge cluster?',
       buttons: {
         confirm: {
           label: 'Shutdown',

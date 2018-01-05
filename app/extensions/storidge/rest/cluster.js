@@ -11,7 +11,8 @@ angular.module('extension.storidge')
       method: 'GET',
       url: EndpointProvider.StoridgeAPI() + '/events',
       skipAuthorization: true,
-      timeout: 4500
+      timeout: 4500,
+      ignoreLoadingBar: true
     });
   };
 
@@ -28,7 +29,8 @@ angular.module('extension.storidge')
       method: 'GET',
       url: EndpointProvider.StoridgeAPI() + '/info',
       skipAuthorization: true,
-      timeout: 4500
+      timeout: 4500,
+      ignoreLoadingBar: true
     });
   };
 

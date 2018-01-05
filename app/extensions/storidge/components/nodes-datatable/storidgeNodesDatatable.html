@@ -52,11 +52,11 @@
           <tbody>
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
               <td>{{ item.Name }}</td>
-              <td>{{ node.IP }}</td>
-              <td>{{ node.Role }}</td>
+              <td>{{ item.IP }}</td>
+              <td>{{ item.Role }}</td>
               <td>
                 <i class="fa fa-heartbeat space-right green-icon"></i>
-                {{ node.Status }}
+                {{ item.Status }}
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

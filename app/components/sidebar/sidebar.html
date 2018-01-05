@@ -61,7 +61,7 @@
       <span>Extensions</span>
     </li>
     <li class="sidebar-list" ng-if="applicationState.endpoint.extensions.indexOf('storidge') !== -1">
-      <a ui-sref="storidge.cluster" ui-sref-active="active">Storidge <span class="menu-icon fa fa-bolt"></span></a>
+      <a ui-sref="storidge.cluster" ui-sref-active="active">Storidge <span class="menu-icon fa fa-bolt fa-fw"></span></a>
       <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor' || $state.current.name === 'storidge.profiles.create' || $state.current.name === 'storidge.profiles.edit')">
         <a ui-sref="storidge.monitor" ui-sref-active="active">Monitor</a>
       </div>
