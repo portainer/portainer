@@ -195,6 +195,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       config.Hostname = '';
     }
     config.HostConfig.NetworkMode = networkMode;
+    config.MacAddress = $scope.formValues.MacAddress;
 
     config.NetworkingConfig.EndpointsConfig[networkMode] = {
       IPAMConfig: {
@@ -255,7 +256,6 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
     config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
-    config.MacAddress = $scope.formValues.MacAddress;
     prepareNetworkConfig(config);
     prepareImageConfig(config);
     preparePortBindings(config);
@@ -390,6 +390,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       }
     }
     $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode] = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode];
+    // Mac Address
+    $scope.formValues.MacAddress = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].MacAddress;
     // ExtraHosts
     for (var h in $scope.config.HostConfig.ExtraHosts) {
       if ({}.hasOwnProperty.call($scope.config.HostConfig.ExtraHosts, h)) {
@@ -397,10 +399,6 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         $scope.config.HostConfig.ExtraHosts = [];
       }
     }
-  }
-
-  function loadFromContainerMacAddress(d) {
-    $scope.formValues.MacAddress = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].MacAddress;
   }
 
   function loadFromContainerEnvrionmentVariables(d) {
@@ -485,7 +483,6 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       loadFromContainerPortBindings(d);
       loadFromContainerVolumes(d);
       loadFromContainerNetworkConfig(d);
-      loadFromContainerMacAddress(d);
       loadFromContainerEnvrionmentVariables(d);
       loadFromContainerLabels(d);
       loadFromContainerConsole(d);
