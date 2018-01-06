@@ -1,11 +1,13 @@
 angular.module('serviceLogs', [])
-.controller('ServiceLogsController', ['$scope', '$transition$', '$anchorScroll', 'ServiceService', 'LogsService', 'Notifications',
-function ($scope, $transition$, $anchorScroll, ServiceService, LogsService, Notifications) {
+.controller('ServiceLogsController', ['$scope', '$interval', '$transition$', '$anchorScroll', 'ServiceService', 'LogsService', 'Notifications',
+function ($scope, $interval, $transition$, $anchorScroll, ServiceService, LogsService, Notifications) {
   $scope.state = {};
   $scope.state.displayTimestampsOut = false;
   $scope.state.displayTimestampsErr = false;
   $scope.stdout = '';
   $scope.stderr = '';
+
+  var fetchLogsInterval;
 
   function getLogs() {
     getLogsStdout();
@@ -40,11 +42,10 @@ function ($scope, $transition$, $anchorScroll, ServiceService, LogsService, Noti
     getService();
     getLogs();
 
-    var logIntervalId = window.setInterval(getLogs, 5000);
+    fetchLogsInterval = $interval(getLogs, 5000);
 
     $scope.$on('$destroy', function () {
-      // clearing interval when view changes
-      clearInterval(logIntervalId);
+      $interval.cancel(fetchLogsInterval);
     });
 
     $scope.toggleTimestampsOut = function () {

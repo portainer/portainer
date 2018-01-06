@@ -7,6 +7,8 @@ function ($scope, $transition$, ServiceService, TaskService, LogsService, Notifi
   $scope.stdout = '';
   $scope.stderr = '';
 
+  var fetchLogsInterval;
+  
   function getLogs() {
     $('#loadingViewSpinner').show();
     getLogsStdout();
@@ -41,10 +43,10 @@ function ($scope, $transition$, ServiceService, TaskService, LogsService, Notifi
       Notifications.error('Failure', err, 'Unable to retrieve task info');
     });
 
-    var logIntervalId = window.setInterval(getLogs, 5000);
-    $scope.$on('$destroy', function() {
-      // clearing interval when view changes
-      clearInterval(logIntervalId);
+    fetchLogsInterval = $interval(getLogs, 5000);
+
+    $scope.$on('$destroy', function () {
+      $interval.cancel(fetchLogsInterval);
     });
 
     $scope.toggleTimestampsOut = getLogsStdout;

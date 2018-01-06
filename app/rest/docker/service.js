@@ -18,10 +18,10 @@ angular.module('portainer.rest')
         method: 'GET',
         params: {
             action: 'logs',
-            stdout: '@stdout' || 0,
-            stderr: '@stderr' || 0,
-            timestamps: '@timestamps' || 0,
-            tail: '@tail' || 'all'
+            stdout: '@stdout',
+            stderr: '@stderr',
+            timestamps: '@timestamps',
+            tail: '@tail'
         },
         transformResponse: genericHandler
     }
