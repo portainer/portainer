@@ -144,7 +144,20 @@ function (PaginationService, DatatableService) {
       }
       availableStateFilters.push({ label: item.Status, display: true });
     }
-    this.filters.state.values = _.uniqBy(availableStateFilters, 'label');
+     this.filters.state.values = _.uniqBy(availableStateFilters, 'label');
+  };
+
+  this.updateStoredFilters = function(storedFilters) {
+    var datasetFilters = this.filters.state.values;
+
+    for (var i = 0; i < datasetFilters.length; i++) {
+      var filter = datasetFilters[i];
+      existingFilter = _.find(storedFilters, ['label', filter.label]);
+      if (existingFilter && !existingFilter.display) {
+        filter.display = existingFilter.display;
+        this.filters.state.enabled = true;
+      }
+    }
   };
 
   this.$onInit = function() {
@@ -159,7 +172,7 @@ function (PaginationService, DatatableService) {
 
     var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
     if (storedFilters !== null) {
-      this.filters = storedFilters;
+      this.updateStoredFilters(storedFilters.state.values);
     }
     this.filters.state.open = false;
 

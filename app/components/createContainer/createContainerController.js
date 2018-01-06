@@ -11,6 +11,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     NetworkContainer: '',
     Labels: [],
     ExtraHosts: [],
+    MacAddress: '',
     IPv4: '',
     IPv6: '',
     AccessControlData: new AccessControlFormData(),
@@ -34,6 +35,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     Image: '',
     Env: [],
     Cmd: '',
+    MacAddress: '',
     ExposedPorts: {},
     HostConfig: {
       RestartPolicy: {
@@ -193,6 +195,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       config.Hostname = '';
     }
     config.HostConfig.NetworkMode = networkMode;
+    config.MacAddress = $scope.formValues.MacAddress;
 
     config.NetworkingConfig.EndpointsConfig[networkMode] = {
       IPAMConfig: {
@@ -387,6 +390,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       }
     }
     $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode] = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode];
+    // Mac Address
+    $scope.formValues.MacAddress = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].MacAddress;
     // ExtraHosts
     for (var h in $scope.config.HostConfig.ExtraHosts) {
       if ({}.hasOwnProperty.call($scope.config.HostConfig.ExtraHosts, h)) {
@@ -396,7 +401,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
-  function loadFromContainerEnvrionmentVariables(d) {
+  function loadFromContainerEnvironmentVariables(d) {
     var envArr = [];
     for (var e in $scope.config.Env) {
       if ({}.hasOwnProperty.call($scope.config.Env, e)) {
@@ -478,7 +483,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       loadFromContainerPortBindings(d);
       loadFromContainerVolumes(d);
       loadFromContainerNetworkConfig(d);
-      loadFromContainerEnvrionmentVariables(d);
+      loadFromContainerEnvironmentVariables(d);
       loadFromContainerLabels(d);
       loadFromContainerConsole(d);
       loadFromContainerDevices(d);

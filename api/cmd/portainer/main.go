@@ -7,7 +7,7 @@ import (
 	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/crypto"
 	"github.com/portainer/portainer/exec"
-	"github.com/portainer/portainer/file"
+	"github.com/portainer/portainer/filesystem"
 	"github.com/portainer/portainer/git"
 	"github.com/portainer/portainer/http"
 	"github.com/portainer/portainer/jwt"
@@ -31,7 +31,7 @@ func initCLI() *portainer.CLIFlags {
 }
 
 func initFileService(dataStorePath string) portainer.FileService {
-	fileService, err := file.NewService(dataStorePath, "")
+	fileService, err := filesystem.NewService(dataStorePath, "")
 	if err != nil {
 		log.Fatal(err)
 	}
