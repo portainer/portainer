@@ -45,6 +45,14 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     $scope.state.selectedTemplate.Hosts.splice(index, 1);
   };
 
+  $scope.addLabel = function () {
+    $scope.state.selectedTemplate.Labels.push({ name: '', value: ''});
+  };
+
+  $scope.removeLabel = function(index) {
+    $scope.state.selectedTemplate.Labels.splice(index, 1);
+  };
+
   function validateForm(accessControlData, isAdmin) {
     $scope.state.formValidationError = '';
     var error = '';
