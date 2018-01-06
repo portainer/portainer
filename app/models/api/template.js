@@ -14,8 +14,8 @@ function TemplateViewModel(data) {
   this.Privileged = data.privileged ? data.privileged : false;
   this.Interactive = data.interactive ? data.interactive : false;
   this.RestartPolicy = data.restart_policy ? data.restart_policy : 'always';
+  this.Labels = data.labels ? data.labels : [];
   this.Volumes = [];
-  this.Labels = [];
 
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
@@ -45,12 +45,5 @@ function TemplateViewModel(data) {
       };
     });
   }
-  this.Hosts = data.hosts ? data.hosts : [];
-  
-  for (var label in data.labels) {
-    if (label) {
-      this.Labels.push({name:label, value:data.labels[label]});
-    }
-  }
-    
+  this.Hosts = data.hosts ? data.hosts : []; 
 }
