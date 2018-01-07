@@ -3,7 +3,7 @@ angular.module('extension.storidge')
 function ($scope, $state, $transition$, Notifications, StoridgeProfileService, ModalService) {
 
   $scope.state = {
-    NoLimit: true,
+    NoLimit: false,
     LimitIOPS: false,
     LimitBandwidth: false,
     updateInProgress: false,
