@@ -1,6 +1,6 @@
 angular.module('extension.storidge')
-.controller('StoridgeProfilesController', ['$q', '$scope', '$state', 'Notifications', 'StoridgeProfileService',
-function ($q, $scope, $state, Notifications, StoridgeProfileService) {
+.controller('StoridgeProfilesController', ['$q', '$scope', '$state', 'Notifications', 'StoridgeProfileService', 'StoridgeManager',
+function ($q, $scope, $state, Notifications, StoridgeProfileService, StoridgeManager) {
 
   $scope.state = {
     actionInProgress: false
@@ -60,5 +60,11 @@ function ($q, $scope, $state, Notifications, StoridgeProfileService) {
     });
   }
 
-  initView();
+  StoridgeManager.init()
+  .then(function success() {
+    initView();
+  })
+  .catch(function error(err) {
+    Notifications.error('Failure', err, 'Unable to communicate with Storidge API');
+  });
 }]);

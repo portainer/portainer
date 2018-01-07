@@ -1,6 +1,6 @@
 angular.module('sidebar', [])
-.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService',
-function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService) {
+.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'StoridgeManager',
+function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService, StoridgeManager) {
 
   $scope.uiVersion = StateManager.getState().application.version;
   $scope.displayExternalContributors = StateManager.getState().application.displayExternalContributors;
@@ -14,10 +14,12 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
 
     // STORIDGE_TMP
-    var activeStoridgeAPI = EndpointProvider.StoridgeAPI();
-    EndpointProvider.setStoridgeAPIFromURL(endpoint.URL);
+    // var activeStoridgeAPI = EndpointProvider.StoridgeAPI();
+    // EndpointProvider.setStoridgeAPIFromURL(endpoint.URL);
     StateManager.updateEndpointState(true)
     .then(function success() {
+      // STORIDGE_TMP
+      StoridgeManager.reset();
       $state.go('dashboard');
     })
     .catch(function error(err) {
@@ -25,7 +27,7 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
       EndpointProvider.setEndpointID(activeEndpointID);
       EndpointProvider.setEndpointPublicURL(activeEndpointPublicURL);
       // STORIDGE_TMP
-      EndpointProvider.setStoridgeAPI(activeStoridgeAPI);
+      // EndpointProvider.setStoridgeAPI(activeStoridgeAPI);
       StateManager.updateEndpointState(true)
       .then(function success() {});
     });

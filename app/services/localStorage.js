@@ -42,12 +42,16 @@ angular.module('portainer.services')
       return localStorageService.cookie.get('pagination_' + key);
     },
     // STORIDGE_TMP
-    storeStoridgeAPI: function(state) {
-      localStorageService.set('STORIDGE_API', state);
+    storeStoridgeAPIURL: function(url) {
+      localStorageService.set('STORIDGE_API_URL', url);
     },
     // STORIDGE_TMP
-    getStoridgeAPI: function() {
-      return localStorageService.get('STORIDGE_API');
+    getStoridgeAPIURL: function() {
+      return localStorageService.get('STORIDGE_API_URL');
+    },
+    // STORIDGE_TMP
+    clearStoridgeAPIURL: function() {
+      return localStorageService.remove('STORIDGE_API_URL');
     },
     getDataTableOrder: function(key) {
       return localStorageService.get('datatable_order_' + key);

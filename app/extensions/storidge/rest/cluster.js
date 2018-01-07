@@ -1,15 +1,13 @@
 angular.module('extension.storidge')
-.factory('StoridgeCluster', ['$http', 'EndpointProvider', function StoridgeClusterFactory($http, EndpointProvider) {
+.factory('StoridgeCluster', ['$http', 'StoridgeManager', function StoridgeClusterFactory($http, StoridgeManager) {
   'use strict';
-
-  // var EndpointProvider.StoridgeAPI() = 'http://114.23.120.182:8282';
 
   var service = {};
 
   service.queryEvents = function() {
     return $http({
       method: 'GET',
-      url: EndpointProvider.StoridgeAPI() + '/events',
+      url: StoridgeManager.StoridgeAPIURL() + '/events',
       skipAuthorization: true,
       timeout: 4500,
       ignoreLoadingBar: true
@@ -19,7 +17,7 @@ angular.module('extension.storidge')
   service.queryVersion = function() {
     return $http({
       method: 'GET',
-      url: EndpointProvider.StoridgeAPI() + '/version',
+      url: StoridgeManager.StoridgeAPIURL() + '/version',
       skipAuthorization: true
     });
   };
@@ -27,7 +25,7 @@ angular.module('extension.storidge')
   service.queryInfo = function() {
     return $http({
       method: 'GET',
-      url: EndpointProvider.StoridgeAPI() + '/info',
+      url: StoridgeManager.StoridgeAPIURL() + '/info',
       skipAuthorization: true,
       timeout: 4500,
       ignoreLoadingBar: true
@@ -37,7 +35,7 @@ angular.module('extension.storidge')
   service.reboot = function() {
     return $http({
       method: 'POST',
-      url: EndpointProvider.StoridgeAPI() + '/cluster/reboot',
+      url: StoridgeManager.StoridgeAPIURL() + '/cluster/reboot',
       skipAuthorization: true
     });
   };

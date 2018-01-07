@@ -1,15 +1,13 @@
 angular.module('extension.storidge')
-.factory('StoridgeProfiles', ['$http', 'EndpointProvider', function StoridgeProfilesFactory($http, EndpointProvider) {
+.factory('StoridgeProfiles', ['$http', 'StoridgeManager', function StoridgeProfilesFactory($http, StoridgeManager) {
   'use strict';
-
-  // var EndpointProvider.StoridgeAPI() = 'http://114.23.120.182:8282';
 
   var service = {};
 
   service.create = function(payload) {
     return $http({
       method: 'POST',
-      url: EndpointProvider.StoridgeAPI() + '/profiles',
+      url: StoridgeManager.StoridgeAPIURL() + '/profiles',
       data: payload,
       headers: { 'Content-type': 'application/json' },
       skipAuthorization: true
@@ -19,7 +17,7 @@ angular.module('extension.storidge')
   service.update = function(id, payload) {
     return $http({
       method: 'PUT',
-      url: EndpointProvider.StoridgeAPI() + '/profiles/' + id,
+      url: StoridgeManager.StoridgeAPIURL() + '/profiles/' + id,
       data: payload,
       headers: { 'Content-type': 'application/json' },
       skipAuthorization: true
@@ -29,7 +27,7 @@ angular.module('extension.storidge')
   service.query = function() {
     return $http({
       method: 'GET',
-      url: EndpointProvider.StoridgeAPI() + '/profiles',
+      url: StoridgeManager.StoridgeAPIURL() + '/profiles',
       skipAuthorization: true
     });
   };
@@ -37,7 +35,7 @@ angular.module('extension.storidge')
   service.inspect = function(id) {
     return $http({
       method: 'GET',
-      url: EndpointProvider.StoridgeAPI() + '/profiles/' + id,
+      url: StoridgeManager.StoridgeAPIURL() + '/profiles/' + id,
       skipAuthorization: true
     });
   };
@@ -45,7 +43,7 @@ angular.module('extension.storidge')
   service.delete = function(id) {
     return $http({
       method: 'DELETE',
-      url: EndpointProvider.StoridgeAPI() + '/profiles/' + id,
+      url: StoridgeManager.StoridgeAPIURL() + '/profiles/' + id,
       skipAuthorization: true
     });
   };

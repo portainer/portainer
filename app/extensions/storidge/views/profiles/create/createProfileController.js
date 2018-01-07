@@ -1,6 +1,6 @@
 angular.module('extension.storidge')
-.controller('CreateProfileController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeProfileService',
-function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
+.controller('CreateProfileController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeProfileService', 'StoridgeManager',
+function ($scope, $state, $transition$, Notifications, StoridgeProfileService, StoridgeManager) {
 
   $scope.state = {
     NoLimit: true,
@@ -62,5 +62,11 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
     $scope.model = profile;
   }
 
-  initView();
+  StoridgeManager.init()
+  .then(function success() {
+    initView();
+  })
+  .catch(function error(err) {
+    Notifications.error('Failure', err, 'Unable to communicate with Storidge API');
+  });
 }]);

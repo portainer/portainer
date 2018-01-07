@@ -113,6 +113,10 @@ angular-local-storage@~0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/angular-local-storage/-/angular-local-storage-0.5.2.tgz#7079beb0aa5ca91386d223125efefd13ca0ecd0c"
 
+angular-messages@~1.5.0:
+  version "1.5.11"
+  resolved "https://registry.yarnpkg.com/angular-messages/-/angular-messages-1.5.11.tgz#ea99f0163594fcb0a2db701b3038339250decc90"
+
 angular-mocks@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.5.11.tgz#a0e1dd0ea55fd77ee7a757d75536c5e964c86f81"
@@ -2363,7 +2367,7 @@ istanbul@~0.1.40:
     wordwrap "0.0.x"
 
 isteven-angular-multiselect@~4.0.0:
-  version v4.0.0
+  version "4.0.0"
   resolved "https://registry.yarnpkg.com/isteven-angular-multiselect/-/isteven-angular-multiselect-4.0.0.tgz#70276da5ff3bc4d9a0887dc585ee26a1a26a8ed6"
 
 jquery@1.11.1:

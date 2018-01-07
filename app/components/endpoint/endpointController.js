@@ -41,7 +41,7 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications,
     .then(function success(data) {
       Notifications.success('Endpoint updated', $scope.endpoint.Name);
       // STORIDGE_TMP
-      EndpointProvider.setStoridgeAPI('http://' + endpoint.PublicURL + ':8282');
+      // EndpointProvider.setStoridgeAPI('http://' + endpoint.PublicURL + ':8282');
       $state.go('endpoints');
     }, function error(err) {
       Notifications.error('Failure', err, 'Unable to update endpoint');

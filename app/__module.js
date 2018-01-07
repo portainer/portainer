@@ -5,6 +5,7 @@ angular.module('portainer', [
   'ngCookies',
   'ngSanitize',
   'ngFileUpload',
+  'ngMessages',
   'angularUtils.directives.dirPagination',
   'LocalStorageModule',
   'angular-jwt',
