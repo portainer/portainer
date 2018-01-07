@@ -6,9 +6,7 @@ import (
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
 
-	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 )
 
@@ -122,21 +120,4 @@ func (server *Server) Start() error {
 		return http.ListenAndServeTLS(server.BindAddress, server.SSLCert, server.SSLKey, server.Handler)
 	}
 	return http.ListenAndServe(server.BindAddress, server.Handler)
-}
-
-// GetHealth checks the response of GET /api/status and exits
-func GetHealth(addr string) {
-	addr = "http://" + addr + "/api/status"
-	resp, err := http.Get(addr)
-	if err == nil {
-		s := "Error"
-		if resp.StatusCode < 400 {
-			s = "Online"
-		}
-		log.Println(addr, ":", s, "- response:", resp.StatusCode)
-		os.Exit(0)
-	} else {
-		log.Println("Connection error:", err.Error())
-		os.Exit(1)
-	}
 }

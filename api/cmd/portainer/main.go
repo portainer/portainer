@@ -14,6 +14,7 @@ import (
 	"github.com/portainer/portainer/ldap"
 
 	"log"
+	"os"
 )
 
 func initCLI() *portainer.CLIFlags {
@@ -172,7 +173,16 @@ func main() {
 	flags := initCLI()
 
 	if *flags.CheckHealth {
-		http.GetHealth("localhost" + *flags.Addr)
+		statuscode, err := http.HealthCheck("localhost" + *flags.Addr)
+		if err == nil {
+			if statuscode < 400 {
+				log.Println(*flags.Addr, ": Online - response:", statuscode)
+				os.Exit(0)
+			} else {
+				log.Fatal(*flags.Addr, ": Error - response:", statuscode)
+			}
+		}
+		log.Fatal("Connection error:", err.Error())
 	}
 
 	fileService := initFileService(*flags.Data)
