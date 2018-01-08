@@ -168,7 +168,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     }
   };
 
-  $scope.addLogDriverOpt = function addLogDriverOpt(service) {    
+  $scope.addLogDriverOpt = function addLogDriverOpt(service) {
     service.LogDriverOpts.push({ key: '', value: '', originalValue: '' });
     updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
   };
@@ -182,16 +182,16 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     if (variable.value !== variable.originalValue || variable.key !== variable.originalKey) {
       updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
     }
-  };   
-  $scope.updateLogDriverName = function updateLogDriverName(service) {    
-    updateServiceArray(service, 'LogDriverName', service.LogDriverName);    
-  };    
+  };
+  $scope.updateLogDriverName = function updateLogDriverName(service) {
+    updateServiceArray(service, 'LogDriverName', service.LogDriverName);
+  };
 
   $scope.addHostsEntry = function (service) {
     if (!service.Hosts) {
       service.Hosts = [];
     }
-    service.Hosts.push({ hostname: '', ip: '' });    
+    service.Hosts.push({ hostname: '', ip: '' });
   };
   $scope.removeHostsEntry = function(service, index) {
     var removedElement = service.Hosts.splice(index, 1);
@@ -199,9 +199,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'Hosts', service.Hosts);
     }
   };
-  $scope.updateHostsEntry = function(service, entry) {  
+  $scope.updateHostsEntry = function(service, entry) {
     updateServiceArray(service, 'Hosts', service.Hosts);
-  };  
+  };
 
   $scope.cancelChanges = function cancelChanges(service, keys) {
     if (keys) { // clean out the keys only from the list of modified keys
@@ -239,7 +239,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
     config.TaskTemplate.ContainerSpec.Configs = service.ServiceConfigs ? service.ServiceConfigs.map(ConfigHelper.configConfig) : [];
     config.TaskTemplate.ContainerSpec.Hosts = service.Hosts ? ServiceHelper.translateHostnameIPToHostsEntries(service.Hosts) : [];
-    
+
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
     }
@@ -279,17 +279,17 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       MaxAttempts: service.RestartMaxAttempts,
       Window: ServiceHelper.translateHumanDurationToNanos(service.RestartWindow) || 0
     };
-    
+
     config.TaskTemplate.LogDriver = null;
-    if (service.LogDriverName) {      
+    if (service.LogDriverName) {
       config.TaskTemplate.LogDriver = { Name: service.LogDriverName };
       if (service.LogDriverName !== 'none') {
         var logOpts = ServiceHelper.translateKeyValueToLogDriverOpts(service.LogDriverOpts);
         if (Object.keys(logOpts).length !== 0 && logOpts.constructor === Object) {
           config.TaskTemplate.LogDriver.Options = logOpts;
         }
-      }      
-    }    
+      }
+    }
 
     if (service.Ports) {
       service.Ports.forEach(function (binding) {
@@ -338,6 +338,32 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     });
   }
 
+  $scope.forceUpdateService = function(service) {
+    ModalService.confirmServiceForceUpdate(
+      'Do you want to force update this service? All the tasks associated to the selected service(s) will be recreated.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        forceUpdateService(service);
+      }
+    );
+  };
+
+  function forceUpdateService(service) {
+    var config = ServiceHelper.serviceToConfig(service.Model);
+    // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
+    // value or an increment of the counter value to force an update.
+    config.TaskTemplate.ForceUpdate++;
+    ServiceService.update(service, config)
+    .then(function success(data) {
+      Notifications.success('Service successfully updated', service.Name);
+      $scope.cancelChanges({});
+      initView();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to force update service', service.Name);
+    });
+  }
+
   function translateServiceArrays(service) {
     service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
     service.ServiceConfigs = service.Configs ? service.Configs.map(ConfigHelper.flattenConfig) : [];
@@ -365,7 +391,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   }
 
   function initView() {
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;  
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
     ServiceService.service($transition$.params().id)
     .then(function success(data) {
