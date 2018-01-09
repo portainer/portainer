@@ -2,7 +2,11 @@ angular.module('service', [])
 .controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService', 'PluginService',
 function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService, PluginService) {
 
-  $scope.state = {};
+  $scope.state = {
+    updateInProgress: false,
+    deletionInProgress: false
+  };
+
   $scope.tasks = [];
   $scope.availableImages = [];
 
@@ -328,6 +332,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   };
 
   function removeService() {
+    $scope.state.deletionInProgress = true;
     ServiceService.remove($scope.service)
     .then(function success(data) {
       Notifications.success('Service successfully deleted');
@@ -335,6 +340,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to remove service');
+    })
+    .finally(function final() {
+      $scope.state.deletionInProgress = false;
     });
   }
 
@@ -353,6 +361,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
     // value or an increment of the counter value to force an update.
     config.TaskTemplate.ForceUpdate++;
+    $scope.state.updateInProgress = true;
     ServiceService.update(service, config)
     .then(function success(data) {
       Notifications.success('Service successfully updated', service.Name);
@@ -361,6 +370,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to force update service', service.Name);
+    })
+    .finally(function final() {
+      $scope.state.updateInProgress = false;
     });
   }
 
