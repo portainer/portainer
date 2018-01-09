@@ -12,14 +12,16 @@
         </div>
       </div>
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-          <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button ng-if="$ctrl.showForceUpdateButton" type="button" class="btn btn-sm btn-primary"
-          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.forceUpdateAction($ctrl.state.selectedItems)">
-          <i class="fa fa-refresh space-right" aria-hidden="true"></i>Force update
-        </button>
+        <div class="btn-group" role="group" aria-label="...">
+          <button ng-if="$ctrl.showForceUpdateButton" type="button" class="btn btn-sm btn-primary"
+            ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.forceUpdateAction($ctrl.state.selectedItems)">
+            <i class="fa fa-refresh space-right" aria-hidden="true"></i>Update
+          </button>
+          <button type="button" class="btn btn-sm btn-danger"
+            ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+            <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
+          </button>
+        </div>
         <button type="button" class="btn btn-sm btn-primary" ui-sref="actions.create.service">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add service
         </button>
