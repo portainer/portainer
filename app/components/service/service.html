@@ -38,7 +38,6 @@
               <td>ID</td>
               <td>
                 {{ service.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeService()"><i class="fa fa-trash space-right" aria-hidden="true" ng-disabled="isUpdating"></i>Delete this service</button>
               </td>
             </tr>
             <tr ng-if="service.CreatedAt">
@@ -72,11 +71,17 @@
                     ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" id="image_name" ng-disabled="isUpdating">
               </td>
             </tr>
-            <tr ng-if="applicationState.endpoint.apiVersion >= 1.30">
+            <tr>
               <td colspan="2">
-                <div class="btn-group" role="group" aria-label="...">
-                  <a class="btn" type="button" ui-sref="servicelogs({id: service.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Logs</a>
-                </div>
+                <a ng-if="applicationState.endpoint.apiVersion >= 1.30" class="btn btn-primary btn-sm" type="button" ui-sref="servicelogs({id: service.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Service logs</a>
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.updateInProgress || isUpdating" ng-click="forceUpdateService(service)" button-spinner="state.updateInProgress" ng-if="applicationState.endpoint.apiVersion >= 1.25">
+                  <span ng-hide="state.updateInProgress"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Update the service</span>
+                  <span ng-show="state.updateInProgress">Update in progress...</span>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" ng-disabled="state.deletionInProgress || isUpdating" ng-click="removeService()" button-spinner="state.deletionInProgress">
+                  <span ng-hide="state.deletionInProgress"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete the service</span>
+                  <span ng-show="state.deletionInProgress">Deletion in progress...</span>
+                </button>
               </td>
             </tr>
           </tbody>

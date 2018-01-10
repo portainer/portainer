@@ -12,6 +12,8 @@ angular.module('ui').component('servicesDatatable', {
     showOwnershipColumn: '<',
     removeAction: '<',
     scaleAction: '<',
-    swarmManagerIp: '<'
+    swarmManagerIp: '<',
+    forceUpdateAction: '<',
+    showForceUpdateButton: '<'
   }
 });

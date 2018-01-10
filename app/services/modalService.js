@@ -156,5 +156,19 @@ angular.module('portainer.services')
     });
   };
 
+  service.confirmServiceForceUpdate = function(message, callback) {
+    service.confirm({
+      title: 'Are you sure ?',
+      message: message,
+      buttons: {
+        confirm: {
+          label: 'Update',
+          className: 'btn-primary'
+        }
+      },
+      callback: callback
+    });
+  };
+
   return service;
 }]);
