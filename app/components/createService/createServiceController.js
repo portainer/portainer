@@ -1,8 +1,8 @@
 // @@OLD_SERVICE_CONTROLLER: this service should be rewritten to use services.
 // See app/components/templates/templatesController.js as a reference.
 angular.module('createService', [])
-.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigService', 'ConfigHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService',
-function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, ConfigHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, RegistryService, HttpRequestHelper, NodeService, SettingsService) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigService', 'ConfigHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'PluginService', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService',
+function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, ConfigHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, PluginService, RegistryService, HttpRequestHelper, NodeService, SettingsService) {
 
   $scope.formValues = {
     Name: '',
@@ -20,6 +20,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     Volumes: [],
     Network: '',
     ExtraNetworks: [],
+    HostsEntries: [],
     Ports: [],
     Parallelism: 1,
     PlacementConstraints: [],
@@ -35,7 +36,13 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     MemoryLimit: 0,
     MemoryReservation: 0,
     MemoryLimitUnit: 'MB',
-    MemoryReservationUnit: 'MB'
+    MemoryReservationUnit: 'MB',
+    RestartCondition: 'any',
+    RestartDelay: '5s',
+    RestartMaxAttempts: 0,
+    RestartWindow: '0s',
+    LogDriverName: '',
+    LogDriverOpts: []    
   };
 
   $scope.state = {
@@ -63,6 +70,14 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
   $scope.removeExtraNetwork = function(index) {
     $scope.formValues.ExtraNetworks.splice(index, 1);
+  };
+
+  $scope.addHostsEntry = function() {
+    $scope.formValues.HostsEntries.push({});
+  };
+
+  $scope.removeHostsEntry = function(index) {
+    $scope.formValues.HostsEntries.splice(index, 1);
   };
 
   $scope.addVolume = function() {
@@ -128,6 +143,14 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   $scope.removeContainerLabel = function(index) {
     $scope.formValues.ContainerLabels.splice(index, 1);
   };
+
+  $scope.addLogDriverOpt = function(value) {    
+    $scope.formValues.LogDriverOpts.push({ name: '', value: ''});
+  };
+  
+  $scope.removeLogDriverOpt = function(index) {
+    $scope.formValues.LogDriverOpts.splice(index, 1);
+  };    
 
   function prepareImageConfig(config, input) {
     var imageConfig = ImageHelper.createImageConfigForContainer(input.Image, input.Registry.URL);
@@ -240,13 +263,38 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     config.Networks = _.uniqWith(networks, _.isEqual);
   }
 
+  function prepareHostsEntries(config, input) {
+    var hostsEntries = [];
+    if (input.HostsEntries) {      
+      input.HostsEntries.forEach(function (host_ip) {
+        if (host_ip.value && host_ip.value.indexOf(':') && host_ip.value.split(':').length === 2) {          
+          var keyVal = host_ip.value.split(':');
+          // Hosts file format, IP_address canonical_hostname
+          hostsEntries.push(keyVal[1] + ' ' + keyVal[0]);                  
+        }        
+      });
+      if (hostsEntries.length > 0) {
+        config.TaskTemplate.ContainerSpec.Hosts = hostsEntries;
+      }      
+    }       
+  }
+
   function prepareUpdateConfig(config, input) {
     config.UpdateConfig = {
       Parallelism: input.Parallelism || 0,
-      Delay: ServiceHelper.translateHumanDurationToNanos(input.UpdateDelay),
+      Delay: ServiceHelper.translateHumanDurationToNanos(input.UpdateDelay) || 0,
       FailureAction: input.FailureAction,
       Order: input.UpdateOrder
     };
+  }
+
+  function prepareRestartPolicy(config, input) {
+    config.TaskTemplate.RestartPolicy = {
+      Condition: input.RestartCondition || 'any',
+      Delay: ServiceHelper.translateHumanDurationToNanos(input.RestartDelay) || 5000000000,
+      MaxAttempts: input.RestartMaxAttempts || 0,
+      Window: ServiceHelper.translateHumanDurationToNanos(input.RestartWindow) || 0
+    };    
   }
 
   function preparePlacementConfig(config, input) {
@@ -317,6 +365,23 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     }
   }
 
+  function prepareLogDriverConfig(config, input) {
+    var logOpts = {};    
+    if (input.LogDriverName) {
+      config.TaskTemplate.LogDriver = { Name: input.LogDriverName };  
+      if (input.LogDriverName !== 'none') {           
+        input.LogDriverOpts.forEach(function (opt) {
+          if (opt.name) {
+            logOpts[opt.name] = opt.value;
+          }
+        });
+        if (Object.keys(logOpts).length !== 0 && logOpts.constructor === Object) {
+          config.TaskTemplate.LogDriver.Options = logOpts;
+        }        
+      }
+    }
+  }
+
   function prepareConfiguration() {
     var input = $scope.formValues;
     var config = {
@@ -342,12 +407,15 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     prepareLabelsConfig(config, input);
     prepareVolumes(config, input);
     prepareNetworks(config, input);
+    prepareHostsEntries(config, input);
     prepareUpdateConfig(config, input);
     prepareConfigConfig(config, input);
     prepareSecretConfig(config, input);
     preparePlacementConfig(config, input);
     prepareResourcesCpuConfig(config, input);
     prepareResourcesMemoryConfig(config, input);
+    prepareRestartPolicy(config, input);
+    prepareLogDriverConfig(config, input);
     return config;
   }
 
@@ -434,17 +502,17 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
       configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
       nodes: NodeService.nodes(),
-      settings: SettingsService.publicSettings()
+      settings: SettingsService.publicSettings(),
+      availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25)
     })
     .then(function success(data) {
       $scope.availableVolumes = data.volumes;
       $scope.availableNetworks = data.networks;
       $scope.availableSecrets = data.secrets;
-      $scope.availableConfigs = data.configs;
-      var nodes = data.nodes;
-      initSlidersMaxValuesBasedOnNodeData(nodes);
-      var settings = data.settings;
-      $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
+      $scope.availableConfigs = data.configs;      
+      $scope.availableLoggingDrivers = data.availableLoggingDrivers;
+      initSlidersMaxValuesBasedOnNodeData(data.nodes);      
+      $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
       $scope.isAdmin = userDetails.role === 1;
     })

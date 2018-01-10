@@ -25,11 +25,11 @@
           <tr>
             <td>Restart delay</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.RestartDelay" ng-change="updateServiceAttribute(service, 'RestartDelay')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="text" ng-model="service.RestartDelay" ng-change="updateServiceAttribute(service, 'RestartDelay')" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
-                Delay between restart attempts. Time in seconds.
+                Delay between restart attempts expressed by a number followed by unit (ns|us|ms|s|m|h). Default value is 5s, 5 seconds.
               </p>
             </td>
           </tr>
@@ -40,18 +40,18 @@
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
-                Maximum attempts to restart a given container before giving up (default value is 0, which is ignored).
+                Maximum attempts to restart a given task before giving up (default value is 0, which means unlimited).
               </p>
             </td>
           </tr>
           <tr>
             <td>Restart window</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.RestartWindow" ng-change="updateServiceAttribute(service, 'RestartWindow')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="text" ng-model="service.RestartWindow" ng-change="updateServiceAttribute(service, 'RestartWindow')" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" ng-disabled="isUpdating"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
-                The time window used to evaluate the restart policy (default value is 0, which is unbounded). Time in seconds.
+                Time window to evaluate restart attempts expressed by a number followed by unit (ns|us|ms|s|m|h). Default value is 0 seconds, which is unbounded.
               </p>
             </td>
           </tr>

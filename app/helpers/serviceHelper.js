@@ -142,7 +142,7 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
   };
 
   helper.translateHumanDurationToNanos = function(humanDuration) {    
-    var nanos = 0;
+    var nanos;
     var regex = /^([0-9]+)(h|m|s|ms|us|ns)$/i;
     var matches = humanDuration.match(regex);
 
@@ -172,8 +172,7 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
   // e.g 3600000000000 nanoseconds = 1h
 
   helper.translateNanosToHumanDuration = function(nanos) {          
-    var humanDuration = '0s';
-    
+    var humanDuration = '0s';    
     var conversionFromNano = {};
     conversionFromNano['ns'] = 1;
     conversionFromNano['us'] = conversionFromNano['ns'] * 1000;
@@ -186,9 +185,61 @@ angular.module('portainer.helpers').factory('ServiceHelper', [function ServiceHe
       if ( nanos % conversionFromNano[unit] === 0 && (nanos / conversionFromNano[unit]) > 0) {
         humanDuration = (nanos / conversionFromNano[unit]) + unit;
       }
-    });
-    
+    });    
     return humanDuration;
+  };
+
+  helper.translateLogDriverOptsToKeyValue = function(logOptions) {
+    var options = [];
+    if (logOptions) {      
+      Object.keys(logOptions).forEach(function(key) {
+        options.push({
+          key: key,
+          value: logOptions[key],
+          originalKey: key,
+          originalValue: logOptions[key],
+          added: true
+        });
+      });            
+    }
+    return options;
+  };
+
+  helper.translateKeyValueToLogDriverOpts = function(keyValueLogDriverOpts) {
+    var options = {};
+    if (keyValueLogDriverOpts) {      
+      keyValueLogDriverOpts.forEach(function(option) {
+        if (option.key && option.key !== '' && option.value && option.value !== '') {
+          options[option.key] = option.value;
+        }
+      });
+    }
+    return options;    
+  };    
+
+  helper.translateHostsEntriesToHostnameIP = function(entries) {
+    var ipHostEntries = [];
+    if (entries) {      
+      entries.forEach(function(entry) {
+        if (entry.indexOf(' ') && entry.split(' ').length === 2) {
+          var keyValue = entry.split(' ');
+          ipHostEntries.push({ hostname: keyValue[1], ip: keyValue[0]});
+        }
+      });      
+    }
+    return ipHostEntries;    
+  };
+
+  helper.translateHostnameIPToHostsEntries = function(entries) {
+    var ipHostEntries = [];
+    if (entries) {   
+      entries.forEach(function(entry) {
+        if (entry.ip && entry.hostname) {          
+          ipHostEntries.push(entry.ip + ' ' + entry.hostname);
+        }
+      });           
+    }        
+    return ipHostEntries;   
   };
 
   return helper;

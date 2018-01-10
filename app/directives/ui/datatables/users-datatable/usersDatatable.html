@@ -70,8 +70,8 @@
                 </span>
               </td>
               <td>
-                <span ng-if="item.Id === 1 || authenticationMethod !== 2">Internal</span>
-                <span ng-if="item.Id !== 1 && authenticationMethod === 2">LDAP</span>
+                <span ng-if="item.Id === 1 || $ctrl.authenticationMethod !== 2">Internal</span>
+                <span ng-if="item.Id !== 1 && $ctrl.authenticationMethod === 2">LDAP</span>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

@@ -126,11 +126,11 @@
     <rd-widget>
       <rd-widget-body>
         <ul class="nav nav-pills nav-justified">
-          <li class="active interactive"><a data-target="#command" data-toggle="tab">Command</a></li>
+          <li class="active interactive"><a data-target="#command" data-toggle="tab">Command & Logging</a></li>
           <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
-          <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config</a></li>
+          <li class="interactive"><a data-target="#update-config" data-toggle="tab">Update config & Restart</a></li>
           <li class="interactive" ng-if="applicationState.endpoint.apiVersion >= 1.25"><a data-target="#secrets" data-toggle="tab">Secrets</a></li>
           <li class="interactive"><a data-target="#configs" data-toggle="tab" ng-if="applicationState.endpoint.apiVersion >= 1.30">Configs</a></li>
           <li class="interactive"><a data-target="#resources-placement" data-toggle="tab" ng-click="refreshSlider()">Resources & Placement</a></li>
@@ -140,6 +140,9 @@
           <!-- tab-command -->
           <div class="tab-pane active" id="command">
             <form class="form-horizontal" style="margin-top: 15px;">
+              <div class="col-sm-12 form-section-title">
+                Command
+              </div>                    
               <!-- command-input -->
               <div class="form-group">
                 <label for="service_command" class="col-sm-2 col-lg-1 control-label text-left">Command</label>
@@ -195,6 +198,59 @@
                 <!-- !environment-variable-input-list -->
               </div>
               <!-- !environment-variables -->
+
+              <div class="col-sm-12 form-section-title">
+                Logging
+              </div>
+              <!-- logging-driver -->              
+              <div class="form-group">
+                <label for="log-driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
+                <div class="col-sm-4">
+                  <select class="form-control" ng-model="formValues.LogDriverName" id="log-driver">
+                    <option selected value="">Default logging driver</option>                    
+                    <option ng-repeat="driver in availableLoggingDrivers" ng-value="driver">{{ driver }}</option>
+                    <option value="none">none</option>
+                  </select>
+                </div>
+                <div class="col-sm-5">
+                  <p class="small text-muted">
+                    Logging driver for service that will override the default docker daemon driver. Select Default logging driver if you don't want to override it. Supported logging drivers can be found <a href="https://docs.docker.com/engine/admin/logging/overview/#supported-logging-drivers" target="_blank">in the Docker documentation</a>.
+                  </p>
+                </div>
+              </div>
+              <!-- !logging-driver -->
+              <!-- logging-opts -->
+              <div class="form-group">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                  <label class="control-label text-left">
+                    Options
+                    <portainer-tooltip position="top" message="Add button is disabled unless a driver other than none or default is selected. Options are specific to the selected driver, refer to the driver documentation."></portainer-tooltip>
+                  </label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="!formValues.LogDriverName || formValues.LogDriverName === 'none' || addLogDriverOpt(formValues.LogDriverName)">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add logging driver option
+                  </span>
+                </div>
+                <!-- logging-opts-input-list -->
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="opt in formValues.LogDriverOpts" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">option</span>
+                      <input type="text" class="form-control" ng-model="opt.name" placeholder="e.g. FOO">
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="opt.value" placeholder="e.g. bar">
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeLogDriverOpt($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- logging-opts-input-list -->
+              </div>              
+              <!-- !logging-opts -->
+                                        
+                  
             </form>
           </div>
           <!-- !tab-command -->
@@ -308,6 +364,29 @@
                 <!-- !network-input-list -->
               </div>
               <!-- !extra-networks -->
+              <!-- extra-hosts-variables -->
+              <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.25">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                  <label class="control-label text-left">Hosts file entries</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addHostsEntry()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add additional entry
+                  </span>
+                </div>
+                <!-- hosts-input-list -->
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="variable in formValues.HostsEntries" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP">
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeHostsEntry($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- !hosts-input-list -->
+              </div>
+              <!-- !extra-hosts-variables -->
             </form>
           </div>
           <!-- !tab-network -->
@@ -372,74 +451,7 @@
           </div>
           <!-- !tab-labels -->
           <!-- tab-update-config -->
-          <div class="tab-pane" id="update-config">
-            <form class="form-horizontal" style="margin-top: 15px;">
-              <!-- parallelism-input -->
-              <div class="form-group">
-                <label for="parallelism" class="col-sm-3 col-lg-1 control-label text-left">Parallelism</label>
-                <div class="col-sm-4 col-lg-3">
-                  <input type="number" class="form-control" ng-model="formValues.Parallelism" id="parallelism" placeholder="e.g. 1">
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Maximum number of tasks to be updated simultaneously (0 to update all at once).
-                  </p>
-                </div>
-              </div>
-              <!-- !parallelism-input -->
-              <!-- delay-input -->
-              <div class="form-group">
-                <label for="update-delay" class="col-sm-3 col-lg-1 control-label text-left">
-                  Delay
-                  <portainer-tooltip position="bottom" message="Supported format examples: 1h, 5m, 10s, 1000ms, 15us, 60ns."></portainer-tooltip>
-                </label>                
-                <div class="col-sm-4 col-lg-3">
-                  <input type="text" class="form-control" ng-model="formValues.UpdateDelay" id="update-delay" placeholder="e.g. 1m" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i">
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Amount of time between updates expressed by a number followed by unit (ns|us|ms|s|m|h). Example: 1m.
-                  </p>
-                </div>
-              </div>
-              <!-- !delay-input -->
-              <!-- failureAction-input -->
-              <div class="form-group">
-                <label for="failure-action" class="col-sm-3 col-lg-1 control-label text-left">Failure action</label>
-                <div class="col-sm-4 col-lg-3">
-                  <div class="btn-group btn-group-sm">
-                    <label class="btn btn-primary" ng-model="formValues.FailureAction" uib-btn-radio="'continue'">Continue</label>
-                    <label class="btn btn-primary" ng-model="formValues.FailureAction" uib-btn-radio="'pause'">Pause</label>
-                  </div>
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Action taken on failure to start after update.
-                  </p>
-                </div>
-
-              </div>
-              <!-- !failureAction-input -->
-              <!-- order-input -->
-              <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.29">
-
-                <label for="update-order" class="col-sm-3 col-lg-1 control-label text-left">Order</label>
-                <div class="col-sm-4 col-lg-3">
-                  <div class="btn-group btn-group-sm">
-                    <label class="btn btn-primary" ng-model="formValues.UpdateOrder" uib-btn-radio="'start-first'">start-first</label>
-                    <label class="btn btn-primary" ng-model="formValues.UpdateOrder" uib-btn-radio="'stop-first'">stop-first</label>
-                  </div>
-                </div>
-                <div class="col-sm-5">
-                  <p class="small text-muted">
-                    Operation order on failure.
-                  </p>
-                </div>
-
-              </div>
-              <!-- !order-input -->
-            </form>
-          </div>
+          <div class="tab-pane" id="update-config" ng-include="'app/components/createService/includes/update-restart.html'"></div>
           <!-- !tab-update-config -->
           <!-- tab-secrets -->
           <div class="tab-pane" id="secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25" ng-include="'app/components/createService/includes/secret.html'"></div>
