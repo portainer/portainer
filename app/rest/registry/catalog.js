@@ -7,7 +7,11 @@ angular.module('portainer.rest')
       params: { id: '@id', limit: '@limit', last: '@last' },
       transformResponse: function(data, headers){
         var response = {}
-        response.data = JSON.parse(data);
+        try {
+          response.data = JSON.parse(data);
+        } catch (e) {
+          response.data = data;
+        }
         response.headers = headers();
         return response;
       }
