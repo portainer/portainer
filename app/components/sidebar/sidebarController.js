@@ -1,6 +1,6 @@
 angular.module('sidebar', [])
-.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'StoridgeManager',
-function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService, StoridgeManager) {
+.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
+function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
 
   $scope.uiVersion = StateManager.getState().application.version;
   $scope.displayExternalContributors = StateManager.getState().application.displayExternalContributors;
@@ -19,7 +19,7 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     StateManager.updateEndpointState(true)
     .then(function success() {
       // STORIDGE_TMP
-      StoridgeManager.reset();
+      ExtensionManager.reset();
       $state.go('dashboard');
     })
     .catch(function error(err) {

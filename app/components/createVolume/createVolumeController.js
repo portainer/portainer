@@ -1,6 +1,6 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator',
-function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator) {
+.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator', 'ExtensionManager',
+function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, ExtensionManager) {
 
   $scope.formValues = {
     Driver: 'local',
@@ -87,5 +87,11 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     }
   }
 
-  initView();
+  ExtensionManager.init()
+  .then(function success(data) {
+    initView();
+  })
+  .catch(function error(err) {
+    Notifications.error('Failure', err, 'Unable to initialize extensions');
+  });
 }]);
