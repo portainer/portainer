@@ -50,30 +50,16 @@
             </div>
           </div>
         </form>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-info-circle" title="About Cluster Visualizer">
-      </rd-widget-header>
-      <rd-widget-body>
         <form class="form-horizontal">
-          <div class="form-group">
-            <div class="col-sm-12">
-              <span class="small text-muted">
-                This view displays real-time information about the Swarm.
-              </span>
-            </div>
+          <div class="col-sm-12 form-section-title">
+            Refresh
           </div>
           <div class="form-group">
-            <label for="refreshRate" class="col-sm-3 col-md-2 col-lg-2 margin-sm-top control-label text-left">
-              Refresh rate
+            <label for="refreshRate" class="col-sm-1 margin-sm-top control-label text-left">
+              Rate
+              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="display: none;"></i>
             </label>
-            <div class="col-sm-3 col-md-2">
+            <div class="col-sm-2">
               <select id="refreshRate" ng-model="state.refreshRate" ng-change="changeUpdateRepeater()" class="form-control">
                 <option value="5">5s</option>
                 <option value="10">10s</option>
@@ -81,9 +67,6 @@
                 <option value="60">60s</option>
               </select>
             </div>
-            <span>
-              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
-            </span>
           </div>
         </form>
       </rd-widget-body>
