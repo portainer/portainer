@@ -173,9 +173,9 @@ func main() {
 	flags := initCLI()
 
 	if *flags.CheckHealth {
-		statuscode, err := http.HealthCheck("localhost" + *flags.Addr)
+		statuscode, err := http.HealthCheck(*flags.Addr)
 		if err == nil {
-			if statuscode < 400 {
+			if statuscode == 200 {
 				log.Println(*flags.Addr, ": Online - response:", statuscode)
 				os.Exit(0)
 			} else {
