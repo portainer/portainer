@@ -78,7 +78,7 @@ type (
 	putStackRequest struct {
 		StackFileContent string           `valid:"required"`
 		Env              []portainer.Pair `valid:""`
-		Prune						 bool							`valid:"-"`
+		Prune            bool             `valid:"-"`
 	}
 )
 
