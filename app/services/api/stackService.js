@@ -167,8 +167,8 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.updateStack = function(id, stackFile, env) {
-    return Stack.update({ id: id, StackFileContent: stackFile, Env: env }).$promise;
+  service.updateStack = function(id, stackFile, env, prune) {
+    return Stack.update({ id: id, StackFileContent: stackFile, Env: env, Prune: prune}).$promise;
   };
 
   return service;

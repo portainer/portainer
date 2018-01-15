@@ -2964,6 +2964,10 @@ definitions:
         description: "A list of environment variables used during stack deployment"
         items:
           $ref: "#/definitions/Stack_Env"
+      Prune:
+        type: "boolean"
+        example: true
+        description: "Prune services that are no longer referenced?"
   StackUpdateRequest:
     type: "object"
     properties:
@@ -2976,10 +2980,14 @@ definitions:
         description: "A list of environment variables used during stack deployment"
         items:
           $ref: "#/definitions/Stack_Env"
+      Prune:
+        type: "boolean"
+        example: true
+        description: "Prune services that are no longer referenced?"
   StackFileInspectResponse:
     type: "object"
     properties:
       StackFileContent:
         type: "string"
         example: "version: 3\n services:\n web:\n image:nginx"
-        description: "Content of the Stack file."          
+        description: "Content of the Stack file."

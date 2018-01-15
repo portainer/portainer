@@ -90,6 +90,22 @@
             <!-- !environment-variable-input-list -->
           </div>
           <!-- !environment-variables -->
+          <!-- options -->
+          <div class="col-sm-12 form-section-title" ng-if="applicationState.endpoint.apiVersion >= 1.27">
+          Options
+          </div>
+          <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.27">
+            <div class="col-sm-12">
+              <label for="prune" class="control-label text-left">
+                Prune services
+                <portainer-tooltip position="bottom" message="Prune services that are no longer referenced."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input name="prune" type="checkbox" ng-model="formValues.Prune"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- !options -->
           <div class="col-sm-12 form-section-title">
             Actions
           </div>

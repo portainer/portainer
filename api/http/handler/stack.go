@@ -78,6 +78,7 @@ type (
 	putStackRequest struct {
 		StackFileContent string           `valid:"required"`
 		Env              []portainer.Pair `valid:""`
+		Prune						 bool							`valid:"-"`
 	}
 )
 
@@ -600,6 +601,7 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	stack.Env = req.Env
+	stack.Prune = req.Prune
 
 	_, err = handler.FileService.StoreStackFileFromString(string(stack.ID), req.StackFileContent)
 	if err != nil {

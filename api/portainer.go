@@ -140,6 +140,7 @@ type (
 		SwarmID     string  `json:"SwarmId"`
 		ProjectPath string
 		Env         []Pair `json:"Env"`
+		Prune				bool `json:"Prune"`
 	}
 
 	// RegistryID represents a registry identifier.
