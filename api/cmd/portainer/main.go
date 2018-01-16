@@ -74,8 +74,9 @@ func initDemoData(store *bolt.Store, cryptoService portainer.CryptoService) erro
 	}
 
 	localEndpoint := &portainer.Endpoint{
-		Name: "local",
-		URL:  "unix:///var/run/docker.sock",
+		Name:      "local",
+		URL:       "unix:///var/run/docker.sock",
+		PublicURL: "demo.portainer.io",
 	}
 
 	err = store.EndpointService.CreateEndpoint(localEndpoint)
