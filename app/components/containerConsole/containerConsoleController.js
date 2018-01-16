@@ -53,12 +53,13 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
     ContainerService.createExec(execConfig, $transition$.params().nodeName)
     .then(function success(data) {
       execId = data.Id;
-      var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
-      if (url.indexOf('https') > -1) {
-        url = url.replace('https://', 'wss://');
-      } else {
-        url = url.replace('http://', 'ws://');
-      }
+      var url = 'http://10.0.7.10:9001/websocket/exec/proxy?id=' + execId + '&endpointId=' + EndpointProvider.endpointID() + '&nodeName=' + $transition$.params().nodeName;
+      // var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
+      // if (url.indexOf('https') > -1) {
+      //   url = url.replace('https://', 'wss://');
+      // } else {
+      //   url = url.replace('http://', 'ws://');
+      // }
       initTerm(url, termHeight, termWidth);
       return ExecService.resizeTTY(execId, $transition$.params().nodeName, termHeight, termWidth, 2000);
     })

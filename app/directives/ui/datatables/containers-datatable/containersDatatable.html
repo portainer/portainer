@@ -209,7 +209,7 @@
                 </div>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
-              <td><a ui-sref="image({ id: item.Image })">{{ item.Image | hideshasum }}</a></td>
+              <td><a ui-sref="image({ id: item.Image })">{{ item.Image | trimshasum }}</a></td>
               <td>{{ item.IP ? item.IP : '-' }}</td>
               <td ng-if="$ctrl.swarmContainers">{{ item.hostIP }}</td>
               <td>{{ item.NodeName ? item.NodeName : '-' }}</td>

@@ -14,7 +14,9 @@ function TemplateViewModel(data) {
   this.Privileged = data.privileged ? data.privileged : false;
   this.Interactive = data.interactive ? data.interactive : false;
   this.RestartPolicy = data.restart_policy ? data.restart_policy : 'always';
+  this.Labels = data.labels ? data.labels : [];
   this.Volumes = [];
+
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
       // @DEPRECATED: New volume definition introduced
@@ -43,5 +45,5 @@ function TemplateViewModel(data) {
       };
     });
   }
-  this.Hosts = data.hosts ? data.hosts : [];
+  this.Hosts = data.hosts ? data.hosts : []; 
 }

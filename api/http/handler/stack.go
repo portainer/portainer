@@ -9,7 +9,7 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/file"
+	"github.com/portainer/portainer/filesystem"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
@@ -166,7 +166,7 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		ID:         portainer.StackID(stackName + "_" + swarmID),
 		Name:       stackName,
 		SwarmID:    swarmID,
-		EntryPoint: file.ComposeFileDefaultName,
+		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        req.Env,
 	}
 
@@ -264,7 +264,7 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 	}
 
 	if req.PathInRepository == "" {
-		req.PathInRepository = file.ComposeFileDefaultName
+		req.PathInRepository = filesystem.ComposeFileDefaultName
 	}
 
 	stacks, err := handler.StackService.Stacks()
@@ -404,7 +404,7 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		ID:         portainer.StackID(stackName + "_" + swarmID),
 		Name:       stackName,
 		SwarmID:    swarmID,
-		EntryPoint: file.ComposeFileDefaultName,
+		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        env,
 	}
 

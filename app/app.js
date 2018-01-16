@@ -7,7 +7,7 @@ angular.module('portainer')
   StateManager.initialize()
   .then(function success(state) {
     if (state.application.authentication) {
-      initAuthentication(authManager, Authentication, $rootScope);
+      initAuthentication(authManager, Authentication, $rootScope, $state);
     }
     if (state.application.analytics) {
       initAnalytics(Analytics, $rootScope);
@@ -30,7 +30,7 @@ angular.module('portainer')
 }]);
 
 
-function initAuthentication(authManager, Authentication, $rootScope) {
+function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
   authManager.redirectWhenUnauthenticated();
   Authentication.init();
