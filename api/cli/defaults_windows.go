@@ -4,7 +4,7 @@ const (
 	defaultBindAddress     = ":9000"
 	defaultDataDirectory   = "C:\\data"
 	defaultAssetsDirectory = "./"
-	defaultCheckHeath      = "false"
+	defaultCheckHealth     = "false"
 	defaultNoAuth          = "false"
 	defaultNoAnalytics     = "false"
 	defaultTLSVerify       = "false"

@@ -33,7 +33,7 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 	flags := &portainer.CLIFlags{
 		Addr:              kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
 		Assets:            kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
-		CheckHealth:       kingpin.Flag("check-health", "GET http://localhost:<port>/api/health endpoint").Default(defaultCheckHeath).Short('c').Bool(),
+		CheckHealth:       kingpin.Flag("check-health", "GET http://localhost:<port>/api/health endpoint").Default(defaultCheckHealth).Short('c').Bool(),
 		Data:              kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
 		Endpoint:          kingpin.Flag("host", "Dockerd endpoint").Short('H').String(),
 		ExternalEndpoints: kingpin.Flag("external-endpoints", "Path to a file defining available endpoints").String(),
