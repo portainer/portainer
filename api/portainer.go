@@ -13,10 +13,10 @@ type (
 	CLIFlags struct {
 		Addr              *string
 		Assets            *string
+		CheckHealth       *bool
 		Data              *string
-		ExternalEndpoints *string
-		SyncInterval      *string
 		Endpoint          *string
+		ExternalEndpoints *string
 		NoAuth            *bool
 		NoAnalytics       *bool
 		TLSVerify         *bool
@@ -26,12 +26,13 @@ type (
 		SSL               *bool
 		SSLCert           *string
 		SSLKey            *string
+		SyncInterval      *string
 		AdminPassword     *string
 		AdminPasswordFile *string
 		// Deprecated fields
+		Labels    *[]Pair
 		Logo      *string
 		Templates *string
-		Labels    *[]Pair
 	}
 
 	// Status represents the application status.
