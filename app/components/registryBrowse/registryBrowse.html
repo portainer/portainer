@@ -6,6 +6,9 @@
 </rd-header>
 
 <div class="row">
+  <div nf-if="headerMessage" class="col-sm-12 small text-muted">
+    {{ headerMessage }}
+  </div>
   <div class="col-sm-12">
     <registry-repositories-datatable
     title="Repositories" title-icon="fa-database"

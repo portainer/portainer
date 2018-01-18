@@ -11,7 +11,7 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
     RegistryService.catalog(registryID)
     .then(function success(data) {
       if (data.headers.link) {
-        Notifications.warning('We only retrieve the first ' + data.data.repositories.length + ' repositories of the registry');
+        $scope.headerMessage = 'Information: You have more than ' + data.data.repositories.length + ' repositories in this registry. Only first ' + data.data.repositories.length + ' are shown here.';
       }
       var tagsPromises = data.data.repositories.map(function (repository) {
         return RegistryService.tags(registryID, repository);
