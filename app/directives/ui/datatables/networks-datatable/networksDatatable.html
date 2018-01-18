@@ -97,7 +97,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="network({id: item.Id})">{{ item.Name | truncate:40 }}</a>
+                <a ui-sref="network({id: item.Id})" title="{{ item.Name }}">{{ item.Name | truncate:40 }}</a>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
               <td>{{ item.Scope }}</td>
