@@ -36,7 +36,7 @@ function ($q, $scope, $interval, $document, Notifications, StoridgeClusterServic
     StoridgeChartService.UpdateChart('Used', usedCapacity, chart);
   }
 
-  function setUpdateRepeater(iopsChart, bandwidthChart) {
+  function setUpdateRepeater(iopsChart, bandwidthChart, capacityChart) {
     var refreshRate = 5000;
     $scope.repeater = $interval(function() {
       $q.all({
@@ -49,6 +49,7 @@ function ($q, $scope, $interval, $document, Notifications, StoridgeClusterServic
         $scope.info = info;
         updateIOPSChart(info, iopsChart);
         updateBandwithChart(info, bandwidthChart);
+        updateCapacityChart(info, capacityChart);
       })
       .catch(function error(err) {
         stopRepeater();
@@ -69,7 +70,7 @@ function ($q, $scope, $interval, $document, Notifications, StoridgeClusterServic
       updateIOPSChart(info, iopsChart);
       updateBandwithChart(info, bandwidthChart);
       updateCapacityChart(info, capacityChart);
-      setUpdateRepeater(iopsChart, bandwidthChart);
+      setUpdateRepeater(iopsChart, bandwidthChart, capacityChart);
     })
     .catch(function error(err) {
       stopRepeater();
