@@ -32,8 +32,8 @@ function ($q, $scope, $interval, $document, Notifications, StoridgeClusterServic
     var usedCapacity = info.UsedCapacity;
     var freeCapacity = info.FreeCapacity;
 
-    StoridgeChartService.UpdateChart('Free', freeCapacity, chart);
-    StoridgeChartService.UpdateChart('Used', usedCapacity, chart);
+    StoridgeChartService.UpdatePieChart('Free', freeCapacity, chart);
+    StoridgeChartService.UpdatePieChart('Used', usedCapacity, chart);
   }
 
   function setUpdateRepeater(iopsChart, bandwidthChart, capacityChart) {

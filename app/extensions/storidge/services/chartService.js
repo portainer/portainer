@@ -156,6 +156,18 @@ angular.module('extension.storidge')
     chart.update(0);
   };
 
+  service.UpdatePieChart = function(label, value, chart) {
+    var idx = chart.data.labels.indexOf(label);
+    if (idx > -1) {
+      chart.data.datasets[0].data[idx] = value;
+    } else {
+      chart.data.labels.push(label);
+      chart.data.datasets[0].data.push(value);
+    }
+
+    chart.update(0);
+  };
+
   function bytePerSecBasedTooltipLabel(label, value) {
     var processedValue = 0;
     if (value > 5) {
