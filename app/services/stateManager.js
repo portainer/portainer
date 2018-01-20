@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'ExtensionService', 'APPLICATION_CACHE_VALIDITY', function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, ExtensionService, APPLICATION_CACHE_VALIDITY) {
+.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'ExtensionManager', 'APPLICATION_CACHE_VALIDITY', function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, ExtensionManager, APPLICATION_CACHE_VALIDITY) {
   'use strict';
 
   var manager = {};
@@ -115,7 +115,7 @@ angular.module('portainer.services')
     $q.all({
       info: SystemService.info(),
       version: SystemService.version(),
-      extensions: ExtensionService.extensions()
+      extensions: ExtensionManager.extensions()
     })
     .then(function success(data) {
       var endpointMode = InfoHelper.determineEndpointMode(data.info);

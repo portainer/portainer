@@ -45,6 +45,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     if (driver === 'cio:latest' && storidgeProfile) {
       driverOptions.push({ name: 'profile', value: storidgeProfile.Name });
     }
+
     var volumeConfiguration = VolumeService.createVolumeConfiguration(name, driver, driverOptions);
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
