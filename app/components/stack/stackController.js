@@ -7,14 +7,19 @@ function ($q, $scope, $state, $transition$, $document, StackService, NodeService
     publicURL: EndpointProvider.endpointPublicURL()
   };
 
+  $scope.formValues = {
+    Prune: false
+  };
+
   $scope.deployStack = function () {
     // The codemirror editor does not work with ng-model so we need to retrieve
     // the value directly from the editor.
     var stackFile = $scope.editor.getValue();
     var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
+    var prune = $scope.formValues.Prune;
 
     $scope.state.actionInProgress = true;
-    StackService.updateStack($scope.stack.Id, stackFile, env)
+    StackService.updateStack($scope.stack.Id, stackFile, env, prune)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
       $state.reload();
@@ -37,6 +42,7 @@ function ($q, $scope, $state, $transition$, $document, StackService, NodeService
 
   function initView() {
     var stackId = $transition$.params().id;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
     StackService.stack(stackId)
     .then(function success(data) {
