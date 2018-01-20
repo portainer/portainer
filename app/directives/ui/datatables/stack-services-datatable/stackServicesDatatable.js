@@ -9,7 +9,7 @@ angular.module('ui').component('stackServicesDatatable', {
     orderBy: '@',
     reverseOrder: '<',
     nodes: '<',
-    publicURL: '<',
+    publicUrl: '<',
     showTextFilter: '<'
   }
 });
