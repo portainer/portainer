@@ -41,15 +41,12 @@ angular.module('portainer.services')
     getPaginationLimit: function(key) {
       return localStorageService.cookie.get('pagination_' + key);
     },
-    // STORIDGE_TMP
     storeStoridgeAPIURL: function(url) {
       localStorageService.set('STORIDGE_API_URL', url);
     },
-    // STORIDGE_TMP
     getStoridgeAPIURL: function() {
       return localStorageService.get('STORIDGE_API_URL');
     },
-    // STORIDGE_TMP
     clearStoridgeAPIURL: function() {
       return localStorageService.remove('STORIDGE_API_URL');
     },

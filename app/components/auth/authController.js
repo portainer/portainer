@@ -18,11 +18,6 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     if (!endpointID) {
       EndpointProvider.setEndpointID(endpoint.Id);
     }
-    // STORIDGE_TMP
-    // var storidgeAPI = EndpointProvider.StoridgeAPI();
-    // if (!storidgeAPI && endpoint.PublicURL) {
-    //   EndpointProvider.setStoridgeAPI('http://' + endpoint.PublicURL + ':8282');
-    // }
     StateManager.updateEndpointState(true)
     .then(function success(data) {
       $state.go('dashboard');

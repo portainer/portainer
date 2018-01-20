@@ -13,12 +13,8 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
 
-    // STORIDGE_TMP
-    // var activeStoridgeAPI = EndpointProvider.StoridgeAPI();
-    // EndpointProvider.setStoridgeAPIFromURL(endpoint.URL);
     StateManager.updateEndpointState(true)
     .then(function success() {
-      // STORIDGE_TMP
       ExtensionManager.reset();
       $state.go('dashboard');
     })
@@ -26,8 +22,6 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
       Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
       EndpointProvider.setEndpointID(activeEndpointID);
       EndpointProvider.setEndpointPublicURL(activeEndpointPublicURL);
-      // STORIDGE_TMP
-      // EndpointProvider.setStoridgeAPI(activeStoridgeAPI);
       StateManager.updateEndpointState(true)
       .then(function success() {});
     });

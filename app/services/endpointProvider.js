@@ -13,12 +13,6 @@ angular.module('portainer.services')
     if (endpointPublicURL) {
       endpoint.PublicURL = endpointPublicURL;
     }
-
-    // STORIDGE_TMP
-    // var storidgeAPI = LocalStorage.getStoridgeAPI();
-    // if (storidgeAPI) {
-    //   endpoint.StoridgeAPI = storidgeAPI;
-    // }
   };
 
   service.clean = function() {
@@ -42,26 +36,6 @@ angular.module('portainer.services')
     endpoint.PublicURL = publicURL;
     LocalStorage.storeEndpointPublicURL(publicURL);
   };
-
-  // STORIDGE_TMP
-  // service.StoridgeAPI = function() {
-  //   return endpoint.StoridgeAPI;
-  // };
-
-  // STORIDGE_TMP
-  // service.setStoridgeAPI = function(storidgeAPI) {
-  //   endpoint.StoridgeAPI = storidgeAPI;
-  //   LocalStorage.storeStoridgeAPI(storidgeAPI);
-  // };
-
-  // STORIDGE_TMP
-  // service.setStoridgeAPIFromURL = function(endpointURL) {
-  //   if (endpointURL.indexOf('unix://') === -1) {
-  //     var storidgeURL = 'http://' + _.split(endpointURL.replace('tcp://', ''), ':')[0] + ':8282';
-  //     endpoint.StoridgeAPI = storidgeURL;
-  //     LocalStorage.storeStoridgeAPI(storidgeURL);
-  //   }
-  // };
 
   return service;
 }]);
