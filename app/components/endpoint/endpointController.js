@@ -1,6 +1,6 @@
 angular.module('endpoint', [])
-.controller('EndpointController', ['$scope', '$state', '$transition$', '$filter', 'EndpointService', 'Notifications', 'EndpointProvider',
-function ($scope, $state, $transition$, $filter, EndpointService, Notifications, EndpointProvider) {
+.controller('EndpointController', ['$scope', '$state', '$transition$', '$filter', 'EndpointService', 'Notifications',
+function ($scope, $state, $transition$, $filter, EndpointService, Notifications) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('endpoints');
