@@ -140,7 +140,6 @@ type (
 		SwarmID     string  `json:"SwarmId"`
 		ProjectPath string
 		Env         []Pair `json:"Env"`
-		Prune       bool   `json:"Prune"`
 	}
 
 	// RegistryID represents a registry identifier.
@@ -384,7 +383,7 @@ type (
 	StackManager interface {
 		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint) error
 		Logout(endpoint *Endpoint) error
-		Deploy(stack *Stack, endpoint *Endpoint) error
+		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
 	}
 )

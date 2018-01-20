@@ -2964,10 +2964,6 @@ definitions:
         description: "A list of environment variables used during stack deployment"
         items:
           $ref: "#/definitions/Stack_Env"
-      Prune:
-        type: "boolean"
-        example: true
-        description: "Prune services that are no longer referenced?"
   StackUpdateRequest:
     type: "object"
     properties:
@@ -2982,8 +2978,8 @@ definitions:
           $ref: "#/definitions/Stack_Env"
       Prune:
         type: "boolean"
-        example: true
-        description: "Prune services that are no longer referenced?"
+        example: false
+        description: "Prune services that are no longer referenced"
   StackFileInspectResponse:
     type: "object"
     properties:

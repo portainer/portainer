@@ -208,7 +208,8 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		return
 	}
 
-	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
+	prune := false
+	err = handler.deployStack(endpoint, stack, prune, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -335,7 +336,8 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		return
 	}
 
-	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
+	prune := false
+	err = handler.deployStack(endpoint, stack, prune, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -446,7 +448,8 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		return
 	}
 
-	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
+	prune := false
+	err = handler.deployStack(endpoint, stack, prune, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -601,7 +604,6 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	stack.Env = req.Env
-	stack.Prune = req.Prune
 
 	_, err = handler.FileService.StoreStackFileFromString(string(stack.ID), req.StackFileContent)
 	if err != nil {
@@ -639,7 +641,7 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
+	err = handler.deployStack(endpoint, stack, req.Prune, dockerhub, filteredRegistries)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -734,7 +736,7 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 	}
 }
 
-func (handler *StackHandler) deployStack(endpoint *portainer.Endpoint, stack *portainer.Stack, dockerhub *portainer.DockerHub, registries []portainer.Registry) error {
+func (handler *StackHandler) deployStack(endpoint *portainer.Endpoint, stack *portainer.Stack, prune bool, dockerhub *portainer.DockerHub, registries []portainer.Registry) error {
 	handler.stackCreationMutex.Lock()
 
 	err := handler.StackManager.Login(dockerhub, registries, endpoint)
@@ -743,7 +745,7 @@ func (handler *StackHandler) deployStack(endpoint *portainer.Endpoint, stack *po
 		return err
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	err = handler.StackManager.Deploy(stack, prune, endpoint)
 	if err != nil {
 		handler.stackCreationMutex.Unlock()
 		return err

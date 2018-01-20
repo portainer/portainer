@@ -54,11 +54,11 @@ func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
 }
 
 // Deploy executes the docker stack deploy command.
-func (manager *StackManager) Deploy(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
 	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 
-	if stack.Prune {
+	if prune {
 		args = append(args, "stack", "deploy", "--prune", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
 	} else {
 		args = append(args, "stack", "deploy", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
