@@ -1,5 +1,5 @@
 angular.module('portainer.services')
-.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY', function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY) {
+.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'ExtensionManager', 'APPLICATION_CACHE_VALIDITY', function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, ExtensionManager, APPLICATION_CACHE_VALIDITY) {
   'use strict';
 
   var manager = {};
@@ -33,7 +33,6 @@ angular.module('portainer.services')
     state.application.displayDonationHeader = displayDonationHeader;
     LocalStorage.storeApplicationState(state.application);
   };
-
 
  function assignStateFromStatusAndSettings(status, settings) {
    state.application.authentication = status.Authentication;
@@ -115,13 +114,15 @@ angular.module('portainer.services')
     }
     $q.all({
       info: SystemService.info(),
-      version: SystemService.version()
+      version: SystemService.version(),
+      extensions: ExtensionManager.extensions()
     })
     .then(function success(data) {
       var endpointMode = InfoHelper.determineEndpointMode(data.info);
       var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
       state.endpoint.apiVersion = endpointAPIVersion;
+      state.endpoint.extensions = data.extensions;
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();
     })
