@@ -1,7 +1,6 @@
 angular.module('portainer.services')
 .factory('ExtensionManager', ['$q', 'PluginService', 'StoridgeManager', function ExtensionManagerFactory($q, PluginService, StoridgeManager) {
   'use strict';
-
   var service = {};
 
   service.init = function() {
