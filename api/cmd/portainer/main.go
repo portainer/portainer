@@ -7,13 +7,14 @@ import (
 	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/crypto"
 	"github.com/portainer/portainer/exec"
-	"github.com/portainer/portainer/file"
+	"github.com/portainer/portainer/filesystem"
 	"github.com/portainer/portainer/git"
 	"github.com/portainer/portainer/http"
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
 
 	"log"
+	"os"
 )
 
 func initCLI() *portainer.CLIFlags {
@@ -31,7 +32,7 @@ func initCLI() *portainer.CLIFlags {
 }
 
 func initFileService(dataStorePath string) portainer.FileService {
-	fileService, err := file.NewService(dataStorePath, "")
+	fileService, err := filesystem.NewService(dataStorePath, "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -170,6 +171,19 @@ func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService
 
 func main() {
 	flags := initCLI()
+
+	if *flags.CheckHealth {
+		statuscode, err := http.HealthCheck(*flags.Addr)
+		if err == nil {
+			if statuscode == 200 {
+				log.Println(*flags.Addr, ": Online - response:", statuscode)
+				os.Exit(0)
+			} else {
+				log.Fatal(*flags.Addr, ": Error - response:", statuscode)
+			}
+		}
+		log.Fatal("Connection error:", err.Error())
+	}
 
 	fileService := initFileService(*flags.Data)
 

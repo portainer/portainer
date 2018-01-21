@@ -9,7 +9,7 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/file"
+	"github.com/portainer/portainer/filesystem"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
@@ -35,6 +35,14 @@ type StackHandler struct {
 	RegistryService        portainer.RegistryService
 	DockerHubService       portainer.DockerHubService
 	StackManager           portainer.StackManager
+}
+
+type stackDeploymentConfig struct {
+	endpoint   *portainer.Endpoint
+	stack      *portainer.Stack
+	prune      bool
+	dockerhub  *portainer.DockerHub
+	registries []portainer.Registry
 }
 
 // NewStackHandler returns a new instance of StackHandler.
@@ -78,6 +86,7 @@ type (
 	putStackRequest struct {
 		StackFileContent string           `valid:"required"`
 		Env              []portainer.Pair `valid:""`
+		Prune            bool             `valid:"-"`
 	}
 )
 
@@ -166,7 +175,7 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		ID:         portainer.StackID(stackName + "_" + swarmID),
 		Name:       stackName,
 		SwarmID:    swarmID,
-		EntryPoint: file.ComposeFileDefaultName,
+		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        req.Env,
 	}
 
@@ -207,7 +216,14 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		return
 	}
 
-	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
+	config := stackDeploymentConfig{
+		stack:      stack,
+		endpoint:   endpoint,
+		dockerhub:  dockerhub,
+		registries: filteredRegistries,
+		prune:      false,
+	}
+	err = handler.deployStack(&config)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -264,7 +280,7 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 	}
 
 	if req.PathInRepository == "" {
-		req.PathInRepository = file.ComposeFileDefaultName
+		req.PathInRepository = filesystem.ComposeFileDefaultName
 	}
 
 	stacks, err := handler.StackService.Stacks()
@@ -334,7 +350,14 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		return
 	}
 
-	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
+	config := stackDeploymentConfig{
+		stack:      stack,
+		endpoint:   endpoint,
+		dockerhub:  dockerhub,
+		registries: filteredRegistries,
+		prune:      false,
+	}
+	err = handler.deployStack(&config)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -404,7 +427,7 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		ID:         portainer.StackID(stackName + "_" + swarmID),
 		Name:       stackName,
 		SwarmID:    swarmID,
-		EntryPoint: file.ComposeFileDefaultName,
+		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        env,
 	}
 
@@ -445,7 +468,14 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		return
 	}
 
-	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
+	config := stackDeploymentConfig{
+		stack:      stack,
+		endpoint:   endpoint,
+		dockerhub:  dockerhub,
+		registries: filteredRegistries,
+		prune:      false,
+	}
+	err = handler.deployStack(&config)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -637,7 +667,14 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = handler.deployStack(endpoint, stack, dockerhub, filteredRegistries)
+	config := stackDeploymentConfig{
+		stack:      stack,
+		endpoint:   endpoint,
+		dockerhub:  dockerhub,
+		registries: filteredRegistries,
+		prune:      req.Prune,
+	}
+	err = handler.deployStack(&config)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -732,22 +769,22 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 	}
 }
 
-func (handler *StackHandler) deployStack(endpoint *portainer.Endpoint, stack *portainer.Stack, dockerhub *portainer.DockerHub, registries []portainer.Registry) error {
+func (handler *StackHandler) deployStack(config *stackDeploymentConfig) error {
 	handler.stackCreationMutex.Lock()
 
-	err := handler.StackManager.Login(dockerhub, registries, endpoint)
+	err := handler.StackManager.Login(config.dockerhub, config.registries, config.endpoint)
 	if err != nil {
 		handler.stackCreationMutex.Unlock()
 		return err
 	}
 
-	err = handler.StackManager.Deploy(stack, endpoint)
+	err = handler.StackManager.Deploy(config.stack, config.prune, config.endpoint)
 	if err != nil {
 		handler.stackCreationMutex.Unlock()
 		return err
 	}
 
-	err = handler.StackManager.Logout(endpoint)
+	err = handler.StackManager.Logout(config.endpoint)
 	if err != nil {
 		handler.stackCreationMutex.Unlock()
 		return err

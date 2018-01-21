@@ -54,6 +54,7 @@ angular.module('portainer.services')
     var consoleConfiguration = TemplateHelper.getConsoleConfiguration(template.Interactive);
     configuration.OpenStdin = consoleConfiguration.openStdin;
     configuration.Tty = consoleConfiguration.tty;
+    configuration.Labels = TemplateHelper.updateContainerConfigurationWithLabels(template.Labels);
     return configuration;
   };
 

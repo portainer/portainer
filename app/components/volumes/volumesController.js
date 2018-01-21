@@ -40,5 +40,6 @@ function ($q, $scope, $state, VolumeService, Notifications) {
       Notifications.error('Failure', err, 'Unable to retrieve volumes');
     });
   }
+
   initView();
 }]);

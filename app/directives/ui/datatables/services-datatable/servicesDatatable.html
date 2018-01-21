@@ -12,10 +12,16 @@
         </div>
       </div>
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-          <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
-        </button>
+        <div class="btn-group" role="group" aria-label="...">
+          <button ng-if="$ctrl.showForceUpdateButton" type="button" class="btn btn-sm btn-primary"
+            ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.forceUpdateAction($ctrl.state.selectedItems)">
+            <i class="fa fa-refresh space-right" aria-hidden="true"></i>Update
+          </button>
+          <button type="button" class="btn btn-sm btn-danger"
+            ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+            <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
+          </button>
+        </div>
         <button type="button" class="btn btn-sm btn-primary" ui-sref="actions.create.service">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add service
         </button>
@@ -102,7 +108,7 @@
                   </a>
                 </span>
                 <span ng-if="item.Mode === 'replicated' && item.Scale">
-                  <input class="input-sm" type="number" ng-model="item.Replicas" />
+                  <input class="input-sm" type="number" ng-model="item.Replicas" on-enter-key="$ctrl.scaleAction(item)" />
                   <a class="interactive" ng-click="item.Scale = false;"><i class="fa fa-times"></i></a>
                   <a class="interactive" ng-click="$ctrl.scaleAction(item)"><i class="fa fa-check-square-o"></i></a>
                 </span>

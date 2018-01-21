@@ -5,7 +5,7 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/file"
+	"github.com/portainer/portainer/filesystem"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/security"
 
@@ -138,11 +138,11 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 	}
 
 	if (settings.LDAPSettings.TLSConfig.TLS || settings.LDAPSettings.StartTLS) && !settings.LDAPSettings.TLSConfig.TLSSkipVerify {
-		caCertPath, _ := handler.FileService.GetPathForTLSFile(file.LDAPStorePath, portainer.TLSFileCA)
+		caCertPath, _ := handler.FileService.GetPathForTLSFile(filesystem.LDAPStorePath, portainer.TLSFileCA)
 		settings.LDAPSettings.TLSConfig.TLSCACertPath = caCertPath
 	} else {
 		settings.LDAPSettings.TLSConfig.TLSCACertPath = ""
-		err := handler.FileService.DeleteTLSFiles(file.LDAPStorePath)
+		err := handler.FileService.DeleteTLSFiles(filesystem.LDAPStorePath)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		}
@@ -169,7 +169,7 @@ func (handler *SettingsHandler) handlePutSettingsLDAPCheck(w http.ResponseWriter
 	}
 
 	if (req.LDAPSettings.TLSConfig.TLS || req.LDAPSettings.StartTLS) && !req.LDAPSettings.TLSConfig.TLSSkipVerify {
-		caCertPath, _ := handler.FileService.GetPathForTLSFile(file.LDAPStorePath, portainer.TLSFileCA)
+		caCertPath, _ := handler.FileService.GetPathForTLSFile(filesystem.LDAPStorePath, portainer.TLSFileCA)
 		req.LDAPSettings.TLSConfig.TLSCACertPath = caCertPath
 	}
 

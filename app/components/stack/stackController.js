@@ -1,10 +1,14 @@
 angular.module('stack', [])
-.controller('StackController', ['$q', '$scope', '$state', '$stateParams', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications', 'FormHelper', 'EndpointProvider',
-function ($q, $scope, $state, $stateParams, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper, EndpointProvider) {
+.controller('StackController', ['$q', '$scope', '$state', '$transition$', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications', 'FormHelper', 'EndpointProvider',
+function ($q, $scope, $state, $transition$, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper, EndpointProvider) {
 
   $scope.state = {
     actionInProgress: false,
     publicURL: EndpointProvider.endpointPublicURL()
+  };
+
+  $scope.formValues = {
+    Prune: false
   };
 
   $scope.deployStack = function () {
@@ -12,9 +16,10 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
     // the value directly from the editor.
     var stackFile = $scope.editor.getValue();
     var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
+    var prune = $scope.formValues.Prune;
 
     $scope.state.actionInProgress = true;
-    StackService.updateStack($scope.stack.Id, stackFile, env)
+    StackService.updateStack($scope.stack.Id, stackFile, env, prune)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
       $state.reload();
@@ -36,7 +41,8 @@ function ($q, $scope, $state, $stateParams, $document, StackService, NodeService
   };
 
   function initView() {
-    var stackId = $stateParams.id;
+    var stackId = $transition$.params().id;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
     StackService.stack(stackId)
     .then(function success(data) {

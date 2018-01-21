@@ -1,6 +1,6 @@
 angular.module('createVolume', [])
-.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator',
-function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator) {
+.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator', 'ExtensionManager',
+function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, ExtensionManager) {
 
   $scope.formValues = {
     Driver: 'local',
@@ -40,6 +40,12 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     var name = $scope.formValues.Name;
     var driver = $scope.formValues.Driver;
     var driverOptions = $scope.formValues.DriverOptions;
+    var storidgeProfile = $scope.formValues.StoridgeProfile;
+
+    if (driver === 'cio:latest' && storidgeProfile) {
+      driverOptions.push({ name: 'profile', value: storidgeProfile.Name });
+    }
+
     var volumeConfiguration = VolumeService.createVolumeConfiguration(name, driver, driverOptions);
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
@@ -82,5 +88,11 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     }
   }
 
-  initView();
+  ExtensionManager.init()
+  .then(function success(data) {
+    initView();
+  })
+  .catch(function error(err) {
+    Notifications.error('Failure', err, 'Unable to initialize extensions');
+  });
 }]);

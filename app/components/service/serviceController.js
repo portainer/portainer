@@ -1,8 +1,12 @@
 angular.module('service', [])
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService', 'PluginService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService, PluginService) {
 
-  $scope.state = {};
+  $scope.state = {
+    updateInProgress: false,
+    deletionInProgress: false
+  };
+
   $scope.tasks = [];
   $scope.availableImages = [];
 
@@ -168,6 +172,41 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     }
   };
 
+  $scope.addLogDriverOpt = function addLogDriverOpt(service) {
+    service.LogDriverOpts.push({ key: '', value: '', originalValue: '' });
+    updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
+  };
+  $scope.removeLogDriverOpt = function removeLogDriverOpt(service, index) {
+    var removedElement = service.LogDriverOpts.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
+    }
+  };
+  $scope.updateLogDriverOpt = function updateLogDriverOpt(service, variable) {
+    if (variable.value !== variable.originalValue || variable.key !== variable.originalKey) {
+      updateServiceArray(service, 'LogDriverOpts', service.LogDriverOpts);
+    }
+  };
+  $scope.updateLogDriverName = function updateLogDriverName(service) {
+    updateServiceArray(service, 'LogDriverName', service.LogDriverName);
+  };
+
+  $scope.addHostsEntry = function (service) {
+    if (!service.Hosts) {
+      service.Hosts = [];
+    }
+    service.Hosts.push({ hostname: '', ip: '' });
+  };
+  $scope.removeHostsEntry = function(service, index) {
+    var removedElement = service.Hosts.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'Hosts', service.Hosts);
+    }
+  };
+  $scope.updateHostsEntry = function(service, entry) {
+    updateServiceArray(service, 'Hosts', service.Hosts);
+  };
+
   $scope.cancelChanges = function cancelChanges(service, keys) {
     if (keys) { // clean out the keys only from the list of modified keys
       keys.forEach(function(key) {
@@ -203,6 +242,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.ContainerSpec.Image = service.Image;
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
     config.TaskTemplate.ContainerSpec.Configs = service.ServiceConfigs ? service.ServiceConfigs.map(ConfigHelper.configConfig) : [];
+    config.TaskTemplate.ContainerSpec.Hosts = service.Hosts ? ServiceHelper.translateHostnameIPToHostsEntries(service.Hosts) : [];
 
     if (service.Mode === 'replicated') {
       config.Mode.Replicated.Replicas = service.Replicas;
@@ -244,6 +284,17 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       Window: ServiceHelper.translateHumanDurationToNanos(service.RestartWindow) || 0
     };
 
+    config.TaskTemplate.LogDriver = null;
+    if (service.LogDriverName) {
+      config.TaskTemplate.LogDriver = { Name: service.LogDriverName };
+      if (service.LogDriverName !== 'none') {
+        var logOpts = ServiceHelper.translateKeyValueToLogDriverOpts(service.LogDriverOpts);
+        if (Object.keys(logOpts).length !== 0 && logOpts.constructor === Object) {
+          config.TaskTemplate.LogDriver.Options = logOpts;
+        }
+      }
+    }
+
     if (service.Ports) {
       service.Ports.forEach(function (binding) {
         if (binding.PublishedPort === null || binding.PublishedPort === '') {
@@ -253,7 +304,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     }
 
     config.EndpointSpec = {
-      Mode: config.EndpointSpec.Mode || 'vip',
+      Mode: (config.EndpointSpec && config.EndpointSpec.Mode) || 'vip',
       Ports: service.Ports
     };
 
@@ -281,6 +332,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   };
 
   function removeService() {
+    $scope.state.deletionInProgress = true;
     ServiceService.remove($scope.service)
     .then(function success(data) {
       Notifications.success('Service successfully deleted');
@@ -288,6 +340,39 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to remove service');
+    })
+    .finally(function final() {
+      $scope.state.deletionInProgress = false;
+    });
+  }
+
+  $scope.forceUpdateService = function(service) {
+    ModalService.confirmServiceForceUpdate(
+      'Do you want to force update this service? All the tasks associated to the selected service(s) will be recreated.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        forceUpdateService(service);
+      }
+    );
+  };
+
+  function forceUpdateService(service) {
+    var config = ServiceHelper.serviceToConfig(service.Model);
+    // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
+    // value or an increment of the counter value to force an update.
+    config.TaskTemplate.ForceUpdate++;
+    $scope.state.updateInProgress = true;
+    ServiceService.update(service, config)
+    .then(function success(data) {
+      Notifications.success('Service successfully updated', service.Name);
+      $scope.cancelChanges({});
+      initView();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to force update service', service.Name);
+    })
+    .finally(function final() {
+      $scope.state.updateInProgress = false;
     });
   }
 
@@ -295,11 +380,13 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.ServiceSecrets = service.Secrets ? service.Secrets.map(SecretHelper.flattenSecret) : [];
     service.ServiceConfigs = service.Configs ? service.Configs.map(ConfigHelper.flattenConfig) : [];
     service.EnvironmentVariables = ServiceHelper.translateEnvironmentVariables(service.Env);
+    service.LogDriverOpts = ServiceHelper.translateLogDriverOptsToKeyValue(service.LogDriverOpts);
     service.ServiceLabels = LabelHelper.fromLabelHashToKeyValue(service.Labels);
     service.ServiceContainerLabels = LabelHelper.fromLabelHashToKeyValue(service.ContainerLabels);
     service.ServiceMounts = angular.copy(service.Mounts);
     service.ServiceConstraints = ServiceHelper.translateConstraintsToKeyValue(service.Constraints);
     service.ServicePreferences = ServiceHelper.translatePreferencesToKeyValue(service.Preferences);
+    service.Hosts = ServiceHelper.translateHostsEntriesToHostnameIP(service.Hosts);
   }
 
   function transformResources(service) {
@@ -317,6 +404,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+
     ServiceService.service($transition$.params().id)
     .then(function success(data) {
       var service = data;
@@ -336,7 +424,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         nodes: NodeService.nodes(),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
-        availableImages: ImageService.images()
+        availableImages: ImageService.images(),
+        availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25)
       });
     })
     .then(function success(data) {
@@ -345,6 +434,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.configs = data.configs;
       $scope.secrets = data.secrets;
       $scope.availableImages = ImageService.getUniqueTagListFromImages(data.availableImages);
+      $scope.availableLoggingDrivers = data.availableLoggingDrivers;
 
       // Set max cpu value
       var maxCpus = 0;
