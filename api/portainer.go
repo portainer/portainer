@@ -384,7 +384,7 @@ type (
 	StackManager interface {
 		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint) error
 		Logout(endpoint *Endpoint) error
-		Deploy(stack *Stack, endpoint *Endpoint) error
+		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
 	}
 )
