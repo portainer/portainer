@@ -18,7 +18,8 @@ angular.module('portainer.helpers')
         Privileged: false,
         ExtraHosts: []
       },
-      Volumes: {}
+      Volumes: {},
+      Labels: {}
     };
   };
 
@@ -44,6 +45,16 @@ angular.module('portainer.helpers')
       }
     });
     return portConfiguration;
+  };
+
+  helper.updateContainerConfigurationWithLabels = function(labelsArray) {
+    var labels = {};
+    labelsArray.forEach(function (l) {
+      if (l.name && l.value) {
+        labels[l.name] = l.value;
+      }
+    });
+    return labels;
   };
 
   helper.EnvToStringArray = function(templateEnvironment, containerMapping) {

@@ -1,6 +1,6 @@
 angular.module('sidebar', [])
-.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService',
-function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService) {
+.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
+function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
 
   $scope.uiVersion = StateManager.getState().application.version;
   $scope.displayExternalContributors = StateManager.getState().application.displayExternalContributors;
@@ -12,8 +12,10 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     var activeEndpointPublicURL = EndpointProvider.endpointPublicURL();
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+
     StateManager.updateEndpointState(true)
     .then(function success() {
+      ExtensionManager.reset();
       $state.go('dashboard');
     })
     .catch(function error(err) {

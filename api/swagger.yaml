@@ -56,7 +56,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.15.5"
+  version: "1.16.0"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -77,6 +77,8 @@ tags:
   description: "Manage Portainer settings"
 - name: "status"
   description: "Information about the Portainer instance"
+- name: "stacks"
+  description: "Manage Docker stacks"
 - name: "users"
   description: "Manage users"
 - name: "teams"
@@ -436,6 +438,285 @@ paths:
           schema:
             $ref: "#/definitions/GenericError"
 
+  /endpoints/{endpointId}/stacks:
+    get:
+      tags:
+      - "stacks"
+      summary: "List stacks"
+      description: |
+        List all stacks based on the current user authorizations.
+        Will return all stacks if using an administrator account otherwise it
+        will only return the list of stacks the user have access to.
+        **Access policy**: restricted
+      operationId: "StackList"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "endpointId"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/StackListResponse"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "stacks"
+      summary: "Deploy a new stack"
+      description: |
+        Deploy a new stack into a Docker environment specified via the endpoint identifier.
+        **Access policy**: restricted
+      operationId: "StackCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "endpointId"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      - name: "method"
+        in: "query"
+        description: "Stack deployment method. Possible values: string or repository."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Stack details. Used when"
+        required: true
+        schema:
+          $ref: "#/definitions/StackCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/StackCreateResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Endpoint not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /endpoints/{endpointId}/stacks/{id}:
+    get:
+      tags:
+      - "stacks"
+      summary: "Inspect a stack"
+      description: |
+        Retrieve details about a stack.
+        **Access policy**: restricted
+      operationId: "StackInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "endpointId"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      - name: "id"
+        in: "path"
+        description: "Stack identifier"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Stack"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Stack not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Stack not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "stacks"
+      summary: "Update a stack"
+      description: |
+        Update a stack.
+        **Access policy**: restricted
+      operationId: "StackUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "endpointId"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      - name: "id"
+        in: "path"
+        description: "Stack identifier"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Stack details"
+        required: true
+        schema:
+          $ref: "#/definitions/StackUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "Stack not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Stack not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "stacks"
+      summary: "Remove a stack"
+      description: |
+        Remove a stack.
+        **Access policy**: restricted
+      operationId: "StackDelete"
+      parameters:
+      - name: "endpointId"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      - name: "id"
+        in: "path"
+        description: "Stack identifier"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Stack not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Stack not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /endpoints/{endpointId}/stacks/{id}/stackfile:
+    get:
+      tags:
+      - "stacks"
+      summary: "Retrieve the content of the Stack file for the specified stack"
+      description: |
+        Get Stack file content.
+        **Access policy**: restricted
+      operationId: "StackFileInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "endpointId"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      - name: "id"
+        in: "path"
+        description: "Stack identifier"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/StackFileInspectResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Stack not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Stack not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
   /registries:
     get:
       tags:
@@ -536,7 +817,7 @@ paths:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "Endpoint not found"
+              err: "Registry not found"
         500:
           description: "Server error"
           schema:
@@ -593,13 +874,6 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
-        503:
-          description: "Endpoint management disabled"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Endpoint management is disabled"
     delete:
       tags:
       - "registries"
@@ -1869,7 +2143,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.15.5"
+        example: "1.16.0"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -1883,7 +2157,7 @@ definitions:
       DisplayDonationHeader:
         type: "boolean"
         example: true
-        description: "Whether to display or not the donation message in the header."\
+        description: "Whether to display or not the donation message in the header."
       DisplayExternalContributors:
         type: "boolean"
         example: false
@@ -2612,3 +2886,104 @@ definitions:
         type: "string"
         example: "nginx:latest"
         description: "The Docker image associated to the template"
+  StackCreateRequest:
+    type: "object"
+    required:
+    - "Name"
+    - "SwarmID"
+    properties:
+      Name:
+        type: "string"
+        example: "myStack"
+        description: "Name of the stack"
+      SwarmID:
+        type: "string"
+        example: "jpofkc0i9uo9wtx1zesuk649w"
+        description: "Cluster identifier of the Swarm cluster"
+      StackFileContent:
+        type: "string"
+        example: "version: 3\n services:\n web:\n image:nginx"
+        description: "Content of the Stack file. Required when using the 'string' deployment method."
+      GitRepository:
+        type: "string"
+        example: "https://github.com/openfaas/faas"
+        description: "URL of a public Git repository hosting the Stack file. Required when using the 'repository' deployment method."
+      PathInRepository:
+        type: "string"
+        example: "docker-compose.yml"
+        description: "Path to the Stack file inside the Git repository. Required when using the 'repository' deployment method."
+      Env:
+        type: "array"
+        description: "A list of environment variables used during stack deployment"
+        items:
+          $ref: "#/definitions/Stack_Env"
+  Stack_Env:
+    properties:
+      name:
+        type: "string"
+        example: "MYSQL_ROOT_PASSWORD"
+      value:
+        type: "string"
+        example: "password"
+  StackCreateResponse:
+    type: "object"
+    properties:
+      Id:
+        type: "string"
+        example: "myStack_jpofkc0i9uo9wtx1zesuk649w"
+        description: "Id of the stack"
+  StackListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Stack"
+  Stack:
+    type: "object"
+    properties:
+      Id:
+        type: "string"
+        example: "myStack_jpofkc0i9uo9wtx1zesuk649w"
+        description: "Stack identifier"
+      Name:
+        type: "string"
+        example: "myStack"
+        description: "Stack name"
+      EntryPoint:
+        type: "string"
+        example: "docker-compose.yml"
+        description: "Path to the Stack file"
+      SwarmID:
+        type: "string"
+        example: "jpofkc0i9uo9wtx1zesuk649w"
+        description: "Cluster identifier of the Swarm cluster where the stack is deployed"
+      ProjectPath:
+        type: "string"
+        example: "/data/compose/myStack_jpofkc0i9uo9wtx1zesuk649w"
+        description: "Path on disk to the repository hosting the Stack file"
+      Env:
+        type: "array"
+        description: "A list of environment variables used during stack deployment"
+        items:
+          $ref: "#/definitions/Stack_Env"
+  StackUpdateRequest:
+    type: "object"
+    properties:
+      StackFileContent:
+        type: "string"
+        example: "version: 3\n services:\n web:\n image:nginx"
+        description: "New content of the Stack file."
+      Env:
+        type: "array"
+        description: "A list of environment variables used during stack deployment"
+        items:
+          $ref: "#/definitions/Stack_Env"
+      Prune:
+        type: "boolean"
+        example: false
+        description: "Prune services that are no longer referenced"
+  StackFileInspectResponse:
+    type: "object"
+    properties:
+      StackFileContent:
+        type: "string"
+        example: "version: 3\n services:\n web:\n image:nginx"
+        description: "Content of the Stack file."

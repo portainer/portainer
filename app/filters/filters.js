@@ -66,7 +66,7 @@ angular.module('portainer.filters')
       labelStyle = 'primary';
     } else if (includeString(status, ['running'])) {
       labelStyle = 'success';
-    }    
+    }
     return labelStyle;
   };
 })
@@ -344,5 +344,14 @@ angular.module('portainer.filters')
   'use strict';
   return function (createdBy) {
 	  return createdBy.replace('/bin/sh -c #(nop) ', '').replace('/bin/sh -c ', 'RUN ');
+  };
+})
+.filter('trimshasum', function () {
+  'use strict';
+  return function (imageName) {
+    if (imageName.indexOf('sha256:') === 0) {
+      return imageName.substring(7, 19);
+    }
+    return _.split(imageName, '@sha256')[0];
   };
 });

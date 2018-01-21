@@ -41,6 +41,15 @@ function ServiceViewModel(data, runningTasks, allTasks, nodes) {
     this.RestartMaxAttempts = 0;
     this.RestartWindow = 0;
   }
+
+  if (data.Spec.TaskTemplate.LogDriver) {
+    this.LogDriverName = data.Spec.TaskTemplate.LogDriver.Name || '';
+    this.LogDriverOpts = data.Spec.TaskTemplate.LogDriver.Options || [];
+  } else {
+    this.LogDriverName = '';
+    this.LogDriverOpts = [];
+  }
+    
   this.Constraints = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Constraints || [] : [];
   this.Preferences = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Preferences || [] : [];
   this.Platforms = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Platforms || [] : [];

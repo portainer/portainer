@@ -69,6 +69,7 @@ angular:
   - node_modules/angular-google-analytics/dist/angular-google-analytics.js
   - node_modules/angular-jwt/dist/angular-jwt.js
   - node_modules/angular-local-storage/dist/angular-local-storage.js
+  - node_modules/angular-messages/angular-messages.js
   - node_modules/angular-resource/angular-resource.js
   - node_modules/angular-sanitize/angular-sanitize.js
   - node_modules/ui-select/dist/select.js
@@ -86,6 +87,7 @@ angular:
   - node_modules/angular-google-analytics/dist/angular-google-analytics.min.js
   - node_modules/angular-jwt/dist/angular-jwt.min.js
   - node_modules/angular-local-storage/dist/angular-local-storage.min.js
+  - node_modules/angular-messages/angular-messages.min.js
   - node_modules/angular-resource/angular-resource.min.js
   - node_modules/angular-sanitize/angular-sanitize.min.js
   - node_modules/ui-select/dist/select.min.js
