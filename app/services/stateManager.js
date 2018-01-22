@@ -114,15 +114,18 @@ angular.module('portainer.services')
     }
     $q.all({
       info: SystemService.info(),
-      version: SystemService.version(),
-      extensions: ExtensionManager.extensions()
+      version: SystemService.version()
     })
     .then(function success(data) {
       var endpointMode = InfoHelper.determineEndpointMode(data.info);
       var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
       state.endpoint.apiVersion = endpointAPIVersion;
-      state.endpoint.extensions = data.extensions;
+      return $q.when(endpointAPIVersion < 1.25 || ExtensionManager.extensions());
+    })
+    .then(function success(data) {
+      state.endpoint.extensions = data instanceof Array ? data : [];
+      console.log(JSON.stringify(state.endpoint.extensions, null, 4));
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();
     })
