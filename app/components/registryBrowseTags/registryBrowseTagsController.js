@@ -14,15 +14,19 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
   // Store info in tags and blobs arrays
   function storeManifests(allManifests) {
     for (var t in allManifests) {
+      $scope.tags.push(allManifests[t]);
+      // Store associated blobs
+      blobs = blobs.concat(allManifests[t].Layers);
+/*
       var tag = {};
-      tag.name = allManifests[t].tag;
+      tag.name = allManifests[t].TagName;
       tag.nb_layers = allManifests[t].fsLayers.length;
       tag.layers = allManifests[t].fsLayers.map(function (elem) {
         return elem.blobSum;
       });
       $scope.tags.push(tag);
       // Store associated blobs
-      blobs = blobs.concat(tag.layers);
+      blobs = blobs.concat(tag.layers);*/
     }
     // Uniq on blobs array
     blobs = blobs.filter(function(elem, pos) {
@@ -33,22 +37,22 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
   // Store info in blobSizes object
   function storeBlobSizes(allBlobs) {
     for (var b in allBlobs) {
-      var reference = allBlobs[b].headers['docker-content-digest'];
-      var size = allBlobs[b].headers['content-length'];
-      blobSizes[reference] = parseInt(size, 10);
+      var reference = allBlobs[b].Reference;
+      var size = allBlobs[b].Size;
+      blobSizes[reference] = size;
     }
   }
 
-  // Set total_size in tags array
+  // Set TotalSize in tags array
   function storeTagSizes() {
     for (var t in $scope.tags) {
-      var tag = $scope.tags[t].name;
+      var tag = $scope.tags[t].TagName;
       var size = 0
-      for (l in $scope.tags[t].layers) {
-        var reference = $scope.tags[t].layers[l];
+      for (l in $scope.tags[t].Layers) {
+        var reference = $scope.tags[t].Layers[l];
         size += blobSizes[reference];
       }
-      $scope.tags[t].total_size = size;
+      $scope.tags[t].TotalSize = size;
     }
   }
 
@@ -58,10 +62,10 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
 
     // Get all tags
     RegistryService.tags(registryID, repository)
-    .then(function success(data) {
+    .then(function success(tags) {
       
       // Prepare all queries to manifests
-      var manifestsPromises = data.tags.map(function (tag) {
+      var manifestsPromises = tags.Tags.map(function (tag) {
         return RegistryService.manifests(registryID, repository, tag);
       });
 

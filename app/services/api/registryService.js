@@ -40,7 +40,8 @@ angular.module('portainer.services')
 
     RegistryCatalog.get({id: id, limit: 200, last: ''}).$promise
     .then(function success(data) {
-      deferred.resolve(data);
+      var catalog = new RegistryCatalogViewModel(data.data, data.headers);
+      deferred.resolve(catalog);
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve registry catalog', err: err});
@@ -54,7 +55,8 @@ angular.module('portainer.services')
 
     RegistryTags.get({id: id, repository: repository}).$promise
     .then(function success(data) {
-      deferred.resolve(data);
+      var tags = new RegistryTagsViewModel(data);
+      deferred.resolve(tags);
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve repository tags', err: err});
@@ -68,7 +70,8 @@ angular.module('portainer.services')
 
     RegistryManifests.get({id: id, repository: repository, tag: tag}).$promise
     .then(function success(data) {
-      deferred.resolve(data);
+      var manifests = new RegistryManifestsViewModel(data);
+      deferred.resolve(manifests);
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve repository tag manifests', err: err});
@@ -83,7 +86,8 @@ angular.module('portainer.services')
 
     RegistryBlobs.head({id: id, repository: repository, reference: reference}).$promise
     .then(function success(data) {
-      deferred.resolve(data);
+      var blobs = new RegistryBlobsViewModel(data.data, data.headers);
+      deferred.resolve(blobs);
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve repository blob metadata', err: err});

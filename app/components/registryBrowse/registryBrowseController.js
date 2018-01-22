@@ -9,11 +9,11 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
     var registryID = $transition$.params().id;
 
     RegistryService.catalog(registryID)
-    .then(function success(data) {
-      if (data.headers.link) {
-        $scope.headerMessage = 'Information: You have more than ' + data.data.repositories.length + ' repositories in this registry. Only first ' + data.data.repositories.length + ' are shown here.';
+    .then(function success(catalog) {
+      if (catalog.NotComplete) {
+        $scope.headerMessage = 'Information: You have more than ' + catalog.Size + ' repositories in this registry. Only first ' + catalog.Size + ' are shown here.';
       }
-      var tagsPromises = data.data.repositories.map(function (repository) {
+      var tagsPromises = catalog.Repositories.map(function (repository) {
         return RegistryService.tags(registryID, repository);
       });
 
