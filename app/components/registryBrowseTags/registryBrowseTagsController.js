@@ -17,16 +17,6 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
       $scope.tags.push(allManifests[t]);
       // Store associated blobs
       blobs = blobs.concat(allManifests[t].Layers);
-/*
-      var tag = {};
-      tag.name = allManifests[t].TagName;
-      tag.nb_layers = allManifests[t].fsLayers.length;
-      tag.layers = allManifests[t].fsLayers.map(function (elem) {
-        return elem.blobSum;
-      });
-      $scope.tags.push(tag);
-      // Store associated blobs
-      blobs = blobs.concat(tag.layers);*/
     }
     // Uniq on blobs array
     blobs = blobs.filter(function(elem, pos) {
