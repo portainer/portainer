@@ -125,7 +125,6 @@ angular.module('portainer.services')
     })
     .then(function success(data) {
       state.endpoint.extensions = data instanceof Array ? data : [];
-      console.log(JSON.stringify(state.endpoint.extensions, null, 4));
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();
     })
