@@ -13,7 +13,6 @@ type (
 	CLIFlags struct {
 		Addr              *string
 		Assets            *string
-		CheckHealth       *bool
 		Data              *string
 		Endpoint          *string
 		ExternalEndpoints *string
