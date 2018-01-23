@@ -277,12 +277,14 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       Order: service.UpdateOrder
     };
 
-    config.TaskTemplate.RestartPolicy = {
-      Condition: service.RestartCondition,
-      Delay: ServiceHelper.translateHumanDurationToNanos(service.RestartDelay) || 5000000000,
-      MaxAttempts: service.RestartMaxAttempts,
-      Window: ServiceHelper.translateHumanDurationToNanos(service.RestartWindow) || 0
-    };
+    if ($scope.hasChanges(service, ['RestartCondition', 'RestartDelay', 'RestartMaxAttempts', 'RestartWindow'])){
+      config.TaskTemplate.RestartPolicy = {
+        Condition: service.RestartCondition,
+        Delay: ServiceHelper.translateHumanDurationToNanos(service.RestartDelay) || 5000000000,
+        MaxAttempts: service.RestartMaxAttempts,
+        Window: ServiceHelper.translateHumanDurationToNanos(service.RestartWindow) || 0
+      };
+    }
 
     config.TaskTemplate.LogDriver = null;
     if (service.LogDriverName) {

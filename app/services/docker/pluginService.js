@@ -5,16 +5,17 @@ angular.module('portainer.services')
 
   service.plugins = function() {
     var deferred = $q.defer();
+    var plugins = [];
 
     Plugin.query({}).$promise
     .then(function success(data) {
-      var plugins = data.map(function (item) {
-        return new PluginViewModel(item);
-      });
-      deferred.resolve(plugins);
+      for (var i = 0; i < data.length; i++) {
+        var plugin = new PluginViewModel(data[i]);
+        plugins.push(plugin);
+      }
     })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve plugins', err: err });
+    .finally(function final() {
+      deferred.resolve(plugins);
     });
 
     return deferred.promise;
@@ -61,7 +62,7 @@ angular.module('portainer.services')
   };
 
   service.loggingPlugins = function(systemOnly) {
-    return servicePlugins(systemOnly, 'Log', 'docker.logdriver/1.0');        
+    return servicePlugins(systemOnly, 'Log', 'docker.logdriver/1.0');
   };
 
   return service;

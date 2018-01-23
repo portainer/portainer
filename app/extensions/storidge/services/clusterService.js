@@ -7,6 +7,10 @@ angular.module('extension.storidge')
     return StoridgeCluster.reboot();
   };
 
+  service.shutdown = function() {
+    return StoridgeCluster.shutdown();
+  };
+
   service.info = function() {
     var deferred = $q.defer();
 

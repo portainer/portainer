@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.16.0",
+  "version": "1.16.1",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -45,7 +45,7 @@
     "filesize": "~3.3.0",
     "font-awesome": "~4.7.0",
     "isteven-angular-multiselect": "~4.0.0",
-    "jquery": "1.11.1",
+    "jquery": "^3.3.1",
     "js-yaml": "~3.10.0",
     "lodash": "4.12.0",
     "moment": "~2.14.1",
