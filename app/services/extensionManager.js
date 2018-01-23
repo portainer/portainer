@@ -23,10 +23,9 @@ angular.module('portainer.services')
       if (_.includes(volumePlugins, 'cio:latest')) {
         extensions.push('storidge');
       }
-      deferred.resolve(extensions);
     })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve extensions', err: err });
+    .finally(function final() {
+      deferred.resolve(extensions);
     });
 
     return deferred.promise;
