@@ -37,12 +37,12 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-danger btn-sm" ng-click="shutdownCluster()" ng-disabled="state.shutdownInProgress" button-spinner="state.shutdownInProgress">
-                <span ng-hide="state.updateInProgress"><i class="fa fa-power-off space-right" aria-hidden="true"></i> Shutdown the cluster</span>
-                <span ng-show="state.updateInProgress">Shutting down cluster...</span>
+                <span ng-hide="state.shutdownInProgress"><i class="fa fa-power-off space-right" aria-hidden="true"></i> Shutdown the cluster</span>
+                <span ng-show="state.shutdownInProgress">Shutting down cluster...</span>
               </button>
               <button type="button" class="btn btn-danger btn-sm" ng-click="rebootCluster()" ng-disabled="state.rebootInProgress" button-spinner="state.shutdownInProgress">
-                <span ng-hide="state.deleteInProgress"><i class="fa fa-refresh space-right" aria-hidden="true"></i> Reboot the cluster</span>
-                <span ng-show="state.deleteInProgress">Rebooting cluster...</span>
+                <span ng-hide="state.rebootInProgress"><i class="fa fa-refresh space-right" aria-hidden="true"></i> Reboot the cluster</span>
+                <span ng-show="state.rebootInProgress">Rebooting cluster...</span>
               </button>
             </div>
           </div>
