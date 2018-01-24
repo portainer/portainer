@@ -11,7 +11,7 @@ angular.module('portainer.helpers')
     return options;
   };
 
-  service.isVolumeUsedByAService = function(volume, services) {
+  helper.isVolumeUsedByAService = function(volume, services) {
     for (var i = 0; i < services.length; i++) {
       var service = services[i];
       var mounts = service.Mounts;
