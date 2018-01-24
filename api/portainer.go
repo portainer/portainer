@@ -12,12 +12,17 @@ type (
 	// CLIFlags represents the available flags on the CLI.
 	CLIFlags struct {
 		Addr              *string
+		AdminPassword     *string
+		AdminPasswordFile *string
 		Assets            *string
 		Data              *string
 		Endpoint          *string
 		ExternalEndpoints *string
+		Labels            *[]Pair
+		Logo              *string
 		NoAuth            *bool
 		NoAnalytics       *bool
+		Templates         *string
 		TLSVerify         *bool
 		TLSCacert         *string
 		TLSCert           *string
@@ -26,12 +31,6 @@ type (
 		SSLCert           *string
 		SSLKey            *string
 		SyncInterval      *string
-		AdminPassword     *string
-		AdminPasswordFile *string
-		// Deprecated fields
-		Labels    *[]Pair
-		Logo      *string
-		Templates *string
 	}
 
 	// Status represents the application status.
