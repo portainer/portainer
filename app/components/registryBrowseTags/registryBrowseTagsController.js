@@ -14,35 +14,43 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
   // Store info in tags and blobs arrays
   function storeManifests(allManifests) {
     for (var t in allManifests) {
-      $scope.tags.push(allManifests[t]);
-      // Store associated blobs
-      blobs = blobs.concat(allManifests[t].Layers);
+      if ({}.hasOwnProperty.call(allManifests, t)) {
+        $scope.tags.push(allManifests[t]);
+        // Store associated blobs
+        blobs = blobs.concat(allManifests[t].Layers);
+      }
     }
     // Uniq on blobs array
     blobs = blobs.filter(function(elem, pos) {
-      return blobs.indexOf(elem) == pos;
+      return blobs.indexOf(elem) === pos;
     });
   }
 
   // Store info in blobSizes object
   function storeBlobSizes(allBlobs) {
     for (var b in allBlobs) {
-      var reference = allBlobs[b].Reference;
-      var size = allBlobs[b].Size;
-      blobSizes[reference] = size;
+      if ({}.hasOwnProperty.call(allBlobs, b)) {
+        var reference = allBlobs[b].Reference;
+        var size = allBlobs[b].Size;
+        blobSizes[reference] = size;
+      }
     }
   }
 
   // Set TotalSize in tags array
   function storeTagSizes() {
     for (var t in $scope.tags) {
-      var tag = $scope.tags[t].TagName;
-      var size = 0
-      for (l in $scope.tags[t].Layers) {
-        var reference = $scope.tags[t].Layers[l];
-        size += blobSizes[reference];
+      if ({}.hasOwnProperty.call($scope.tags, t)) {
+        var tag = $scope.tags[t].TagName;
+        var size = 0;
+        for (l in $scope.tags[t].Layers) {
+          if ({}.hasOwnProperty.call($scope.tags[t].Layers, l)) {
+            var reference = $scope.tags[t].Layers[l];
+            size += blobSizes[reference];
+          }
+        }
+        $scope.tags[t].TotalSize = size;
       }
-      $scope.tags[t].TotalSize = size;
     }
   }
 

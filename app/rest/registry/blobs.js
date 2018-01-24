@@ -6,7 +6,7 @@ angular.module('portainer.rest')
       method: 'HEAD',
       params: { id: '@id', repository: '@repository', reference: '@reference' },
       transformResponse: function(data, headers){
-        var response = {}
+        var response = {};
         try {
           response.data = JSON.parse(data);
         } catch (e) {
