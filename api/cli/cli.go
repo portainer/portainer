@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"log"
 	"time"
 
 	"github.com/portainer/portainer"
@@ -48,10 +47,9 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		SyncInterval:      kingpin.Flag("sync-interval", "Duration between each synchronization via the external endpoints source").Default(defaultSyncInterval).String(),
 		AdminPassword:     kingpin.Flag("admin-password", "Hashed admin password").String(),
 		AdminPasswordFile: kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
-		// Deprecated flags
-		Labels:    pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
-		Logo:      kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
-		Templates: kingpin.Flag("templates", "URL to the templates (apps) definitions").Short('t').String(),
+		Labels:            pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
+		Logo:              kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
+		Templates:         kingpin.Flag("templates", "URL to the templates (apps) definitions").Short('t').String(),
 	}
 
 	kingpin.Parse()
@@ -97,8 +95,6 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 		return errAdminPassExcludeAdminPassFile
 	}
 
-	displayDeprecationWarnings(*flags.Templates, *flags.Logo, *flags.Labels)
-
 	return nil
 }
 
@@ -141,16 +137,4 @@ func validateSyncInterval(syncInterval string) error {
 		}
 	}
 	return nil
-}
-
-func displayDeprecationWarnings(templates, logo string, labels []portainer.Pair) {
-	if templates != "" {
-		log.Println("Warning: the --templates / -t flag is deprecated and will be removed in future versions.")
-	}
-	if logo != "" {
-		log.Println("Warning: the --logo flag is deprecated and will be removed in future versions.")
-	}
-	if labels != nil {
-		log.Println("Warning: the --hide-label / -l flag is deprecated and will be removed in future versions.")
-	}
 }
