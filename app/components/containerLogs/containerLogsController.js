@@ -1,4 +1,4 @@
-angular.module('containerLogs', [])
+angular.module('containerLogs', ['luegg.directives'])
 .controller('ContainerLogsController', ['$scope', '$transition$', '$anchorScroll', 'ContainerLogs', 'Container', 'Notifications',
 function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notifications) {
   $scope.state = {};
