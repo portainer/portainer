@@ -7,6 +7,7 @@ function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notific
   $scope.stdout = '';
   $scope.stderr = '';
   $scope.tailLines = 2000;
+  $scope.autoscroll = true;
 
   Container.get({id: $transition$.params().id}, function (d) {
     $scope.container = d;
