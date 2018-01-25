@@ -184,7 +184,16 @@
             <tbody>
               <tr>
                 <td>Image</td>
-                <td><a ui-sref="image({id: container.Image})">{{ container.Image }}</a></td>
+                <td>
+                  <table class="table table-bordered table-condensed">
+                    <tr>
+                      <td>Tag</td>
+                      <td><i title="This tag does not belong to image {{ (container.Image || '' ).slice(7)|truncate:23 }} anymore" class="fa fa-warning space-right red-icon" ng-if="state.ChangedTag"></i>{{ container.Config.Image }}</td>
+                      <td>ID</td>
+                      <td><a title="{{state.RepoTags}}" ui-sref="image({id: container.Image})">{{ (container.Image || '' ).slice(7)|truncate:23 }}</a></td>
+                    </tr>
+                  </table>
+                </td>
               </tr>
               <tr ng-if="portBindings.length > 0">
                 <td>Port configuration</td>
