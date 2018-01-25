@@ -26,10 +26,12 @@
       <rd-widget-taskbar>
         <input type="checkbox" ng-model="state.displayTimestampsOut" id="displayAllTsOut" ng-change="toggleTimestampsOut()"/>
         <label for="displayAllTsOut">Display timestamps</label>
+        <input type="checkbox" ng-model="state.autoscroll" id="autoScroll"/>
+        <label for="autoScroll">Autoscroll</label>
       </rd-widget-taskbar>
       <rd-widget-body classes="no-padding">
         <div class="panel-body">
-          <pre id="stdoutLog" class="pre-scrollable pre-x-scrollable">{{stdout}}</pre>
+          <pre id="stdoutLog" scroll-glue="autoscroll" class="pre-scrollable pre-x-scrollable">{{stdout}}</pre>
         </div>
       </rd-widget-body>
     </rd-widget>
