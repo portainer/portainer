@@ -1,70 +1,17 @@
 angular.module('containerLogs', [])
-.controller('ContainerLogsController', ['$scope', '$transition$', '$anchorScroll', 'ContainerLogs', 'Container', 'Notifications',
-function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notifications) {
-  $scope.state = {};
-  $scope.state.displayTimestampsOut = false;
-  $scope.state.displayTimestampsErr = false;
-  $scope.stdout = '';
-  $scope.stderr = '';
-  $scope.tailLines = 2000;
+.controller('ContainerLogsController', ['$scope', '$transition$', 'ContainerService', 'Notifications',
+function ($scope, $transition$, ContainerService, Notifications) {
 
-  Container.get({id: $transition$.params().id}, function (d) {
-    $scope.container = d;
-  }, function (e) {
-    Notifications.error('Failure', e, 'Unable to retrieve container info');
-  });
-
-  function getLogs() {
-    getLogsStdout();
-    getLogsStderr();
+  $scope.ContainerId = $transition$.params().id;
+  
+  function initView() {
+      ContainerService.container($transition$.params().id).then(function(container) {
+        $scope.container = container;
+      }).catch(function(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve container info');
+      });
   }
 
-  function getLogsStderr() {
-    ContainerLogs.get($transition$.params().id, {
-      stdout: 0,
-      stderr: 1,
-      timestamps: $scope.state.displayTimestampsErr,
-      tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-      // Replace carriage returns with newlines to clean up output
-      data = data.replace(/[\r]/g, '\n');
-      // Strip 8 byte header from each line of output
-      data = data.substring(8);
-      data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stderr = data;
-    });
-  }
+  initView();
 
-  function getLogsStdout() {
-    ContainerLogs.get($transition$.params().id, {
-      stdout: 1,
-      stderr: 0,
-      timestamps: $scope.state.displayTimestampsOut,
-      tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-      // Replace carriage returns with newlines to clean up output
-      data = data.replace(/[\r]/g, '\n');
-      // Strip 8 byte header from each line of output
-      data = data.substring(8);
-      data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stdout = data;
-    });
-  }
-
-  // initial call
-  getLogs();
-  var logIntervalId = window.setInterval(getLogs, 5000);
-
-  $scope.$on('$destroy', function () {
-    // clearing interval when view changes
-    clearInterval(logIntervalId);
-  });
-
-  $scope.toggleTimestampsOut = function () {
-    getLogsStdout();
-  };
-
-  $scope.toggleTimestampsErr = function () {
-    getLogsStderr();
-  };
 }]);
