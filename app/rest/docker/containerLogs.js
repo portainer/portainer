@@ -10,7 +10,8 @@ angular.module('portainer.rest')
           'stdout': params.stdout || 0,
           'stderr': params.stderr || 0,
           'timestamps': params.timestamps || 0,
-          'tail': params.tail || 'all'
+          'tail': params.tail || 'all',
+          'since': params.since || '0'
         },
         ignoreLoadingBar: true
       }).success(callback).error(function (data, status, headers, config) {

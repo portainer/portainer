@@ -210,6 +210,11 @@ a[ng-click]{
   padding: 10px 5px;
 }
 
+#stdOut-terminal,
+#stdErr-terminal {
+  height: 350px;
+}
+
 .interactive {
   cursor: pointer;
 }
@@ -770,4 +775,14 @@ json-tree .branch-preview {
 
 .row.header .meta .page {
   padding-top: 7px;
+}
+
+/* container logs */
+
+.log-input {
+  display: contents;
+  width: 90px;
+  height: 30px;
+  text-align: center;
+  padding: 4px 4px;
 }
