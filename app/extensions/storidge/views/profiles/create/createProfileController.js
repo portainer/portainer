@@ -1,5 +1,5 @@
 angular.module('extension.storidge')
-.controller('CreateProfileController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeProfileService', 'StoridgeManager',
+.controller('StoridgeCreateProfileController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeProfileService', 'StoridgeManager',
 function ($scope, $state, $transition$, Notifications, StoridgeProfileService, StoridgeManager) {
 
   $scope.state = {

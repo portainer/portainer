@@ -1,0 +1,97 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <div class="toolBar">
+        <div class="toolBarTitle">
+          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.title }}
+        </div>
+        <div class="settings">
+          <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
+            <i class="fa fa-search" aria-hidden="true"></i> Search
+          </span>
+        </div>
+      </div>
+      <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
+        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search...">
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Id')">
+                  Id
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Id' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Id' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Status')">
+                  Status
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Slot')">
+                  Slot
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Slot' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Slot' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Spec.ContainerSpec.Image')">
+                  Image
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Spec.ContainerSpec.Image' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Spec.ContainerSpec.Image' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Updated')">
+                  Last Update
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Updated' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Updated' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
+              <td><a ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}</a></td>
+              <td><span class="label label-{{ item.Status.State | taskstatusbadge }}">{{ item.Status.State }}</span></td>
+              <td>{{ item.Slot ? item.Slot : '-' }}</td>
+              <td>{{ item.Spec.ContainerSpec.Image | hideshasum }}</td>
+              <td>{{ item.Updated | getisodate }}</td>
+            </tr>
+            <tr ng-if="!$ctrl.dataset">
+              <td colspan="5" class="text-center text-muted">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+              <td colspan="5" class="text-center text-muted">No task available.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" ng-if="$ctrl.dataset">
+        <div class="paginationControls">
+          <form class="form-inline">
+            <span class="limitSelector">
+              <span style="margin-right: 5px;">
+                Items per page
+              </span>
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+                <option value="0">All</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </span>
+            <dir-pagination-controls max-size="5"></dir-pagination-controls>
+          </form>
+        </div>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>

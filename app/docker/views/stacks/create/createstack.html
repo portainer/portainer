@@ -1,0 +1,185 @@
+<rd-header>
+  <rd-header-title title="Create stack"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.stacks">Stacks</a> > Add stack
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="formValues.Name" id="stack_name" placeholder="e.g. myStack" auto-focus>
+            </div>
+          </div>
+          <!-- !name-input -->
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              This stack will be deployed using the equivalent of the <code>docker stack deploy</code> command.
+            </span>
+          </div>
+          <!-- build-method -->
+          <div class="col-sm-12 form-section-title">
+            Build method
+          </div>
+          <div class="form-group"></div>
+          <div class="form-group" style="margin-bottom: 0">
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="method_editor" ng-model="state.Method" value="editor" ng-click="toggleEditor(state.Method)">
+                <label for="method_editor">
+                  <div class="boxselector_header">
+                    <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Web editor
+                  </div>
+                  <p>Use our Web editor</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="method_upload" ng-model="state.Method" value="upload" ng-click="saveEditorContent()">
+                <label for="method_upload">
+                  <div class="boxselector_header">
+                    <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Upload
+                  </div>
+                  <p>Upload from your computer</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="method_repository" ng-model="state.Method" value="repository" ng-click="saveEditorContent()">
+                <label for="method_repository">
+                  <div class="boxselector_header">
+                    <i class="fa fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Repository
+                  </div>
+                  <p>Use a git repository</p>
+                </label>
+              </div>
+            </div>
+          </div>
+          <!-- !build-method -->
+          <!-- web-editor -->
+          <div ng-if="state.Method === 'editor'">
+            <div class="col-sm-12 form-section-title">
+              Web editor
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <textarea id="web-editor" class="form-control" ng-model="formValues.StackFileContent" placeholder='version: "3"'></textarea>
+              </div>
+            </div>
+          </div>
+          <!-- !web-editor -->
+          <!-- upload -->
+          <div ng-if="state.Method === 'upload'">
+            <div class="col-sm-12 form-section-title">
+              Upload
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                You can upload a Compose file from your computer.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.StackFile">Select file</button>
+                <span style="margin-left: 5px;">
+                  {{ formValues.StackFile.name }}
+                  <i class="fa fa-times red-icon" ng-if="!formValues.StackFile" aria-hidden="true"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- !upload -->
+          <!-- repository -->
+          <div ng-if="state.Method === 'repository'">
+            <div class="col-sm-12 form-section-title">
+              Git repository
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                You can use the URL of a public git repository.
+              </span>
+            </div>
+            <div class="form-group">
+              <label for="stack_repository_url" class="col-sm-2 control-label text-left">Repository URL</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="formValues.RepositoryURL" id="stack_repository_url" placeholder="https://github.com/portainer/portainer-compose">
+              </div>
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Indicate the path to the Compose file from the root of your repository.
+              </span>
+            </div>
+            <div class="form-group">
+              <label for="stack_repository_path" class="col-sm-2 control-label text-left">Compose path</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="formValues.RepositoryPath" id="stack_repository_path" placeholder="docker-compose.yml">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Environment
+          </div>
+          <!-- environment-variables -->
+          <div class="form-group">
+            <div class="col-sm-12" style="margin-top: 5px;">
+              <label class="control-label text-left">Environment variables</label>
+              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
+              </span>
+            </div>
+            <!-- environment-variable-input-list -->
+            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+              <div ng-repeat="variable in formValues.Env" style="margin-top: 2px;">
+                <div class="input-group col-sm-5 input-group-sm">
+                  <span class="input-group-addon">name</span>
+                  <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO">
+                </div>
+                <div class="input-group col-sm-5 input-group-sm">
+                  <span class="input-group-addon">value</span>
+                  <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
+                </div>
+                <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <!-- !environment-variable-input-list -->
+          </div>
+          <!-- !environment-variables -->
+          <!-- !repository -->
+          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || (state.Method === 'editor' && !formValues.StackFileContent)
+              || (state.Method === 'upload' && !formValues.StackFile)
+              || (state.Method === 'repository' && (!formValues.RepositoryURL || !formValues.RepositoryPath))
+              || !formValues.Name" ng-click="deployStack()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Deploy the stack</span>
+                <span ng-show="state.actionInProgress">Deployment in progress...</span>
+              </button>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
