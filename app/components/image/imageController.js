@@ -1,10 +1,26 @@
 angular.module('image', [])
-.controller('ImageController', ['$q', '$scope', '$transition$', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications',
-function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryService, Notifications) {
+.controller('ImageController', ['$q', '$scope', '$transition$', '$state', '$stateParams', '$timeout', 'ImageService', 'RegistryService', 'Notifications',
+function ($q, $scope, $transition$, $state, $stateParams, $timeout, ImageService, RegistryService, Notifications) {
 	$scope.formValues = {
 		Image: '',
 		Registry: ''
 	};
+
+  $scope.state = { Select: {
+    Active: 'All',
+    Options: {
+      All: 'circle-o',
+      Tags: 'tags',
+      Details: 'clone',
+      Dockerfile: 'file-text-o'
+    },
+    Match: function(v) {
+      var c = this.Active;
+      return v.match(new RegExp((c === 'All') ? '.+' : c)) !== null;
+		}
+  }};
+
+  $scope.state.Select.Active = ($scope.state.Select.Options[$stateParams.s]===undefined) ? 'All': $stateParams.s;
 
 	$scope.sortType = 'Size';
   $scope.sortReverse = true;

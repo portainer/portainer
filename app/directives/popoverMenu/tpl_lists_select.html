@@ -1,0 +1,14 @@
+<div class="open dropdown-select" ng-click="object.isOpen = !object.isOpen; object.Click()">
+  <ul class="dropdown-menu">
+    <li class="interactive" ng-model="object.Active" ng-repeat="(k , v) in object.Options" uib-btn-radio="'{{k}}'"><!--
+    --><a><i class="fa fa-{{v}}"></i>&nbsp;{{k}}</a><!--
+ --></li>
+    <li role="separator" class="divider" ng-if="object.Options!==undefined && object.Links!==undefined"></li>
+    <li class="interactive" ng-repeat="(k , v) in object.Links"><!--
+   --><a ng-href="{{$state.href(v.ref, {id: container.Id})}}"><i class="fa fa-{{v.icon}}"></i>&nbsp;{{k}}</a><!--
+ --></li>
+  </ul>
+</div>
+
+
+<!--- TODO $state is not defined, so the refs in the links don't work -->

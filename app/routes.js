@@ -70,7 +70,7 @@ function configureRoutes($stateProvider) {
     }
   })
   .state('container', {
-    url: '^/containers/:id',
+    url: '^/containers/:id?s',
     views: {
       'content@': {
         templateUrl: 'app/components/container/container.html',
@@ -385,7 +385,7 @@ function configureRoutes($stateProvider) {
     }
   })
   .state('image', {
-    url: '^/images/:id/',
+    url: '^/images/:id/?s',
     views: {
       'content@': {
         templateUrl: 'app/components/image/image.html',
