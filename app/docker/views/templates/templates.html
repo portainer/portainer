@@ -30,6 +30,16 @@
               </div>
             </div>
           </div>
+          <div ng-if="! state.selectedTemplate.Note && state.selectedTemplate.Description">
+            <div class="col-sm-12 form-section-title">
+              Information
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <div class="template-note fallback" ng-if="state.selectedTemplate.Description" ng-bind-html="state.selectedTemplate.Description"></div>
+              </div>
+            </div>
+          </div>
           <!-- !description -->
           <div class="col-sm-12 form-section-title">
             Configuration
