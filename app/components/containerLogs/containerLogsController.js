@@ -1,4 +1,4 @@
-angular.module('containerLogs', [])
+angular.module('containerLogs', ['luegg.directives'])
 .controller('ContainerLogsController', ['$scope', '$transition$', '$anchorScroll', 'ContainerLogs', 'Container', 'Notifications',
 function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notifications) {
   $scope.state = {};
@@ -7,6 +7,7 @@ function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notific
   $scope.stdout = '';
   $scope.stderr = '';
   $scope.tailLines = 2000;
+  $scope.autoscroll = true;
 
   Container.get({id: $transition$.params().id}, function (d) {
     $scope.container = d;
