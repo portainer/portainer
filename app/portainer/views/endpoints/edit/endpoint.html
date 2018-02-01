@@ -1,0 +1,67 @@
+<rd-header>
+  <rd-header-title title="Endpoint details"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title">
+            Configuration
+          </div>
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="container_name" ng-model="endpoint.Name" placeholder="e.g. docker-prod01">
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- endpoint-url-input -->
+          <div class="form-group">
+            <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Endpoint URL
+              <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <input ng-disabled="endpointType === 'local'" type="text" class="form-control" id="endpoint_url" ng-model="endpoint.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
+            </div>
+          </div>
+          <!-- !endpoint-url-input -->
+          <!-- endpoint-public-url-input -->
+          <div class="form-group">
+            <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Public IP
+              <portainer-tooltip position="bottom" message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."></portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="endpoint_public_url" ng-model="endpoint.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com">
+            </div>
+          </div>
+          <!-- !endpoint-public-url-input -->
+          <!-- endpoint-security -->
+          <div ng-if="endpointType === 'remote'">
+            <div class="col-sm-12 form-section-title">
+              Security
+            </div>
+            <por-endpoint-security form-data="formValues.SecurityFormData" endpoint="endpoint"></por-endpoint-security>
+          </div>
+          <!-- !endpoint-security -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !endpoint.Name || !endpoint.URL || (endpoint.TLS && ((endpoint.TLSVerify && !formValues.TLSCACert) || (endpoint.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="updateEndpoint()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Update endpoint</span>
+                <span ng-show="state.actionInProgress">Updating endpoint...</span>
+              </button>
+              <a type="button" class="btn btn-default btn-sm" ui-sref="portainer.endpoints">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

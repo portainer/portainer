@@ -1,0 +1,125 @@
+<rd-header>
+  <rd-header-title title="Users">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.users" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>User management</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plus" title="Add a new user">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="username" class="col-sm-3 col-lg-2 control-label text-left">
+              Username
+              <portainer-tooltip ng-if="AuthenticationMethod === 2" position="bottom" message="Username must exactly match username defined in external LDAP source."></portainer-tooltip>
+            </label>
+            <div class="col-sm-8">
+              <div class="input-group">
+                <input type="text" class="form-control" id="username" ng-model="formValues.Username" ng-change="checkUsernameValidity()" placeholder="e.g. jdoe">
+                <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[state.validUsername]" aria-hidden="true"></i></span>
+              </div>
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- new-password-input -->
+          <div class="form-group" ng-if="AuthenticationMethod === 1">
+            <label for="password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+            <div class="col-sm-8">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+                <input type="password" class="form-control" ng-model="formValues.Password" id="password">
+              </div>
+            </div>
+          </div>
+          <!-- !new-password-input -->
+          <!-- confirm-password-input -->
+          <div class="form-group" ng-if="AuthenticationMethod === 1">
+            <label for="confirm_password" class="col-sm-3 col-lg-2 control-label text-left">Confirm password</label>
+            <div class="col-sm-8">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+                <input type="password" class="form-control" ng-model="formValues.ConfirmPassword" id="confirm_password">
+                <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[formValues.Password !== '' && formValues.Password === formValues.ConfirmPassword]" aria-hidden="true"></i></span>
+              </div>
+            </div>
+          </div>
+          <!-- !confirm-password-input -->
+          <!-- admin-checkbox -->
+          <div class="form-group" ng-if="isAdmin">
+            <div class="col-sm-12">
+              <label for="permissions" class="control-label text-left">
+                Administrator
+                <portainer-tooltip position="bottom" message="Administrators have access to Portainer settings management as well as full control over all defined endpoints and their resources."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.Administrator"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- !admin-checkbox -->
+          <!-- teams -->
+          <div class="form-group" ng-if="!formValues.Administrator">
+            <div class="col-sm-12">
+              <label class="control-label text-left">
+                Add to team(s)
+              </label>
+              <span class="small text-muted" style="margin-left: 20px;" ng-if="teams.length === 0">
+                You have not yet created any team. Head over the <a ui-sref="portainer.teams">teams view</a> to manage user teams.
+              </span>
+              <span isteven-multi-select
+               ng-if="teams.length > 0"
+               input-model="teams"
+               output-model="formValues.Teams"
+               button-label="Name"
+               item-label="Name"
+               tick-property="ticked"
+               helper-elements="filter"
+               search-property="Name"
+               translation="{nothingSelected: 'Select one or more teams', search: 'Search...'}"
+               style="margin-left: 20px;">
+               </span>
+            </div>
+          </div>
+          <!-- !teams -->
+          <div class="form-group" ng-if="isAdmin && !formValues.Administrator && formValues.Teams.length === 0">
+            <div class="col-sm-12">
+              <span class="small text-muted">
+                Note: non-administrator users with no team do not have access to any endpoint by default. Head over the <a ui-sref="portainer.endpoints">endpoints view</a> to manage their accesses.
+              </span>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !state.validUsername || formValues.Username === '' || (AuthenticationMethod === 1 && formValues.Password === '') || (AuthenticationMethod === 1 && formValues.Password !== formValues.ConfirmPassword)" ng-click="addUser()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create user</span>
+                <span ng-show="state.actionInProgress">Creating user...</span>
+              </button>
+              <span class="text-danger" ng-if="state.userCreationError" style="margin: 5px;">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.userCreationError }}
+              </span>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <users-datatable
+    title="Users" title-icon="fa-user"
+    dataset="users" table-key="users"
+    order-by="Username" show-text-filter="true"
+    authentication-method="AuthenticationMethod"
+    remove-action="removeAction"
+    ></users-datatable>
+  </div>
+</div>

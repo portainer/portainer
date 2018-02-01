@@ -45,7 +45,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="storidge.profiles.edit({id: item.Name})">{{ item.Name }}</a>
+                <a ui-sref="storidge.profiles.profile({id: item.Name})">{{ item.Name }}</a>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

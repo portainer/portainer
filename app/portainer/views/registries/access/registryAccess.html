@@ -1,0 +1,43 @@
+<rd-header>
+  <rd-header-title title="Registry access"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry({id: registry.Id})">{{ registry.Name }}</a> &gt; Access management
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="registry">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plug" title="Registry"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>
+                {{ registry.Name }}
+              </td>
+            </tr>
+            <tr>
+              <td>URL</td>
+              <td>
+                {{ registry.URL }}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <span class="small text-muted">
+                  You can select which user or team can access this registry by moving them to the authorized accesses table. Simply click
+                  on a user or team entry to move it from one table to the other.
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<por-access-management ng-if="registry" access-controlled-entity="registry" update-access="updateAccess(userAccesses, teamAccesses)">
+</por-access-management>
