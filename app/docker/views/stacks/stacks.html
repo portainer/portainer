@@ -1,0 +1,51 @@
+<rd-header>
+  <rd-header-title title="Stacks list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.stacks" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Stacks</rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="state.displayInformationPanel">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-info-circle" title="Information"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              Stacks marked with the <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true"></i> icon are external stacks that were created outside of Portainer. You'll not be able to execute any actions against these stacks.
+            </span>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Filters
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label class="control-label text-left">
+                Display external stacks
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="state.displayExternalStacks"><i></i>
+              </label>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <stacks-datatable
+    title="Stacks" title-icon="fa-th-list"
+    dataset="stacks" table-key="stacks"
+    order-by="Name" show-text-filter="true"
+    remove-action="removeAction"
+    show-ownership-column="applicationState.application.authentication"
+    display-external-stacks="state.displayExternalStacks"
+    ></stacks-datatable>
+  </div>
+</div>

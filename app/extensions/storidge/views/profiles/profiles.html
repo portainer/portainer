@@ -37,7 +37,7 @@
                 <span ng-hide="state.actionInProgress">Create the profile</span>
                 <span ng-show="state.actionInProgress">Creating profile...</span>
               </button>
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ui-sref="storidge.profiles.create({ profileName: formValues.Name })">Modify defaults...</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ui-sref="storidge.profiles.new({ profileName: formValues.Name })">Modify defaults...</button>
             </div>
           </div>
         </form>
@@ -102,7 +102,7 @@
               <tr dir-paginate="profile in (state.filteredProfiles = (profiles | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count))">
                 <td><input type="checkbox" ng-model="profile.Checked" ng-change="selectItem(profile)" /></td>
                 <td>
-                  <a ui-sref="storidge.profiles.edit({id: profile.Name})">{{ profile.Name }}</a>
+                  <a ui-sref="storidge.profiles.profile({id: profile.Name})">{{ profile.Name }}</a>
                 </td>
               </tr>
               <tr ng-if="!profiles">

@@ -1,0 +1,96 @@
+<rd-header>
+  <rd-header-title title="Volume details"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.volumes">Volumes</a> &gt; <a ui-sref="docker.volumes.volume({id: volume.Id})">{{ volume.Id }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="volume">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-cube" title="Volume details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>ID</td>
+              <td>
+                {{ volume.Id }}
+                <button class="btn btn-xs btn-danger" ng-click="removeVolume()"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove this volume</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Mount path</td>
+              <td>{{ volume.Mountpoint }}</td>
+            </tr>
+            <tr>
+              <td>Driver</td>
+              <td>{{ volume.Driver }}</td>
+            </tr>
+            <tr ng-if="!(volume.Labels | emptyobject)">
+              <td>Labels</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="(k, v) in volume.Labels">
+                    <td>{{ k }}</td>
+                    <td>{{ v }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<!-- access-control-panel -->
+<por-access-control-panel
+  ng-if="volume && applicationState.application.authentication"
+  resource-id="volume.Id"
+  resource-control="volume.ResourceControl"
+  resource-type="'volume'">
+</por-access-control-panel>
+<!-- !access-control-panel -->
+
+<div class="row" ng-if="!(volume.Options | emptyobject)">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-cogs" title="Volume options"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr ng-repeat="(key, value) in volume.Options">
+              <td>{{ key }}</td>
+              <td>{{ value }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+<div class="row" ng-if="containersUsingVolume.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-server" title="Containers using volume"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <thead>
+            <th>Container Name</th>
+            <th>Mounted At</th>
+            <th>Read-only</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="container in containersUsingVolume">
+              <td><a ui-sref="docker.containers.container({id: container.Id})">{{ container | containername }}</a></td>
+              <td>{{ container.volumeData.Destination }}</td>
+              <td>{{ !container.volumeData.RW }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

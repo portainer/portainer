@@ -1,0 +1,26 @@
+<div id="service-network-specs">
+  <rd-widget>
+    <rd-widget-header icon="fa-tasks" title="Networks"></rd-widget-header>
+    <rd-widget-body ng-if="!service.VirtualIPs || service.VirtualIPs.length === 0">
+      <p>This service is not connected to any networks.</p>
+    </rd-widget-body>
+    <rd-widget-body ng-if="service.VirtualIPs && service.VirtualIPs.length > 0" classes="no-padding">
+      <table class="table" >
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>IP address</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="network in service.VirtualIPs">
+            <td>
+              <a ui-sref="docker.networks.network({id: network.NetworkID})">{{ network.NetworkID }}</a>
+            </td>
+            <td>{{ network.Addr }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+  </rd-widget>
+</div>

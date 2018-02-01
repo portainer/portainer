@@ -1,0 +1,82 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <div class="toolBar">
+        <div class="toolBarTitle">
+          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.title }}
+        </div>
+      </div>
+      <div class="actionBar">
+        <form class="form-horizontal">
+          <div class="row">
+            <label for="container_network" class="col-sm-3 col-lg-2 control-label text-left">Join a network</label>
+            <div class="col-sm-5 col-lg-4">
+              <select class="form-control" ng-model="$ctrl.selectedNetwork" id="container_network">
+                <option selected disabled hidden value="">Select a network</option>
+                <option ng-repeat="net in $ctrl.availableNetworks" ng-value="net.Id">{{ net.Name }}</option>
+              </select>
+            </div>
+            <div class="col-sm-1">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="$ctrl.joinNetworkActionInProgress || !$ctrl.selectedNetwork" ng-click="$ctrl.joinNetworkAction($ctrl.container, $ctrl.selectedNetwork)" button-spinner="$ctrl.joinNetworkActionInProgress">
+                <span ng-hide="$ctrl.joinNetworkActionInProgress">Join network</span>
+                <span ng-show="$ctrl.joinNetworkActionInProgress">Joining network...</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Network</th>
+              <th>IP Address</th>
+              <th>Gateway</th>
+              <th>MAC Address</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="(key, value) in $ctrl.dataset | itemsPerPage: $ctrl.state.paginatedItemLimit" ng-class="{active: item.Checked}">
+              <td><a ui-sref="docker.networks.network({id: value.NetworkID})">{{ key }}</a></td>
+              <td>{{ value.IPAddress || '-' }}</td>
+              <td>{{ value.Gateway || '-' }}</td>
+              <td>{{ value.MacAddress || '-' }}</td>
+              <td>
+                <button type="button" class="btn btn-xs btn-danger" ng-disabled="$ctrl.leaveNetworkActionInProgress" button-spinner="$ctrl.leaveNetworkActionInProgress" ng-click="$ctrl.leaveNetworkAction($ctrl.container, value.NetworkID)">
+                  <span ng-hide="$ctrl.leaveNetworkActionInProgress"><i class="fa fa-trash space-right" aria-hidden="true"></i> Leave network</span>
+                  <span ng-show="$ctrl.leaveNetworkActionInProgress">Leaving network...</span>
+                </button>
+              </td>
+            </tr>
+            <tr ng-if="!$ctrl.dataset">
+              <td colspan="5" class="text-center text-muted">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.dataset.length === 0">
+              <td colspan="5" class="text-center text-muted">No network available.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" ng-if="$ctrl.dataset">
+        <div class="paginationControls">
+          <form class="form-inline">
+            <span class="limitSelector">
+              <span style="margin-right: 5px;">
+                Items per page
+              </span>
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+                <option value="0">All</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </span>
+            <dir-pagination-controls max-size="5"></dir-pagination-controls>
+          </form>
+        </div>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>

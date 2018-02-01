@@ -46,7 +46,7 @@ function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNod
     StoridgeClusterService.shutdown()
     .then(function success(data) {
       Notifications.success('Cluster successfully shutdown');
-      $state.go('dashboard');
+      $state.go('docker.dashboard');
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to shutdown cluster');

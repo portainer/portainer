@@ -1,0 +1,92 @@
+<rd-header>
+  <rd-header-title title="Endpoints">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.endpoints" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Endpoint management</rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="!applicationState.application.endpointManagement">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-exclamation-triangle" title="Endpoint management is not available">
+      </rd-widget-header>
+      <rd-widget-body>
+        <span class="small text-muted">Portainer has been started using the <code>--external-endpoints</code> flag.
+          Endpoint management via the UI is disabled.
+          <span ng-if="applicationState.application.authentication">You can still manage endpoint access.</span>
+        </span>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="applicationState.application.endpointManagement">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plus" title="Add a new endpoint">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="container_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01">
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- endpoint-url-input -->
+          <div class="form-group">
+            <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Endpoint URL
+              <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
+            </div>
+          </div>
+          <!-- !endpoint-url-input -->
+          <!-- endpoint-public-url-input -->
+          <div class="form-group">
+            <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Public IP
+              <portainer-tooltip position="bottom" message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."></portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="endpoint_public_url" ng-model="formValues.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com">
+            </div>
+          </div>
+          <!-- !endpoint-public-url-input -->
+          <!-- endpoint-security -->
+          <por-endpoint-security form-data="formValues.SecurityFormData"></por-endpoint-security>
+          <!-- !endpoint-security -->
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addEndpoint()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
+                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <endpoints-datatable
+    title="Endpoints" title-icon="fa-plug"
+    dataset="endpoints" table-key="endpoints"
+    order-by="Name" show-text-filter="true"
+    endpoint-management="applicationState.application.endpointManagement"
+    access-management="applicationState.application.authentication"
+    remove-action="removeAction"
+    ></endpoints-datatable>
+  </div>
+</div>
