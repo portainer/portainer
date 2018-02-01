@@ -36,8 +36,8 @@
 
 <body ng-controller="MainController">
   <div id="page-wrapper" ng-class="{
-    open: toggle && ['auth', 'init', 'init.endpoint', 'init.admin'].indexOf($state.current.name) === -1,
-    nopadding: ['auth', 'init', 'init.endpoint', 'init.admin'].indexOf($state.current.name) > -1 || applicationState.loading
+    open: toggle && ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) === -1,
+    nopadding: ['portainer.auth', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) > -1 || applicationState.loading
   }"
   ng-cloak>
     <div id="sideview" ui-view="sidebar" ng-if="!applicationState.loading"></div>
