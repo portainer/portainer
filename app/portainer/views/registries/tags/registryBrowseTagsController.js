@@ -1,4 +1,4 @@
-angular.module('portainer.app', [])
+angular.module('portainer.app')
 .controller('RegistryBrowseTagsController', ['$q', '$scope', '$transition$', 'RegistryService', 'Notifications',
 function ($q, $scope, $transition$, RegistryService, Notifications) {
 

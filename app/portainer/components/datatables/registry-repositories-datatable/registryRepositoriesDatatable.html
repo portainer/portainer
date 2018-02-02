@@ -42,7 +42,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="registry.tags({id: $ctrl.registryId, repository: item.RegistryName})">{{ item.RegistryName }}</a>
+                <a ui-sref="portainer.registries.registry.tags({id: $ctrl.registryId, repository: item.RegistryName})">{{ item.RegistryName }}</a>
               </td>
               <td>
                 {{ item.TagsCount }}
