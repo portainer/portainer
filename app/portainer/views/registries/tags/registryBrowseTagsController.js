@@ -98,7 +98,7 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
   }
 
   // Retrieve registry object
-  function retriveRegistry() {
+  function retrieveRegistry() {
     $scope.repository = repository;
 
     RegistryService.registry(registryID)
@@ -111,7 +111,7 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
   }
 
   function initView() {
-    retriveRegistry();
+    retrieveRegistry();
     retrieveTags();
   }
 

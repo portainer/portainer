@@ -66,19 +66,7 @@ func (manager *Manager) CreateAndRegisterRegistryProxy(registry *portainer.Regis
 		return nil, err
 	}
 
-	//if registryURL.Scheme == "tcp" {
-	/*if endpoint.TLSConfig.TLS {
-		proxy, err = manager.proxyFactory.newHTTPSProxy(endpointURL, endpoint)
-		if err != nil {
-			return nil, err
-		}
-	} else {*/
 	proxy = manager.proxyFactory.newHTTPProxy(registryURL)
-	//}
-	//} else {
-	// Assume unix:// scheme
-	//proxy = manager.proxyFactory.newSocketProxy(endpointURL.Path)
-	//}
 
 	manager.registryProxies.Set(string(registry.ID), proxy)
 	return proxy, nil
