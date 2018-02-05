@@ -4,6 +4,7 @@ import (
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/http/proxy"
 
 	"encoding/json"
 	"log"
@@ -20,6 +21,7 @@ type RegistryHandler struct {
 	*mux.Router
 	Logger          *log.Logger
 	RegistryService portainer.RegistryService
+	ProxyManager    *proxy.Manager
 }
 
 // NewRegistryHandler returns a new instance of RegistryHandler.
@@ -40,6 +42,8 @@ func NewRegistryHandler(bouncer *security.RequestBouncer) *RegistryHandler {
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePutRegistryAccess))).Methods(http.MethodPut)
 	h.Handle("/registries/{id}",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteRegistry))).Methods(http.MethodDelete)
+	h.PathPrefix("/registries/{id}/v2").Handler(
+		bouncer.AdministratorAccess(http.HandlerFunc(h.proxyRequestsToRegistryAPI)))
 
 	return h
 }
@@ -311,4 +315,36 @@ func (handler *RegistryHandler) handleDeleteRegistry(w http.ResponseWriter, r *h
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+}
+
+func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	registryID, err := strconv.Atoi(id)
+        if err != nil {
+                httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+                return
+        }
+
+	registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
+        if err == portainer.ErrRegistryNotFound {
+                httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+                return
+        } else if err != nil {
+                httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+                return
+        }
+
+	var proxy http.Handler
+	proxy = handler.ProxyManager.GetRegistryProxy(string(registryID))
+	if proxy == nil {
+		proxy, err = handler.ProxyManager.CreateAndRegisterRegistryProxy(registry)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+			return
+		}
+	}
+
+	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)
 }

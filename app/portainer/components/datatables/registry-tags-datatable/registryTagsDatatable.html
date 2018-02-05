@@ -11,15 +11,6 @@
           </span>
         </div>
       </div>
-      <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-          <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.registries.new">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add registry
-        </button>
-      </div>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search...">
@@ -33,20 +24,26 @@
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
+                <a ng-click="$ctrl.changeOrderBy('name')">
                   Name
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'name' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('URL')">
-                  URL
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('nb_layers')">
+                  Layers Count
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'nb_layers' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'nb_layers' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>Actions</th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('total_size')">
+                  Tota Size (compressed)
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'total_size' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'total_size' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -56,26 +53,20 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="portainer.registries.registry({id: item.Id})">{{ item.Name }}</a>
-                <span ng-if="item.Authentication" style="margin-left: 5px;" class="label label-info image-tag">authentication-enabled</span>
+                {{ item.TagName }}
               </td>
               <td>
-                {{ item.URL }}
+                {{ item.LayersCount }}
               </td>
               <td>
-                <a ui-sref="portainer.registries.registry.access({id: item.Id})" ng-if="$ctrl.accessManagement">
-                  <i class="fa fa-users" aria-hidden="true"></i> Manage access
-                </a>
-                <a ui-sref="portainer.registries.registry.browse({id: item.Id})">
-                  <i class="fa fa-search" aria-hidden="true"></i> Browse
-                </a>
+                {{ item.TotalSize | humansize }}
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="3" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="3" class="text-center text-muted">No registry available.</td>
+              <td colspan="3" class="text-center text-muted">No tags available.</td>
             </tr>
           </tbody>
         </table>

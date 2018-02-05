@@ -1,5 +1,5 @@
 angular.module('portainer.app')
-.factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper) {
+.factory('RegistryService', ['$q', 'Registries', 'RegistryBlobs', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, RegistryBlobs, RegistryCatalog, RegistryTags, RegistryManifests, DockerHubService, RegistryHelper, ImageHelper) {
   'use strict';
   var service = {};
 
@@ -30,6 +30,67 @@ angular.module('portainer.app')
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve registry details', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+  service.catalog = function(id) {
+    var deferred = $q.defer();
+
+    RegistryCatalog.get({id: id, limit: 200, last: ''}).$promise
+    .then(function success(data) {
+      var catalog = new RegistryCatalogViewModel(data.data, data.headers);
+      deferred.resolve(catalog);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve registry catalog', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+  service.tags = function(id, repository) {
+    var deferred = $q.defer();
+
+    RegistryTags.get({id: id, repository: repository}).$promise
+    .then(function success(data) {
+      var tags = new RegistryTagsViewModel(data);
+      deferred.resolve(tags);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve repository tags', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+  service.manifests = function(id, repository, tag) {
+    var deferred = $q.defer();
+
+    RegistryManifests.get({id: id, repository: repository, tag: tag}).$promise
+    .then(function success(data) {
+      var manifests = new RegistryManifestsViewModel(data);
+      deferred.resolve(manifests);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve repository tag manifests', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+
+  service.blobs = function(id, repository, reference) {
+    var deferred = $q.defer();
+
+    RegistryBlobs.head({id: id, repository: repository, reference: reference}).$promise
+    .then(function success(data) {
+      var blobs = new RegistryBlobsViewModel(data.data, data.headers);
+      deferred.resolve(blobs);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve repository blob metadata', err: err});
     });
 
     return deferred.promise;

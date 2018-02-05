@@ -10,14 +10,16 @@ import (
 
 // Manager represents a service used to manage Docker proxies.
 type Manager struct {
-	proxyFactory *proxyFactory
-	proxies      cmap.ConcurrentMap
+	proxyFactory    *proxyFactory
+	proxies         cmap.ConcurrentMap
+	registryProxies cmap.ConcurrentMap
 }
 
 // NewManager initializes a new proxy Service
 func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService, settingsService portainer.SettingsService) *Manager {
 	return &Manager{
-		proxies: cmap.New(),
+		proxies:         cmap.New(),
+		registryProxies: cmap.New(),
 		proxyFactory: &proxyFactory{
 			ResourceControlService: resourceControlService,
 			TeamMembershipService:  teamMembershipService,
@@ -54,6 +56,22 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 	return proxy, nil
 }
 
+// CreateAndRegisterRegistryProxy creates a new HTTP reverse proxy and adds it to the registered proxies.
+// It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
+func (manager *Manager) CreateAndRegisterRegistryProxy(registry *portainer.Registry) (http.Handler, error) {
+	var proxy http.Handler
+
+	registryURL, err := url.Parse("http://" + registry.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy = manager.proxyFactory.newHTTPProxy(registryURL)
+
+	manager.registryProxies.Set(string(registry.ID), proxy)
+	return proxy, nil
+}
+
 // GetProxy returns the proxy associated to a key
 func (manager *Manager) GetProxy(key string) http.Handler {
 	proxy, ok := manager.proxies.Get(key)
@@ -63,7 +81,21 @@ func (manager *Manager) GetProxy(key string) http.Handler {
 	return proxy.(http.Handler)
 }
 
+// GetProxy returns the proxy associated to a key
+func (manager *Manager) GetRegistryProxy(key string) http.Handler {
+	proxy, ok := manager.registryProxies.Get(key)
+	if !ok {
+		return nil
+	}
+	return proxy.(http.Handler)
+}
+
 // DeleteProxy deletes the proxy associated to a key
 func (manager *Manager) DeleteProxy(key string) {
 	manager.proxies.Remove(key)
+}
+
+// DeleteProxy deletes the proxy associated to a key
+func (manager *Manager) DeleteRegistryProxy(key string) {
+	manager.registryProxies.Remove(key)
 }
