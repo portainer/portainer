@@ -15,10 +15,11 @@ angular.module('portainer.app')
   var service = {};
 
   service.applyCodeMirrorOnElement = function(element, yamlLint, readOnly) {
-    var options = codeMirrorGenericOptions;
+    var options = angular.copy(codeMirrorGenericOptions);
 
     if (yamlLint) {
-      options = codeMirrorYAMLOptions;
+      _.assign(options, codeMirrorYAMLOptions);
+      // options = codeMirrorYAMLOptions;
     }
 
     if (readOnly) {
