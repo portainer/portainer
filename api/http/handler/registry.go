@@ -19,7 +19,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const registryCheckTimeout = 3
+const registryCheckTimeout = 3 * time.Second
 
 // RegistryHandler represents an HTTP API handler for managing Docker registries.
 type RegistryHandler struct {
@@ -388,7 +388,7 @@ func validateRegistryURL(url string) (string, string, error) {
 	}
 
 	client := &http.Client{
-		Timeout: registryCheckTimeout * time.Second,
+		Timeout: registryCheckTimeout,
 	}
 	for _, config := range configs {
 		req, err := http.NewRequest("GET", fmt.Sprintf("%s://%s/%s/", config.protocol, url, config.version), nil)
