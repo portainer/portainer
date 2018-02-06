@@ -1,0 +1,20 @@
+<rd-header>
+  <rd-header-title title="Network list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.networks" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Networks</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <networks-datatable
+    title="Networks" title-icon="fa-sitemap"
+    dataset="networks" table-key="networks"
+    order-by="Name" show-text-filter="true"
+    remove-action="removeAction"
+    show-ownership-column="applicationState.application.authentication"
+    ></networks-datatable>
+  </div>
+</div>

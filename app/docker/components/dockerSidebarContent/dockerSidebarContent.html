@@ -1,0 +1,42 @@
+<li class="sidebar-list">
+  <a ui-sref="docker.dashboard" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer fa-fw"></span></a>
+</li>
+<li class="sidebar-list">
+  <a ui-sref="docker.templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket fa-fw"></span></a>
+  <div class="sidebar-sublist" ng-if="$ctrl.sidebarToggledOn && $ctrl.externalContributions && ($ctrl.currentState === 'docker.templates' || $ctrl.currentState === 'docker.templates.linuxserver')">
+    <a ui-sref="docker.templates.linuxserver" ui-sref-active="active">LinuxServer.io</a>
+  </div>
+</li>
+<li class="sidebar-list" ng-if="$ctrl.endpointApiVersion >= 1.25 && $ctrl.swarmManagement">
+  <a ui-sref="docker.stacks" ui-sref-active="active">Stacks <span class="menu-icon fa fa-th-list fa-fw"></span></a>
+</li>
+<li class="sidebar-list" ng-if="$ctrl.swarmManagement">
+  <a ui-sref="docker.services" ui-sref-active="active">Services <span class="menu-icon fa fa-list-alt fa-fw"></span></a>
+</li>
+<li class="sidebar-list">
+  <a ui-sref="docker.containers" ui-sref-active="active">Containers <span class="menu-icon fa fa-server fa-fw"></span></a>
+</li>
+<li class="sidebar-list">
+  <a ui-sref="docker.images" ui-sref-active="active">Images <span class="menu-icon fa fa-clone fa-fw"></span></a>
+</li>
+<li class="sidebar-list">
+  <a ui-sref="docker.networks" ui-sref-active="active">Networks <span class="menu-icon fa fa-sitemap fa-fw"></span></a>
+</li>
+<li class="sidebar-list">
+  <a ui-sref="docker.volumes" ui-sref-active="active">Volumes <span class="menu-icon fa fa-cubes fa-fw"></span></a>
+</li>
+<li class="sidebar-list" ng-if="$ctrl.endpointApiVersion >= 1.30 && $ctrl.swarmManagement">
+  <a ui-sref="docker.configs" ui-sref-active="active">Configs <span class="menu-icon fa fa-file-code-o fa-fw"></span></a>
+</li>
+<li class="sidebar-list" ng-if="$ctrl.endpointApiVersion >= 1.25 && $ctrl.swarmManagement">
+  <a ui-sref="docker.secrets" ui-sref-active="active">Secrets <span class="menu-icon fa fa-user-secret fa-fw"></span></a>
+</li>
+<li class="sidebar-list" ng-if="$ctrl.standaloneManagement && $ctrl.adminAccess">
+  <a ui-sref="docker.events" ui-sref-active="active">Events <span class="menu-icon fa fa-history fa-fw"></span></a>
+</li>
+<li class="sidebar-list" ng-if="$ctrl.swarmManagement">
+  <a ui-sref="docker.swarm" ui-sref-active="active">Swarm <span class="menu-icon fa fa-object-group fa-fw"></span></a>
+</li>
+<li class="sidebar-list" ng-if="$ctrl.standaloneManagement">
+  <a ui-sref="docker.engine" ui-sref-active="active">Engine <span class="menu-icon fa fa-th fa-fw"></span></a>
+</li>

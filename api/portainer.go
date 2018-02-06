@@ -12,13 +12,17 @@ type (
 	// CLIFlags represents the available flags on the CLI.
 	CLIFlags struct {
 		Addr              *string
+		AdminPassword     *string
+		AdminPasswordFile *string
 		Assets            *string
-		CheckHealth       *bool
 		Data              *string
 		Endpoint          *string
 		ExternalEndpoints *string
+		Labels            *[]Pair
+		Logo              *string
 		NoAuth            *bool
 		NoAnalytics       *bool
+		Templates         *string
 		TLSVerify         *bool
 		TLSCacert         *string
 		TLSCert           *string
@@ -27,12 +31,6 @@ type (
 		SSLCert           *string
 		SSLKey            *string
 		SyncInterval      *string
-		AdminPassword     *string
-		AdminPasswordFile *string
-		// Deprecated fields
-		Labels    *[]Pair
-		Logo      *string
-		Templates *string
 	}
 
 	// Status represents the application status.
@@ -384,14 +382,14 @@ type (
 	StackManager interface {
 		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint) error
 		Logout(endpoint *Endpoint) error
-		Deploy(stack *Stack, endpoint *Endpoint) error
+		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
 	}
 )
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.15.5"
+	APIVersion = "1.16.1"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 7
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
