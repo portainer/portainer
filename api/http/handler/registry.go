@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/http/security"
 
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -128,7 +129,7 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 		}
 	}
 
-	err = validateRegistryURL(req.URL)
+	protocol, version, err := validateRegistryURL(req.URL)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
@@ -137,6 +138,8 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 	registry := &portainer.Registry{
 		Name:            req.Name,
 		URL:             req.URL,
+		Protocol:        protocol,
+		Version:         version,
 		Authentication:  req.Authentication,
 		Username:        req.Username,
 		Password:        req.Password,
@@ -275,18 +278,19 @@ func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http
 		}
 	}
 
-	err = validateRegistryURL(req.URL)
-	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
 	if req.Name != "" {
 		registry.Name = req.Name
 	}
 
 	if req.URL != "" {
+		protocol, version, err := validateRegistryURL(req.URL)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+			return
+		}
 		registry.URL = req.URL
+		registry.Protocol = protocol
+		registry.Version = version
 	}
 
 	if req.Authentication {
@@ -366,31 +370,48 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 }
 
 // validateRegistryURL validates wether given url is valid a docker registry url by
-// sending http get request to URL + /v2/. The url is considered as a valid docker registry url
-// if it returns 200 or 401. If there is an error during the check, it will be returned.
-func validateRegistryURL(url string) error {
+// sending http get request to url using combination of protocols and available
+// registry versions. upon first successfull attempt, it returns protocol, version
+// and nil error.
+func validateRegistryURL(url string) (string, string, error) {
 	if !strings.HasSuffix(url, "/") {
 		url += "/"
 	}
 
-	req, err := http.NewRequest("GET", "http://"+url+"v2/", nil)
-	if err != nil {
-		return err
+	configs := []struct {
+		protocol, version string
+	}{
+		{"https", "v2"},
+		{"https", "v1"},
+		{"http", "v2"},
+		{"http", "v1"},
 	}
 
 	client := &http.Client{
 		Timeout: registryCheckTimeout * time.Second,
 	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
+	for _, config := range configs {
+		req, err := http.NewRequest("GET", fmt.Sprintf("%s://%s/%s/", config.protocol, url, config.version), nil)
+		if err != nil {
+			continue
+		}
+
+		resp, err := client.Do(req)
+		if err != nil {
+			continue
+		}
+
+		switch resp.StatusCode {
+		case http.StatusOK:
+		case http.StatusUnauthorized:
+		case http.StatusNotFound:
+			continue
+		default:
+			continue
+		}
+
+		return config.protocol, config.version, nil
 	}
 
-	switch resp.StatusCode {
-	case http.StatusOK:
-	case http.StatusUnauthorized:
-	default:
-		return portainer.ErrRegistryInvalid
-	}
-	return nil
+	return "", "", portainer.ErrRegistryInvalid
 }
