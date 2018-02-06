@@ -391,7 +391,7 @@ func validateRegistryURL(url string) (string, string, error) {
 		Timeout: registryCheckTimeout,
 	}
 	for _, config := range configs {
-		req, err := http.NewRequest("GET", fmt.Sprintf("%s://%s/%s/", config.protocol, url, config.version), nil)
+		req, err := http.NewRequest("GET", fmt.Sprintf("%s://%s%s/", config.protocol, url, config.version), nil)
 		if err != nil {
 			continue
 		}
@@ -402,15 +402,9 @@ func validateRegistryURL(url string) (string, string, error) {
 		}
 
 		switch resp.StatusCode {
-		case http.StatusOK:
-		case http.StatusUnauthorized:
-		case http.StatusNotFound:
-			continue
-		default:
-			continue
+		case http.StatusOK, http.StatusUnauthorized:
+			return config.protocol, config.version, nil
 		}
-
-		return config.protocol, config.version, nil
 	}
 
 	return "", "", portainer.ErrRegistryInvalid
