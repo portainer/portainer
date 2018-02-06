@@ -19,7 +19,6 @@ angular.module('portainer.app')
 
     if (yamlLint) {
       _.assign(options, codeMirrorYAMLOptions);
-      // options = codeMirrorYAMLOptions;
     }
 
     if (readOnly) {
