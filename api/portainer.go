@@ -380,7 +380,7 @@ type (
 
 	// StackManager represents a service to manage stacks.
 	StackManager interface {
-		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint) error
+		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error

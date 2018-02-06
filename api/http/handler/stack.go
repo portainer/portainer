@@ -772,13 +772,9 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 func (handler *StackHandler) deployStack(config *stackDeploymentConfig) error {
 	handler.stackCreationMutex.Lock()
 
-	err := handler.StackManager.Login(config.dockerhub, config.registries, config.endpoint)
-	if err != nil {
-		handler.stackCreationMutex.Unlock()
-		return err
-	}
+	handler.StackManager.Login(config.dockerhub, config.registries, config.endpoint)
 
-	err = handler.StackManager.Deploy(config.stack, config.prune, config.endpoint)
+	err := handler.StackManager.Deploy(config.stack, config.prune, config.endpoint)
 	if err != nil {
 		handler.stackCreationMutex.Unlock()
 		return err

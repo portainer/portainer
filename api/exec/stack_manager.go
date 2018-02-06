@@ -23,27 +23,19 @@ func NewStackManager(binaryPath string) *StackManager {
 }
 
 // Login executes the docker login command against a list of registries (including DockerHub).
-func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []portainer.Registry, endpoint *portainer.Endpoint) error {
+func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []portainer.Registry, endpoint *portainer.Endpoint) {
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	for _, registry := range registries {
 		if registry.Authentication {
 			registryArgs := append(args, "login", "--username", registry.Username, "--password", registry.Password, registry.URL)
-			err := runCommandAndCaptureStdErr(command, registryArgs, nil)
-			if err != nil {
-				return err
-			}
+			runCommandAndCaptureStdErr(command, registryArgs, nil)
 		}
 	}
 
 	if dockerhub.Authentication {
 		dockerhubArgs := append(args, "login", "--username", dockerhub.Username, "--password", dockerhub.Password)
-		err := runCommandAndCaptureStdErr(command, dockerhubArgs, nil)
-		if err != nil {
-			return err
-		}
+		runCommandAndCaptureStdErr(command, dockerhubArgs, nil)
 	}
-
-	return nil
 }
 
 // Logout executes the docker logout command.
