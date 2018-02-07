@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/asaskevich/govalidator"
@@ -374,10 +373,6 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 // registry versions. upon first successfull attempt, it returns protocol, version
 // and nil error.
 func validateRegistryURL(url string) (string, string, error) {
-	if !strings.HasSuffix(url, "/") {
-		url += "/"
-	}
-
 	configs := []struct {
 		protocol, version string
 	}{
@@ -391,7 +386,7 @@ func validateRegistryURL(url string) (string, string, error) {
 		Timeout: registryCheckTimeout,
 	}
 	for _, config := range configs {
-		req, err := http.NewRequest("GET", fmt.Sprintf("%s://%s%s/", config.protocol, url, config.version), nil)
+		req, err := http.NewRequest("GET", fmt.Sprintf("%s://%s/%s/", config.protocol, url, config.version), nil)
 		if err != nil {
 			continue
 		}
@@ -401,8 +396,7 @@ func validateRegistryURL(url string) (string, string, error) {
 			continue
 		}
 
-		switch resp.StatusCode {
-		case http.StatusOK, http.StatusUnauthorized:
+		if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusUnauthorized {
 			return config.protocol, config.version, nil
 		}
 	}
