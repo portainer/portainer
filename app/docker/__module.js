@@ -68,7 +68,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var containerConsole = {
     name: 'docker.containers.container.console',
-    url: '/console?nodeName',
+    url: '/console',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/containers/console/containerconsole.html',
@@ -93,7 +93,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var containerInspect = {
     name: 'docker.containers.container.inspect',
-    url: '/inspect?nodeName',
+    url: '/inspect',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/containers/inspect/containerinspect.html',
@@ -104,7 +104,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var containerLogs = {
     name: 'docker.containers.container.logs',
-    url: '/logs?nodeName',
+    url: '/logs',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/containers/logs/containerlogs.html',
@@ -115,7 +115,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var containerStats = {
     name: 'docker.containers.container.stats',
-    url: '/stats?nodeName',
+    url: '/stats',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/containers/stats/containerstats.html',
