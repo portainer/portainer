@@ -1,0 +1,231 @@
+<rd-header>
+  <rd-header-title title="Image details"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.images">Images</a> &gt; <a ui-sref="docker.images.image({id: image.Id})">{{ image.Id }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="image.RepoTags.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa fa-tags" title="Image tags"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="row">
+              <div class="pull-left" ng-repeat="tag in image.RepoTags" style="display:table">
+                <div class="input-group col-md-1" style="padding:0 15px">
+                  <span class="input-group-addon">{{ tag }}</span>
+                  <span class="input-group-btn">
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushTag(tag)">
+                      <span class="fa fa-upload white-icon" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullTag(tag)">
+                      <span class="fa fa-download white-icon" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)">
+                      <span class="fa fa-trash-o white-icon" aria-hidden="true"></span>
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">
+                Note: you can click on the upload icon <span class="fa fa-upload" aria-hidden="true"></span> to push an image
+                or on the download icon <span class="fa fa-download" aria-hidden="true"></span> to pull an image
+                or on the trash icon <span class="fa fa-trash-o" aria-hidden="true"></span> to delete a tag.
+              </span>
+            </div>
+            <div class="col-sm-12">
+              <span id="downloadResourceHint" class="createResource" style="display: none; margin-left: 0;">
+                Download in progress...
+                <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
+              </span>
+              <span id="uploadResourceHint" class="createResource" style="display: none; margin-left: 0;">
+                Upload in progress...
+                <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
+              </span>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tag" title="Tag the image"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- image-and-registry -->
+          <div class="form-group">
+            <por-image-registry image="formValues.Image" registry="formValues.Registry"></por-image-registry>
+          </div>
+          <!-- !image-and-registry -->
+          <!-- tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">Note: if you don't specify the tag in the image name, <span class="label label-default">latest</span> will be used.</span>
+            </div>
+          </div>
+          <!-- !tag-note -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Image" ng-click="tagImage()">Tag</button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title="Image details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>ID</td>
+              <td>
+                {{ image.Id }}
+                <button class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this image</button>
+              </td>
+            </tr>
+            <tr ng-if="image.Parent">
+              <td>Parent</td>
+              <td><a ui-sref="docker.images.image({id: image.Parent})">{{ image.Parent }}</a></td>
+            </tr>
+            <tr>
+              <td>Size</td>
+              <td>{{ image.VirtualSize|humansize }}</td>
+            </tr>
+            <tr>
+              <td>Created</td>
+              <td>{{ image.Created|getisodate }}</td>
+            </tr>
+            <tr>
+              <td>Build</td>
+              <td>Docker {{ image.DockerVersion }} on {{ image.Os}}, {{ image.Architecture }}</td>
+            </tr>
+            <tr ng-if="image.Author">
+              <td>Author</td>
+              <td>{{ image.Author }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title="Dockerfile details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>CMD</td>
+              <td><code>{{ image.Command|command }}</code></td>
+            </tr>
+            <tr ng-if="image.Entrypoint">
+              <td>ENTRYPOINT</td>
+              <td><code>{{ image.Entrypoint|command }}</code></td>
+            </tr>
+            <tr ng-if="image.ExposedPorts.length > 0">
+              <td>EXPOSE</td>
+              <td>
+                <span class="label label-default space-right" ng-repeat="port in image.ExposedPorts">
+                  {{ port }}
+                </span>
+              </td>
+            </tr>
+            <tr ng-if="image.Volumes.length > 0">
+              <td>VOLUME</td>
+              <td>
+                <span class="label label-default space-right" ng-repeat="volume in image.Volumes">
+                  {{ volume }}
+                </span>
+              </td>
+            </tr>
+            <tr ng-if="image.Env.length > 0">
+              <td>ENV</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="var in image.Env">
+                    <td>{{ var|key: '=' }}</td>
+                    <td>{{ var|value: '=' }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="history.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title="Image layers"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table id="image-layers" class="table">
+          <thead>
+            <th>
+              <a ng-click="order('Size')">
+                Size
+                <span ng-show="sortType == 'Size' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'Size' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+              </a>
+            </th>
+            <th>
+              <a ng-click="order('CreatedBy')">
+                Layer
+                <span ng-show="sortType == 'CreatedBy' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'CreatedBy' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+              </a>
+            </th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="layer in history | orderBy:sortType:sortReverse">
+              <td style="white-space:nowrap;">
+                {{ layer.Size | humansize }}
+              </td>
+              <td class="expand">
+                <div ng-if="layer.CreatedBy.length > 130">
+                  <span id="layer-command-{{$index}}-full" style="display: none">
+                    {{ layer.CreatedBy | imagelayercommand }}
+                  </span>
+                  <span id="layer-command-{{$index}}-short">
+                    {{ layer.CreatedBy | imagelayercommand | truncate:130 }}
+                    <span ng-if="layer.CreatedBy.length > 130" style="margin-left: 5px;">
+                      <a id="layer-command-expander{{$index}}" class="btn" ng-click='toggleLayerCommand($index)'>
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                      </a>
+                    </span>
+                  </span>
+                </div>
+                <div ng-if="layer.CreatedBy.length <= 130">
+                  <span id="layer-command-{{$index}}-full">
+                    {{ layer.CreatedBy | imagelayercommand }}
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

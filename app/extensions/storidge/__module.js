@@ -4,16 +4,9 @@ angular.module('extension.storidge', [])
 
   var storidge = {
     name: 'storidge',
+    parent: 'root',
     abstract: true,
-    url: '/storidge',
-    views: {
-      'content@': {
-        template: '<div ui-view="content@"></div>'
-      },
-      'sidebar@': {
-        template: '<div ui-view="sidebar@"></div>'
-      }
-    }
+    url: '/storidge'
   };
 
   var profiles = {
@@ -23,43 +16,31 @@ angular.module('extension.storidge', [])
       'content@': {
         templateUrl: 'app/extensions/storidge/views/profiles/profiles.html',
         controller: 'StoridgeProfilesController'
-      },
-      'sidebar@': {
-        templateUrl: 'app/components/sidebar/sidebar.html',
-        controller: 'SidebarController'
+      }
+    }
+  };
+
+  var profile = {
+    name: 'storidge.profiles.profile',
+    url: '/:id',
+    views: {
+      'content@': {
+        templateUrl: 'app/extensions/storidge/views/profiles/edit/profile.html',
+        controller: 'StoridgeProfileController'
       }
     }
   };
 
   var profileCreation = {
-    name: 'storidge.profiles.create',
-    url: '/create',
+    name: 'storidge.profiles.new',
+    url: '/new',
     params: {
       profileName: ''
     },
     views: {
       'content@': {
-        templateUrl: 'app/extensions/storidge/views/profiles/create/createProfile.html',
-        controller: 'CreateProfileController'
-      },
-      'sidebar@': {
-        templateUrl: 'app/components/sidebar/sidebar.html',
-        controller: 'SidebarController'
-      }
-    }
-  };
-
-  var profileEdition = {
-    name: 'storidge.profiles.edit',
-    url: '/edit/:id',
-    views: {
-      'content@': {
-        templateUrl: 'app/extensions/storidge/views/profiles/edit/editProfile.html',
-        controller: 'EditProfileController'
-      },
-      'sidebar@': {
-        templateUrl: 'app/components/sidebar/sidebar.html',
-        controller: 'SidebarController'
+        templateUrl: 'app/extensions/storidge/views/profiles/create/createprofile.html',
+        controller: 'StoridgeCreateProfileController'
       }
     }
   };
@@ -71,10 +52,6 @@ angular.module('extension.storidge', [])
       'content@': {
         templateUrl: 'app/extensions/storidge/views/cluster/cluster.html',
         controller: 'StoridgeClusterController'
-      },
-      'sidebar@': {
-        templateUrl: 'app/components/sidebar/sidebar.html',
-        controller: 'SidebarController'
       }
     }
   };
@@ -86,18 +63,14 @@ angular.module('extension.storidge', [])
       'content@': {
         templateUrl: 'app/extensions/storidge/views/monitor/monitor.html',
         controller: 'StoridgeMonitorController'
-      },
-      'sidebar@': {
-        templateUrl: 'app/components/sidebar/sidebar.html',
-        controller: 'SidebarController'
       }
     }
   };
 
   $stateRegistryProvider.register(storidge);
   $stateRegistryProvider.register(profiles);
+  $stateRegistryProvider.register(profile);
   $stateRegistryProvider.register(profileCreation);
-  $stateRegistryProvider.register(profileEdition);
   $stateRegistryProvider.register(cluster);
   $stateRegistryProvider.register(monitor);
 }]);

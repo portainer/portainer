@@ -1,0 +1,114 @@
+<rd-header>
+  <rd-header-title title="Swarm visualizer">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.swarm.visualizer" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.swarm">Swarm</a> &gt; <a ui-sref="docker.swarm.visualizer">Cluster visualizer</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title="Cluster information">
+        <div class="pull-right">
+          <button type="button" class="btn btn-sm btn-primary" ng-click="state.ShowInformationPanel = true;" ng-if="!state.ShowInformationPanel">Show</button>
+          <button type="button" class="btn btn-sm btn-primary" ng-click="state.ShowInformationPanel = false;" ng-if="state.ShowInformationPanel">Hide</button>
+        </div>
+      </rd-widget-header>
+      <rd-widget-body ng-if="state.ShowInformationPanel">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Nodes</td>
+              <td>{{ nodes.length }}</td>
+            </tr>
+            <tr>
+              <td>Services</td>
+              <td>{{ services.length }}</td>
+            </tr>
+            <tr>
+              <td>Tasks</td>
+              <td>{{ tasks.length }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title">
+            Filters
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label class="control-label text-left">
+                Only display running tasks
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="state.DisplayOnlyRunningTasks"><i></i>
+              </label>
+            </div>
+          </div>
+        </form>
+        <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title">
+            Refresh
+          </div>
+          <div class="form-group">
+            <label for="refreshRate" class="col-sm-1 margin-sm-top control-label text-left">
+              Rate
+              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="display: none;"></i>
+            </label>
+            <div class="col-sm-2">
+              <select id="refreshRate" ng-model="state.refreshRate" ng-change="changeUpdateRepeater()" class="form-control">
+                <option value="5">5s</option>
+                <option value="10">10s</option>
+                <option value="30">30s</option>
+                <option value="60">60s</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="visualizerData">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title="Cluster visualizer"></rd-widget-header>
+      <rd-widget-body>
+        <div class="visualizer_container">
+          <div class="node" ng-repeat="node in visualizerData.nodes track by $index">
+            <div class="node_info">
+              <div>
+                <div>
+                  <b>{{ node.Hostname }}</b>
+                  <span class="node_platform">
+                    <i class="fa fa-linux" aria-hidden="true" ng-if="node.PlatformOS === 'linux'"></i>
+                    <i class="fa fa-windows" aria-hidden="true" ng-if="node.PlatformOS === 'windows'"></i>
+                  </span>
+                </div>
+              </div>
+              <div>{{ node.Role }}</div>
+              <div>CPU: {{ node.CPUs / 1000000000 }}</div>
+              <div>Memory: {{ node.Memory|humansize: 2 }}</div>
+              <div><span class="label label-{{ node.Status | nodestatusbadge }}">{{ node.Status }}</span></div>
+            </div>
+            <div class="tasks">
+              <div class="task task_{{ task.Status.State | visualizerTask }}" ng-repeat="task in node.Tasks | filter: (state.DisplayOnlyRunningTasks || '') && { Status: { State: 'running' } }">
+                <div class="service_name">{{ task.ServiceName }}</div>
+                <div>Image: {{ task.Spec.ContainerSpec.Image | hideshasum }}</div>
+                <div>Status: {{ task.Status.State }}</div>
+                <div>Update: {{ task.Updated | getisodate }}</div>
+                <div ng-if="task.Spec.Resources.Limits.MemoryBytes">Memory limit: {{ task.Spec.Resources.Limits.MemoryBytes | humansize: 2:2 }}</div>
+                <div ng-if="task.Spec.Resources.Limits.NanoCPUs">CPU limit: {{ task.Spec.Resources.Limits.NanoCPUs / 1000000000 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

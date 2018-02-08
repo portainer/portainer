@@ -1,0 +1,20 @@
+<rd-header>
+  <rd-header-title title="Configs list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.configs" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Configs</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <configs-datatable
+    title="Configs" title-icon="fa-file-code-o"
+    dataset="configs" table-key="configs"
+    order-by="Name" show-text-filter="true"
+    show-ownership-column="applicationState.application.authentication"
+    remove-action="removeAction"
+    ></configs-datatable>
+  </div>
+</div>
