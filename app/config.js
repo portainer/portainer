@@ -1,6 +1,6 @@
 angular.module('portainer')
-  .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', 'cfpLoadingBarProvider',
-  function ($stateProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
+  .config(['$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', 'cfpLoadingBarProvider',
+  function ($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
     'use strict';
 
     var environment = '@@ENVIRONMENT';
@@ -16,7 +16,7 @@ angular.module('portainer')
         return LocalStorage.getJWT();
       }],
       unauthenticatedRedirector: ['$state', function($state) {
-        $state.go('auth', {error: 'Your session has expired'});
+        $state.go('portainer.auth', {error: 'Your session has expired'});
       }]
     });
     $httpProvider.interceptors.push('jwtInterceptor');
@@ -37,5 +37,4 @@ angular.module('portainer')
     cfpLoadingBarProvider.parentSelector = '#loadingbar-placeholder';
 
     $urlRouterProvider.otherwise('/auth');
-    configureRoutes($stateProvider);
   }]);

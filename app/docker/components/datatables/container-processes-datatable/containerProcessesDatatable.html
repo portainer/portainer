@@ -1,0 +1,61 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <div class="toolBar">
+        <div class="toolBarTitle">
+          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.title }}
+        </div>
+        <div class="settings">
+          <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
+            <i class="fa fa-search" aria-hidden="true"></i> Search
+          </span>
+        </div>
+      </div>
+      <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
+        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th ng-repeat="header in $ctrl.headerset">
+                {{ header }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dir-paginate="item in ($ctrl.state.filteredProcesses = ($ctrl.dataset | filter:$ctrl.state.textFilter | itemsPerPage: $ctrl.state.paginatedItemLimit))">
+              <td ng-repeat="info in item track by $index">{{ info }}</td>
+            </tr>
+            <tr ng-if="!$ctrl.dataset">
+              <td colspan="{{ $ctrl.headerset.length }}" class="text-center text-muted">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.state.filteredProcesses.length === 0">
+              <td colspan="{{ $ctrl.headerset.length }}" class="text-center text-muted">No process available.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" ng-if="$ctrl.dataset">
+        <div class="paginationControls">
+          <form class="form-inline">
+            <span class="limitSelector">
+              <span style="margin-right: 5px;">
+                Items per page
+              </span>
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+                <option value="0">All</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </span>
+            <dir-pagination-controls max-size="5"></dir-pagination-controls>
+          </form>
+        </div>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>

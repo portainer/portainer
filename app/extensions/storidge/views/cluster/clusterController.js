@@ -42,8 +42,18 @@ function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNod
   };
 
   function shutdownCluster() {
-    Notifications.error('Not implemented', {}, 'Not implemented yet');
-    $state.reload();
+    $scope.state.shutdownInProgress = true;
+    StoridgeClusterService.shutdown()
+    .then(function success(data) {
+      Notifications.success('Cluster successfully shutdown');
+      $state.go('docker.dashboard');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to shutdown cluster');
+    })
+    .finally(function final() {
+      $scope.state.shutdownInProgress = false;
+    });
   }
 
   function rebootCluster() {

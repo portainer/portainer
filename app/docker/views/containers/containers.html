@@ -1,0 +1,29 @@
+<rd-header>
+  <rd-header-title title="Container list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.containers" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Containers</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12" ng-if="containers">
+    <containers-datatable
+      title="Containers" title-icon="fa-server"
+      dataset="containers" table-key="containers"
+      order-by="Status" show-text-filter="true"
+      show-ownership-column="applicationState.application.authentication"
+      swarm-containers="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"
+      public-url="state.publicURL"
+      container-name-truncate-size="truncate_size"
+      start-action="startAction"
+      stop-action="stopAction"
+      restart-action="restartAction"
+      kill-action="killAction"
+      pause-action="pauseAction"
+      resume-action="resumeAction"
+      remove-action="confirmRemoveAction"
+    ></containers-datatable>
+  </div>
+</div>

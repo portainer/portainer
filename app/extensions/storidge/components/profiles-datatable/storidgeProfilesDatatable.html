@@ -19,7 +19,7 @@
       </div>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search...">
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
       </div>
       <div class="table-responsive">
         <table class="table table-hover">
@@ -45,7 +45,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="storidge.profiles.edit({id: item.Name})">{{ item.Name }}</a>
+                <a ui-sref="storidge.profiles.profile({id: item.Name})">{{ item.Name }}</a>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

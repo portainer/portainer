@@ -116,7 +116,7 @@ gruntfile_cfg.src = {
   js: ['app/**/__module.js', 'app/**/*.js', '!app/**/*.spec.js'],
   jsTpl: ['<%= distdir %>/templates/**/*.js'],
   html: ['index.html'],
-  tpl: ['app/components/**/*.html', 'app/directives/**/*.html', 'app/extensions/**/*.html'],
+  tpl: ['app/**/*.html'],
   css: ['assets/css/app.css', 'app/**/*.css']
 };
 

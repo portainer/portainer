@@ -40,5 +40,13 @@ angular.module('extension.storidge')
     });
   };
 
+  service.shutdown = function() {
+    return $http({
+      method: 'POST',
+      url: StoridgeManager.StoridgeAPIURL() + '/cluster/shutdown',
+      skipAuthorization: true
+    });
+  };
+
   return service;
 }]);

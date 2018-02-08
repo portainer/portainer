@@ -1,0 +1,80 @@
+<rd-header>
+  <rd-header-title title="Config details">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.configs.config({id: config.Id})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.configs">Configs</a> &gt; <a ui-sref="docker.configs.config({id: config.Id})">{{ config.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-file-code-o" title="Config details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>{{ config.Name }}</td>
+            </tr>
+            <tr>
+              <td>ID</td>
+              <td>
+                {{ config.Id }}
+                <button class="btn btn-xs btn-danger" ng-click="removeConfig(config.Id)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this config</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Created</td>
+              <td>{{ config.CreatedAt | getisodate }}</td>
+            </tr>
+            <tr>
+              <td>Last updated</td>
+              <td>{{ config.UpdatedAt | getisodate }}</td>
+            </tr>
+            <tr ng-if="!(config.Labels | emptyobject)">
+              <td>Labels</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="(k, v) in config.Labels">
+                    <td>{{ k }}</td>
+                    <td>{{ v }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<!-- access-control-panel -->
+<por-access-control-panel
+  ng-if="config && applicationState.application.authentication"
+  resource-id="config.Id"
+  resource-control="config.ResourceControl"
+  resource-type="'config'">
+</por-access-control-panel>
+<!-- !access-control-panel -->
+
+<div class="row" ng-if="config">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-file-code-o" title="Config content"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-12">
+              <textarea id="config-editor" ng-model="config.Data" class="form-control"></textarea>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
