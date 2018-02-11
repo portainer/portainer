@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/asaskevich/govalidator"
@@ -128,7 +129,7 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 		}
 	}
 
-	protocol, version, err := validateRegistryURL(req.URL)
+	protocol, version, err := validateRegistryURL(req.URL, req.Authentication, req.Username, req.Password)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
@@ -282,7 +283,7 @@ func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http
 	}
 
 	if req.URL != "" {
-		protocol, version, err := validateRegistryURL(req.URL)
+		protocol, version, err := validateRegistryURL(req.URL, req.Authentication, req.Username, req.Password)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 			return
@@ -372,7 +373,7 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 // sending http get request to url using combination of protocols and available
 // registry versions. upon first successfull attempt, it returns protocol, version
 // and nil error.
-func validateRegistryURL(url string) (string, string, error) {
+func validateRegistryURL(url string, auth bool, username, password string) (string, string, error) {
 	configs := []struct {
 		protocol, version string
 	}{
@@ -386,20 +387,88 @@ func validateRegistryURL(url string) (string, string, error) {
 		Timeout: registryCheckTimeout,
 	}
 	for _, config := range configs {
-		req, err := http.NewRequest("GET", fmt.Sprintf("%s://%s/%s/", config.protocol, url, config.version), nil)
-		if err != nil {
+		url := fmt.Sprintf("%s://%s/%s/", config.protocol, url, config.version)
+		if auth {
+			if err := registryAuthAttempt(client, url, username, password); err == nil {
+				return config.protocol, config.version, nil
+			} else if err == portainer.ErrRegistryInvalidAuthCreds {
+				return "", "", err
+			}
 			continue
 		}
 
-		resp, err := client.Do(req)
-		if err != nil {
-			continue
-		}
-
-		if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusUnauthorized {
+		if err := checkRegistryURL(client, url); err == nil {
 			return config.protocol, config.version, nil
+		} else if err == portainer.ErrRegistryAuthRequired {
+			return "", "", err
 		}
 	}
 
 	return "", "", portainer.ErrRegistryInvalid
+}
+
+func checkRegistryURL(client *http.Client, url string) error {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return portainer.ErrRegistryInvalid
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return portainer.ErrRegistryInvalid
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	}
+	if resp.StatusCode == http.StatusUnauthorized {
+		return portainer.ErrRegistryAuthRequired
+	}
+	return portainer.ErrRegistryInvalid
+}
+
+func registryAuthAttempt(client *http.Client, url, username, password string) error {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return portainer.ErrRegistryInvalid
+	}
+
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != http.StatusUnauthorized {
+		return portainer.ErrRegistryInvalid
+	}
+
+	authHeader := resp.Header.Get("Www-Authenticate")
+	parts := strings.Split(strings.Replace(authHeader, "Bearer ", "", 1), ",")
+
+	m := map[string]string{}
+	for _, part := range parts {
+		splits := strings.Split(part, "=")
+		if len(splits) == 2 {
+			m[splits[0]] = strings.Replace(splits[1], "\"", "", 2)
+		}
+	}
+	if _, ok := m["realm"]; !ok {
+		return portainer.ErrRegistryInvalid
+	}
+
+	authURL := m["realm"]
+	if v, ok := m["service"]; ok {
+		authURL += "?service=" + v
+	}
+
+	authReq, err := http.NewRequest("GET", authURL, nil)
+	if err != nil {
+		return portainer.ErrRegistryInvalid
+	}
+	authReq.SetBasicAuth(username, password)
+
+	resp, err = client.Do(authReq)
+	if err != nil {
+		return portainer.ErrRegistryInvalid
+	}
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	}
+	return portainer.ErrRegistryInvalidAuthCreds
 }
