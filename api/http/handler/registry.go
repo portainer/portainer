@@ -6,6 +6,7 @@ import (
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
 
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -385,6 +386,11 @@ func validateRegistryURL(url string, auth bool, username, password string) (stri
 
 	client := &http.Client{
 		Timeout: registryCheckTimeout,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
 	}
 	for _, config := range configs {
 		url := fmt.Sprintf("%s://%s/%s/", config.protocol, url, config.version)
