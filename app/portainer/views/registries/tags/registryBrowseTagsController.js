@@ -4,6 +4,7 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
 
   $scope.state = {};
   $scope.tags = [];
+  $scope.digests = [];
 
   var blobs = [];
   var blobSizes = {};
@@ -54,6 +55,22 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
     }
   }
 
+  function storeDigests() {
+    var digestsObj = {};
+    for (var t in $scope.tags) {
+      if ({}.hasOwnProperty.call($scope.tags, t)) {
+        var tag = $scope.tags[t];
+        if (digestsObj[tag.Digest]) {
+          digestsObj[tag.Digest].TagList.push(tag.TagName);
+        } else {
+          digestsObj[tag.Digest] = {'Digest': tag.Digest, 'TagList': [tag.TagName], 'LayersCount': tag.LayersCount, 'TotalSize': tag.TotalSize}
+        }
+      }
+    }
+    // Arrayfy
+    $scope.digests = Object.keys(digestsObj).map(function (key) { return digestsObj[key]; });
+  }
+
   // Retrieve all tags and their sizes
   function retrieveTags() {
     $scope.repository = repository;
@@ -87,6 +104,9 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
           // And then sum each tag.layers
           storeTagSizes();
 
+          // Reorganize by digest
+          storeDigests();
+
         });
 
       });
@@ -111,8 +131,10 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
   }
 
   $scope.removeAction = function(selectedItems) {
+    // TODO Get tagsCount
+    var tagsCount = 2;
     ModalService.confirmDeletion(
-      'Do you want to remove the selected tag(s)?',
+      'Warning ! All the tags with same digest will be removed, Do you want to remove ' + tagsCount + ' tag(s)?',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
         removeTags(selectedItems);

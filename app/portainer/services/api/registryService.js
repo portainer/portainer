@@ -84,8 +84,14 @@ angular.module('portainer.app')
 
     RegistryManifests.get({id: id, repository: repository, tag: tag}).$promise
     .then(function success(data) {
-      var manifests = new RegistryManifestsViewModel(data.data, data.headers);
-      deferred.resolve(manifests);
+      RegistryManifests.head({id: id, repository: repository, tag: tag}).$promise
+      .then(function success(headersv2) {
+        var manifests = new RegistryManifestsViewModel(data.data, data.headers, headersv2.headers);
+        deferred.resolve(manifests);
+      })
+      .catch(function error(err) {
+        deferred.reject({msg: 'Unable to retrieve repository tag manifests headers', err: err});
+      });
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve repository tag manifests', err: err});

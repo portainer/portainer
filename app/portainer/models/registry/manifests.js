@@ -1,4 +1,5 @@
-function RegistryManifestsViewModel(data, headers) {
+function RegistryManifestsViewModel(data, headers, headersv2) {
+  console.log(headersv2);
   this.RepositoryName = data.name;
   this.TagName = data.tag;
   this.Architecture = data.architecture;
@@ -10,7 +11,7 @@ function RegistryManifestsViewModel(data, headers) {
     var legacyHistory = JSON.parse(elem.v1Compatibility);
     return legacyHistory.container_config.Cmd.join(' ');
   });
-  if (headers && headers["docker-content-digest"]) {
-    this.Digest = headers["docker-content-digest"];
+  if (headersv2 && headersv2["docker-content-digest"]) {
+    this.Digest = headersv2["docker-content-digest"];
   }
 }
