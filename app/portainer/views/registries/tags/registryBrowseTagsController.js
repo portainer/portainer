@@ -111,7 +111,6 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
   }
 
   $scope.removeAction = function(selectedItems) {
-    console.log("in remove action");
     ModalService.confirmDeletion(
       'Do you want to remove the selected tag(s)?',
       function onConfirm(confirmed) {
@@ -122,7 +121,6 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
   };
 
   function removeTags(tags) {
-    console.log(tags);
     for (var t in tags) {
       var repository = tags[t].RepositoryName;
       var tag = tags[t].TagName;
