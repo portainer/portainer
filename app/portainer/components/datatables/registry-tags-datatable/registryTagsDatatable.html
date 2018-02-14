@@ -11,6 +11,14 @@
           </span>
         </div>
       </div>
+      <div class="actionBar">
+        <div class="btn-group" role="group" aria-label="...">
+          <button type="button" class="btn btn-sm btn-danger"
+            ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+            <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
+          </button>
+        </div>
+      </div>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search...">

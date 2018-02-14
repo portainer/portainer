@@ -123,11 +123,26 @@ angular.module('portainer.app')
 
     RegistryManifests.get({id: id, repository: repository, tag: tag}).$promise
     .then(function success(data) {
-      var manifests = new RegistryManifestsViewModel(data);
+      var manifests = new RegistryManifestsViewModel(data.data, data.headers);
       deferred.resolve(manifests);
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve repository tag manifests', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+  service.deleteTag = function(id, repository, tag) {
+    var deferred = $q.defer();
+
+    RegistryManifests.delete({id: id, repository: repository, tag: tag}).$promise
+    .then(function success(data) {
+      //var manifests = new RegistryManifestsViewModel(data);
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to delete repository tag', err: err});
     });
 
     return deferred.promise;

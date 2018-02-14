@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('RegistryBrowseTagsController', ['$q', '$scope', '$transition$', 'RegistryService', 'Notifications',
-function ($q, $scope, $transition$, RegistryService, Notifications) {
+.controller('RegistryBrowseTagsController', ['$q', '$scope', '$transition$', 'RegistryService', 'Notifications', 'ModalService',
+function ($q, $scope, $transition$, RegistryService, Notifications, ModalService) {
 
   $scope.state = {};
   $scope.tags = [];
@@ -108,6 +108,33 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve registry details');
     });
+  }
+
+  $scope.removeAction = function(selectedItems) {
+    console.log("in remove action");
+    ModalService.confirmDeletion(
+      'Do you want to remove the selected tag(s)?',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        removeTags(selectedItems);
+      }
+    );
+  };
+
+  function removeTags(tags) {
+    console.log(tags);
+    for (var t in tags) {
+      var repository = tags[t].RepositoryName;
+      var tag = tags[t].TagName;
+      var digest = tags[t].Digest;
+      RegistryService.deleteTag(registryID, repository, digest)
+      .then(function success() {
+        Notifications.success('Tag deleted', tag);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to delete tag ' + tag);
+      });
+    }
   }
 
   function initView() {
