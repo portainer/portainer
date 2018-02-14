@@ -13,14 +13,15 @@ function ($q, $scope, $transition$, RegistryService, Notifications) {
       if (catalog.NotComplete) {
         $scope.headerMessage = 'Information: You have more than ' + catalog.Size + ' repositories in this registry. Only first ' + catalog.Size + ' are shown here.';
       }
-      var tagsPromises = catalog.Repositories.map(function (repository) {
+      $scope.repositories = catalog.Repositories;
+      /*var tagsPromises = catalog.Repositories.map(function (repository) {
         return RegistryService.tags(registryID, repository);
       });
 
       $q.all(tagsPromises)
       .then(function(allTags) {
         $scope.repositories = allTags;
-      });
+      });*/
 
     })
     .catch(function error(err) {

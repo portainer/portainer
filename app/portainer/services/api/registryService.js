@@ -38,14 +38,67 @@ angular.module('portainer.app')
   service.catalog = function(id) {
     var deferred = $q.defer();
 
-    RegistryCatalog.get({id: id, limit: 200, last: ''}).$promise
+    var doSomething = function doSomething(value) {
+      return new Promise(function (resolve) {
+        return setTimeout(function () {
+          return resolve(value >= 5 ? 'ok' : 'no');
+        }, 1000);
+      });
+    };
+
+    var loop = function loop(value) {
+      return doSomething(value).then(function (result) {
+        if (result === 'ok') {
+          console.log('yay');
+        } else {
+          console.log(value);
+          return loop(value + 1);
+        }
+      });
+    };
+
+    /*loop(1).then(function () {
+      return console.log('all done!');
+    });*/
+
+    var last = '';
+    var limit = 200;
+
+    // Init empty catalog
+    var catalog = {repositories: []};
+
+    var loopAllSlices = function loopAllSlices(id, limit, last) {
+      return RegistryCatalog.get({id: id, limit: limit, last: last}).$promise.then(function success(data) {
+        console.log(data.headers);
+        catalog.repositories = catalog.repositories.concat(data.data.repositories);
+        if (data.headers.link) {
+          // Get last and recall
+          var newLast = data.headers.link.split('last=')[1].split('&')[0];
+          console.log(newLast);
+          return loopAllSlices(id, limit, newLast);
+        } else {
+          console.log('Finish !');
+        }
+      });
+    };
+
+    loopAllSlices(id, 200, '').then(function () {
+      console.log(catalog.repositories.length);
+      console.log('all done!');
+      var catalogViewModel = new RegistryCatalogViewModel(catalog);
+      deferred.resolve(catalogViewModel);
+      return deferred.promise;
+    });
+
+    /*RegistryCatalog.get({id: id, limit: 200, last: ''}).$promise
     .then(function success(data) {
+      console.log(data);
       var catalog = new RegistryCatalogViewModel(data.data, data.headers);
       deferred.resolve(catalog);
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve registry catalog', err: err});
-    });
+    });*/
 
     return deferred.promise;
   };

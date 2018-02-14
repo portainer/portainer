@@ -30,9 +30,9 @@
                   <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <!--<th>
                 Tags Count
-              </th>
+              </th>-->
             </tr>
           </thead>
           <tbody>
@@ -42,11 +42,12 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="portainer.registries.registry.tags({id: $ctrl.registryId, repository: item.RegistryName})">{{ item.RegistryName }}</a>
+                <!--<a ui-sref="portainer.registries.registry.tags({id: $ctrl.registryId, repository: item.RegistryName})">{{ item.RegistryName }}</a>-->
+                <a ui-sref="portainer.registries.registry.tags({id: $ctrl.registryId, repository: item})">{{ item }}</a>
               </td>
-              <td>
+              <!--<td>
                 {{ item.TagsCount }}
-              </td>
+              </td>-->
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="3" class="text-center text-muted">Loading...</td>
