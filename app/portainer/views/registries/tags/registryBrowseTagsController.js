@@ -63,7 +63,7 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
         if (digestsObj[tag.Digest]) {
           digestsObj[tag.Digest].TagList.push(tag.TagName);
         } else {
-          digestsObj[tag.Digest] = {'Digest': tag.Digest, 'TagList': [tag.TagName], 'LayersCount': tag.LayersCount, 'TotalSize': tag.TotalSize}
+          digestsObj[tag.Digest] = {'RepositoryName': tag.RepositoryName, 'Digest': tag.Digest, 'TagList': [tag.TagName], 'LayersCount': tag.LayersCount, 'TotalSize': tag.TotalSize}
         }
       }
     }
@@ -137,16 +137,16 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
       'Warning ! All the tags with same digest will be removed, Do you want to remove ' + tagsCount + ' tag(s)?',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
-        removeTags(selectedItems);
+        removeDigests(selectedItems);
       }
     );
   };
 
-  function removeTags(tags) {
-    for (var t in tags) {
-      var repository = tags[t].RepositoryName;
-      var tag = tags[t].TagName;
-      var digest = tags[t].Digest;
+  function removeDigests(digests) {
+    for (var d in digests) {
+      var repository = digests[d].RepositoryName;
+      var tag = digests[d].TagName;
+      var digest = digests[d].Digest;
       RegistryService.deleteTag(registryID, repository, digest)
       .then(function success() {
         Notifications.success('Tag deleted', tag);
