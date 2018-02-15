@@ -1,5 +1,4 @@
 function RegistryManifestsViewModel(data, headers, headersv2) {
-  console.log(headersv2);
   this.RepositoryName = data.name;
   this.TagName = data.tag;
   this.Architecture = data.architecture;
