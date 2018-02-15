@@ -134,7 +134,7 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
     // TODO Get tagsCount
     var tagsCount = 2;
     ModalService.confirmDeletion(
-      'Warning ! All the tags with same digest will be removed, Do you want to remove ' + tagsCount + ' tag(s)?',
+      'Do you want to delete this digest? All associated tags will be unreachable.',
       function onConfirm(confirmed) {
         if(!confirmed) { return; }
         removeDigests(selectedItems);
