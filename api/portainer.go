@@ -155,6 +155,7 @@ type (
 		Authentication  bool       `json:"Authentication"`
 		Username        string     `json:"Username"`
 		Password        string     `json:"Password"`
+		TLSVerification bool       `json:"TLSVerification"`
 		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
 	}
