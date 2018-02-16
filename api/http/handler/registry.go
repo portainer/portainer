@@ -456,14 +456,12 @@ func registryAuthAttempt(client *http.Client, url, username, password string) er
 	}
 
 	authURL := url
-	authHeader := resp.Header.Get("Www-Authenticate")
-	if strings.HasPrefix(authHeader, "Bearer") {
+	if authHeader := resp.Header.Get("Www-Authenticate"); strings.HasPrefix(authHeader, "Bearer") {
 		parts := strings.Split(strings.Replace(authHeader, "Bearer ", "", 1), ",")
 
 		m := map[string]string{}
 		for _, part := range parts {
-			splits := strings.Split(part, "=")
-			if len(splits) == 2 {
+			if splits := strings.Split(part, "="); len(splits) == 2 {
 				m[splits[0]] = strings.Replace(splits[1], "\"", "", 2)
 			}
 		}
