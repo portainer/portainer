@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'Notifications',
-function ($scope, $state, $filter, EndpointService, Notifications) {
+.controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'Notifications', 'ExtensionManager', 'EndpointProvider',
+function ($scope, $state, $filter, EndpointService, Notifications, ExtensionManager, EndpointProvider) {
   $scope.state = {
     uploadInProgress: false,
     actionInProgress: false
@@ -31,9 +31,21 @@ function ($scope, $state, $filter, EndpointService, Notifications) {
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
-      Notifications.success('Endpoint created', name);
-      $state.reload();
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    .then(function success(data) {
+      var currentEndpointId = EndpointProvider.endpointID();
+      EndpointProvider.setEndpointID(data.Id);
+      ExtensionManager.initEndpointExtensions(data.Id)
+      .then(function success(data) {
+        Notifications.success('Endpoint created', name);
+        $state.reload();
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to create endpoint');
+      })
+      .finally(function final() {
+        EndpointProvider.setEndpointID(currentEndpointId);
+      });
     }, function error(err) {
       $scope.state.uploadInProgress = false;
       $scope.state.actionInProgress = false;

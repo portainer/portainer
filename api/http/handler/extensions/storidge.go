@@ -1,4 +1,4 @@
-package handler
+package extensions
 
 import (
 	"strconv"
@@ -15,8 +15,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// DockerHandler represents an HTTP API handler for proxying requests to the Docker API.
-type DockerHandler struct {
+// StoridgeHandler represents an HTTP API handler for proxying requests to the Docker API.
+type StoridgeHandler struct {
 	*mux.Router
 	Logger                *log.Logger
 	EndpointService       portainer.EndpointService
@@ -24,18 +24,18 @@ type DockerHandler struct {
 	ProxyManager          *proxy.Manager
 }
 
-// NewDockerHandler returns a new instance of DockerHandler.
-func NewDockerHandler(bouncer *security.RequestBouncer) *DockerHandler {
-	h := &DockerHandler{
+// NewStoridgeHandler returns a new instance of StoridgeHandler.
+func NewStoridgeHandler(bouncer *security.RequestBouncer) *StoridgeHandler {
+	h := &StoridgeHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	h.PathPrefix("/{id}/docker").Handler(
-		bouncer.AuthenticatedAccess(http.HandlerFunc(h.proxyRequestsToDockerAPI)))
+	h.PathPrefix("/{id}/extensions/storidge").Handler(
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.proxyRequestsToStoridgeAPI)))
 	return h
 }
 
-func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.Request) {
+func (handler *StoridgeHandler) proxyRequestsToStoridgeAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -69,15 +69,29 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 		return
 	}
 
+	var storidgeExtension *portainer.EndpointExtension
+	for _, extension := range endpoint.Extensions {
+		if extension.Type == portainer.StoridgeEndpointExtension {
+			storidgeExtension = &extension
+		}
+	}
+
+	if storidgeExtension == nil {
+		httperror.WriteErrorResponse(w, portainer.ErrEndpointExtensionNotSupported, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	proxyExtensionKey := string(endpoint.ID) + "_" + string(portainer.StoridgeEndpointExtension)
+
 	var proxy http.Handler
-	proxy = handler.ProxyManager.GetProxy(string(endpointID))
+	proxy = handler.ProxyManager.GetExtensionProxy(proxyExtensionKey)
 	if proxy == nil {
-		proxy, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
+		proxy, err = handler.ProxyManager.CreateAndRegisterExtensionProxy(proxyExtensionKey, storidgeExtension.URL)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return
 		}
 	}
 
-	http.StripPrefix("/"+id+"/docker", proxy).ServeHTTP(w, r)
+	http.StripPrefix("/"+id+"/extensions/storidge", proxy).ServeHTTP(w, r)
 }
