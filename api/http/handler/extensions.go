@@ -62,7 +62,7 @@ func (handler *ExtensionHandler) handlePostExtensions(w http.ResponseWriter, r *
 	}
 
 	var req postExtensionRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
