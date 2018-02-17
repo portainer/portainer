@@ -78,7 +78,7 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
     // Get all tags
     RegistryService.tags(registryID, repository)
     .then(function success(tags) {
-      
+
       // Prepare all queries to manifests
       var manifestsPromises = tags.Tags.map(function (tag) {
         return RegistryService.manifests(registryID, repository, tag);
@@ -150,6 +150,8 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
       RegistryService.deleteTag(registryID, repository, digest)
       .then(function success() {
         Notifications.success('Tag deleted', tag);
+        // Reload view
+        initView();
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to delete tag ' + tag);
@@ -158,6 +160,11 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
   }
 
   function initView() {
+    $scope.tags = [];
+    $scope.digests = [];
+    blobs = [];
+    blobSizes = {};
+
     retrieveRegistry();
     retrieveTags();
   }

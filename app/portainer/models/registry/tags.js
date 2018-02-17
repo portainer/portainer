@@ -1,5 +1,8 @@
 function RegistryTagsViewModel(data) {
   this.RegistryName = data.name;
-  this.Tags = data.tags;
-  this.TagsCount = data.tags.length;
+  this.Tags = [];
+  if (data.tags) {
+    this.Tags = data.tags;
+  }
+  this.TagsCount = this.Tags.length;
 }
