@@ -3,17 +3,15 @@ angular.module('portainer.app')
 function ($q, $scope, $transition$, RegistryService, Notifications) {
 
   $scope.state = {};
-  $scope.repositories = [];
 
   function initView() {
     var registryID = $transition$.params().id;
 
     RegistryService.catalog(registryID)
     .then(function success(catalog) {
-      if (catalog.NotComplete) {
-        $scope.headerMessage = 'Information: You have more than ' + catalog.Size + ' repositories in this registry. Only first ' + catalog.Size + ' are shown here.';
-      }
-      $scope.repositories = catalog.Repositories;
+      $scope.repositories = catalog.Repositories.map(function (elem) {
+        return {'Name': elem};
+      });
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve registry catalog');
