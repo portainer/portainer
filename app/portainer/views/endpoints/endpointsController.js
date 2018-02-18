@@ -44,6 +44,7 @@ function ($scope, $state, $filter, EndpointService, Notifications, ExtensionMana
         Notifications.error('Failure', err, 'Unable to create endpoint');
       })
       .finally(function final() {
+        $scope.state.actionInProgress = false;
         EndpointProvider.setEndpointID(currentEndpointId);
       });
     }, function error(err) {

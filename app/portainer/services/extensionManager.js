@@ -22,7 +22,7 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
       deferred.resolve(extensions);
     })
     .catch(function error(err) {
-      deferred.reject({ msg: 'An error occured during extension check', err: err });
+      deferred.reject({ msg: 'Unable to connect to the Docker environment', err: err });
     });
 
     return deferred.promise;
