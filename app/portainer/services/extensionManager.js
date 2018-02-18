@@ -10,6 +10,7 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
     SystemService.version()
     .then(function success(data) {
       var endpointAPIVersion = parseFloat(data.ApiVersion);
+
       return $q.all([
         endpointAPIVersion >= 1.25 ? initStoridgeExtension(endpointId): null
       ]);
@@ -21,7 +22,7 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
       deferred.resolve(extensions);
     })
     .catch(function error(err) {
-      deferred.reject({ msg: 'An error occured during extensions initialization', err: err });
+      deferred.reject({ msg: 'An error occured during extension check', err: err });
     });
 
     return deferred.promise;
@@ -41,7 +42,7 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
       deferred.resolve(data);
     })
     .catch(function error(err) {
-      deferred.reject({ msg: 'An error occured during Storidge extension initialization', err: err });
+      deferred.reject({ msg: 'An error occured during Storidge extension check', err: err });
     });
 
     return deferred.promise;
