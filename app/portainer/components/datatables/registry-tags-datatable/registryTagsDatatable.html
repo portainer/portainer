@@ -68,7 +68,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                {{ item.Digest | truncate: 25 }}
+                <a ui-sref="portainer.registries.registry.digest({digestid: item.Digest, repository: item.RepositoryName})">{{ item.Digest | truncate: 25 }}</a>
               </td>
               <!--<td style="white-space: pre">-->
               <td>

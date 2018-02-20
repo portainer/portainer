@@ -198,6 +198,17 @@ angular.module('portainer.app', [])
     }
   };
 
+  var registryDigest = {
+    name: 'portainer.registries.registry.digest',
+    url: '/digest/:digestid?repository',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/registries/digest/registryDigest.html',
+        controller: 'RegistryDigestController'
+      }
+    }
+  };
+
   var settings = {
     name: 'portainer.settings',
     url: '/settings',
@@ -281,6 +292,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(registryCreation);
   $stateRegistryProvider.register(registryBrowse);
   $stateRegistryProvider.register(registryTags);
+  $stateRegistryProvider.register(registryDigest);
   $stateRegistryProvider.register(settings);
   $stateRegistryProvider.register(settingsAuthentication);
   $stateRegistryProvider.register(users);

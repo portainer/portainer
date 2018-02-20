@@ -107,6 +107,8 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
           // Reorganize by digest
           storeDigests();
 
+          console.log($scope.digests);
+
         });
 
       });
