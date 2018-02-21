@@ -1,70 +1,77 @@
 angular.module('portainer.docker')
-.controller('ContainerLogsController', ['$scope', '$transition$', '$anchorScroll', 'ContainerLogs', 'Container', 'Notifications',
-function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notifications) {
-  $scope.state = {};
-  $scope.state.displayTimestampsOut = false;
-  $scope.state.displayTimestampsErr = false;
-  $scope.stdout = '';
-  $scope.stderr = '';
-  $scope.tailLines = 2000;
-
-  Container.get({id: $transition$.params().id}, function (d) {
-    $scope.container = d;
-  }, function (e) {
-    Notifications.error('Failure', e, 'Unable to retrieve container info');
-  });
-
-  function getLogs() {
-    getLogsStdout();
-    getLogsStderr();
-  }
-
-  function getLogsStderr() {
-    ContainerLogs.get($transition$.params().id, {
-      stdout: 0,
-      stderr: 1,
-      timestamps: $scope.state.displayTimestampsErr,
-      tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-      // Replace carriage returns with newlines to clean up output
-      data = data.replace(/[\r]/g, '\n');
-      // Strip 8 byte header from each line of output
-      data = data.substring(8);
-      data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stderr = data;
-    });
-  }
-
-  function getLogsStdout() {
-    ContainerLogs.get($transition$.params().id, {
-      stdout: 1,
-      stderr: 0,
-      timestamps: $scope.state.displayTimestampsOut,
-      tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-      // Replace carriage returns with newlines to clean up output
-      data = data.replace(/[\r]/g, '\n');
-      // Strip 8 byte header from each line of output
-      data = data.substring(8);
-      data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stdout = data;
-    });
-  }
-
-  // initial call
-  getLogs();
-  var logIntervalId = window.setInterval(getLogs, 5000);
-
-  $scope.$on('$destroy', function () {
-    // clearing interval when view changes
-    clearInterval(logIntervalId);
-  });
-
-  $scope.toggleTimestampsOut = function () {
-    getLogsStdout();
+.controller('ContainerLogsController', ['$scope', '$transition$', 'ContainerService', 'Notifications',
+function ($scope, $transition$, ContainerService, Notifications) {
+  $scope.state = {
+    refreshRate: '3'
   };
 
-  $scope.toggleTimestampsErr = function () {
-    getLogsStderr();
-  };
+  function goTerm() {
+    var termWidth = 30;
+    var termHeight = 30;
+
+    term = new Terminal();
+    term.open(document.getElementById('logs-xterm-container'), true);
+    term.resize(termWidth, termHeight);
+    term.fit();
+
+    window.onresize = function() {
+      term.fit();
+    };
+
+    term.write($scope.logs);
+  }
+
+  $scope.$on('$destroy', function() {
+    stopRepeater();
+  });
+
+  function stopRepeater() {
+    var repeater = $scope.repeater;
+    if (angular.isDefined(repeater)) {
+      $interval.cancel(repeater);
+      repeater = null;
+    }
+  }
+
+  function setUpdateRepeater(networkChart, cpuChart, memoryChart) {
+    var refreshRate = $scope.state.refreshRate;
+    $scope.repeater = $interval(function() {
+      ContainerService.containerLogs($transition$.params().id, 1, 1, 0, 2000)
+      .then(function success(data) {
+        var logs = processLogs(data.message || '');
+        $scope.logs = logs;
+      })
+      .catch(function error(err) {
+        stopRepeater();
+        Notifications.error('Failure', err, 'Unable to retrieve container statistics');
+      });
+    }, refreshRate * 1000);
+  }
+
+  function processLogs(data) {
+    var logs = data;
+    console.log(JSON.stringify(logs, null, 4));
+    // Replace carriage returns with newlines to clean up output
+    logs = logs.replace(/[\r]/g, '\n');
+    // // Strip 8 byte header from each line of output
+    logs = logs.substring(8);
+    console.log(JSON.stringify(logs, null, 4));
+    logs = logs.replace(/\n(.{8})/g, '\n\r');
+    console.log(JSON.stringify(logs, null, 4));
+    $scope.logs = logs;
+  }
+
+  function initView() {
+    ContainerService.container($transition$.params().id)
+    .then(function success(data) {
+      $scope.container = data;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve container information');
+    });
+
+    goTerm();
+  }
+
+  initView();
 }]);
