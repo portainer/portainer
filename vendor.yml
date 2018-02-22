@@ -80,6 +80,7 @@ angular:
   - node_modules/isteven-angular-multiselect/isteven-multi-select.js
   - node_modules/angular-json-tree/dist/angular-json-tree.js
   - node_modules/angular-loading-bar/build/loading-bar.js
+  - node_modules/angularjs-scroll-glue/src/scrollglue.js
   minified:
   - node_modules/angular/angular.min.js
   - node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js
@@ -98,3 +99,4 @@ angular:
   - node_modules/isteven-angular-multiselect/isteven-multi-select.js
   - node_modules/angular-json-tree/dist/angular-json-tree.min.js
   - node_modules/angular-loading-bar/build/loading-bar.min.js
+  - node_modules/angularjs-scroll-glue/src/scrollglue.js

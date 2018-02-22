@@ -693,6 +693,31 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   margin-bottom: 5px;
 }
 
+.container_logs {
+  height:100%;
+  overflow-y: scroll;
+  white-space: pre-wrap;
+  color: black;
+  font-size: .85em;
+  background-color: white;
+}
+
+.container_logs .inner_line {
+  padding: 0 15px;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.container_logs .inner_line:empty::after {
+  content: '.';
+  visibility: hidden;
+}
+
+.container_logs .line_selected {
+  background-color: #ffb2b0;
+  /* background-color: #55acf7; */
+}
+
 /*bootbox override*/
 .modal-open {
   padding-right: 0 !important;

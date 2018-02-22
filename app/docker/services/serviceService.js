@@ -58,5 +58,17 @@ angular.module('portainer.docker')
     return Service.update({ id: service.Id, version: service.Version }, config).$promise;
   };
 
+  service.logs = function(id, stdout, stderr, timestamps, tail) {
+    var parameters = {
+      id: id,
+      stdout: stdout || 0,
+      stderr: stderr || 0,
+      timestamps: timestamps || 0,
+      tail: tail || 'all'
+    };
+
+    return Service.logs(parameters).$promise;
+  };
+
   return service;
 }]);

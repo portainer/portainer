@@ -141,6 +141,10 @@ angular@1.x, angular@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.5.11.tgz#8c5ba7386f15965c9acf3429f6881553aada30d6"
 
+angularjs-scroll-glue@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/angularjs-scroll-glue/-/angularjs-scroll-glue-2.2.0.tgz#07d3399ac16ca874c63b6b5ee2ee30558b37e5d1"
+
 angularjs-slider@^6.4.0:
   version "6.4.3"
   resolved "https://registry.yarnpkg.com/angularjs-slider/-/angularjs-slider-6.4.3.tgz#50a7d738ff28d6a20b85263bb022771887aabd85"
@@ -4475,7 +4479,7 @@ xtend@~3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-3.0.0.tgz#5cce7407baf642cba7becda568111c493f59665a"
 
-xterm@~2.8.1:
+xterm@2.8.1:
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/xterm/-/xterm-2.8.1.tgz#3f6b939bcb8d015a1f247d66257102cb16a0b2e1"
 

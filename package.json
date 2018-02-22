@@ -37,6 +37,7 @@
     "angular-sanitize": "~1.5.0",
     "angular-ui-bootstrap": "~2.5.0",
     "angular-utils-pagination": "~0.11.1",
+    "angularjs-scroll-glue": "^2.2.0",
     "angularjs-slider": "^6.4.0",
     "bootbox": "^4.4.0",
     "bootstrap": "~3.3.6",

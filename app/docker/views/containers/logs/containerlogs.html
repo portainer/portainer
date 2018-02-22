@@ -5,8 +5,6 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row">
-  <div class="col-sm-12">
-    <div id="logs-xterm-container" class="terminal-container"></div>
-  </div>
-</div>
+<log-viewer 
+  data="logs" ng-if="logs">
+</log-viewer>

@@ -131,7 +131,7 @@ angular.module('portainer.docker')
     return deferred.promise;
   };
 
-  service.containerLogs = function(id, stdout, stderr, timestamps, tail) {
+  service.logs = function(id, stdout, stderr, timestamps, tail) {
     var parameters = {
       id: id,
       stdout: stdout || 0,

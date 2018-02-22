@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerLogsController', ['$scope', '$transition$', '$interval', 'ContainerService', 'Notifications',
-function ($scope, $transition$, $interval, ContainerService, Notifications) {
+.controller('TaskLogsController', ['$scope', '$transition$', '$interval', 'TaskService', 'ServiceService', 'Notifications',
+function ($scope, $transition$, $interval, TaskService, ServiceService, Notifications) {
   $scope.state = {
     refreshRate: 3,
     lineCount: 2000
@@ -18,44 +18,46 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
     }
   }
 
-  function update(logs) {
-    $scope.logs = logs;
-  }
-
   function setUpdateRepeater() {
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
-      ContainerService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
+      TaskService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
       .then(function success(data) {
         $scope.logs = data;
       })
       .catch(function error(err) {
         stopRepeater();
-        Notifications.error('Failure', err, 'Unable to retrieve container statistics');
+        Notifications.error('Failure', err, 'Unable to retrieve task statistics');
       });
     }, refreshRate * 1000);
   }
 
   function startLogPolling() {
-    ContainerService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
+    TaskService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
     .then(function success(data) {
       $scope.logs = data;
       setUpdateRepeater();
     })
     .catch(function error(err) {
       stopRepeater();
-      Notifications.error('Failure', err, 'Unable to retrieve container statistics');
+      Notifications.error('Failure', err, 'Unable to retrieve task statistics');
     });
   }
 
   function initView() {
-    ContainerService.container($transition$.params().id)
+    TaskService.task($transition$.params().id)
     .then(function success(data) {
-      $scope.container = data;
+      var task = data;
+      $scope.task = task;
+      return ServiceService.service(task.ServiceId);
+    })
+    .then(function success(data) {
+      var service = data;
+      $scope.service = service;
       startLogPolling();
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve container information');
+      Notifications.error('Failure', err, 'Unable to retrieve task details');
     });
   }
 
