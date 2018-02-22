@@ -31,7 +31,7 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
       })
       .catch(function error(err) {
         stopRepeater();
-        Notifications.error('Failure', err, 'Unable to retrieve container statistics');
+        Notifications.error('Failure', err, 'Unable to retrieve container logs');
       });
     }, refreshRate * 1000);
   }
@@ -44,7 +44,7 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
     })
     .catch(function error(err) {
       stopRepeater();
-      Notifications.error('Failure', err, 'Unable to retrieve container statistics');
+      Notifications.error('Failure', err, 'Unable to retrieve container logs');
     });
   }
 

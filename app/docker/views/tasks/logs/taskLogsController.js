@@ -27,7 +27,7 @@ function ($scope, $transition$, $interval, TaskService, ServiceService, Notifica
       })
       .catch(function error(err) {
         stopRepeater();
-        Notifications.error('Failure', err, 'Unable to retrieve task statistics');
+        Notifications.error('Failure', err, 'Unable to retrieve task logs');
       });
     }, refreshRate * 1000);
   }
@@ -40,7 +40,7 @@ function ($scope, $transition$, $interval, TaskService, ServiceService, Notifica
     })
     .catch(function error(err) {
       stopRepeater();
-      Notifications.error('Failure', err, 'Unable to retrieve task statistics');
+      Notifications.error('Failure', err, 'Unable to retrieve task logs');
     });
   }
 
