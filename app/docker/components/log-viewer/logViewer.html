@@ -46,7 +46,7 @@
 
 <div class="row" style="height:65%;">
   <div class="col-sm-12" style="height:100%;">
-    <pre class="container_logs" scroll-glue="$ctrl.state.autoScroll">
+    <pre class="log_viewer" scroll-glue="$ctrl.state.autoScroll">
       <div ng-repeat="line in filteredLogs = ($ctrl.data | filter:$ctrl.state.search) track by $index" class="line" ng-if="line"><p class="inner_line" ng-click="active=!active" ng-class="{'line_selected': active}">{{ line }}</p></div>
       <div ng-if="!filteredLogs.length" class="line"><p class="inner_line">No log line matching the '{{ $ctrl.state.search }}' filter</p></div>
       <div ng-if="filteredLogs.length === 1 && !filteredLogs[0]" class="line"><p class="inner_line">No logs available</p></div>

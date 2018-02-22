@@ -693,7 +693,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   margin-bottom: 5px;
 }
 
-.container_logs {
+.log_viewer {
   height:100%;
   overflow-y: scroll;
   white-space: pre-wrap;
@@ -702,20 +702,19 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   background-color: white;
 }
 
-.container_logs .inner_line {
+.log_viewer .inner_line {
   padding: 0 15px;
   cursor: pointer;
   margin-bottom: 0;
 }
 
-.container_logs .inner_line:empty::after {
+.log_viewer .inner_line:empty::after {
   content: '.';
   visibility: hidden;
 }
 
-.container_logs .line_selected {
-  background-color: #ffb2b0;
-  /* background-color: #55acf7; */
+.log_viewer .line_selected {
+  background-color: #C5CAE9;
 }
 
 /*bootbox override*/
