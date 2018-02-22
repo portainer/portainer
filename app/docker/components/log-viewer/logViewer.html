@@ -46,7 +46,7 @@
   </div>
 </div>
 
-<div class="row" style="height:65%;">
+<div class="row" style="height:54%;">
   <div class="col-sm-12" style="height:100%;">
     <pre class="log_viewer" scroll-glue="$ctrl.state.autoScroll">
       <div ng-repeat="line in $ctrl.state.filteredLogs = ($ctrl.data | filter:$ctrl.state.search) track by $index" class="line" ng-if="line"><p class="inner_line" ng-click="active=!active; $ctrl.selectLine(line)" ng-class="{'line_selected': active}">{{ line }}</p></div>
