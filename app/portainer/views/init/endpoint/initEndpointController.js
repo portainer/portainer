@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('InitEndpointController', ['$scope', '$state', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications',
-function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notifications) {
+.controller('InitEndpointController', ['$scope', '$state', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'ExtensionManager',
+function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notifications, ExtensionManager) {
 
   if (!_.isEmpty($scope.applicationState.endpoint)) {
     $state.go('docker.dashboard');
@@ -35,7 +35,11 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     .then(function success(data) {
       endpointID = data.Id;
       EndpointProvider.setEndpointID(endpointID);
-      return StateManager.updateEndpointState(false);
+      return ExtensionManager.initEndpointExtensions(endpointID);
+    })
+    .then(function success(data) {
+      var extensions = data;
+      return StateManager.updateEndpointState(false, extensions);
     })
     .then(function success(data) {
       $state.go('docker.dashboard');
@@ -66,7 +70,11 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     .then(function success(data) {
       endpointID = data.Id;
       EndpointProvider.setEndpointID(endpointID);
-      return StateManager.updateEndpointState(false);
+      return ExtensionManager.initEndpointExtensions(endpointID);
+    })
+    .then(function success(data) {
+      var extensions = data;
+      return StateManager.updateEndpointState(false, extensions);
     })
     .then(function success(data) {
       $state.go('docker.dashboard');

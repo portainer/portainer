@@ -8,6 +8,7 @@ import (
 
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
+	"github.com/portainer/portainer/http/handler/extensions"
 )
 
 // Handler is a collection of all the service handlers.
@@ -19,6 +20,8 @@ type Handler struct {
 	EndpointHandler       *EndpointHandler
 	RegistryHandler       *RegistryHandler
 	DockerHubHandler      *DockerHubHandler
+	ExtensionHandler      *ExtensionHandler
+	StoridgeHandler       *extensions.StoridgeHandler
 	ResourceHandler       *ResourceHandler
 	StackHandler          *StackHandler
 	StatusHandler         *StatusHandler
@@ -48,11 +51,16 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(r.URL.Path, "/api/dockerhub"):
 		http.StripPrefix("/api", h.DockerHubHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/endpoints"):
-		if strings.Contains(r.URL.Path, "/docker/") {
+		switch {
+		case strings.Contains(r.URL.Path, "/docker"):
 			http.StripPrefix("/api/endpoints", h.DockerHandler).ServeHTTP(w, r)
-		} else if strings.Contains(r.URL.Path, "/stacks") {
+		case strings.Contains(r.URL.Path, "/stacks"):
 			http.StripPrefix("/api/endpoints", h.StackHandler).ServeHTTP(w, r)
-		} else {
+		case strings.Contains(r.URL.Path, "/extensions/storidge"):
+			http.StripPrefix("/api/endpoints", h.StoridgeHandler).ServeHTTP(w, r)
+		case strings.Contains(r.URL.Path, "/extensions"):
+			http.StripPrefix("/api/endpoints", h.ExtensionHandler).ServeHTTP(w, r)
+		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}
 	case strings.HasPrefix(r.URL.Path, "/api/registries"):

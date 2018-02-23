@@ -24,7 +24,7 @@
       sidebar-toggled-on="toggle"
       current-state="$state.current.name"
     ></docker-sidebar-content>
-    <li class="sidebar-title" ng-if="applicationState.endpoint.extensions.length > 0 && isAdmin && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
+    <li class="sidebar-title" ng-if="applicationState.endpoint.extensions.length > 0">
       <span>Extensions</span>
     </li>
     <li class="sidebar-list" ng-if="applicationState.endpoint.extensions.indexOf('storidge') !== -1 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
