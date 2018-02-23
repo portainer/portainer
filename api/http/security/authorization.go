@@ -121,3 +121,22 @@ func AuthorizedUserManagement(userID portainer.UserID, context *RestrictedReques
 	}
 	return false
 }
+
+// AuthorizedEndpointAccess ensure that the user can access the specified endpoint.
+// It will check if the user is part of the authorized users or part of a team that is
+// listed in the authorized teams.
+func AuthorizedEndpointAccess(endpoint *portainer.Endpoint, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+	for _, authorizedUserID := range endpoint.AuthorizedUsers {
+		if authorizedUserID == userID {
+			return true
+		}
+	}
+	for _, membership := range memberships {
+		for _, authorizedTeamID := range endpoint.AuthorizedTeams {
+			if membership.TeamID == authorizedTeamID {
+				return true
+			}
+		}
+	}
+	return false
+}

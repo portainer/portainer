@@ -1,6 +1,6 @@
 angular.module('extension.storidge')
-.controller('StoridgeMonitorController', ['$q', '$scope', '$interval', '$document', 'Notifications', 'StoridgeClusterService', 'StoridgeChartService', 'StoridgeManager', 'ModalService',
-function ($q, $scope, $interval, $document, Notifications, StoridgeClusterService, StoridgeChartService, StoridgeManager, ModalService) {
+.controller('StoridgeMonitorController', ['$q', '$scope', '$interval', '$document', 'Notifications', 'StoridgeClusterService', 'StoridgeChartService', 'ModalService',
+function ($q, $scope, $interval, $document, Notifications, StoridgeClusterService, StoridgeChartService, ModalService) {
 
   $scope.$on('$destroy', function() {
     stopRepeater();
@@ -98,11 +98,5 @@ function ($q, $scope, $interval, $document, Notifications, StoridgeClusterServic
     });
   }
 
-  StoridgeManager.init()
-  .then(function success() {
-    initView();
-  })
-  .catch(function error(err) {
-    Notifications.error('Failure', err, 'Unable to communicate with Storidge API');
-  });
+  initView();
 }]);

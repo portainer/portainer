@@ -1,14 +1,14 @@
 angular.module('extension.storidge')
-.factory('StoridgeNodeService', ['$q', 'StoridgeNodes', function StoridgeNodeServiceFactory($q, StoridgeNodes) {
+.factory('StoridgeNodeService', ['$q', 'Storidge', function StoridgeNodeServiceFactory($q, Storidge) {
   'use strict';
   var service = {};
 
   service.nodes = function() {
     var deferred = $q.defer();
 
-    StoridgeNodes.query()
-    .then(function success(response) {
-      var nodeData = response.data.nodes;
+    Storidge.queryNodes().$promise
+    .then(function success(data) {
+      var nodeData = data.nodes;
       var nodes = [];
 
       for (var key in nodeData) {
