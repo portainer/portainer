@@ -3,14 +3,14 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.title }}
+          <i class="fas" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.title }}
         </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
-            <i class="fa fa-search" aria-hidden="true"></i> Search
+            <i class="fas fa-search" aria-hidden="true"></i> Search
           </span>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+            <span uib-dropdown-toggle><i class="fas fa-cog" aria-hidden="true"></i> Settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader">
@@ -55,39 +55,39 @@
         <div class="btn-group" role="group" aria-label="...">
           <button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.startAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noStoppedItemsSelected">
-            <i class="fa fa-play space-right" aria-hidden="true"></i>Start
+            <i class="fas fa-play space-right" aria-hidden="true"></i>Start
           </button>
           <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.stopAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noRunningItemsSelected">
-            <i class="fa fa-stop space-right" aria-hidden="true"></i>Stop
+            <i class="fas fa-stop space-right" aria-hidden="true"></i>Stop
           </button>
           <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.killAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0">
-            <i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill
+            <i class="fas fa-bomb space-right" aria-hidden="true"></i>Kill
           </button>
           <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.restartAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0">
-            <i class="fa fa-refresh space-right" aria-hidden="true"></i>Restart
+            <i class="fas fa-sync space-right" aria-hidden="true"></i>Restart
           </button>
           <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.pauseAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noRunningItemsSelected">
-            <i class="fa fa-pause space-right" aria-hidden="true"></i>Pause
+            <i class="fas fa-pause space-right" aria-hidden="true"></i>Pause
           </button>
           <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.resumeAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noPausedItemsSelected">
-            <i class="fa fa-play space-right" aria-hidden="true"></i>Resume
+            <i class="fas fa-play space-right" aria-hidden="true"></i>Resume
           </button>
           <button type="button" class="btn btn-sm btn-danger"
             ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-            <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove
+            <i class="fas fa-trash space-right" aria-hidden="true"></i>Remove
           </button>
         </div>
         <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.containers.new">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add container
+          <i class="fas fa-plus space-right" aria-hidden="true"></i>Add container
         </button>
       </div>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
-        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <i class="fas fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
       </div>
       <div class="table-responsive">
@@ -101,15 +101,15 @@
                 </span>
                 <a ng-click="$ctrl.changeOrderBy('Names')">
                   Name
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Names' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Names' && $ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Names' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Names' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
                 <a ng-click="$ctrl.changeOrderBy('Status')">
                   State
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
                 </a>
                 <div>
                   <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
@@ -138,43 +138,43 @@
               <th>
                 <a ng-click="$ctrl.changeOrderBy('StackName')">
                   Stack
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Image')">
                   Image
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('IP')">
                   IP Address
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th ng-if="$ctrl.swarmContainers">
                 <a ng-click="$ctrl.changeOrderBy('Host')">
                   Host IP
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Host' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Host' && $ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Host' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Host' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Ports')">
                   Published Ports
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th ng-if="$ctrl.showOwnershipColumn">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fas fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
             </tr>
@@ -207,7 +207,7 @@
               <td ng-if="$ctrl.swarmContainers">{{ item.hostIP }}</td>
               <td>
                 <a ng-if="item.Ports.length > 0" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.publicUrl || p.host }}:{{p.public}}" target="_blank">
-                  <i class="fa fa-external-link" aria-hidden="true"></i> {{ p.public }}:{{ p.private }}
+                  <i class="fas fa-external-link-alt" aria-hidden="true"></i> {{ p.public }}:{{ p.private }}
                 </a>
                 <span ng-if="item.Ports.length == 0" >-</span>
               </td>
