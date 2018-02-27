@@ -21,7 +21,12 @@
           <!-- config-data -->
           <div class="form-group">
             <div class="col-sm-12">
-              <textarea id="config-editor" class="form-control"></textarea>
+              <code-editor
+                identifier="config-creation-editor"
+                placeholder="Define or paste the content of your config here"
+                yml="false"
+                on-change="editorUpdate"
+              ></code-editor>
             </div>
           </div>
           <!-- !config-data -->
@@ -62,6 +67,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ng-click="create()">Create config</button>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
           <!-- !actions -->
