@@ -61,6 +61,11 @@ function ($scope, $state, Notifications, ConfigService, Authentication, FormVali
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1;
 
+    if ($scope.formValues.ConfigContent === '') {
+      $scope.state.formValidationError = 'Config content must not be empty';
+      return;
+    }
+
     if (!validateForm(accessControlData, isAdmin)) {
       return;
     }

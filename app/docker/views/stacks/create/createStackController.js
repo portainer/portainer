@@ -38,13 +38,11 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     return true;
   }
 
-  function createStack(name) {
-    var method = $scope.state.Method;
+  function createStack(name, method) {
     var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
 
     if (method === 'editor') {
       var stackFileContent = $scope.formValues.StackFileContent;
-
       return StackService.createStackFromFileContent(name, stackFileContent, env);
     } else if (method === 'upload') {
       var stackFile = $scope.formValues.StackFile;
@@ -58,18 +56,24 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
 
   $scope.deployStack = function () {
     var name = $scope.formValues.Name;
+    var method = $scope.state.Method;
 
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1;
     var userId = userDetails.ID;
 
+    if (method === 'editor' && $scope.formValues.StackFileContent === '') {
+      $scope.state.formValidationError = 'Stack file content must not be empty';
+      return;
+    }
+
     if (!validateForm(accessControlData, isAdmin)) {
       return;
     }
 
     $scope.state.actionInProgress = true;
-    createStack(name)
+    createStack(name, method)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
     })

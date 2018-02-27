@@ -173,7 +173,6 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress
-              || (state.Method === 'editor' && !formValues.StackFileContent)
               || (state.Method === 'upload' && !formValues.StackFile)
               || (state.Method === 'repository' && (!formValues.RepositoryURL || !formValues.RepositoryPath))
               || !formValues.Name" ng-click="deployStack()" button-spinner="state.actionInProgress">
