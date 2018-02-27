@@ -1,15 +1,11 @@
 package proxy
 
 import (
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"path"
 	"strings"
 
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/archive"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -31,6 +27,7 @@ type (
 		labelBlackList   []portainer.Pair
 	}
 	restrictedOperationRequest func(*http.Request, *http.Response, *operationExecutor) error
+	operationRequest           func(*http.Request) error
 )
 
 func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error) {
@@ -235,46 +232,7 @@ func (p *proxyTransport) proxyTaskRequest(request *http.Request) (*http.Response
 }
 
 func (p *proxyTransport) proxyBuildRequest(request *http.Request) (*http.Response, error) {
-	// POST Dockerfile via upload
-	if request.Header.Get("Content-Type") == "" {
-
-		fileContent, err := ioutil.ReadAll(request.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		buffer, err := archive.TarFileInBuffer(fileContent, "Dockerfile")
-		if err != nil {
-			return nil, err
-		}
-
-		request.Body = ioutil.NopCloser(bytes.NewReader(buffer))
-		request.ContentLength = int64(len(buffer))
-		request.Header.Set("Content-Type", "application/x-tar")
-
-		// Posting Dockerfile content via JSON in body
-	} else if strings.Contains(request.Header.Get("Content-Type"), "application/json") {
-
-		type postDockerfileRequest struct {
-			Content string
-		}
-
-		var req postDockerfileRequest
-		if err := json.NewDecoder(request.Body).Decode(&req); err != nil {
-			return nil, err
-		}
-
-		buffer, err := archive.TarFileInBuffer([]byte(req.Content), "Dockerfile")
-		if err != nil {
-			return nil, err
-		}
-
-		request.Body = ioutil.NopCloser(bytes.NewReader(buffer))
-		request.ContentLength = int64(len(buffer))
-		request.Header.Set("Content-Type", "application/x-tar")
-	}
-
-	return p.executeDockerRequest(request)
+	return p.interceptAndRewriteRequest(request, buildOperation)
 }
 
 // restrictedOperation ensures that the current user has the required authorizations
@@ -347,6 +305,15 @@ func (p *proxyTransport) rewriteOperation(request *http.Request, operation restr
 	}
 
 	return p.executeRequestAndRewriteResponse(request, operation, executor)
+}
+
+func (p *proxyTransport) interceptAndRewriteRequest(request *http.Request, operation operationRequest) (*http.Response, error) {
+	err := operation(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.executeDockerRequest(request)
 }
 
 func (p *proxyTransport) executeRequestAndRewriteResponse(request *http.Request, operation restrictedOperationRequest, executor *operationExecutor) (*http.Response, error) {
