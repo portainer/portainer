@@ -6,6 +6,14 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
     lineCount: 2000
   };
 
+  $scope.changeLogCollection = function(logCollectionStatus) {
+    if (!logCollectionStatus) {
+      stopRepeater();
+    } else {
+      setUpdateRepeater();
+    }
+  };
+
   $scope.$on('$destroy', function() {
     stopRepeater();
   });
