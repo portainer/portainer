@@ -1,14 +1,10 @@
 angular.module('portainer.docker')
-.controller('CreateStackController', ['$scope', '$state', '$document', 'StackService', 'CodeMirrorService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService', 'FormHelper',
-function ($scope, $state, $document, StackService, CodeMirrorService, Authentication, Notifications, FormValidator, ResourceControlService, FormHelper) {
-
-  // Store the editor content when switching builder methods
-  var editorContent = '';
-  var editorEnabled = true;
+.controller('CreateStackController', ['$scope', '$state', 'StackService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService', 'FormHelper',
+function ($scope, $state, StackService, Authentication, Notifications, FormValidator, ResourceControlService, FormHelper) {
 
   $scope.formValues = {
     Name: '',
-    StackFileContent: '# Define or paste the content of your docker-compose file here',
+    StackFileContent: '',
     StackFile: null,
     RepositoryURL: '',
     Env: [],
@@ -47,9 +43,7 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
     var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
 
     if (method === 'editor') {
-      // The codemirror editor does not work with ng-model so we need to retrieve
-      // the value directly from the editor.
-      var stackFileContent = $scope.editor.getValue();
+      var stackFileContent = $scope.formValues.StackFileContent;
 
       return StackService.createStackFromFileContent(name, stackFileContent, env);
     } else if (method === 'upload') {
@@ -96,33 +90,7 @@ function ($scope, $state, $document, StackService, CodeMirrorService, Authentica
     });
   };
 
-  function enableEditor(value) {
-    $document.ready(function() {
-      var webEditorElement = $document[0].getElementById('web-editor');
-      if (webEditorElement) {
-        $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement, true, false);
-        if (value) {
-          $scope.editor.setValue(value);
-        }
-      }
-    });
-  }
-
-  $scope.toggleEditor = function() {
-    if (!editorEnabled) {
-      enableEditor(editorContent);
-      editorEnabled = true;
-    }
+  $scope.editorUpdate = function(cm) {
+    $scope.formValues.StackFileContent = cm.getValue();
   };
-
-  $scope.saveEditorContent = function() {
-    editorContent = $scope.editor.getValue();
-    editorEnabled = false;
-  };
-
-  function initView() {
-    enableEditor();
-  }
-
-  initView();
 }]);

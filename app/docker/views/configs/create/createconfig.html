@@ -21,7 +21,12 @@
           <!-- config-data -->
           <div class="form-group">
             <div class="col-sm-12">
-              <textarea id="config-editor" class="form-control"></textarea>
+              <code-editor
+                identifier="config-creation-editor"
+                placeholder="Define or paste the content of your config here"
+                yml="false"
+                on-change="editorUpdate"
+              ></code-editor>
             </div>
           </div>
           <!-- !config-data -->

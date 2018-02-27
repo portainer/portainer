@@ -110,7 +110,6 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
 
 
   function assignExtensions(endpointExtensions) {
-    console.log(JSON.stringify(endpointExtensions, null, 4));
     var extensions = [];
 
     for (var i = 0; i < endpointExtensions.length; i++) {
