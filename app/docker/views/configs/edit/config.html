@@ -70,7 +70,12 @@
         <form class="form-horizontal">
           <div class="form-group">
             <div class="col-sm-12">
-              <textarea id="config-editor" ng-model="config.Data" class="form-control"></textarea>
+              <code-editor
+                identifier="config-editor"
+                yml="false"
+                read-only="true"
+                value="config.Data"
+              ></code-editor>
             </div>
           </div>
         </form>
