@@ -9,13 +9,11 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-
         <uib-tabset active="state.activeTab">
           <uib-tab index="0">
             <uib-tab-heading>
               <i class="fa fa-wrench space-right" aria-hidden="true"></i> Builder
             </uib-tab-heading>
-
             <form class="form-horizontal">
               <div class="col-sm-12 form-section-title">
                 Naming
@@ -112,7 +110,7 @@
               </div>
               <!-- !build-method -->
               <!-- web-editor -->
-              <div ng-if="state.BuildType === 'editor'">
+              <div ng-show="state.BuildType === 'editor'">
                 <div class="col-sm-12 form-section-title">
                   Web editor
                 </div>
@@ -123,13 +121,18 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <textarea id="build-web-editor" class="form-control" placeholder='Define or paste the content of your Dockerfile file here'></textarea>
+                    <code-editor
+                      identifier="image-build-editor"
+                      placeholder="Define or paste the content of your Dockerfile here"
+                      yml="false"
+                      on-change="editorUpdate"
+                    ></code-editor>
                   </div>
                 </div>
               </div>
               <!-- !web-editor -->
               <!-- upload -->
-              <div ng-if="state.BuildType === 'upload'">
+              <div ng-show="state.BuildType === 'upload'">
                 <div class="col-sm-12 form-section-title">
                   Upload
                 </div>
@@ -163,7 +166,7 @@
               </div>
               <!-- !upload -->
               <!-- url -->
-              <div ng-if="state.BuildType === 'url'">
+              <div ng-show="state.BuildType === 'url'">
                 <div class="col-sm-12 form-section-title">
                   URL
                 </div>
@@ -206,6 +209,7 @@
                     <span ng-hide="state.actionInProgress">Build the image</span>
                     <span ng-show="state.actionInProgress">Image building in progress...</span>
                   </button>
+                  <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
                 </div>
               </div>
               <!-- !actions -->
@@ -215,15 +219,12 @@
             <uib-tab-heading>
               <i class="fa fa-file-text space-right" aria-hidden="true"></i> Output
             </uib-tab-heading>
-
             <pre class="log_viewer">
               <div ng-repeat="line in buildLogs track by $index" class="line"><p class="inner_line" ng-click="active=!active" ng-class="{'line_selected': active}">{{ line }}</p></div>
               <div ng-if="!buildLogs.length" class="line"><p class="inner_line">No build output available.</p></div>
             </pre>
-
           </uib-tab>
         </uib-tabset>
-
       </rd-widget-body>
     </rd-widget>
   </div>

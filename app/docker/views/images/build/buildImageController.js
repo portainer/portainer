@@ -1,10 +1,6 @@
 angular.module('portainer.docker')
-.controller('BuildImageController', ['$scope', '$state', '$document', 'CodeMirrorService', 'BuildService', 'Notifications',
-function ($scope, $state, $document, CodeMirrorService, BuildService, Notifications) {
-
-	// Store the editor content when switching builder methods
-	var editorContent = '';
-	var editorEnabled = true;
+.controller('BuildImageController', ['$scope', '$state', 'BuildService', 'Notifications',
+function ($scope, $state, BuildService, Notifications) {
 
 	$scope.state = {
 		BuildType: 'editor',
@@ -15,6 +11,7 @@ function ($scope, $state, $document, CodeMirrorService, BuildService, Notificati
 	$scope.formValues = {
 		ImageNames: [{ Name: '' }],
 		UploadFile: null,
+		DockerFileContent: '',
 		URL: '',
 		Path: 'Dockerfile'
 	};
@@ -38,14 +35,19 @@ function ($scope, $state, $document, CodeMirrorService, BuildService, Notificati
 			var URL = $scope.formValues.URL;
 			return BuildService.buildImageFromURL(names, URL, dockerfilePath);
 		} else {
-			// The codemirror editor does not work with ng-model so we need to retrieve
-			// the value directly from the editor.
-			var dockerfileContent = $scope.editor.getValue();
+			var dockerfileContent = $scope.formValues.DockerFileContent;
 			return BuildService.buildImageFromDockerfileContent(names, dockerfileContent);
 		}
 	}
 
 	$scope.buildImage = function() {
+		var buildType = $scope.state.BuildType;
+
+		if (buildType === 'editor' && $scope.formValues.DockerFileContent === '') {
+			$scope.state.formValidationError = 'Dockerfile content must not be empty';
+			return;
+		}
+
 		$scope.state.actionInProgress = true;
 
 		var imageNames = $scope.formValues.ImageNames.filter(function filterNull(x) {
@@ -54,7 +56,6 @@ function ($scope, $state, $document, CodeMirrorService, BuildService, Notificati
 			return x.Name;
 		});
 
-		var buildType = $scope.state.BuildType;
 		buildImageBasedOnBuildType(buildType, imageNames)
 		.then(function success(data) {
 			$scope.buildLogs = data.buildLogs;
@@ -73,30 +74,6 @@ function ($scope, $state, $document, CodeMirrorService, BuildService, Notificati
 		});
 	};
 
-	function enableEditor(value) {
-    $document.ready(function() {
-      var webEditorElement = $document[0].getElementById('build-web-editor');
-      if (webEditorElement) {
-        $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement, false, false);
-        if (value) {
-          $scope.editor.setValue(value);
-        }
-      }
-    });
-  }
-
-  $scope.toggleEditor = function() {
-    if (!editorEnabled) {
-      enableEditor(editorContent);
-      editorEnabled = true;
-    }
-  };
-
-  $scope.saveEditorContent = function() {
-    editorContent = $scope.editor.getValue();
-    editorEnabled = false;
-  };
-
 	$scope.validImageNames = function() {
 		for (var i = 0; i < $scope.formValues.ImageNames.length; i++) {
 			var item = $scope.formValues.ImageNames[i];
@@ -107,9 +84,7 @@ function ($scope, $state, $document, CodeMirrorService, BuildService, Notificati
 		return false;
 	};
 
-  function initView() {
-    enableEditor();
-  }
-
-  initView();
+	$scope.editorUpdate = function(cm) {
+    $scope.formValues.DockerFileContent = cm.getValue();
+  };
 }]);
