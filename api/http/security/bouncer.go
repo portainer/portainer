@@ -12,6 +12,7 @@ type (
 	// RequestBouncer represents an entity that manages API request accesses
 	RequestBouncer struct {
 		jwtService            portainer.JWTService
+		userService           portainer.UserService
 		teamMembershipService portainer.TeamMembershipService
 		authDisabled          bool
 	}
@@ -27,9 +28,10 @@ type (
 )
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(jwtService portainer.JWTService, teamMembershipService portainer.TeamMembershipService, authDisabled bool) *RequestBouncer {
+func NewRequestBouncer(jwtService portainer.JWTService, userService portainer.UserService, teamMembershipService portainer.TeamMembershipService, authDisabled bool) *RequestBouncer {
 	return &RequestBouncer{
 		jwtService:            jwtService,
+		userService:           userService,
 		teamMembershipService: teamMembershipService,
 		authDisabled:          authDisabled,
 	}
@@ -134,6 +136,15 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 			tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token)
 			if err != nil {
 				httperror.WriteErrorResponse(w, err, http.StatusUnauthorized, nil)
+				return
+			}
+
+			_, err = bouncer.userService.User(tokenData.ID)
+			if err != nil && err == portainer.ErrUserNotFound {
+				httperror.WriteErrorResponse(w, portainer.ErrUnauthorized, http.StatusUnauthorized, nil)
+				return
+			} else if err != nil {
+				httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, nil)
 				return
 			}
 		} else {
