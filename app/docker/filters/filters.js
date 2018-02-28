@@ -42,11 +42,11 @@ angular.module('portainer.docker')
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (includeString(status, ['paused', 'starting'])) {
+    if (includeString(status, ['paused', 'starting', 'unhealthy'])) {
       return 'warning';
     } else if (includeString(status, ['created'])) {
       return 'info';
-    } else if (includeString(status, ['stopped', 'unhealthy', 'dead', 'exited'])) {
+    } else if (includeString(status, ['stopped', 'dead', 'exited'])) {
       return 'danger';
     }
     return 'success';
