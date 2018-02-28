@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServiceLogsController', ['$scope', '$transition$', '$interval', 'ServiceService', 'Notifications',
-function ($scope, $transition$, $interval, ServiceService, Notifications) {
+.controller('TaskLogsController', ['$scope', '$transition$', '$interval', 'TaskService', 'ServiceService', 'Notifications',
+function ($scope, $transition$, $interval, TaskService, ServiceService, Notifications) {
   $scope.state = {
     refreshRate: 3,
     lineCount: 2000
@@ -29,40 +29,44 @@ function ($scope, $transition$, $interval, ServiceService, Notifications) {
   function setUpdateRepeater() {
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
-      ServiceService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
+      TaskService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
       .then(function success(data) {
         $scope.logs = data;
       })
       .catch(function error(err) {
         stopRepeater();
-        Notifications.error('Failure', err, 'Unable to retrieve service logs');
+        Notifications.error('Failure', err, 'Unable to retrieve task logs');
       });
     }, refreshRate * 1000);
   }
 
   function startLogPolling() {
-    ServiceService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
+    TaskService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
     .then(function success(data) {
       $scope.logs = data;
-      console.log(JSON.stringify(data, null, 4));
       setUpdateRepeater();
     })
     .catch(function error(err) {
       stopRepeater();
-      Notifications.error('Failure', err, 'Unable to retrieve service logs');
+      Notifications.error('Failure', err, 'Unable to retrieve task logs');
     });
   }
 
   function initView() {
-    ServiceService.service($transition$.params().id)
+    TaskService.task($transition$.params().id)
     .then(function success(data) {
-      $scope.service = data;
+      var task = data;
+      $scope.task = task;
+      return ServiceService.service(task.ServiceId);
+    })
+    .then(function success(data) {
+      var service = data;
+      $scope.service = service;
       startLogPolling();
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve service information');
+      Notifications.error('Failure', err, 'Unable to retrieve task details');
     });
-
   }
 
   initView();

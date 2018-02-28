@@ -44,6 +44,9 @@
               <td>Container ID</td>
               <td>{{ task.Status.ContainerStatus.ContainerID }}</td>
             </tr>
+            <tr ng-if="applicationState.endpoint.apiVersion >= 1.30" >
+              <td colspan="2"><a class="btn btn-primary btn-sm" type="button" ui-sref="docker.tasks.task.logs({id: task.Id})"><i class="fa fa-file-text-o space-right" aria-hidden="true"></i>Task logs</a></td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>

@@ -54,6 +54,7 @@
                   <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Updated' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th ng-if="$ctrl.showLogsButton">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -63,6 +64,11 @@
               <td ng-if="$ctrl.showSlotColumn">{{ item.Slot ? item.Slot : '-' }}</td>
               <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>
               <td>{{ item.Updated | getisodate }}</td>
+              <td ng-if="$ctrl.showLogsButton">
+                <a ui-sref="docker.tasks.task.logs({id: item.Id})">
+                  <i class="fa fa-file-text-o" aria-hidden="true"></i> View logs
+                </a>
+              </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="5" class="text-center text-muted">Loading...</td>

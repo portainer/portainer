@@ -389,6 +389,17 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+  var taskLogs = {
+    name: 'docker.tasks.task.logs',
+    url: '/logs',
+    views: {
+      'content@': {
+        templateUrl: 'app/docker/views/tasks/logs/tasklogs.html',
+        controller: 'TaskLogsController'
+      }
+    }
+  };
+
   var templates = {
     name: 'docker.templates',
     url: '/templates',
@@ -488,6 +499,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(swarmVisualizer);
   $stateRegistryProvider.register(tasks);
   $stateRegistryProvider.register(task);
+  $stateRegistryProvider.register(taskLogs);
   $stateRegistryProvider.register(templates);
   $stateRegistryProvider.register(templatesLinuxServer);
   $stateRegistryProvider.register(volumes);

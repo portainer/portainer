@@ -13,6 +13,11 @@ angular.module('portainer.docker')
       ignoreLoadingBar: true
     },
     update: { method: 'POST', params: {id: '@id', action: 'update', version: '@version'} },
-    remove: { method: 'DELETE', params: {id: '@id'} }
+    remove: { method: 'DELETE', params: {id: '@id'} },
+    logs: {
+      method: 'GET', params: { id: '@id', action: 'logs' },
+      timeout: 4500, ignoreLoadingBar: true,
+      transformResponse: logsHandler, isArray: true
+    }
   });
 }]);
