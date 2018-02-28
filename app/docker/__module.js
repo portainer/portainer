@@ -179,6 +179,17 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+  var imageBuild = {
+    name: 'docker.images.build',
+    url: '/build',
+    views: {
+      'content@': {
+        templateUrl: 'app/docker/views/images/build/buildimage.html',
+        controller: 'BuildImageController'
+      }
+    }
+  };
+
   var networks = {
     name: 'docker.networks',
     url: '/networks',
@@ -457,6 +468,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(events);
   $stateRegistryProvider.register(images);
   $stateRegistryProvider.register(image);
+  $stateRegistryProvider.register(imageBuild);
   $stateRegistryProvider.register(networks);
   $stateRegistryProvider.register(network);
   $stateRegistryProvider.register(networkCreation);

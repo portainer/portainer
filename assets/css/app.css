@@ -693,6 +693,30 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   margin-bottom: 5px;
 }
 
+.log_viewer {
+  height:100%;
+  overflow-y: scroll;
+  white-space: pre-wrap;
+  color: black;
+  font-size: .85em;
+  background-color: white;
+}
+
+.log_viewer .inner_line {
+  padding: 0 15px;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.log_viewer .inner_line:empty::after {
+  content: '.';
+  visibility: hidden;
+}
+
+.log_viewer .line_selected {
+  background-color: #C5CAE9;
+}
+
 /*bootbox override*/
 .modal-open {
   padding-right: 0 !important;
