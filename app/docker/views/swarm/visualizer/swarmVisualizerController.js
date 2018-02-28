@@ -28,9 +28,9 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
   }
 
   function hashToHexColor(hash) {
-    var color = "#";
+    var color = '#';
     for (var i = 0; i < 3;) {
-      color += ("00" + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2);
+      color += ('00' + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2);
     }
     return color;
   }
@@ -83,7 +83,7 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
 
         if (task.ServiceId === service.Id) {
           task.ServiceName = service.Name;
-          task.ServiceColor = stringToColor(task.ServiceId)
+          task.ServiceColor = stringToColor(task.ServiceId);
         }
       }
     }
