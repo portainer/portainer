@@ -58,9 +58,6 @@ function createEventDetails(event) {
       case 'resize':
       details = 'Container ' + eventAttr.name + ' resized';
       break;
-      case 'restart':
-      details = 'Container ' + eventAttr.name + ' restarted';
-      break;
       case 'top':
       details = 'Showed running processes for container ' + eventAttr.name;
       break;

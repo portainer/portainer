@@ -4,3 +4,6 @@ dist
 portainer-checksum.txt
 api/cmd/portainer/portainer*
 .tmp
+
+*.iml
+.idea
