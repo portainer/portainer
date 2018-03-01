@@ -204,7 +204,7 @@ angular.module('portainer.app', [])
     views: {
       'content@': {
         templateUrl: 'app/portainer/views/registries/digest/registryDigest.html',
-        controller: 'RegistryDigestController'
+        controller: 'RegistryBrowseTagsController'
       }
     }
   };
