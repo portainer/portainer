@@ -19,28 +19,6 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
     $('#refreshRateChange').fadeOut(1500);
   };
 
-  function strToHash(str) {
-    var hash = 0;
-    for (var i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return hash;
-  }
-
-  function hashToHexColor(hash) {
-    var color = '#';
-    for (var i = 0; i < 3;) {
-      color += ('00' + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2);
-    }
-    return color;
-  }
-
-  function stringToColor(str) {
-    var hash = strToHash(str);
-    var color = hashToHexColor(hash);
-    return color;
-  }
-
   function stopRepeater() {
     var repeater = $scope.repeater;
     if (angular.isDefined(repeater)) {
@@ -83,7 +61,6 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
 
         if (task.ServiceId === service.Id) {
           task.ServiceName = service.Name;
-          task.ServiceColor = stringToColor(task.ServiceId);
         }
       }
     }
