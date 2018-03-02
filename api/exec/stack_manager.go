@@ -28,13 +28,13 @@ func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []
 	for _, registry := range registries {
 		if registry.Authentication {
 			registryArgs := append(args, "login", "--username", registry.Username, "--password", registry.Password, registry.URL)
-			runCommandAndCaptureStdErr(command, registryArgs, nil)
+			runCommandAndCaptureStdErr(command, registryArgs, nil, "")
 		}
 	}
 
 	if dockerhub.Authentication {
 		dockerhubArgs := append(args, "login", "--username", dockerhub.Username, "--password", dockerhub.Password)
-		runCommandAndCaptureStdErr(command, dockerhubArgs, nil)
+		runCommandAndCaptureStdErr(command, dockerhubArgs, nil, "")
 	}
 }
 
@@ -42,7 +42,7 @@ func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []
 func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	args = append(args, "logout")
-	return runCommandAndCaptureStdErr(command, args, nil)
+	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
 
 // Deploy executes the docker stack deploy command.
@@ -61,20 +61,21 @@ func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint
 		env = append(env, envvar.Name+"="+envvar.Value)
 	}
 
-	return runCommandAndCaptureStdErr(command, args, env)
+	return runCommandAndCaptureStdErr(command, args, env, stack.ProjectPath)
 }
 
 // Remove executes the docker stack rm command.
 func (manager *StackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	args = append(args, "stack", "rm", stack.Name)
-	return runCommandAndCaptureStdErr(command, args, nil)
+	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
 
-func runCommandAndCaptureStdErr(command string, args []string, env []string) error {
+func runCommandAndCaptureStdErr(command string, args []string, env []string, workingDir string) error {
 	var stderr bytes.Buffer
 	cmd := exec.Command(command, args...)
 	cmd.Stderr = &stderr
+	cmd.Dir = workingDir
 
 	if env != nil {
 		cmd.Env = os.Environ()

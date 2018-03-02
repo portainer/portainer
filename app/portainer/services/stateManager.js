@@ -1,5 +1,6 @@
 angular.module('portainer.app')
-.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'ExtensionManager', 'APPLICATION_CACHE_VALIDITY', function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, ExtensionManager, APPLICATION_CACHE_VALIDITY) {
+.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY',
+function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY) {
   'use strict';
 
   var manager = {};
@@ -107,8 +108,23 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  manager.updateEndpointState = function(loading) {
+
+  function assignExtensions(endpointExtensions) {
+    var extensions = [];
+
+    for (var i = 0; i < endpointExtensions.length; i++) {
+      var extension = endpointExtensions[i];
+      if (extension.Type === 1) {
+        extensions.push('storidge');
+      }
+    }
+
+    return extensions;
+  }
+
+  manager.updateEndpointState = function(loading, extensions) {
     var deferred = $q.defer();
+
     if (loading) {
       state.loading = true;
     }
@@ -121,10 +137,7 @@ angular.module('portainer.app')
       var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
       state.endpoint.apiVersion = endpointAPIVersion;
-      return $q.when(endpointAPIVersion < 1.25 || ExtensionManager.extensions());
-    })
-    .then(function success(data) {
-      state.endpoint.extensions = data instanceof Array ? data : [];
+      state.endpoint.extensions = assignExtensions(extensions);
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();
     })

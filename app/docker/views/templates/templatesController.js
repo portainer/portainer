@@ -178,6 +178,12 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === 'bridge'; });
     }
 
+    if (selectedTemplate.Name) {
+      $scope.formValues.name = selectedTemplate.Name;
+    } else {
+      $scope.formValues.name = '';
+    }
+
     $anchorScroll('view-top');
   }
 

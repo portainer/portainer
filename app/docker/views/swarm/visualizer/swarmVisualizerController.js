@@ -52,7 +52,7 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
   }
 
 
-  function assignServiceName(services, tasks) {
+  function assignServiceInfo(services, tasks) {
     for (var i = 0; i < services.length; i++) {
       var service = services[i];
 
@@ -84,7 +84,7 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
   function prepareVisualizerData(nodes, services, tasks) {
     var visualizerData = {};
 
-    assignServiceName(services, tasks);
+    assignServiceInfo(services, tasks);
     assignTasksToNode(nodes, tasks);
 
     visualizerData.nodes = nodes;

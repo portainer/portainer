@@ -1,54 +1,10 @@
 <rd-header>
   <rd-header-title title="Service logs"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="docker.services">Services</a> > <a ui-sref="docker.services.service({id: service.ID})">{{ service.Spec.Name }}</a> > Logs
+    <a ui-sref="docker.services">Services</a> > <a ui-sref="docker.services.service({id: service.ID})">{{ service.Name }}</a> &gt; Logs
   </rd-header-content>
 </rd-header>
 
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="widget-icon grey pull-left">
-          <i class="fa fa-list-alt"></i>
-        </div>
-        <div class="title">{{ service.Spec.Name }}</div>
-        <div class="comment">Name</div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-info-circle" title="Stdout logs"></rd-widget-header>
-      <rd-widget-taskbar>
-        <input type="checkbox" ng-model="state.displayTimestampsOut" id="displayAllTsOut" ng-change="toggleTimestampsOut()"/>
-        <label for="displayAllTsOut">Display timestamps</label>
-      </rd-widget-taskbar>
-      <rd-widget-body classes="no-padding">
-        <div class="panel-body">
-          <pre id="stdoutLog" class="pre-scrollable pre-x-scrollable">{{stdout}}</pre>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-exclamation-triangle" title="Stderr logs"></rd-widget-header>
-      <rd-widget-taskbar>
-        <input type="checkbox" ng-model="state.displayTimestampsErr" id="displayAllTsErr" ng-change="toggleTimestampsErr()"/>
-        <label for="displayAllTsErr">Display timestamps</label>
-      </rd-widget-taskbar>
-      <rd-widget-body classes="no-padding">
-        <div class="panel-body">
-          <pre id="stderrLog" class="pre-scrollable pre-x-scrollable">{{stderr}}</pre>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
+<log-viewer
+  data="logs" ng-if="logs" log-collection-change="changeLogCollection"
+></log-viewer>

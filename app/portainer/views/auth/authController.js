@@ -18,7 +18,7 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     if (!endpointID) {
       EndpointProvider.setEndpointID(endpoint.Id);
     }
-    StateManager.updateEndpointState(true)
+    StateManager.updateEndpointState(true, endpoint.Extensions)
     .then(function success(data) {
       $state.go('docker.dashboard');
     })

@@ -73,7 +73,7 @@
             </tr>
             <tr>
               <td colspan="2">
-                <a ng-if="applicationState.endpoint.apiVersion >= 1.30" class="btn btn-primary btn-sm" type="button" ui-sref="docker.services.service.logs({id: service.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i>Service logs</a>
+                <a ng-if="applicationState.endpoint.apiVersion >= 1.30" class="btn btn-primary btn-sm" type="button" ui-sref="docker.services.service.logs({id: service.Id})"><i class="fa fa-file-text-o space-right" aria-hidden="true"></i>Service logs</a>
                 <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.updateInProgress || isUpdating" ng-click="forceUpdateService(service)" button-spinner="state.updateInProgress" ng-if="applicationState.endpoint.apiVersion >= 1.25">
                   <span ng-hide="state.updateInProgress"><i class="fa fa-refresh space-right" aria-hidden="true"></i>Update the service</span>
                   <span ng-show="state.updateInProgress">Update in progress...</span>

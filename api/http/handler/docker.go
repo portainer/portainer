@@ -35,24 +35,6 @@ func NewDockerHandler(bouncer *security.RequestBouncer) *DockerHandler {
 	return h
 }
 
-func (handler *DockerHandler) checkEndpointAccessControl(endpoint *portainer.Endpoint, userID portainer.UserID) bool {
-	for _, authorizedUserID := range endpoint.AuthorizedUsers {
-		if authorizedUserID == userID {
-			return true
-		}
-	}
-
-	memberships, _ := handler.TeamMembershipService.TeamMembershipsByUserID(userID)
-	for _, authorizedTeamID := range endpoint.AuthorizedTeams {
-		for _, membership := range memberships {
-			if membership.TeamID == authorizedTeamID {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -75,7 +57,14 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-	if tokenData.Role != portainer.AdministratorRole && !handler.checkEndpointAccessControl(endpoint, tokenData.ID) {
+
+	memberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if tokenData.Role != portainer.AdministratorRole && !security.AuthorizedEndpointAccess(endpoint, tokenData.ID, memberships) {
 		httperror.WriteErrorResponse(w, portainer.ErrEndpointAccessDenied, http.StatusForbidden, handler.Logger)
 		return
 	}
@@ -85,7 +74,7 @@ func (handler *DockerHandler) proxyRequestsToDockerAPI(w http.ResponseWriter, r 
 	if proxy == nil {
 		proxy, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
 		if err != nil {
-			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return
 		}
 	}

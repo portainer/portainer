@@ -35,5 +35,17 @@ angular.module('portainer.docker')
     return deferred.promise;
   };
 
+  service.logs = function(id, stdout, stderr, timestamps, tail) {
+    var parameters = {
+      id: id,
+      stdout: stdout || 0,
+      stderr: stderr || 0,
+      timestamps: timestamps || 0,
+      tail: tail || 'all'
+    };
+
+    return Task.logs(parameters).$promise;
+  };
+
   return service;
 }]);

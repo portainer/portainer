@@ -1,5 +1,6 @@
 function TemplateViewModel(data) {
   this.Type = data.type;
+  this.Name = data.name;
   this.Title = data.title;
   this.Description = data.description;
   this.Note = data.note;
@@ -45,5 +46,5 @@ function TemplateViewModel(data) {
       };
     });
   }
-  this.Hosts = data.hosts ? data.hosts : []; 
+  this.Hosts = data.hosts ? data.hosts : [];
 }

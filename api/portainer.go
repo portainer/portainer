@@ -171,13 +171,14 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
-		ID              EndpointID       `json:"Id"`
-		Name            string           `json:"Name"`
-		URL             string           `json:"URL"`
-		PublicURL       string           `json:"PublicURL"`
-		TLSConfig       TLSConfiguration `json:"TLSConfig"`
-		AuthorizedUsers []UserID         `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID         `json:"AuthorizedTeams"`
+		ID              EndpointID          `json:"Id"`
+		Name            string              `json:"Name"`
+		URL             string              `json:"URL"`
+		PublicURL       string              `json:"PublicURL"`
+		TLSConfig       TLSConfiguration    `json:"TLSConfig"`
+		AuthorizedUsers []UserID            `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID            `json:"AuthorizedTeams"`
+		Extensions      []EndpointExtension `json:"Extensions"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -186,6 +187,16 @@ type (
 		TLSCertPath   string `json:"TLSCert,omitempty"`
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
+
+	// EndpointExtension represents a extension associated to an endpoint.
+	EndpointExtension struct {
+		Type EndpointExtensionType `json:"Type"`
+		URL  string                `json:"URL"`
+	}
+
+	// EndpointExtensionType represents the type of an endpoint extension. Only
+	// one extension of each type can be associated to an endpoint.
+	EndpointExtensionType int
 
 	// ResourceControlID represents a resource control identifier.
 	ResourceControlID int
@@ -389,9 +400,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.16.2"
+	APIVersion = "1.16.3"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 7
+	DBVersion = 8
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 )
@@ -451,4 +462,10 @@ const (
 	StackResourceControl
 	// ConfigResourceControl represents a resource control associated to a Docker config
 	ConfigResourceControl
+)
+
+const (
+	_ EndpointExtensionType = iota
+	// StoridgeEndpointExtension represents the Storidge extension
+	StoridgeEndpointExtension
 )

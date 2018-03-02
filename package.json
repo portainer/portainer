@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.16.2",
+  "version": "1.16.3",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -25,6 +25,7 @@
   "dependencies": {
     "@uirouter/angularjs": "~1.0.6",
     "angular": "~1.5.0",
+    "angular-clipboard": "^1.6.2",
     "angular-cookies": "~1.5.0",
     "angular-google-analytics": "github:revolunet/angular-google-analytics#~1.1.9",
     "angular-json-tree": "1.0.1",
@@ -37,6 +38,7 @@
     "angular-sanitize": "~1.5.0",
     "angular-ui-bootstrap": "~2.5.0",
     "angular-utils-pagination": "~0.11.1",
+    "angularjs-scroll-glue": "^2.2.0",
     "angularjs-slider": "^6.4.0",
     "bootbox": "^4.4.0",
     "bootstrap": "~3.3.6",

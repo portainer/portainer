@@ -179,6 +179,17 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+  var imageBuild = {
+    name: 'docker.images.build',
+    url: '/build',
+    views: {
+      'content@': {
+        templateUrl: 'app/docker/views/images/build/buildimage.html',
+        controller: 'BuildImageController'
+      }
+    }
+  };
+
   var networks = {
     name: 'docker.networks',
     url: '/networks',
@@ -378,6 +389,17 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+  var taskLogs = {
+    name: 'docker.tasks.task.logs',
+    url: '/logs',
+    views: {
+      'content@': {
+        templateUrl: 'app/docker/views/tasks/logs/tasklogs.html',
+        controller: 'TaskLogsController'
+      }
+    }
+  };
+
   var templates = {
     name: 'docker.templates',
     url: '/templates',
@@ -457,6 +479,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(events);
   $stateRegistryProvider.register(images);
   $stateRegistryProvider.register(image);
+  $stateRegistryProvider.register(imageBuild);
   $stateRegistryProvider.register(networks);
   $stateRegistryProvider.register(network);
   $stateRegistryProvider.register(networkCreation);
@@ -476,6 +499,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(swarmVisualizer);
   $stateRegistryProvider.register(tasks);
   $stateRegistryProvider.register(task);
+  $stateRegistryProvider.register(taskLogs);
   $stateRegistryProvider.register(templates);
   $stateRegistryProvider.register(templatesLinuxServer);
   $stateRegistryProvider.register(volumes);

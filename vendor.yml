@@ -17,6 +17,7 @@ js:
   - node_modules/codemirror/mode/yaml/yaml.js
   - node_modules/codemirror/addon/lint/lint.js
   - node_modules/codemirror/addon/lint/yaml-lint.js
+  - node_modules/codemirror/addon/display/placeholder.js
   minified:
   - node_modules/jquery/dist/jquery.min.js
   - node_modules/bootstrap/dist/js/bootstrap.min.js
@@ -34,6 +35,7 @@ js:
   - node_modules/codemirror/mode/yaml/yaml.js
   - node_modules/codemirror/addon/lint/lint.js
   - node_modules/codemirror/addon/lint/yaml-lint.js
+  - node_modules/codemirror/addon/display/placeholder.js
 css:
   regular:
   - node_modules/bootstrap/dist/css/bootstrap.css
@@ -80,6 +82,8 @@ angular:
   - node_modules/isteven-angular-multiselect/isteven-multi-select.js
   - node_modules/angular-json-tree/dist/angular-json-tree.js
   - node_modules/angular-loading-bar/build/loading-bar.js
+  - node_modules/angularjs-scroll-glue/src/scrollglue.js
+  - node_modules/angular-clipboard/angular-clipboard.js
   minified:
   - node_modules/angular/angular.min.js
   - node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js
@@ -98,3 +102,5 @@ angular:
   - node_modules/isteven-angular-multiselect/isteven-multi-select.js
   - node_modules/angular-json-tree/dist/angular-json-tree.min.js
   - node_modules/angular-loading-bar/build/loading-bar.min.js
+  - node_modules/angularjs-scroll-glue/src/scrollglue.js
+  - node_modules/angular-clipboard/angular-clipboard.js

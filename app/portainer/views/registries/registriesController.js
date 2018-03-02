@@ -6,8 +6,13 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
     actionInProgress: false
   };
 
+  $scope.formValues = {
+    dockerHubPassword: ''
+  };
+
   $scope.updateDockerHub = function() {
     var dockerhub = $scope.dockerhub;
+    dockerhub.Password = $scope.formValues.dockerHubPassword;
     $scope.state.actionInProgress = true;
     DockerHubService.update(dockerhub)
     .then(function success(data) {

@@ -10,6 +10,7 @@ angular.module('portainer.docker').component('tasksDatatable', {
     reverseOrder: '<',
     nodes: '<',
     showTextFilter: '<',
-    showSlotColumn: '<'
+    showSlotColumn: '<',
+    showLogsButton: '<'
   }
 });
