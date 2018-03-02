@@ -6,8 +6,13 @@ function ($scope, $state, $transition$, $filter, RegistryService, Notifications)
     actionInProgress: false
   };
 
+  $scope.formValues = {
+    Password: ''
+  };
+
   $scope.updateRegistry = function() {
     var registry = $scope.registry;
+    registry.Password = $scope.formValues.Password;
     $scope.state.actionInProgress = true;
     RegistryService.updateRegistry(registry)
     .then(function success(data) {

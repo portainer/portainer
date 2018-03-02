@@ -3,11 +3,17 @@ angular.module('portainer.app')
 function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, PaginationService) {
 
   $scope.state = {
-    actionInProgress: false
+    actionInProgress: false,
+    updateCredentials: false
+  };
+
+  $scope.formValues = {
+    dockerHubPassword: ''
   };
 
   $scope.updateDockerHub = function() {
     var dockerhub = $scope.dockerhub;
+    dockerhub.Password = $scope.formValues.dockerHubPassword;
     $scope.state.actionInProgress = true;
     DockerHubService.update(dockerhub)
     .then(function success(data) {
