@@ -56,7 +56,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.16.2"
+  version: "1.16.3"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -2143,7 +2143,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.16.2"
+        example: "1.16.3"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
