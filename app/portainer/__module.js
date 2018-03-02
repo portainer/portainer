@@ -203,7 +203,7 @@ angular.module('portainer.app', [])
     url: '/digest/:digestid?repository',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/registries/digest/registryDigest.html',
+        templateUrl: 'app/portainer/views/registries/tags/registryDigest.html',
         controller: 'RegistryBrowseTagsController'
       }
     }

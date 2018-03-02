@@ -5,12 +5,14 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
   $scope.state = {};
   $scope.tags = [];
   $scope.digests = [];
+  $scope.digest = null;
 
   var blobs = [];
   var blobSizes = {};
 
   var registryID = $transition$.params().id;
   var repository = $transition$.params().repository;
+  var digestID = $transition$.params().digestid;
 
   // Store info in tags and blobs arrays
   function storeManifests(allManifests) {
@@ -63,7 +65,7 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
         if (digestsObj[tag.Digest]) {
           digestsObj[tag.Digest].TagList.push(tag.TagName);
         } else {
-          digestsObj[tag.Digest] = {'RepositoryName': tag.RepositoryName, 'Digest': tag.Digest, 'TagList': [tag.TagName], 'LayersCount': tag.LayersCount, 'TotalSize': tag.TotalSize}
+          digestsObj[tag.Digest] = {'RepositoryName': tag.RepositoryName, 'Digest': tag.Digest, 'TagList': [tag.TagName], 'LayersCount': tag.LayersCount, 'TotalSize': tag.TotalSize, 'History': tag.History};
         }
       }
     }
@@ -107,7 +109,8 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
           // Reorganize by digest
           storeDigests();
 
-          console.log($scope.digests);
+          // Store selected digest
+          storeSelectedDigest();
 
         });
 
@@ -160,6 +163,25 @@ function ($q, $scope, $transition$, RegistryService, Notifications, ModalService
       });
     }
   }
+
+  function storeSelectedDigest() {
+    if (digestID) {
+      for (var d in $scope.digests) {
+        if ({}.hasOwnProperty.call($scope.digests, d)) {
+          if ($scope.digests[d].Digest === digestID) {
+            $scope.digest = $scope.digests[d];
+          }
+        }
+      }
+      console.log($scope.digest);
+    }
+  }
+
+  $scope.toggleLayerCommand = function(layerId) {
+    $('#layer-command-expander'+layerId+' span').toggleClass('glyphicon-plus-sign glyphicon-minus-sign');
+    $('#layer-command-'+layerId+'-short').toggle();
+    $('#layer-command-'+layerId+'-full').toggle();
+  };
 
   function initView() {
     $scope.tags = [];

@@ -1,0 +1,89 @@
+<rd-header>
+  <rd-header-title title="Repository Digest"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry.browse({id: registry.Id})">{{ registry.Name }}</a> &gt; <a ui-sref="portainer.registries.registry.tags({id: registry.Id, repository: repository})">{{ repository }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title="Digest details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>ID</td>
+              <td>
+                {{ digest.Digest }}
+              </td>
+            </tr>
+            <tr>
+              <td>Repository</td>
+              <td>
+                {{ digest.RepositoryName }}
+              </td>
+            </tr>
+            <tr>
+              <td>Size</td>
+              <td>{{ digest.TotalSize|humansize }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="digest.TagList.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title="Tags"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table id="digest-tags" class="table">
+          <tbody>
+            <tr ng-repeat="tag in digest.TagList">
+              <td>{{ tag }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="digest.History.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title="History"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table id="digest-history" class="table">
+          <tbody>
+            <tr ng-repeat="cmd in digest.History">
+              <td class="expand">
+                <div ng-if="cmd.length > 130">
+                  <span id="layer-command-{{$index}}-full" style="display: none">
+                    {{ cmd | imagelayercommand }}
+                  </span>
+                  <span id="layer-command-{{$index}}-short">
+                    {{ cmd | imagelayercommand | truncate:130 }}
+                    <span ng-if="cmd.length > 130" style="margin-left: 5px;">
+                      <a id="layer-command-expander{{$index}}" class="btn" ng-click='toggleLayerCommand($index)'>
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                      </a>
+                    </span>
+                  </span>
+                </div>
+                <div ng-if="cmd.length <= 130">
+                  <span id="layer-command-{{$index}}-full">
+                    {{ cmd | imagelayercommand }}
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
