@@ -3,8 +3,7 @@ angular.module('portainer.app')
 function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, PaginationService) {
 
   $scope.state = {
-    actionInProgress: false,
-    updateCredentials: false
+    actionInProgress: false
   };
 
   $scope.formValues = {
