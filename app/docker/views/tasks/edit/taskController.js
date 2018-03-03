@@ -1,16 +1,16 @@
 angular.module('portainer.docker')
-.controller('TaskController', ['$scope', '$transition$', 'TaskService', 'Service', 'Notifications',
-function ($scope, $transition$, TaskService, Service, Notifications) {
+.controller('TaskController', ['$scope', '$transition$', 'TaskService', 'ServiceService', 'Notifications',
+function ($scope, $transition$, TaskService, ServiceService, Notifications) {
 
   function initView() {
     TaskService.task($transition$.params().id)
     .then(function success(data) {
       var task = data;
       $scope.task = task;
-      return Service.get({ id: task.ServiceId }).$promise;
+      return ServiceService.service(task.ServiceId);
     })
     .then(function success(data) {
-      var service = new ServiceViewModel(data);
+      var service = data;
       $scope.service = service;
     })
     .catch(function error(err) {

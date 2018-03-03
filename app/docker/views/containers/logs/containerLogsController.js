@@ -1,70 +1,71 @@
 angular.module('portainer.docker')
-.controller('ContainerLogsController', ['$scope', '$transition$', '$anchorScroll', 'ContainerLogs', 'Container', 'Notifications',
-function ($scope, $transition$, $anchorScroll, ContainerLogs, Container, Notifications) {
-  $scope.state = {};
-  $scope.state.displayTimestampsOut = false;
-  $scope.state.displayTimestampsErr = false;
-  $scope.stdout = '';
-  $scope.stderr = '';
-  $scope.tailLines = 2000;
+.controller('ContainerLogsController', ['$scope', '$transition$', '$interval', 'ContainerService', 'Notifications',
+function ($scope, $transition$, $interval, ContainerService, Notifications) {
+  $scope.state = {
+    refreshRate: 3,
+    lineCount: 2000
+  };
 
-  Container.get({id: $transition$.params().id}, function (d) {
-    $scope.container = d;
-  }, function (e) {
-    Notifications.error('Failure', e, 'Unable to retrieve container info');
+  $scope.changeLogCollection = function(logCollectionStatus) {
+    if (!logCollectionStatus) {
+      stopRepeater();
+    } else {
+      setUpdateRepeater();
+    }
+  };
+
+  $scope.$on('$destroy', function() {
+    stopRepeater();
   });
 
-  function getLogs() {
-    getLogsStdout();
-    getLogsStderr();
+  function stopRepeater() {
+    var repeater = $scope.repeater;
+    if (angular.isDefined(repeater)) {
+      $interval.cancel(repeater);
+      repeater = null;
+    }
   }
 
-  function getLogsStderr() {
-    ContainerLogs.get($transition$.params().id, {
-      stdout: 0,
-      stderr: 1,
-      timestamps: $scope.state.displayTimestampsErr,
-      tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-      // Replace carriage returns with newlines to clean up output
-      data = data.replace(/[\r]/g, '\n');
-      // Strip 8 byte header from each line of output
-      data = data.substring(8);
-      data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stderr = data;
+  function update(logs) {
+    $scope.logs = logs;
+  }
+
+  function setUpdateRepeater() {
+    var refreshRate = $scope.state.refreshRate;
+    $scope.repeater = $interval(function() {
+      ContainerService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
+      .then(function success(data) {
+        $scope.logs = data;
+      })
+      .catch(function error(err) {
+        stopRepeater();
+        Notifications.error('Failure', err, 'Unable to retrieve container logs');
+      });
+    }, refreshRate * 1000);
+  }
+
+  function startLogPolling() {
+    ContainerService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
+    .then(function success(data) {
+      $scope.logs = data;
+      setUpdateRepeater();
+    })
+    .catch(function error(err) {
+      stopRepeater();
+      Notifications.error('Failure', err, 'Unable to retrieve container logs');
     });
   }
 
-  function getLogsStdout() {
-    ContainerLogs.get($transition$.params().id, {
-      stdout: 1,
-      stderr: 0,
-      timestamps: $scope.state.displayTimestampsOut,
-      tail: $scope.tailLines
-    }, function (data, status, headers, config) {
-      // Replace carriage returns with newlines to clean up output
-      data = data.replace(/[\r]/g, '\n');
-      // Strip 8 byte header from each line of output
-      data = data.substring(8);
-      data = data.replace(/\n(.{8})/g, '\n');
-      $scope.stdout = data;
+  function initView() {
+    ContainerService.container($transition$.params().id)
+    .then(function success(data) {
+      $scope.container = data;
+      startLogPolling();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve container information');
     });
   }
 
-  // initial call
-  getLogs();
-  var logIntervalId = window.setInterval(getLogs, 5000);
-
-  $scope.$on('$destroy', function () {
-    // clearing interval when view changes
-    clearInterval(logIntervalId);
-  });
-
-  $scope.toggleTimestampsOut = function () {
-    getLogsStdout();
-  };
-
-  $scope.toggleTimestampsErr = function () {
-    getLogsStderr();
-  };
+  initView();
 }]);

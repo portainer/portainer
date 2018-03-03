@@ -195,10 +195,10 @@
               </td>
               <td ng-if="$ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect">
                 <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:inline-flex;">
-                  <a ng-if="$ctrl.settings.showQuickActionStats" style="margin: 0 2.5px;" ui-sref="docker.containers.container.stats({id: item.Id})"><i class="fa fa-area-chart space-right" aria-hidden="true"></i></a>
-                  <a ng-if="$ctrl.settings.showQuickActionLogs" style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({id: item.Id})"><i class="fa fa-exclamation-circle space-right" aria-hidden="true"></i></a>
-                  <a ng-if="$ctrl.settings.showQuickActionConsole" style="margin: 0 2.5px;" ui-sref="docker.containers.container.console({id: item.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
-                  <a ng-if="$ctrl.settings.showQuickActionInspect" style="margin: 0 2.5px;" ui-sref="docker.containers.container.inspect({id: item.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionStats" style="margin: 0 2.5px;" ui-sref="docker.containers.container.stats({id: item.Id})" title="Stats"><i class="fa fa-area-chart space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionLogs" style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({id: item.Id})" title="Logs"><i class="fa fa-file-text-o space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionConsole" style="margin: 0 2.5px;" ui-sref="docker.containers.container.console({id: item.Id})" title="Console"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionInspect" style="margin: 0 2.5px;" ui-sref="docker.containers.container.inspect({id: item.Id})" title="Inspect"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
                 </div>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>

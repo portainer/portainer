@@ -13,6 +13,11 @@ angular.module('portainer.docker')
     kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
     pause: {method: 'POST', params: {id: '@id', action: 'pause'}},
     unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
+    logs: {
+      method: 'GET', params: { id: '@id', action: 'logs' },
+      timeout: 4500, ignoreLoadingBar: true,
+      transformResponse: logsHandler, isArray: true
+    },
     stats: {
       method: 'GET', params: { id: '@id', stream: false, action: 'stats' },
       timeout: 4500, ignoreLoadingBar: true

@@ -31,7 +31,7 @@
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
               <div>
-                <input type="radio" id="method_editor" ng-model="state.Method" value="editor" ng-click="toggleEditor(state.Method)">
+                <input type="radio" id="method_editor" ng-model="state.Method" value="editor">
                 <label for="method_editor">
                   <div class="boxselector_header">
                     <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -41,7 +41,7 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="method_upload" ng-model="state.Method" value="upload" ng-click="saveEditorContent()">
+                <input type="radio" id="method_upload" ng-model="state.Method" value="upload">
                 <label for="method_upload">
                   <div class="boxselector_header">
                     <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -51,7 +51,7 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="method_repository" ng-model="state.Method" value="repository" ng-click="saveEditorContent()">
+                <input type="radio" id="method_repository" ng-model="state.Method" value="repository">
                 <label for="method_repository">
                   <div class="boxselector_header">
                     <i class="fa fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -64,7 +64,7 @@
           </div>
           <!-- !build-method -->
           <!-- web-editor -->
-          <div ng-if="state.Method === 'editor'">
+          <div ng-show="state.Method === 'editor'">
             <div class="col-sm-12 form-section-title">
               Web editor
             </div>
@@ -75,13 +75,18 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <textarea id="web-editor" class="form-control" ng-model="formValues.StackFileContent" placeholder='version: "3"'></textarea>
+                <code-editor
+                  identifier="stack-creation-editor"
+                  placeholder="# Define or paste the content of your docker-compose file here"
+                  yml="true"
+                  on-change="editorUpdate"
+                ></code-editor>
               </div>
             </div>
           </div>
           <!-- !web-editor -->
           <!-- upload -->
-          <div ng-if="state.Method === 'upload'">
+          <div ng-show="state.Method === 'upload'">
             <div class="col-sm-12 form-section-title">
               Upload
             </div>
@@ -102,7 +107,7 @@
           </div>
           <!-- !upload -->
           <!-- repository -->
-          <div ng-if="state.Method === 'repository'">
+          <div ng-show="state.Method === 'repository'">
             <div class="col-sm-12 form-section-title">
               Git repository
             </div>
@@ -167,7 +172,7 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || (state.Method === 'editor' && !formValues.StackFileContent)
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress
               || (state.Method === 'upload' && !formValues.StackFile)
               || (state.Method === 'repository' && (!formValues.RepositoryURL || !formValues.RepositoryPath))
               || !formValues.Name" ng-click="deployStack()" button-spinner="state.actionInProgress">

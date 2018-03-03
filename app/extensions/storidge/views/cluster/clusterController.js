@@ -1,6 +1,6 @@
 angular.module('extension.storidge')
-.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'StoridgeClusterService', 'StoridgeNodeService', 'StoridgeManager', 'ModalService',
-function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNodeService, StoridgeManager, ModalService) {
+.controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'StoridgeClusterService', 'StoridgeNodeService', 'ModalService',
+function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNodeService, ModalService) {
 
   $scope.state = {
     shutdownInProgress: false,
@@ -44,30 +44,20 @@ function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNod
   function shutdownCluster() {
     $scope.state.shutdownInProgress = true;
     StoridgeClusterService.shutdown()
-    .then(function success(data) {
-      Notifications.success('Cluster successfully shutdown');
-      $state.go('docker.dashboard');
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to shutdown cluster');
-    })
     .finally(function final() {
       $scope.state.shutdownInProgress = false;
+      Notifications.success('Cluster successfully shutdown');
+      $state.go('docker.dashboard');
     });
   }
 
   function rebootCluster() {
     $scope.state.rebootInProgress = true;
     StoridgeClusterService.reboot()
-    .then(function success(data) {
-      Notifications.success('Cluster successfully rebooted');
-      $state.reload();
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to reboot cluster');
-    })
     .finally(function final() {
       $scope.state.rebootInProgress = false;
+      Notifications.success('Cluster successfully rebooted');
+      $state.reload();
     });
   }
 
@@ -87,11 +77,5 @@ function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNod
     });
   }
 
-  StoridgeManager.init()
-  .then(function success() {
-    initView();
-  })
-  .catch(function error(err) {
-    Notifications.error('Failure', err, 'Unable to communicate with Storidge API');
-  });
+  initView();
 }]);

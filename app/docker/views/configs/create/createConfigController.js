@@ -1,11 +1,12 @@
 angular.module('portainer.docker')
-.controller('CreateConfigController', ['$scope', '$state', '$document', 'Notifications', 'ConfigService', 'Authentication', 'FormValidator', 'ResourceControlService', 'CodeMirrorService',
-function ($scope, $state, $document, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService, CodeMirrorService) {
+.controller('CreateConfigController', ['$scope', '$state', 'Notifications', 'ConfigService', 'Authentication', 'FormValidator', 'ResourceControlService',
+function ($scope, $state, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
 
   $scope.formValues = {
     Name: '',
     Labels: [],
-    AccessControlData: new AccessControlFormData()
+    AccessControlData: new AccessControlFormData(),
+    ConfigContent: ''
   };
 
   $scope.state = {
@@ -31,9 +32,7 @@ function ($scope, $state, $document, Notifications, ConfigService, Authenticatio
   }
 
   function prepareConfigData(config) {
-    // The codemirror editor does not work with ng-model so we need to retrieve
-    // the value directly from the editor.
-    var configData = $scope.editor.getValue();
+    var configData = $scope.formValues.ConfigContent;
     config.Data = btoa(unescape(encodeURIComponent(configData)));
   }
 
@@ -62,6 +61,11 @@ function ($scope, $state, $document, Notifications, ConfigService, Authenticatio
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1;
 
+    if ($scope.formValues.ConfigContent === '') {
+      $scope.state.formValidationError = 'Config content must not be empty';
+      return;
+    }
+
     if (!validateForm(accessControlData, isAdmin)) {
       return;
     }
@@ -83,14 +87,7 @@ function ($scope, $state, $document, Notifications, ConfigService, Authenticatio
     });
   };
 
-  function initView() {
-    $document.ready(function() {
-      var webEditorElement = $document[0].getElementById('config-editor', false);
-      if (webEditorElement) {
-        $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement, false, false);
-      }
-    });
-  }
-
-  initView();
+  $scope.editorUpdate = function(cm) {
+    $scope.formValues.ConfigContent = cm.getValue();
+  };
 }]);

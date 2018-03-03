@@ -7,7 +7,7 @@ angular.module('portainer.docker')
   },
   {
     info: { method: 'GET', params: { action: 'info' }, ignoreLoadingBar: true },
-    version: { method: 'GET', params: { action: 'version' }, ignoreLoadingBar: true },
+    version: { method: 'GET', params: { action: 'version' }, ignoreLoadingBar: true, timeout: 4500 },
     events: {
       method: 'GET', params: { action: 'events', since: '@since', until: '@until' },
       isArray: true, transformResponse: jsonObjectsToArrayHandler

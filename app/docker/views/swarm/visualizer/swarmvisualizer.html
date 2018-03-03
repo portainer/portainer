@@ -97,7 +97,7 @@
               <div><span class="label label-{{ node.Status | nodestatusbadge }}">{{ node.Status }}</span></div>
             </div>
             <div class="tasks">
-              <div class="task task_{{ task.Status.State | visualizerTask }}" ng-repeat="task in node.Tasks | filter: (state.DisplayOnlyRunningTasks || '') && { Status: { State: 'running' } }">
+              <div class="task task_{{ task.Status.State | visualizerTask }}" style="border: 2px solid {{ task.ServiceId | visualizerTaskBorderColor }}" ng-repeat="task in node.Tasks | filter: (state.DisplayOnlyRunningTasks || '') && { Status: { State: 'running' } }">
                 <div class="service_name">{{ task.ServiceName }}</div>
                 <div>Image: {{ task.Spec.ContainerSpec.Image | hideshasum }}</div>
                 <div>Status: {{ task.Status.State }}</div>

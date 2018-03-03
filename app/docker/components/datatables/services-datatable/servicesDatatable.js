@@ -12,7 +12,7 @@ angular.module('portainer.docker').component('servicesDatatable', {
     showOwnershipColumn: '<',
     removeAction: '<',
     scaleAction: '<',
-    swarmManagerIp: '<',
+    publicUrl: '<',
     forceUpdateAction: '<',
     showForceUpdateButton: '<'
   }

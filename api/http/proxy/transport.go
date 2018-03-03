@@ -27,6 +27,7 @@ type (
 		labelBlackList   []portainer.Pair
 	}
 	restrictedOperationRequest func(*http.Request, *http.Response, *operationExecutor) error
+	operationRequest           func(*http.Request) error
 )
 
 func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error) {
@@ -59,6 +60,8 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxyNodeRequest(request)
 	case strings.HasPrefix(path, "/tasks"):
 		return p.proxyTaskRequest(request)
+	case strings.HasPrefix(path, "/build"):
+		return p.proxyBuildRequest(request)
 	default:
 		return p.executeDockerRequest(request)
 	}
@@ -228,6 +231,10 @@ func (p *proxyTransport) proxyTaskRequest(request *http.Request) (*http.Response
 	}
 }
 
+func (p *proxyTransport) proxyBuildRequest(request *http.Request) (*http.Response, error) {
+	return p.interceptAndRewriteRequest(request, buildOperation)
+}
+
 // restrictedOperation ensures that the current user has the required authorizations
 // before executing the original request.
 func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID string) (*http.Response, error) {
@@ -298,6 +305,15 @@ func (p *proxyTransport) rewriteOperation(request *http.Request, operation restr
 	}
 
 	return p.executeRequestAndRewriteResponse(request, operation, executor)
+}
+
+func (p *proxyTransport) interceptAndRewriteRequest(request *http.Request, operation operationRequest) (*http.Response, error) {
+	err := operation(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.executeDockerRequest(request)
 }
 
 func (p *proxyTransport) executeRequestAndRewriteResponse(request *http.Request, operation restrictedOperationRequest, executor *operationExecutor) (*http.Response, error) {

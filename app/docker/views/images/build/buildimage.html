@@ -1,0 +1,231 @@
+<rd-header>
+  <rd-header-title title="Build image"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.images">Images</a> &gt; Build image
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <uib-tabset active="state.activeTab">
+          <uib-tab index="0">
+            <uib-tab-heading>
+              <i class="fa fa-wrench space-right" aria-hidden="true"></i> Builder
+            </uib-tab-heading>
+            <form class="form-horizontal">
+              <div class="col-sm-12 form-section-title">
+                Naming
+              </div>
+              <!-- names -->
+              <div class="form-group">
+                <span class="col-sm-12 text-muted small">
+                  You can specify multiple names to your image.
+                </span>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <label class="control-label text-left">Names</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addImageName()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add additional name
+                  </span>
+                </div>
+              </div>
+              <!-- !names -->
+              <div class="form-group" ng-if="formValues.ImageNames.length === 0">
+                <span class="col-sm-12 text-danger small">
+                  <i class="fa fa-exclamation-triangle space-right" aria-hidden="true"></i>You must specify at least one name for the image.
+                </span>
+              </div>
+              <!-- name-input-list -->
+              <div ng-if="formValues.ImageNames.length > 0">
+                <div class="form-group">
+                  <span class="col-sm-12 text-muted small">
+                    A name must be specified in one of the following formats: <code>name:tag</code>, <code>repository/name:tag</code> or <code>registryfqdn:port/repository/name:tag</code> format. If you omit the tag the default <b>latest</b> value is assumed.
+                  </span>
+                </div>
+                <div class="form-group" >
+                  <div class="col-sm-12">
+                    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                      <div ng-repeat="item in formValues.ImageNames track by $index" style="margin-top: 2px;">
+                        <!-- name-input -->
+                        <div class="input-group col-sm-5 input-group-sm">
+                          <span class="input-group-addon">name</span>
+                          <input type="text" class="form-control" ng-model="item.Name" placeholder="e.g. myImage:myTag" auto-focus>
+                          <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[item.Name !== '']" aria-hidden="true"></i></span>
+                        </div>
+                        <!-- !name-input -->
+                        <!-- actions -->
+                        <div class="input-group col-sm-2 input-group-sm">
+                          <button class="btn btn-sm btn-danger" type="button" ng-click="removeImageName($index)">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <!-- !actions -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- !name-input-list -->
+              <!-- build-method -->
+              <div class="col-sm-12 form-section-title">
+                Build method
+              </div>
+              <div class="form-group"></div>
+              <div class="form-group" style="margin-bottom: 0">
+                <div class="boxselector_wrapper">
+                  <div>
+                    <input type="radio" id="method_editor" ng-model="state.BuildType" value="editor" ng-click="toggleEditor()">
+                    <label for="method_editor">
+                      <div class="boxselector_header">
+                        <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Web editor
+                      </div>
+                      <p>Use our Web editor</p>
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" id="method_upload" ng-model="state.BuildType" value="upload" ng-click="saveEditorContent()">
+                    <label for="method_upload">
+                      <div class="boxselector_header">
+                        <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Upload
+                      </div>
+                      <p>Upload a tarball or a Dockerfile from your computer</p>
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" id="method_url" ng-model="state.BuildType" value="url" ng-click="saveEditorContent()">
+                    <label for="method_url">
+                      <div class="boxselector_header">
+                        <i class="fa fa-globe" aria-hidden="true" style="margin-right: 2px;"></i>
+                        URL
+                      </div>
+                      <p>Specify an URL to a file</p>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <!-- !build-method -->
+              <!-- web-editor -->
+              <div ng-show="state.BuildType === 'editor'">
+                <div class="col-sm-12 form-section-title">
+                  Web editor
+                </div>
+                <div class="form-group">
+                  <span class="col-sm-12 text-muted small">
+                    You can get more information about Dockerfile format in the <a href="https://docs.docker.com/engine/reference/builder/" target="_blank">official documentation</a>.
+                  </span>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <code-editor
+                      identifier="image-build-editor"
+                      placeholder="Define or paste the content of your Dockerfile here"
+                      yml="false"
+                      on-change="editorUpdate"
+                    ></code-editor>
+                  </div>
+                </div>
+              </div>
+              <!-- !web-editor -->
+              <!-- upload -->
+              <div ng-show="state.BuildType === 'upload'">
+                <div class="col-sm-12 form-section-title">
+                  Upload
+                </div>
+                <div class="form-group">
+                  <span class="col-sm-12 text-muted small">
+                    You can upload a Dockerfile or a tar archive containing a Dockerfile from your computer. When using an tarball, the root folder will be used as the build context.
+                  </span>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.UploadFile">Select file</button>
+                    <span style="margin-left: 5px;">
+                      {{ formValues.UploadFile.name }}
+                      <i class="fa fa-times red-icon" ng-if="!formValues.UploadFile" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                </div>
+                <div ng-if="formValues.UploadFile.type === 'application/gzip' || formValues.UploadFile.type === 'application/x-tar'">
+                  <div class="form-group">
+                    <span class="col-sm-12 text-muted small">
+                      Indicate the path to the Dockerfile within the tarball.
+                    </span>
+                  </div>
+                  <div class="form-group">
+                    <label for="image_path" class="col-sm-2 control-label text-left">Dockerfile path</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-model="formValues.Path" id="image_path" placeholder="Dockerfile">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- !upload -->
+              <!-- url -->
+              <div ng-show="state.BuildType === 'url'">
+                <div class="col-sm-12 form-section-title">
+                  URL
+                </div>
+                <div class="form-group">
+                  <span class="col-sm-12 text-muted small">
+                    Specify the URL to a Dockerfile, a tarball or a public Git repository (suffixed by <b>.git</b>). When using a tarball or a Git repository URL, the root folder will be used as the build context.
+                  </span>
+                </div>
+                <div class="form-group">
+                  <label for="image_url" class="col-sm-2 control-label text-left">URL</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" ng-model="formValues.URL" id="image_url" placeholder="https://myhost.mydomain/myimage.tar.gz">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <span class="col-sm-12 text-muted small">
+                    Indicate the path to the Dockerfile within the tarball/repository (ignored when using a Dockerfile).
+                  </span>
+                </div>
+                <div class="form-group">
+                  <label for="image_path" class="col-sm-2 control-label text-left">Dockerfile path</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" ng-model="formValues.Path" id="image_path" placeholder="Dockerfile">
+                  </div>
+                </div>
+              </div>
+              <!-- !url -->
+              <!-- actions -->
+              <div class="col-sm-12 form-section-title">
+                Actions
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <button type="button" class="btn btn-primary btn-sm"
+                    ng-disabled="state.actionInProgress
+                    || (state.BuildType === 'upload' && (!formValues.UploadFile || !formValues.Path))
+                    || (state.BuildType === 'url' && (!formValues.URL || !formValues.Path))
+                    || (formValues.ImageNames.length === 0 || !validImageNames())"
+                    ng-click="buildImage()" button-spinner="state.actionInProgress">
+                    <span ng-hide="state.actionInProgress">Build the image</span>
+                    <span ng-show="state.actionInProgress">Image building in progress...</span>
+                  </button>
+                  <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+                </div>
+              </div>
+              <!-- !actions -->
+            </form>
+          </uib-tab>
+          <uib-tab index="1" disable="!buildLogs">
+            <uib-tab-heading>
+              <i class="fa fa-file-text space-right" aria-hidden="true"></i> Output
+            </uib-tab-heading>
+            <pre class="log_viewer">
+              <div ng-repeat="line in buildLogs track by $index" class="line"><p class="inner_line" ng-click="active=!active" ng-class="{'line_selected': active}">{{ line }}</p></div>
+              <div ng-if="!buildLogs.length" class="line"><p class="inner_line">No build output available.</p></div>
+            </pre>
+          </uib-tab>
+        </uib-tabset>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

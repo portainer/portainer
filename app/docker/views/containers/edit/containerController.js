@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
-function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService) {
+.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
+function ($q, $scope, $state, $transition$, $filter, Container, Commit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
 
@@ -80,7 +80,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;
     var imageConfig = ImageHelper.createImageConfigForCommit(image, registry.URL);
-    ContainerCommit.commit({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
+    Commit.commitContainer({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
       update();
       Notifications.success('Container commited', $transition$.params().id);
     }, function (e) {

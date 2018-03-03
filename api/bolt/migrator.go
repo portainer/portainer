@@ -89,6 +89,13 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	if m.CurrentDBVersion < 8 {
+		err := m.updateEndpointsToVersion8()
+		if err != nil {
+			return err
+		}
+	}
+
 	err := m.VersionService.StoreDBVersion(portainer.DBVersion)
 	if err != nil {
 		return err
