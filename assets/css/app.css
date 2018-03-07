@@ -661,28 +661,24 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 }
 
 .visualizer_container .node .tasks .task_running {
-  border: 2px solid #23ae89;
   border-radius: 4px;
   background-color: rgb(35, 174, 137);
   background-color: rgba(35, 174, 137, 0.2);
 }
 
 .visualizer_container .node .tasks .task_stopped {
-  border: 2px solid #ae2323;
   border-radius: 4px;
   background-color: rgb(174, 35, 35);
   background-color: rgba(174, 35, 35, 0.2);
 }
 
 .visualizer_container .node .tasks .task_warning {
-  border: 2px solid #f0ad4e;
   border-radius: 4px;
   background-color: rgb(240, 173, 78);
   background-color: rgba(240, 173, 78, 0.2);
 }
 
 .visualizer_container .node .tasks .task_info {
-  border: 2px solid #46b8da;
   border-radius: 4px;
   background-color: rgb(70, 184, 218);
   background-color: rgba(70, 184, 218, 0.2);
@@ -691,6 +687,30 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .visualizer_container .node .tasks .task .service_name {
   text-align: center;
   margin-bottom: 5px;
+}
+
+.log_viewer {
+  height:100%;
+  overflow-y: scroll;
+  white-space: pre-wrap;
+  color: black;
+  font-size: .85em;
+  background-color: white;
+}
+
+.log_viewer .inner_line {
+  padding: 0 15px;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.log_viewer .inner_line:empty::after {
+  content: '.';
+  visibility: hidden;
+}
+
+.log_viewer .line_selected {
+  background-color: #C5CAE9;
 }
 
 /*bootbox override*/

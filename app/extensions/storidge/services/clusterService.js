@@ -1,22 +1,22 @@
 angular.module('extension.storidge')
-.factory('StoridgeClusterService', ['$q', 'StoridgeCluster', function StoridgeClusterServiceFactory($q, StoridgeCluster) {
+.factory('StoridgeClusterService', ['$q', 'Storidge', function StoridgeClusterServiceFactory($q, Storidge) {
   'use strict';
   var service = {};
 
   service.reboot = function() {
-    return StoridgeCluster.reboot();
+    return Storidge.rebootCluster().$promise;
   };
 
   service.shutdown = function() {
-    return StoridgeCluster.shutdown();
+    return Storidge.shutdownCluster().$promise;
   };
 
   service.info = function() {
     var deferred = $q.defer();
 
-    StoridgeCluster.queryInfo()
-    .then(function success(response) {
-      var info = new StoridgeInfoModel(response.data);
+    Storidge.getInfo().$promise
+    .then(function success(data) {
+      var info = new StoridgeInfoModel(data);
       deferred.resolve(info);
     })
     .catch(function error(err) {
@@ -29,9 +29,9 @@ angular.module('extension.storidge')
   service.version = function() {
     var deferred = $q.defer();
 
-    StoridgeCluster.queryVersion()
-    .then(function success(response) {
-      var version = response.data.version;
+    Storidge.getVersion().$promise
+    .then(function success(data) {
+      var version = data.version;
       deferred.resolve(version);
     })
     .catch(function error(err) {
@@ -44,9 +44,9 @@ angular.module('extension.storidge')
   service.events = function() {
     var deferred = $q.defer();
 
-    StoridgeCluster.queryEvents()
-    .then(function success(response) {
-      var events = response.data.map(function(item) {
+    Storidge.queryEvents().$promise
+    .then(function success(data) {
+      var events = data.map(function(item) {
         return new StoridgeEventModel(item);
       });
       deferred.resolve(events);

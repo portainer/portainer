@@ -40,6 +40,7 @@
       nodes="nodes"
       show-text-filter="true"
       show-slot-column="true"
+      show-logs-button="applicationState.endpoint.apiVersion >= 1.30"
     ></tasks-datatable>
   </div>
 </div>
@@ -57,7 +58,13 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <textarea id="web-editor" class="form-control" ng-model="stackFileContent" placeholder='version: "3"'></textarea>
+              <code-editor
+                identifier="stack-editor"
+                placeholder="# Define or paste the content of your docker-compose file here"
+                yml="true"
+                on-change="editorUpdate"
+                value="stackFileContent"
+              ></code-editor>
             </div>
           </div>
           <div class="col-sm-12 form-section-title">

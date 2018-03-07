@@ -34,6 +34,12 @@ angular.module('portainer.docker')
       method: 'POST', params: { id: '@id', action: 'unpause' },
       headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
     },
+    logs: {
+      method: 'GET', params: { id: '@id', action: 'logs' },
+      timeout: 4500, ignoreLoadingBar: true,
+      transformResponse: logsHandler, isArray: true,
+      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+    },
     stats: {
       method: 'GET', params: { id: '@id', stream: false, action: 'stats' },
       timeout: 4500, ignoreLoadingBar: true,

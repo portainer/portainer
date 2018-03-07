@@ -17,14 +17,14 @@ type proxyFactory struct {
 	SettingsService        portainer.SettingsService
 }
 
-func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
+func (factory *proxyFactory) newExtensionHTTPPRoxy(u *url.URL) http.Handler {
 	u.Scheme = "http"
-	return factory.createReverseProxy(u)
+	return newSingleHostReverseProxyWithHostHeader(u)
 }
 
-func (factory *proxyFactory) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
+func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
 	u.Scheme = "https"
-	proxy := factory.createReverseProxy(u)
+	proxy := factory.createDockerReverseProxy(u)
 	config, err := crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,12 @@ func (factory *proxyFactory) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpo
 	return proxy, nil
 }
 
-func (factory *proxyFactory) newSocketProxy(path string) http.Handler {
+func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL) http.Handler {
+	u.Scheme = "http"
+	return factory.createDockerReverseProxy(u)
+}
+
+func (factory *proxyFactory) newDockerSocketProxy(path string) http.Handler {
 	proxy := &socketProxy{}
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,
@@ -46,13 +51,13 @@ func (factory *proxyFactory) newSocketProxy(path string) http.Handler {
 	return proxy
 }
 
-func (factory *proxyFactory) createReverseProxy(u *url.URL) *httputil.ReverseProxy {
+func (factory *proxyFactory) createDockerReverseProxy(u *url.URL) *httputil.ReverseProxy {
 	proxy := newSingleHostReverseProxyWithHostHeader(u)
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
 		SettingsService:        factory.SettingsService,
-		dockerTransport:        newHTTPTransport(),
+		dockerTransport:        &http.Transport{},
 	}
 	proxy.Transport = transport
 	return proxy
@@ -64,8 +69,4 @@ func newSocketTransport(socketPath string) *http.Transport {
 			return net.Dial("unix", socketPath)
 		},
 	}
-}
-
-func newHTTPTransport() *http.Transport {
-	return &http.Transport{}
 }

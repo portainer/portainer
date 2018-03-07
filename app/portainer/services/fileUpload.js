@@ -8,6 +8,26 @@ angular.module('portainer.app')
     return Upload.upload({ url: url, data: { file: file }});
   }
 
+  service.buildImage = function(names, file, path) {
+    var endpointID = EndpointProvider.endpointID();
+    Upload.setDefaults({ ngfMinSize: 10 });
+    return Upload.http({
+      url: 'api/endpoints/' + endpointID + '/docker/build',
+      headers : {
+        'Content-Type': file.type
+      },
+      data: file,
+      params: {
+        t: names,
+        dockerfile: path
+      },
+      ignoreLoadingBar: true,
+      transformResponse: function(data, headers) {
+        return jsonObjectsToArrayHandler(data);
+      }
+    });
+  };
+
   service.createStack = function(stackName, swarmId, file, env) {
     var endpointID = EndpointProvider.endpointID();
     return Upload.upload({

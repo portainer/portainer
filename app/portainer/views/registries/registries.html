@@ -48,7 +48,7 @@
             <div class="form-group">
               <label for="hub_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="hub_password" ng-model="dockerhub.Password">
+                <input type="password" class="form-control" id="hub_password" ng-model="formValues.dockerHubPassword" placeholder="*******">
               </div>
             </div>
             <!-- !credentials-password -->
@@ -56,7 +56,7 @@
           <!-- !authentication-credentials -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || dockerhub.Authentication && (!dockerhub.Username || !dockerhub.Password)" ng-click="updateDockerHub()" button-spinner="state.actionInProgress">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || dockerhub.Authentication && (!dockerhub.Username || !formValues.dockerHubPassword)" ng-click="updateDockerHub()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Update</span>
                 <span ng-show="state.actionInProgress">Updating DockerHub settings...</span>
               </button>

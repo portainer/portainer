@@ -56,7 +56,7 @@
             <div class="form-group">
               <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="credentials_password" ng-model="registry.Password">
+                <input type="password" class="form-control" id="credentials_password" ng-model="formValues.Password" placeholder="*******">
               </div>
             </div>
             <!-- !credentials-password -->
@@ -64,7 +64,7 @@
           <!-- !authentication-credentials -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !registry.Name || !registry.URL || (registry.Authentication && (!registry.Username || !registry.Password))" ng-click="updateRegistry()" button-spinner="state.actionInProgress">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !registry.Name || !registry.URL || (registry.Authentication && (!registry.Username || !formValues.Password))" ng-click="updateRegistry()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Update registry</span>
                 <span ng-show="state.actionInProgress">Updating registry...</span>
               </button>

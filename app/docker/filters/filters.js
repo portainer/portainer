@@ -4,6 +4,22 @@ function includeString(text, values) {
   });
 }
 
+function strToHash(str) {
+  var hash = 0;
+  for (var i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return hash;
+}
+
+function hashToHexColor(hash) {
+  var color = '#';
+  for (var i = 0; i < 3;) {
+    color += ('00' + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2);
+  }
+  return color;
+}
+
 angular.module('portainer.docker')
 .filter('visualizerTask', function () {
   'use strict';
@@ -17,6 +33,14 @@ angular.module('portainer.docker')
       return 'stopped';
     }
     return 'running';
+  };
+})
+.filter('visualizerTaskBorderColor', function () {
+  'use strict';
+  return function (str) {
+    var hash = strToHash(str);
+    var color = hashToHexColor(hash);
+    return color;
   };
 })
 .filter('taskstatusbadge', function () {
@@ -42,11 +66,11 @@ angular.module('portainer.docker')
   'use strict';
   return function (text) {
     var status = _.toLower(text);
-    if (includeString(status, ['paused', 'starting'])) {
+    if (includeString(status, ['paused', 'starting', 'unhealthy'])) {
       return 'warning';
     } else if (includeString(status, ['created'])) {
       return 'info';
-    } else if (includeString(status, ['stopped', 'unhealthy', 'dead', 'exited'])) {
+    } else if (includeString(status, ['stopped', 'dead', 'exited'])) {
       return 'danger';
     }
     return 'success';

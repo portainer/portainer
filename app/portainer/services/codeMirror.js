@@ -2,6 +2,8 @@ angular.module('portainer.app')
 .factory('CodeMirrorService', function CodeMirrorService() {
   'use strict';
 
+  var service = {};
+
   var codeMirrorGenericOptions = {
     lineNumbers: true
   };
@@ -11,8 +13,6 @@ angular.module('portainer.app')
     gutters: ['CodeMirror-lint-markers'],
     lint: true
   };
-
-  var service = {};
 
   service.applyCodeMirrorOnElement = function(element, yamlLint, readOnly) {
     var options = angular.copy(codeMirrorGenericOptions);

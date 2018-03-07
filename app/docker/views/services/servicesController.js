@@ -1,6 +1,10 @@
 angular.module('portainer.docker')
-.controller('ServicesController', ['$q', '$scope', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'Task', 'Node', 'NodeHelper', 'ModalService',
-function ($q, $scope, $state, Service, ServiceService, ServiceHelper, Notifications, Task, Node, NodeHelper, ModalService) {
+.controller('ServicesController', ['$q', '$scope', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'Task', 'Node', 'ModalService', 'EndpointProvider',
+function ($q, $scope, $state, Service, ServiceService, ServiceHelper, Notifications, Task, Node, ModalService, EndpointProvider) {
+
+  $scope.state = {
+    publicURL: EndpointProvider.endpointPublicURL()
+  };
 
   $scope.scaleAction = function scaleService(service) {
     var config = ServiceHelper.serviceToConfig(service.Model);
@@ -88,7 +92,6 @@ function ($q, $scope, $state, Service, ServiceService, ServiceHelper, Notificati
       nodes: Node.query({}).$promise
     })
     .then(function success(data) {
-      $scope.swarmManagerIP = NodeHelper.getManagerIP(data.nodes);
       $scope.services = data.services.map(function (service) {
         var runningTasks = data.tasks.filter(function (task) {
           return task.ServiceID === service.ID && task.Status.State === 'running';

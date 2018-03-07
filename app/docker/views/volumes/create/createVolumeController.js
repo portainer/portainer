@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator', 'ExtensionManager',
-function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, ExtensionManager) {
+.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator',
+function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator) {
 
   $scope.formValues = {
     Driver: 'local',
@@ -88,11 +88,5 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     }
   }
 
-  ExtensionManager.init()
-  .then(function success(data) {
-    initView();
-  })
-  .catch(function error(err) {
-    Notifications.error('Failure', err, 'Unable to initialize extensions');
-  });
+  initView();
 }]);

@@ -131,6 +131,19 @@ angular.module('portainer.docker')
     return deferred.promise;
   };
 
+  service.logs = function(id, stdout, stderr, timestamps, tail, nodeName) {
+    var parameters = {
+      id: id,
+      stdout: stdout || 0,
+      stderr: stderr || 0,
+      timestamps: timestamps || 0,
+      tail: tail || 'all',
+      nodeName: nodeName
+    };
+
+    return Container.logs(parameters).$promise;
+  };
+
   service.containerStats = function(id, nodeName) {
     var deferred = $q.defer();
 

@@ -218,6 +218,7 @@ func main() {
 				},
 				AuthorizedUsers: []portainer.UserID{},
 				AuthorizedTeams: []portainer.TeamID{},
+				Extensions:      []portainer.EndpointExtension{},
 			}
 			err = store.EndpointService.CreateEndpoint(endpoint)
 			if err != nil {

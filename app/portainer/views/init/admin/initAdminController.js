@@ -30,9 +30,9 @@ function ($scope, $state, $sanitize, Notifications, Authentication, StateManager
       if (data.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
-        var endpointID = data[0].Id;
-        EndpointProvider.setEndpointID(endpointID);
-        StateManager.updateEndpointState(false)
+        var endpoint = data[0];
+        EndpointProvider.setEndpointID(endpoint.Id);
+        StateManager.updateEndpointState(false, endpoint.Extensions)
         .then(function success() {
           $state.go('docker.dashboard');
         })

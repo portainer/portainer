@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'Notifications',
-function ($scope, $state, $filter, EndpointService, Notifications) {
+.controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'Notifications', 'ExtensionManager', 'EndpointProvider',
+function ($scope, $state, $filter, EndpointService, Notifications, ExtensionManager, EndpointProvider) {
   $scope.state = {
     uploadInProgress: false,
     actionInProgress: false
@@ -30,10 +30,26 @@ function ($scope, $state, $filter, EndpointService, Notifications) {
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
+    var endpointId;
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile).then(function success(data) {
-      Notifications.success('Endpoint created', name);
-      $state.reload();
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    .then(function success(data) {
+      endpointId = data.Id;
+      var currentEndpointId = EndpointProvider.endpointID();
+      EndpointProvider.setEndpointID(endpointId);
+      ExtensionManager.initEndpointExtensions(endpointId)
+      .then(function success(data) {
+        Notifications.success('Endpoint created', name);
+        $state.reload();
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to create endpoint');
+        EndpointService.deleteEndpoint(endpointId);
+      })
+      .finally(function final() {
+        $scope.state.actionInProgress = false;
+        EndpointProvider.setEndpointID(currentEndpointId);
+      });
     }, function error(err) {
       $scope.state.uploadInProgress = false;
       $scope.state.actionInProgress = false;
