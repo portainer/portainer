@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'Notifications', 'ExtensionManager', 'EndpointProvider',
-function ($scope, $state, $filter, EndpointService, Notifications, ExtensionManager, EndpointProvider) {
+.controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'Notifications', 'SystemService', 'EndpointProvider',
+function ($scope, $state, $filter, EndpointService, Notifications, SystemService, EndpointProvider) {
   $scope.state = {
     uploadInProgress: false,
     actionInProgress: false
@@ -37,8 +37,8 @@ function ($scope, $state, $filter, EndpointService, Notifications, ExtensionMana
       endpointId = data.Id;
       var currentEndpointId = EndpointProvider.endpointID();
       EndpointProvider.setEndpointID(endpointId);
-      ExtensionManager.initEndpointExtensions(endpointId)
-      .then(function success(data) {
+      SystemService.info()
+      .then(function success() {
         Notifications.success('Endpoint created', name);
         $state.reload();
       })

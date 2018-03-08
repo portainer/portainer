@@ -33,6 +33,8 @@ func NewExtensionHandler(bouncer *security.RequestBouncer) *ExtensionHandler {
 	}
 	h.Handle("/{endpointId}/extensions",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePostExtensions))).Methods(http.MethodPost)
+	h.Handle("/{endpointId}/extensions/{extensionType}",
+		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteExtensions))).Methods(http.MethodDelete)
 	return h
 }
 
@@ -75,19 +77,23 @@ func (handler *ExtensionHandler) handlePostExtensions(w http.ResponseWriter, r *
 
 	extensionType := portainer.EndpointExtensionType(req.Type)
 
-	for _, extension := range endpoint.Extensions {
-		if extension.Type == extensionType {
-			httperror.WriteErrorResponse(w, portainer.ErrEndpointExtensionAlreadyAssociated, http.StatusConflict, handler.Logger)
-			return
+	var extension *portainer.EndpointExtension
+
+	for _, ext := range endpoint.Extensions {
+		if ext.Type == extensionType {
+			extension = &ext
 		}
 	}
 
-	extension := portainer.EndpointExtension{
-		Type: extensionType,
-		URL:  req.URL,
+	if extension != nil {
+		extension.URL = req.URL
+	} else {
+		extension = &portainer.EndpointExtension{
+			Type: extensionType,
+			URL:  req.URL,
+		}
+		endpoint.Extensions = append(endpoint.Extensions, *extension)
 	}
-
-	endpoint.Extensions = append(endpoint.Extensions, extension)
 
 	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
@@ -96,4 +102,42 @@ func (handler *ExtensionHandler) handlePostExtensions(w http.ResponseWriter, r *
 	}
 
 	encodeJSON(w, extension, handler.Logger)
+}
+
+func (handler *ExtensionHandler) handleDeleteExtensions(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["endpointId"])
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+	endpointID := portainer.EndpointID(id)
+
+	endpoint, err := handler.EndpointService.Endpoint(endpointID)
+	if err == portainer.ErrEndpointNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	extType, err := strconv.Atoi(vars["extensionType"])
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+	extensionType := portainer.EndpointExtensionType(extType)
+
+	for idx, ext := range endpoint.Extensions {
+		if ext.Type == extensionType {
+			endpoint.Extensions = append(endpoint.Extensions[:idx], endpoint.Extensions[idx+1:]...)
+		}
+	}
+
+	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
 }
