@@ -130,6 +130,51 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
+  service.deleteRepository = function(id, repository) {
+    var deferred = $q.defer();
+
+    // Get tags for repo
+    service.tags(id, repository)
+    .then(function success(tags) {
+    
+      // Prepare all queries to manifests
+      var manifestsPromises = tags.Tags.map(function (tag) {
+        return service.manifests(id, repository, tag);
+      });
+
+      // Query all manifests of all tags
+      $q.all(manifestsPromises)
+      .then(function(allManifests) {
+
+        // Get digests unique list
+        var digests = [];
+        for (var m in allManifests) {
+          if (digests.indexOf(allManifests[m].Digest) === -1) {
+            digests.push(allManifests[m].Digest);
+          }
+        }
+
+        // Prepare all delete promises
+        var deleteDigestPromises = digests.map(function (d) {
+          return service.deleteTag(id, repository, d);
+        });
+
+        // Run all delete
+        $q.all(deleteDigestPromises)
+        .then(function(result) {
+          deferred.resolve(repository);
+          console.log(result);
+        });
+      });
+
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve repository tags', err: err});
+    });
+
+    return deferred.promise;
+  };
+
   service.encodedCredentials = function(registry) {
     var credentials = {
       username: registry.Username,
