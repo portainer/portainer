@@ -54,8 +54,7 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
     SystemService.info()
     .then(function success(data) {
       var managerIP = data.Swarm.NodeAddr;
-      // var storidgeAPIURL = 'tcp://' + managerIP + ':8282';
-      var storidgeAPIURL = 'tcp://home.cresswell.net.nz:8282';
+      var storidgeAPIURL = 'tcp://' + managerIP + ':8282';
       return ExtensionService.registerStoridgeExtension(storidgeAPIURL);
     })
     .then(function success(data) {
