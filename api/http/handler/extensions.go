@@ -32,9 +32,9 @@ func NewExtensionHandler(bouncer *security.RequestBouncer) *ExtensionHandler {
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
 	}
 	h.Handle("/{endpointId}/extensions",
-		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePostExtensions))).Methods(http.MethodPost)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handlePostExtensions))).Methods(http.MethodPost)
 	h.Handle("/{endpointId}/extensions/{extensionType}",
-		bouncer.AdministratorAccess(http.HandlerFunc(h.handleDeleteExtensions))).Methods(http.MethodDelete)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.handleDeleteExtensions))).Methods(http.MethodDelete)
 	return h
 }
 
