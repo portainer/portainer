@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title="Storidge monitor">
     <a data-toggle="tooltip" title="Refresh" ui-sref="storidge.monitor" ui-sref-opts="{reload: true}">
-      <i class="fa fa-refresh" aria-hidden="true"></i>
+      <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>
@@ -12,7 +12,7 @@
 <div class="row">
   <div class="col-md-4 col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tachometer" title="Cluster capacity"></rd-widget-header>
+      <rd-widget-header icon="fa-tachometer-alt" title="Cluster capacity"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative;">
           <canvas id="capacityChart" width="770" height="400"></canvas>
@@ -45,7 +45,7 @@
   </div>
   <div class="col-md-4 col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-area-chart" title="IOPS usage"></rd-widget-header>
+      <rd-widget-header icon="fa-chart-area" title="IOPS usage"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative;">
           <canvas id="iopsChart" width="770" height="400"></canvas>
@@ -78,7 +78,7 @@
   </div>
   <div class="col-md-4 col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-area-chart" title="Bandwith usage"></rd-widget-header>
+      <rd-widget-header icon="fa-chart-area" title="Bandwith usage"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative;">
           <canvas id="bandwithChart" width="770" height="400"></canvas>

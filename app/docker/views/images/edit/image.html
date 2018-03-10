@@ -24,7 +24,7 @@
                       <span class="fa fa-download white-icon" aria-hidden="true"></span>
                     </a>
                     <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)">
-                      <span class="fa fa-trash-o white-icon" aria-hidden="true"></span>
+                      <span class="far fa-trash-alt white-icon" aria-hidden="true"></span>
                     </a>
                   </span>
                 </div>
@@ -36,17 +36,17 @@
               <span class="small text-muted">
                 Note: you can click on the upload icon <span class="fa fa-upload" aria-hidden="true"></span> to push an image
                 or on the download icon <span class="fa fa-download" aria-hidden="true"></span> to pull an image
-                or on the trash icon <span class="fa fa-trash-o" aria-hidden="true"></span> to delete a tag.
+                or on the trash icon <span class="far fa-trash-alt" aria-hidden="true"></span> to delete a tag.
               </span>
             </div>
             <div class="col-sm-12">
               <span id="downloadResourceHint" class="createResource" style="display: none; margin-left: 0;">
                 Download in progress...
-                <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
+                <i class="fa fa-circle-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
               </span>
               <span id="uploadResourceHint" class="createResource" style="display: none; margin-left: 0;">
                 Upload in progress...
-                <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
+                <i class="fa fa-circle-notch fa-spin" aria-hidden="true" style="margin-left: 2px;"></i>
               </span>
             </div>
           </div>
@@ -96,7 +96,7 @@
               <td>ID</td>
               <td>
                 {{ image.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this image</button>
+                <button class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this image</button>
               </td>
             </tr>
             <tr ng-if="image.Parent">

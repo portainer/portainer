@@ -31,7 +31,7 @@
         <input type="radio" id="tls_client_ca" ng-model="$ctrl.formData.TLSMode" value="tls_client_ca">
         <label for="tls_client_ca">
           <div class="boxselector_header">
-            <i class="fa fa-shield" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i class="fa fa-shield-alt" aria-hidden="true" style="margin-right: 2px;"></i>
             TLS with server and client verification
           </div>
           <p>Use client certificates and server verification</p>
@@ -41,7 +41,7 @@
         <input type="radio" id="tls_client_noca" ng-model="$ctrl.formData.TLSMode" value="tls_client_noca">
         <label for="tls_client_noca">
           <div class="boxselector_header">
-            <i class="fa fa-shield" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i class="fa fa-shield-alt" aria-hidden="true" style="margin-right: 2px;"></i>
             TLS with client verification only
           </div>
           <p>Use client certificates without server verification</p>
@@ -51,7 +51,7 @@
         <input type="radio" id="tls_ca" ng-model="$ctrl.formData.TLSMode" value="tls_ca">
         <label for="tls_ca">
           <div class="boxselector_header">
-            <i class="fa fa-shield" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i class="fa fa-shield-alt" aria-hidden="true" style="margin-right: 2px;"></i>
             TLS with server verification only
           </div>
           <p>Only verify the server certificate</p>
@@ -61,7 +61,7 @@
         <input type="radio" id="tls_only" ng-model="$ctrl.formData.TLSMode" value="tls_only">
         <label for="tls_only">
           <div class="boxselector_header">
-            <i class="fa fa-shield" aria-hidden="true" style="margin-right: 2px;"></i>
+            <i class="fa fa-shield-alt" aria-hidden="true" style="margin-right: 2px;"></i>
             TLS only
           </div>
           <p>No server/client verification</p>
@@ -84,7 +84,7 @@
           {{ $ctrl.formData.TLSCACert.name }}
           <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSCACert && $ctrl.formData.TLSCACert === $ctrl.endpoint.TLSConfig.TLSCACert" aria-hidden="true"></i>
           <i class="fa fa-times red-icon" ng-if="!$ctrl.formData.TLSCACert" aria-hidden="true"></i>
-          <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+          <i class="fa fa-circle-notch fa-spin" ng-if="state.uploadInProgress"></i>
         </span>
       </div>
     </div>
@@ -100,7 +100,7 @@
             {{ $ctrl.formData.TLSCert.name }}
             <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSCert && $ctrl.formData.TLSCert === $ctrl.endpoint.TLSConfig.TLSCert" aria-hidden="true"></i>
             <i class="fa fa-times red-icon" ng-if="!$ctrl.formData.TLSCert" aria-hidden="true"></i>
-            <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+            <i class="fa fa-circle-notch fa-spin" ng-if="state.uploadInProgress"></i>
           </span>
         </div>
       </div>
@@ -114,7 +114,7 @@
             {{ $ctrl.formData.TLSKey.name }}
             <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSKey && $ctrl.formData.TLSKey === $ctrl.endpoint.TLSConfig.TLSKey" aria-hidden="true"></i>
             <i class="fa fa-times red-icon" ng-if="!$ctrl.formData.TLSKey" aria-hidden="true"></i>
-            <i class="fa fa-circle-o-notch fa-spin" ng-if="state.uploadInProgress"></i>
+            <i class="fa fa-circle-notch fa-spin" ng-if="state.uploadInProgress"></i>
           </span>
         </div>
       </div>

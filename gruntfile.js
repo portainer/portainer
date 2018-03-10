@@ -159,7 +159,7 @@ gruntfile_cfg.copy = {
   assets: {
     files: [
       {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/bootstrap/fonts/'},
-      {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/font-awesome/fonts/'},
+      {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,eot,svg}', expand: true, cwd: 'node_modules/@fortawesome/fontawesome-free-webfonts/webfonts/'},
       {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/rdash-ui/dist/fonts/'},
       {dest: '<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
       {dest: '<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
@@ -235,7 +235,8 @@ gruntfile_cfg.replace = {
     options: {
       patterns: [
         { match: 'ENVIRONMENT',  replacement: '<%= grunt.config.get("environment") %>' },
-        { match: 'CONFIG_GA_ID', replacement: '<%= pkg.config.GA_ID %>' }
+        { match: 'CONFIG_GA_ID', replacement: '<%= pkg.config.GA_ID %>' },
+        { match: /..\/webfonts\//g, replacement: '../fonts/'}
       ]
     },
     files: [
@@ -244,6 +245,12 @@ gruntfile_cfg.replace = {
         flatten: true,
         src: ['.tmp/concat/js/app.js'],
         dest: '.tmp/concat/js'
+      },
+      {
+        expand: true,
+        flatten: true,
+        src: ['.tmp/concat/css/app.css'],
+        dest: '.tmp/concat/css'
       }
     ]
   }
