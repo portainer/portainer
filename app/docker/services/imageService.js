@@ -57,8 +57,10 @@ angular.module('portainer.docker')
         deferred.reject({ msg: data.message });
       } else {
         var layers = [];
+        var depth = data.length;
         angular.forEach(data, function(imageLayer) {
-          layers.push(new ImageLayerViewModel(imageLayer));
+          layers.push(new ImageLayerViewModel(depth, imageLayer));
+          depth--;
         });
         deferred.resolve(layers);
       }

@@ -6,8 +6,8 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		Registry: ''
 	};
 
-	$scope.sortType = 'Size';
-  $scope.sortReverse = true;
+	$scope.sortType = 'Depth';
+	$scope.sortReverse = true;
 
 	$scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;

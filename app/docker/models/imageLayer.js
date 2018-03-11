@@ -1,4 +1,5 @@
-function ImageLayerViewModel(data) {
+function ImageLayerViewModel(depth, data) {
+  this.Depth = depth;
   this.Id = data.Id;
   this.Created = data.Created;
   this.CreatedBy = data.CreatedBy;
