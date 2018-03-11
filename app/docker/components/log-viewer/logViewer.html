@@ -30,7 +30,7 @@
             <div class="col-sm-11">
               <button class="btn btn-primary btn-sm" ng-click="$ctrl.copy()" ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0]) || !$ctrl.state.filteredLogs.length"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</button>
               <button class="btn btn-primary btn-sm" ng-click="$ctrl.copySelection()" ng-disabled="($ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0]) || !$ctrl.state.filteredLogs.length || !$ctrl.state.selectedLines.length"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy selected lines</button>
-              <button class="btn btn-primary btn-sm" ng-click="$ctrl.clearSelection()" ng-disabled="$ctrl.state.selectedLines.length === 0"><i class="fa fa-trash space-right" aria-hidden="true"></i>Clear selection</button>
+              <button class="btn btn-primary btn-sm" ng-click="$ctrl.clearSelection()" ng-disabled="$ctrl.state.selectedLines.length === 0"><i class="fa fa-times space-right" aria-hidden="true"></i>Unselect</button>
               <span>
                 <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
               </span>
