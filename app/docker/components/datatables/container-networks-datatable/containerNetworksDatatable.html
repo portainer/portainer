@@ -3,7 +3,7 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.title }}
+          <i class="fas" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.title }}
         </div>
       </div>
       <div class="actionBar">
@@ -44,7 +44,7 @@
               <td>{{ value.MacAddress || '-' }}</td>
               <td>
                 <button type="button" class="btn btn-xs btn-danger" ng-disabled="$ctrl.leaveNetworkActionInProgress" button-spinner="$ctrl.leaveNetworkActionInProgress" ng-click="$ctrl.leaveNetworkAction($ctrl.container, value.NetworkID)">
-                  <span ng-hide="$ctrl.leaveNetworkActionInProgress"><i class="fa fa-trash space-right" aria-hidden="true"></i> Leave network</span>
+                  <span ng-hide="$ctrl.leaveNetworkActionInProgress"><i class="fas fa-trash space-right" aria-hidden="true"></i> Leave network</span>
                   <span ng-show="$ctrl.leaveNetworkActionInProgress">Leaving network...</span>
                 </button>
               </td>
