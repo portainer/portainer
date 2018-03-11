@@ -4,7 +4,7 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
   'use strict';
   var service = {};
 
-  service.initEndpointExtensions = function(endpointId) {
+  service.initEndpointExtensions = function() {
     var deferred = $q.defer();
 
     SystemService.version()
@@ -12,13 +12,11 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
       var endpointAPIVersion = parseFloat(data.ApiVersion);
 
       return $q.all([
-        endpointAPIVersion >= 1.25 ? initStoridgeExtension(endpointId): null
+        endpointAPIVersion >= 1.25 ? initStoridgeExtension(): null
       ]);
     })
     .then(function success(data) {
-      var extensions = data.filter(function filterNull(x) {
-        return x;
-      });
+      var extensions = data;
       deferred.resolve(extensions);
     })
     .catch(function error(err) {
@@ -28,14 +26,16 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
     return deferred.promise;
   };
 
-  function initStoridgeExtension(endpointId) {
+  function initStoridgeExtension() {
     var deferred = $q.defer();
 
     PluginService.volumePlugins()
     .then(function success(data) {
       var volumePlugins = data;
       if (_.includes(volumePlugins, 'cio:latest')) {
-        return registerStoridgeUsingSwarmManagerIP(endpointId);
+        return registerStoridgeUsingSwarmManagerIP();
+      } else {
+        return deregisterStoridgeExtension();
       }
     })
     .then(function success(data) {
@@ -48,14 +48,14 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
     return deferred.promise;
   }
 
-  function registerStoridgeUsingSwarmManagerIP(endpointId) {
+  function registerStoridgeUsingSwarmManagerIP() {
     var deferred = $q.defer();
 
     SystemService.info()
     .then(function success(data) {
       var managerIP = data.Swarm.NodeAddr;
       var storidgeAPIURL = 'tcp://' + managerIP + ':8282';
-      return ExtensionService.registerStoridgeExtension(endpointId, storidgeAPIURL);
+      return ExtensionService.registerStoridgeExtension(storidgeAPIURL);
     })
     .then(function success(data) {
       deferred.resolve(data);
@@ -65,6 +65,10 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
     });
 
     return deferred.promise;
+  }
+
+  function deregisterStoridgeExtension() {
+    return ExtensionService.deregisterStoridgeExtension();
   }
 
   return service;

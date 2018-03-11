@@ -15,13 +15,17 @@ function (clipboard) {
   this.copy = function() {
     clipboard.copyText(this.state.filteredLogs);
     $('#refreshRateChange').show();
-    $('#refreshRateChange').fadeOut(1500);
+    $('#refreshRateChange').fadeOut(2000);
   };
 
   this.copySelection = function() {
     clipboard.copyText(this.state.selectedLines);
     $('#refreshRateChange').show();
-    $('#refreshRateChange').fadeOut(1500);
+    $('#refreshRateChange').fadeOut(2000);
+  };
+
+  this.clearSelection = function() {
+    this.state.selectedLines = [];
   };
 
   this.selectLine = function(line) {
