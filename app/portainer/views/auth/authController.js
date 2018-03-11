@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$scope', '$state', '$transition$', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'UserService', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'SettingsService',
-function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentication, Users, UserService, EndpointService, StateManager, EndpointProvider, Notifications, SettingsService) {
+.controller('AuthenticationController', ['$scope', '$state', '$transition$', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'UserService', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'SettingsService', 'ExtensionManager',
+function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentication, Users, UserService, EndpointService, StateManager, EndpointProvider, Notifications, SettingsService, ExtensionManager) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -18,7 +18,12 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     if (!endpointID) {
       EndpointProvider.setEndpointID(endpoint.Id);
     }
-    StateManager.updateEndpointState(true, endpoint.Extensions)
+
+    ExtensionManager.initEndpointExtensions(endpoint.Id)
+    .then(function success(data) {
+      var extensions = data;
+      return StateManager.updateEndpointState(true, extensions);
+    })
     .then(function success(data) {
       $state.go('docker.dashboard');
     })

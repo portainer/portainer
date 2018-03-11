@@ -26,6 +26,8 @@ angular.module('portainer')
 
     toastr.options.timeOut = 3000;
 
+    Terminal.applyAddon(fit);
+
     $uibTooltipProvider.setTriggers({
       'mouseenter': 'mouseleave',
       'click': 'click',

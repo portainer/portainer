@@ -44,7 +44,6 @@ function ($scope, $transition$, $interval, ServiceService, Notifications) {
     ServiceService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
     .then(function success(data) {
       $scope.logs = data;
-      console.log(JSON.stringify(data, null, 4));
       setUpdateRepeater();
     })
     .catch(function error(err) {
