@@ -52,7 +52,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.DockerHubHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/endpoints"):
 		switch {
-		case strings.Contains(r.URL.Path, "/docker"):
+		case strings.Contains(r.URL.Path, "/docker/"):
 			http.StripPrefix("/api/endpoints", h.DockerHandler).ServeHTTP(w, r)
 		case strings.Contains(r.URL.Path, "/stacks"):
 			http.StripPrefix("/api/endpoints", h.StackHandler).ServeHTTP(w, r)
