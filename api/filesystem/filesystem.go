@@ -42,20 +42,17 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 		fileStorePath: path.Join(dataStorePath, fileStorePath),
 	}
 
-	// Checking if a mount directory exists is broken with Go on Windows.
-	// This will need to be reviewed after the issue has been fixed in Go.
-	// See: https://github.com/portainer/portainer/issues/474
-	// err := createDirectoryIfNotExist(dataStorePath, 0755)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	err := service.createDirectoryInStoreIfNotExist(TLSStorePath)
+	err := os.MkdirAll(dataStorePath, 0755)
 	if err != nil {
 		return nil, err
 	}
 
-	err = service.createDirectoryInStoreIfNotExist(ComposeStorePath)
+	err = service.createDirectoryInStore(TLSStorePath)
+	if err != nil {
+		return nil, err
+	}
+
+	err = service.createDirectoryInStore(ComposeStorePath)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +75,7 @@ func (service *Service) GetStackProjectPath(stackIdentifier string) string {
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreStackFileFromString(stackIdentifier, stackFileContent string) (string, error) {
 	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
-	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
+	err := service.createDirectoryInStore(stackStorePath)
 	if err != nil {
 		return "", err
 	}
@@ -99,7 +96,7 @@ func (service *Service) StoreStackFileFromString(stackIdentifier, stackFileConte
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreStackFileFromReader(stackIdentifier string, r io.Reader) (string, error) {
 	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
-	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
+	err := service.createDirectoryInStore(stackStorePath)
 	if err != nil {
 		return "", err
 	}
@@ -117,7 +114,7 @@ func (service *Service) StoreStackFileFromReader(stackIdentifier string, r io.Re
 // StoreTLSFile creates a folder in the TLSStorePath and stores a new file with the content from r.
 func (service *Service) StoreTLSFile(folder string, fileType portainer.TLSFileType, r io.Reader) error {
 	storePath := path.Join(TLSStorePath, folder)
-	err := service.createDirectoryInStoreIfNotExist(storePath)
+	err := service.createDirectoryInStore(storePath)
 	if err != nil {
 		return err
 	}
@@ -201,24 +198,10 @@ func (service *Service) GetFileContent(filePath string) (string, error) {
 	return string(content), nil
 }
 
-// createDirectoryInStoreIfNotExist creates a new directory in the file store if it doesn't exists on the file system.
-func (service *Service) createDirectoryInStoreIfNotExist(name string) error {
+// createDirectoryInStore creates a new directory in the file store
+func (service *Service) createDirectoryInStore(name string) error {
 	path := path.Join(service.fileStorePath, name)
-	return createDirectoryIfNotExist(path, 0700)
-}
-
-// createDirectoryIfNotExist creates a directory if it doesn't exists on the file system.
-func createDirectoryIfNotExist(path string, mode uint32) error {
-	_, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		err = os.Mkdir(path, os.FileMode(mode))
-		if err != nil {
-			return err
-		}
-	} else if err != nil {
-		return err
-	}
-	return nil
+	return os.MkdirAll(path, 0700)
 }
 
 // createFile creates a new file in the file store with the content from r.
