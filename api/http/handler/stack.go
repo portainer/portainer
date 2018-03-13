@@ -182,7 +182,7 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		Env:        req.Env,
 	}
 
-	projectPath, err := handler.FileService.StoreStackFileFromString(string(stack.ID), stackFileContent)
+	projectPath, err := handler.FileService.StoreStackFileFromString(string(stack.ID), stack.EntryPoint, stackFileContent)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -434,7 +434,7 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		Env:        env,
 	}
 
-	projectPath, err := handler.FileService.StoreStackFileFromReader(string(stack.ID), stackFile)
+	projectPath, err := handler.FileService.StoreStackFileFromReader(string(stack.ID), stack.EntryPoint, stackFile)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -634,7 +634,7 @@ func (handler *StackHandler) handlePutStack(w http.ResponseWriter, r *http.Reque
 	}
 	stack.Env = req.Env
 
-	_, err = handler.FileService.StoreStackFileFromString(string(stack.ID), req.StackFileContent)
+	_, err = handler.FileService.StoreStackFileFromString(string(stack.ID), stack.EntryPoint, req.StackFileContent)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
