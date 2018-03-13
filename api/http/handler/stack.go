@@ -70,12 +70,15 @@ func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 
 type (
 	postStacksRequest struct {
-		Name             string           `valid:"required"`
-		SwarmID          string           `valid:"required"`
-		StackFileContent string           `valid:""`
-		GitRepository    string           `valid:""`
-		PathInRepository string           `valid:""`
-		Env              []portainer.Pair `valid:""`
+		Name                        string           `valid:"required"`
+		SwarmID                     string           `valid:"required"`
+		StackFileContent            string           `valid:""`
+		RepositoryURL               string           `valid:""`
+		RepositoryAuthentication    bool             `valid:""`
+		RepositoryUsername          string           `valid:""`
+		RepositoryPassword          string           `valid:""`
+		ComposeFilePathInRepository string           `valid:""`
+		Env                         []portainer.Pair `valid:""`
 	}
 	postStacksResponse struct {
 		ID string `json:"Id"`
@@ -263,24 +266,20 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 	}
 
 	stackName := req.Name
-	if stackName == "" {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
 	swarmID := req.SwarmID
-	if swarmID == "" {
+
+	if stackName == "" || swarmID == "" || req.RepositoryURL == "" {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
-	if req.GitRepository == "" {
+	if req.RepositoryAuthentication && (req.RepositoryUsername == "" || req.RepositoryPassword == "") {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
-	if req.PathInRepository == "" {
-		req.PathInRepository = filesystem.ComposeFileDefaultName
+	if req.ComposeFilePathInRepository == "" {
+		req.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
 
 	stacks, err := handler.StackService.Stacks()
@@ -300,7 +299,7 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		ID:         portainer.StackID(stackName + "_" + swarmID),
 		Name:       stackName,
 		SwarmID:    swarmID,
-		EntryPoint: req.PathInRepository,
+		EntryPoint: req.ComposeFilePathInRepository,
 		Env:        req.Env,
 	}
 
@@ -314,7 +313,11 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		return
 	}
 
-	err = handler.GitService.CloneRepository(req.GitRepository, projectPath)
+	if req.RepositoryAuthentication {
+		err = handler.GitService.ClonePrivateRepositoryWithBasicAuth(req.RepositoryURL, projectPath, req.RepositoryUsername, req.RepositoryPassword)
+	} else {
+		err = handler.GitService.ClonePublicRepository(req.RepositoryURL, projectPath)
+	}
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return

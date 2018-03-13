@@ -124,7 +124,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.createStackFromGitRepository = function(name, gitRepository, pathInRepository, env) {
+  service.createStackFromGitRepository = function(name, repositoryOptions, env) {
     var deferred = $q.defer();
 
     SwarmService.swarm()
@@ -133,8 +133,11 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
       var payload = {
         Name: name,
         SwarmID: swarm.Id,
-        GitRepository: gitRepository,
-        PathInRepository: pathInRepository,
+        RepositoryURL: repositoryOptions.RepositoryURL,
+        ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
+        RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
+        RepositoryUsername: repositoryOptions.RepositoryUsername,
+        RepositoryPassword: repositoryOptions.RepositoryPassword,
         Env: env
       };
       return Stack.create({ method: 'repository' }, payload).$promise;
