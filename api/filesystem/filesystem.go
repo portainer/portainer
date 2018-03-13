@@ -76,14 +76,14 @@ func (service *Service) GetStackProjectPath(stackIdentifier string) string {
 
 // StoreStackFileFromString creates a subfolder in the ComposeStorePath and stores a new file using the content from a string.
 // It returns the path to the folder where the file is stored.
-func (service *Service) StoreStackFileFromString(stackIdentifier, stackFileContent string) (string, error) {
+func (service *Service) StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error) {
 	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
 	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	composeFilePath := path.Join(stackStorePath, ComposeFileDefaultName)
+	composeFilePath := path.Join(stackStorePath, fileName)
 	data := []byte(stackFileContent)
 	r := bytes.NewReader(data)
 
@@ -97,14 +97,14 @@ func (service *Service) StoreStackFileFromString(stackIdentifier, stackFileConte
 
 // StoreStackFileFromReader creates a subfolder in the ComposeStorePath and stores a new file using the content from an io.Reader.
 // It returns the path to the folder where the file is stored.
-func (service *Service) StoreStackFileFromReader(stackIdentifier string, r io.Reader) (string, error) {
+func (service *Service) StoreStackFileFromReader(stackIdentifier, fileName string, r io.Reader) (string, error) {
 	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
 	err := service.createDirectoryInStoreIfNotExist(stackStorePath)
 	if err != nil {
 		return "", err
 	}
 
-	composeFilePath := path.Join(stackStorePath, ComposeFileDefaultName)
+	composeFilePath := path.Join(stackStorePath, fileName)
 
 	err = service.createFileInStore(composeFilePath, r)
 	if err != nil {
