@@ -119,17 +119,15 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
   };
 
   function initView() {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    if(endpointProvider !== 'DOCKER_SWARM') {
-      PluginService.networkPlugins(apiVersion < 1.25)
-      .then(function success(data){
-          $scope.availableNetworkDrivers = data;
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve network drivers');
-      });
-    }
+
+    PluginService.networkPlugins(apiVersion < 1.25)
+    .then(function success(data){
+        $scope.availableNetworkDrivers = data;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve network drivers');
+    });
   }
 
   initView();

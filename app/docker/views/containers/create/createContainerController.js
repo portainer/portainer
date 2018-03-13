@@ -183,9 +183,6 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     var containerName = container;
     if (container && typeof container === 'object') {
       containerName = $filter('trimcontainername')(container.Names[0]);
-      if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM') {
-        containerName = $filter('swarmcontainername')(container);
-      }
     }
     var networkMode = mode;
     if (containerName) {
@@ -505,8 +502,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     NetworkService.networks(
       provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
       false,
-      provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
-      provider === 'DOCKER_SWARM'
+      provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
     )
     .then(function success(data) {
       var networks = data;
