@@ -16,9 +16,9 @@ module.exports = function (grunt) {
     'html2js',
     'useminPrepare:release',
     'concat',
-    'postcss:build',
     'clean:tmpl',
     'replace',
+    'postcss:build',
     'uglify'
   ]);
   grunt.registerTask('after-copy', [
@@ -218,7 +218,7 @@ gruntfile_cfg.postcss = {
         cssnano() // minify the result
       ]
     },
-    src: '<%= distdir %>/css/<%= pkg.name %>.css',
+    src: '.tmp/concat/css/app.css',
     dest: '<%= distdir %>/css/app.css'
   }
 };
