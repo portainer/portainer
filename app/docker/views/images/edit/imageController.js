@@ -6,7 +6,7 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		Registry: ''
 	};
 
-	$scope.sortType = 'Depth';
+	$scope.sortType = 'Order';
 	$scope.sortReverse = true;
 
 	$scope.order = function(sortType) {

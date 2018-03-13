@@ -183,10 +183,10 @@
         <table id="image-layers" class="table">
           <thead>
             <th style="white-space:nowrap;">
-              <a ng-click="order('Depth')">
-                Depth
-                <span ng-show="sortType == 'Depth' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                <span ng-show="sortType == 'Depth' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+              <a ng-click="order('Order')">
+                Order
+                <span ng-show="sortType == 'Order' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'Order' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
               </a>
             </th>
             <th>
@@ -207,7 +207,7 @@
           <tbody>
             <tr ng-repeat="layer in history | orderBy:sortType:sortReverse">
               <td style="white-space:nowrap;">
-                {{ layer.Depth }}
+                {{ layer.Order }}
               </td>
               <td style="white-space:nowrap;">
                 {{ layer.Size | humansize }}
