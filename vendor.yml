@@ -42,7 +42,10 @@ css:
   - node_modules/rdash-ui/dist/css/rdash.css
   - node_modules/isteven-angular-multiselect/isteven-multi-select.css
   - node_modules/ui-select/dist/select.css
-  - node_modules/font-awesome/css/font-awesome.css
+  - node_modules/@fortawesome/fontawesome-free-webfonts/css/fa-brands.css
+  - node_modules/@fortawesome/fontawesome-free-webfonts/css/fa-regular.css
+  - node_modules/@fortawesome/fontawesome-free-webfonts/css/fa-solid.css
+  - node_modules/@fortawesome/fontawesome-free-webfonts/css/fontawesome.css
   - node_modules/toastr/build/toastr.css
   - node_modules/xterm/dist/xterm.css
   - node_modules/angularjs-slider/dist/rzslider.css
@@ -55,7 +58,10 @@ css:
   - node_modules/rdash-ui/dist/css/rdash.min.css
   - node_modules/isteven-angular-multiselect/isteven-multi-select.css
   - node_modules/ui-select/dist/select.min.css
-  - node_modules/font-awesome/css/font-awesome.min.css
+  - node_modules/@fortawesome/fontawesome-free-webfonts/css/fa-brands.css
+  - node_modules/@fortawesome/fontawesome-free-webfonts/css/fa-regular.css
+  - node_modules/@fortawesome/fontawesome-free-webfonts/css/fa-solid.css
+  - node_modules/@fortawesome/fontawesome-free-webfonts/css/fontawesome.css
   - node_modules/toastr/build/toastr.min.css
   - node_modules/xterm/dist/xterm.css
   - node_modules/angularjs-slider/dist/rzslider.min.css
