@@ -12,7 +12,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('before-copy', [
-    'vendor:',
+    'vendor',
     'html2js',
     'useminPrepare:release',
     'concat',
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
     'clean:app',
     'shell:buildBinary:linux:' + arch,
     'shell:downloadDockerBinary:linux:' + arch,
-    'vendor:regular',
+    'vendor',
     'html2js',
     'useminPrepare:dev',
     'concat',
@@ -55,20 +55,19 @@ module.exports = function (grunt) {
   grunt.registerTask('clear', ['clean:app']);
 
   // Load content of `vendor.yml` to src.jsVendor, src.cssVendor and src.angularVendor
-  grunt.registerTask('vendor', 'vendor:<minified|regular>', function(min) {
-      // Argument `min` defaults to 'minified'
-      var minification = (min === '') ? 'minified' : min;
+  grunt.registerTask('vendor', function() {
       var vendorFile = grunt.file.readYAML('vendor.yml');
       for (var filelist in vendorFile) {
           if (vendorFile.hasOwnProperty(filelist)) {
-              var list = vendorFile[filelist][minification];
+              var list = vendorFile[filelist];
               // Check if any of the files is missing
               for (var itemIndex in list) {
                   if (list.hasOwnProperty(itemIndex)) {
-                      var item = list[itemIndex];
+                      var item = 'node_modules/'+list[itemIndex];
                       if (!grunt.file.exists(item)) {
                           grunt.fail.warn('Dependency file ' + item + ' not found.');
                       }
+                      list[itemIndex] = item;
                   }
               }
               // If none is missing, save the list
