@@ -7,7 +7,7 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 	};
 
 	$scope.sortType = 'Order';
-	$scope.sortReverse = true;
+	$scope.sortReverse = false;
 
 	$scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
