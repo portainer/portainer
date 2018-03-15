@@ -375,7 +375,8 @@ type (
 
 	// GitService represents a service for managing Git.
 	GitService interface {
-		CloneRepository(url, destination string) error
+		ClonePublicRepository(repositoryURL, destination string) error
+		ClonePrivateRepositoryWithBasicAuth(repositoryURL, destination, username, password string) error
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.

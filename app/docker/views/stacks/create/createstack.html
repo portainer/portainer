@@ -113,7 +113,7 @@
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                You can use the URL of a public git repository.
+                You can use the URL of a git repository.
               </span>
             </div>
             <div class="form-group">
@@ -130,7 +130,29 @@
             <div class="form-group">
               <label for="stack_repository_path" class="col-sm-2 control-label text-left">Compose path</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" ng-model="formValues.RepositoryPath" id="stack_repository_path" placeholder="docker-compose.yml">
+                <input type="text" class="form-control" ng-model="formValues.ComposeFilePathInRepository" id="stack_repository_path" placeholder="docker-compose.yml">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Authentication
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="formValues.RepositoryAuthentication"><i></i>
+                </label>
+              </div>
+            </div>
+            <div class="form-group" ng-if="formValues.RepositoryAuthentication">
+              <label for="repository_username" class="col-sm-1 control-label text-left">Username</label>
+              <div class="col-sm-11 col-md-5">
+                <input type="text" class="form-control" ng-model="formValues.RepositoryUsername" name="repository_username" placeholder="myGitUser">
+              </div>
+              <label for="repository_password" class="col-sm-1 margin-sm-top control-label text-left">
+                Password
+              </label>
+              <div class="col-sm-11 col-md-5 margin-sm-top">
+                <input type="password" class="form-control" ng-model="formValues.RepositoryPassword" name="repository_password" placeholder="myPassword">
               </div>
             </div>
           </div>
@@ -174,7 +196,7 @@
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress
               || (state.Method === 'upload' && !formValues.StackFile)
-              || (state.Method === 'repository' && (!formValues.RepositoryURL || !formValues.RepositoryPath))
+              || (state.Method === 'repository' && ((!formValues.RepositoryURL || !formValues.ComposeFilePathInRepository) || (formValues.RepositoryAuthentication && (!formValues.RepositoryUsername || !formValues.RepositoryPassword))))
               || !formValues.Name" ng-click="deployStack()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Deploy the stack</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>

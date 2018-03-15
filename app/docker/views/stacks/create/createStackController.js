@@ -7,8 +7,11 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     StackFileContent: '',
     StackFile: null,
     RepositoryURL: '',
+    RepositoryAuthentication: false,
+    RepositoryUsername: '',
+    RepositoryPassword: '',
     Env: [],
-    RepositoryPath: 'docker-compose.yml',
+    ComposeFilePathInRepository: 'docker-compose.yml',
     AccessControlData: new AccessControlFormData()
   };
 
@@ -48,9 +51,14 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       var stackFile = $scope.formValues.StackFile;
       return StackService.createStackFromFileUpload(name, stackFile, env);
     } else if (method === 'repository') {
-      var gitRepository = $scope.formValues.RepositoryURL;
-      var pathInRepository = $scope.formValues.RepositoryPath;
-      return StackService.createStackFromGitRepository(name, gitRepository, pathInRepository, env);
+      var repositoryOptions = {
+        RepositoryURL: $scope.formValues.RepositoryURL,
+        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
+        RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
+        RepositoryUsername: $scope.formValues.RepositoryUsername,
+        RepositoryPassword: $scope.formValues.RepositoryPassword
+      };
+      return StackService.createStackFromGitRepository(name, repositoryOptions, env);
     }
   }
 
@@ -76,18 +84,16 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     createStack(name, method)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
+      return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, [])
+      .then(function success() {
+        $state.go('docker.stacks');
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to apply resource control on the stack');
+      });
     })
     .catch(function error(err) {
       Notifications.warning('Deployment error', err.err.data.err);
-    })
-    .then(function success(data) {
-      return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, []);
-    })
-    .then(function success() {
-      $state.go('docker.stacks');
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to apply resource control on the stack');
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;
