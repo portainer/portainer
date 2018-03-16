@@ -23,7 +23,6 @@ css:
   - 'isteven-angular-multiselect/isteven-multi-select.css'
   - 'ui-select/dist/select.css'
   - '@fortawesome/fontawesome-free-webfonts/css/fa-brands.css'
-  - '@fortawesome/fontawesome-free-webfonts/css/fa-regular.css'
   - '@fortawesome/fontawesome-free-webfonts/css/fa-solid.css'
   - '@fortawesome/fontawesome-free-webfonts/css/fontawesome.css'
   - 'toastr/build/toastr.css'
