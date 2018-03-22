@@ -83,14 +83,11 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     $scope.state.actionInProgress = true;
     createStack(name, method)
     .then(function success(data) {
+      return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, []);
+    })
+    .then(function success() {
       Notifications.success('Stack successfully deployed');
-      return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, [])
-      .then(function success() {
-        $state.go('docker.stacks');
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to apply resource control on the stack');
-      });
+      $state.go('docker.stacks');
     })
     .catch(function error(err) {
       Notifications.warning('Deployment error', err.err.data.err);

@@ -115,14 +115,11 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
 
     StackService.createStackFromGitRepository(stackName, repositoryOptions, template.Env)
     .then(function success(data) {
+      return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, []);
+    })
+    .then(function success() {
       Notifications.success('Stack successfully deployed');
-      ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, [])
-      .then(function success() {
-        $state.go('docker.stacks');
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to apply resource control on the stack');
-      });
+      $state.go('docker.stacks');
     })
     .catch(function error(err) {
       Notifications.warning('Deployment error', err.err.data.err);
