@@ -35,7 +35,7 @@ func isHTML(acceptContent []string) bool {
 func (handler *FileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !isHTML(r.Header["Accept"]) {
 		w.Header().Set("Cache-Control", "max-age=31536000")
-		w.Header().Set("X-XSS-Protection", ""1; mode=block"")
+		w.Header().Set("X-XSS-Protection", "\"1; mode=block\"")
 		w.Header().Set("X-Frame-Options", "SAMEORIGIN")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 	} else {
