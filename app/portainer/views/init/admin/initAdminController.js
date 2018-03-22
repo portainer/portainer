@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('InitAdminController', ['$scope', '$state', '$sanitize', 'Notifications', 'Authentication', 'StateManager', 'UserService', 'EndpointService', 'EndpointProvider',
-function ($scope, $state, $sanitize, Notifications, Authentication, StateManager, UserService, EndpointService, EndpointProvider) {
+.controller('InitAdminController', ['$scope', '$state', '$sanitize', 'Notifications', 'Authentication', 'StateManager', 'UserService', 'EndpointService', 'EndpointProvider', 'ExtensionManager',
+function ($scope, $state, $sanitize, Notifications, Authentication, StateManager, UserService, EndpointService, EndpointProvider, ExtensionManager) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -31,8 +31,13 @@ function ($scope, $state, $sanitize, Notifications, Authentication, StateManager
         $state.go('portainer.init.endpoint');
       } else {
         var endpoint = data[0];
-        EndpointProvider.setEndpointID(endpoint.Id);
-        StateManager.updateEndpointState(false, endpoint.Extensions)
+        endpointID = endpoint.Id;
+        EndpointProvider.setEndpointID(endpointID);
+        ExtensionManager.initEndpointExtensions(endpointID)
+        .then(function success(data) {
+          var extensions = data;
+          return StateManager.updateEndpointState(false, extensions);
+        })
         .then(function success() {
           $state.go('docker.dashboard');
         })

@@ -57,8 +57,10 @@ angular.module('portainer.docker')
         deferred.reject({ msg: data.message });
       } else {
         var layers = [];
+        var order = data.length;
         angular.forEach(data, function(imageLayer) {
-          layers.push(new ImageLayerViewModel(imageLayer));
+          layers.push(new ImageLayerViewModel(order, imageLayer));
+          order--;
         });
         deferred.resolve(layers);
       }

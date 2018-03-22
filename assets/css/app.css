@@ -586,7 +586,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 
 .boxselector_wrapper input[type="radio"]:checked + label::after {
   color: #337ab7;
-  font-family: FontAwesome;
+  font-family: "Font Awesome 5 Free";
   border: 2px solid #337ab7;
   content: "\f00c";
   font-size: 16px;

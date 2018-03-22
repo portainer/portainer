@@ -369,13 +369,14 @@ type (
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
-		StoreStackFileFromString(stackIdentifier string, stackFileContent string) (string, error)
-		StoreStackFileFromReader(stackIdentifier string, r io.Reader) (string, error)
+		StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error)
+		StoreStackFileFromReader(stackIdentifier, fileName string, r io.Reader) (string, error)
 	}
 
 	// GitService represents a service for managing Git.
 	GitService interface {
-		CloneRepository(url, destination string) error
+		ClonePublicRepository(repositoryURL, destination string) error
+		ClonePrivateRepositoryWithBasicAuth(repositoryURL, destination, username, password string) error
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.
@@ -400,7 +401,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.16.3"
+	APIVersion = "1.16.4"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 8
 	// DefaultTemplatesURL represents the default URL for the templates definitions.

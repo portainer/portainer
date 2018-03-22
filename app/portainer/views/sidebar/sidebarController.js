@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService',
-function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService) {
+.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
+function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
 
   $scope.switchEndpoint = function(endpoint) {
     var activeEndpointID = EndpointProvider.endpointID();
@@ -8,7 +8,11 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
 
-    StateManager.updateEndpointState(true, endpoint.Extensions)
+    ExtensionManager.initEndpointExtensions(endpoint.Id)
+    .then(function success(data) {
+      var extensions = data;
+      return StateManager.updateEndpointState(true, extensions);
+    })
     .then(function success() {
       $state.go('docker.dashboard');
     })

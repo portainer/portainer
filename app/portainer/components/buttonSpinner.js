@@ -6,7 +6,7 @@ angular.module('portainer.app')
       spinning: '=buttonSpinner'
     },
     transclude: true,
-    template: '<ng-transclude></ng-transclude><span ng-show="spinning"><i class="fa fa-circle-o-notch fa-spin" style="margin-left: 2px;"></i>&nbsp;</span>'
+    template: '<ng-transclude></ng-transclude><span ng-show="spinning"><i class="fa fa-circle-notch fa-spin" style="margin-left: 2px;"></i>&nbsp;</span>'
   };
 
   return directive;

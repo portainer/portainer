@@ -1,5 +1,6 @@
 angular.module('portainer.app')
-.factory('EndpointService', ['$q', 'Endpoints', 'FileUploadService', function EndpointServiceFactory($q, Endpoints, FileUploadService) {
+.factory('EndpointService', ['$q', 'Endpoints', 'FileUploadService',
+function EndpointServiceFactory($q, Endpoints, FileUploadService) {
   'use strict';
   var service = {};
 
