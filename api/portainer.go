@@ -152,7 +152,7 @@ type (
 		URL             string     `json:"URL"`
 		Authentication  bool       `json:"Authentication"`
 		Username        string     `json:"Username"`
-		Password        string     `json:"Password"`
+		Password        string     `json:"Password,omitempty"`
 		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
 	}
@@ -162,7 +162,7 @@ type (
 	DockerHub struct {
 		Authentication bool   `json:"Authentication"`
 		Username       string `json:"Username"`
-		Password       string `json:"Password"`
+		Password       string `json:"Password,omitempty"`
 	}
 
 	// EndpointID represents an endpoint identifier.
