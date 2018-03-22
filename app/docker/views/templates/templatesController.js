@@ -116,7 +116,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     StackService.createStackFromGitRepository(stackName, repositoryOptions, template.Env)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
-      return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, [])
+      ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, [])
       .then(function success() {
         $state.go('docker.stacks');
       })
@@ -126,7 +126,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     })
     .catch(function error(err) {
       Notifications.warning('Deployment error', err.err.data.err);
-      })
+    })
     .finally(function final() {
       $scope.state.actionInProgress = false;
     });
