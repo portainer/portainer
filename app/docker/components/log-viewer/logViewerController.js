@@ -7,6 +7,7 @@ function (clipboard) {
     copySupported: clipboard.supported,
     logCollection: true,
     autoScroll: true,
+    displayTimestamp: false,
     search: '',
     filteredLogs: [],
     selectedLines: []

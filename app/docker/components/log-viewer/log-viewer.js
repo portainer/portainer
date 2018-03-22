@@ -3,6 +3,7 @@ angular.module('portainer.docker').component('logViewer', {
   controller: 'LogViewerController',
   bindings: {
     data: '=',
-    logCollectionChange: '<'
+    logCollectionChange: '<',
+    logDisplayTimestamp: '<'
   }
 });

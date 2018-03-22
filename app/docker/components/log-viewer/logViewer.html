@@ -16,6 +16,18 @@
             </div>
           </div>
           <div class="form-group">
+            <div class="col-sm-12">
+              <label for="tls" class="control-label text-left">
+                Display timestamps
+                <portainer-tooltip position="bottom" message="Display timestamps in log."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+               <input type="checkbox" ng-model="$ctrl.state.displayTimestamp" ng-change="$ctrl.logDisplayTimeStamp($ctrl.state.displayTimestamp)">
+               <i></i>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
             <label for="logs_search" class="col-sm-1 control-label text-left">
               Search
             </label>
