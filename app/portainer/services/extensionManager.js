@@ -12,7 +12,7 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
       var endpointAPIVersion = parseFloat(data.ApiVersion);
 
       return $q.all([
-        endpointAPIVersion >= 1.25 ? initStoridgeExtension(): null
+        endpointAPIVersion >= 1.25 ? initStoridgeExtension(): {}
       ]);
     })
     .then(function success(data) {
