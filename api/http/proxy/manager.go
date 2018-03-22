@@ -17,7 +17,7 @@ type Manager struct {
 }
 
 // NewManager initializes a new proxy Service
-func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService, settingsService portainer.SettingsService) *Manager {
+func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService, settingsService portainer.SettingsService, registryService portainer.RegistryService, dockerHubService portainer.DockerHubService) *Manager {
 	return &Manager{
 		proxies:          cmap.New(),
 		extensionProxies: cmap.New(),
@@ -25,6 +25,8 @@ func NewManager(resourceControlService portainer.ResourceControlService, teamMem
 			ResourceControlService: resourceControlService,
 			TeamMembershipService:  teamMembershipService,
 			SettingsService:        settingsService,
+			RegistryService:        registryService,
+			DockerHubService:       dockerHubService,
 		},
 	}
 }

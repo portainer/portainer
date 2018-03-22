@@ -140,3 +140,22 @@ func AuthorizedEndpointAccess(endpoint *portainer.Endpoint, userID portainer.Use
 	}
 	return false
 }
+
+// AuthorizedRegistryAccess ensure that the user can access the specified registry.
+// It will check if the user is part of the authorized users or part of a team that is
+// listed in the authorized teams.
+func AuthorizedRegistryAccess(registry *portainer.Registry, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+	for _, authorizedUserID := range registry.AuthorizedUsers {
+		if authorizedUserID == userID {
+			return true
+		}
+	}
+	for _, membership := range memberships {
+		for _, authorizedTeamID := range registry.AuthorizedTeams {
+			if membership.TeamID == authorizedTeamID {
+				return true
+			}
+		}
+	}
+	return false
+}
