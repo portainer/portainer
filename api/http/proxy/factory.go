@@ -15,6 +15,8 @@ type proxyFactory struct {
 	ResourceControlService portainer.ResourceControlService
 	TeamMembershipService  portainer.TeamMembershipService
 	SettingsService        portainer.SettingsService
+	RegistryService        portainer.RegistryService
+	DockerHubService       portainer.DockerHubService
 }
 
 func (factory *proxyFactory) newExtensionHTTPPRoxy(u *url.URL) http.Handler {
@@ -45,6 +47,8 @@ func (factory *proxyFactory) newDockerSocketProxy(path string) http.Handler {
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
 		SettingsService:        factory.SettingsService,
+		RegistryService:        factory.RegistryService,
+		DockerHubService:       factory.DockerHubService,
 		dockerTransport:        newSocketTransport(path),
 	}
 	proxy.Transport = transport
@@ -57,6 +61,8 @@ func (factory *proxyFactory) createDockerReverseProxy(u *url.URL) *httputil.Reve
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
 		SettingsService:        factory.SettingsService,
+		RegistryService:        factory.RegistryService,
+		DockerHubService:       factory.DockerHubService,
 		dockerTransport:        &http.Transport{},
 	}
 	proxy.Transport = transport
