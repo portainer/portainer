@@ -4,7 +4,7 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
   $scope.state = {
     refreshRate: 3,
     lineCount: 2000,
-    displayTimestamp: false
+    displayTimestamps: false
   };
 
   $scope.changeLogCollection = function(logCollectionStatus) {
@@ -13,10 +13,6 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
     } else {
       setUpdateRepeater();
     }
-  };
-
-  $scope.displayTimestamp = function(timestampStatus) {
-      $scope.state.displayTimestamp = timestampStatus;
   };
 
   $scope.$on('$destroy', function() {
@@ -38,7 +34,7 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
   function setUpdateRepeater() {
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
-      ContainerService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamp, $scope.state.lineCount)
+      ContainerService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, $scope.state.lineCount)
       .then(function success(data) {
         $scope.logs = data;
       })
@@ -50,7 +46,7 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
   }
 
   function startLogPolling() {
-    ContainerService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamp, $scope.state.lineCount)
+    ContainerService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, $scope.state.lineCount)
     .then(function success(data) {
       $scope.logs = data;
       setUpdateRepeater();
