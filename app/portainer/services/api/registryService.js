@@ -37,8 +37,6 @@ angular.module('portainer.app')
 
   service.encodedCredentials = function(registry) {
     var credentials = {
-      username: registry.Username,
-      password: registry.Password,
       serveraddress: registry.URL
     };
     return btoa(JSON.stringify(credentials));

@@ -20,7 +20,7 @@
               <td>ID</td>
               <td>
                 {{ network.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeNetwork(network.Id)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this network</button>
+                <button class="btn btn-xs btn-danger" ng-click="removeNetwork(network.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this network</button>
               </td>
             </tr>
             <tr>
@@ -94,7 +94,7 @@
               <td>{{ container.IPv6Address || '-' }}</td>
               <td>{{ container.MacAddress || '-' }}</td>
               <td>
-                <button type="button" class="btn btn-xs btn-danger" ng-click="containerLeaveNetwork(network, container.Id)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Leave Network</button>
+                <button type="button" class="btn btn-xs btn-danger" ng-click="containerLeaveNetwork(network, container.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Leave Network</button>
               </td>
             </tr>
           </tbody>

@@ -1,4 +1,5 @@
-function ImageLayerViewModel(data) {
+function ImageLayerViewModel(order, data) {
+  this.Order = order;
   this.Id = data.Id;
   this.Created = data.Created;
   this.CreatedBy = data.CreatedBy;

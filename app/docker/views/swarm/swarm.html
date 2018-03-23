@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title="Cluster overview">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.swarm" ui-sref-opts="{reload: true}">
-      <i class="fa fa-refresh" aria-hidden="true"></i>
+      <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>Swarm</rd-header-content>
@@ -47,7 +47,7 @@
 <div class="row">
   <div class="col-sm-12">
     <nodes-datatable
-    title="Nodes" title-icon="fa-hdd-o"
+    title="Nodes" title-icon="fa-hdd"
     dataset="nodes" table-key="nodes"
     order-by="Hostname" show-text-filter="true"
     show-ip-address-column="applicationState.endpoint.apiVersion >= 1.25"
