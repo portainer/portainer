@@ -3,14 +3,17 @@ angular.module('portainer.app')
   'use strict';
   var service = {};
 
-  service.registerStoridgeExtension = function(endpointId, url) {
+  service.registerStoridgeExtension = function(url) {
     var payload = {
-      endpointId: endpointId,
       Type: 1,
       URL: url
     };
 
     return Extensions.register(payload).$promise;
+  };
+
+  service.deregisterStoridgeExtension = function() {
+    return Extensions.deregister({ type: 1 }).$promise;
   };
 
   return service;
