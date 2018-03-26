@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerStatsController', ['$q', '$scope', '$transition$', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications',
-function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications) {
+.controller('ContainerStatsController', ['$q', '$scope', '$transition$', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'HttpRequestHelper',
+function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications, HttpRequestHelper) {
 
   $scope.state = {
     refreshRate: '5',
@@ -68,8 +68,8 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
 
   function startChartUpdate(networkChart, cpuChart, memoryChart) {
     $q.all({
-      stats: ContainerService.containerStats($transition$.params().id, $transition$.params().nodeName),
-      top: ContainerService.containerTop($transition$.params().id, $transition$.params().nodeName)
+      stats: ContainerService.containerStats($transition$.params().id),
+      top: ContainerService.containerTop($transition$.params().id)
     })
     .then(function success(data) {
       var stats = data.stats;
@@ -92,8 +92,8 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
       $q.all({
-        stats: ContainerService.containerStats($transition$.params().id, $transition$.params().nodeName),
-        top: ContainerService.containerTop($transition$.params().id, $transition$.params().nodeName)
+        stats: ContainerService.containerStats($transition$.params().id),
+        top: ContainerService.containerTop($transition$.params().id)
       })
       .then(function success(data) {
         var stats = data.stats;
@@ -126,7 +126,8 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
   }
 
   function initView() {
-    ContainerService.container($transition$.params().id, $transition$.params().nodeName)
+    HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
+    ContainerService.container($transition$.params().id)
     .then(function success(data) {
       $scope.container = data;
     })

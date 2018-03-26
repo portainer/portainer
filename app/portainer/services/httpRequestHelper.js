@@ -13,5 +13,13 @@ angular.module('portainer.app')
     headers.registryAuthentication = headerValue;
   };
 
+  service.portainerAgentTargetHeader = function() {
+    return headers.portainerAgentTarget;
+  };
+
+  service.setPortainerAgentTargetHeader = function(headerValue) {
+    headers.portainerAgentTarget = headerValue;
+  };
+
   return service;
 }]);

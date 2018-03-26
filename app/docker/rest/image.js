@@ -1,5 +1,6 @@
 angular.module('portainer.docker')
-.factory('Image', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'HttpRequestHelper', function ImageFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpRequestHelper) {
+.factory('Image', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
+function ImageFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
 
   return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/images/:id/:action', {
@@ -16,13 +17,11 @@ angular.module('portainer.docker')
     push: {
       method: 'POST', params: {action: 'push', id: '@tag'},
       isArray: true, transformResponse: jsonObjectsToArrayHandler,
-      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader },
       ignoreLoadingBar: true
     },
     create: {
       method: 'POST', params: {action: 'create', fromImage: '@fromImage', tag: '@tag'},
       isArray: true, transformResponse: jsonObjectsToArrayHandler,
-      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader },
       ignoreLoadingBar: true
     },
     remove: {

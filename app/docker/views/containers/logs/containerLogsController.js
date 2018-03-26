@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerLogsController', ['$scope', '$transition$', '$interval', 'ContainerService', 'Notifications',
-function ($scope, $transition$, $interval, ContainerService, Notifications) {
+.controller('ContainerLogsController', ['$scope', '$transition$', '$interval', 'ContainerService', 'Notifications', 'HttpRequestHelper',
+function ($scope, $transition$, $interval, ContainerService, Notifications, HttpRequestHelper) {
   $scope.state = {
     refreshRate: 3,
     lineCount: 2000,
@@ -58,7 +58,8 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
   }
 
   function initView() {
-    ContainerService.container($transition$.params().id, $transition$.params().nodeName)
+    HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
+    ContainerService.container($transition$.params().id)
     .then(function success(data) {
       $scope.container = data;
       startLogPolling();

@@ -19,7 +19,7 @@ angular.module('portainer.docker')
   service.network = function(id) {
     var deferred = $q.defer();
 
-    Network.get({id: id}).$promise
+    Network.get({ id: id }).$promise
     .then(function success(data) {
       var network = new NetworkViewModel(data);
       deferred.resolve(network);
@@ -66,6 +66,14 @@ angular.module('portainer.docker')
 
   service.remove = function(id) {
     return Network.remove({ id: id }).$promise;
+  };
+
+  service.disconnectContainer = function(networkId, containerId, force) {
+    return Network.disconnect({ id: networkId }, { Container: containerId, Force: force }).$promise;
+  };
+
+  service.connectContainer = function(networkId, containerId) {
+    return Network.connect({ id: networkId }, { Container: containerId }).$promise;
   };
 
   return service;

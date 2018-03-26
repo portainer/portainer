@@ -5,6 +5,7 @@ function ($scope, $state, NetworkService, Notifications) {
   $scope.removeAction = function (selectedItems) {
     var actionCount = selectedItems.length;
     angular.forEach(selectedItems, function (network) {
+      HttpRequestHelper.setPortainerAgentTargetHeader(network.NodeName);
       NetworkService.remove(network.Id)
       .then(function success() {
         Notifications.success('Network successfully removed', network.Name);

@@ -1,5 +1,6 @@
 angular.module('portainer.docker')
-.factory('Container', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+.factory('Container', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
+function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
   return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/containers/:id/:action', {
     name: '@name',
@@ -11,49 +12,39 @@ angular.module('portainer.docker')
       isArray: true
     },
     get: {
-      method: 'GET', params: { action: 'json' },
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      method: 'GET', params: { action: 'json' }
     },
     stop: {
-      method: 'POST', params: { id: '@id', t: 5, action: 'stop' },
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      method: 'POST', params: { id: '@id', t: 5, action: 'stop' }
     },
     restart: {
-      method: 'POST', params: { id: '@id', t: 5, action: 'restart' },
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      method: 'POST', params: { id: '@id', t: 5, action: 'restart' }
     },
     kill: {
-      method: 'POST', params: { id: '@id', action: 'kill' },
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      method: 'POST', params: { id: '@id', action: 'kill' }
     },
     pause: {
-      method: 'POST', params: { id: '@id', action: 'pause' },
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      method: 'POST', params: { id: '@id', action: 'pause' }
     },
     unpause: {
-      method: 'POST', params: { id: '@id', action: 'unpause' },
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      method: 'POST', params: { id: '@id', action: 'unpause' }
     },
     logs: {
       method: 'GET', params: { id: '@id', action: 'logs' },
       timeout: 4500, ignoreLoadingBar: true,
-      transformResponse: logsHandler, isArray: true,
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      transformResponse: logsHandler, isArray: true
     },
     stats: {
       method: 'GET', params: { id: '@id', stream: false, action: 'stats' },
-      timeout: 4500, ignoreLoadingBar: true,
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      timeout: 4500, ignoreLoadingBar: true
     },
     top: {
       method: 'GET', params: { id: '@id', action: 'top' },
-      timeout: 4500, ignoreLoadingBar: true,
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      timeout: 4500, ignoreLoadingBar: true
     },
     start: {
       method: 'POST', params: {id: '@id', action: 'start'},
-      transformResponse: genericHandler,
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      transformResponse: genericHandler
     },
     create: {
       method: 'POST', params: {action: 'create'},
@@ -62,28 +53,18 @@ angular.module('portainer.docker')
     },
     remove: {
       method: 'DELETE', params: {id: '@id', v: '@v', force: '@force'},
-      transformResponse: genericHandler,
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      transformResponse: genericHandler
     },
     rename: {
-      method: 'POST', params: {id: '@id', action: 'rename', name: '@name'},
-      transformResponse: genericHandler,
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      method: 'POST', params: { id: '@id', action: 'rename', name: '@name' },
+      transformResponse: genericHandler
     },
     exec: {
       method: 'POST', params: {id: '@id', action: 'exec'},
-      transformResponse: genericHandler, ignoreLoadingBar: true,
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      transformResponse: genericHandler, ignoreLoadingBar: true
     },
     inspect: {
-      method: 'GET', params: { id: '@id', action: 'json' },
-      headers: { 'X-PortainerAgent-Target': retrieveNodeNameFromConfig }
+      method: 'GET', params: { id: '@id', action: 'json' }
     }
   });
 }]);
-
-function retrieveNodeNameFromConfig(requestConfig){
-  if (requestConfig.params.nodeName) {
-    return requestConfig.params.nodeName;
-  }
-}

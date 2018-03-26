@@ -84,6 +84,13 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Mountpoint' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('NodeName')">
+                  Host
+                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
               <th ng-if="$ctrl.showOwnershipColumn">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
@@ -106,6 +113,7 @@
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
               <td>{{ item.Driver }}</td>
               <td>{{ item.Mountpoint | truncatelr }}</td>
+              <td>{{ item.NodeName ? item.NodeName : '-' }}</td>
               <td ng-if="$ctrl.showOwnershipColumn">
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>

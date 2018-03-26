@@ -3,11 +3,11 @@ angular.module('portainer.docker')
   'use strict';
   var service = {};
 
-  service.resizeTTY = function(execId, nodeName, height, width, timeout) {
+  service.resizeTTY = function(execId, height, width, timeout) {
     var deferred = $q.defer();
 
     $timeout(function() {
-      Exec.resize({ nodeName: nodeName }, { id: execId, height: height, width: width }).$promise
+      Exec.resize({}, { id: execId, height: height, width: width }).$promise
       .then(function success(data) {
         if (data.message) {
           deferred.reject({ msg: 'Unable to exec into container', err: data.message });
