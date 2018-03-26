@@ -38,10 +38,129 @@ func NewWebSocketHandler() *WebSocketHandler {
 	return h
 }
 
+type (
+	httpTarget struct {
+		host      string
+		scheme    string
+		tlsConfig *tls.Config
+	}
+
+	execStartOperationPayload struct {
+		Tty    bool
+		Detach bool
+	}
+
+	hijackedStream struct {
+		in  io.ReadCloser
+		out io.Writer
+	}
+)
+
+func createHTTPTargetFromEndpoint(endpoint *portainer.Endpoint) (*httpTarget, error) {
+	url, err := url.Parse(endpoint.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	target := httpTarget{
+		scheme: url.Scheme,
+	}
+
+	if url.Scheme == "tcp" {
+		target.host = url.Host
+	} else if url.Scheme == "unix" {
+		target.host = url.Path
+	}
+
+	if endpoint.TLSConfig.TLS {
+		tlsConfig, err := crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
+		if err != nil {
+			return nil, err
+		}
+		target.tlsConfig = tlsConfig
+	}
+
+	return &target, nil
+}
+
+func prepareRequest(method, path, host string) (*http.Request, error) {
+	execStartOperationPayload := &execStartOperationPayload{
+		Tty:    true,
+		Detach: false,
+	}
+
+	encodedBody := bytes.NewBuffer(nil)
+	err := json.NewEncoder(encodedBody).Encode(execStartOperationPayload)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := http.NewRequest(method, path, encodedBody)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Connection", "Upgrade")
+	request.Header.Set("Upgrade", "tcp")
+	request.Header.Set("User-Agent", "Docker-Client")
+	request.Host = host
+
+	return request, nil
+}
+
+func prepareDial(target *httpTarget) (net.Conn, error) {
+	if target.tlsConfig != nil {
+		return tls.Dial(target.scheme, target.host, target.tlsConfig)
+	}
+	return net.Dial(target.scheme, target.host)
+}
+
+func doHijack(dial net.Conn, request *http.Request, stream hijackedStream) error {
+	clientconn := httputil.NewClientConn(dial, nil)
+	defer clientconn.Close()
+
+	// Server hijacks the connection, error 'connection closed' expected
+	resp, err := clientconn.Do(request)
+	if err != httputil.ErrPersistEOF {
+		if err != nil {
+			return err
+		}
+		if resp.StatusCode != http.StatusSwitchingProtocols {
+			resp.Body.Close()
+			return fmt.Errorf("unable to upgrade to tcp, received %d", resp.StatusCode)
+		}
+	}
+
+	c, br := clientconn.Hijack()
+	defer c.Close()
+
+	go func() error {
+		_, err = io.Copy(stream.out, br)
+		return err
+	}()
+
+	go func() error {
+		_, err = io.Copy(c, stream.in)
+		return err
+	}()
+
+	var receiveStdout chan error
+	if err := <-receiveStdout; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
 	qry := ws.Request().URL.Query()
 	execID := qry.Get("id")
 	edpID := qry.Get("endpointId")
+	if execID == "" || edpID == "" {
+		log.Printf("Invalid query parameters")
+		return
+	}
 
 	parsedID, err := strconv.Atoi(edpID)
 	if err != nil {
@@ -56,79 +175,22 @@ func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
 		return
 	}
 
-	endpointURL, err := url.Parse(endpoint.URL)
+	target, err := createHTTPTargetFromEndpoint(endpoint)
 	if err != nil {
-		log.Printf("Unable to parse endpoint URL: %s", err)
+		log.Printf("Unable to retrieve endpoint: %s", err)
 		return
 	}
 
-	var host string
-	if endpointURL.Scheme == "tcp" {
-		host = endpointURL.Host
-	} else if endpointURL.Scheme == "unix" {
-		host = endpointURL.Path
-	}
-
-	// TODO: Should not be managed here
-	var tlsConfig *tls.Config
-	if endpoint.TLSConfig.TLS {
-		tlsConfig, err = crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
-		if err != nil {
-			log.Fatalf("Unable to create TLS configuration: %s", err)
-			return
-		}
-	}
-
-	if err := hijack(host, endpointURL.Scheme, "POST", "/exec/"+execID+"/start", tlsConfig, true, ws, ws, ws, nil, nil); err != nil {
-		log.Fatalf("error during hijack: %s", err)
+	request, err := prepareRequest("POST", "/exec/"+execID+"/start", target.host)
+	if err != nil {
+		log.Printf("Unable to create request: %s", err)
 		return
 	}
-}
 
-type execConfig struct {
-	Tty    bool
-	Detach bool
-}
-
-// hijack allows to upgrade an HTTP connection to a TCP connection
-// It redirects IO streams for stdin, stdout and stderr to a websocket
-func hijack(addr, scheme, method, path string, tlsConfig *tls.Config, setRawTerminal bool, in io.ReadCloser, stdout, stderr io.Writer, started chan io.Closer, data interface{}) error {
-	execConfig := &execConfig{
-		Tty:    true,
-		Detach: false,
-	}
-
-	buf, err := json.Marshal(execConfig)
+	dial, err := prepareDial(target)
 	if err != nil {
-		return fmt.Errorf("error marshaling exec config: %s", err)
-	}
-
-	rdr := bytes.NewReader(buf)
-
-	req, err := http.NewRequest(method, path, rdr)
-	if err != nil {
-		return fmt.Errorf("error during hijack request: %s", err)
-	}
-
-	req.Header.Set("User-Agent", "Docker-Client")
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Connection", "Upgrade")
-	req.Header.Set("Upgrade", "tcp")
-	req.Host = addr
-
-	var (
-		dial    net.Conn
-		dialErr error
-	)
-
-	if tlsConfig == nil {
-		dial, dialErr = net.Dial(scheme, addr)
-	} else {
-		dial, dialErr = tls.Dial(scheme, addr, tlsConfig)
-	}
-
-	if dialErr != nil {
-		return dialErr
+		log.Printf("Unable to create dial: %s", err)
+		return
 	}
 
 	// When we set up a TCP connection for hijack, there could be long periods
@@ -140,57 +202,15 @@ func hijack(addr, scheme, method, path string, tlsConfig *tls.Config, setRawTerm
 		tcpConn.SetKeepAlive(true)
 		tcpConn.SetKeepAlivePeriod(30 * time.Second)
 	}
+
+	stream := hijackedStream{
+		in:  ws,
+		out: ws,
+	}
+
+	err = doHijack(dial, request, stream)
 	if err != nil {
-		return err
+		log.Printf("Hijack failed: %s", err)
+		return
 	}
-	clientconn := httputil.NewClientConn(dial, nil)
-	defer clientconn.Close()
-
-	// Server hijacks the connection, error 'connection closed' expected
-	clientconn.Do(req)
-
-	rwc, br := clientconn.Hijack()
-	defer rwc.Close()
-
-	if started != nil {
-		started <- rwc
-	}
-
-	var receiveStdout chan error
-
-	if stdout != nil || stderr != nil {
-		go func() (err error) {
-			if setRawTerminal && stdout != nil {
-				_, err = io.Copy(stdout, br)
-			}
-			return err
-		}()
-	}
-
-	go func() error {
-		if in != nil {
-			io.Copy(rwc, in)
-		}
-
-		if conn, ok := rwc.(interface {
-			CloseWrite() error
-		}); ok {
-			if err := conn.CloseWrite(); err != nil {
-			}
-		}
-		return nil
-	}()
-
-	if stdout != nil || stderr != nil {
-		if err := <-receiveStdout; err != nil {
-			return err
-		}
-	}
-	go func() {
-		for {
-			fmt.Println(br)
-		}
-	}()
-
-	return nil
 }
