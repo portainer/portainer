@@ -3,7 +3,8 @@ angular.module('portainer.docker')
 function ($scope, $transition$, $interval, ContainerService, Notifications) {
   $scope.state = {
     refreshRate: 3,
-    lineCount: 2000
+    lineCount: 2000,
+    displayTimestamps: false
   };
 
   $scope.changeLogCollection = function(logCollectionStatus) {
@@ -33,7 +34,7 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
   function setUpdateRepeater() {
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
-      ContainerService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
+      ContainerService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, $scope.state.lineCount)
       .then(function success(data) {
         $scope.logs = data;
       })
@@ -45,7 +46,7 @@ function ($scope, $transition$, $interval, ContainerService, Notifications) {
   }
 
   function startLogPolling() {
-    ContainerService.logs($transition$.params().id, 1, 1, 0, $scope.state.lineCount)
+    ContainerService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, $scope.state.lineCount)
     .then(function success(data) {
       $scope.logs = data;
       setUpdateRepeater();
