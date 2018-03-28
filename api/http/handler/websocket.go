@@ -1,11 +1,11 @@
 package handler
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"net/http"
@@ -16,181 +16,117 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
+	"github.com/koding/websocketproxy"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
-	"golang.org/x/net/websocket"
+	httperror "github.com/portainer/portainer/http/error"
 )
 
-// WebSocketHandler represents an HTTP API handler for proxying requests to a web socket.
-type WebSocketHandler struct {
-	*mux.Router
-	Logger          *log.Logger
-	EndpointService portainer.EndpointService
-}
-
-// NewWebSocketHandler returns a new instance of WebSocketHandler.
-func NewWebSocketHandler() *WebSocketHandler {
-	h := &WebSocketHandler{
-		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "", log.LstdFlags),
-	}
-	h.Handle("/websocket/exec", websocket.Handler(h.webSocketDockerExec))
-	return h
-}
-
 type (
-	httpTarget struct {
-		host      string
-		scheme    string
-		tlsConfig *tls.Config
+	// WebSocketHandler represents an HTTP API handler for proxying requests to a web socket.
+	WebSocketHandler struct {
+		*mux.Router
+		Logger             *log.Logger
+		EndpointService    portainer.EndpointService
+		connectionUpgrader websocket.Upgrader
+	}
+
+	webSocketExecRequestParams struct {
+		execID   string
+		nodeName string
+		endpoint *portainer.Endpoint
 	}
 
 	execStartOperationPayload struct {
 		Tty    bool
 		Detach bool
 	}
-
-	hijackedStream struct {
-		in  io.ReadCloser
-		out io.Writer
-	}
 )
 
-func createHTTPTargetFromEndpoint(endpoint *portainer.Endpoint) (*httpTarget, error) {
-	url, err := url.Parse(endpoint.URL)
-	if err != nil {
-		return nil, err
+// NewWebSocketHandler returns a new instance of WebSocketHandler.
+func NewWebSocketHandler() *WebSocketHandler {
+	h := &WebSocketHandler{
+		Router:             mux.NewRouter(),
+		Logger:             log.New(os.Stderr, "", log.LstdFlags),
+		connectionUpgrader: websocket.Upgrader{},
 	}
-
-	target := httpTarget{
-		scheme: url.Scheme,
-	}
-
-	if url.Scheme == "tcp" {
-		target.host = url.Host
-	} else if url.Scheme == "unix" {
-		target.host = url.Path
-	}
-
-	if endpoint.TLSConfig.TLS {
-		tlsConfig, err := crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
-		if err != nil {
-			return nil, err
-		}
-		target.tlsConfig = tlsConfig
-	}
-
-	return &target, nil
+	h.HandleFunc("/websocket/exec", h.handleWebsocketExec).Methods(http.MethodGet)
+	return h
 }
 
-func prepareRequest(method, path, host string) (*http.Request, error) {
-	execStartOperationPayload := &execStartOperationPayload{
-		Tty:    true,
-		Detach: false,
+// handleWebsocketExec handles GET requests on /websocket/exec?id=<execID>&endpointId=<endpointID>&nodeName=<nodeName>
+// If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
+// If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
+// an ExecStart operation HTTP request will be created and hijacked.
+func (handler *WebSocketHandler) handleWebsocketExec(w http.ResponseWriter, r *http.Request) {
+	paramExecID := r.FormValue("id")
+	paramEndpointID := r.FormValue("endpointId")
+	if paramExecID == "" || paramEndpointID == "" {
+		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		return
 	}
 
-	encodedBody := bytes.NewBuffer(nil)
-	err := json.NewEncoder(encodedBody).Encode(execStartOperationPayload)
+	endpointID, err := strconv.Atoi(paramEndpointID)
 	if err != nil {
-		return nil, err
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
 	}
 
-	request, err := http.NewRequest(method, path, encodedBody)
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 	if err != nil {
-		return nil, err
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
 	}
 
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Connection", "Upgrade")
-	request.Header.Set("Upgrade", "tcp")
-	request.Header.Set("User-Agent", "Docker-Client")
-	request.Host = host
+	params := &webSocketExecRequestParams{
+		endpoint: endpoint,
+		execID:   paramExecID,
+		nodeName: r.FormValue("nodeName"),
+	}
 
-	return request, nil
+	err = handler.handleRequest(w, r, params)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
 }
 
-func prepareDial(target *httpTarget) (net.Conn, error) {
-	if target.tlsConfig != nil {
-		return tls.Dial(target.scheme, target.host, target.tlsConfig)
+func (handler *WebSocketHandler) handleRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
+	if params.nodeName != "" {
+		return proxyWebsocketRequest(w, r, params)
 	}
-	return net.Dial(target.scheme, target.host)
+
+	websocketConn, err := handler.connectionUpgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return err
+	}
+	defer websocketConn.Close()
+
+	return hijackExecStartOperation(websocketConn, params.endpoint, params.execID)
 }
 
-func doHijack(dial net.Conn, request *http.Request, stream hijackedStream) error {
-	clientconn := httputil.NewClientConn(dial, nil)
-	defer clientconn.Close()
-
-	// Server hijacks the connection, error 'connection closed' expected
-	resp, err := clientconn.Do(request)
-	if err != httputil.ErrPersistEOF {
-		if err != nil {
-			return err
-		}
-		if resp.StatusCode != http.StatusSwitchingProtocols {
-			resp.Body.Close()
-			return fmt.Errorf("unable to upgrade to tcp, received %d", resp.StatusCode)
-		}
-	}
-
-	c, br := clientconn.Hijack()
-	defer c.Close()
-
-	go func() error {
-		_, err = io.Copy(stream.out, br)
-		return err
-	}()
-
-	go func() error {
-		_, err = io.Copy(c, stream.in)
-		return err
-	}()
-
-	var receiveStdout chan error
-	if err := <-receiveStdout; err != nil {
+func proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
+	agentURL, err := url.Parse(params.endpoint.URL)
+	if err != nil {
 		return err
 	}
+
+	agentURL.Scheme = "ws"
+	proxy := websocketproxy.NewProxy(agentURL)
+	proxy.Director = func(incoming *http.Request, out http.Header) {
+		out.Set("X-PortainerAgent-Target", params.nodeName)
+	}
+	r.Header.Del("Origin")
+	proxy.ServeHTTP(w, r)
 
 	return nil
 }
 
-func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
-	qry := ws.Request().URL.Query()
-	execID := qry.Get("id")
-	edpID := qry.Get("endpointId")
-	if execID == "" || edpID == "" {
-		log.Printf("Invalid query parameters")
-		return
-	}
-
-	parsedID, err := strconv.Atoi(edpID)
+func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer.Endpoint, execID string) error {
+	dial, err := createDial(endpoint)
 	if err != nil {
-		log.Printf("Unable to parse endpoint ID: %s", err)
-		return
-	}
-
-	endpointID := portainer.EndpointID(parsedID)
-	endpoint, err := handler.EndpointService.Endpoint(endpointID)
-	if err != nil {
-		log.Printf("Unable to retrieve endpoint: %s", err)
-		return
-	}
-
-	target, err := createHTTPTargetFromEndpoint(endpoint)
-	if err != nil {
-		log.Printf("Unable to retrieve endpoint: %s", err)
-		return
-	}
-
-	request, err := prepareRequest("POST", "/exec/"+execID+"/start", target.host)
-	if err != nil {
-		log.Printf("Unable to create request: %s", err)
-		return
-	}
-
-	dial, err := prepareDial(target)
-	if err != nil {
-		log.Printf("Unable to create dial: %s", err)
-		return
+		return err
 	}
 
 	// When we set up a TCP connection for hijack, there could be long periods
@@ -203,14 +139,127 @@ func (handler *WebSocketHandler) webSocketDockerExec(ws *websocket.Conn) {
 		tcpConn.SetKeepAlivePeriod(30 * time.Second)
 	}
 
-	stream := hijackedStream{
-		in:  ws,
-		out: ws,
+	httpConn := httputil.NewClientConn(dial, nil)
+	defer httpConn.Close()
+
+	execStartRequest, err := createExecStartRequest(execID)
+	if err != nil {
+		return err
 	}
 
-	err = doHijack(dial, request, stream)
+	err = hijackRequest(websocketConn, httpConn, execStartRequest)
 	if err != nil {
-		log.Printf("Hijack failed: %s", err)
-		return
+		return err
+	}
+
+	return nil
+}
+
+func createDial(endpoint *portainer.Endpoint) (net.Conn, error) {
+	url, err := url.Parse(endpoint.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	var host string
+	if url.Scheme == "tcp" {
+		host = url.Host
+	} else if url.Scheme == "unix" {
+		host = url.Path
+	}
+
+	if endpoint.TLSConfig.TLS {
+		tlsConfig, err := crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
+		if err != nil {
+			return nil, err
+		}
+		return tls.Dial(url.Scheme, host, tlsConfig)
+	}
+
+	return net.Dial(url.Scheme, host)
+}
+
+func createExecStartRequest(execID string) (*http.Request, error) {
+	execStartOperationPayload := &execStartOperationPayload{
+		Tty:    true,
+		Detach: false,
+	}
+
+	encodedBody := bytes.NewBuffer(nil)
+	err := json.NewEncoder(encodedBody).Encode(execStartOperationPayload)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := http.NewRequest("POST", "/exec/"+execID+"/start", encodedBody)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Connection", "Upgrade")
+	request.Header.Set("Upgrade", "tcp")
+
+	return request, nil
+}
+
+func hijackRequest(websocketConn *websocket.Conn, httpConn *httputil.ClientConn, request *http.Request) error {
+	// Server hijacks the connection, error 'connection closed' expected
+	resp, err := httpConn.Do(request)
+	if err != httputil.ErrPersistEOF {
+		if err != nil {
+			return err
+		}
+		if resp.StatusCode != http.StatusSwitchingProtocols {
+			resp.Body.Close()
+			return fmt.Errorf("unable to upgrade to tcp, received %d", resp.StatusCode)
+		}
+	}
+
+	tcpConn, brw := httpConn.Hijack()
+	defer tcpConn.Close()
+
+	errorChan := make(chan error, 1)
+	go streamFromTCPConnToWebsocketConn(websocketConn, brw, errorChan)
+	go streamFromWebsocketConnToTCPConn(websocketConn, tcpConn, errorChan)
+
+	err = <-errorChan
+	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
+		return err
+	}
+
+	return nil
+}
+
+func streamFromWebsocketConnToTCPConn(websocketConn *websocket.Conn, tcpConn net.Conn, errorChan chan error) {
+	for {
+		_, in, err := websocketConn.ReadMessage()
+		if err != nil {
+			errorChan <- err
+			break
+		}
+
+		_, err = tcpConn.Write(in)
+		if err != nil {
+			errorChan <- err
+			break
+		}
+	}
+}
+
+func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.Reader, errorChan chan error) {
+	for {
+		out := make([]byte, 1024)
+		_, err := br.Read(out)
+		if err != nil {
+			errorChan <- err
+			break
+		}
+
+		err = websocketConn.WriteMessage(websocket.TextMessage, out)
+		if err != nil {
+			errorChan <- err
+			break
+		}
 	}
 }

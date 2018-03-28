@@ -1,6 +1,8 @@
 angular.module('portainer.docker')
-.controller('ContainerConsoleController', ['$scope', '$transition$', 'Container', 'Image', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ContainerService', 'ExecService',
-function ($scope, $transition$, Container, Image, EndpointProvider, Notifications, ContainerHelper, ContainerService, ExecService) {
+.controller('ContainerConsoleController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper',
+function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper) {
+  var socket, term;
+
   $scope.state = {
     loaded: false,
     connected: false
@@ -8,30 +10,11 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
 
   $scope.formValues = {};
 
-  var socket, term;
-
   // Ensure the socket is closed before leaving the view
   $scope.$on('$stateChangeStart', function (event, next, current) {
     if (socket && socket !== null) {
       socket.close();
     }
-  });
-
-  Container.get({ id: $transition$.params().id }, function(d) {
-    $scope.container = d;
-    if (d.message) {
-      Notifications.error('Error', d, 'Unable to retrieve container details');
-    } else {
-      Image.get({id: d.Image}, function(imgData) {
-        $scope.imageOS = imgData.Os;
-        $scope.formValues.command = imgData.Os === 'windows' ? 'powershell' : 'bash';
-        $scope.state.loaded = true;
-      }, function (e) {
-        Notifications.error('Failure', e, 'Unable to retrieve image details');
-      });
-    }
-  }, function (e) {
-    Notifications.error('Failure', e, 'Unable to retrieve container details');
   });
 
   $scope.connect = function() {
@@ -54,6 +37,9 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
     .then(function success(data) {
       execId = data.Id;
       var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
+      if ($transition$.params().nodeName) {
+        url += '&nodeName=' + $transition$.params().nodeName;
+      }
       if (url.indexOf('https') > -1) {
         url = url.replace('https://', 'wss://');
       } else {
@@ -108,4 +94,25 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
       };
     };
   }
+
+  function initView() {
+    HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
+    ContainerService.container($transition$.params().id)
+    .then(function success(data) {
+      var container = data;
+      $scope.container = container;
+      return ImageService.image(container.Image);
+    })
+    .then(function success(data) {
+      var image = data;
+      $scope.imageOS = image.Os;
+      $scope.formValues.command = image.Os === 'windows' ? 'powershell' : 'bash';
+      $scope.state.loaded = true;
+    })
+    .catch(function error(err) {
+      Notifications.error('Error', err, 'Unable to retrieve container details');
+    });
+  }
+
+  initView();
 }]);
