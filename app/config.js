@@ -21,7 +21,7 @@ angular.module('portainer')
     });
     $httpProvider.interceptors.push('jwtInterceptor');
 
-    $httpProvider.interceptors.push(function(HttpRequestHelper) {
+    $httpProvider.interceptors.push(['HttpRequestHelper', function(HttpRequestHelper) {
       return {
         'request': function(config) {
           if (config.url.indexOf('/docker/') > -1) {
@@ -30,7 +30,7 @@ angular.module('portainer')
           return config;
         }
       };
-    });
+    }]);
 
     AnalyticsProvider.setAccount('@@CONFIG_GA_ID');
     AnalyticsProvider.startOffline(true);
