@@ -1,7 +1,22 @@
 angular.module('portainer.docker')
-.factory('ServiceService', ['$q', 'Service', 'ServiceHelper', 'TaskService', 'ResourceControlService', function ServiceServiceFactory($q, Service, ServiceHelper, TaskService, ResourceControlService) {
+.factory('ServiceService', ['$q', 'Service', 'ServiceHelper', 'TaskService', 'ResourceControlService', 'Notifications', function ServiceServiceFactory($q, Service, ServiceHelper, TaskService, ResourceControlService, Notifications) {
   'use strict';
   var service = {};
+
+  service.scaleService = function(selectedService, $state) {
+    var config = ServiceHelper.serviceToConfig(selectedService.Model);
+    config.Mode.Replicated.Replicas = selectedService.Replicas;
+    service.update(selectedService, config)
+    .then(function success(data) {
+      Notifications.success('Service successfully scaled', 'New replica count: ' + selectedService.Replicas);
+      $state.reload();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to scale service');
+      selectedService.Scale = false;
+      selectedService.Replicas = selectedService.ReplicaCount;
+    });
+  };
 
   service.services = function(filters) {
     var deferred = $q.defer();

@@ -84,5 +84,9 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     $scope.stackFileContent = cm.getValue();
   };
 
+  $scope.scaleAction = function(selectedService) {
+    ServiceService.scaleService(selectedService, $state);
+  };
+
   initView();
 }]);
