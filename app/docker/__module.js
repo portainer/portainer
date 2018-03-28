@@ -170,7 +170,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var image = {
     name: 'docker.images.image',
-    url: '/:id',
+    url: '/:id?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/images/edit/image.html',
@@ -443,7 +443,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var volume = {
     name: 'docker.volumes.volume',
-    url: '/:id',
+    url: '/:id?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/volumes/edit/volume.html',
