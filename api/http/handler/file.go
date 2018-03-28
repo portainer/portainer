@@ -33,7 +33,7 @@ func isHTML(acceptContent []string) bool {
 }
 
 func (handler *FileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	//Security headers (concerning owasp rules)
+	//Security headers (According to Owasp recommendations)
 	w.Header().Set("X-XSS-Protection", "\"1; mode=block\"")
 	w.Header().Set("X-Frame-Options", "SAMEORIGIN")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
