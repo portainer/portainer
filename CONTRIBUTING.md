@@ -30,9 +30,6 @@ You can have a use Github filters to list these issues:
 * intermediate labeled issues: https://github.com/portainer/portainer/labels/exp%2Fintermediate
 * advanced labeled issues: https://github.com/portainer/portainer/labels/exp%2Fadvanced
 
-### Linting
-
-Please check your code using `grunt lint` before submitting your pull requests.
 
 ### Commit Message Format
 
