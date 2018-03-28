@@ -132,6 +132,10 @@ a[ng-click]{
   font-weight: normal;
 }
 
+.widget .widget-body table tbody td {
+  white-space: nowrap; 
+}
+
 .template-widget {
   height: 100%;
 }
