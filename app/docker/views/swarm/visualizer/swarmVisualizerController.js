@@ -3,21 +3,21 @@ angular.module('portainer.docker')
 function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskService, Notifications, LocalStorage) {
 
   $scope.state = {
-    ShowInformationPanel: LocalStorage.getSwarmVisualizerSettings("show_info_panel", true),
-    DisplayOnlyRunningTasks: LocalStorage.getSwarmVisualizerSettings("display_only_running_tasks", false),
-    refreshRate: LocalStorage.getSwarmVisualizerSettings("refresh_rate", '5')
+    ShowInformationPanel: LocalStorage.getSwarmVisualizerSettings('show_info_panel', true),
+    DisplayOnlyRunningTasks: LocalStorage.getSwarmVisualizerSettings('display_only_running_tasks', false),
+    refreshRate: LocalStorage.getSwarmVisualizerSettings('refresh_rate', '5')
   };
 
   $scope.$on('$destroy', function() {
     stopRepeater();
   });
 
-  $scope.$watch("state.DisplayOnlyRunningTasks", function(newVal, oldVal) {
-    LocalStorage.storeSwarmVisualizerSettings("display_only_running_tasks", newVal);
+  $scope.$watch('state.DisplayOnlyRunningTasks', function(newVal, oldVal) {
+    LocalStorage.storeSwarmVisualizerSettings('display_only_running_tasks', newVal);
   });
 
-  $scope.$watch("state.ShowInformationPanel", function(newVal, oldVal) {
-    LocalStorage.storeSwarmVisualizerSettings("show_info_panel", newVal);
+  $scope.$watch('state.ShowInformationPanel', function(newVal, oldVal) {
+    LocalStorage.storeSwarmVisualizerSettings('show_info_panel', newVal);
   });
   
   $scope.changeUpdateRepeater = function() {
@@ -58,7 +58,7 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
       });
     }, refreshRate * 1000);
     
-    LocalStorage.storeSwarmVisualizerSettings("refresh_rate", refreshRate);
+    LocalStorage.storeSwarmVisualizerSettings('refresh_rate', refreshRate);
   }
 
 
