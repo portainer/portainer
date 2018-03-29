@@ -181,6 +181,11 @@ func (handler *UserHandler) handleGetUsers(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
+		httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+		return
+	}
+
 	filteredUsers := security.FilterUsers(users, securityContext)
 
 	for i := range filteredUsers {
