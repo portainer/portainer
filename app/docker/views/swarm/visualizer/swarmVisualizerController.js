@@ -1,17 +1,25 @@
 angular.module('portainer.docker')
-.controller('SwarmVisualizerController', ['$q', '$scope', '$document', '$interval', 'NodeService', 'ServiceService', 'TaskService', 'Notifications',
-function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskService, Notifications) {
+.controller('SwarmVisualizerController', ['$q', '$scope', '$document', '$interval', 'NodeService', 'ServiceService', 'TaskService', 'Notifications', 'LocalStorage',
+function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskService, Notifications, LocalStorage) {
 
   $scope.state = {
-    ShowInformationPanel: true,
-    DisplayOnlyRunningTasks: false,
-    refreshRate: '5'
+    ShowInformationPanel: LocalStorage.getSwarmVisualizerSettings("show_info_panel", true),
+    DisplayOnlyRunningTasks: LocalStorage.getSwarmVisualizerSettings("display_only_running_tasks", false),
+    refreshRate: LocalStorage.getSwarmVisualizerSettings("refresh_rate", '5')
   };
 
   $scope.$on('$destroy', function() {
     stopRepeater();
   });
 
+  $scope.$watch("state.DisplayOnlyRunningTasks", function(newVal, oldVal) {
+    LocalStorage.storeSwarmVisualizerSettings("display_only_running_tasks", newVal);
+  });
+
+  $scope.$watch("state.ShowInformationPanel", function(newVal, oldVal) {
+    LocalStorage.storeSwarmVisualizerSettings("show_info_panel", newVal);
+  });
+  
   $scope.changeUpdateRepeater = function() {
     stopRepeater();
     setUpdateRepeater();
@@ -49,6 +57,8 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
         Notifications.error('Failure', err, 'Unable to retrieve cluster information');
       });
     }, refreshRate * 1000);
+    
+    LocalStorage.storeSwarmVisualizerSettings("refresh_rate", refreshRate);
   }
 
 

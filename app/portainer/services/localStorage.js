@@ -59,6 +59,16 @@ angular.module('portainer.app')
     storeDataTableSettings: function(key, data) {
       localStorageService.set('datatable_settings_' + key, data);
     },
+    storeSwarmVisualizerSettings: function(key, data) {
+      localStorageService.set('swarmvisualizer_' + key, data);
+    },
+    getSwarmVisualizerSettings: function(key, defaultVal) {
+      var val = localStorageService.get('swarmvisualizer_' + key);
+      if (val === undefined || val === null)
+          return defaultVal;
+      
+      return val;
+    },
     clean: function() {
       localStorageService.clearAll();
     }
