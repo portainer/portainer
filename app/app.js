@@ -1,5 +1,6 @@
 angular.module('portainer')
-.run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'cfpLoadingBar', function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, cfpLoadingBar) {
+.run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'cfpLoadingBar', '$transitions', 'HttpRequestHelper',
+function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, cfpLoadingBar, $transitions, HttpRequestHelper) {
   'use strict';
 
   EndpointProvider.initialize();
@@ -27,6 +28,10 @@ angular.module('portainer')
       originalSet.apply(cfpLoadingBar, arguments);
     }
   };
+
+  $transitions.onSuccess({ to: 'docker.**' }, function() {
+    HttpRequestHelper.resetAgentTargetQueue();
+  });
 }]);
 
 

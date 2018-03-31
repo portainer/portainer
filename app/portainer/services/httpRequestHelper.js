@@ -36,5 +36,10 @@ angular.module('portainer.app')
     }
   };
 
+  service.resetAgentTargetQueue = function() {
+    headers.agentTargetQueue = [];
+    delete headers.agentTargetLastValue;
+  };
+
   return service;
 }]);
