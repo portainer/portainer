@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.16.4",
+  "version": "1.16.5",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -23,6 +23,7 @@
     "node": ">= 0.8.4"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free-webfonts": "^1.0.4",
     "@uirouter/angularjs": "~1.0.6",
     "angular": "~1.5.0",
     "angular-clipboard": "^1.6.2",
@@ -45,7 +46,6 @@
     "chart.js": "~2.6.0",
     "codemirror": "~5.30.0",
     "filesize": "~3.3.0",
-    "font-awesome": "~4.7.0",
     "isteven-angular-multiselect": "~4.0.0",
     "jquery": "^3.3.1",
     "js-yaml": "~3.10.0",

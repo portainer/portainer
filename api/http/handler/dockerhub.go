@@ -52,6 +52,8 @@ func (handler *DockerHubHandler) handleGetDockerHub(w http.ResponseWriter, r *ht
 		return
 	}
 
+	dockerhub.Password = ""
+
 	encodeJSON(w, dockerhub, handler.Logger)
 	return
 }

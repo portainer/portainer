@@ -56,7 +56,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.16.4"
+  version: "1.16.5"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -2143,7 +2143,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.16.4"
+        example: "1.16.5"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -2904,14 +2904,26 @@ definitions:
         type: "string"
         example: "version: 3\n services:\n web:\n image:nginx"
         description: "Content of the Stack file. Required when using the 'string' deployment method."
-      GitRepository:
+      RepositoryURL:
         type: "string"
         example: "https://github.com/openfaas/faas"
-        description: "URL of a public Git repository hosting the Stack file. Required when using the 'repository' deployment method."
-      PathInRepository:
+        description: "URL of a Git repository hosting the Stack file. Required when using the 'repository' deployment method."
+      ComposeFilePathInRepository:
         type: "string"
         example: "docker-compose.yml"
         description: "Path to the Stack file inside the Git repository. Required when using the 'repository' deployment method."
+      RepositoryAuthentication:
+        type: "boolean"
+        example: true
+        description: "Use basic authentication to clone the Git repository."
+      RepositoryUsername:
+        type: "string"
+        example: "myGitUsername"
+        description: "Username used in basic authentication. Required when RepositoryAuthentication is true."
+      RepositoryPassword:
+        type: "string"
+        example: "myGitPassword"
+        description: "Password used in basic authentication. Required when RepositoryAuthentication is true."  
       Env:
         type: "array"
         description: "A list of environment variables used during stack deployment"

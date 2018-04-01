@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title="Swarm visualizer">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.swarm.visualizer" ui-sref-opts="{reload: true}">
-      <i class="fa fa-refresh" aria-hidden="true"></i>
+      <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>
@@ -86,8 +86,8 @@
                 <div>
                   <b>{{ node.Hostname }}</b>
                   <span class="node_platform">
-                    <i class="fa fa-linux" aria-hidden="true" ng-if="node.PlatformOS === 'linux'"></i>
-                    <i class="fa fa-windows" aria-hidden="true" ng-if="node.PlatformOS === 'windows'"></i>
+                    <i class="fab fa-linux" aria-hidden="true" ng-if="node.PlatformOS === 'linux'"></i>
+                    <i class="fab fa-windows" aria-hidden="true" ng-if="node.PlatformOS === 'windows'"></i>
                   </span>
                 </div>
               </div>
