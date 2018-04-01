@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService', 'PluginService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService, PluginService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService) {
 
   $scope.state = {
     updateInProgress: false,
@@ -402,6 +402,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.RestartDelay = ServiceHelper.translateNanosToHumanDuration(service.RestartDelay) || '5s';
     service.RestartWindow = ServiceHelper.translateNanosToHumanDuration(service.RestartWindow) || '0s';
     service.UpdateDelay = ServiceHelper.translateNanosToHumanDuration(service.UpdateDelay) || '0s';
+    service.StopGracePeriod = service.StopGracePeriod ? ServiceHelper.translateNanosToHumanDuration(service.StopGracePeriod) : '';
   }
 
   function initView() {
@@ -422,12 +423,14 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       originalService = angular.copy(service);
 
       return $q.all({
+        volumes: VolumeService.volumes(),
         tasks: TaskService.tasks({ service: [service.Name] }),
         nodes: NodeService.nodes(),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
         availableImages: ImageService.images(),
-        availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25)
+        availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
+        settings: SettingsService.publicSettings()
       });
     })
     .then(function success(data) {
@@ -437,6 +440,10 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.secrets = data.secrets;
       $scope.availableImages = ImageService.getUniqueTagListFromImages(data.availableImages);
       $scope.availableLoggingDrivers = data.availableLoggingDrivers;
+      $scope.availableVolumes = data.volumes;
+      $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
+      var userDetails = Authentication.getUserDetails();
+      $scope.isAdmin = userDetails.role === 1;
 
       // Set max cpu value
       var maxCpus = 0;

@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title="Storidge cluster">
     <a data-toggle="tooltip" title="Refresh" ui-sref="storidge.cluster" ui-sref-opts="{reload: true}">
-      <i class="fa fa-refresh" aria-hidden="true"></i>
+      <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>
@@ -41,7 +41,7 @@
                 <span ng-show="state.shutdownInProgress">Shutting down cluster...</span>
               </button>
               <button type="button" class="btn btn-danger btn-sm" ng-click="rebootCluster()" ng-disabled="state.rebootInProgress" button-spinner="state.shutdownInProgress">
-                <span ng-hide="state.rebootInProgress"><i class="fa fa-refresh space-right" aria-hidden="true"></i> Reboot the cluster</span>
+                <span ng-hide="state.rebootInProgress"><i class="fa fa-sync space-right" aria-hidden="true"></i> Reboot the cluster</span>
                 <span ng-show="state.rebootInProgress">Rebooting cluster...</span>
               </button>
             </div>

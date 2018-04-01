@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-file-text-o" title="Log viewer settings"></rd-widget-header>
+      <rd-widget-header icon="fa-file-alt" title="Log viewer settings"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -13,6 +13,16 @@
               <label class="switch" style="margin-left: 20px;">
                 <input type="checkbox" ng-model="$ctrl.state.logCollection" ng-change="$ctrl.state.autoScroll = $ctrl.state.logCollection; $ctrl.logCollectionChange($ctrl.state.logCollection)"><i></i>
               </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="tls" class="control-label text-left">
+                Display timestamps
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+               <input type="checkbox" ng-model="$ctrl.displayTimestamps"><i></i>
+               </label>
             </div>
           </div>
           <div class="form-group">

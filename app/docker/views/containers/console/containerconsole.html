@@ -18,8 +18,8 @@
                 <div class="col-lg-11 col-sm-10">
                   <div class="input-group" ng-if="!formValues.isCustomCommand">
                     <span class="input-group-addon">
-                      <i class="fa fa-linux" aria-hidden="true" ng-if="imageOS == 'linux'"></i>
-                      <i class="fa fa-windows" aria-hidden="true" ng-if="imageOS == 'windows'"></i>
+                      <i class="fab fa-linux" aria-hidden="true" ng-if="imageOS == 'linux'"></i>
+                      <i class="fab fa-windows" aria-hidden="true" ng-if="imageOS == 'windows'"></i>
                     </span>
                     <select class="form-control" ng-model="formValues.command" id="command">
                       <option value="bash" ng-if="imageOS == 'linux'">/bin/bash</option>

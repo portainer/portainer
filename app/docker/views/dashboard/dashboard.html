@@ -6,7 +6,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'">
     <rd-widget>
-      <rd-widget-header icon="fa-tachometer" title="Node info"></rd-widget-header>
+      <rd-widget-header icon="fa-tachometer-alt" title="Node info"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -33,7 +33,7 @@
   </div>
   <div class="col-lg-12 col-md-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
     <rd-widget>
-      <rd-widget-header icon="fa-tachometer" title="Cluster info"></rd-widget-header>
+      <rd-widget-header icon="fa-tachometer-alt" title="Cluster info"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -60,7 +60,7 @@
   </div>
   <div class="col-lg-12 col-md-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
     <rd-widget>
-      <rd-widget-header icon="fa-tachometer" title="Swarm info"></rd-widget-header>
+      <rd-widget-header icon="fa-tachometer-alt" title="Swarm info"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -141,7 +141,7 @@
             <i class="fa fa-clone"></i>
           </div>
           <div class="pull-right">
-            <div><i class="fa fa-pie-chart space-right"></i>{{ imageData.size|humansize }}</div>
+            <div><i class="fa fa-chart-pie space-right"></i>{{ imageData.size|humansize }}</div>
           </div>
           <div class="title">{{ imageData.total }}</div>
           <div class="comment">Images</div>
