@@ -15,7 +15,7 @@ const (
 
 // serviceListOperation extracts the response as a JSON array, loop through the service array
 // decorate and/or filter the services based on resource controls before rewriting the response
-func serviceListOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
+func serviceListOperation(response *http.Response, executor *operationExecutor) error {
 	var err error
 	// ServiceList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
@@ -39,7 +39,7 @@ func serviceListOperation(request *http.Request, response *http.Response, execut
 // serviceInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the service based on resource control and either rewrite an access denied response
 // or a decorated service.
-func serviceInspectOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
+func serviceInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ServiceInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
 	responseObject, err := getResponseAsJSONOBject(response)

@@ -42,7 +42,7 @@ type (
 		operationContext *restrictedOperationContext
 		labelBlackList   []portainer.Pair
 	}
-	restrictedOperationRequest func(*http.Request, *http.Response, *operationExecutor) error
+	restrictedOperationRequest func(*http.Response, *operationExecutor) error
 	operationRequest           func(*http.Request) error
 )
 
@@ -388,7 +388,7 @@ func (p *proxyTransport) executeRequestAndRewriteResponse(request *http.Request,
 		return response, err
 	}
 
-	err = operation(request, response, executor)
+	err = operation(response, executor)
 	return response, err
 }
 
