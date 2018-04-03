@@ -1,6 +1,6 @@
 Name:           portainer
 Version:        1.16.4
-Release:        2
+Release:        0
 License:        Zlib
 Summary:        A lightweight docker management UI
 Url:            https://portainer.io
@@ -11,7 +11,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %if 0%{?suse_version}
 BuildRequires:  help2man
 %endif
-Requires:       docker-ce
+Requires:       docker
 %{?systemd_requires}
 BuildRequires: systemd
 
