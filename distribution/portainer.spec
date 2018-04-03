@@ -15,6 +15,12 @@ Requires:       docker
 %{?systemd_requires}
 BuildRequires: systemd
 
+## HowTo build ## 
+# You can use spectool to fetch sources
+# spectool -g -R distribution/portainer.spec 
+# Then build with 'rpmbuild -ba distribution/portainer.spec' 
+
+
 %description
 Portainer is a lightweight management UI which allows you to easily manage
 your different Docker environments (Docker hosts or Swarm clusters).
@@ -35,7 +41,7 @@ help2man -N --no-discard-stderr ./portainer  > portainer.1
 %install
 # Create directory structure
 install -D -m 0755 portainer %{buildroot}%{_sbindir}/portainer
-install -d -m 0755 %{buildroot}%{_datadir}/portainer
+install -d -m 0755 %{buildroot}%{_datadir}/portainer/public
 install -d -m 0755 %{buildroot}%{_localstatedir}/lib/portainer
 install -D -m 0644 %{S:1} %{buildroot}%{_unitdir}/portainer.service
 %if 0%{?suse_version}
@@ -44,9 +50,7 @@ install -D -m 0644 portainer.1 %{buildroot}%{_mandir}/man1/portainer.1
 %endif
 # populate
 # don't install docker binary with package use system wide installed one
-for src in css fonts ico images index.html js;do
-	cp -a $src %{buildroot}%{_datadir}/portainer/
-done
+cp -ra public/ %{buildroot}%{_datadir}/portainer/
 
 %pre
 %if 0%{?suse_version}
@@ -81,13 +85,7 @@ true
 %files
 %defattr(-,root,root)
 %{_sbindir}/portainer
-%dir %{_datadir}/portainer
-%{_datadir}/portainer/css
-%{_datadir}/portainer/fonts
-%{_datadir}/portainer/ico
-%{_datadir}/portainer/images
-%{_datadir}/portainer/index.html
-%{_datadir}/portainer/js
+%{_datadir}/portainer/public
 %dir %{_localstatedir}/lib/portainer/
 %{_unitdir}/portainer.service
 %if 0%{?suse_version}
