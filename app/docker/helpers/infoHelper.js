@@ -5,8 +5,18 @@ angular.module('portainer.docker')
     determineEndpointMode: function(info) {
       var mode = {
         provider: '',
-        role: ''
+        role: '',
+        agentPowered: false
       };
+
+      var agentHeader = info.$header('Portainer-Agent');
+      if (agentHeader) {
+        mode.provider = 'DOCKER_SWARM_MODE';
+        mode.role = 'MANAGER';
+        mode.agentPowered = true;
+        return mode;
+      }
+
       if (_.startsWith(info.ServerVersion, 'swarm')) {
         mode.provider = 'DOCKER_SWARM';
         if (info.SystemStatus[0][1] === 'primary') {

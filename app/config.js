@@ -23,7 +23,7 @@ angular.module('portainer')
 
     $httpProvider.interceptors.push(['HttpRequestHelper', function(HttpRequestHelper) {
       return {
-        'request': function(config) {
+        request: function(config) {
           if (config.url.indexOf('/docker/') > -1) {
             config.headers['X-PortainerAgent-Target'] = HttpRequestHelper.portainerAgentTargetHeader();
           }

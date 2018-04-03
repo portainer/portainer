@@ -129,7 +129,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       state.loading = true;
     }
     $q.all({
-      info: SystemService.info(),
+      info: SystemService.infoWithHeaders(),
       version: SystemService.version()
     })
     .then(function success(data) {
