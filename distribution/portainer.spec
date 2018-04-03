@@ -1,6 +1,6 @@
 Name:           portainer
 Version:        1.16.4
-Release:        0
+Release:        2
 License:        Zlib
 Summary:        A lightweight docker management UI
 Url:            https://portainer.io
@@ -11,7 +11,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %if 0%{?suse_version}
 BuildRequires:  help2man
 %endif
-Requires:       docker
+Requires:       docker-ce
 %{?systemd_requires}
 BuildRequires: systemd
 
@@ -50,9 +50,7 @@ install -D -m 0644 portainer.1 %{buildroot}%{_mandir}/man1/portainer.1
 %endif
 # populate
 # don't install docker binary with package use system wide installed one
-for src in public/css public/fonts public/ico public/images public/index.html public/js;do
-	cp -a $src %{buildroot}%{_datadir}/portainer/public/
-done
+cp -ra public/ %{buildroot}%{_datadir}/portainer/
 
 %pre
 %if 0%{?suse_version}
@@ -87,13 +85,7 @@ true
 %files
 %defattr(-,root,root)
 %{_sbindir}/portainer
-%dir %{_datadir}/portainer/public
-%{_datadir}/portainer/public/css
-%{_datadir}/portainer/public/fonts
-%{_datadir}/portainer/public/ico
-%{_datadir}/portainer/public/images
-%{_datadir}/portainer/public/index.html
-%{_datadir}/portainer/public/js
+%{_datadir}/portainer/public
 %dir %{_localstatedir}/lib/portainer/
 %{_unitdir}/portainer.service
 %if 0%{?suse_version}
