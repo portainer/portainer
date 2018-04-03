@@ -84,8 +84,19 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     $scope.stackFileContent = cm.getValue();
   };
 
-  $scope.scaleAction = function(selectedService) {
-    ServiceService.scaleService(selectedService, $state);
+  $scope.scaleAction =  function scaleService(service) {
+    var config = ServiceHelper.serviceToConfig(service.Model);
+    config.Mode.Replicated.Replicas = service.Replicas;
+    ServiceService.update(service, config)
+    .then(function success(data) {
+      Notifications.success('Service successfully scaled', 'New replica count: ' + service.Replicas);
+      $state.reload();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to scale service');
+      service.Scale = false;
+      service.Replicas = service.ReplicaCount;
+    });
   };
 
   initView();
