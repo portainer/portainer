@@ -14,7 +14,7 @@
       <table class="table" >
         <thead>
           <tr>
-            <th>Type</th>
+            <th ng-if="isAdmin || allowBindMounts">Type</th>
             <th>Source</th>
             <th>Target</th>
             <th>Read only</th>
@@ -23,14 +23,17 @@
         </thead>
         <tbody>
           <tr ng-repeat="mount in service.ServiceMounts">
-            <td>
+            <td ng-if="isAdmin || allowBindMounts">
               <select name="mountType" class="form-control" ng-model="mount.Type" ng-disabled="isUpdating">
                 <option value="volume">Volume</option>
                 <option value="bind">Bind</option>
               </select>
             </td>
             <td>
-              <input type="text" class="form-control" ng-model="mount.Source" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)" ng-disabled="isUpdating">
+              <select class="form-control" ng-model="mount.Source" ng-options="vol.Id|truncate:30 as vol.Id for vol in availableVolumes" ng-if="mount.Type === 'volume'">
+                <option selected disabled hidden value="">Select a volume</option>
+              </select>
+              <input type="text" class="form-control" ng-model="mount.Source" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)" ng-disabled="isUpdating || (!isAdmin && !allowBindMounts && mount.Type === 'bind')" ng-if="mount.Type === 'bind'">
             </td>
             <td>
               <input type="text" class="form-control" ng-model="mount.Target" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)" ng-disabled="isUpdating">
