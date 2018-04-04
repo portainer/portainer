@@ -58,9 +58,6 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
   };
 
   function initView() {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
-
     ImageService.images(true)
     .then(function success(data) {
       $scope.images = data;

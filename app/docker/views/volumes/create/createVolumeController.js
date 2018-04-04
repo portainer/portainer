@@ -75,17 +75,15 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
   };
 
   function initView() {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    if (endpointProvider !== 'DOCKER_SWARM') {
-      PluginService.volumePlugins(apiVersion < 1.25 || endpointProvider === 'VMWARE_VIC')
-      .then(function success(data) {
-        $scope.availableVolumeDrivers = data;
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
-      });
-    }
+
+    PluginService.volumePlugins(apiVersion < 1.25 || endpointProvider === 'VMWARE_VIC')
+    .then(function success(data) {
+      $scope.availableVolumeDrivers = data;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
+    });
   }
 
   initView();

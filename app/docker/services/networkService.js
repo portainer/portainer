@@ -31,7 +31,7 @@ angular.module('portainer.docker')
     return deferred.promise;
   };
 
-  service.networks = function(localNetworks, swarmNetworks, swarmAttachableNetworks, globalNetworks) {
+  service.networks = function(localNetworks, swarmNetworks, swarmAttachableNetworks) {
     var deferred = $q.defer();
 
     Network.query({}).$promise
@@ -46,9 +46,6 @@ angular.module('portainer.docker')
           return network;
         }
         if (swarmAttachableNetworks && network.Scope === 'swarm' && network.Attachable === true) {
-          return network;
-        }
-        if (globalNetworks && network.Scope === 'global') {
           return network;
         }
       }).map(function (item) {
