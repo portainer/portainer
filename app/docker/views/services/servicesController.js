@@ -6,7 +6,7 @@ function ($q, $scope, $state, Service, ServiceService, ServiceHelper, Notificati
     publicURL: EndpointProvider.endpointPublicURL()
   };
 
-  $scope.scaleAction =  function scaleService(service) {
+  $scope.scaleAction = function scaleService(service) {
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Mode.Replicated.Replicas = service.Replicas;
     ServiceService.update(service, config)
@@ -20,7 +20,6 @@ function ($q, $scope, $state, Service, ServiceService, ServiceHelper, Notificati
       service.Replicas = service.ReplicaCount;
     });
   };
-
 
   $scope.forceUpdateAction = function(selectedItems) {
     ModalService.confirmServiceForceUpdate(
