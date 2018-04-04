@@ -24,6 +24,7 @@ angular.module('portainer.docker')
         mode.role = 'WORKER';
       }
     }
+    return mode;
   };
 
   return helper;
