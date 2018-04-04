@@ -162,12 +162,6 @@ angular.module('portainer.docker')
     return name.substring(1, name.length);
   };
 })
-.filter('swarmcontainername', function () {
-  'use strict';
-  return function (container) {
-    return _.split(container.Names[0], '/')[2];
-  };
-})
 .filter('swarmversion', function () {
   'use strict';
   return function (text) {
