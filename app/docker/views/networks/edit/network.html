@@ -89,7 +89,7 @@
           </thead>
           <tbody>
             <tr ng-repeat="container in containersInNetwork">
-              <td><a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name }}</a></td>
+              <td><a ui-sref="docker.containers.container({ id: container.Id, nodeName: nodeName })">{{ container.Name }}</a></td>
               <td>{{ container.IPv4Address || '-' }}</td>
               <td>{{ container.IPv6Address || '-' }}</td>
               <td>{{ container.MacAddress || '-' }}</td>

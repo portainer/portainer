@@ -68,7 +68,9 @@ function ($scope, $state, $transition$, $filter, NetworkService, Container, Cont
   }
 
   function initView() {
-    HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
+    var nodeName = $transition$.params().nodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+    $scope.nodeName = nodeName;
     NetworkService.network($transition$.params().id)
     .then(function success(data) {
       $scope.network = data;

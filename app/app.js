@@ -29,7 +29,7 @@ function ($rootScope, $state, Authentication, authManager, StateManager, Endpoin
     }
   };
 
-  $transitions.onSuccess({ to: 'docker.**' }, function() {
+  $transitions.onBefore({ to: 'docker.**' }, function() {
     HttpRequestHelper.resetAgentTargetQueue();
   });
 }]);

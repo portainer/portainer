@@ -184,7 +184,7 @@
             <tbody>
               <tr>
                 <td>Image</td>
-                <td><a ui-sref="docker.images.image({id: container.Image})">{{ container.Image }}</a></td>
+                <td><a ui-sref="docker.images.image({ id: container.Image, nodeName: nodeName })">{{ container.Image }}</a></td>
               </tr>
               <tr ng-if="portBindings.length > 0">
                 <td>Port configuration</td>
@@ -259,7 +259,7 @@
             <tbody>
               <tr ng-repeat="vol in container.Mounts">
                 <td ng-if="vol.Type === 'bind'">{{ vol.Source }}</td>
-                <td ng-if="vol.Type === 'volume'"><a ui-sref="docker.volumes.volume({id: vol.Name})">{{ vol.Name }}</a></td>
+                <td ng-if="vol.Type === 'volume'"><a ui-sref="docker.volumes.volume({ id: vol.Name, nodeName: nodeName })">{{ vol.Name }}</a></td>
                 <td>{{ vol.Destination }}</td>
               </tr>
             </tbody>
@@ -280,6 +280,7 @@
       join-network-action-in-progress="state.joinNetworkInProgress"
       leave-network-action="containerLeaveNetwork"
       leave-network-action-in-progress="state.leaveNetworkInProgress"
+      node-name="nodeName"
       ></container-networks-datatable>
     </div>
   </div>
