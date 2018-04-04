@@ -81,28 +81,48 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	var username = req.Username
 	var password = req.Password
 
-	u, err := handler.UserService.UserByUsername(username)
-	if err == portainer.ErrUserNotFound {
-		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
-		return
-	} else if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
 	settings, err := handler.SettingsService.Settings()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	if settings.AuthenticationMethod == portainer.AuthenticationLDAP && u.ID != 1 {
+	u, err := handler.UserService.UserByUsername(username)
+	var userExists = true
+	if err == portainer.ErrUserNotFound {
+		userExists = false
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if settings.AuthenticationMethod == portainer.AuthenticationLDAP && userExists && u.ID != 1 {
 		err = handler.LDAPService.AuthenticateUser(username, password, &settings.LDAPSettings)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return
 		}
+	} else if settings.AuthenticationMethod == portainer.AuthenticationLDAP && !userExists {
+		err = handler.LDAPService.AuthenticateUser(username, password, &settings.LDAPSettings)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
+		// Create user
+		u = &portainer.User{
+			Username: username,
+			Role:     portainer.StandardUserRole,
+		}
+		err = handler.UserService.CreateUser(u)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
 	} else {
+		if !userExists {
+			httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
+			return
+		}
 		err = handler.CryptoService.CompareHashAndData(u.Password, password)
 		if err != nil {
 			httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
