@@ -68,8 +68,6 @@ angular.module('portainer.app')
             value = container.NetworkSettings.Networks[Object.keys(container.NetworkSettings.Networks)[0]].IPAddress;
           } else if (containerMapping === 'BY_CONTAINER_NAME') {
             value = $filter('containername')(envvar.value);
-          } else if (containerMapping === 'BY_SWARM_CONTAINER_NAME') {
-            value = $filter('swarmcontainername')(envvar.value);
           }
         }
         env.push(envvar.name + '=' + value);
