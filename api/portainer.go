@@ -24,6 +24,7 @@ type (
 		NoAnalytics       *bool
 		Templates         *string
 		TLSVerify         *bool
+		TLSSkipVerify     *bool
 		TLSCacert         *string
 		TLSCert           *string
 		TLSKey            *string

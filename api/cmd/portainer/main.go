@@ -211,7 +211,7 @@ func main() {
 				URL:  *flags.Endpoint,
 				TLSConfig: portainer.TLSConfiguration{
 					TLS:           *flags.TLSVerify,
-					TLSSkipVerify: false,
+					TLSSkipVerify: *flags.TLSSkipVerify,
 					TLSCACertPath: *flags.TLSCacert,
 					TLSCertPath:   *flags.TLSCert,
 					TLSKeyPath:    *flags.TLSKey,
