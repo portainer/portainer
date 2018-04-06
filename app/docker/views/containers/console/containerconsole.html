@@ -22,6 +22,7 @@
                       <i class="fab fa-windows" aria-hidden="true" ng-if="imageOS == 'windows'"></i>
                     </span>
                     <select class="form-control" ng-model="formValues.command" id="command">
+                      <option value="ash" ng-if="imageOS == 'linux'">/bin/ash</option>
                       <option value="bash" ng-if="imageOS == 'linux'">/bin/bash</option>
                       <option value="sh" ng-if="imageOS == 'linux'">/bin/sh</option>
                       <option value="powershell" ng-if="imageOS == 'windows'">powershell</option>
