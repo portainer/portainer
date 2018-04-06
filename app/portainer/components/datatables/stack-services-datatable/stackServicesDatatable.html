@@ -63,6 +63,16 @@
               <td>
                 {{ item.Mode }}
                 <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount) }}</code>
+                <span ng-if="item.Mode === 'replicated' && !item.Scale">
+                  <a class="interactive" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas;">
+                    <i class="fa fa-arrows-alt-v" aria-hidden="true"></i> Scale
+                  </a>
+                </span>
+                <span ng-if="item.Mode === 'replicated' && item.Scale">
+                  <input class="input-sm" type="number" ng-model="item.Replicas" on-enter-key="$ctrl.scaleAction(item)" />
+                  <a class="interactive" ng-click="item.Scale = false;"><i class="fa fa-times"></i></a>
+                  <a class="interactive" ng-click="$ctrl.scaleAction(item)"><i class="fa fa-check-square"></i></a>
+                </span>                
               </td>
               <td>
                 <a ng-if="item.Ports && item.Ports.length > 0 && p.PublishedPort" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.publicUrl }}:{{ p.PublishedPort }}" target="_blank">

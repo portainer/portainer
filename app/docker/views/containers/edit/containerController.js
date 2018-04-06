@@ -274,8 +274,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, Commit, Containe
   NetworkService.networks(
     provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
     false,
-    provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
-    provider === 'DOCKER_SWARM'
+    provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
   )
   .then(function success(data) {
     var networks = data;
