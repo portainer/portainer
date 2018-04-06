@@ -62,12 +62,8 @@ angular.module('portainer.app')
     storeSwarmVisualizerSettings: function(key, data) {
       localStorageService.set('swarmvisualizer_' + key, data);
     },
-    getSwarmVisualizerSettings: function(key, defaultVal) {
-      var val = localStorageService.get('swarmvisualizer_' + key);
-      if (val === undefined || val === null)
-          return defaultVal;
-      
-      return val;
+    getSwarmVisualizerSettings: function(key) {
+      return localStorageService.get('swarmvisualizer_' + key);
     },
     clean: function() {
       localStorageService.clearAll();

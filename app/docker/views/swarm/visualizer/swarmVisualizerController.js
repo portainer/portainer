@@ -3,9 +3,9 @@ angular.module('portainer.docker')
 function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskService, Notifications, LocalStorage) {
 
   $scope.state = {
-    ShowInformationPanel: LocalStorage.getSwarmVisualizerSettings('show_info_panel', true),
-    DisplayOnlyRunningTasks: LocalStorage.getSwarmVisualizerSettings('display_only_running_tasks', false),
-    refreshRate: LocalStorage.getSwarmVisualizerSettings('refresh_rate', '5')
+    ShowInformationPanel: true,
+    DisplayOnlyRunningTasks: false,
+    refreshRate: '5',
   };
 
   $scope.$on('$destroy', function() {
@@ -120,6 +120,18 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize cluster visualizer');
     });
+    
+    var showInfoPanel = LocalStorage.getSwarmVisualizerSettings('show_info_panel');
+    if (showInfoPanel !== undefined && showInfoPanel !== null)
+        $scope.state.ShowInformationPanel = showInfoPanel;
+    
+    var displayOnlyRunningTasks = LocalStorage.getSwarmVisualizerSettings('display_only_running_tasks');
+    if (displayOnlyRunningTasks !== undefined && displayOnlyRunningTasks !== null)
+        $scope.state.DisplayOnlyRunningTasks = displayOnlyRunningTasks;
+    
+    var refreshRate = LocalStorage.getSwarmVisualizerSettings('refresh_rate');
+    if (refreshRate !== undefined && refreshRate !== null)
+        $scope.state.refreshRate = refreshRate;
   }
 
   initView();
