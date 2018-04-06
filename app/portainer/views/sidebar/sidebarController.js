@@ -8,9 +8,12 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
 
-    StateManager.updateEndpointState(true)
+    ExtensionManager.initEndpointExtensions(endpoint.Id)
+    .then(function success(data) {
+      var extensions = data;
+      return StateManager.updateEndpointState(true, extensions);
+    })
     .then(function success() {
-      ExtensionManager.reset();
       $state.go('docker.dashboard');
     })
     .catch(function error(err) {
@@ -47,7 +50,7 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     $scope.displayExternalContributors = StateManager.getState().application.displayExternalContributors;
     $scope.logo = StateManager.getState().application.logo;
     $scope.endpoints = [];
-    
+
     EndpointService.endpoints()
     .then(function success(data) {
       var endpoints = data;

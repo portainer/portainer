@@ -41,15 +41,6 @@ angular.module('portainer.app')
     getPaginationLimit: function(key) {
       return localStorageService.cookie.get('pagination_' + key);
     },
-    storeStoridgeAPIURL: function(url) {
-      localStorageService.set('STORIDGE_API_URL', url);
-    },
-    getStoridgeAPIURL: function() {
-      return localStorageService.get('STORIDGE_API_URL');
-    },
-    clearStoridgeAPIURL: function() {
-      return localStorageService.remove('STORIDGE_API_URL');
-    },
     getDataTableOrder: function(key) {
       return localStorageService.get('datatable_order_' + key);
     },
@@ -67,6 +58,12 @@ angular.module('portainer.app')
     },
     storeDataTableSettings: function(key, data) {
       localStorageService.set('datatable_settings_' + key, data);
+    },
+    storeSwarmVisualizerSettings: function(key, data) {
+      localStorageService.set('swarmvisualizer_' + key, data);
+    },
+    getSwarmVisualizerSettings: function(key) {
+      return localStorageService.get('swarmvisualizer_' + key);
     },
     clean: function() {
       localStorageService.clearAll();

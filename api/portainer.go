@@ -152,7 +152,7 @@ type (
 		URL             string     `json:"URL"`
 		Authentication  bool       `json:"Authentication"`
 		Username        string     `json:"Username"`
-		Password        string     `json:"Password"`
+		Password        string     `json:"Password,omitempty"`
 		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
 	}
@@ -162,7 +162,7 @@ type (
 	DockerHub struct {
 		Authentication bool   `json:"Authentication"`
 		Username       string `json:"Username"`
-		Password       string `json:"Password"`
+		Password       string `json:"Password,omitempty"`
 	}
 
 	// EndpointID represents an endpoint identifier.
@@ -171,13 +171,14 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
-		ID              EndpointID       `json:"Id"`
-		Name            string           `json:"Name"`
-		URL             string           `json:"URL"`
-		PublicURL       string           `json:"PublicURL"`
-		TLSConfig       TLSConfiguration `json:"TLSConfig"`
-		AuthorizedUsers []UserID         `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID         `json:"AuthorizedTeams"`
+		ID              EndpointID          `json:"Id"`
+		Name            string              `json:"Name"`
+		URL             string              `json:"URL"`
+		PublicURL       string              `json:"PublicURL"`
+		TLSConfig       TLSConfiguration    `json:"TLSConfig"`
+		AuthorizedUsers []UserID            `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID            `json:"AuthorizedTeams"`
+		Extensions      []EndpointExtension `json:"Extensions"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -186,6 +187,16 @@ type (
 		TLSCertPath   string `json:"TLSCert,omitempty"`
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
+
+	// EndpointExtension represents a extension associated to an endpoint.
+	EndpointExtension struct {
+		Type EndpointExtensionType `json:"Type"`
+		URL  string                `json:"URL"`
+	}
+
+	// EndpointExtensionType represents the type of an endpoint extension. Only
+	// one extension of each type can be associated to an endpoint.
+	EndpointExtensionType int
 
 	// ResourceControlID represents a resource control identifier.
 	ResourceControlID int
@@ -358,13 +369,14 @@ type (
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
-		StoreStackFileFromString(stackIdentifier string, stackFileContent string) (string, error)
-		StoreStackFileFromReader(stackIdentifier string, r io.Reader) (string, error)
+		StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error)
+		StoreStackFileFromReader(stackIdentifier, fileName string, r io.Reader) (string, error)
 	}
 
 	// GitService represents a service for managing Git.
 	GitService interface {
-		CloneRepository(url, destination string) error
+		ClonePublicRepository(repositoryURL, destination string) error
+		ClonePrivateRepositoryWithBasicAuth(repositoryURL, destination, username, password string) error
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.
@@ -380,7 +392,7 @@ type (
 
 	// StackManager represents a service to manage stacks.
 	StackManager interface {
-		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint) error
+		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
@@ -389,9 +401,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.16.1"
+	APIVersion = "1.16.5"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 7
+	DBVersion = 8
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 )
@@ -451,4 +463,10 @@ const (
 	StackResourceControl
 	// ConfigResourceControl represents a resource control associated to a Docker config
 	ConfigResourceControl
+)
+
+const (
+	_ EndpointExtensionType = iota
+	// StoridgeEndpointExtension represents the Storidge extension
+	StoridgeEndpointExtension
 )

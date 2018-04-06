@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title="Container list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.containers" ui-sref-opts="{reload: true}">
-      <i class="fa fa-refresh" aria-hidden="true"></i>
+      <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>Containers</rd-header-content>
@@ -14,7 +14,6 @@
       dataset="containers" table-key="containers"
       order-by="Status" show-text-filter="true"
       show-ownership-column="applicationState.application.authentication"
-      swarm-containers="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'"
       public-url="state.publicURL"
       container-name-truncate-size="truncate_size"
       start-action="startAction"

@@ -95,6 +95,10 @@ func (handler *RegistryHandler) handleGetRegistries(w http.ResponseWriter, r *ht
 		return
 	}
 
+	for i := range filteredRegistries {
+		filteredRegistries[i].Password = ""
+	}
+
 	encodeJSON(w, filteredRegistries, handler.Logger)
 }
 
@@ -162,6 +166,8 @@ func (handler *RegistryHandler) handleGetRegistry(w http.ResponseWriter, r *http
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+
+	registry.Password = ""
 
 	encodeJSON(w, registry, handler.Logger)
 }

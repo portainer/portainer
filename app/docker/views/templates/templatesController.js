@@ -108,18 +108,21 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       }
     }
 
-    StackService.createStackFromGitRepository(stackName, template.Repository.url, template.Repository.stackfile, template.Env)
-    .then(function success() {
-      Notifications.success('Stack successfully created');
-    })
-    .catch(function error(err) {
-      Notifications.warning('Deployment error', err.err.data.err);
-    })
+    var repositoryOptions = {
+      RepositoryURL: template.Repository.url,
+      ComposeFilePathInRepository: template.Repository.stackfile
+    };
+
+    StackService.createStackFromGitRepository(stackName, repositoryOptions, template.Env)
     .then(function success(data) {
       return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, []);
     })
     .then(function success() {
-      $state.go('docker.stacks', {}, {reload: true});
+      Notifications.success('Stack successfully deployed');
+      $state.go('docker.stacks');
+    })
+    .catch(function error(err) {
+      Notifications.warning('Deployment error', err.err.data.err);
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;
@@ -178,6 +181,12 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === 'bridge'; });
     }
 
+    if (selectedTemplate.Name) {
+      $scope.formValues.name = selectedTemplate.Name;
+    } else {
+      $scope.formValues.name = '';
+    }
+
     $anchorScroll('view-top');
   }
 
@@ -189,11 +198,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
   }
 
   function determineContainerMapping(network) {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var containerMapping = 'BY_CONTAINER_IP';
-    if (endpointProvider === 'DOCKER_SWARM' && network.Scope === 'global') {
-      containerMapping = 'BY_SWARM_CONTAINER_NAME';
-    } else if (network.Name !== 'bridge') {
+    if (network.Name !== 'bridge') {
       containerMapping = 'BY_CONTAINER_NAME';
     }
     return containerMapping;
@@ -222,8 +228,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       networks: NetworkService.networks(
         provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
         false,
-        provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
-        provider === 'DOCKER_SWARM'),
+        provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
+      ),
       settings: SettingsService.publicSettings()
     })
     .then(function success(data) {

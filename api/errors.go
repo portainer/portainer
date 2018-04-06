@@ -57,6 +57,12 @@ const (
 	ErrComposeFileNotFoundInRepository = Error("Unable to find a Compose file in the repository")
 )
 
+// Endpoint extensions error
+const (
+	ErrEndpointExtensionNotSupported      = Error("This extension is not supported")
+	ErrEndpointExtensionAlreadyAssociated = Error("This extension is already associated to the endpoint")
+)
+
 // Version errors.
 const (
 	ErrDBVersionNotFound = Error("DB version not found")

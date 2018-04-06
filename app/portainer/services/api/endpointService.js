@@ -1,5 +1,6 @@
 angular.module('portainer.app')
-.factory('EndpointService', ['$q', 'Endpoints', 'FileUploadService', function EndpointServiceFactory($q, Endpoints, FileUploadService) {
+.factory('EndpointService', ['$q', 'Endpoints', 'FileUploadService',
+function EndpointServiceFactory($q, Endpoints, FileUploadService) {
   'use strict';
   var service = {};
 
@@ -66,6 +67,7 @@ angular.module('portainer.app')
       TLSSkipVerify: TLSSkipVerify,
       TLSSkipClientVerify: TLSSkipClientVerify
     };
+
     var deferred = $q.defer();
     Endpoints.create({}, endpoint).$promise
     .then(function success(data) {
@@ -85,6 +87,7 @@ angular.module('portainer.app')
       deferred.notify({upload: false});
       deferred.reject({msg: 'Unable to upload TLS certs', err: err});
     });
+
     return deferred.promise;
   };
 

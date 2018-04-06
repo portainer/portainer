@@ -31,7 +31,7 @@
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
               <div>
-                <input type="radio" id="method_editor" ng-model="state.Method" value="editor" ng-click="toggleEditor(state.Method)">
+                <input type="radio" id="method_editor" ng-model="state.Method" value="editor">
                 <label for="method_editor">
                   <div class="boxselector_header">
                     <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -41,7 +41,7 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="method_upload" ng-model="state.Method" value="upload" ng-click="saveEditorContent()">
+                <input type="radio" id="method_upload" ng-model="state.Method" value="upload">
                 <label for="method_upload">
                   <div class="boxselector_header">
                     <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -51,10 +51,10 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="method_repository" ng-model="state.Method" value="repository" ng-click="saveEditorContent()">
+                <input type="radio" id="method_repository" ng-model="state.Method" value="repository">
                 <label for="method_repository">
                   <div class="boxselector_header">
-                    <i class="fa fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
+                    <i class="fab fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
                     Repository
                   </div>
                   <p>Use a git repository</p>
@@ -64,7 +64,7 @@
           </div>
           <!-- !build-method -->
           <!-- web-editor -->
-          <div ng-if="state.Method === 'editor'">
+          <div ng-show="state.Method === 'editor'">
             <div class="col-sm-12 form-section-title">
               Web editor
             </div>
@@ -75,13 +75,18 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <textarea id="web-editor" class="form-control" ng-model="formValues.StackFileContent" placeholder='version: "3"'></textarea>
+                <code-editor
+                  identifier="stack-creation-editor"
+                  placeholder="# Define or paste the content of your docker-compose file here"
+                  yml="true"
+                  on-change="editorUpdate"
+                ></code-editor>
               </div>
             </div>
           </div>
           <!-- !web-editor -->
           <!-- upload -->
-          <div ng-if="state.Method === 'upload'">
+          <div ng-show="state.Method === 'upload'">
             <div class="col-sm-12 form-section-title">
               Upload
             </div>
@@ -102,13 +107,13 @@
           </div>
           <!-- !upload -->
           <!-- repository -->
-          <div ng-if="state.Method === 'repository'">
+          <div ng-show="state.Method === 'repository'">
             <div class="col-sm-12 form-section-title">
               Git repository
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                You can use the URL of a public git repository.
+                You can use the URL of a git repository.
               </span>
             </div>
             <div class="form-group">
@@ -125,7 +130,29 @@
             <div class="form-group">
               <label for="stack_repository_path" class="col-sm-2 control-label text-left">Compose path</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" ng-model="formValues.RepositoryPath" id="stack_repository_path" placeholder="docker-compose.yml">
+                <input type="text" class="form-control" ng-model="formValues.ComposeFilePathInRepository" id="stack_repository_path" placeholder="docker-compose.yml">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Authentication
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="formValues.RepositoryAuthentication"><i></i>
+                </label>
+              </div>
+            </div>
+            <div class="form-group" ng-if="formValues.RepositoryAuthentication">
+              <label for="repository_username" class="col-sm-1 control-label text-left">Username</label>
+              <div class="col-sm-11 col-md-5">
+                <input type="text" class="form-control" ng-model="formValues.RepositoryUsername" name="repository_username" placeholder="myGitUser">
+              </div>
+              <label for="repository_password" class="col-sm-1 margin-sm-top control-label text-left">
+                Password
+              </label>
+              <div class="col-sm-11 col-md-5 margin-sm-top">
+                <input type="password" class="form-control" ng-model="formValues.RepositoryPassword" name="repository_password" placeholder="myPassword">
               </div>
             </div>
           </div>
@@ -167,9 +194,9 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || (state.Method === 'editor' && !formValues.StackFileContent)
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress
               || (state.Method === 'upload' && !formValues.StackFile)
-              || (state.Method === 'repository' && (!formValues.RepositoryURL || !formValues.RepositoryPath))
+              || (state.Method === 'repository' && ((!formValues.RepositoryURL || !formValues.ComposeFilePathInRepository) || (formValues.RepositoryAuthentication && (!formValues.RepositoryUsername || !formValues.RepositoryPassword))))
               || !formValues.Name" ng-click="deployStack()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Deploy the stack</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>

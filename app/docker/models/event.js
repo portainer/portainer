@@ -37,6 +37,33 @@ function createEventDetails(event) {
       case 'attach':
       details = 'Container ' + eventAttr.name + ' attached';
       break;
+      case 'detach':
+      details = 'Container ' + eventAttr.name + ' detached';
+      break;
+      case 'copy':
+      details = 'Container ' + eventAttr.name + ' copied';
+      break;
+      case 'export':
+      details = 'Container ' + eventAttr.name + ' exported';
+      break;
+      case 'health_status':
+      details = 'Container ' + eventAttr.name + ' executed health status';
+      break;
+      case 'oom':
+      details = 'Container ' + eventAttr.name + ' goes in out of memory';
+      break;
+      case 'rename':
+      details = 'Container ' + eventAttr.name + ' renamed';
+      break;
+      case 'resize':
+      details = 'Container ' + eventAttr.name + ' resized';
+      break;
+      case 'top':
+      details = 'Showed running processes for container ' + eventAttr.name;
+      break;
+      case 'update':
+      details = 'Container ' + eventAttr.name + ' updated';
+      break;
       default:
       if (event.Action.indexOf('exec_create') === 0) {
         details = 'Exec instance created';
@@ -52,14 +79,26 @@ function createEventDetails(event) {
       case 'delete':
       details = 'Image deleted';
       break;
+      case 'import':
+      details = 'Image ' + event.Actor.ID + ' imported';
+      break;
+      case 'load':
+      details = 'Image ' + event.Actor.ID + ' loaded';
+      break;
       case 'tag':
       details = 'New tag created for ' + eventAttr.name;
       break;
       case 'untag':
       details = 'Image untagged';
       break;
+      case 'save':
+      details = 'Image ' + event.Actor.ID + ' saved';
+      break;
       case 'pull':
       details = 'Image ' + event.Actor.ID + ' pulled';
+      break;
+      case 'push':
+      details = 'Image ' + event.Actor.ID + ' pushed';
       break;
       default:
       details = 'Unsupported event';
@@ -72,6 +111,9 @@ function createEventDetails(event) {
       break;
       case 'destroy':
       details = 'Network ' + eventAttr.name + ' deleted';
+      break;
+      case 'remove':
+      details = 'Network ' + eventAttr.name + ' removed';
       break;
       case 'connect':
       details = 'Container connected to ' + eventAttr.name + ' network';

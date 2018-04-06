@@ -79,7 +79,7 @@
                 </div>
                 <!-- !host-port -->
                 <span style="margin: 0 10px 0 10px;">
-                  <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                  <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
                 </span>
                 <!-- container-port -->
                 <div class="input-group col-sm-4 input-group-sm">
@@ -250,7 +250,7 @@
                     <!-- !volume-line1 -->
                     <!-- volume-line2 -->
                     <div class="col-sm-12 form-inline" style="margin-top: 5px;">
-                      <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                      <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
                       <!-- volume -->
                       <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
                         <span class="input-group-addon">volume</span>
@@ -307,10 +307,7 @@
               <div class="form-group" ng-if="config.HostConfig.NetworkMode == 'container'">
                 <label for="container_network_container" class="col-sm-2 col-lg-1 control-label text-left">Container</label>
                 <div class="col-sm-9">
-                  <select ng-if="applicationState.endpoint.mode.provider !== 'DOCKER_SWARM'" ng-options="container|containername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
-                    <option selected disabled hidden value="">Select a container</option>
-                  </select>
-                  <select ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'" ng-options="container|swarmcontainername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
+                  <select ng-options="container|containername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
                     <option selected disabled hidden value="">Select a container</option>
                   </select>
                 </div>

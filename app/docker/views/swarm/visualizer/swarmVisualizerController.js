@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('SwarmVisualizerController', ['$q', '$scope', '$document', '$interval', 'NodeService', 'ServiceService', 'TaskService', 'Notifications',
-function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskService, Notifications) {
+.controller('SwarmVisualizerController', ['$q', '$scope', '$document', '$interval', 'NodeService', 'ServiceService', 'TaskService', 'Notifications', 'LocalStorage',
+function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskService, Notifications, LocalStorage) {
 
   $scope.state = {
     ShowInformationPanel: true,
@@ -12,11 +12,22 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
     stopRepeater();
   });
 
+  $scope.changeShowInformationPanel = function(value) {
+      $scope.state.ShowInformationPanel = value;
+      LocalStorage.storeSwarmVisualizerSettings('show_info_panel', value);
+  };
+
+  $scope.changeDisplayOnlyRunningTasks = function() {
+      var value = $scope.state.DisplayOnlyRunningTasks;
+      LocalStorage.storeSwarmVisualizerSettings('display_only_running_tasks', value);
+  };
+
   $scope.changeUpdateRepeater = function() {
     stopRepeater();
     setUpdateRepeater();
     $('#refreshRateChange').show();
     $('#refreshRateChange').fadeOut(1500);
+    LocalStorage.storeSwarmVisualizerSettings('refresh_rate', $scope.state.refreshRate);
   };
 
   function stopRepeater() {
@@ -51,8 +62,7 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
     }, refreshRate * 1000);
   }
 
-
-  function assignServiceName(services, tasks) {
+  function assignServiceInfo(services, tasks) {
     for (var i = 0; i < services.length; i++) {
       var service = services[i];
 
@@ -84,11 +94,25 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
   function prepareVisualizerData(nodes, services, tasks) {
     var visualizerData = {};
 
-    assignServiceName(services, tasks);
+    assignServiceInfo(services, tasks);
     assignTasksToNode(nodes, tasks);
 
     visualizerData.nodes = nodes;
     $scope.visualizerData = visualizerData;
+  }
+
+  function loadState() {
+    var showInfoPanel = LocalStorage.getSwarmVisualizerSettings('show_info_panel');
+    if (showInfoPanel !== undefined && showInfoPanel !== null)
+        $scope.state.ShowInformationPanel = showInfoPanel;
+
+    var displayOnlyRunningTasks = LocalStorage.getSwarmVisualizerSettings('display_only_running_tasks');
+    if (displayOnlyRunningTasks !== undefined && displayOnlyRunningTasks !== null)
+        $scope.state.DisplayOnlyRunningTasks = displayOnlyRunningTasks;
+
+    var refreshRate = LocalStorage.getSwarmVisualizerSettings('refresh_rate');
+    if (refreshRate !== undefined && refreshRate !== null)
+        $scope.state.refreshRate = refreshRate;
   }
 
   function initView() {
@@ -110,6 +134,8 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize cluster visualizer');
     });
+
+    loadState();
   }
 
   initView();

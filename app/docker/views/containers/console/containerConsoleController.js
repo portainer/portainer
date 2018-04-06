@@ -87,7 +87,8 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
       term.on('data', function (data) {
         socket.send(data);
       });
-      term.open(document.getElementById('terminal-container'), true);
+      term.open(document.getElementById('terminal-container'));
+      term.focus();
       term.resize(width, height);
       term.setOption('cursorBlink', true);
       term.fit();

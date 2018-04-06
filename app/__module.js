@@ -13,6 +13,8 @@ angular.module('portainer', [
   'angular-google-analytics',
   'angular-json-tree',
   'angular-loading-bar',
+  'angular-clipboard',
+  'luegg.directives',
   'portainer.templates',
   'portainer.app',
   'portainer.docker',

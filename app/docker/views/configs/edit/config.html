@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title="Config details">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.configs.config({id: config.Id})" ui-sref-opts="{reload: true}">
-      <i class="fa fa-refresh" aria-hidden="true"></i>
+      <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>
@@ -12,7 +12,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-file-code-o" title="Config details"></rd-widget-header>
+      <rd-widget-header icon="fa-file-code" title="Config details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -24,7 +24,7 @@
               <td>ID</td>
               <td>
                 {{ config.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeConfig(config.Id)"><i class="fa fa-trash space-right" aria-hidden="true"></i>Delete this config</button>
+                <button class="btn btn-xs btn-danger" ng-click="removeConfig(config.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this config</button>
               </td>
             </tr>
             <tr>
@@ -65,12 +65,17 @@
 <div class="row" ng-if="config">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-file-code-o" title="Config content"></rd-widget-header>
+      <rd-widget-header icon="fa-file-code" title="Config content"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
             <div class="col-sm-12">
-              <textarea id="config-editor" ng-model="config.Data" class="form-control"></textarea>
+              <code-editor
+                identifier="config-editor"
+                yml="false"
+                read-only="true"
+                value="config.Data"
+              ></code-editor>
             </div>
           </div>
         </form>

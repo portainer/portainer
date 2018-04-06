@@ -136,6 +136,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		},
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
+		Extensions:      []portainer.EndpointExtension{},
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
@@ -372,6 +373,7 @@ func (handler *EndpointHandler) handleDeleteEndpoint(w http.ResponseWriter, r *h
 	}
 
 	handler.ProxyManager.DeleteProxy(string(endpointID))
+	handler.ProxyManager.DeleteExtensionProxies(string(endpointID))
 
 	err = handler.EndpointService.DeleteEndpoint(portainer.EndpointID(endpointID))
 	if err != nil {

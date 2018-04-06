@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator', 'ExtensionManager',
-function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, ExtensionManager) {
+.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator',
+function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator) {
 
   $scope.formValues = {
     Driver: 'local',
@@ -75,24 +75,16 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
   };
 
   function initView() {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    if (endpointProvider !== 'DOCKER_SWARM') {
-      PluginService.volumePlugins(apiVersion < 1.25 || endpointProvider === 'VMWARE_VIC')
-      .then(function success(data) {
-        $scope.availableVolumeDrivers = data;
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
-      });
-    }
+
+    PluginService.volumePlugins(apiVersion < 1.25 || endpointProvider === 'VMWARE_VIC')
+    .then(function success(data) {
+      $scope.availableVolumeDrivers = data;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve volume drivers');
+    });
   }
 
-  ExtensionManager.init()
-  .then(function success(data) {
-    initView();
-  })
-  .catch(function error(err) {
-    Notifications.error('Failure', err, 'Unable to initialize extensions');
-  });
+  initView();
 }]);

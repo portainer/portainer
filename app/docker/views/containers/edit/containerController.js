@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'ContainerCommit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
-function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService) {
+.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
+function ($q, $scope, $state, $transition$, $filter, Container, Commit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
 
@@ -80,7 +80,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;
     var imageConfig = ImageHelper.createImageConfigForCommit(image, registry.URL);
-    ContainerCommit.commit({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
+    Commit.commitContainer({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
       update();
       Notifications.success('Container commited', $transition$.params().id);
     }, function (e) {
@@ -274,8 +274,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, ContainerCommit,
   NetworkService.networks(
     provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
     false,
-    provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
-    provider === 'DOCKER_SWARM'
+    provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
   )
   .then(function success(data) {
     var networks = data;

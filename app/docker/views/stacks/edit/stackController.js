@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('StackController', ['$q', '$scope', '$state', '$transition$', '$document', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'CodeMirrorService', 'Notifications', 'FormHelper', 'EndpointProvider',
-function ($q, $scope, $state, $transition$, $document, StackService, NodeService, ServiceService, TaskService, ServiceHelper, CodeMirrorService, Notifications, FormHelper, EndpointProvider) {
+.controller('StackController', ['$q', '$scope', '$state', '$transition$', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'Notifications', 'FormHelper', 'EndpointProvider',
+function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceService, TaskService, ServiceHelper, Notifications, FormHelper, EndpointProvider) {
 
   $scope.state = {
     actionInProgress: false,
@@ -12,9 +12,7 @@ function ($q, $scope, $state, $transition$, $document, StackService, NodeService
   };
 
   $scope.deployStack = function () {
-    // The codemirror editor does not work with ng-model so we need to retrieve
-    // the value directly from the editor.
-    var stackFile = $scope.editor.getValue();
+    var stackFile = $scope.stackFileContent;
     var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
     var prune = $scope.formValues.Prune;
 
@@ -63,13 +61,6 @@ function ($q, $scope, $state, $transition$, $document, StackService, NodeService
     .then(function success(data) {
       $scope.stackFileContent = data.stackFile;
 
-      $document.ready(function() {
-        var webEditorElement = $document[0].getElementById('web-editor');
-        if (webEditorElement) {
-          $scope.editor = CodeMirrorService.applyCodeMirrorOnElement(webEditorElement, true, false);
-        }
-      });
-
       $scope.nodes = data.nodes;
 
       var services = data.services;
@@ -88,6 +79,25 @@ function ($q, $scope, $state, $transition$, $document, StackService, NodeService
       Notifications.error('Failure', err, 'Unable to retrieve tasks details');
     });
   }
+
+  $scope.editorUpdate = function(cm) {
+    $scope.stackFileContent = cm.getValue();
+  };
+
+  $scope.scaleAction =  function scaleService(service) {
+    var config = ServiceHelper.serviceToConfig(service.Model);
+    config.Mode.Replicated.Replicas = service.Replicas;
+    ServiceService.update(service, config)
+    .then(function success(data) {
+      Notifications.success('Service successfully scaled', 'New replica count: ' + service.Replicas);
+      $state.reload();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to scale service');
+      service.Scale = false;
+      service.Replicas = service.ReplicaCount;
+    });
+  };
 
   initView();
 }]);

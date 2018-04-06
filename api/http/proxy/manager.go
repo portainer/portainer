@@ -3,6 +3,7 @@ package proxy
 import (
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/orcaman/concurrent-map"
 	"github.com/portainer/portainer"
@@ -10,20 +11,24 @@ import (
 
 // Manager represents a service used to manage Docker proxies.
 type Manager struct {
-	proxyFactory    *proxyFactory
-	proxies         cmap.ConcurrentMap
-	registryProxies cmap.ConcurrentMap
+	proxyFactory     *proxyFactory
+	proxies          cmap.ConcurrentMap
+	registryProxies  cmap.ConcurrentMap
+	extensionProxies cmap.ConcurrentMap
 }
 
 // NewManager initializes a new proxy Service
-func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService, settingsService portainer.SettingsService) *Manager {
+func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService, settingsService portainer.SettingsService, registryService portainer.RegistryService, dockerHubService portainer.DockerHubService) *Manager {
 	return &Manager{
-		proxies:         cmap.New(),
-		registryProxies: cmap.New(),
+		proxies:          cmap.New(),
+		registryProxies:  cmap.New(),
+		extensionProxies: cmap.New(),
 		proxyFactory: &proxyFactory{
 			ResourceControlService: resourceControlService,
 			TeamMembershipService:  teamMembershipService,
 			SettingsService:        settingsService,
+			RegistryService:        registryService,
+			DockerHubService:       dockerHubService,
 		},
 	}
 }
@@ -40,16 +45,16 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 
 	if endpointURL.Scheme == "tcp" {
 		if endpoint.TLSConfig.TLS {
-			proxy, err = manager.proxyFactory.newHTTPSProxy(endpointURL, endpoint)
+			proxy, err = manager.proxyFactory.newDockerHTTPSProxy(endpointURL, endpoint)
 			if err != nil {
 				return nil, err
 			}
 		} else {
-			proxy = manager.proxyFactory.newHTTPProxy(endpointURL)
+			proxy = manager.proxyFactory.newDockerHTTPProxy(endpointURL)
 		}
 	} else {
 		// Assume unix:// scheme
-		proxy = manager.proxyFactory.newSocketProxy(endpointURL.Path)
+		proxy = manager.proxyFactory.newDockerSocketProxy(endpointURL.Path)
 	}
 
 	manager.proxies.Set(string(endpoint.ID), proxy)
@@ -98,4 +103,35 @@ func (manager *Manager) DeleteProxy(key string) {
 // DeleteProxy deletes the proxy associated to a key
 func (manager *Manager) DeleteRegistryProxy(key string) {
 	manager.registryProxies.Remove(key)
+}
+
+// CreateAndRegisterExtensionProxy creates a new HTTP reverse proxy for an extension and adds it to the registered proxies.
+func (manager *Manager) CreateAndRegisterExtensionProxy(key, extensionAPIURL string) (http.Handler, error) {
+
+	extensionURL, err := url.Parse(extensionAPIURL)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy := manager.proxyFactory.newExtensionHTTPPRoxy(extensionURL)
+	manager.extensionProxies.Set(key, proxy)
+	return proxy, nil
+}
+
+// GetExtensionProxy returns the extension proxy associated to a key
+func (manager *Manager) GetExtensionProxy(key string) http.Handler {
+	proxy, ok := manager.extensionProxies.Get(key)
+	if !ok {
+		return nil
+	}
+	return proxy.(http.Handler)
+}
+
+// DeleteExtensionProxies deletes all the extension proxies associated to a key
+func (manager *Manager) DeleteExtensionProxies(key string) {
+	for _, k := range manager.extensionProxies.Keys() {
+		if strings.Contains(k, key+"_") {
+			manager.extensionProxies.Remove(k)
+		}
+	}
 }

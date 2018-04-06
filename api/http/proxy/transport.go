@@ -1,6 +1,8 @@
 package proxy
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"net/http"
 	"path"
 	"strings"
@@ -14,6 +16,8 @@ type (
 		dockerTransport        *http.Transport
 		ResourceControlService portainer.ResourceControlService
 		TeamMembershipService  portainer.TeamMembershipService
+		RegistryService        portainer.RegistryService
+		DockerHubService       portainer.DockerHubService
 		SettingsService        portainer.SettingsService
 	}
 	restrictedOperationContext struct {
@@ -22,11 +26,24 @@ type (
 		userTeamIDs      []portainer.TeamID
 		resourceControls []portainer.ResourceControl
 	}
+	registryAccessContext struct {
+		isAdmin         bool
+		userID          portainer.UserID
+		teamMemberships []portainer.TeamMembership
+		registries      []portainer.Registry
+		dockerHub       *portainer.DockerHub
+	}
+	registryAuthenticationHeader struct {
+		Username      string `json:"username"`
+		Password      string `json:"password"`
+		Serveraddress string `json:"serveraddress"`
+	}
 	operationExecutor struct {
 		operationContext *restrictedOperationContext
 		labelBlackList   []portainer.Pair
 	}
 	restrictedOperationRequest func(*http.Request, *http.Response, *operationExecutor) error
+	operationRequest           func(*http.Request) error
 )
 
 func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error) {
@@ -59,6 +76,10 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxyNodeRequest(request)
 	case strings.HasPrefix(path, "/tasks"):
 		return p.proxyTaskRequest(request)
+	case strings.HasPrefix(path, "/build"):
+		return p.proxyBuildRequest(request)
+	case strings.HasPrefix(path, "/images"):
+		return p.proxyImageRequest(request)
 	default:
 		return p.executeDockerRequest(request)
 	}
@@ -116,7 +137,7 @@ func (p *proxyTransport) proxyContainerRequest(request *http.Request) (*http.Res
 func (p *proxyTransport) proxyServiceRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/services/create":
-		return p.executeDockerRequest(request)
+		return p.replaceRegistryAuthenticationHeader(request)
 
 	case "/services":
 		return p.rewriteOperation(request, serviceListOperation)
@@ -228,6 +249,58 @@ func (p *proxyTransport) proxyTaskRequest(request *http.Request) (*http.Response
 	}
 }
 
+func (p *proxyTransport) proxyBuildRequest(request *http.Request) (*http.Response, error) {
+	return p.interceptAndRewriteRequest(request, buildOperation)
+}
+
+func (p *proxyTransport) proxyImageRequest(request *http.Request) (*http.Response, error) {
+	switch requestPath := request.URL.Path; requestPath {
+	case "/images/create":
+		return p.replaceRegistryAuthenticationHeader(request)
+	default:
+		if match, _ := path.Match("/images/*/push", requestPath); match {
+			return p.replaceRegistryAuthenticationHeader(request)
+		}
+		return p.executeDockerRequest(request)
+	}
+}
+
+func (p *proxyTransport) replaceRegistryAuthenticationHeader(request *http.Request) (*http.Response, error) {
+	accessContext, err := p.createRegistryAccessContext(request)
+	if err != nil {
+		return nil, err
+	}
+
+	originalHeader := request.Header.Get("X-Registry-Auth")
+
+	if originalHeader != "" {
+
+		decodedHeaderData, err := base64.StdEncoding.DecodeString(originalHeader)
+		if err != nil {
+			return nil, err
+		}
+
+		var originalHeaderData registryAuthenticationHeader
+		err = json.Unmarshal(decodedHeaderData, &originalHeaderData)
+		if err != nil {
+			return nil, err
+		}
+
+		authenticationHeader := createRegistryAuthenticationHeader(originalHeaderData.Serveraddress, accessContext)
+
+		headerData, err := json.Marshal(authenticationHeader)
+		if err != nil {
+			return nil, err
+		}
+
+		header := base64.StdEncoding.EncodeToString(headerData)
+
+		request.Header.Set("X-Registry-Auth", header)
+	}
+
+	return p.executeDockerRequest(request)
+}
+
 // restrictedOperation ensures that the current user has the required authorizations
 // before executing the original request.
 func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID string) (*http.Response, error) {
@@ -263,7 +336,7 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 	return p.executeDockerRequest(request)
 }
 
-// rewriteOperation will create a new operation context with data that will be used
+// rewriteOperationWithLabelFiltering will create a new operation context with data that will be used
 // to decorate the original request's response as well as retrieve all the black listed labels
 // to filter the resources.
 func (p *proxyTransport) rewriteOperationWithLabelFiltering(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
@@ -300,6 +373,15 @@ func (p *proxyTransport) rewriteOperation(request *http.Request, operation restr
 	return p.executeRequestAndRewriteResponse(request, operation, executor)
 }
 
+func (p *proxyTransport) interceptAndRewriteRequest(request *http.Request, operation operationRequest) (*http.Response, error) {
+	err := operation(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.executeDockerRequest(request)
+}
+
 func (p *proxyTransport) executeRequestAndRewriteResponse(request *http.Request, operation restrictedOperationRequest, executor *operationExecutor) (*http.Response, error) {
 	response, err := p.executeDockerRequest(request)
 	if err != nil {
@@ -323,6 +405,43 @@ func (p *proxyTransport) administratorOperation(request *http.Request) (*http.Re
 	}
 
 	return p.executeDockerRequest(request)
+}
+
+func (p *proxyTransport) createRegistryAccessContext(request *http.Request) (*registryAccessContext, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	accessContext := &registryAccessContext{
+		isAdmin: true,
+		userID:  tokenData.ID,
+	}
+
+	hub, err := p.DockerHubService.DockerHub()
+	if err != nil {
+		return nil, err
+	}
+	accessContext.dockerHub = hub
+
+	registries, err := p.RegistryService.Registries()
+	if err != nil {
+		return nil, err
+	}
+	accessContext.registries = registries
+
+	if tokenData.Role != portainer.AdministratorRole {
+		accessContext.isAdmin = false
+
+		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		accessContext.teamMemberships = teamMemberships
+	}
+
+	return accessContext, nil
 }
 
 func (p *proxyTransport) createOperationContext(request *http.Request) (*restrictedOperationContext, error) {

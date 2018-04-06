@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/handler"
+	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
 
@@ -40,8 +41,8 @@ type Server struct {
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
-	requestBouncer := security.NewRequestBouncer(server.JWTService, server.TeamMembershipService, server.AuthDisabled)
-	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamMembershipService, server.SettingsService)
+	requestBouncer := security.NewRequestBouncer(server.JWTService, server.UserService, server.TeamMembershipService, server.AuthDisabled)
+	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamMembershipService, server.SettingsService, server.RegistryService, server.DockerHubService)
 
 	var fileHandler = handler.NewFileHandler(filepath.Join(server.AssetsPath, "public"))
 	var authHandler = handler.NewAuthHandler(requestBouncer, server.AuthDisabled)
@@ -97,6 +98,13 @@ func (server *Server) Start() error {
 	stackHandler.GitService = server.GitService
 	stackHandler.RegistryService = server.RegistryService
 	stackHandler.DockerHubService = server.DockerHubService
+	var extensionHandler = handler.NewExtensionHandler(requestBouncer)
+	extensionHandler.EndpointService = server.EndpointService
+	extensionHandler.ProxyManager = proxyManager
+	var storidgeHandler = extensions.NewStoridgeHandler(requestBouncer)
+	storidgeHandler.EndpointService = server.EndpointService
+	storidgeHandler.TeamMembershipService = server.TeamMembershipService
+	storidgeHandler.ProxyManager = proxyManager
 
 	server.Handler = &handler.Handler{
 		AuthHandler:           authHandler,
@@ -115,6 +123,8 @@ func (server *Server) Start() error {
 		WebSocketHandler:      websocketHandler,
 		FileHandler:           fileHandler,
 		UploadHandler:         uploadHandler,
+		ExtensionHandler:      extensionHandler,
+		StoridgeHandler:       storidgeHandler,
 	}
 
 	if server.SSL {
