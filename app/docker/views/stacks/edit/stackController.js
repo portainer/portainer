@@ -3,7 +3,8 @@ angular.module('portainer.docker')
 function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceService, TaskService, ServiceHelper, Notifications, FormHelper, EndpointProvider) {
 
   $scope.state = {
-    actionInProgress: false,
+    updateActionInProgress: false,
+    pullActionInProgress: false,
     publicURL: EndpointProvider.endpointPublicURL()
   };
 
@@ -16,7 +17,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
     var prune = $scope.formValues.Prune;
 
-    $scope.state.actionInProgress = true;
+    $scope.state.updateActionInProgress = true;
     StackService.updateStack($scope.stack.Id, stackFile, env, prune)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
@@ -26,7 +27,27 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
       Notifications.error('Failure', err, 'Unable to create stack');
     })
     .finally(function final() {
-      $scope.state.actionInProgress = false;
+      $scope.state.updateActionInProgress = false;
+    });
+  };
+
+  $scope.pullAndDeployStack = function () {
+    console.log('going to pull and deploy stack')
+    var stackFile = $scope.stackFileContent;
+    var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
+    var prune = $scope.formValues.Prune;
+
+    $scope.state.pullActionInProgress = true;
+    StackService.pullAndDeployStack($scope.stack.Id, stackFile, env, prune)
+    .then(function success(data) {
+      Notifications.success('Stack successfully deployed');
+      $state.reload();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to create stack');
+    })
+    .finally(function final() {
+      $scope.state.pullActionInProgress = false;
     });
   };
 

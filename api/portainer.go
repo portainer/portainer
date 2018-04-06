@@ -133,12 +133,15 @@ type (
 
 	// Stack represents a Docker stack created via docker stack deploy.
 	Stack struct {
-		ID          StackID `json:"Id"`
-		Name        string  `json:"Name"`
-		EntryPoint  string  `json:"EntryPoint"`
-		SwarmID     string  `json:"SwarmId"`
-		ProjectPath string
-		Env         []Pair `json:"Env"`
+		ID                       StackID `json:"Id"`
+		Name                     string  `json:"Name"`
+		EntryPoint               string  `json:"EntryPoint"`
+		SwarmID                  string  `json:"SwarmId"`
+		ProjectPath              string
+		Env                      []Pair `json:"Env"`
+		RepositoryAuthentication bool   `json:"RepositoryAuthentication"`
+		RepositoryUsername       string `json:"RepositoryUsername,omitempty"`
+		RepositoryPassword       string `json:"RepositoryPassword,omitempty"`
 	}
 
 	// RegistryID represents a registry identifier.
@@ -377,6 +380,8 @@ type (
 	GitService interface {
 		ClonePublicRepository(repositoryURL, destination string) error
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, destination, username, password string) error
+		UpdatePublicRepository(repositoryPath string) error
+		UpdatePrivateRepositoryWithBasicAuth(repositoryPath, username, password string) error
 	}
 
 	// EndpointWatcher represents a service to synchronize the endpoints via an external source.

@@ -63,6 +63,8 @@ func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 		bouncer.RestrictedAccess(http.HandlerFunc(h.handleDeleteStack))).Methods(http.MethodDelete)
 	h.Handle("/{endpointId}/stacks/{id}",
 		bouncer.RestrictedAccess(http.HandlerFunc(h.handlePutStack))).Methods(http.MethodPut)
+	h.Handle("/{endpointId}/stacks/{id}/update",
+		bouncer.RestrictedAccess(http.HandlerFunc(h.handlePutUpdateStack))).Methods(http.MethodPut)
 	h.Handle("/{endpointId}/stacks/{id}/stackfile",
 		bouncer.RestrictedAccess(http.HandlerFunc(h.handleGetStackFile))).Methods(http.MethodGet)
 	return h
@@ -180,6 +182,9 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 		SwarmID:    swarmID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        req.Env,
+		RepositoryAuthentication: false,
+		RepositoryUsername:       "",
+		RepositoryPassword:       "",
 	}
 
 	projectPath, err := handler.FileService.StoreStackFileFromString(string(stack.ID), stack.EntryPoint, stackFileContent)
@@ -301,6 +306,9 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 		SwarmID:    swarmID,
 		EntryPoint: req.ComposeFilePathInRepository,
 		Env:        req.Env,
+		RepositoryAuthentication: req.RepositoryAuthentication,
+		RepositoryUsername:       req.RepositoryUsername,
+		RepositoryPassword:       req.RepositoryPassword,
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(string(stack.ID))
@@ -432,6 +440,9 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		SwarmID:    swarmID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        env,
+		RepositoryAuthentication: false,
+		RepositoryUsername:       "",
+		RepositoryPassword:       "",
 	}
 
 	projectPath, err := handler.FileService.StoreStackFileFromReader(string(stack.ID), stack.EntryPoint, stackFile)
@@ -590,6 +601,105 @@ func (handler *StackHandler) handleGetStack(w http.ResponseWriter, r *http.Reque
 	}
 
 	encodeJSON(w, extendedStack, handler.Logger)
+}
+
+// handlePutUpdateStack handles PUT requests on /:endpointId/stacks/:id/update
+func (handler *StackHandler) handlePutUpdateStack(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	stackID := vars["id"]
+
+	endpointID, err := strconv.Atoi(vars["endpointId"])
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrEndpointNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
+	if err == portainer.ErrStackNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	var req putStackRequest
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	_, err = govalidator.ValidateStruct(req)
+	if err != nil {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	stack.Env = req.Env
+
+	if stack.RepositoryAuthentication {
+		err = handler.GitService.UpdatePrivateRepositoryWithBasicAuth(stack.ProjectPath, stack.RepositoryUsername, stack.RepositoryPassword)
+	} else {
+		err = handler.GitService.UpdatePublicRepository(stack.ProjectPath)
+	}
+
+	if err != nil && err.Error() != portainer.ErrAlreadyUptodate.Error() {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	err = handler.StackService.UpdateStack(stack.ID, stack)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	dockerhub, err := handler.DockerHubService.DockerHub()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	registries, err := handler.RegistryService.Registries()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredRegistries, err := security.FilterRegistries(registries, securityContext)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	config := stackDeploymentConfig{
+		stack:      stack,
+		endpoint:   endpoint,
+		dockerhub:  dockerhub,
+		registries: filteredRegistries,
+		prune:      req.Prune,
+	}
+	err = handler.deployStack(&config)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
 }
 
 // handlePutStack handles PUT requests on /:endpointId/stacks/:id
