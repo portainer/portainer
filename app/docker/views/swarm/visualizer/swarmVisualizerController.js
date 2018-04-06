@@ -101,6 +101,20 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
     $scope.visualizerData = visualizerData;
   }
 
+  function loadState() {
+    var showInfoPanel = LocalStorage.getSwarmVisualizerSettings('show_info_panel');
+    if (showInfoPanel !== undefined && showInfoPanel !== null)
+        $scope.state.ShowInformationPanel = showInfoPanel;
+
+    var displayOnlyRunningTasks = LocalStorage.getSwarmVisualizerSettings('display_only_running_tasks');
+    if (displayOnlyRunningTasks !== undefined && displayOnlyRunningTasks !== null)
+        $scope.state.DisplayOnlyRunningTasks = displayOnlyRunningTasks;
+
+    var refreshRate = LocalStorage.getSwarmVisualizerSettings('refresh_rate');
+    if (refreshRate !== undefined && refreshRate !== null)
+        $scope.state.refreshRate = refreshRate;
+  }
+
   function initView() {
     $q.all({
       nodes: NodeService.nodes(),
@@ -120,18 +134,8 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize cluster visualizer');
     });
-    
-    var showInfoPanel = LocalStorage.getSwarmVisualizerSettings('show_info_panel');
-    if (showInfoPanel !== undefined && showInfoPanel !== null)
-        $scope.state.ShowInformationPanel = showInfoPanel;
-    
-    var displayOnlyRunningTasks = LocalStorage.getSwarmVisualizerSettings('display_only_running_tasks');
-    if (displayOnlyRunningTasks !== undefined && displayOnlyRunningTasks !== null)
-        $scope.state.DisplayOnlyRunningTasks = displayOnlyRunningTasks;
-    
-    var refreshRate = LocalStorage.getSwarmVisualizerSettings('refresh_rate');
-    if (refreshRate !== undefined && refreshRate !== null)
-        $scope.state.refreshRate = refreshRate;
+
+    loadState();
   }
 
   initView();
