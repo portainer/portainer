@@ -71,7 +71,7 @@ func (manager *Manager) CreateAndRegisterRegistryProxy(registry *portainer.Regis
 		return nil, err
 	}
 
-	proxy = manager.proxyFactory.newHTTPProxy(registryURL)
+	proxy = manager.proxyFactory.newRegistryHTTPPRoxy(registryURL)
 
 	manager.registryProxies.Set(string(registry.ID), proxy)
 	return proxy, nil
