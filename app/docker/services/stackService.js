@@ -175,7 +175,6 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
   };
 
   service.pullAndDeployStack = function(id, stackFile, env, prune) {
-    console.log('pullAndDeployStack')
     return Stack.pullAndDeploy({ id: id, StackFileContent: stackFile, Env: env, Prune: prune}).$promise;
   };
 

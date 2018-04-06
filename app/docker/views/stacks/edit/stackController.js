@@ -32,7 +32,6 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
   };
 
   $scope.pullAndDeployStack = function () {
-    console.log('going to pull and deploy stack')
     var stackFile = $scope.stackFileContent;
     var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
     var prune = $scope.formValues.Prune;
