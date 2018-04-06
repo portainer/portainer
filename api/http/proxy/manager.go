@@ -42,7 +42,7 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 	}
 
 	if endpointURL.Scheme == "tcp" {
-		if endpoint.TLSConfig.TLS {
+		if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
 			proxy, err = manager.proxyFactory.newDockerHTTPSProxy(endpointURL, endpoint)
 			if err != nil {
 				return nil, err

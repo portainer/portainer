@@ -12,7 +12,7 @@ import (
 func CreateTLSConfiguration(config *portainer.TLSConfiguration) (*tls.Config, error) {
 	TLSConfig := &tls.Config{}
 
-	if config.TLSCertPath != "" && config.TLSKeyPath != "" {
+	if config.TLS && config.TLSCertPath != "" && config.TLSKeyPath != "" {
 		cert, err := tls.LoadX509KeyPair(config.TLSCertPath, config.TLSKeyPath)
 		if err != nil {
 			return nil, err
@@ -21,7 +21,7 @@ func CreateTLSConfiguration(config *portainer.TLSConfiguration) (*tls.Config, er
 		TLSConfig.Certificates = []tls.Certificate{cert}
 	}
 
-	if !config.TLSSkipVerify {
+	if config.TLS && !config.TLSSkipVerify {
 		caCert, err := ioutil.ReadFile(config.TLSCACertPath)
 		if err != nil {
 			return nil, err

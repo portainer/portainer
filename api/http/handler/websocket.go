@@ -115,7 +115,7 @@ func proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSo
 	agentURL.Scheme = "ws"
 	proxy := websocketproxy.NewProxy(agentURL)
 
-	if params.endpoint.TLSConfig.TLS {
+	if params.endpoint.TLSConfig.TLS || params.endpoint.TLSConfig.TLSSkipVerify {
 		agentURL.Scheme = "wss"
 		proxy.Dialer = &websocket.Dialer{
 			TLSClientConfig: &tls.Config{
