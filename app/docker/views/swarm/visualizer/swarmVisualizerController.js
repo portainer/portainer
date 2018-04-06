@@ -5,26 +5,29 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
   $scope.state = {
     ShowInformationPanel: true,
     DisplayOnlyRunningTasks: false,
-    refreshRate: '5',
+    refreshRate: '5'
   };
 
   $scope.$on('$destroy', function() {
     stopRepeater();
   });
 
-  $scope.$watch('state.DisplayOnlyRunningTasks', function(newVal, oldVal) {
-    LocalStorage.storeSwarmVisualizerSettings('display_only_running_tasks', newVal);
-  });
+  $scope.changeShowInformationPanel = function(value) {
+      $scope.state.ShowInformationPanel = value;
+      LocalStorage.storeSwarmVisualizerSettings('show_info_panel', value);
+  };
 
-  $scope.$watch('state.ShowInformationPanel', function(newVal, oldVal) {
-    LocalStorage.storeSwarmVisualizerSettings('show_info_panel', newVal);
-  });
-  
+  $scope.changeDisplayOnlyRunningTasks = function() {
+      var value = $scope.state.DisplayOnlyRunningTasks;
+      LocalStorage.storeSwarmVisualizerSettings('display_only_running_tasks', value);
+  };
+
   $scope.changeUpdateRepeater = function() {
     stopRepeater();
     setUpdateRepeater();
     $('#refreshRateChange').show();
     $('#refreshRateChange').fadeOut(1500);
+    LocalStorage.storeSwarmVisualizerSettings('refresh_rate', $scope.state.refreshRate);
   };
 
   function stopRepeater() {
@@ -57,10 +60,7 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
         Notifications.error('Failure', err, 'Unable to retrieve cluster information');
       });
     }, refreshRate * 1000);
-    
-    LocalStorage.storeSwarmVisualizerSettings('refresh_rate', refreshRate);
   }
-
 
   function assignServiceInfo(services, tasks) {
     for (var i = 0; i < services.length; i++) {
