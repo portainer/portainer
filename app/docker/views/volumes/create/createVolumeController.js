@@ -76,6 +76,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
 
     PluginService.volumePlugins(apiVersion < 1.25 || endpointProvider === 'VMWARE_VIC')
     .then(function success(data) {
