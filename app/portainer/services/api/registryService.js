@@ -194,10 +194,11 @@ angular.module('portainer.app')
     return Registries.update({ id: registry.Id }, registry).$promise;
   };
 
-  service.createRegistry = function(name, URL, authentication, username, password) {
+  service.createRegistry = function(name, URL, authentication, username, password, tlsVerification) {
     var payload = {
       Name: name,
       URL: URL,
+      TLSVerification: tlsVerification,
       Authentication: authentication
     };
     if (authentication) {

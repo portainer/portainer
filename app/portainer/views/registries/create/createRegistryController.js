@@ -10,6 +10,7 @@ function ($scope, $state, RegistryService, Notifications) {
   $scope.formValues = {
     Name: 'Quay',
     URL: 'quay.io',
+    TLSVerification: true,
     Authentication: true,
     Username: '',
     Password: ''
@@ -18,24 +19,27 @@ function ($scope, $state, RegistryService, Notifications) {
   $scope.selectQuayRegistry = function() {
     $scope.formValues.Name = 'Quay';
     $scope.formValues.URL = 'quay.io';
+    $scope.formValues.TLSVerification = true;    
     $scope.formValues.Authentication = true;
   };
 
   $scope.selectCustomRegistry = function() {
     $scope.formValues.Name = '';
     $scope.formValues.URL = '';
+    $scope.formValues.TLSVerification = true;
     $scope.formValues.Authentication = false;
   };
 
   $scope.addRegistry = function() {
     var registryName = $scope.formValues.Name;
     var registryURL = $scope.formValues.URL.replace(/^https?\:\/\//i, '');
+    var tlsVerification = $scope.formValues.TLSVerification;
     var authentication = $scope.formValues.Authentication;
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
 
     $scope.state.actionInProgress = true;
-    RegistryService.createRegistry(registryName, registryURL, authentication, username, password)
+    RegistryService.createRegistry(registryName, registryURL, authentication, username, password, tlsVerification)
     .then(function success(data) {
       Notifications.success('Registry successfully created');
       $state.go('portainer.registries');

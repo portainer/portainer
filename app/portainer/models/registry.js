@@ -5,6 +5,7 @@ function RegistryViewModel(data) {
   this.Authentication = data.Authentication;
   this.Username = data.Username;
   this.Password = data.Password;
+  this.TLSVerification = data.TLSVerification;
   this.AuthorizedUsers = data.AuthorizedUsers;
   this.AuthorizedTeams = data.AuthorizedTeams;
   this.Checked = false;

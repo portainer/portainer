@@ -3,18 +3,24 @@ package handler
 import (
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/security"
 	"github.com/portainer/portainer/http/proxy"
+	"github.com/portainer/portainer/http/security"
 
+	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 )
+
+const registryCheckTimeout = 3 * time.Second
 
 // RegistryHandler represents an HTTP API handler for managing Docker registries.
 type RegistryHandler struct {
@@ -50,11 +56,12 @@ func NewRegistryHandler(bouncer *security.RequestBouncer) *RegistryHandler {
 
 type (
 	postRegistriesRequest struct {
-		Name           string `valid:"required"`
-		URL            string `valid:"required"`
-		Authentication bool   `valid:""`
-		Username       string `valid:""`
-		Password       string `valid:""`
+		Name            string `valid:"required"`
+		URL             string `valid:"required"`
+		TLSVerification bool   `valid:""`
+		Authentication  bool   `valid:""`
+		Username        string `valid:""`
+		Password        string `valid:""`
 	}
 
 	postRegistriesResponse struct {
@@ -67,11 +74,12 @@ type (
 	}
 
 	putRegistriesRequest struct {
-		Name           string `valid:"required"`
-		URL            string `valid:"required"`
-		Authentication bool   `valid:""`
-		Username       string `valid:""`
-		Password       string `valid:""`
+		Name            string `valid:"required"`
+		URL             string `valid:"required"`
+		TLSVerification bool   `valid:""`
+		Authentication  bool   `valid:""`
+		Username        string `valid:""`
+		Password        string `valid:""`
 	}
 )
 
@@ -128,9 +136,18 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 		}
 	}
 
+	protocol, version, err := validateRegistryURL(req.URL, req.Authentication, req.Username, req.Password, req.TLSVerification)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
 	registry := &portainer.Registry{
 		Name:            req.Name,
 		URL:             req.URL,
+		Protocol:        protocol,
+		Version:         version,
+		TLSVerification: req.TLSVerification,
 		Authentication:  req.Authentication,
 		Username:        req.Username,
 		Password:        req.Password,
@@ -276,7 +293,14 @@ func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http
 	}
 
 	if req.URL != "" {
+		protocol, version, err := validateRegistryURL(req.URL, req.Authentication, req.Username, req.Password, req.TLSVerification)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+			return
+		}
 		registry.URL = req.URL
+		registry.Protocol = protocol
+		registry.Version = version
 	}
 
 	if req.Authentication {
@@ -288,6 +312,7 @@ func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http
 		registry.Username = ""
 		registry.Password = ""
 	}
+	registry.TLSVerification = req.TLSVerification
 
 	err = handler.RegistryService.UpdateRegistry(registry.ID, registry)
 	if err != nil {
@@ -328,19 +353,19 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 	id := vars["id"]
 
 	registryID, err := strconv.Atoi(id)
-        if err != nil {
-                httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-                return
-        }
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
 
 	registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
-        if err == portainer.ErrRegistryNotFound {
-                httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
-                return
-        } else if err != nil {
-                httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-                return
-        }
+	if err == portainer.ErrRegistryNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
+		return
+	} else if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
 
 	var proxy http.Handler
 	proxy = handler.ProxyManager.GetRegistryProxy(string(registryID))
@@ -353,4 +378,121 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 	}
 
 	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)
+}
+
+// validateRegistryURL validates wether given url is valid a docker registry url by
+// sending http get request to url using combination of protocols and available
+// registry versions. upon first successfull attempt, it returns protocol, version
+// and nil error.
+func validateRegistryURL(url string, auth bool, username, password string, tlsVerification bool) (string, string, error) {
+	configs := []struct {
+		protocol, version string
+	}{
+		{"https", "v2"},
+		{"https", "v1"},
+		{"http", "v2"},
+		{"http", "v1"},
+	}
+
+	client := &http.Client{
+		Timeout: registryCheckTimeout,
+	}
+	if !tlsVerification {
+		client.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		}
+	}
+	for _, config := range configs {
+		url := fmt.Sprintf("%s://%s/%s/", config.protocol, url, config.version)
+		if auth {
+			if err := registryAuthAttempt(client, url, username, password); err == nil {
+				return config.protocol, config.version, nil
+			} else if err == portainer.ErrRegistryInvalidAuthCreds || err == portainer.ErrRegistryInvalidServerCert {
+				return "", "", err
+			}
+			continue
+		}
+
+		if err := checkRegistryURL(client, url); err == nil {
+			return config.protocol, config.version, nil
+		} else if err == portainer.ErrRegistryAuthRequired || err == portainer.ErrRegistryInvalidServerCert {
+			return "", "", err
+		}
+	}
+
+	return "", "", portainer.ErrRegistryInvalid
+}
+
+func checkRegistryURL(client *http.Client, url string) error {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return portainer.ErrRegistryInvalid
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		if strings.Contains(err.Error(), "cannot validate certificate for") {
+			return portainer.ErrRegistryInvalidServerCert
+		}
+		return portainer.ErrRegistryInvalid
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	}
+	if resp.StatusCode == http.StatusUnauthorized {
+		return portainer.ErrRegistryAuthRequired
+	}
+	return portainer.ErrRegistryInvalid
+}
+
+func registryAuthAttempt(client *http.Client, url, username, password string) error {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return portainer.ErrRegistryInvalid
+	}
+
+	resp, err := client.Do(req)
+	if err != nil && strings.Contains(err.Error(), "cannot validate certificate for") {
+		return portainer.ErrRegistryInvalidServerCert
+	} else if err != nil || resp.StatusCode != http.StatusUnauthorized {
+		return portainer.ErrRegistryInvalid
+	}
+
+	authURL := url
+	if authHeader := resp.Header.Get("Www-Authenticate"); strings.HasPrefix(authHeader, "Bearer") {
+		parts := strings.Split(strings.Replace(authHeader, "Bearer ", "", 1), ",")
+
+		m := map[string]string{}
+		for _, part := range parts {
+			if splits := strings.Split(part, "="); len(splits) == 2 {
+				m[splits[0]] = strings.Replace(splits[1], "\"", "", 2)
+			}
+		}
+		if _, ok := m["realm"]; !ok {
+			return portainer.ErrRegistryInvalid
+		}
+
+		authURL = m["realm"]
+		if v, ok := m["service"]; ok {
+			authURL += "?service=" + v
+		}
+	}
+
+	authReq, err := http.NewRequest("GET", authURL, nil)
+	if err != nil {
+		return portainer.ErrRegistryInvalid
+	}
+	authReq.SetBasicAuth(username, password)
+
+	resp, err = client.Do(authReq)
+	if err != nil {
+		return portainer.ErrRegistryInvalid
+	}
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	}
+	return portainer.ErrRegistryInvalidAuthCreds
 }
