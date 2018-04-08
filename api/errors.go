@@ -46,8 +46,12 @@ const (
 
 // Registry errors.
 const (
-	ErrRegistryNotFound      = Error("Registry not found")
-	ErrRegistryAlreadyExists = Error("A registry is already defined for this URL")
+	ErrRegistryNotFound          = Error("Registry not found")
+	ErrRegistryAlreadyExists     = Error("A registry is already defined for this URL")
+	ErrRegistryInvalid           = Error("Invalid registry URL")
+	ErrRegistryAuthRequired      = Error("Authentication required")
+	ErrRegistryInvalidAuthCreds  = Error("Invalid authentication credentials")
+	ErrRegistryInvalidServerCert = Error("Unable to validate registry server certificate")
 )
 
 // Stack errors

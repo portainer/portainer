@@ -69,6 +69,19 @@
             </div>
           </div>
           <!-- !registry-url-input -->
+          <!-- tls-verification -->
+          <div class="form-group" ng-if="state.RegistryType === 'custom'">
+            <div class="col-sm-12">
+              <label for="tls_verification" class="control-label text-left">
+                TLS Verification
+                <portainer-tooltip position="bottom" message="Enable this option if you want to use TLS Verification when doing auth check to registry."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.TLSVerification"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- !tls-verification -->
           <!-- authentication-checkbox -->
           <div class="form-group" ng-if="state.RegistryType === 'custom'">
             <div class="col-sm-12">

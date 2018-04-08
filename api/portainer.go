@@ -150,9 +150,12 @@ type (
 		ID              RegistryID `json:"Id"`
 		Name            string     `json:"Name"`
 		URL             string     `json:"URL"`
+		Protocol        string     `json:"Protocol"`
+		Version         string     `json:"Version"`
 		Authentication  bool       `json:"Authentication"`
 		Username        string     `json:"Username"`
 		Password        string     `json:"Password,omitempty"`
+		TLSVerification bool       `json:"TLSVerification"`
 		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
 	}
