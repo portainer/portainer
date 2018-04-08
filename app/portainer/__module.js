@@ -176,6 +176,39 @@ angular.module('portainer.app', [])
     }
   };
 
+  var registryBrowse = {
+    name: 'portainer.registries.registry.browse',
+    url: '/browse',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/registries/browse/registryBrowse.html',
+        controller: 'RegistryBrowseController'
+      }
+    }
+  };
+
+  var registryTags = {
+    name: 'portainer.registries.registry.tags',
+    url: '/tags?repository',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/registries/tags/registryBrowseTags.html',
+        controller: 'RegistryBrowseTagsController'
+      }
+    }
+  };
+
+  var registryDigest = {
+    name: 'portainer.registries.registry.digest',
+    url: '/digest/:digestid?repository',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/registries/tags/registryDigest.html',
+        controller: 'RegistryBrowseTagsController'
+      }
+    }
+  };
+
   var settings = {
     name: 'portainer.settings',
     url: '/settings',
@@ -257,6 +290,9 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);
   $stateRegistryProvider.register(registryCreation);
+  $stateRegistryProvider.register(registryBrowse);
+  $stateRegistryProvider.register(registryTags);
+  $stateRegistryProvider.register(registryDigest);
   $stateRegistryProvider.register(settings);
   $stateRegistryProvider.register(settingsAuthentication);
   $stateRegistryProvider.register(users);

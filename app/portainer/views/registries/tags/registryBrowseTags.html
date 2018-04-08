@@ -1,0 +1,17 @@
+<rd-header>
+  <rd-header-title title="Repository Tags"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry.browse({id: registry.Id})">{{ registry.Name }}</a> &gt; <a ui-sref="portainer.registries.registry.tags({id: registry.Id, repository: repository})">{{ repository }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <registry-tags-datatable
+    title="Tags" title-icon="fa-database"
+    dataset="digests" table-key="digests"
+    order-by="digest" show-text-filter="true"
+    remove-action="removeAction"
+    ></registry-tags-datatable>
+  </div>
+</div>

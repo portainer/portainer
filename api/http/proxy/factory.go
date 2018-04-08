@@ -24,6 +24,11 @@ func (factory *proxyFactory) newExtensionHTTPPRoxy(u *url.URL) http.Handler {
 	return newSingleHostReverseProxyWithHostHeader(u)
 }
 
+func (factory *proxyFactory) newRegistryHTTPPRoxy(u *url.URL) http.Handler {
+	u.Scheme = "http"
+	return newSingleHostReverseProxyWithHostHeader(u)
+}
+
 func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
 	u.Scheme = "https"
 	proxy := factory.createDockerReverseProxy(u)
