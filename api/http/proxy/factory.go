@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"crypto/tls"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -21,12 +22,22 @@ type proxyFactory struct {
 
 func (factory *proxyFactory) newExtensionHTTPPRoxy(u *url.URL) http.Handler {
 	u.Scheme = "http"
-	return newSingleHostReverseProxyWithHostHeader(u)
+	return newSingleHostReverseProxyWithHostHeader(u, &http.Transport{})
 }
 
-func (factory *proxyFactory) newRegistryHTTPPRoxy(u *url.URL) http.Handler {
-	u.Scheme = "http"
-	return newSingleHostReverseProxyWithHostHeader(u)
+func (factory *proxyFactory) newRegistryProxy(u *url.URL, p string, tlsVerification bool) http.Handler {
+	u.Scheme = p
+	if tlsVerification {
+		return newSingleHostReverseProxyWithHostHeader(u, &http.Transport{})
+	} else {
+		tlsConfig := &tls.Config{
+	                InsecureSkipVerify: true,
+	        }
+	        transport := &http.Transport{
+	                TLSClientConfig: tlsConfig,
+	        }
+		return newSingleHostReverseProxyWithHostHeader(u, transport)
+	}
 }
 
 func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
@@ -61,7 +72,7 @@ func (factory *proxyFactory) newDockerSocketProxy(path string) http.Handler {
 }
 
 func (factory *proxyFactory) createDockerReverseProxy(u *url.URL) *httputil.ReverseProxy {
-	proxy := newSingleHostReverseProxyWithHostHeader(u)
+	proxy := newSingleHostReverseProxyWithHostHeader(u, &http.Transport{})
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
