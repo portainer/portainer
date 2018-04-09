@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('StackController', ['$q', '$scope', '$state', '$transition$', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ServiceHelper', 'Notifications', 'FormHelper', 'EndpointProvider',
-function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceService, TaskService, ServiceHelper, Notifications, FormHelper, EndpointProvider) {
+.controller('StackController', ['$q', '$scope', '$state', '$transition$', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ContainerService', 'ServiceHelper', 'TaskHelper', 'Notifications', 'FormHelper', 'EndpointProvider',
+function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceService, TaskService, ContainerService, ServiceHelper, TaskHelper, Notifications, FormHelper, EndpointProvider) {
 
   $scope.state = {
     actionInProgress: false,
@@ -41,6 +41,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
   function initView() {
     var stackId = $transition$.params().id;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    var agentPowered = $scope.applicationState.endpoint.mode.agentPowered;
 
     StackService.stack(stackId)
     .then(function success(data) {
@@ -55,24 +56,31 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
         stackFile: StackService.getStackFile(stackId),
         services: ServiceService.services(serviceFilters),
         tasks: TaskService.tasks(serviceFilters),
+        containers: agentPowered ? ContainerService.containers() : [],
         nodes: NodeService.nodes()
       });
     })
     .then(function success(data) {
       $scope.stackFileContent = data.stackFile;
-
       $scope.nodes = data.nodes;
 
       var services = data.services;
-
       var tasks = data.tasks;
-      $scope.tasks = tasks;
 
       for (var i = 0; i < services.length; i++) {
         var service = services[i];
         ServiceHelper.associateTasksToService(service, tasks);
       }
 
+      if (agentPowered) {
+        var containers = data.containers;
+        for (var j = 0; j < tasks.length; j++) {
+          var task = tasks[j];
+          TaskHelper.associateContainerToTask(task, containers);
+        }
+      }
+
+      $scope.tasks = tasks;
       $scope.services = services;
     })
     .catch(function error(err) {

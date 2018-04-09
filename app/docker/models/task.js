@@ -7,4 +7,5 @@ function TaskViewModel(data) {
   this.Status = data.Status;
   this.ServiceId = data.ServiceID;
   this.NodeId = data.NodeID;
+  this.ContainerId = data.Status.ContainerStatus.ContainerID;
 }

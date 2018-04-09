@@ -54,19 +54,25 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Updated' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th ng-if="$ctrl.showLogsButton">Actions</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
-              <td><a ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}</a></td>
+              <td>
+                <a ng-if="!$ctrl.agentPowered" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}</a>
+                <a ng-if="$ctrl.agentPowered" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.Id }}</a>
+              </td>
               <td><span class="label label-{{ item.Status.State | taskstatusbadge }}">{{ item.Status.State }}</span></td>
               <td ng-if="$ctrl.showSlotColumn">{{ item.Slot ? item.Slot : '-' }}</td>
               <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>
               <td>{{ item.Updated | getisodate }}</td>
-              <td ng-if="$ctrl.showLogsButton">
-                <a ui-sref="docker.tasks.task.logs({id: item.Id})">
+              <td>
+                <a ui-sref="docker.tasks.task.logs({id: item.Id})" ng-if="$ctrl.showLogsButton" class="space-right">
                   <i class="fa fa-file-alt" aria-hidden="true"></i> View logs
+                </a>
+                <a ui-sref="docker.containers.container.console({ id: item.Container.Id, nodeName: item.Container.NodeName })" ng-if="$ctrl.agentPowered">
+                  <i class="fa fa-terminal" aria-hidden="true"></i> Console
                 </a>
               </td>
             </tr>
