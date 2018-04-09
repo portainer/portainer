@@ -60,8 +60,8 @@
           <tbody>
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
               <td>
-                <a ng-if="!$ctrl.agentPowered" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}</a>
-                <a ng-if="$ctrl.agentPowered" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.Id }}</a>
+                <a ng-if="!$ctrl.agentPowered || !item.Container" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}</a>
+                <a ng-if="$ctrl.agentPowered && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.Id }}</a>
               </td>
               <td><span class="label label-{{ item.Status.State | taskstatusbadge }}">{{ item.Status.State }}</span></td>
               <td ng-if="$ctrl.showSlotColumn">{{ item.Slot ? item.Slot : '-' }}</td>

@@ -7,5 +7,7 @@ function TaskViewModel(data) {
   this.Status = data.Status;
   this.ServiceId = data.ServiceID;
   this.NodeId = data.NodeID;
-  this.ContainerId = data.Status.ContainerStatus.ContainerID;
+  if (data.Status && data.Status.ContainerStatus && data.Status.ContainerStatus.ContainerID) {
+    this.ContainerId = data.Status.ContainerStatus.ContainerID;
+  }
 }
