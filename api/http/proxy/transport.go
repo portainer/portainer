@@ -258,7 +258,7 @@ func (p *proxyTransport) proxyImageRequest(request *http.Request) (*http.Respons
 	case "/images/create":
 		return p.replaceRegistryAuthenticationHeader(request)
 	default:
-		if match, _ := path.Match("/images/*/push", requestPath); match {
+		if match, _ := path.Match("/images/*/*/push", requestPath); match {
 			return p.replaceRegistryAuthenticationHeader(request)
 		}
 		return p.executeDockerRequest(request)
