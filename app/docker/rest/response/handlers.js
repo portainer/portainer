@@ -49,7 +49,6 @@ function genericHandler(data) {
 // It will also strip the 8 first characters of each line and remove any ANSI code related character sequences.
 function logsHandler(data) {
   var logs = data;
-  logs = logs.substring(8);
   logs = logs.replace(/\n(.{8})/g, '\n\r');
   logs = logs.replace(
     /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
