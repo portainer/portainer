@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"net/http"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/security"
 )
+
+var apiVersionRe = regexp.MustCompile(`(/v[0-9]\.[0-9]*)?`)
 
 type (
 	proxyTransport struct {
@@ -55,7 +58,8 @@ func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Resp
 }
 
 func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Response, error) {
-	path := request.URL.Path
+	path := apiVersionRe.ReplaceAllString(request.URL.Path, "")
+	request.URL.Path = path
 
 	switch {
 	case strings.HasPrefix(path, "/configs"):
