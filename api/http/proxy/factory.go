@@ -2,6 +2,8 @@ package proxy
 
 import (
 	"crypto/tls"
+	"encoding/base64"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -22,22 +24,30 @@ type proxyFactory struct {
 
 func (factory *proxyFactory) newExtensionHTTPPRoxy(u *url.URL) http.Handler {
 	u.Scheme = "http"
-	return newSingleHostReverseProxyWithHostHeader(u, &http.Transport{})
+	return newSingleHostReverseProxyWithHostHeader(u)
 }
 
-func (factory *proxyFactory) newRegistryProxy(u *url.URL, p string, tlsVerification bool) http.Handler {
-	u.Scheme = p
-	if tlsVerification {
-		return newSingleHostReverseProxyWithHostHeader(u, &http.Transport{})
-	} else {
-		tlsConfig := &tls.Config{
-	                InsecureSkipVerify: true,
-	        }
-	        transport := &http.Transport{
-	                TLSClientConfig: tlsConfig,
-	        }
-		return newSingleHostReverseProxyWithHostHeader(u, transport)
+func (factory *proxyFactory) newRegistryProxy(u *url.URL, registry *portainer.Registry) http.Handler {
+	u.Scheme = registry.Protocol
+	transport := &http.Transport{}
+	if registry.TLSVerification {
+		transport.TLSClientConfig = &tls.Config{
+                        InsecureSkipVerify: true,
+                }
 	}
+	proxy := newSingleHostReverseProxyWithHostHeader(u)
+	switch registry.AuthType {
+		case "Basic":
+			auth := base64.StdEncoding.EncodeToString([]byte(registry.Username + ":" + registry.Password))
+			proxy = newSingleHostReverseProxyWithHostHeaderBasicAuth(u, auth)
+		case "":
+		default:
+			fmt.Printf("Auth Type %s not yet supported.", registry.AuthType)
+			return nil
+	}
+
+	proxy.Transport = transport
+	return proxy
 }
 
 func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
@@ -72,7 +82,7 @@ func (factory *proxyFactory) newDockerSocketProxy(path string) http.Handler {
 }
 
 func (factory *proxyFactory) createDockerReverseProxy(u *url.URL) *httputil.ReverseProxy {
-	proxy := newSingleHostReverseProxyWithHostHeader(u, &http.Transport{})
+	proxy := newSingleHostReverseProxyWithHostHeader(u)
 	transport := &proxyTransport{
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
