@@ -464,7 +464,7 @@ func registryAuthAttempt(client *http.Client, url, username, password string) (s
 	}
 
 	authURL := url
-        authHeader := resp.Header.Get("Www-Authenticate");
+	authHeader := resp.Header.Get("Www-Authenticate")
 	authType := strings.Split(authHeader, " ")[0]
 	if authType == "Bearer" {
 		parts := strings.Split(strings.Replace(authHeader, "Bearer ", "", 1), ",")
