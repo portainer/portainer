@@ -32,18 +32,18 @@ func (factory *proxyFactory) newRegistryProxy(u *url.URL, registry *portainer.Re
 	transport := &http.Transport{}
 	if registry.TLSVerification {
 		transport.TLSClientConfig = &tls.Config{
-                        InsecureSkipVerify: true,
-                }
+			InsecureSkipVerify: true,
+		}
 	}
 	proxy := newSingleHostReverseProxyWithHostHeader(u)
 	switch registry.AuthType {
-		case "Basic":
-			auth := base64.StdEncoding.EncodeToString([]byte(registry.Username + ":" + registry.Password))
-			proxy = newSingleHostReverseProxyWithHostHeaderBasicAuth(u, auth)
-		case "":
-		default:
-			fmt.Printf("Auth Type %s not yet supported.", registry.AuthType)
-			return nil
+	case "Basic":
+		auth := base64.StdEncoding.EncodeToString([]byte(registry.Username + ":" + registry.Password))
+		proxy = newSingleHostReverseProxyWithHostHeaderBasicAuth(u, auth)
+	case "":
+	default:
+		fmt.Printf("Auth Type %s not yet supported.", registry.AuthType)
+		return nil
 	}
 
 	proxy.Transport = transport
