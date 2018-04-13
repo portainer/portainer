@@ -90,6 +90,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // encodeJSON encodes v to w in JSON format. WriteErrorResponse() is called if encoding fails.
 func encodeJSON(w http.ResponseWriter, v interface{}, logger *log.Logger) {
+	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(v); err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, logger)
 	}
