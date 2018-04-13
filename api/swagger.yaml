@@ -2608,7 +2608,7 @@ definitions:
         type: "string"
         example: "container"
         description: "Type of Docker resource. Valid values are: container, volume\
-          \ or service"
+          \ service, secret, config or stack"
       AdministratorsOnly:
         type: "boolean"
         example: true
@@ -2923,7 +2923,7 @@ definitions:
       RepositoryPassword:
         type: "string"
         example: "myGitPassword"
-        description: "Password used in basic authentication. Required when RepositoryAuthentication is true."  
+        description: "Password used in basic authentication. Required when RepositoryAuthentication is true."
       Env:
         type: "array"
         description: "A list of environment variables used during stack deployment"
