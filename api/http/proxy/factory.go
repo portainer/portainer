@@ -30,7 +30,7 @@ func (factory *proxyFactory) newExtensionHTTPPRoxy(u *url.URL) http.Handler {
 func (factory *proxyFactory) newRegistryProxy(u *url.URL, registry *portainer.Registry) http.Handler {
 	u.Scheme = registry.Protocol
 	transport := &http.Transport{}
-	if registry.TLSVerification {
+	if !registry.TLSVerification {
 		transport.TLSClientConfig = &tls.Config{
 			InsecureSkipVerify: true,
 		}
@@ -40,6 +40,9 @@ func (factory *proxyFactory) newRegistryProxy(u *url.URL, registry *portainer.Re
 	case "Basic":
 		auth := base64.StdEncoding.EncodeToString([]byte(registry.Username + ":" + registry.Password))
 		proxy = newSingleHostReverseProxyWithHostHeaderBasicAuth(u, auth)
+	case "Bearer":
+		// Need to code a transport to get token from auth url
+		// Then proxy to registry url with token in header
 	case "":
 	default:
 		fmt.Printf("Auth Type %s not yet supported.", registry.AuthType)
