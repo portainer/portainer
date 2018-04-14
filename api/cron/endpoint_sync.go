@@ -142,8 +142,6 @@ func (job endpointSyncJob) prepareSyncData(storedEndpoints, fileEndpoints []port
 			if endpoint != nil {
 				job.logger.Printf("New definition for a stored endpoint found in file, updating database. [name: %v] [url: %v]\n", endpoint.Name, endpoint.URL)
 				endpointsToUpdate = append(endpointsToUpdate, endpoint)
-			} else {
-				job.logger.Printf("No change detected for a stored endpoint. [name: %v] [url: %v]\n", storedEndpoints[idx].Name, storedEndpoints[idx].URL)
 			}
 		} else {
 			job.logger.Printf("Stored endpoint not found in file (definition might be invalid), removing from database. [name: %v] [url: %v]", storedEndpoints[idx].Name, storedEndpoints[idx].URL)
