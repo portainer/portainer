@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -94,4 +95,20 @@ func encodeJSON(w http.ResponseWriter, v interface{}, logger *log.Logger) {
 	if err := json.NewEncoder(w).Encode(v); err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, logger)
 	}
+}
+
+// getUploadedFileContent retrieve the content of a file uploaded in the request.
+// Uses requestParameter as the key to retrieve the file in the request payload.
+func getUploadedFileContent(request *http.Request, requestParameter string) ([]byte, error) {
+	file, _, err := request.FormFile(requestParameter)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	fileContent, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	return fileContent, nil
 }
