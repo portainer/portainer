@@ -9,8 +9,10 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -21,6 +23,7 @@ import (
 )
 
 const registryCheckTimeout = 3 * time.Second
+const registryTimeout = 5 * time.Second
 
 // RegistryHandler represents an HTTP API handler for managing Docker registries.
 type RegistryHandler struct {
@@ -28,6 +31,11 @@ type RegistryHandler struct {
 	Logger          *log.Logger
 	RegistryService portainer.RegistryService
 	ProxyManager    *proxy.Manager
+}
+
+// RegistryAuthResponse represents a response of a registry auth service (token)
+type RegistryAuthResponse struct {
+	Token string `json:"token"`
 }
 
 // NewRegistryHandler returns a new instance of RegistryHandler.
@@ -369,7 +377,8 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 		return
 	}
 
-	var proxy http.Handler
+	// Old method, get proxy
+	/*var proxy http.Handler
 	proxy = handler.ProxyManager.GetRegistryProxy(string(registryID))
 	if proxy == nil {
 		proxy, err = handler.ProxyManager.CreateAndRegisterRegistryProxy(registry)
@@ -379,7 +388,127 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 		}
 	}
 
-	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)
+	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)*/
+
+	// New method, without proxy
+	client := &http.Client{
+		Timeout: registryTimeout,
+	}
+	if !registry.TLSVerification {
+		client.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		}
+	}
+	// Proxy to registry and verify auth
+	/*req, err := http.NewRequest("GET", url, nil)
+	  if err != nil {
+	    return "", portainer.ErrRegistryInvalid
+	  }*/
+	uri := strings.Replace(r.RequestURI, "/api/registries/"+id+"/", "", 1)
+	fmt.Println(uri)
+	req := r
+	req.RequestURI = ""
+	u, err := url.Parse(registry.Protocol + "://" + registry.URL + "/" + uri)
+	fmt.Println(registry.Protocol + "://" + registry.URL + "/" + uri)
+	if err != nil {
+		panic(err)
+	}
+	/*
+	   Registry struct {
+	     ID              RegistryID `json:"Id"`
+	     Name            string     `json:"Name"`
+	     URL             string     `json:"URL"`
+	     Protocol        string     `json:"Protocol"`
+	     Version         string     `json:"Version"`
+	     Authentication  bool       `json:"Authentication"`
+	     Username        string     `json:"Username"`
+	     Password        string     `json:"Password,omitempty"`
+	     TLSVerification bool       `json:"TLSVerification"`
+	     AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
+	     AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
+	     AuthType        string     `json:"AuthType"`
+	   }
+	*/
+	req.URL = u
+	req.Host = registry.URL
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	authHeader := resp.Header.Get("Www-Authenticate")
+	switch authType := strings.Split(authHeader, " ")[0]; authType {
+	case "Bearer":
+		// Call auth URI to get token, and recall registry with token
+		parts := strings.Split(strings.Replace(authHeader, "Bearer ", "", 1), ",")
+		m := map[string]string{}
+		for _, part := range parts {
+			if splits := strings.Split(part, "="); len(splits) == 2 {
+				m[splits[0]] = strings.Replace(splits[1], "\"", "", 2)
+			}
+		}
+		if _, ok := m["realm"]; !ok {
+			//return "", portainer.ErrRegistryInvalid
+		}
+
+		authURL := m["realm"]
+		if v, ok := m["service"]; ok {
+			authURL += "?service=" + v
+			if v, ok = m["scope"]; ok {
+				authURL += "&scope=" + v
+			}
+		}
+
+		authReq, err := http.NewRequest("GET", authURL, nil)
+		fmt.Println(authURL)
+		if err != nil {
+			// TODO handle error
+		}
+		authReq.SetBasicAuth(registry.Username, registry.Password)
+
+		resp, err = client.Do(authReq)
+		if err != nil {
+			// TODO handle error
+		}
+		if resp.StatusCode == http.StatusOK {
+			// Store token
+			// Parse response into RegistryAuthResponse
+			defer resp.Body.Close()
+			respJson := &RegistryAuthResponse{}
+			err = json.NewDecoder(resp.Body).Decode(respJson)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(respJson.Token)
+
+			// Redo request with auth token
+			req.Header.Set("Authorization", "Bearer "+respJson.Token)
+			nextResp, err := client.Do(req)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			if nextResp.StatusCode == http.StatusOK {
+				defer nextResp.Body.Close()
+				bodyBytes, _ := ioutil.ReadAll(nextResp.Body)
+				fmt.Println(string(bodyBytes))
+				// Write response
+				fmt.Fprintln(w, string(bodyBytes))
+			}
+
+		}
+
+	case "Basic":
+	// Just recall registry with base64 user/pass un auth header
+	default:
+		// Forward to registry
+	}
+
+	/*  authURL := url
+	    authHeader := resp.Header.Get("Www-Authenticate")
+	    authType := strings.Split(authHeader, " ")[0]*/
+
 }
 
 // validateRegistryURL validates wether given url is valid a docker registry url by
