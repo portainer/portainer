@@ -407,6 +407,8 @@ const (
 	DBVersion = 8
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
+	// PortainerAgentHeader represents the name of the header available in any agent response
+	PortainerAgentHeader = "Portainer-Agent"
 )
 
 const (

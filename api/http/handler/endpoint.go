@@ -116,7 +116,7 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 	encodeJSON(w, filteredEndpoints, handler.Logger)
 }
 
-func sendPingRequest(host string, tlsConfig *tls.Config) error {
+func sendPingRequest(host string, tlsConfig *tls.Config) (bool, error) {
 	transport := &http.Transport{}
 
 	scheme := "http"
@@ -131,12 +131,17 @@ func sendPingRequest(host string, tlsConfig *tls.Config) error {
 	}
 
 	pingOperationURL := strings.Replace(host, "tcp://", scheme+"://", 1) + "/_ping"
-	_, err := client.Get(pingOperationURL)
+	response, err := client.Get(pingOperationURL)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return nil
+	agentOnDockerEnvironment := false
+	if response.Header.Get(portainer.PortainerAgentHeader) != "" {
+		agentOnDockerEnvironment = true
+	}
+
+	return agentOnDockerEnvironment, nil
 }
 
 func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
@@ -146,7 +151,7 @@ func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPa
 		return nil, err
 	}
 
-	err = sendPingRequest(payload.url, tlsConfig)
+	_, err = sendPingRequest(payload.url, tlsConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +221,7 @@ func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPa
 func (handler *EndpointHandler) createUnsecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
 
 	if !strings.HasPrefix(payload.url, "unix://") {
-		err := sendPingRequest(payload.url, nil)
+		_, err := sendPingRequest(payload.url, nil)
 		if err != nil {
 			return nil, err
 		}
