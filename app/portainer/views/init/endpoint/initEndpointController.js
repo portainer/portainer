@@ -46,7 +46,6 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
-      EndpointService.deleteEndpoint(endpointID);
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;
@@ -81,7 +80,6 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
-      EndpointService.deleteEndpoint(endpointID);
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;

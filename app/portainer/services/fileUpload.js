@@ -42,6 +42,24 @@ angular.module('portainer.app')
     });
   };
 
+  service.createEndpoint = function(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    return Upload.upload({
+      url: 'api/endpoints',
+      data: {
+        Name: name,
+        URL: URL,
+        PublicURL: PublicURL,
+        TLS: TLS,
+        TLSSkipVerify: TLSSkipVerify,
+        TLSSkipClientVerify: TLSSkipClientVerify,
+        TLSCACertFile: TLSCAFile,
+        TLSCertFile: TLSCertFile,
+        TLSKeyFile: TLSKeyFile
+      },
+      ignoreLoadingBar: true
+    });
+  };
+
   service.uploadLDAPTLSFiles = function(TLSCAFile, TLSCertFile, TLSKeyFile) {
     var queue = [];
 
