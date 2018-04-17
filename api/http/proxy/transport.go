@@ -1,8 +1,10 @@
 package proxy
 
 import (
+	"crypto/md5"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"path"
 	"regexp"
@@ -17,11 +19,13 @@ var apiVersionRe = regexp.MustCompile(`(/v[0-9]\.[0-9]*)?`)
 type (
 	proxyTransport struct {
 		dockerTransport        *http.Transport
+		enableSignature        bool
 		ResourceControlService portainer.ResourceControlService
 		TeamMembershipService  portainer.TeamMembershipService
 		RegistryService        portainer.RegistryService
 		DockerHubService       portainer.DockerHubService
 		SettingsService        portainer.SettingsService
+		SignatureService       portainer.DigitalSignatureService
 	}
 	restrictedOperationContext struct {
 		isAdmin          bool
@@ -57,9 +61,30 @@ func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Resp
 	return p.dockerTransport.RoundTrip(request)
 }
 
+func (p *proxyTransport) createSignature() (string, error) {
+	hasher := md5.New()
+	hasher.Write([]byte(portainer.PortainerAgentSignatureMessage))
+	hash := fmt.Sprintf("%x", hasher.Sum(nil))
+
+	signature, err := p.SignatureService.Sign([]byte(hash))
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%x", signature), nil
+}
+
 func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Response, error) {
 	path := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 	request.URL.Path = path
+
+	if p.enableSignature {
+		signature, err := p.createSignature()
+		if err != nil {
+			return nil, err
+		}
+		request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
+	}
 
 	switch {
 	case strings.HasPrefix(path, "/configs"):

@@ -169,11 +169,15 @@ type (
 	// EndpointID represents an endpoint identifier.
 	EndpointID int
 
+	// EndpointType represents the type of an endpoint.
+	EndpointType int
+
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
 		ID              EndpointID          `json:"Id"`
 		Name            string              `json:"Name"`
+		Type            EndpointType        `json:"Type"`
 		URL             string              `json:"URL"`
 		PublicURL       string              `json:"PublicURL"`
 		TLSConfig       TLSConfiguration    `json:"TLSConfig"`
@@ -355,6 +359,12 @@ type (
 		CompareHashAndData(hash string, data string) error
 	}
 
+	// DigitalSignatureService represents a service to manage digital signatures.
+	DigitalSignatureService interface {
+		GenerateKeyPair() error
+		Sign(hash []byte) ([]byte, error)
+	}
+
 	// JWTService represents a service for managing JWT tokens.
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
@@ -409,6 +419,11 @@ const (
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
+	// PortainerAgentSignatureHeader represent the name of the header containing the digital signature
+	PortainerAgentSignatureHeader = "X-PortainerAgent-Signature"
+	// PortainerAgentSignatureMessage represents the message used to create a digital signature
+	// to be used when communicating with an agent
+	PortainerAgentSignatureMessage = "Portainer-App"
 )
 
 const (
@@ -472,4 +487,12 @@ const (
 	_ EndpointExtensionType = iota
 	// StoridgeEndpointExtension represents the Storidge extension
 	StoridgeEndpointExtension
+)
+
+const (
+	_ EndpointType = iota
+	// DockerEnvironment represents an endpoint connected to a Docker environment
+	DockerEnvironment
+	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
+	AgentOnDockerEnvironment
 )

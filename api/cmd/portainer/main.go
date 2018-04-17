@@ -56,8 +56,8 @@ func initStore(dataStorePath string) *bolt.Store {
 	return store
 }
 
-func initStackManager(assetsPath string) portainer.StackManager {
-	return exec.NewStackManager(assetsPath)
+func initStackManager(assetsPath string, signatureService portainer.DigitalSignatureService) portainer.StackManager {
+	return exec.NewStackManager(assetsPath, signatureService)
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -69,6 +69,10 @@ func initJWTService(authenticationEnabled bool) portainer.JWTService {
 		return jwtService
 	}
 	return nil
+}
+
+func initDigitalSignatureService() portainer.DigitalSignatureService {
+	return &crypto.ECDSAService{}
 }
 
 func initCryptoService() portainer.CryptoService {
@@ -176,11 +180,13 @@ func main() {
 	store := initStore(*flags.Data)
 	defer store.Close()
 
-	stackManager := initStackManager(*flags.Assets)
-
 	jwtService := initJWTService(!*flags.NoAuth)
 
 	cryptoService := initCryptoService()
+
+	digitalSignatureService := initDigitalSignatureService()
+
+	stackManager := initStackManager(*flags.Assets, digitalSignatureService)
 
 	ldapService := initLDAPService()
 
@@ -188,7 +194,12 @@ func main() {
 
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
-	err := initSettings(store.SettingsService, flags)
+	err := digitalSignatureService.GenerateKeyPair()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = initSettings(store.SettingsService, flags)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -286,6 +297,7 @@ func main() {
 		FileService:            fileService,
 		LDAPService:            ldapService,
 		GitService:             gitService,
+		SignatureService:       digitalSignatureService,
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,

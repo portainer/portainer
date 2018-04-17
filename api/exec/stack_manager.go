@@ -2,6 +2,10 @@ package exec
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -12,13 +16,15 @@ import (
 
 // StackManager represents a service for managing stacks.
 type StackManager struct {
-	binaryPath string
+	binaryPath       string
+	signatureService portainer.DigitalSignatureService
 }
 
 // NewStackManager initializes a new StackManager service.
-func NewStackManager(binaryPath string) *StackManager {
+func NewStackManager(binaryPath string, signatureService portainer.DigitalSignatureService) *StackManager {
 	return &StackManager{
-		binaryPath: binaryPath,
+		binaryPath:       binaryPath,
+		signatureService: signatureService,
 	}
 }
 
@@ -47,6 +53,11 @@ func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
 
 // Deploy executes the docker stack deploy command.
 func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
+	err := manager.updateConfigFile(manager.binaryPath)
+	if err != nil {
+		return err
+	}
+
 	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 
@@ -66,6 +77,11 @@ func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint
 
 // Remove executes the docker stack rm command.
 func (manager *StackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	err := manager.updateConfigFile(manager.binaryPath)
+	if err != nil {
+		return err
+	}
+
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	args = append(args, "stack", "rm", stack.Name)
 	return runCommandAndCaptureStdErr(command, args, nil, "")
@@ -90,6 +106,46 @@ func runCommandAndCaptureStdErr(command string, args []string, env []string, wor
 	return nil
 }
 
+// TODO: should be relocated
+// Also, should only be created/written once, possibly at startup or instanciation of this service
+type configFileFormat struct {
+	HTTPHeaders struct {
+		ManagerOperationHeader string `json:"X-PortainerAgent-ManagerOperation"`
+		SignatureHeader        string `json:"X-PortainerAgent-Signature"`
+	} `json:"HttpHeaders"`
+}
+
+func (manager *StackManager) updateConfigFile(binaryPath string) error {
+	fileContent := configFileFormat{}
+	fileContent.HTTPHeaders.ManagerOperationHeader = "1"
+
+	signature, err := manager.createSignature()
+	if err != nil {
+		return err
+	}
+	fileContent.HTTPHeaders.SignatureHeader = signature
+
+	jsonContent, err := json.Marshal(fileContent)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(path.Join(binaryPath, "config.json"), jsonContent, 0644)
+}
+
+func (manager *StackManager) createSignature() (string, error) {
+	hasher := md5.New()
+	hasher.Write([]byte(portainer.PortainerAgentSignatureMessage))
+	hash := fmt.Sprintf("%x", hasher.Sum(nil))
+
+	signature, err := manager.signatureService.Sign([]byte(hash))
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%x", signature), nil
+}
+
 func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint) (string, []string) {
 	// Assume Linux as a default
 	command := path.Join(binaryPath, "docker")
@@ -99,6 +155,7 @@ func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint
 	}
 
 	args := make([]string, 0)
+	args = append(args, "--config", binaryPath)
 	args = append(args, "-H", endpoint.URL)
 
 	if endpoint.TLSConfig.TLS {

@@ -116,7 +116,7 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 	encodeJSON(w, filteredEndpoints, handler.Logger)
 }
 
-func sendPingRequest(host string, tlsConfig *tls.Config) (bool, error) {
+func executePingOperation(host string, tlsConfig *tls.Config) (bool, error) {
 	transport := &http.Transport{}
 
 	scheme := "http"
@@ -145,20 +145,25 @@ func sendPingRequest(host string, tlsConfig *tls.Config) (bool, error) {
 }
 
 func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
-
 	tlsConfig, err := crypto.CreateTLSConfig(payload.caCert, payload.cert, payload.key, payload.skipTLSClientVerification, payload.skipTLSServerVerification)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = sendPingRequest(payload.url, tlsConfig)
+	agentOnDockerEnvironment, err := executePingOperation(payload.url, tlsConfig)
 	if err != nil {
 		return nil, err
+	}
+
+	endpointType := portainer.DockerEnvironment
+	if agentOnDockerEnvironment {
+		endpointType = portainer.AgentOnDockerEnvironment
 	}
 
 	endpoint := &portainer.Endpoint{
 		Name:      payload.name,
 		URL:       payload.url,
+		Type:      endpointType,
 		PublicURL: payload.publicURL,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS:           payload.useTLS,
@@ -219,17 +224,22 @@ func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPa
 }
 
 func (handler *EndpointHandler) createUnsecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
+	endpointType := portainer.DockerEnvironment
 
 	if !strings.HasPrefix(payload.url, "unix://") {
-		_, err := sendPingRequest(payload.url, nil)
+		agentOnDockerEnvironment, err := executePingOperation(payload.url, nil)
 		if err != nil {
 			return nil, err
+		}
+		if agentOnDockerEnvironment {
+			endpointType = portainer.AgentOnDockerEnvironment
 		}
 	}
 
 	endpoint := &portainer.Endpoint{
 		Name:      payload.name,
 		URL:       payload.url,
+		Type:      endpointType,
 		PublicURL: payload.publicURL,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,

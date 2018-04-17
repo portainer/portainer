@@ -16,8 +16,11 @@ type Manager struct {
 	extensionProxies cmap.ConcurrentMap
 }
 
+// TODO: might want to refactor this ugly function
 // NewManager initializes a new proxy Service
-func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService, settingsService portainer.SettingsService, registryService portainer.RegistryService, dockerHubService portainer.DockerHubService) *Manager {
+func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService,
+	settingsService portainer.SettingsService, registryService portainer.RegistryService,
+	dockerHubService portainer.DockerHubService, signatureService portainer.DigitalSignatureService) *Manager {
 	return &Manager{
 		proxies:          cmap.New(),
 		extensionProxies: cmap.New(),
@@ -27,6 +30,7 @@ func NewManager(resourceControlService portainer.ResourceControlService, teamMem
 			SettingsService:        settingsService,
 			RegistryService:        registryService,
 			DockerHubService:       dockerHubService,
+			SignatureService:       signatureService,
 		},
 	}
 }
@@ -41,14 +45,19 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 		return nil, err
 	}
 
+	enableSignature := false
+	if endpoint.Type == portainer.AgentOnDockerEnvironment {
+		enableSignature = true
+	}
+
 	if endpointURL.Scheme == "tcp" {
 		if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
-			proxy, err = manager.proxyFactory.newDockerHTTPSProxy(endpointURL, endpoint)
+			proxy, err = manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, enableSignature)
 			if err != nil {
 				return nil, err
 			}
 		} else {
-			proxy = manager.proxyFactory.newDockerHTTPProxy(endpointURL)
+			proxy = manager.proxyFactory.newDockerHTTPProxy(endpointURL, enableSignature)
 		}
 	} else {
 		// Assume unix:// scheme
