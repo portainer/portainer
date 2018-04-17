@@ -361,7 +361,9 @@ type (
 
 	// DigitalSignatureService represents a service to manage digital signatures.
 	DigitalSignatureService interface {
-		GenerateKeyPair() error
+		ParseKeyPair(private, public []byte) error
+		GenerateKeyPair() ([]byte, []byte, error)
+		PEMHeaders() (string, string)
 		Sign(hash []byte) ([]byte, error)
 	}
 
@@ -382,6 +384,9 @@ type (
 		GetStackProjectPath(stackIdentifier string) string
 		StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error)
 		StoreStackFileFromReader(stackIdentifier, fileName string, r io.Reader) (string, error)
+		KeyPairFilesExist() (bool, error)
+		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
+		LoadKeyPair() ([]byte, []byte, error)
 	}
 
 	// GitService represents a service for managing Git.
@@ -414,7 +419,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.16.5"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 8
+	DBVersion = 9
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response

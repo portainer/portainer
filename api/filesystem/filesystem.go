@@ -2,6 +2,7 @@ package filesystem
 
 import (
 	"bytes"
+	"encoding/pem"
 	"io/ioutil"
 
 	"github.com/portainer/portainer"
@@ -26,6 +27,10 @@ const (
 	ComposeStorePath = "compose"
 	// ComposeFileDefaultName represents the default name of a compose file.
 	ComposeFileDefaultName = "docker-compose.yml"
+	// PrivateKeyFile represents the name on disk of the file containing the private key.
+	PrivateKeyFile = "portainer.key"
+	// PublicKeyFile represents the name on disk of the file containing the public key.
+	PublicKeyFile = "portainer.pub"
 )
 
 // Service represents a service for managing files and directories.
@@ -198,6 +203,56 @@ func (service *Service) GetFileContent(filePath string) (string, error) {
 	return string(content), nil
 }
 
+func (service *Service) KeyPairFilesExist() (bool, error) {
+	privateKeyPath := path.Join(service.dataStorePath, PrivateKeyFile)
+	exists, err := fileExists(privateKeyPath)
+	if err != nil {
+		return false, err
+	}
+	if !exists {
+		return false, nil
+	}
+
+	publicKeyPath := path.Join(service.dataStorePath, PublicKeyFile)
+	exists, err = fileExists(publicKeyPath)
+	if err != nil {
+		return false, err
+	}
+	if !exists {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (service *Service) StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error {
+	err := service.createPEMFileInStore(private, privatePEMHeader, PrivateKeyFile)
+	if err != nil {
+		return err
+	}
+
+	err = service.createPEMFileInStore(public, publicPEMHeader, PublicKeyFile)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *Service) LoadKeyPair() ([]byte, []byte, error) {
+	privateKey, err := service.getContentFromPEMFile(PrivateKeyFile)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	publicKey, err := service.getContentFromPEMFile(PublicKeyFile)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return privateKey, publicKey, nil
+}
+
 // createDirectoryInStore creates a new directory in the file store
 func (service *Service) createDirectoryInStore(name string) error {
 	path := path.Join(service.fileStorePath, name)
@@ -220,4 +275,44 @@ func (service *Service) createFileInStore(filePath string, r io.Reader) error {
 	}
 
 	return nil
+}
+
+func (service *Service) createPEMFileInStore(content []byte, fileType, filePath string) error {
+	path := path.Join(service.fileStorePath, filePath)
+	block := &pem.Block{Type: fileType, Bytes: content}
+
+	out, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	err = pem.Encode(out, block)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *Service) getContentFromPEMFile(filePath string) ([]byte, error) {
+	path := path.Join(service.fileStorePath, filePath)
+
+	fileContent, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	block, _ := pem.Decode(fileContent)
+	return block.Bytes, nil
+}
+
+func fileExists(filePath string) (bool, error) {
+	if _, err := os.Stat(filePath); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }

@@ -1,6 +1,9 @@
 package main // import "github.com/portainer/portainer"
 
 import (
+	"crypto/tls"
+	"strings"
+
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/bolt"
 	"github.com/portainer/portainer/cli"
@@ -10,6 +13,7 @@ import (
 	"github.com/portainer/portainer/filesystem"
 	"github.com/portainer/portainer/git"
 	"github.com/portainer/portainer/http"
+	"github.com/portainer/portainer/http/client"
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
 
@@ -172,6 +176,35 @@ func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService
 	return &endpoints[0]
 }
 
+func initKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
+	existingKeyPair, err := fileService.KeyPairFilesExist()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if existingKeyPair {
+		private, public, err := fileService.LoadKeyPair()
+		if err != nil {
+			return err
+		}
+		err = signatureService.ParseKeyPair(private, public)
+		if err != nil {
+			return err
+		}
+	} else {
+		private, public, err := signatureService.GenerateKeyPair()
+		if err != nil {
+			return err
+		}
+		privateHeader, publicHeader := signatureService.PEMHeaders()
+		err = fileService.StoreKeyPair(private, public, privateHeader, publicHeader)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func main() {
 	flags := initCLI()
 
@@ -194,7 +227,7 @@ func main() {
 
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
-	err := digitalSignatureService.GenerateKeyPair()
+	err := initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -220,6 +253,7 @@ func main() {
 			endpoint := &portainer.Endpoint{
 				Name: "primary",
 				URL:  *flags.Endpoint,
+				Type: portainer.DockerEnvironment,
 				TLSConfig: portainer.TLSConfiguration{
 					TLS:           *flags.TLSVerify,
 					TLSSkipVerify: *flags.TLSSkipVerify,
@@ -231,6 +265,27 @@ func main() {
 				AuthorizedTeams: []portainer.TeamID{},
 				Extensions:      []portainer.EndpointExtension{},
 			}
+
+			// TODO: refactor, strings and tls packages should not be imported in here
+			if !strings.HasPrefix(endpoint.URL, "unix://") {
+				var tlsConfig *tls.Config
+				if endpoint.TLS {
+					tlsConfig, err = crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
+					if err != nil {
+						log.Fatal(err)
+					}
+				}
+
+				agentOnDockerEnvironment, err := client.ExecutePingOperation(endpoint.URL, tlsConfig)
+				if err != nil {
+					log.Fatal(err)
+				}
+				if agentOnDockerEnvironment {
+					endpoint.Type = portainer.AgentOnDockerEnvironment
+				}
+			}
+
+			// ping endpoint
 			err = store.EndpointService.CreateEndpoint(endpoint)
 			if err != nil {
 				log.Fatal(err)

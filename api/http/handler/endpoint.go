@@ -2,12 +2,11 @@ package handler
 
 import (
 	"bytes"
-	"crypto/tls"
 	"strings"
-	"time"
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/http/client"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
@@ -116,41 +115,13 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 	encodeJSON(w, filteredEndpoints, handler.Logger)
 }
 
-func executePingOperation(host string, tlsConfig *tls.Config) (bool, error) {
-	transport := &http.Transport{}
-
-	scheme := "http"
-	if tlsConfig != nil {
-		transport.TLSClientConfig = tlsConfig
-		scheme = "https"
-	}
-
-	client := &http.Client{
-		Timeout:   time.Second * 3,
-		Transport: transport,
-	}
-
-	pingOperationURL := strings.Replace(host, "tcp://", scheme+"://", 1) + "/_ping"
-	response, err := client.Get(pingOperationURL)
-	if err != nil {
-		return false, err
-	}
-
-	agentOnDockerEnvironment := false
-	if response.Header.Get(portainer.PortainerAgentHeader) != "" {
-		agentOnDockerEnvironment = true
-	}
-
-	return agentOnDockerEnvironment, nil
-}
-
 func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
 	tlsConfig, err := crypto.CreateTLSConfig(payload.caCert, payload.cert, payload.key, payload.skipTLSClientVerification, payload.skipTLSServerVerification)
 	if err != nil {
 		return nil, err
 	}
 
-	agentOnDockerEnvironment, err := executePingOperation(payload.url, tlsConfig)
+	agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.url, tlsConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +198,7 @@ func (handler *EndpointHandler) createUnsecuredEndpoint(payload *postEndpointPay
 	endpointType := portainer.DockerEnvironment
 
 	if !strings.HasPrefix(payload.url, "unix://") {
-		agentOnDockerEnvironment, err := executePingOperation(payload.url, nil)
+		agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.url, nil)
 		if err != nil {
 			return nil, err
 		}
