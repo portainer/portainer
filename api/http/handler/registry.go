@@ -9,7 +9,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -485,25 +485,27 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 
 			// Redo request with auth token
 			req.Header.Set("Authorization", "Bearer "+respJson.Token)
-			nextResp, err := client.Do(req)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-			if nextResp.StatusCode == http.StatusOK {
-				defer nextResp.Body.Close()
-				bodyBytes, _ := ioutil.ReadAll(nextResp.Body)
-				fmt.Println(string(bodyBytes))
-				// Write response
-				fmt.Fprintln(w, string(bodyBytes))
-			}
-
 		}
 
 	case "Basic":
-	// Just recall registry with base64 user/pass un auth header
+		// Just recall registry with basic auth
+		req.SetBasicAuth(registry.Username, registry.Password)
 	default:
 		// Forward to registry
 	}
+
+	// Do the backend call and forward response
+	nextResp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	// Write response
+	defer nextResp.Body.Close()
+	for name, values := range nextResp.Header {
+		w.Header()[name] = values
+	}
+	w.WriteHeader(nextResp.StatusCode)
+	io.Copy(w, nextResp.Body)
 
 	/*  authURL := url
 	    authHeader := resp.Header.Get("Www-Authenticate")
