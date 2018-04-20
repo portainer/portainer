@@ -8,7 +8,6 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"fmt"
-	"log"
 	"math/big"
 )
 
@@ -18,8 +17,13 @@ const (
 )
 
 type ECDSAService struct {
-	privateKey *ecdsa.PrivateKey
-	publicKey  *ecdsa.PublicKey
+	privateKey    *ecdsa.PrivateKey
+	publicKey     *ecdsa.PublicKey
+	encodedPubKey string
+}
+
+func (service *ECDSAService) EncodedPublicKey() string {
+	return service.encodedPubKey
 }
 
 func (service *ECDSAService) PEMHeaders() (string, string) {
@@ -35,7 +39,8 @@ func (service *ECDSAService) ParseKeyPair(private, public []byte) error {
 	service.privateKey = privateKey
 
 	encodedKey := hex.EncodeToString(public)
-	log.Printf("Portainer public key: %s", encodedKey)
+	service.encodedPubKey = encodedKey
+	// log.Printf("Portainer public key: %s", encodedKey)
 
 	publicKey, err := x509.ParsePKIXPublicKey(public)
 	if err != nil {
@@ -69,7 +74,8 @@ func (service *ECDSAService) GenerateKeyPair() ([]byte, []byte, error) {
 	}
 
 	encodedKey := hex.EncodeToString(public)
-	log.Printf("Portainer public key: %s", encodedKey)
+	service.encodedPubKey = encodedKey
+	// log.Printf("Portainer public key: %s", encodedKey)
 
 	return private, public, nil
 }

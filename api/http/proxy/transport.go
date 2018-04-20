@@ -78,6 +78,7 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		if err != nil {
 			return nil, err
 		}
+		request.Header.Set(portainer.PortainerAgentPublicKeyHeader, p.SignatureService.EncodedPublicKey())
 		request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
 	}
 

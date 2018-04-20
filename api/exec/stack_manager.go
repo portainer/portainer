@@ -22,6 +22,7 @@ type dockerCLIConfiguration struct {
 	HTTPHeaders struct {
 		ManagerOperationHeader string `json:"X-PortainerAgent-ManagerOperation"`
 		SignatureHeader        string `json:"X-PortainerAgent-Signature"`
+		PublicKey              string `json:"X-PortainerAgent-PublicKey"`
 	} `json:"HttpHeaders"`
 }
 
@@ -156,6 +157,7 @@ func (manager *StackManager) updateDockerCLIConfiguration(binaryPath string) err
 		return err
 	}
 	config.HTTPHeaders.SignatureHeader = fmt.Sprintf("%x", signature)
+	config.HTTPHeaders.PublicKey = manager.signatureService.EncodedPublicKey()
 
 	err = manager.fileService.WriteJSONToFile(path.Join(binaryPath, "config.json"), config)
 	if err != nil {

@@ -363,6 +363,7 @@ type (
 	DigitalSignatureService interface {
 		ParseKeyPair(private, public []byte) error
 		GenerateKeyPair() ([]byte, []byte, error)
+		EncodedPublicKey() string
 		PEMHeaders() (string, string)
 		Sign(message string) ([]byte, error)
 	}
@@ -427,6 +428,8 @@ const (
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentSignatureHeader represent the name of the header containing the digital signature
 	PortainerAgentSignatureHeader = "X-PortainerAgent-Signature"
+	// PortainerAgentPublicKeyHeader represent the name of the header containing the public key
+	PortainerAgentPublicKeyHeader = "X-PortainerAgent-PublicKey"
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
