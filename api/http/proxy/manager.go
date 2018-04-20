@@ -9,28 +9,37 @@ import (
 	"github.com/portainer/portainer"
 )
 
-// Manager represents a service used to manage Docker proxies.
-type Manager struct {
-	proxyFactory     *proxyFactory
-	proxies          cmap.ConcurrentMap
-	extensionProxies cmap.ConcurrentMap
-}
+type (
+	// Manager represents a service used to manage Docker proxies.
+	Manager struct {
+		proxyFactory     *proxyFactory
+		proxies          cmap.ConcurrentMap
+		extensionProxies cmap.ConcurrentMap
+	}
 
-// TODO: might want to refactor this ugly function
+	// ManagerParams represents the required parameters to create a new Manager instance.
+	ManagerParams struct {
+		ResourceControlService portainer.ResourceControlService
+		TeamMembershipService  portainer.TeamMembershipService
+		SettingsService        portainer.SettingsService
+		RegistryService        portainer.RegistryService
+		DockerHubService       portainer.DockerHubService
+		SignatureService       portainer.DigitalSignatureService
+	}
+)
+
 // NewManager initializes a new proxy Service
-func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService,
-	settingsService portainer.SettingsService, registryService portainer.RegistryService,
-	dockerHubService portainer.DockerHubService, signatureService portainer.DigitalSignatureService) *Manager {
+func NewManager(parameters *ManagerParams) *Manager {
 	return &Manager{
 		proxies:          cmap.New(),
 		extensionProxies: cmap.New(),
 		proxyFactory: &proxyFactory{
-			ResourceControlService: resourceControlService,
-			TeamMembershipService:  teamMembershipService,
-			SettingsService:        settingsService,
-			RegistryService:        registryService,
-			DockerHubService:       dockerHubService,
-			SignatureService:       signatureService,
+			ResourceControlService: parameters.ResourceControlService,
+			TeamMembershipService:  parameters.TeamMembershipService,
+			SettingsService:        parameters.SettingsService,
+			RegistryService:        parameters.RegistryService,
+			DockerHubService:       parameters.DockerHubService,
+			SignatureService:       parameters.SignatureService,
 		},
 	}
 }

@@ -3,9 +3,11 @@ package crypto
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
+	"crypto/md5"
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/hex"
+	"fmt"
 	"log"
 	"math/big"
 )
@@ -46,27 +48,22 @@ func (service *ECDSAService) ParseKeyPair(private, public []byte) error {
 }
 
 func (service *ECDSAService) GenerateKeyPair() ([]byte, []byte, error) {
-	// TODO: check best practices
-	pubkeyCurve := elliptic.P256() //see http://golang.org/pkg/crypto/elliptic/#P256
+	pubkeyCurve := elliptic.P256()
 
-	privatekey := new(ecdsa.PrivateKey)
 	privatekey, err := ecdsa.GenerateKey(pubkeyCurve, rand.Reader)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	service.privateKey = privatekey
-
-	var publicKey ecdsa.PublicKey
-	publicKey = privatekey.PublicKey
-	service.publicKey = &publicKey
+	service.publicKey = &privatekey.PublicKey
 
 	private, err := x509.MarshalECPrivateKey(service.privateKey)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	public, err := x509.MarshalPKIXPublicKey(&publicKey)
+	public, err := x509.MarshalPKIXPublicKey(service.publicKey)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -77,12 +74,15 @@ func (service *ECDSAService) GenerateKeyPair() ([]byte, []byte, error) {
 	return private, public, nil
 }
 
-func (service *ECDSAService) Sign(hash []byte) ([]byte, error) {
+func (service *ECDSAService) Sign(message string) ([]byte, error) {
+	hasher := md5.New()
+	hasher.Write([]byte(message))
+	hash := fmt.Sprintf("%x", hasher.Sum(nil))
 
 	r := big.NewInt(0)
 	s := big.NewInt(0)
 
-	r, s, err := ecdsa.Sign(rand.Reader, service.privateKey, hash)
+	r, s, err := ecdsa.Sign(rand.Reader, service.privateKey, []byte(hash))
 	if err != nil {
 		return nil, err
 	}

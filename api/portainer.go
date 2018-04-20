@@ -364,7 +364,7 @@ type (
 		ParseKeyPair(private, public []byte) error
 		GenerateKeyPair() ([]byte, []byte, error)
 		PEMHeaders() (string, string)
-		Sign(hash []byte) ([]byte, error)
+		Sign(message string) ([]byte, error)
 	}
 
 	// JWTService represents a service for managing JWT tokens.
@@ -387,6 +387,7 @@ type (
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
 		LoadKeyPair() ([]byte, []byte, error)
+		WriteJSONToFile(path string, content interface{}) error
 	}
 
 	// GitService represents a service for managing Git.

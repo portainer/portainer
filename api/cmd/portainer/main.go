@@ -1,9 +1,6 @@
 package main // import "github.com/portainer/portainer"
 
 import (
-	"crypto/tls"
-	"strings"
-
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/bolt"
 	"github.com/portainer/portainer/cli"
@@ -60,8 +57,8 @@ func initStore(dataStorePath string) *bolt.Store {
 	return store
 }
 
-func initStackManager(assetsPath string, signatureService portainer.DigitalSignatureService) portainer.StackManager {
-	return exec.NewStackManager(assetsPath, signatureService)
+func initStackManager(assetsPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.StackManager, error) {
+	return exec.NewStackManager(assetsPath, signatureService, fileService)
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -219,8 +216,6 @@ func main() {
 
 	digitalSignatureService := initDigitalSignatureService()
 
-	stackManager := initStackManager(*flags.Assets, digitalSignatureService)
-
 	ldapService := initLDAPService()
 
 	gitService := initGitService()
@@ -228,6 +223,11 @@ func main() {
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
 	err := initKeyPair(fileService, digitalSignatureService)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stackManager, err := initStackManager(*flags.Assets, digitalSignatureService, fileService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -266,26 +266,15 @@ func main() {
 				Extensions:      []portainer.EndpointExtension{},
 			}
 
-			// TODO: refactor, strings and tls packages should not be imported in here
-			if !strings.HasPrefix(endpoint.URL, "unix://") {
-				var tlsConfig *tls.Config
-				if endpoint.TLS {
-					tlsConfig, err = crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
-					if err != nil {
-						log.Fatal(err)
-					}
-				}
-
-				agentOnDockerEnvironment, err := client.ExecutePingOperation(endpoint.URL, tlsConfig)
-				if err != nil {
-					log.Fatal(err)
-				}
-				if agentOnDockerEnvironment {
-					endpoint.Type = portainer.AgentOnDockerEnvironment
-				}
+			agentOnDockerEnvironment, err := client.ExecutePingOperationFromEndpoint(endpoint)
+			if err != nil {
+				log.Fatal(err)
 			}
 
-			// ping endpoint
+			if agentOnDockerEnvironment {
+				endpoint.Type = portainer.AgentOnDockerEnvironment
+			}
+
 			err = store.EndpointService.CreateEndpoint(endpoint)
 			if err != nil {
 				log.Fatal(err)

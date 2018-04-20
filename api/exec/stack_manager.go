@@ -2,10 +2,7 @@ package exec
 
 import (
 	"bytes"
-	"crypto/md5"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -18,14 +15,31 @@ import (
 type StackManager struct {
 	binaryPath       string
 	signatureService portainer.DigitalSignatureService
+	fileService      portainer.FileService
+}
+
+type dockerCLIConfiguration struct {
+	HTTPHeaders struct {
+		ManagerOperationHeader string `json:"X-PortainerAgent-ManagerOperation"`
+		SignatureHeader        string `json:"X-PortainerAgent-Signature"`
+	} `json:"HttpHeaders"`
 }
 
 // NewStackManager initializes a new StackManager service.
-func NewStackManager(binaryPath string, signatureService portainer.DigitalSignatureService) *StackManager {
-	return &StackManager{
+// It also updates the configuration of the Docker CLI binary.
+func NewStackManager(binaryPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (*StackManager, error) {
+	manager := &StackManager{
 		binaryPath:       binaryPath,
 		signatureService: signatureService,
+		fileService:      fileService,
 	}
+
+	err := manager.updateDockerCLIConfiguration(binaryPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return manager, nil
 }
 
 // Login executes the docker login command against a list of registries (including DockerHub).
@@ -53,7 +67,7 @@ func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
 
 // Deploy executes the docker stack deploy command.
 func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
-	err := manager.updateConfigFile(manager.binaryPath)
+	err := manager.updateDockerCLIConfiguration(manager.binaryPath)
 	if err != nil {
 		return err
 	}
@@ -77,7 +91,7 @@ func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint
 
 // Remove executes the docker stack rm command.
 func (manager *StackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	err := manager.updateConfigFile(manager.binaryPath)
+	err := manager.updateDockerCLIConfiguration(manager.binaryPath)
 	if err != nil {
 		return err
 	}
@@ -106,46 +120,6 @@ func runCommandAndCaptureStdErr(command string, args []string, env []string, wor
 	return nil
 }
 
-// TODO: should be relocated
-// Also, should only be created/written once, possibly at startup or instanciation of this service
-type configFileFormat struct {
-	HTTPHeaders struct {
-		ManagerOperationHeader string `json:"X-PortainerAgent-ManagerOperation"`
-		SignatureHeader        string `json:"X-PortainerAgent-Signature"`
-	} `json:"HttpHeaders"`
-}
-
-func (manager *StackManager) updateConfigFile(binaryPath string) error {
-	fileContent := configFileFormat{}
-	fileContent.HTTPHeaders.ManagerOperationHeader = "1"
-
-	signature, err := manager.createSignature()
-	if err != nil {
-		return err
-	}
-	fileContent.HTTPHeaders.SignatureHeader = signature
-
-	jsonContent, err := json.Marshal(fileContent)
-	if err != nil {
-		return err
-	}
-
-	return ioutil.WriteFile(path.Join(binaryPath, "config.json"), jsonContent, 0644)
-}
-
-func (manager *StackManager) createSignature() (string, error) {
-	hasher := md5.New()
-	hasher.Write([]byte(portainer.PortainerAgentSignatureMessage))
-	hash := fmt.Sprintf("%x", hasher.Sum(nil))
-
-	signature, err := manager.signatureService.Sign([]byte(hash))
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%x", signature), nil
-}
-
 func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint) (string, []string) {
 	// Assume Linux as a default
 	command := path.Join(binaryPath, "docker")
@@ -171,4 +145,22 @@ func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint
 	}
 
 	return command, args
+}
+
+func (manager *StackManager) updateDockerCLIConfiguration(binaryPath string) error {
+	config := dockerCLIConfiguration{}
+	config.HTTPHeaders.ManagerOperationHeader = "1"
+
+	signature, err := manager.signatureService.Sign(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return err
+	}
+	config.HTTPHeaders.SignatureHeader = fmt.Sprintf("%x", signature)
+
+	err = manager.fileService.WriteJSONToFile(path.Join(binaryPath, "config.json"), config)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

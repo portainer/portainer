@@ -43,7 +43,15 @@ type Server struct {
 // Start starts the HTTP server
 func (server *Server) Start() error {
 	requestBouncer := security.NewRequestBouncer(server.JWTService, server.UserService, server.TeamMembershipService, server.AuthDisabled)
-	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamMembershipService, server.SettingsService, server.RegistryService, server.DockerHubService, server.SignatureService)
+	proxyManagerParameters := &proxy.ManagerParams{
+		ResourceControlService: server.ResourceControlService,
+		TeamMembershipService:  server.TeamMembershipService,
+		SettingsService:        server.SettingsService,
+		RegistryService:        server.RegistryService,
+		DockerHubService:       server.DockerHubService,
+		SignatureService:       server.SignatureService,
+	}
+	proxyManager := proxy.NewManager(proxyManagerParameters)
 
 	var fileHandler = handler.NewFileHandler(filepath.Join(server.AssetsPath, "public"))
 	var authHandler = handler.NewAuthHandler(requestBouncer, server.AuthDisabled)

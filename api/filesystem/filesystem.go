@@ -2,6 +2,7 @@ package filesystem
 
 import (
 	"bytes"
+	"encoding/json"
 	"encoding/pem"
 	"io/ioutil"
 
@@ -201,6 +202,15 @@ func (service *Service) GetFileContent(filePath string) (string, error) {
 	}
 
 	return string(content), nil
+}
+
+func (service *Service) WriteJSONToFile(path string, content interface{}) error {
+	jsonContent, err := json.Marshal(content)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(path, jsonContent, 0644)
 }
 
 func (service *Service) KeyPairFilesExist() (bool, error) {

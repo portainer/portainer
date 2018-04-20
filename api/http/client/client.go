@@ -7,7 +7,35 @@ import (
 	"time"
 
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/crypto"
 )
+
+func ExecutePingOperationFromEndpoint(endpoint *portainer.Endpoint) (bool, error) {
+	if strings.HasPrefix(endpoint.URL, "unix://") {
+		return false, nil
+	}
+
+	transport := &http.Transport{}
+
+	scheme := "http"
+
+	if endpoint.TLS {
+		tlsConfig, err := crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
+		if err != nil {
+			return false, err
+		}
+		scheme = "https"
+		transport.TLSClientConfig = tlsConfig
+	}
+
+	client := &http.Client{
+		Timeout:   time.Second * 3,
+		Transport: transport,
+	}
+
+	target := strings.Replace(endpoint.URL, "tcp://", scheme+"://", 1)
+	return pingOperation(client, target)
+}
 
 func ExecutePingOperation(host string, tlsConfig *tls.Config) (bool, error) {
 	transport := &http.Transport{}
@@ -23,7 +51,13 @@ func ExecutePingOperation(host string, tlsConfig *tls.Config) (bool, error) {
 		Transport: transport,
 	}
 
-	pingOperationURL := strings.Replace(host, "tcp://", scheme+"://", 1) + "/_ping"
+	target := strings.Replace(host, "tcp://", scheme+"://", 1)
+	return pingOperation(client, target)
+}
+
+func pingOperation(client *http.Client, target string) (bool, error) {
+	pingOperationURL := target + "/_ping"
+
 	response, err := client.Get(pingOperationURL)
 	if err != nil {
 		return false, err

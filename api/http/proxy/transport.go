@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"crypto/md5"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -62,11 +61,7 @@ func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Resp
 }
 
 func (p *proxyTransport) createSignature() (string, error) {
-	hasher := md5.New()
-	hasher.Write([]byte(portainer.PortainerAgentSignatureMessage))
-	hash := fmt.Sprintf("%x", hasher.Sum(nil))
-
-	signature, err := p.SignatureService.Sign([]byte(hash))
+	signature, err := p.SignatureService.Sign(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
 		return "", err
 	}
