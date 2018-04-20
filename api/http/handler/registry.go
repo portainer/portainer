@@ -9,7 +9,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -474,8 +474,6 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 		}
 		if resp.StatusCode == http.StatusOK {
 			// Store token
-			// Response example :
-			// {"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ilc1S1Q6UlVPTDpYSjdLOlhZNFM6WTMzRjpTV0VNOldXNUI6SzVBWDpNSFJGOjRXVVA6TEZOUDpNTDdOIn0.eyJhY2Nlc3MiOlt7InR5cGUiOiJyZWdpc3RyeSIsIm5hbWUiOiJjYXRhbG9nIiwiYWN0aW9ucyI6WyIqIl19XSwianRpIjoiMTY5ZmRlNzQtZDE1ZC00YjUzLThiNzEtYjU5NWNkYzE5NGI3IiwiYXVkIjoiY29udGFpbmVyX3JlZ2lzdHJ5Iiwic3ViIjoiSDc3ODMzIiwiaXNzIjoib21uaWJ1cy1naXRsYWItaXNzdWVyIiwiaWF0IjoxNTIzODg4MjQ3LCJuYmYiOjE1MjM4ODgyNDIsImV4cCI6MTUyMzg4ODU0N30.Zs5nUIFWwRuKyZZRHQ5c7k1rApkTWC92IK7-3wezetZ-qPEqdqtoNXMyuYS54OZ3sAayv05jFEHfmgCBRDpCy9KZOhgvHrKhvCYqVf3eXlyP25ZfSAonJBmOchWkbaCeKWHQdSSggxkGMu-IldaGv8AEAmVLwQ0vmRLWj9vUUyVoCFTPpQS49ex1KRoF8DhLbHlgxBi5p-LJPfrXqMtroUUBBPoz4o0OyZv29aKi0msKmZLBx0ZERWX5i3_PvjX39vZxVhX8PTBY_Y83MXtUdxcTBUvL2kqLpXArUkIiu-Pb6vgNqwmaRbCWNW0Jf2GMEAlUcpl-bpdr8eBRfMrVEA"}
 			// Parse response into RegistryAuthResponse
 			defer resp.Body.Close()
 			respJson := &RegistryAuthResponse{}
@@ -487,25 +485,28 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 
 			// Redo request with auth token
 			req.Header.Set("Authorization", "Bearer "+respJson.Token)
-			nextResp, err := client.Do(req)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-			if nextResp.StatusCode == http.StatusOK {
-				defer nextResp.Body.Close()
-				bodyBytes, _ := ioutil.ReadAll(nextResp.Body)
-				fmt.Println(string(bodyBytes))
-				// Write response
-				fmt.Fprintln(w, string(bodyBytes))
-			}
-
 		}
 
 	case "Basic":
-	// Just recall registry with base64 user/pass un auth header
+		// Just recall registry with basic auth
+		req.SetBasicAuth(registry.Username, registry.Password)
+
 	default:
 		// Forward to registry
 	}
+
+	// Do the backend call and forward response
+	nextResp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	// Write response
+	defer nextResp.Body.Close()
+	for name, values := range nextResp.Header {
+		w.Header()[name] = values
+	}
+	w.WriteHeader(nextResp.StatusCode)
+	io.Copy(w, nextResp.Body)
 
 	/*  authURL := url
 	    authHeader := resp.Header.Get("Www-Authenticate")
