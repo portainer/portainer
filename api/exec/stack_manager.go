@@ -133,7 +133,7 @@ func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint
 	args = append(args, "--config", binaryPath)
 	args = append(args, "-H", endpoint.URL)
 
-	if endpoint.TLSConfig.TLS {
+	if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
 		args = append(args, "--tls")
 
 		if !endpoint.TLSConfig.TLSSkipVerify {
