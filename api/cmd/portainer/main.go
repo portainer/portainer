@@ -173,6 +173,23 @@ func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService
 	return &endpoints[0]
 }
 
+func loadAndParseKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
+	private, public, err := fileService.LoadKeyPair()
+	if err != nil {
+		return err
+	}
+	return signatureService.ParseKeyPair(private, public)
+}
+
+func generateAndStoreKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
+	private, public, err := signatureService.GenerateKeyPair()
+	if err != nil {
+		return err
+	}
+	privateHeader, publicHeader := signatureService.PEMHeaders()
+	return fileService.StoreKeyPair(private, public, privateHeader, publicHeader)
+}
+
 func initKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
 	existingKeyPair, err := fileService.KeyPairFilesExist()
 	if err != nil {
@@ -180,26 +197,9 @@ func initKeyPair(fileService portainer.FileService, signatureService portainer.D
 	}
 
 	if existingKeyPair {
-		private, public, err := fileService.LoadKeyPair()
-		if err != nil {
-			return err
-		}
-		err = signatureService.ParseKeyPair(private, public)
-		if err != nil {
-			return err
-		}
-	} else {
-		private, public, err := signatureService.GenerateKeyPair()
-		if err != nil {
-			return err
-		}
-		privateHeader, publicHeader := signatureService.PEMHeaders()
-		err = fileService.StoreKeyPair(private, public, privateHeader, publicHeader)
-		if err != nil {
-			return err
-		}
+		return loadAndParseKeyPair(fileService, signatureService)
 	}
-	return nil
+	return generateAndStoreKeyPair(fileService, signatureService)
 }
 
 func main() {
