@@ -1,0 +1,33 @@
+<rd-header>
+  <rd-header-title title="Create endpoint group"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.groups">Endpoint groups</a> &gt; Add group
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="group_name" ng-model="formValues.Name" placeholder="e.g. my-group">
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- description-input -->
+          <div class="form-group">
+            <label for="group_description" class="col-sm-3 col-lg-2 control-label text-left">Description</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="group_description" ng-model="formValues.Description" placeholder="e.g. production environments...">
+            </div>
+          </div>
+          <!-- !description-input -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

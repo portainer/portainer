@@ -1,0 +1,37 @@
+<rd-header>
+  <rd-header-title title="Endpoint group access"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.groups">Groups</a> &gt; <a ui-sref="portainer.groups.group({id: group.Id})">{{ group.Name }}</a> &gt; Access management
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="group">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title="Group"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>
+                {{ group.Name }}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <span class="small text-muted">
+                  You can select which user or team can access this endpoint group by moving them to the authorized accesses table. Simply click
+                  on a user or team entry to move it from one table to the other.
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<por-access-management ng-if="group" access-controlled-entity="group" update-access="updateAccess(userAccesses, teamAccesses)">
+</por-access-management>

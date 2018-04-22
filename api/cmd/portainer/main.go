@@ -275,6 +275,7 @@ func main() {
 		TeamService:            store.TeamService,
 		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
+		EndpointGroupService:   store.EndpointGroupService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,
