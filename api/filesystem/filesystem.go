@@ -204,6 +204,7 @@ func (service *Service) GetFileContent(filePath string) (string, error) {
 	return string(content), nil
 }
 
+// WriteJSONToFile writes JSON to the specified file.
 func (service *Service) WriteJSONToFile(path string, content interface{}) error {
 	jsonContent, err := json.Marshal(content)
 	if err != nil {
@@ -213,6 +214,7 @@ func (service *Service) WriteJSONToFile(path string, content interface{}) error 
 	return ioutil.WriteFile(path, jsonContent, 0644)
 }
 
+// KeyPairFilesExist checks for the existence of the key files.
 func (service *Service) KeyPairFilesExist() (bool, error) {
 	privateKeyPath := path.Join(service.dataStorePath, PrivateKeyFile)
 	exists, err := fileExists(privateKeyPath)
@@ -235,6 +237,7 @@ func (service *Service) KeyPairFilesExist() (bool, error) {
 	return true, nil
 }
 
+// StoreKeyPair store the specified keys content as PEM files on disk.
 func (service *Service) StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error {
 	err := service.createPEMFileInStore(private, privatePEMHeader, PrivateKeyFile)
 	if err != nil {
@@ -249,6 +252,7 @@ func (service *Service) StoreKeyPair(private, public []byte, privatePEMHeader, p
 	return nil
 }
 
+// LoadKeyPair retrieve the content of both key files on disk.
 func (service *Service) LoadKeyPair() ([]byte, []byte, error) {
 	privateKey, err := service.getContentFromPEMFile(PrivateKeyFile)
 	if err != nil {

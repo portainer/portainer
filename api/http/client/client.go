@@ -10,6 +10,9 @@ import (
 	"github.com/portainer/portainer/crypto"
 )
 
+// ExecutePingOperationFromEndpoint will send a SystemPing operation HTTP request to a Docker environment
+// using the specified endpoint configuration. It is used exclusively when
+// specifying an endpoint from the CLI via the -H flag.
 func ExecutePingOperationFromEndpoint(endpoint *portainer.Endpoint) (bool, error) {
 	if strings.HasPrefix(endpoint.URL, "unix://") {
 		return false, nil
@@ -37,6 +40,8 @@ func ExecutePingOperationFromEndpoint(endpoint *portainer.Endpoint) (bool, error
 	return pingOperation(client, target)
 }
 
+// ExecutePingOperation will send a SystemPing operation HTTP request to a Docker environment
+// using the specified host and optional TLS configuration.
 func ExecutePingOperation(host string, tlsConfig *tls.Config) (bool, error) {
 	transport := &http.Transport{}
 
