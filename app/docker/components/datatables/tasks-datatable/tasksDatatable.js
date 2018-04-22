@@ -12,6 +12,6 @@ angular.module('portainer.docker').component('tasksDatatable', {
     showTextFilter: '<',
     showSlotColumn: '<',
     showLogsButton: '<',
-    agentPowered: '<'
+    agentProxy: '<'
   }
 });

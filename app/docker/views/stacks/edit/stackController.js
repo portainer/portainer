@@ -41,7 +41,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
   function initView() {
     var stackId = $transition$.params().id;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    var agentPowered = $scope.applicationState.endpoint.mode.agentPowered;
+    var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
     StackService.stack(stackId)
     .then(function success(data) {
@@ -56,7 +56,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
         stackFile: StackService.getStackFile(stackId),
         services: ServiceService.services(serviceFilters),
         tasks: TaskService.tasks(serviceFilters),
-        containers: agentPowered ? ContainerService.containers() : [],
+        containers: agentProxy ? ContainerService.containers() : [],
         nodes: NodeService.nodes()
       });
     })
@@ -72,7 +72,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
         ServiceHelper.associateTasksToService(service, tasks);
       }
 
-      if (agentPowered) {
+      if (agentProxy) {
         var containers = data.containers;
         for (var j = 0; j < tasks.length; j++) {
           var task = tasks[j];

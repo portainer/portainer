@@ -16,20 +16,6 @@ angular.module('portainer.docker')
     return deferred.promise;
   };
 
-  service.infoWithHeaders = function() {
-    var deferred = $q.defer();
-
-    System.info({}, function success(data, headers) {
-      var info = data;
-      info.$header = headers;
-      deferred.resolve(info);
-    }, function error(err) {
-      deferred.reject({msg: 'Unable to retrieve environment information', err: err});
-    });
-
-    return deferred.promise;
-  };
-
   service.info = function() {
     return System.info({}).$promise;
   };

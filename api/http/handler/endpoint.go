@@ -61,10 +61,6 @@ func NewEndpointHandler(bouncer *security.RequestBouncer, authorizeEndpointManag
 }
 
 type (
-	postEndpointsResponse struct {
-		ID int `json:"Id"`
-	}
-
 	putEndpointAccessRequest struct {
 		AuthorizedUsers []int `valid:"-"`
 		AuthorizedTeams []int `valid:"-"`
@@ -295,7 +291,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		return
 	}
 
-	encodeJSON(w, &postEndpointsResponse{ID: int(endpoint.ID)}, handler.Logger)
+	encodeJSON(w, &endpoint, handler.Logger)
 }
 
 // handleGetEndpoint handles GET requests on /endpoints/:id

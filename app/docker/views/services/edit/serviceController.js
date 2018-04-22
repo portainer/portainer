@@ -407,7 +407,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    var agentPowered = $scope.applicationState.endpoint.mode.agentPowered;
+    var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
     ServiceService.service($transition$.params().id)
     .then(function success(data) {
@@ -426,7 +426,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       return $q.all({
         volumes: VolumeService.volumes(),
         tasks: TaskService.tasks({ service: [service.Name] }),
-        containers: agentPowered ? ContainerService.containers() : [],
+        containers: agentProxy ? ContainerService.containers() : [],
         nodes: NodeService.nodes(),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
@@ -448,7 +448,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
       var tasks = data.tasks;
 
-      if (agentPowered) {
+      if (agentProxy) {
         var containers = data.containers;
         for (var i = 0; i < tasks.length; i++) {
           var task = tasks[i];
