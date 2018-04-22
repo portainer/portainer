@@ -188,6 +188,19 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
+	// EndpointGroupID represents an endpoint group identifier.
+	EndpointGroupID int
+
+	// EndpointGroup represents a group of endpoints.
+	EndpointGroup struct {
+		ID              EndpointGroupID `json:"Id"`
+		Name            string          `json:"Name"`
+		Description     string          `json:"Description"`
+		AuthorizedUsers []UserID        `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID        `json:"AuthorizedTeams"`
+		Labels          []Pair          `json:"Labels"`
+	}
+
 	// EndpointExtension represents a extension associated to an endpoint.
 	EndpointExtension struct {
 		Type EndpointExtensionType `json:"Type"`
@@ -299,6 +312,15 @@ type (
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
+	}
+
+	// EndpointGroupService represents a service for managing endpoint group data.
+	EndpointGroupService interface {
+		EndpointGroup(ID EndpointGroupID) (*EndpointGroup, error)
+		EndpointGroups() ([]EndpointGroup, error)
+		CreateEndpointGroup(group *EndpointGroup) error
+		UpdateEndpointGroup(ID EndpointGroupID, group *EndpointGroup) error
+		DeleteEndpointGroup(ID EndpointGroupID) error
 	}
 
 	// RegistryService represents a service for managing registry data.

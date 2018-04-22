@@ -20,6 +20,7 @@ type Store struct {
 	TeamService            *TeamService
 	TeamMembershipService  *TeamMembershipService
 	EndpointService        *EndpointService
+	EndpointGroupService   *EndpointGroupService
 	ResourceControlService *ResourceControlService
 	VersionService         *VersionService
 	SettingsService        *SettingsService
@@ -38,6 +39,7 @@ const (
 	teamBucketName            = "teams"
 	teamMembershipBucketName  = "team_membership"
 	endpointBucketName        = "endpoints"
+	endpointGroupBucketName   = "endpoint_groups"
 	resourceControlBucketName = "resource_control"
 	settingsBucketName        = "settings"
 	registryBucketName        = "registries"
@@ -53,6 +55,7 @@ func NewStore(storePath string) (*Store, error) {
 		TeamService:            &TeamService{},
 		TeamMembershipService:  &TeamMembershipService{},
 		EndpointService:        &EndpointService{},
+		EndpointGroupService:   &EndpointGroupService{},
 		ResourceControlService: &ResourceControlService{},
 		VersionService:         &VersionService{},
 		SettingsService:        &SettingsService{},
@@ -64,6 +67,7 @@ func NewStore(storePath string) (*Store, error) {
 	store.TeamService.store = store
 	store.TeamMembershipService.store = store
 	store.EndpointService.store = store
+	store.EndpointGroupService.store = store
 	store.ResourceControlService.store = store
 	store.VersionService.store = store
 	store.SettingsService.store = store
@@ -94,7 +98,7 @@ func (store *Store) Open() error {
 	store.db = db
 
 	bucketsToCreate := []string{versionBucketName, userBucketName, teamBucketName, endpointBucketName,
-		resourceControlBucketName, teamMembershipBucketName, settingsBucketName,
+		endpointGroupBucketName, resourceControlBucketName, teamMembershipBucketName, settingsBucketName,
 		registryBucketName, dockerhubBucketName, stackBucketName}
 
 	return db.Update(func(tx *bolt.Tx) error {

@@ -44,6 +44,11 @@ const (
 	ErrEndpointAccessDenied = Error("Access denied to endpoint")
 )
 
+// Endpoint group errors.
+const (
+	ErrEndpointGroupNotFound = Error("Endpoint group not found")
+)
+
 // Registry errors.
 const (
 	ErrRegistryNotFound      = Error("Registry not found")

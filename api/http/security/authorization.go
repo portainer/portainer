@@ -126,32 +126,31 @@ func AuthorizedUserManagement(userID portainer.UserID, context *RestrictedReques
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams.
 func AuthorizedEndpointAccess(endpoint *portainer.Endpoint, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
-	for _, authorizedUserID := range endpoint.AuthorizedUsers {
-		if authorizedUserID == userID {
-			return true
-		}
-	}
-	for _, membership := range memberships {
-		for _, authorizedTeamID := range endpoint.AuthorizedTeams {
-			if membership.TeamID == authorizedTeamID {
-				return true
-			}
-		}
-	}
-	return false
+	return authorizedAccess(userID, memberships, endpoint.AuthorizedUsers, endpoint.AuthorizedTeams)
+}
+
+// AuthorizedEndpointGroupAccess ensure that the user can access the specified endpoint group.
+// It will check if the user is part of the authorized users or part of a team that is
+// listed in the authorized teams.
+func AuthorizedEndpointGroupAccess(endpointGroup *portainer.EndpointGroup, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+	return authorizedAccess(userID, memberships, endpointGroup.AuthorizedUsers, endpointGroup.AuthorizedTeams)
 }
 
 // AuthorizedRegistryAccess ensure that the user can access the specified registry.
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams.
 func AuthorizedRegistryAccess(registry *portainer.Registry, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
-	for _, authorizedUserID := range registry.AuthorizedUsers {
+	return authorizedAccess(userID, memberships, registry.AuthorizedUsers, registry.AuthorizedTeams)
+}
+
+func authorizedAccess(userID portainer.UserID, memberships []portainer.TeamMembership, authorizedUsers []portainer.UserID, authorizedTeams []portainer.TeamID) bool {
+	for _, authorizedUserID := range authorizedUsers {
 		if authorizedUserID == userID {
 			return true
 		}
 	}
 	for _, membership := range memberships {
-		for _, authorizedTeamID := range registry.AuthorizedTeams {
+		for _, authorizedTeamID := range authorizedTeams {
 			if membership.TeamID == authorizedTeamID {
 				return true
 			}
