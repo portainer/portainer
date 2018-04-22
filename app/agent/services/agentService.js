@@ -1,4 +1,4 @@
-angular.module('portainer.docker')
+angular.module('portainer.agent')
 .factory('AgentService', ['$q', 'Agent', function AgentServiceFactory($q, Agent) {
   'use strict';
   var service = {};
