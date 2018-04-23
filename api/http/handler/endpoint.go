@@ -75,6 +75,7 @@ type (
 		Name                string `valid:"-"`
 		URL                 string `valid:"-"`
 		PublicURL           string `valid:"-"`
+		GroupID             int    `valid:"-"`
 		TLS                 bool   `valid:"-"`
 		TLSSkipVerify       bool   `valid:"-"`
 		TLSSkipClientVerify bool   `valid:"-"`
@@ -84,6 +85,7 @@ type (
 		name                      string
 		url                       string
 		publicURL                 string
+		groupID                   int
 		useTLS                    bool
 		skipTLSServerVerification bool
 		skipTLSClientVerification bool
@@ -154,6 +156,7 @@ func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPa
 	endpoint := &portainer.Endpoint{
 		Name:      payload.name,
 		URL:       payload.url,
+		GroupID:   portainer.EndpointGroupID(payload.groupID),
 		PublicURL: payload.publicURL,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS:           payload.useTLS,
@@ -225,7 +228,7 @@ func (handler *EndpointHandler) createUnsecuredEndpoint(payload *postEndpointPay
 	endpoint := &portainer.Endpoint{
 		Name:      payload.name,
 		URL:       payload.url,
-		GroupID:   portainer.EndpointGroupID(1),
+		GroupID:   portainer.EndpointGroupID(payload.groupID),
 		PublicURL: payload.publicURL,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
@@ -258,6 +261,17 @@ func convertPostEndpointRequestToPayload(r *http.Request) (*postEndpointPayload,
 
 	if payload.name == "" || payload.url == "" {
 		return nil, ErrInvalidRequestFormat
+	}
+
+	rawGroupID := r.FormValue("GroupID")
+	if rawGroupID == "" {
+		payload.groupID = 1
+	} else {
+		groupID, err := strconv.Atoi(rawGroupID)
+		if err != nil {
+			return nil, err
+		}
+		payload.groupID = groupID
 	}
 
 	payload.useTLS = r.FormValue("TLS") == "true"
@@ -438,6 +452,10 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 
 	if req.PublicURL != "" {
 		endpoint.PublicURL = req.PublicURL
+	}
+
+	if req.GroupID != 0 {
+		endpoint.GroupID = portainer.EndpointGroupID(req.GroupID)
 	}
 
 	folder := strconv.Itoa(int(endpoint.ID))
