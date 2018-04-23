@@ -1,22 +1,69 @@
 angular.module('portainer.app')
-.controller('GroupController', ['$scope', '$state', '$transition$', '$filter', 'EndpointService', 'Notifications',
-function ($scope, $state, $transition$, $filter, EndpointService, Notifications) {
+.controller('GroupController', ['$q', '$scope', '$state', '$transition$', 'GroupService', 'EndpointService', 'Notifications',
+function ($q, $scope, $state, $transition$, GroupService, EndpointService, Notifications) {
+
+  $scope.state = {
+    actionInProgress: false
+  };
+
+  $scope.addLabel = function() {
+    $scope.group.Labels.push({ name: '', value: '' });
+  };
+
+  $scope.removeLabel = function(index) {
+    $scope.group.Labels.splice(index, 1);
+  };
+
+  $scope.update = function() {
+    var model = $scope.group;
+
+    var associatedEndpoints = [];
+    for (var i = 0; i < $scope.associatedEndpoints.length; i++) {
+      var endpoint = $scope.associatedEndpoints[i];
+      associatedEndpoints.push(endpoint.Id);
+    }
+
+    $scope.state.actionInProgress = true;
+    GroupService.updateGroup(model, associatedEndpoints)
+    .then(function success(data) {
+      Notifications.success('Group successfully updated');
+      $state.go('portainer.groups');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to update group');
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
+    });
+  };
 
   function initView() {
-    // EndpointService.endpoint($transition$.params().id)
-    // .then(function success(data) {
-    //   var endpoint = data;
-    //   if (endpoint.URL.indexOf('unix://') === 0) {
-    //     $scope.endpointType = 'local';
-    //   } else {
-    //     $scope.endpointType = 'remote';
-    //   }
-    //   endpoint.URL = $filter('stripprotocol')(endpoint.URL);
-    //   $scope.endpoint = endpoint;
-    // })
-    // .catch(function error(err) {
-    //   Notifications.error('Failure', err, 'Unable to retrieve endpoint details');
-    // });
+    var groupId = $transition$.params().id;
+
+    $q.all({
+      group: GroupService.group(groupId),
+      endpoints: EndpointService.endpoints()
+    })
+    .then(function success(data) {
+      $scope.group = data.group;
+
+      var availableEndpoints = [];
+      var associatedEndpoints = [];
+      for (var i = 0; i < data.endpoints.length; i++) {
+        var endpoint = data.endpoints[i];
+        if (endpoint.GroupId === +groupId) {
+          associatedEndpoints.push(endpoint);
+        } else if (endpoint.GroupId === 1) {
+          availableEndpoints.push(endpoint);
+        }
+      }
+
+      $scope.availableEndpoints = availableEndpoints;
+      $scope.associatedEndpoints = associatedEndpoints;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to load view');
+    });
   }
 
   initView();

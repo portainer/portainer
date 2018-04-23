@@ -49,6 +49,11 @@ func initStore(dataStorePath string) *bolt.Store {
 		log.Fatal(err)
 	}
 
+	err = store.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = store.MigrateData()
 	if err != nil {
 		log.Fatal(err)

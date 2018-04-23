@@ -1,34 +1,54 @@
 angular.module('portainer.app')
-.controller('CreateGroupController', ['$scope', '$state', 'GroupService', 'Notifications',
-function ($scope, $state, GroupService, Notifications) {
+.controller('CreateGroupController', ['$scope', '$state', 'GroupService', 'EndpointService', 'Notifications',
+function ($scope, $state, GroupService, EndpointService, Notifications) {
 
   $scope.state = {
     actionInProgress: false
   };
 
-  $scope.formValues = {
-    Name: '',
-    Description: ''
+  $scope.addLabel = function() {
+    $scope.model.Labels.push({ name: '', value: '' });
   };
 
-  $scope.addGroup = function() {
-    // var registryName = $scope.formValues.Name;
-    // var registryURL = $scope.formValues.URL.replace(/^https?\:\/\//i, '');
-    // var authentication = $scope.formValues.Authentication;
-    // var username = $scope.formValues.Username;
-    // var password = $scope.formValues.Password;
-    //
-    // $scope.state.actionInProgress = true;
-    // RegistryService.createRegistry(registryName, registryURL, authentication, username, password)
-    // .then(function success(data) {
-    //   Notifications.success('Registry successfully created');
-    //   $state.go('portainer.registries');
-    // })
-    // .catch(function error(err) {
-    //   Notifications.error('Failure', err, 'Unable to create registry');
-    // })
-    // .finally(function final() {
-    //   $scope.state.actionInProgress = false;
-    // });
+  $scope.removeLabel = function(index) {
+    $scope.model.Labels.splice(index, 1);
   };
+
+  $scope.create = function() {
+    var model = $scope.model;
+
+    var associatedEndpoints = [];
+    for (var i = 0; i < $scope.associatedEndpoints.length; i++) {
+      var endpoint = $scope.associatedEndpoints[i];
+      associatedEndpoints.push(endpoint.Id);
+    }
+
+    $scope.state.actionInProgress = true;
+    GroupService.createGroup(model, associatedEndpoints)
+    .then(function success() {
+      Notifications.success('Group successfully created');
+      $state.go('portainer.groups');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to create group');
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
+    });
+  };
+
+  function initView() {
+    $scope.model = new EndpointGroupDefaultModel();
+
+    EndpointService.endpointsByGroup(1)
+    .then(function success(data) {
+      $scope.availableEndpoints = data;
+      $scope.associatedEndpoints = [];
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+    });
+  }
+
+  initView();
 }]);

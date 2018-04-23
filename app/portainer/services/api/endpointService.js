@@ -12,6 +12,23 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.query({}).$promise;
   };
 
+  service.endpointsByGroup = function(groupId) {
+    var deferred = $q.defer();
+
+    Endpoints.query({}).$promise
+    .then(function success(data) {
+      var endpoints = data.filter(function (endpoint) {
+        return endpoint.GroupId === groupId;
+      });
+      deferred.resolve(endpoints);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve endpoints', err: err});
+    });
+
+    return deferred.promise;
+  };
+
   service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
     return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
   };

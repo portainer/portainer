@@ -114,6 +114,28 @@ func (store *Store) Open() error {
 	})
 }
 
+// Init creates the default data set.
+func (store *Store) Init() error {
+	groups, err := store.EndpointGroupService.EndpointGroups()
+	if err != nil {
+		return err
+	}
+
+	if len(groups) == 0 {
+		unassignedGroup := &portainer.EndpointGroup{
+			Name:            "Unassigned",
+			Description:     "Unassigned endpoints",
+			Labels:          []portainer.Pair{},
+			AuthorizedUsers: []portainer.UserID{},
+			AuthorizedTeams: []portainer.TeamID{},
+		}
+
+		return store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)
+	}
+
+	return nil
+}
+
 // Close closes the BoltDB database.
 func (store *Store) Close() error {
 	if store.db != nil {

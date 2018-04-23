@@ -19,6 +19,7 @@ import (
 type EndpointGroupHandler struct {
 	*mux.Router
 	Logger               *log.Logger
+	EndpointService      portainer.EndpointService
 	EndpointGroupService portainer.EndpointGroupService
 }
 
@@ -50,9 +51,10 @@ type (
 	}
 
 	postEndpointGroupsRequest struct {
-		Name        string           `valid:"required"`
-		Description string           `valid:"-"`
-		Labels      []portainer.Pair `valid:""`
+		Name                string                 `valid:"required"`
+		Description         string                 `valid:"-"`
+		Labels              []portainer.Pair       `valid:""`
+		AssociatedEndpoints []portainer.EndpointID `valid:""`
 	}
 
 	putEndpointGroupAccessRequest struct {
@@ -61,9 +63,10 @@ type (
 	}
 
 	putEndpointGroupsRequest struct {
-		Name        string           `valid:"-"`
-		Description string           `valid:"-"`
-		Labels      []portainer.Pair `valid:""`
+		Name                string                 `valid:"-"`
+		Description         string                 `valid:"-"`
+		Labels              []portainer.Pair       `valid:""`
+		AssociatedEndpoints []portainer.EndpointID `valid:""`
 	}
 )
 
@@ -116,6 +119,26 @@ func (handler *EndpointGroupHandler) handlePostEndpointGroups(w http.ResponseWri
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
+	}
+
+	endpoints, err := handler.EndpointService.Endpoints()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	for _, id := range req.AssociatedEndpoints {
+		for _, endpoint := range endpoints {
+			if endpoint.ID == id {
+				endpoint.GroupID = endpointGroup.ID
+				err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+				if err != nil {
+					httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+					return
+				}
+				break
+			}
+		}
 	}
 
 	encodeJSON(w, &postEndpointGroupsResponse{ID: int(endpointGroup.ID)}, handler.Logger)
@@ -222,7 +245,8 @@ func (handler *EndpointGroupHandler) handlePutEndpointGroup(w http.ResponseWrite
 		return
 	}
 
-	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
+	groupID := portainer.EndpointGroupID(endpointGroupID)
+	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(groupID)
 	if err == portainer.ErrEndpointGroupNotFound {
 		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
@@ -246,6 +270,46 @@ func (handler *EndpointGroupHandler) handlePutEndpointGroup(w http.ResponseWrite
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+
+	endpoints, err := handler.EndpointService.Endpoints()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	// TODO: refactor
+	for _, endpoint := range endpoints {
+		if endpoint.GroupID == groupID {
+			found := false
+			for _, id := range req.AssociatedEndpoints {
+				if id == endpoint.ID {
+					found = true
+				}
+			}
+
+			if !found {
+				endpoint.GroupID = portainer.EndpointGroupID(1)
+				err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+				if err != nil {
+					httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+					return
+				}
+				break
+			}
+		} else if endpoint.GroupID == portainer.EndpointGroupID(1) {
+			for _, id := range req.AssociatedEndpoints {
+				if id == endpoint.ID {
+					endpoint.GroupID = portainer.EndpointGroupID(groupID)
+					err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+					if err != nil {
+						httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+						return
+					}
+					break
+				}
+			}
+		}
+	}
 }
 
 // handleDeleteEndpointGroup handles DELETE requests on /endpoint_groups/:id
@@ -259,7 +323,13 @@ func (handler *EndpointGroupHandler) handleDeleteEndpointGroup(w http.ResponseWr
 		return
 	}
 
-	_, err = handler.EndpointGroupService.EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
+	if endpointGroupID == 1 {
+		httperror.WriteErrorResponse(w, portainer.ErrCannotRemoveDefaultGroup, http.StatusForbidden, handler.Logger)
+		return
+	}
+
+	groupID := portainer.EndpointGroupID(endpointGroupID)
+	_, err = handler.EndpointGroupService.EndpointGroup(groupID)
 	if err == portainer.ErrEndpointGroupNotFound {
 		httperror.WriteErrorResponse(w, err, http.StatusNotFound, handler.Logger)
 		return
@@ -272,5 +342,22 @@ func (handler *EndpointGroupHandler) handleDeleteEndpointGroup(w http.ResponseWr
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
+	}
+
+	endpoints, err := handler.EndpointService.Endpoints()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	for _, endpoint := range endpoints {
+		if endpoint.GroupID == groupID {
+			endpoint.GroupID = portainer.EndpointGroupID(1)
+			err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+			if err != nil {
+				httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+				return
+			}
+		}
 	}
 }

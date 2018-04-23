@@ -225,6 +225,7 @@ func (handler *EndpointHandler) createUnsecuredEndpoint(payload *postEndpointPay
 	endpoint := &portainer.Endpoint{
 		Name:      payload.name,
 		URL:       payload.url,
+		GroupID:   portainer.EndpointGroupID(1),
 		PublicURL: payload.publicURL,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,

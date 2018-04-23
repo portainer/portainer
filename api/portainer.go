@@ -174,6 +174,7 @@ type (
 		ID              EndpointID          `json:"Id"`
 		Name            string              `json:"Name"`
 		URL             string              `json:"URL"`
+		GroupID         EndpointGroupID     `json:"GroupId"`
 		PublicURL       string              `json:"PublicURL"`
 		TLSConfig       TLSConfiguration    `json:"TLSConfig"`
 		AuthorizedUsers []UserID            `json:"AuthorizedUsers"`
@@ -261,6 +262,7 @@ type (
 	// DataStore defines the interface to manage the data.
 	DataStore interface {
 		Open() error
+		Init() error
 		Close() error
 		MigrateData() error
 	}
@@ -425,7 +427,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.16.5"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 8
+	DBVersion = 9
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 )
