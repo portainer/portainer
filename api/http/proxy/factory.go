@@ -1,9 +1,6 @@
 package proxy
 
 import (
-	"crypto/tls"
-	"encoding/base64"
-	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -25,32 +22,6 @@ type proxyFactory struct {
 func (factory *proxyFactory) newExtensionHTTPPRoxy(u *url.URL) http.Handler {
 	u.Scheme = "http"
 	return newSingleHostReverseProxyWithHostHeader(u)
-}
-
-func (factory *proxyFactory) newRegistryProxy(u *url.URL, registry *portainer.Registry) http.Handler {
-	u.Scheme = registry.Protocol
-	transport := &http.Transport{}
-	if !registry.TLSVerification {
-		transport.TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: true,
-		}
-	}
-	proxy := newSingleHostReverseProxyWithHostHeader(u)
-	switch registry.AuthType {
-	case "Basic":
-		auth := base64.StdEncoding.EncodeToString([]byte(registry.Username + ":" + registry.Password))
-		proxy = newSingleHostReverseProxyWithHostHeaderBasicAuth(u, auth)
-	case "Bearer":
-		// Need to code a transport to get token from auth url
-		// Then proxy to registry url with token in header
-	case "":
-	default:
-		fmt.Printf("Auth Type %s not yet supported.", registry.AuthType)
-		return nil
-	}
-
-	proxy.Transport = transport
-	return proxy
 }
 
 func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {

@@ -13,7 +13,6 @@ import (
 type Manager struct {
 	proxyFactory     *proxyFactory
 	proxies          cmap.ConcurrentMap
-	registryProxies  cmap.ConcurrentMap
 	extensionProxies cmap.ConcurrentMap
 }
 
@@ -21,7 +20,6 @@ type Manager struct {
 func NewManager(resourceControlService portainer.ResourceControlService, teamMembershipService portainer.TeamMembershipService, settingsService portainer.SettingsService, registryService portainer.RegistryService, dockerHubService portainer.DockerHubService) *Manager {
 	return &Manager{
 		proxies:          cmap.New(),
-		registryProxies:  cmap.New(),
 		extensionProxies: cmap.New(),
 		proxyFactory: &proxyFactory{
 			ResourceControlService: resourceControlService,
@@ -61,22 +59,6 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 	return proxy, nil
 }
 
-// CreateAndRegisterRegistryProxy creates a new HTTP reverse proxy and adds it to the registered proxies.
-// It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
-func (manager *Manager) CreateAndRegisterRegistryProxy(registry *portainer.Registry) (http.Handler, error) {
-	var proxy http.Handler
-
-	registryURL, err := url.Parse("http://" + registry.URL)
-	if err != nil {
-		return nil, err
-	}
-
-	proxy = manager.proxyFactory.newRegistryProxy(registryURL, registry)
-
-	manager.registryProxies.Set(string(registry.ID), proxy)
-	return proxy, nil
-}
-
 // GetProxy returns the proxy associated to a key
 func (manager *Manager) GetProxy(key string) http.Handler {
 	proxy, ok := manager.proxies.Get(key)
@@ -86,23 +68,9 @@ func (manager *Manager) GetProxy(key string) http.Handler {
 	return proxy.(http.Handler)
 }
 
-// GetProxy returns the proxy associated to a key
-func (manager *Manager) GetRegistryProxy(key string) http.Handler {
-	proxy, ok := manager.registryProxies.Get(key)
-	if !ok {
-		return nil
-	}
-	return proxy.(http.Handler)
-}
-
 // DeleteProxy deletes the proxy associated to a key
 func (manager *Manager) DeleteProxy(key string) {
 	manager.proxies.Remove(key)
-}
-
-// DeleteProxy deletes the proxy associated to a key
-func (manager *Manager) DeleteRegistryProxy(key string) {
-	manager.registryProxies.Remove(key)
 }
 
 // CreateAndRegisterExtensionProxy creates a new HTTP reverse proxy for an extension and adds it to the registered proxies.

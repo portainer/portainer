@@ -158,7 +158,6 @@ type (
 		TLSVerification bool       `json:"TLSVerification"`
 		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
-		AuthType        string     `json:"AuthType"`
 	}
 
 	// DockerHub represents all the required information to connect and use the

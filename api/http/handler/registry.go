@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
 
 	"crypto/tls"
@@ -30,7 +29,6 @@ type RegistryHandler struct {
 	*mux.Router
 	Logger          *log.Logger
 	RegistryService portainer.RegistryService
-	ProxyManager    *proxy.Manager
 }
 
 // RegistryAuthResponse represents a response of a registry auth service (token)
@@ -144,7 +142,7 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 		}
 	}
 
-	protocol, version, authType, err := validateRegistryURL(req.URL, req.Authentication, req.Username, req.Password, req.TLSVerification)
+	protocol, version, err := validateRegistryURL(req.URL, req.Authentication, req.Username, req.Password, req.TLSVerification)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
@@ -161,7 +159,6 @@ func (handler *RegistryHandler) handlePostRegistries(w http.ResponseWriter, r *h
 		Password:        req.Password,
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
-		AuthType:        authType,
 	}
 
 	err = handler.RegistryService.CreateRegistry(registry)
@@ -302,7 +299,7 @@ func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http
 	}
 
 	if req.URL != "" {
-		protocol, version, authType, err := validateRegistryURL(req.URL, req.Authentication, req.Username, req.Password, req.TLSVerification)
+		protocol, version, err := validateRegistryURL(req.URL, req.Authentication, req.Username, req.Password, req.TLSVerification)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 			return
@@ -310,7 +307,6 @@ func (handler *RegistryHandler) handlePutRegistry(w http.ResponseWriter, r *http
 		registry.URL = req.URL
 		registry.Protocol = protocol
 		registry.Version = version
-		registry.AuthType = authType
 	}
 
 	if req.Authentication {
@@ -358,6 +354,7 @@ func (handler *RegistryHandler) handleDeleteRegistry(w http.ResponseWriter, r *h
 	}
 }
 
+// proxyRequestsToRegistryAPI proxy to registry and set auth header if necessary
 func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -377,20 +374,6 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 		return
 	}
 
-	// Old method, get proxy
-	/*var proxy http.Handler
-	proxy = handler.ProxyManager.GetRegistryProxy(string(registryID))
-	if proxy == nil {
-		proxy, err = handler.ProxyManager.CreateAndRegisterRegistryProxy(registry)
-		if err != nil {
-			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
-			return
-		}
-	}
-
-	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)*/
-
-	// New method, without proxy
 	client := &http.Client{
 		Timeout: registryTimeout,
 	}
@@ -401,45 +384,30 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 			},
 		}
 	}
-	// Proxy to registry and verify auth
-	/*req, err := http.NewRequest("GET", url, nil)
-	  if err != nil {
-	    return "", portainer.ErrRegistryInvalid
-	  }*/
+
+	// Build first request (without auth)
 	uri := strings.Replace(r.RequestURI, "/api/registries/"+id+"/", "", 1)
-	fmt.Println(uri)
 	req := r
 	req.RequestURI = ""
 	u, err := url.Parse(registry.Protocol + "://" + registry.URL + "/" + uri)
-	fmt.Println(registry.Protocol + "://" + registry.URL + "/" + uri)
 	if err != nil {
-		panic(err)
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 	}
-	/*
-	   Registry struct {
-	     ID              RegistryID `json:"Id"`
-	     Name            string     `json:"Name"`
-	     URL             string     `json:"URL"`
-	     Protocol        string     `json:"Protocol"`
-	     Version         string     `json:"Version"`
-	     Authentication  bool       `json:"Authentication"`
-	     Username        string     `json:"Username"`
-	     Password        string     `json:"Password,omitempty"`
-	     TLSVerification bool       `json:"TLSVerification"`
-	     AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
-	     AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
-	     AuthType        string     `json:"AuthType"`
-	   }
-	*/
+
 	req.URL = u
 	req.Host = registry.URL
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err.Error())
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 	}
 
+	// Get Www-Authenticate header to find requested auth method
+	// Bearer: Need to auth to a 3rd party service, and get token, then recall original uri with Authorization header
+	// Basic: Need to recall same uri with Basic Authorization header
+	// Else: Just send response
 	authHeader := resp.Header.Get("Www-Authenticate")
-	switch authType := strings.Split(authHeader, " ")[0]; authType {
+	authType := strings.Split(authHeader, " ")[0]
+	switch authType {
 	case "Bearer":
 		// Call auth URI to get token, and recall registry with token
 		parts := strings.Split(strings.Replace(authHeader, "Bearer ", "", 1), ",")
@@ -448,9 +416,6 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 			if splits := strings.Split(part, "="); len(splits) == 2 {
 				m[splits[0]] = strings.Replace(splits[1], "\"", "", 2)
 			}
-		}
-		if _, ok := m["realm"]; !ok {
-			//return "", portainer.ErrRegistryInvalid
 		}
 
 		authURL := m["realm"]
@@ -462,63 +427,59 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 		}
 
 		authReq, err := http.NewRequest("GET", authURL, nil)
-		fmt.Println(authURL)
 		if err != nil {
-			// TODO handle error
+			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		}
 		authReq.SetBasicAuth(registry.Username, registry.Password)
 
 		resp, err = client.Do(authReq)
 		if err != nil {
-			// TODO handle error
+			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		}
 		if resp.StatusCode == http.StatusOK {
-			// Store token
 			// Parse response into RegistryAuthResponse
 			defer resp.Body.Close()
 			respJson := &RegistryAuthResponse{}
 			err = json.NewDecoder(resp.Body).Decode(respJson)
 			if err != nil {
-				log.Fatal(err)
+				httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 			}
-			fmt.Println(respJson.Token)
 
-			// Redo request with auth token
+			// Forward to registry with bearer token
 			req.Header.Set("Authorization", "Bearer "+respJson.Token)
 		}
 
 	case "Basic":
-		// Just recall registry with basic auth
+		// Forward to registry with basic auth
 		req.SetBasicAuth(registry.Username, registry.Password)
 
 	default:
-		// Forward to registry
+		// Just send response, nothing more
 	}
 
-	// Do the backend call and forward response
-	nextResp, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err.Error())
+	nextResp := resp
+	if authType != "" {
+		// Do the backend call
+		nextResp, err = client.Do(req)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		}
 	}
-	// Write response
+
+	// Copy response and headers to original writer
 	defer nextResp.Body.Close()
 	for name, values := range nextResp.Header {
 		w.Header()[name] = values
 	}
 	w.WriteHeader(nextResp.StatusCode)
 	io.Copy(w, nextResp.Body)
-
-	/*  authURL := url
-	    authHeader := resp.Header.Get("Www-Authenticate")
-	    authType := strings.Split(authHeader, " ")[0]*/
-
 }
 
 // validateRegistryURL validates wether given url is valid a docker registry url by
 // sending http get request to url using combination of protocols and available
 // registry versions. upon first successfull attempt, it returns protocol, version
 // and nil error.
-func validateRegistryURL(url string, auth bool, username, password string, tlsVerification bool) (string, string, string, error) {
+func validateRegistryURL(url string, auth bool, username, password string, tlsVerification bool) (string, string, error) {
 	configs := []struct {
 		protocol, version string
 	}{
@@ -541,22 +502,22 @@ func validateRegistryURL(url string, auth bool, username, password string, tlsVe
 	for _, config := range configs {
 		url := fmt.Sprintf("%s://%s/%s/", config.protocol, url, config.version)
 		if auth {
-			if authType, err := registryAuthAttempt(client, url, username, password); err == nil {
-				return config.protocol, config.version, authType, nil
+			if err := registryAuthAttempt(client, url, username, password); err == nil {
+				return config.protocol, config.version, nil
 			} else if err == portainer.ErrRegistryInvalidAuthCreds || err == portainer.ErrRegistryInvalidServerCert {
-				return "", "", "", err
+				return "", "", err
 			}
 			continue
 		}
 
 		if err := checkRegistryURL(client, url); err == nil {
-			return config.protocol, config.version, "", nil
+			return config.protocol, config.version, nil
 		} else if err == portainer.ErrRegistryAuthRequired || err == portainer.ErrRegistryInvalidServerCert {
-			return "", "", "", err
+			return "", "", err
 		}
 	}
 
-	return "", "", "", portainer.ErrRegistryInvalid
+	return "", "", portainer.ErrRegistryInvalid
 }
 
 func checkRegistryURL(client *http.Client, url string) error {
@@ -582,17 +543,17 @@ func checkRegistryURL(client *http.Client, url string) error {
 	return portainer.ErrRegistryInvalid
 }
 
-func registryAuthAttempt(client *http.Client, url, username, password string) (string, error) {
+func registryAuthAttempt(client *http.Client, url, username, password string) error {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return "", portainer.ErrRegistryInvalid
+		return portainer.ErrRegistryInvalid
 	}
 
 	resp, err := client.Do(req)
 	if err != nil && strings.Contains(err.Error(), "cannot validate certificate for") {
-		return "", portainer.ErrRegistryInvalidServerCert
+		return portainer.ErrRegistryInvalidServerCert
 	} else if err != nil || resp.StatusCode != http.StatusUnauthorized {
-		return "", portainer.ErrRegistryInvalid
+		return portainer.ErrRegistryInvalid
 	}
 
 	authURL := url
@@ -608,7 +569,7 @@ func registryAuthAttempt(client *http.Client, url, username, password string) (s
 			}
 		}
 		if _, ok := m["realm"]; !ok {
-			return "", portainer.ErrRegistryInvalid
+			return portainer.ErrRegistryInvalid
 		}
 
 		authURL = m["realm"]
@@ -619,16 +580,16 @@ func registryAuthAttempt(client *http.Client, url, username, password string) (s
 
 	authReq, err := http.NewRequest("GET", authURL, nil)
 	if err != nil {
-		return "", portainer.ErrRegistryInvalid
+		return portainer.ErrRegistryInvalid
 	}
 	authReq.SetBasicAuth(username, password)
 
 	resp, err = client.Do(authReq)
 	if err != nil {
-		return "", portainer.ErrRegistryInvalid
+		return portainer.ErrRegistryInvalid
 	}
 	if resp.StatusCode == http.StatusOK {
-		return authType, nil
+		return nil
 	}
-	return "", portainer.ErrRegistryInvalidAuthCreds
+	return portainer.ErrRegistryInvalidAuthCreds
 }
