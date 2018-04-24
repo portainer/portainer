@@ -59,7 +59,15 @@ function ($q, $scope, $state, Settings, EndpointService, GroupService, StateMana
     })
     .then(function success(data) {
       var endpoints = data.endpoints;
-      var groups = data.groups;
+      var groups = data.groups.filter(function f(group) {
+        for (var i = 0; i < endpoints.length; i++) {
+          var endpoint = endpoints[i];
+          if (endpoint.GroupId === group.Id) {
+            return true;
+          }
+        }
+        return false;
+      });
 
       $scope.endpoints = endpoints;
 

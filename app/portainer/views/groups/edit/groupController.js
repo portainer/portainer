@@ -27,7 +27,7 @@ function ($q, $scope, $state, $transition$, GroupService, EndpointService, Notif
     GroupService.updateGroup(model, associatedEndpoints)
     .then(function success(data) {
       Notifications.success('Group successfully updated');
-      $state.go('portainer.groups');
+      $state.go('portainer.groups', {}, {reload: true});
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update group');

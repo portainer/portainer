@@ -41,7 +41,7 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
     EndpointService.updateEndpoint(endpoint.Id, endpointParams)
     .then(function success(data) {
       Notifications.success('Endpoint updated', $scope.endpoint.Name);
-      $state.go('portainer.endpoints');
+      $state.go('portainer.groups', {}, {reload: true});
     }, function error(err) {
       Notifications.error('Failure', err, 'Unable to update endpoint');
       $scope.state.actionInProgress = false;

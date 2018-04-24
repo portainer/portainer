@@ -27,7 +27,7 @@ function ($scope, $state, GroupService, EndpointService, Notifications) {
     GroupService.createGroup(model, associatedEndpoints)
     .then(function success() {
       Notifications.success('Group successfully created');
-      $state.go('portainer.groups');
+      $state.go('portainer.groups', {}, {reload: true});
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to create group');
