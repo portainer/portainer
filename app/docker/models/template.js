@@ -16,7 +16,12 @@ function TemplateViewModel(data) {
   this.Interactive = data.interactive ? data.interactive : false;
   this.RestartPolicy = data.restart_policy ? data.restart_policy : 'always';
   this.Labels = data.labels ? data.labels : [];
+  this.Commands = data.commands ? data.commands : [];
   this.Volumes = [];
+  
+  if (data.template_name) {
+    this.TemplateName = data.template_name ? data.template_name : '';
+  }
 
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {

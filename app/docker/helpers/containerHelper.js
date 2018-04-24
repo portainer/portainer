@@ -3,6 +3,18 @@ angular.module('portainer.docker')
   'use strict';
   var helper = {};
 
+  helper.commandAndArgsToArray = function(command, args) {
+    var commandArray = [];
+    commandArray.push(command);
+    if (args) {
+      args.map(function(v) {
+        commandArray.push(v.value);
+      });
+    }
+
+    return commandArray;
+  };
+
   helper.commandStringToArray = function(command) {
     return splitargs(command);
   };

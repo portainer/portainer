@@ -2,6 +2,11 @@ angular.module('portainer.app')
 .factory('TemplateService', ['$q', 'Template', 'TemplateHelper', 'ImageHelper', 'ContainerHelper', function TemplateServiceFactory($q, Template, TemplateHelper, ImageHelper, ContainerHelper) {
   'use strict';
   var service = {};
+  var template_list = {};
+
+  service.getTemplateByName = function(template_name) {
+    return template_list[template_name]
+  };
 
   service.getTemplates = function(key) {
     var deferred = $q.defer();
@@ -17,11 +22,15 @@ angular.module('portainer.app')
           template = new TemplateViewModel(tpl);
         }
         template.index = idx;
+        if (template.TemplateName) {
+          template_list[template.TemplateName] = template;
+        }
         return template;
       });
       if (key === 'linuxserver.io') {
         templates = TemplateHelper.filterLinuxServerIOTemplates(templates);
       }
+
       deferred.resolve(templates);
     })
     .catch(function error(err) {
@@ -36,6 +45,21 @@ angular.module('portainer.app')
     containerConfiguration.Image = imageConfiguration.fromImage + ':' + imageConfiguration.tag;
     return containerConfiguration;
   };
+
+  function getConfigurationTemplateLabels(template) {
+    var labels = [
+      {
+        name: 'PORTAINER_TEMPLATE_NAME',
+        value: template.TemplateName
+      }
+    ];
+
+    template.Labels.map(function(val) {
+      labels.push(val);
+    });
+
+    return labels;
+  }
 
   service.createContainerConfiguration = function(template, containerName, network, containerMapping) {
     var configuration = TemplateHelper.getDefaultContainerConfiguration();
@@ -54,7 +78,8 @@ angular.module('portainer.app')
     var consoleConfiguration = TemplateHelper.getConsoleConfiguration(template.Interactive);
     configuration.OpenStdin = consoleConfiguration.openStdin;
     configuration.Tty = consoleConfiguration.tty;
-    configuration.Labels = TemplateHelper.updateContainerConfigurationWithLabels(template.Labels);
+    var labels = getConfigurationTemplateLabels(template);
+    configuration.Labels = TemplateHelper.updateContainerConfigurationWithLabels(labels);
     return configuration;
   };
 
@@ -68,6 +93,9 @@ angular.module('portainer.app')
       }
     });
   };
+
+  var defualtTemplateKey = 'containers';
+  service.getTemplates(defualtTemplateKey);
 
   return service;
 }]);

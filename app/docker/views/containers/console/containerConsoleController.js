@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerConsoleController', ['$scope', '$transition$', 'Container', 'Image', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ContainerService', 'ExecService',
-function ($scope, $transition$, Container, Image, EndpointProvider, Notifications, ContainerHelper, ContainerService, ExecService) {
+.controller('ContainerConsoleController', ['$scope', '$transition$', 'Container', 'Image', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ContainerService', 'ExecService', 'TemplateService',
+function ($scope, $transition$, Container, Image, EndpointProvider, Notifications, ContainerHelper, ContainerService, ExecService, TemplateService) {
   $scope.state = {
     loaded: false,
     connected: false
@@ -17,15 +17,49 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
     }
   });
 
+  function getDefaultCommands() {
+    var commands = [
+      {
+        cmd: $scope.imageOS === 'windows' ? 'powershell' : 'bash',
+        args: [],
+        interactive: true
+      },
+      {
+        cmd: $scope.imageOS === 'windows' ? 'cmd.exe' : 'sh',
+        args: [],
+        interactive: true
+      }
+    ];
+
+    return commands;
+  }
+
+  function getContainerTemplateName(container) {
+    var template_name = container['Config']['Labels']['PORTAINER_TEMPLATE_NAME'];
+    return template_name;
+  }
+
   Container.get({id: $transition$.params().id}, function(d) {
     $scope.container = d;
     if (d.message) {
       Notifications.error('Error', d, 'Unable to retrieve container details');
     } else {
       Image.get({id: d.Image}, function(imgData) {
+
         $scope.imageOS = imgData.Os;
-        $scope.formValues.command = imgData.Os === 'windows' ? 'powershell' : 'bash';
         $scope.state.loaded = true;
+
+        $scope.container.Commands = getDefaultCommands();
+
+        var template_name = getContainerTemplateName($scope.container);
+        if (template_name) {
+          var template = TemplateService.getTemplateByName(template_name);
+          if (template) {
+            template.Commands.map(function(command) {
+              $scope.container.Commands.push(command);
+            });
+          }
+        }
       }, function (e) {
         Notifications.error('Failure', e, 'Unable to retrieve image details');
       });
@@ -38,7 +72,7 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
     var termWidth = Math.floor(($('#terminal-container').width() - 20) / 8.39);
     var termHeight = 30;
     var command = $scope.formValues.isCustomCommand ?
-                    $scope.formValues.customCommand : $scope.formValues.command;
+                    $scope.formValues.customCommand : $scope.formValues.command.cmd;
     var execConfig = {
       id: $transition$.params().id,
       AttachStdin: true,
@@ -46,7 +80,7 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
       AttachStderr: true,
       Tty: true,
       User: $scope.formValues.user,
-      Cmd: ContainerHelper.commandStringToArray(command)
+      Cmd: ContainerHelper.commandAndArgsToArray(command, $scope.formValues.command.args)
     };
 
     var execId;
@@ -60,7 +94,9 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
         url = url.replace('http://', 'ws://');
       }
       initTerm(url, termHeight, termWidth);
-      return ExecService.resizeTTY(execId, termHeight, termWidth, 2000);
+      if ($scope.formValues.command.interactive) {
+        return ExecService.resizeTTY(execId, termHeight, termWidth, 2000);
+      }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to exec into container');
@@ -75,6 +111,14 @@ function ($scope, $transition$, Container, Image, EndpointProvider, Notification
     if (term !== null) {
       term.destroy();
     }
+  };
+
+  $scope.addCommandArgs = function() {
+    $scope.formValues.command.Args.push({ value: ''});
+  };
+
+  $scope.removeCommandArgs = function($index) {
+    $scope.formValues.command.Args.splice($index, 1);
   };
 
   function initTerm(url, height, width) {
