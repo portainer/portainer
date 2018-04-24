@@ -9,11 +9,22 @@
   </div>
   <div class="sidebar-content">
   <ul class="sidebar">
-    <li class="sidebar-title"><span>Active endpoint</span></li>
-    <li class="sidebar-title">
-      <select class="select-endpoint form-control" ng-options="endpoint.Name for endpoint in endpoints" ng-model="activeEndpoint" ng-change="switchEndpoint(activeEndpoint)">
-      </select>
-    </li>
+    <div ng-if="groups.length > 1">
+      <li class="sidebar-title"><span>Endpoint group</span></li>
+      <li class="sidebar-title">
+        <select
+          class="select-endpoint form-control" ng-options="group.Name for group in groups" ng-model="activeGroup" ng-change="switchGroup(activeGroup)"
+          ></select>
+      </li>
+    </div>
+    <div ng-if="activeEndpoint">
+      <li class="sidebar-title"><span>Active endpoint</span></li>
+      <li class="sidebar-title">
+        <select
+          class="select-endpoint form-control" ng-options="endpoint.Name for endpoint in groupEndpoints" ng-model="activeEndpoint" ng-change="switchEndpoint(activeEndpoint)"
+          ></select>
+      </li>
+    </div>
     <li class="sidebar-title"><span>Endpoint actions</span></li>
     <docker-sidebar-content
       endpoint-api-version="applicationState.endpoint.apiVersion"

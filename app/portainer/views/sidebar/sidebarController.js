@@ -1,8 +1,21 @@
 angular.module('portainer.app')
-.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
-function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
+.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'GroupService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
+function ($q, $scope, $state, Settings, EndpointService, GroupService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
 
   $scope.switchEndpoint = function(endpoint) {
+    switchEndpoint(endpoint);
+  };
+
+  $scope.switchGroup = function(group) {
+    var groupEndpoints = $scope.endpoints.filter(function f(endpoint) {
+      return endpoint.GroupId === group.Id;
+    });
+    $scope.groupEndpoints = groupEndpoints;
+    $scope.activeEndpoint = groupEndpoints[0];
+    switchEndpoint(groupEndpoints[0]);
+  };
+
+  function switchEndpoint(endpoint) {
     var activeEndpointID = EndpointProvider.endpointID();
     var activeEndpointPublicURL = EndpointProvider.endpointPublicURL();
     EndpointProvider.setEndpointID(endpoint.Id);
@@ -23,16 +36,6 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
       StateManager.updateEndpointState(true)
       .then(function success() {});
     });
-  };
-
-  function setActiveEndpoint(endpoints) {
-    var activeEndpointID = EndpointProvider.endpointID();
-    angular.forEach(endpoints, function (endpoint) {
-      if (endpoint.Id === activeEndpointID) {
-        $scope.activeEndpoint = endpoint;
-        EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-      }
-    });
   }
 
   function checkPermissions(memberships) {
@@ -49,13 +52,30 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     $scope.uiVersion = StateManager.getState().application.version;
     $scope.displayExternalContributors = StateManager.getState().application.displayExternalContributors;
     $scope.logo = StateManager.getState().application.logo;
-    $scope.endpoints = [];
 
-    EndpointService.endpoints()
+    $q.all({
+      endpoints: EndpointService.endpoints(),
+      groups: GroupService.groups()
+    })
     .then(function success(data) {
-      var endpoints = data;
-      $scope.endpoints = _.sortBy(endpoints, ['Name']);
-      setActiveEndpoint(endpoints);
+      var endpoints = data.endpoints;
+      var groups = data.groups;
+
+      $scope.endpoints = endpoints;
+
+      var activeEndpointID = EndpointProvider.endpointID();
+      var activeEndpoint = _.find(endpoints, { Id: activeEndpointID });
+      EndpointProvider.setEndpointPublicURL(activeEndpoint.PublicURL);
+
+      var activeGroup = _.find(groups, { Id: activeEndpoint.GroupId });
+      var groupEndpoints = endpoints.filter(function f(endpoint) {
+        return endpoint.GroupId === activeGroup.Id;
+      });
+
+      $scope.groups = groups;
+      $scope.groupEndpoints = groupEndpoints;
+      $scope.activeEndpoint = activeEndpoint;
+      $scope.activeGroup = activeGroup;
 
       if (StateManager.getState().application.authentication) {
         var userDetails = Authentication.getUserDetails();
