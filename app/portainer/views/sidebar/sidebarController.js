@@ -59,6 +59,8 @@ function ($q, $scope, $state, Settings, EndpointService, GroupService, StateMana
     })
     .then(function success(data) {
       var endpoints = data.endpoints;
+
+      // TODO: helper method? Filter empty groups.
       var groups = data.groups.filter(function f(group) {
         for (var i = 0; i < endpoints.length; i++) {
           var endpoint = endpoints[i];

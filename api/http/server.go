@@ -73,12 +73,14 @@ func (server *Server) Start() error {
 	templatesHandler.SettingsService = server.SettingsService
 	var dockerHandler = handler.NewDockerHandler(requestBouncer)
 	dockerHandler.EndpointService = server.EndpointService
+	dockerHandler.EndpointGroupService = server.EndpointGroupService
 	dockerHandler.TeamMembershipService = server.TeamMembershipService
 	dockerHandler.ProxyManager = proxyManager
 	var websocketHandler = handler.NewWebSocketHandler()
 	websocketHandler.EndpointService = server.EndpointService
 	var endpointHandler = handler.NewEndpointHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.EndpointService = server.EndpointService
+	endpointHandler.EndpointGroupService = server.EndpointGroupService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = proxyManager
 	var endpointGroupHandler = handler.NewEndpointGroupHandler(requestBouncer)
@@ -106,6 +108,7 @@ func (server *Server) Start() error {
 	extensionHandler.ProxyManager = proxyManager
 	var storidgeHandler = extensions.NewStoridgeHandler(requestBouncer)
 	storidgeHandler.EndpointService = server.EndpointService
+	storidgeHandler.EndpointGroupService = server.EndpointGroupService
 	storidgeHandler.TeamMembershipService = server.TeamMembershipService
 	storidgeHandler.ProxyManager = proxyManager
 
