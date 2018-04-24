@@ -18,14 +18,6 @@
                 {{ group.Name }}
               </td>
             </tr>
-            <tr>
-              <td colspan="2">
-                <span class="small text-muted">
-                  You can select which user or team can access this endpoint group by moving them to the authorized accesses table. Simply click
-                  on a user or team entry to move it from one table to the other.
-                </span>
-              </td>
-            </tr>
           </tbody>
         </table>
       </rd-widget-body>
@@ -33,6 +25,10 @@
   </div>
 </div>
 
-<por-access-management
-  ng-if="group" access-controlled-entity="group" update-access="updateAccess(userAccesses, teamAccesses)"
-></por-access-management>
+<div class="row" ng-if="group">
+  <div class="col-sm-12">
+    <por-access-management
+      ng-if="group" access-controlled-entity="group" entity-type="group" update-access="updateAccess(userAccesses, teamAccesses)"
+    ></por-access-management>
+  </div>
+</div>

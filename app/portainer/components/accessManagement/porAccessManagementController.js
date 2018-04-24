@@ -3,32 +3,34 @@ angular.module('portainer.app')
 function (AccessService, PaginationService, Notifications) {
   var ctrl = this;
 
-  ctrl.state = {
-    pagination_count_accesses: PaginationService.getPaginationLimit('access_management_accesses'),
-    pagination_count_authorizedAccesses: PaginationService.getPaginationLimit('access_management_AuthorizedAccesses'),
-    sortAccessesBy: 'Type',
-    sortAccessesReverse: false,
-    sortAuthorizedAccessesBy: 'Type',
-    sortAuthorizedAccessesReverse: false
-  };
+  // TODO: remove PaginationService
 
-  ctrl.orderAccesses = function(sortBy) {
-    ctrl.state.sortAccessesReverse = (ctrl.state.sortAccessesBy === sortBy) ? !ctrl.state.sortAccessesReverse : false;
-    ctrl.state.sortAccessesBy = sortBy;
-  };
-
-  ctrl.orderAuthorizedAccesses = function(sortBy) {
-    ctrl.state.sortAuthorizedAccessesReverse = (ctrl.state.sortAuthorizedAccessesBy === sortBy) ? !ctrl.state.sortAuthorizedAccessesReverse : false;
-    ctrl.state.sortAuthorizedAccessesBy = sortBy;
-  };
-
-  ctrl.changePaginationCountAuthorizedAccesses = function() {
-    PaginationService.setPaginationLimit('access_management_AuthorizedAccesses', ctrl.state.pagination_count_authorizedAccesses);
-  };
-
-  ctrl.changePaginationCountAccesses = function() {
-    PaginationService.setPaginationLimit('access_management_accesses', ctrl.state.pagination_count_accesses);
-  };
+  // ctrl.state = {
+  //   pagination_count_accesses: PaginationService.getPaginationLimit('access_management_accesses'),
+  //   pagination_count_authorizedAccesses: PaginationService.getPaginationLimit('access_management_AuthorizedAccesses'),
+  //   sortAccessesBy: 'Type',
+  //   sortAccessesReverse: false,
+  //   sortAuthorizedAccessesBy: 'Type',
+  //   sortAuthorizedAccessesReverse: false
+  // };
+  //
+  // ctrl.orderAccesses = function(sortBy) {
+  //   ctrl.state.sortAccessesReverse = (ctrl.state.sortAccessesBy === sortBy) ? !ctrl.state.sortAccessesReverse : false;
+  //   ctrl.state.sortAccessesBy = sortBy;
+  // };
+  //
+  // ctrl.orderAuthorizedAccesses = function(sortBy) {
+  //   ctrl.state.sortAuthorizedAccessesReverse = (ctrl.state.sortAuthorizedAccessesBy === sortBy) ? !ctrl.state.sortAuthorizedAccessesReverse : false;
+  //   ctrl.state.sortAuthorizedAccessesBy = sortBy;
+  // };
+  //
+  // ctrl.changePaginationCountAuthorizedAccesses = function() {
+  //   PaginationService.setPaginationLimit('access_management_AuthorizedAccesses', ctrl.state.pagination_count_authorizedAccesses);
+  // };
+  //
+  // ctrl.changePaginationCountAccesses = function() {
+  //   PaginationService.setPaginationLimit('access_management_accesses', ctrl.state.pagination_count_accesses);
+  // };
 
   function dispatchUserAndTeamIDs(accesses, users, teams) {
     angular.forEach(accesses, function (access) {
