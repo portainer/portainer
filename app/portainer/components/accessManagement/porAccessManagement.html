@@ -43,11 +43,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-click="$ctrl.authorizeAccess(user)" class="interactive" dir-paginate="user in $ctrl.accesses | filter:$ctrl.state.filterUsers | orderBy:$ctrl.state.sortAccessesBy:$ctrl.state.sortAccessesReverse | itemsPerPage: $ctrl.state.pagination_count_accesses">
-                <td>{{ user.Name }}</td>
+              <tr ng-click="$ctrl.authorizeAccess(item)" class="interactive" dir-paginate="item in $ctrl.accesses | filter:$ctrl.state.filterUsers | orderBy:$ctrl.state.sortAccessesBy:$ctrl.state.sortAccessesReverse | itemsPerPage: $ctrl.state.pagination_count_accesses">
+                <td>{{ item.Name }}</td>
                 <td>
-                  <i class="fa" ng-class="user.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-right: 2px;"></i>
-                  {{ user.Type }}
+                  <i class="fa" ng-class="item.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-right: 2px;"></i>
+                  {{ item.Type }}
                 </td>
               </tr>
               <tr ng-if="!$ctrl.accesses">
@@ -109,11 +109,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-click="$ctrl.unauthorizeAccess(user)" class="interactive" pagination-id="table_authaccess" dir-paginate="user in $ctrl.authorizedAccesses | filter:$ctrl.state.filterAuthorizedUsers | orderBy:$ctrl.state.sortAuthorizedAccessesBy:$ctrl.state.sortAuthorizedAccessesReverse | itemsPerPage: $ctrl.state.pagination_count_authorizedAccesses">
-                <td>{{ user.Name }}</td>
+              <tr ng-click="!item.Inherited && $ctrl.unauthorizeAccess(item)" ng-class="{ 'interactive': !item.Inherited }" pagination-id="table_authaccess" dir-paginate="item in $ctrl.authorizedAccesses | filter:$ctrl.state.filterAuthorizedUsers | orderBy:$ctrl.state.sortAuthorizedAccessesBy:$ctrl.state.sortAuthorizedAccessesReverse | itemsPerPage: $ctrl.state.pagination_count_authorizedAccesses">
+                <td>{{ item.Name }}<span ng-if="item.Inherited" class="text-muted small"> (inherited)</span></td>
                 <td>
-                  <i class="fa" ng-class="user.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-right: 2px;"></i>
-                  {{ user.Type }}
+                  <i class="fa" ng-class="item.Type === 'user' ? 'fa-user' : 'fa-users'" aria-hidden="true" style="margin-right: 2px;"></i>
+                  {{ item.Type }}
                 </td>
               </tr>
               <tr ng-if="!$ctrl.authorizedAccesses">

@@ -32,9 +32,9 @@ function (AccessService, PaginationService, Notifications) {
 
   function dispatchUserAndTeamIDs(accesses, users, teams) {
     angular.forEach(accesses, function (access) {
-      if (access.Type === 'user') {
+      if (access.Type === 'user' && !access.Inherited) {
         users.push(access.Id);
-      } else if (access.Type === 'team') {
+      } else if (access.Type === 'team' && !access.Inherited) {
         teams.push(access.Id);
       }
     });
@@ -111,11 +111,20 @@ function (AccessService, PaginationService, Notifications) {
     });
   };
 
+  function moveAccesses(source, target) {
+    for (var i = 0; i < source.length; i++) {
+      var access = source[i];
+      if (!access.Inherited) {
+        target.push(access);
+        source.splice(i, 1);
+      }
+    }
+  }
+
   ctrl.unauthorizeAllAccesses = function() {
     ctrl.updateAccess({ userAccesses: [], teamAccesses: [] })
     .then(function success(data) {
-      ctrl.accesses = ctrl.accesses.concat(ctrl.authorizedAccesses);
-      ctrl.authorizedAccesses = [];
+      moveAccesses(ctrl.authorizedAccesses, ctrl.accesses);
       Notifications.success('Accesses successfully updated');
     })
     .catch(function error(err) {
@@ -130,8 +139,7 @@ function (AccessService, PaginationService, Notifications) {
 
     ctrl.updateAccess({ userAccesses: authorizedUserIDs, teamAccesses: authorizedTeamIDs })
     .then(function success(data) {
-      ctrl.authorizedAccesses = ctrl.authorizedAccesses.concat(ctrl.accesses);
-      ctrl.accesses = [];
+      moveAccesses(ctrl.accesses, ctrl.authorizedAccesses);
       Notifications.success('Accesses successfully updated');
     })
     .catch(function error(err) {
@@ -141,7 +149,8 @@ function (AccessService, PaginationService, Notifications) {
 
   function initComponent() {
     var entity = ctrl.accessControlledEntity;
-    AccessService.accesses(entity.AuthorizedUsers, entity.AuthorizedTeams)
+    var parent = ctrl.inheritFrom;
+    AccessService.accesses(entity.AuthorizedUsers, entity.AuthorizedTeams, parent ? parent.AuthorizedUsers: [], parent ? parent.AuthorizedTeams : [])
     .then(function success(data) {
       ctrl.accesses = data.accesses;
       ctrl.authorizedAccesses = data.authorizedAccesses;

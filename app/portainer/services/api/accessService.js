@@ -3,33 +3,30 @@ angular.module('portainer.app')
   'use strict';
   var service = {};
 
-  function mapAccessDataFromAuthorizedIDs(userAccesses, teamAccesses, authorizedUserIDs, authorizedTeamIDs) {
-    var accesses = [];
+  function mapAccessData(accesses, authorizedIDs, inheritedIDs) {
+    var availableAccesses = [];
     var authorizedAccesses = [];
 
-    angular.forEach(userAccesses, function(access) {
-      if (_.includes(authorizedUserIDs, access.Id)) {
-        authorizedAccesses.push(access);
-      } else {
-        accesses.push(access);
-      }
-    });
+    for (var i = 0; i < accesses.length; i++) {
 
-    angular.forEach(teamAccesses, function(access) {
-      if (_.includes(authorizedTeamIDs, access.Id)) {
+      var access = accesses[i];
+      if (_.includes(authorizedIDs, access.Id)) {
+        authorizedAccesses.push(access);
+      } else if (_.includes(inheritedIDs, access.Id)) {
+        access.Inherited = true;
         authorizedAccesses.push(access);
       } else {
-        accesses.push(access);
+        availableAccesses.push(access);
       }
-    });
+    }
 
     return {
-      accesses: accesses,
+      accesses: availableAccesses,
       authorizedAccesses: authorizedAccesses
     };
   }
 
-  service.accesses = function(authorizedUserIDs, authorizedTeamIDs) {
+  service.accesses = function(authorizedUserIDs, authorizedTeamIDs, inheritedUserIDs, inheritedTeamIDs) {
     var deferred = $q.defer();
 
     $q.all({
@@ -44,7 +41,14 @@ angular.module('portainer.app')
         return new TeamAccessViewModel(team);
       });
 
-      var accessData = mapAccessDataFromAuthorizedIDs(userAccesses, teamAccesses, authorizedUserIDs, authorizedTeamIDs);
+      var userAccessData = mapAccessData(userAccesses, authorizedUserIDs, inheritedUserIDs);
+      var teamAccessData = mapAccessData(teamAccesses, authorizedTeamIDs, inheritedTeamIDs);
+
+      var accessData = {
+        accesses: userAccessData.accesses.concat(teamAccessData.accesses),
+        authorizedAccesses: userAccessData.authorizedAccesses.concat(teamAccessData.authorizedAccesses)
+      };
+
       deferred.resolve(accessData);
     })
     .catch(function error(err) {

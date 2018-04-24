@@ -3,6 +3,7 @@ angular.module('portainer.app').component('porAccessManagement', {
   controller: 'porAccessManagementController',
   bindings: {
     accessControlledEntity: '<',
+    inheritFrom: '<',
     updateAccess: '&'
   }
 });
