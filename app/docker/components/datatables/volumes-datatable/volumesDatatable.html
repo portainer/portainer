@@ -87,8 +87,8 @@
               <th>
                 <a ng-click="$ctrl.changeOrderBy('NodeName')">
                   Host
-                  <i class="fa fa-sort-alpha-asc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-desc" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th ng-if="$ctrl.showOwnershipColumn">
