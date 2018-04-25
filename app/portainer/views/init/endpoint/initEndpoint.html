@@ -1,7 +1,7 @@
 <div class="page-wrapper">
   <!-- simple box -->
   <div class="container simple-box">
-    <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+    <div class="col-sm-10 col-sm-offset-1">
       <!-- simple box logo -->
       <div class="row">
         <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
@@ -29,20 +29,30 @@
                   <input type="radio" id="local_endpoint" ng-model="formValues.EndpointType" value="local">
                   <label for="local_endpoint">
                     <div class="boxselector_header">
-                      <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
+                      <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
                       Local
                     </div>
-                    <p>Manage the Docker environment where Portainer is running</p>
+                    <p>Manage the local Docker environment</p>
                   </label>
                 </div>
                 <div>
                   <input type="radio" id="remote_endpoint" ng-model="formValues.EndpointType" value="remote">
                   <label for="remote_endpoint">
                     <div class="boxselector_header">
-                      <i class="fa fa-plug" aria-hidden="true" style="margin-right: 2px;"></i>
+                      <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
                       Remote
                     </div>
                     <p>Manage a remote Docker environment</p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="agent_endpoint" ng-model="formValues.EndpointType" value="agent">
+                  <label for="agent_endpoint">
+                    <div class="boxselector_header">
+                      <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Agent
+                    </div>
+                    <p>Connect to a Portainer agent</p>
                   </label>
                 </div>
               </div>
@@ -50,15 +60,18 @@
             <!-- !endpoint-type  -->
             <!-- local-endpoint -->
             <div ng-if="formValues.EndpointType === 'local'">
+              <div class="col-sm-12 form-section-title">
+                Information
+              </div>
               <div class="form-group">
                 <div class="col-sm-12">
                   <span class="small">
-                    <p class="text-muted">
-                      <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      This feature is not yet available for <u>native Docker Windows containers</u>.
-                    </p>
                     <p class="text-primary">
-                      Please ensure that you have started the Portainer container with the following Docker flag <code>-v "/var/run/docker.sock:/var/run/docker.sock"</code> in order to connect to the local Docker environment.
+                      Manage the Docker environment where Portainer is running using the Unix filesystem socket.
+                    </p>
+                    <p class="text-muted">
+                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Ensure that you have started the Portainer container with the following Docker flag: <code>-v "/var/run/docker.sock:/var/run/docker.sock"</code>.
                     </p>
                   </span>
                 </div>
@@ -75,8 +88,80 @@
               <!-- !actions -->
             </div>
             <!-- !local-endpoint -->
+            <!-- agent-endpoint -->
+            <div ng-if="formValues.EndpointType === 'agent'">
+              <div class="col-sm-12 form-section-title">
+                Information
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <span class="small">
+                    <p class="text-primary">
+                      Connect directly to a Portainer agent running inside a Swarm cluster.
+                    </p>
+                    <p class="text-muted">
+                      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                      If you have started Portainer in the same overlay network as the agent, you can use <code>tasks.AGENT_SERVICE_NAME:AGENT_SERVICE_PORT</code> as the
+                      endpoint URL format.
+                    </p>
+                  </span>
+                </div>
+              </div>
+              <div class="col-sm-12 form-section-title">
+                Environment
+              </div>
+              <!-- name-input -->
+              <div class="form-group">
+                <label for="endpoint_name" class="col-sm-4 col-lg-3 control-label text-left">Name</label>
+                <div class="col-sm-8 col-lg-9">
+                  <input type="text" class="form-control" id="endpoint_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01">
+                </div>
+              </div>
+              <!-- !name-input -->
+              <!-- endpoint-url-input -->
+              <div class="form-group">
+                <label for="endpoint_url" class="col-sm-4 col-lg-3 control-label text-left">
+                  Agent URL
+                  <portainer-tooltip position="bottom" message="URL or IP address of a Portainer agent."></portainer-tooltip>
+                </label>
+                <div class="col-sm-8 col-lg-9">
+                  <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:9001 or tasks.portainer_agent:9001">
+                </div>
+              </div>
+              <!-- !endpoint-url-input -->
+              <!-- actions -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL" ng-click="createAgentEndpoint()" button-spinner="state.actionInProgress">
+                    <span ng-hide="state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
+                    <span ng-show="state.actionInProgress">Connecting...</span>
+                  </button>
+                </div>
+              </div>
+              <!-- !actions -->
+            </div>
+            <!-- !agent-endpoint -->
             <!-- remote-endpoint -->
             <div ng-if="formValues.EndpointType === 'remote'">
+              <div class="col-sm-12 form-section-title">
+                Information
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <span class="small">
+                    <p class="text-primary">
+                      Connect Portainer to a remote Docker environment using the Docker API over TCP.
+                    </p>
+                    <p class="text-muted">
+                      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                      The Docker API must be exposed over TCP. You can find more information about how to expose the Docker API over TCP <a href="https://docs.docker.com/engine/security/https/" target="_blank">in the Docker documentation</a>.
+                    </p>
+                  </span>
+                </div>
+              </div>
+              <div class="col-sm-12 form-section-title">
+                Environment
+              </div>
               <!-- name-input -->
               <div class="form-group">
                 <label for="endpoint_name" class="col-sm-4 col-lg-3 control-label text-left">Name</label>
@@ -89,7 +174,7 @@
               <div class="form-group">
                 <label for="endpoint_url" class="col-sm-4 col-lg-3 control-label text-left">
                   Endpoint URL
-                  <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
+                  <portainer-tooltip position="bottom" message="URL or IP address of a Docker host with API exposed over TCP."></portainer-tooltip>
                 </label>
                 <div class="col-sm-8 col-lg-9">
                   <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">

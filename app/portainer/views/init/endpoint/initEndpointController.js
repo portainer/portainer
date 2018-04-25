@@ -52,6 +52,14 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     });
   };
 
+  $scope.createAgentEndpoint = function() {
+    var name = $scope.formValues.Name;
+    var URL = $scope.formValues.URL;
+    var PublicURL = URL.split(':')[0];
+
+    createRemoteEndpoint(name, URL, PublicURL, true, true, true, null, null, null);
+  };
+
   $scope.createRemoteEndpoint = function() {
     var name = $scope.formValues.Name;
     var URL = $scope.formValues.URL;
@@ -63,6 +71,10 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var TLSCertFile = TLSSKipClientVerify ? null : $scope.formValues.TLSCert;
     var TLSKeyFile = TLSSKipClientVerify ? null : $scope.formValues.TLSKey;
 
+    createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+  };
+
+  function createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var endpoint;
     $scope.state.actionInProgress = true;
     EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
@@ -84,5 +96,5 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     .finally(function final() {
       $scope.state.actionInProgress = false;
     });
-  };
+  }
 }]);

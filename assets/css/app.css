@@ -119,6 +119,10 @@ a[ng-click]{
   color: white;
 }
 
+.fa.blue-icon {
+  color: #337ab7;
+}
+
 .widget .widget-body table tbody .image-tag {
   font-size: 90% !important;
   margin-right: 5px;
@@ -133,7 +137,7 @@ a[ng-click]{
 }
 
 .widget .widget-body table tbody td {
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .template-widget {

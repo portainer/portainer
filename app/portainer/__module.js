@@ -121,6 +121,17 @@ angular.module('portainer.app', [])
     }
   };
 
+  var endpointCreation  = {
+    name: 'portainer.endpoints.new',
+    url: '/new',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/endpoints/create/createendpoint.html',
+        controller: 'CreateEndpointController'
+      }
+    }
+  };
+
   var endpointAccess = {
     name: 'portainer.endpoints.endpoint.access',
     url: '/access',
@@ -253,6 +264,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(endpoints);
   $stateRegistryProvider.register(endpoint);
   $stateRegistryProvider.register(endpointAccess);
+  $stateRegistryProvider.register(endpointCreation);
   $stateRegistryProvider.register(registries);
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);

@@ -16,6 +16,9 @@
           ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.endpoints.new">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add endpoint
+        </button>
       </div>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
