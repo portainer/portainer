@@ -224,7 +224,7 @@ paths:
         **Access policy**: administrator
       operationId: "EndpointCreate"
       consumes:
-      - "application/json"
+      - "multipart/form-data"
       produces:
       - "application/json"
       parameters:
@@ -2455,6 +2455,15 @@ definitions:
         type: "boolean"
         example: false
         description: "Skip client verification when using TLS"
+      TLSCACertFile:
+        type: "file"
+        description: "TLS CA certificate file"
+      TLSCertFile:
+        type: "file"
+        description: "TLS client certificate file"
+      TLSKeyFile:
+        type: "file"
+        description: "TLS client key file"    
   EndpointCreateResponse:
     type: "object"
     properties:
