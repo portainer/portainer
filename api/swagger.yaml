@@ -2603,7 +2603,8 @@ definitions:
       ResourceID:
         type: "string"
         example: "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
-        description: "Docker resource identifier on which access control will be applied"
+        description: "Docker resource identifier on which access control will be applied.\
+          \ In the case of a resource control applied to a stack, use the stack name as identifier"
       Type:
         type: "string"
         example: "container"
