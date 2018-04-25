@@ -85,6 +85,7 @@ func (server *Server) Start() error {
 	dockerHandler.ProxyManager = proxyManager
 	var websocketHandler = handler.NewWebSocketHandler()
 	websocketHandler.EndpointService = server.EndpointService
+	websocketHandler.SignatureService = server.SignatureService
 	var endpointHandler = handler.NewEndpointHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.FileService = server.FileService

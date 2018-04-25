@@ -426,6 +426,8 @@ const (
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
+	// PortainerAgentTargetHeader represent the name of the header containing the target node name.
+	PortainerAgentTargetHeader = "X-PortainerAgent-Target"
 	// PortainerAgentSignatureHeader represent the name of the header containing the digital signature
 	PortainerAgentSignatureHeader = "X-PortainerAgent-Signature"
 	// PortainerAgentPublicKeyHeader represent the name of the header containing the public key

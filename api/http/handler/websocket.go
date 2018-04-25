@@ -29,6 +29,7 @@ type (
 		*mux.Router
 		Logger             *log.Logger
 		EndpointService    portainer.EndpointService
+		SignatureService   portainer.DigitalSignatureService
 		connectionUpgrader websocket.Upgrader
 	}
 
@@ -94,7 +95,7 @@ func (handler *WebSocketHandler) handleWebsocketExec(w http.ResponseWriter, r *h
 
 func (handler *WebSocketHandler) handleRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
 	if params.nodeName != "" {
-		return proxyWebsocketRequest(w, r, params)
+		return handler.proxyWebsocketRequest(w, r, params)
 	}
 
 	websocketConn, err := handler.connectionUpgrader.Upgrade(w, r, nil)
@@ -106,7 +107,7 @@ func (handler *WebSocketHandler) handleRequest(w http.ResponseWriter, r *http.Re
 	return hijackExecStartOperation(websocketConn, params.endpoint, params.execID)
 }
 
-func proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
+func (handler *WebSocketHandler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
 	agentURL, err := url.Parse(params.endpoint.URL)
 	if err != nil {
 		return err
@@ -124,8 +125,16 @@ func proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSo
 		}
 	}
 
+	signature, err := handler.SignatureService.Sign(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return err
+	}
+
+	signatureHeader := fmt.Sprintf("%x", signature)
+
 	proxy.Director = func(incoming *http.Request, out http.Header) {
-		out.Set("X-PortainerAgent-Target", params.nodeName)
+		out.Set(portainer.PortainerAgentSignatureHeader, signatureHeader)
+		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
 	}
 
 	r.Header.Del("Origin")
