@@ -96,9 +96,17 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	// https://github.com/portainer/portainer/issues/461
+	// https: //github.com/portainer/portainer/issues/1396
 	if m.CurrentDBVersion < 9 {
 		err := m.updateEndpointsToVersion9()
+		if err != nil {
+			return err
+		}
+	}
+
+	// https://github.com/portainer/portainer/issues/461
+	if m.CurrentDBVersion < 10 {
+		err := m.updateEndpointsToVersion10()
 		if err != nil {
 			return err
 		}

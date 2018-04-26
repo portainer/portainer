@@ -9,7 +9,7 @@ func (m *Migrator) updateEndpointsToVersion9() error {
 	}
 
 	for _, endpoint := range legacyEndpoints {
-		endpoint.Type = portainer.DockerEnvironment
+		endpoint.GroupID = portainer.EndpointGroupID(1)
 		err = m.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {
 			return err

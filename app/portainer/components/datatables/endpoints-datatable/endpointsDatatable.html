@@ -46,6 +46,13 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('GroupName')">
+                  Group
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'GroupName' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'GroupName' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -60,6 +67,7 @@
                 <span ng-if="!$ctrl.endpointManagement">{{ item.Name }}</span>
               </td>
               <td>{{ item.URL | stripprotocol }}</td>
+              <td>{{ item.GroupName }}</td>
               <td>
                 <a ui-sref="portainer.endpoints.endpoint.access({id: item.Id})" ng-if="$ctrl.accessManagement">
                   <i class="fa fa-users" aria-hidden="true"></i> Manage access

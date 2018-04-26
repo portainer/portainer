@@ -20,6 +20,9 @@ angular.module('portainer')
       }]
     });
     $httpProvider.interceptors.push('jwtInterceptor');
+    $httpProvider.defaults.headers.post['Content-Type'] = 'application/json';
+    $httpProvider.defaults.headers.put['Content-Type'] = 'application/json';
+    $httpProvider.defaults.headers.patch['Content-Type'] = 'application/json';
 
     $httpProvider.interceptors.push(['HttpRequestHelper', function(HttpRequestHelper) {
       return {

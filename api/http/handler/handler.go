@@ -19,6 +19,7 @@ type Handler struct {
 	TeamHandler           *TeamHandler
 	TeamMembershipHandler *TeamMembershipHandler
 	EndpointHandler       *EndpointHandler
+	EndpointGroupHandler  *EndpointGroupHandler
 	RegistryHandler       *RegistryHandler
 	DockerHubHandler      *DockerHubHandler
 	ExtensionHandler      *ExtensionHandler
@@ -51,6 +52,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/dockerhub"):
 		http.StripPrefix("/api", h.DockerHubHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/endpoint_groups"):
+		http.StripPrefix("/api", h.EndpointGroupHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/endpoints"):
 		switch {
 		case strings.Contains(r.URL.Path, "/docker/"):

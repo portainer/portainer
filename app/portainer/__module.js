@@ -143,6 +143,50 @@ angular.module('portainer.app', [])
     }
   };
 
+  var groups = {
+    name: 'portainer.groups',
+    url: '/groups',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/groups/groups.html',
+        controller: 'GroupsController'
+      }
+    }
+  };
+
+  var group = {
+    name: 'portainer.groups.group',
+    url: '/:id',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/groups/edit/group.html',
+        controller: 'GroupController'
+      }
+    }
+  };
+
+  var groupCreation = {
+    name: 'portainer.groups.new',
+    url: '/new',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/groups/create/creategroup.html',
+        controller: 'CreateGroupController'
+      }
+    }
+  };
+
+  var groupAccess = {
+    name: 'portainer.groups.group.access',
+    url: '/access',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/groups/access/groupAccess.html',
+        controller: 'GroupAccessController'
+      }
+    }
+  };
+
   var registries = {
     name: 'portainer.registries',
     url: '/registries',
@@ -265,6 +309,10 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(endpoint);
   $stateRegistryProvider.register(endpointAccess);
   $stateRegistryProvider.register(endpointCreation);
+  $stateRegistryProvider.register(groups);
+  $stateRegistryProvider.register(group);
+  $stateRegistryProvider.register(groupAccess);
+  $stateRegistryProvider.register(groupCreation);
   $stateRegistryProvider.register(registries);
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);

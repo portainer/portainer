@@ -6,7 +6,7 @@
 </rd-header>
 
 <div class="row" ng-if="endpoint">
-  <div class="col-lg-12 col-md-12 col-xs-12">
+  <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-plug" title="Endpoint"></rd-widget-header>
       <rd-widget-body classes="no-padding">
@@ -25,11 +25,9 @@
               </td>
             </tr>
             <tr>
-              <td colspan="2">
-                <span class="small text-muted">
-                  You can select which user or team can access this endpoint by moving them to the authorized accesses table. Simply click
-                  on a user or team entry to move it from one table to the other.
-                </span>
+              <td>Group</td>
+              <td>
+                <a ui-sref="portainer.groups.group({ id: group.Id })">{{ group.Name }}</a>
               </td>
             </tr>
           </tbody>
@@ -39,5 +37,10 @@
   </div>
 </div>
 
-<por-access-management ng-if="endpoint" access-controlled-entity="endpoint" update-access="updateAccess(userAccesses, teamAccesses)">
-</por-access-management>
+<div class="row" ng-if="endpoint && group">
+  <div class="col-sm-12">
+    <por-access-management
+      access-controlled-entity="endpoint" entity-type="endpoint" inherit-from="group" update-access="updateAccess(userAccesses, teamAccesses)"
+    ></por-access-management>
+  </div>
+</div>

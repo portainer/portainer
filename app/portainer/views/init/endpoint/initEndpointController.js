@@ -31,7 +31,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var endpoint;
 
     $scope.state.actionInProgress = true;
-    EndpointService.createLocalEndpoint(name, URL, false, true)
+    EndpointService.createLocalEndpoint()
     .then(function success(data) {
       endpoint = data;
       EndpointProvider.setEndpointID(endpoint.Id);
@@ -77,7 +77,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
   function createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var endpoint;
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, 1, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       endpoint = data;
       EndpointProvider.setEndpointID(endpoint.Id);

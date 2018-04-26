@@ -179,6 +179,7 @@ type (
 		Name            string              `json:"Name"`
 		Type            EndpointType        `json:"Type"`
 		URL             string              `json:"URL"`
+		GroupID         EndpointGroupID     `json:"GroupId"`
 		PublicURL       string              `json:"PublicURL"`
 		TLSConfig       TLSConfiguration    `json:"TLSConfig"`
 		AuthorizedUsers []UserID            `json:"AuthorizedUsers"`
@@ -191,6 +192,19 @@ type (
 		TLSCACertPath string `json:"TLSCACert,omitempty"`
 		TLSCertPath   string `json:"TLSCert,omitempty"`
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
+	}
+
+	// EndpointGroupID represents an endpoint group identifier.
+	EndpointGroupID int
+
+	// EndpointGroup represents a group of endpoints.
+	EndpointGroup struct {
+		ID              EndpointGroupID `json:"Id"`
+		Name            string          `json:"Name"`
+		Description     string          `json:"Description"`
+		AuthorizedUsers []UserID        `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID        `json:"AuthorizedTeams"`
+		Labels          []Pair          `json:"Labels"`
 	}
 
 	// EndpointExtension represents a extension associated to an endpoint.
@@ -253,6 +267,7 @@ type (
 	// DataStore defines the interface to manage the data.
 	DataStore interface {
 		Open() error
+		Init() error
 		Close() error
 		MigrateData() error
 	}
@@ -304,6 +319,15 @@ type (
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
+	}
+
+	// EndpointGroupService represents a service for managing endpoint group data.
+	EndpointGroupService interface {
+		EndpointGroup(ID EndpointGroupID) (*EndpointGroup, error)
+		EndpointGroups() ([]EndpointGroup, error)
+		CreateEndpointGroup(group *EndpointGroup) error
+		UpdateEndpointGroup(ID EndpointGroupID, group *EndpointGroup) error
+		DeleteEndpointGroup(ID EndpointGroupID) error
 	}
 
 	// RegistryService represents a service for managing registry data.
@@ -421,7 +445,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.16.5"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 9
+	DBVersion = 10
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response

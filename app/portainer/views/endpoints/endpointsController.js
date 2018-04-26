@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('EndpointsController', ['$scope', '$state', 'EndpointService', 'Notifications',
-function ($scope, $state, EndpointService, Notifications) {
+.controller('EndpointsController', ['$q', '$scope', '$state', 'EndpointService', 'GroupService', 'EndpointHelper', 'Notifications',
+function ($q, $scope, $state, EndpointService, GroupService, EndpointHelper, Notifications) {
 
   $scope.removeAction = function (selectedItems) {
     var actionCount = selectedItems.length;
@@ -24,12 +24,19 @@ function ($scope, $state, EndpointService, Notifications) {
   };
 
   function initView() {
-    EndpointService.endpoints()
+    $q.all({
+      endpoints: EndpointService.endpoints(),
+      groups: GroupService.groups()
+    })
     .then(function success(data) {
-      $scope.endpoints = data;
+      var endpoints = data.endpoints;
+      var groups = data.groups;
+      EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
+      $scope.groups = groups;
+      $scope.endpoints = endpoints;
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+      Notifications.error('Failure', err, 'Unable to load view');
     });
   }
 

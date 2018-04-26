@@ -22,6 +22,7 @@ type Server struct {
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
 	EndpointService        portainer.EndpointService
+	EndpointGroupService   portainer.EndpointGroupService
 	ResourceControlService portainer.ResourceControlService
 	SettingsService        portainer.SettingsService
 	CryptoService          portainer.CryptoService
@@ -81,6 +82,7 @@ func (server *Server) Start() error {
 	templatesHandler.SettingsService = server.SettingsService
 	var dockerHandler = handler.NewDockerHandler(requestBouncer)
 	dockerHandler.EndpointService = server.EndpointService
+	dockerHandler.EndpointGroupService = server.EndpointGroupService
 	dockerHandler.TeamMembershipService = server.TeamMembershipService
 	dockerHandler.ProxyManager = proxyManager
 	var websocketHandler = handler.NewWebSocketHandler()
@@ -88,8 +90,12 @@ func (server *Server) Start() error {
 	websocketHandler.SignatureService = server.SignatureService
 	var endpointHandler = handler.NewEndpointHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.EndpointService = server.EndpointService
+	endpointHandler.EndpointGroupService = server.EndpointGroupService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = proxyManager
+	var endpointGroupHandler = handler.NewEndpointGroupHandler(requestBouncer)
+	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
+	endpointGroupHandler.EndpointService = server.EndpointService
 	var registryHandler = handler.NewRegistryHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
 	var dockerHubHandler = handler.NewDockerHubHandler(requestBouncer)
@@ -112,6 +118,7 @@ func (server *Server) Start() error {
 	extensionHandler.ProxyManager = proxyManager
 	var storidgeHandler = extensions.NewStoridgeHandler(requestBouncer)
 	storidgeHandler.EndpointService = server.EndpointService
+	storidgeHandler.EndpointGroupService = server.EndpointGroupService
 	storidgeHandler.TeamMembershipService = server.TeamMembershipService
 	storidgeHandler.ProxyManager = proxyManager
 
@@ -121,6 +128,7 @@ func (server *Server) Start() error {
 		TeamHandler:           teamHandler,
 		TeamMembershipHandler: teamMembershipHandler,
 		EndpointHandler:       endpointHandler,
+		EndpointGroupHandler:  endpointGroupHandler,
 		RegistryHandler:       registryHandler,
 		DockerHubHandler:      dockerHubHandler,
 		ResourceHandler:       resourceHandler,

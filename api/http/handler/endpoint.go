@@ -27,6 +27,7 @@ type EndpointHandler struct {
 	Logger                      *log.Logger
 	authorizeEndpointManagement bool
 	EndpointService             portainer.EndpointService
+	EndpointGroupService        portainer.EndpointGroupService
 	FileService                 portainer.FileService
 	ProxyManager                *proxy.Manager
 }
@@ -70,6 +71,7 @@ type (
 		Name                string `valid:"-"`
 		URL                 string `valid:"-"`
 		PublicURL           string `valid:"-"`
+		GroupID             int    `valid:"-"`
 		TLS                 bool   `valid:"-"`
 		TLSSkipVerify       bool   `valid:"-"`
 		TLSSkipClientVerify bool   `valid:"-"`
@@ -79,6 +81,7 @@ type (
 		name                      string
 		url                       string
 		publicURL                 string
+		groupID                   int
 		useTLS                    bool
 		skipTLSServerVerification bool
 		skipTLSClientVerification bool
@@ -102,7 +105,13 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 		return
 	}
 
-	filteredEndpoints, err := security.FilterEndpoints(endpoints, securityContext)
+	groups, err := handler.EndpointGroupService.EndpointGroups()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredEndpoints, err := security.FilterEndpoints(endpoints, groups, securityContext)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -131,6 +140,7 @@ func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPa
 		Name:      payload.name,
 		URL:       payload.url,
 		Type:      endpointType,
+		GroupID:   portainer.EndpointGroupID(payload.groupID),
 		PublicURL: payload.publicURL,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS:           payload.useTLS,
@@ -207,6 +217,7 @@ func (handler *EndpointHandler) createUnsecuredEndpoint(payload *postEndpointPay
 		Name:      payload.name,
 		URL:       payload.url,
 		Type:      endpointType,
+		GroupID:   portainer.EndpointGroupID(payload.groupID),
 		PublicURL: payload.publicURL,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
@@ -239,6 +250,17 @@ func convertPostEndpointRequestToPayload(r *http.Request) (*postEndpointPayload,
 
 	if payload.name == "" || payload.url == "" {
 		return nil, ErrInvalidRequestFormat
+	}
+
+	rawGroupID := r.FormValue("GroupID")
+	if rawGroupID == "" {
+		payload.groupID = 1
+	} else {
+		groupID, err := strconv.Atoi(rawGroupID)
+		if err != nil {
+			return nil, err
+		}
+		payload.groupID = groupID
 	}
 
 	payload.useTLS = r.FormValue("TLS") == "true"
@@ -419,6 +441,10 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 
 	if req.PublicURL != "" {
 		endpoint.PublicURL = req.PublicURL
+	}
+
+	if req.GroupID != 0 {
+		endpoint.GroupID = portainer.EndpointGroupID(req.GroupID)
 	}
 
 	folder := strconv.Itoa(int(endpoint.ID))

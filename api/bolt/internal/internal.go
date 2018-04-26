@@ -47,6 +47,16 @@ func UnmarshalEndpoint(data []byte, endpoint *portainer.Endpoint) error {
 	return json.Unmarshal(data, endpoint)
 }
 
+// MarshalEndpointGroup encodes an endpoint group to binary format.
+func MarshalEndpointGroup(group *portainer.EndpointGroup) ([]byte, error) {
+	return json.Marshal(group)
+}
+
+// UnmarshalEndpointGroup decodes an endpoint group from a binary data.
+func UnmarshalEndpointGroup(data []byte, group *portainer.EndpointGroup) error {
+	return json.Unmarshal(data, group)
+}
+
 // MarshalStack encodes a stack to binary format.
 func MarshalStack(stack *portainer.Stack) ([]byte, error) {
 	return json.Marshal(stack)

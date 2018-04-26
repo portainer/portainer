@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('CreateEndpointController', ['$scope', '$state', '$filter', 'EndpointService', 'Notifications',
-function ($scope, $state, $filter, EndpointService, Notifications) {
+.controller('CreateEndpointController', ['$scope', '$state', '$filter', 'EndpointService', 'GroupService', 'Notifications',
+function ($scope, $state, $filter, EndpointService, GroupService, Notifications) {
 
   $scope.state = {
     EnvironmentType: 'docker',
@@ -11,6 +11,7 @@ function ($scope, $state, $filter, EndpointService, Notifications) {
     Name: '',
     URL: '',
     PublicURL: '',
+    GroupId: 1,
     SecurityFormData: new EndpointSecurityFormData()
   };
 
@@ -18,6 +19,7 @@ function ($scope, $state, $filter, EndpointService, Notifications) {
     var name = $scope.formValues.Name;
     var URL = $filter('stripprotocol')($scope.formValues.URL);
     var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
+    var groupId = $scope.formValues.GroupId;
 
     var securityData = $scope.formValues.SecurityFormData;
     var TLS = securityData.TLS;
@@ -28,20 +30,21 @@ function ($scope, $state, $filter, EndpointService, Notifications) {
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-    addEndpoint(name, URL, publicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+    addEndpoint(name, URL, publicURL, groupdId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
   };
 
   $scope.addAgentEndpoint = function() {
     var name = $scope.formValues.Name;
     var URL = $filter('stripprotocol')($scope.formValues.URL);
     var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
+    var groupId = $scope.formValues.GroupId;
 
-    addEndpoint(name, URL, publicURL, true, true, true, null, null, null);
+    addEndpoint(name, URL, publicURL, groupId, true, true, true, null, null, null);
   };
 
-  function addEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  function addEndpoint(name, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success() {
       Notifications.success('Endpoint created', name);
       $state.reload();
@@ -53,4 +56,16 @@ function ($scope, $state, $filter, EndpointService, Notifications) {
       $scope.state.actionInProgress = false;
     });
   }
+
+  function initView() {
+    GroupService.groups()
+    .then(function success(data) {
+      $scope.groups = data;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to load groups');
+    });
+  }
+
+  initView();
 }]);
