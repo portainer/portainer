@@ -277,39 +277,44 @@ func (handler *EndpointGroupHandler) handlePutEndpointGroup(w http.ResponseWrite
 		return
 	}
 
-	// TODO: refactor
 	for _, endpoint := range endpoints {
-		if endpoint.GroupID == groupID {
-			found := false
-			for _, id := range req.AssociatedEndpoints {
-				if id == endpoint.ID {
-					found = true
-				}
-			}
-
-			if !found {
-				endpoint.GroupID = portainer.EndpointGroupID(1)
-				err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
-				if err != nil {
-					httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-					return
-				}
-				break
-			}
-		} else if endpoint.GroupID == portainer.EndpointGroupID(1) {
-			for _, id := range req.AssociatedEndpoints {
-				if id == endpoint.ID {
-					endpoint.GroupID = portainer.EndpointGroupID(groupID)
-					err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
-					if err != nil {
-						httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-						return
-					}
-					break
-				}
-			}
+		err = handler.updateEndpointGroup(endpoint, groupID, req.AssociatedEndpoints)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+			return
 		}
 	}
+}
+
+func (handler *EndpointGroupHandler) updateEndpointGroup(endpoint portainer.Endpoint, groupID portainer.EndpointGroupID, associatedEndpoints []portainer.EndpointID) error {
+	if endpoint.GroupID == groupID {
+		return handler.checkForGroupUnassignment(endpoint, associatedEndpoints)
+	} else if endpoint.GroupID == portainer.EndpointGroupID(1) {
+		return handler.checkForGroupAssignment(endpoint, groupID, associatedEndpoints)
+	}
+	return nil
+}
+
+func (handler *EndpointGroupHandler) checkForGroupUnassignment(endpoint portainer.Endpoint, associatedEndpoints []portainer.EndpointID) error {
+	for _, id := range associatedEndpoints {
+		if id == endpoint.ID {
+			return nil
+		}
+	}
+
+	endpoint.GroupID = portainer.EndpointGroupID(1)
+	return handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+}
+
+func (handler *EndpointGroupHandler) checkForGroupAssignment(endpoint portainer.Endpoint, groupID portainer.EndpointGroupID, associatedEndpoints []portainer.EndpointID) error {
+	for _, id := range associatedEndpoints {
+
+		if id == endpoint.ID {
+			endpoint.GroupID = groupID
+			return handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+		}
+	}
+	return nil
 }
 
 // handleDeleteEndpointGroup handles DELETE requests on /endpoint_groups/:id
