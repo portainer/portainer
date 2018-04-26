@@ -12,6 +12,23 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.query({}).$promise;
   };
 
+  service.endpointsByGroup = function(groupId) {
+    var deferred = $q.defer();
+
+    Endpoints.query({}).$promise
+    .then(function success(data) {
+      var endpoints = data.filter(function (endpoint) {
+        return endpoint.GroupId === groupId;
+      });
+      deferred.resolve(endpoints);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve endpoints', err: err});
+    });
+
+    return deferred.promise;
+  };
+
   service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
     return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
   };
@@ -20,6 +37,7 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     var query = {
       name: endpointParams.name,
       PublicURL: endpointParams.PublicURL,
+      GroupId: endpointParams.GroupId,
       TLS: endpointParams.TLS,
       TLSSkipVerify: endpointParams.TLSSkipVerify,
       TLSSkipClientVerify: endpointParams.TLSSkipClientVerify,
@@ -49,10 +67,10 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.remove({id: endpointID}).$promise;
   };
 
-  service.createLocalEndpoint = function(name, URL, TLS, active) {
+  service.createLocalEndpoint = function() {
     var deferred = $q.defer();
 
-    FileUploadService.createEndpoint('local', 'unix:///var/run/docker.sock', '', false)
+    FileUploadService.createEndpoint('local', 'unix:///var/run/docker.sock', '', 1, false)
     .then(function success(response) {
       deferred.resolve(response.data);
     })
@@ -63,10 +81,10 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return deferred.promise;
   };
 
-  service.createRemoteEndpoint = function(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  service.createRemoteEndpoint = function(name, URL, PublicURL, groupID, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var deferred = $q.defer();
 
-    FileUploadService.createEndpoint(name, 'tcp://' + URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    FileUploadService.createEndpoint(name, 'tcp://' + URL, PublicURL, groupID, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(response) {
       deferred.resolve(response.data);
     })

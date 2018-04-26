@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('EndpointsController', ['$scope', '$state', '$filter',  'EndpointService', 'Notifications',
-function ($scope, $state, $filter, EndpointService, Notifications) {
+.controller('EndpointsController', ['$q', '$scope', '$state', '$filter',  'EndpointService', 'GroupService', 'EndpointHelper', 'Notifications',
+function ($q, $scope, $state, $filter, EndpointService, GroupService, EndpointHelper, Notifications) {
   $scope.state = {
     uploadInProgress: false,
     actionInProgress: false
@@ -10,6 +10,7 @@ function ($scope, $state, $filter, EndpointService, Notifications) {
     Name: '',
     URL: '',
     PublicURL: '',
+    GroupId: 1,
     SecurityFormData: new EndpointSecurityFormData()
   };
 
@@ -20,6 +21,7 @@ function ($scope, $state, $filter, EndpointService, Notifications) {
     if (PublicURL === '') {
       PublicURL = URL.split(':')[0];
     }
+    var groupId = $scope.formValues.GroupId;
 
     var securityData = $scope.formValues.SecurityFormData;
     var TLS = securityData.TLS;
@@ -31,7 +33,7 @@ function ($scope, $state, $filter, EndpointService, Notifications) {
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success() {
       Notifications.success('Endpoint created', name);
       $state.reload();
@@ -65,16 +67,22 @@ function ($scope, $state, $filter, EndpointService, Notifications) {
     });
   };
 
-  function fetchEndpoints() {
-    EndpointService.endpoints()
+  function initView() {
+    $q.all({
+      endpoints: EndpointService.endpoints(),
+      groups: GroupService.groups()
+    })
     .then(function success(data) {
-      $scope.endpoints = data;
+      var endpoints = data.endpoints;
+      var groups = data.groups;
+      EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
+      $scope.groups = groups;
+      $scope.endpoints = endpoints;
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve endpoints');
-      $scope.endpoints = [];
+      Notifications.error('Failure', err, 'Unable to load view');
     });
   }
 
-  fetchEndpoints();
+  initView();
 }]);

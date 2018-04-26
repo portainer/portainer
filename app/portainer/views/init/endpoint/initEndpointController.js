@@ -31,7 +31,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var endpointID = 1;
 
     $scope.state.actionInProgress = true;
-    EndpointService.createLocalEndpoint(name, URL, false, true)
+    EndpointService.createLocalEndpoint()
     .then(function success(data) {
       endpointID = data.Id;
       EndpointProvider.setEndpointID(endpointID);

@@ -42,13 +42,14 @@ angular.module('portainer.app')
     });
   };
 
-  service.createEndpoint = function(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  service.createEndpoint = function(name, URL, PublicURL, groupID, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     return Upload.upload({
       url: 'api/endpoints',
       data: {
         Name: name,
         URL: URL,
         PublicURL: PublicURL,
+        GroupID: groupID,
         TLS: TLS,
         TLSSkipVerify: TLSSkipVerify,
         TLSSkipClientVerify: TLSSkipClientVerify,

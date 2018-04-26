@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
-function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
+.controller('SidebarController', ['$q', '$scope', '$state', 'EndpointService', 'GroupService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
+function ($q, $scope, $state, EndpointService, GroupService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
 
   $scope.switchEndpoint = function(endpoint) {
     var activeEndpointID = EndpointProvider.endpointID();
@@ -25,16 +25,6 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     });
   };
 
-  function setActiveEndpoint(endpoints) {
-    var activeEndpointID = EndpointProvider.endpointID();
-    angular.forEach(endpoints, function (endpoint) {
-      if (endpoint.Id === activeEndpointID) {
-        $scope.activeEndpoint = endpoint;
-        EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-      }
-    });
-  }
-
   function checkPermissions(memberships) {
     var isLeader = false;
     angular.forEach(memberships, function(membership) {
@@ -49,13 +39,24 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     $scope.uiVersion = StateManager.getState().application.version;
     $scope.displayExternalContributors = StateManager.getState().application.displayExternalContributors;
     $scope.logo = StateManager.getState().application.logo;
-    $scope.endpoints = [];
 
-    EndpointService.endpoints()
+    $q.all({
+      endpoints: EndpointService.endpoints(),
+      groups: GroupService.groups()
+    })
     .then(function success(data) {
-      var endpoints = data;
-      $scope.endpoints = _.sortBy(endpoints, ['Name']);
-      setActiveEndpoint(endpoints);
+      var endpoints = data.endpoints;
+      $scope.groups = data.groups;
+      $scope.endpoints = endpoints;
+
+      var activeEndpointID = EndpointProvider.endpointID();
+      for (var i = 0; i < endpoints.length; i++) {
+        var endpoint = endpoints[i];
+        if (endpoint.Id === activeEndpointID) {
+          $scope.activeEndpoint = endpoint;
+          break;
+        }
+      }
 
       if (StateManager.getState().application.authentication) {
         var userDetails = Authentication.getUserDetails();

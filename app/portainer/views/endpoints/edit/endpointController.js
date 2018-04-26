@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('EndpointController', ['$scope', '$state', '$transition$', '$filter', 'EndpointService', 'Notifications',
-function ($scope, $state, $transition$, $filter, EndpointService, Notifications) {
+.controller('EndpointController', ['$q', '$scope', '$state', '$transition$', '$filter', 'EndpointService', 'GroupService', 'EndpointProvider', 'Notifications',
+function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupService, EndpointProvider, Notifications) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('portainer.endpoints');
@@ -27,6 +27,7 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications)
       name: endpoint.Name,
       URL: endpoint.URL,
       PublicURL: endpoint.PublicURL,
+      GroupId: endpoint.GroupId,
       TLS: TLS,
       TLSSkipVerify: TLSSkipVerify,
       TLSSkipClientVerify: TLSSkipClientVerify,
@@ -40,7 +41,8 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications)
     EndpointService.updateEndpoint(endpoint.Id, endpointParams)
     .then(function success(data) {
       Notifications.success('Endpoint updated', $scope.endpoint.Name);
-      $state.go('portainer.endpoints');
+      EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+      $state.go('portainer.endpoints', {}, {reload: true});
     }, function error(err) {
       Notifications.error('Failure', err, 'Unable to update endpoint');
       $scope.state.actionInProgress = false;
@@ -52,9 +54,12 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications)
   };
 
   function initView() {
-    EndpointService.endpoint($transition$.params().id)
+    $q.all({
+      endpoint: EndpointService.endpoint($transition$.params().id),
+      groups: GroupService.groups()
+    })
     .then(function success(data) {
-      var endpoint = data;
+      var endpoint = data.endpoint;
       if (endpoint.URL.indexOf('unix://') === 0) {
         $scope.endpointType = 'local';
       } else {
@@ -62,6 +67,7 @@ function ($scope, $state, $transition$, $filter, EndpointService, Notifications)
       }
       endpoint.URL = $filter('stripprotocol')(endpoint.URL);
       $scope.endpoint = endpoint;
+      $scope.groups = data.groups;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint details');

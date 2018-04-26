@@ -49,6 +49,11 @@ func initStore(dataStorePath string) *bolt.Store {
 		log.Fatal(err)
 	}
 
+	err = store.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = store.MigrateData()
 	if err != nil {
 		log.Fatal(err)
@@ -275,6 +280,7 @@ func main() {
 		TeamService:            store.TeamService,
 		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
+		EndpointGroupService:   store.EndpointGroupService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,

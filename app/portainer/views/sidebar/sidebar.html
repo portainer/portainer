@@ -9,12 +9,12 @@
   </div>
   <div class="sidebar-content">
   <ul class="sidebar">
-    <li class="sidebar-title"><span>Active endpoint</span></li>
-    <li class="sidebar-title">
-      <select class="select-endpoint form-control" ng-options="endpoint.Name for endpoint in endpoints" ng-model="activeEndpoint" ng-change="switchEndpoint(activeEndpoint)">
-      </select>
-    </li>
-    <li class="sidebar-title"><span>Endpoint actions</span></li>
+    <endpoint-selector ng-if="endpoints && groups"
+      endpoints="endpoints"
+      groups="groups"
+      select-endpoint="switchEndpoint"
+    ></endpoint-selector>
+    <li class="sidebar-title"><span>{{ activeEndpoint.Name }}</span></li>
     <docker-sidebar-content
       endpoint-api-version="applicationState.endpoint.apiVersion"
       swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
@@ -47,6 +47,9 @@
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="portainer.endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug fa-fw"></span></a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.endpoints' || $state.current.name === 'portainer.endpoints.endpoint' || $state.current.name === 'portainer.endpoints.endpoint.access' || $state.current.name === 'portainer.groups' || $state.current.name === 'portainer.groups.group' || $state.current.name === 'portainer.groups.group.access' || $state.current.name === 'portainer.groups.new')">
+        <a ui-sref="portainer.groups" ui-sref-active="active">Groups</a>
+      </div>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="portainer.registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database fa-fw"></span></a>
