@@ -127,16 +127,12 @@ func (handler *EndpointGroupHandler) handlePostEndpointGroups(w http.ResponseWri
 		return
 	}
 
-	for _, id := range req.AssociatedEndpoints {
-		for _, endpoint := range endpoints {
-			if endpoint.ID == id {
-				endpoint.GroupID = endpointGroup.ID
-				err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
-				if err != nil {
-					httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-					return
-				}
-				break
+	for _, endpoint := range endpoints {
+		if endpoint.GroupID == portainer.EndpointGroupID(1) {
+			err = handler.checkForGroupAssignment(endpoint, endpointGroup.ID, req.AssociatedEndpoints)
+			if err != nil {
+				httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+				return
 			}
 		}
 	}
