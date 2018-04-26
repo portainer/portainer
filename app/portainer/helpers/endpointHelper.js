@@ -3,15 +3,18 @@ angular.module('portainer.app')
   'use strict';
   var helper = {};
 
+  function findAssociatedGroup(endpoint, groups) {
+    return _.find(groups, function(group) {
+      return group.Id === endpoint.GroupId;
+    });
+  }
+
   helper.mapGroupNameToEndpoint = function(endpoints, groups) {
     for (var i = 0; i < endpoints.length; i++) {
       var endpoint = endpoints[i];
-      for (var j = 0; j < groups.length; j++) {
-        var group = groups[j];
-        if (endpoint.GroupId === group.Id) {
-          endpoint.GroupName = group.Name;
-          break;
-        }
+      var group = findAssociatedGroup(endpoint, groups);
+      if (group) {
+        endpoint.GroupName = group.Name;
       }
     }
   };
