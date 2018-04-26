@@ -10,10 +10,10 @@ angular.module('portainer.app')
     for (var i = 0; i < accesses.length; i++) {
 
       var access = accesses[i];
-      if (_.includes(authorizedIDs, access.Id)) {
-        authorizedAccesses.push(access);
-      } else if (_.includes(inheritedIDs, access.Id)) {
+      if (_.includes(inheritedIDs, access.Id)) {
         access.Inherited = true;
+        authorizedAccesses.push(access);
+      } else if (_.includes(authorizedIDs, access.Id)) {
         authorizedAccesses.push(access);
       } else {
         availableAccesses.push(access);
