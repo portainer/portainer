@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('EndpointController', ['$q', '$scope', '$state', '$transition$', '$filter', 'EndpointService', 'GroupService', 'Notifications',
-function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupService, Notifications) {
+.controller('EndpointController', ['$q', '$scope', '$state', '$transition$', '$filter', 'EndpointService', 'GroupService', 'EndpointProvider', 'Notifications',
+function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupService, EndpointProvider, Notifications) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('portainer.endpoints');
@@ -41,6 +41,7 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
     EndpointService.updateEndpoint(endpoint.Id, endpointParams)
     .then(function success(data) {
       Notifications.success('Endpoint updated', $scope.endpoint.Name);
+      EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
       $state.go('portainer.endpoints', {}, {reload: true});
     }, function error(err) {
       Notifications.error('Failure', err, 'Unable to update endpoint');
