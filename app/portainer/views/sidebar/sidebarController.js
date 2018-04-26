@@ -1,21 +1,8 @@
 angular.module('portainer.app')
-.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'GroupService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
-function ($q, $scope, $state, Settings, EndpointService, GroupService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
+.controller('SidebarController', ['$q', '$scope', '$state', 'EndpointService', 'GroupService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
+function ($q, $scope, $state, EndpointService, GroupService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
 
   $scope.switchEndpoint = function(endpoint) {
-    switchEndpoint(endpoint);
-  };
-
-  $scope.switchGroup = function(group) {
-    var groupEndpoints = $scope.endpoints.filter(function f(endpoint) {
-      return endpoint.GroupId === group.Id;
-    });
-    $scope.groupEndpoints = groupEndpoints;
-    $scope.activeEndpoint = groupEndpoints[0];
-    switchEndpoint(groupEndpoints[0]);
-  };
-
-  function switchEndpoint(endpoint) {
     var activeEndpointID = EndpointProvider.endpointID();
     var activeEndpointPublicURL = EndpointProvider.endpointPublicURL();
     EndpointProvider.setEndpointID(endpoint.Id);
@@ -36,7 +23,7 @@ function ($q, $scope, $state, Settings, EndpointService, GroupService, StateMana
       StateManager.updateEndpointState(true)
       .then(function success() {});
     });
-  }
+  };
 
   function checkPermissions(memberships) {
     var isLeader = false;
@@ -59,33 +46,17 @@ function ($q, $scope, $state, Settings, EndpointService, GroupService, StateMana
     })
     .then(function success(data) {
       var endpoints = data.endpoints;
-
-      // TODO: helper method? Filter empty groups.
-      var groups = data.groups.filter(function f(group) {
-        for (var i = 0; i < endpoints.length; i++) {
-          var endpoint = endpoints[i];
-          if (endpoint.GroupId === group.Id) {
-            return true;
-          }
-        }
-        return false;
-      });
-
+      $scope.groups = data.groups;
       $scope.endpoints = endpoints;
 
       var activeEndpointID = EndpointProvider.endpointID();
-      var activeEndpoint = _.find(endpoints, { Id: activeEndpointID });
-      EndpointProvider.setEndpointPublicURL(activeEndpoint.PublicURL);
-
-      var activeGroup = _.find(groups, { Id: activeEndpoint.GroupId });
-      var groupEndpoints = endpoints.filter(function f(endpoint) {
-        return endpoint.GroupId === activeGroup.Id;
-      });
-
-      $scope.groups = groups;
-      $scope.groupEndpoints = groupEndpoints;
-      $scope.activeEndpoint = activeEndpoint;
-      $scope.activeGroup = activeGroup;
+      for (var i = 0; i < endpoints.length; i++) {
+        var endpoint = endpoints[i];
+        if (endpoint.Id === activeEndpointID) {
+          $scope.activeEndpoint = endpoint;
+          break;
+        }
+      }
 
       if (StateManager.getState().application.authentication) {
         var userDetails = Authentication.getUserDetails();
