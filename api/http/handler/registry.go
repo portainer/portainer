@@ -29,6 +29,7 @@ type RegistryHandler struct {
 	*mux.Router
 	Logger          *log.Logger
 	RegistryService portainer.RegistryService
+	HttpClient      *http.Client
 }
 
 // RegistryAuthResponse represents a response of a registry auth service (token)
@@ -41,6 +42,9 @@ func NewRegistryHandler(bouncer *security.RequestBouncer) *RegistryHandler {
 	h := &RegistryHandler{
 		Router: mux.NewRouter(),
 		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		HttpClient: &http.Client{
+			Timeout: registryTimeout,
+		},
 	}
 	h.Handle("/registries",
 		bouncer.AdministratorAccess(http.HandlerFunc(h.handlePostRegistries))).Methods(http.MethodPost)
@@ -374,11 +378,8 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 		return
 	}
 
-	client := &http.Client{
-		Timeout: registryTimeout,
-	}
 	if !registry.TLSVerification {
-		client.Transport = &http.Transport{
+		handler.HttpClient.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
 			},
@@ -396,7 +397,7 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 
 	req.URL = u
 	req.Host = registry.URL
-	resp, err := client.Do(req)
+	resp, err := handler.HttpClient.Do(req)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 	}
@@ -432,7 +433,7 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 		}
 		authReq.SetBasicAuth(registry.Username, registry.Password)
 
-		resp, err = client.Do(authReq)
+		resp, err = handler.HttpClient.Do(authReq)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		}
@@ -460,7 +461,7 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 	nextResp := resp
 	if authType != "" {
 		// Do the backend call
-		nextResp, err = client.Do(req)
+		nextResp, err = handler.HttpClient.Do(req)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		}
