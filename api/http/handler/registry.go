@@ -358,6 +358,31 @@ func (handler *RegistryHandler) handleDeleteRegistry(w http.ResponseWriter, r *h
 	}
 }
 
+// getRegistryAuthHeaderInfos returns info from Auth Header Response
+func getRegistryAuthHeaderInfos(authHeader string) (authType string, authURL string) {
+	authType = strings.Split(authHeader, " ")[0]
+	authURL = ""
+	if authType == "Bearer" {
+		// Reconstruct authUrl from params
+		parts := strings.Split(strings.Replace(authHeader, "Bearer ", "", 1), ",")
+		m := map[string]string{}
+		for _, part := range parts {
+			if splits := strings.Split(part, "="); len(splits) == 2 {
+				m[splits[0]] = strings.Replace(splits[1], "\"", "", 2)
+			}
+		}
+
+		authURL := m["realm"]
+		if v, ok := m["service"]; ok {
+			authURL += "?service=" + v
+			if v, ok = m["scope"]; ok {
+				authURL += "&scope=" + v
+			}
+		}
+	}
+	return authType, authURL
+}
+
 // proxyRequestsToRegistryAPI proxy to registry and set auth header if necessary
 func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -406,28 +431,11 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 	// Bearer: Need to auth to a 3rd party service, and get token, then recall original uri with Authorization header
 	// Basic: Need to recall same uri with Basic Authorization header
 	// Else: Just send response
-	authHeader := resp.Header.Get("Www-Authenticate")
-	authType := strings.Split(authHeader, " ")[0]
+	authType, authURL := getRegistryAuthHeaderInfos(resp.Header.Get("Www-Authenticate"))
 	switch authType {
 	case "Bearer":
 		// Call auth URI to get token, and recall registry with token
-		parts := strings.Split(strings.Replace(authHeader, "Bearer ", "", 1), ",")
-		m := map[string]string{}
-		for _, part := range parts {
-			if splits := strings.Split(part, "="); len(splits) == 2 {
-				m[splits[0]] = strings.Replace(splits[1], "\"", "", 2)
-			}
-		}
-
-		authURL := m["realm"]
-		if v, ok := m["service"]; ok {
-			authURL += "?service=" + v
-			if v, ok = m["scope"]; ok {
-				authURL += "&scope=" + v
-			}
-		}
-
-		authReq, err := http.NewRequest("GET", authURL, nil)
+		authReq, err := http.NewRequest(http.MethodGet, authURL, nil)
 		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		}
@@ -522,7 +530,7 @@ func validateRegistryURL(url string, auth bool, username, password string, tlsVe
 }
 
 func checkRegistryURL(client *http.Client, url string) error {
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return portainer.ErrRegistryInvalid
 	}
@@ -557,29 +565,12 @@ func registryAuthAttempt(client *http.Client, url, username, password string) er
 		return portainer.ErrRegistryInvalid
 	}
 
-	authURL := url
-	authHeader := resp.Header.Get("Www-Authenticate")
-	authType := strings.Split(authHeader, " ")[0]
-	if authType == "Bearer" {
-		parts := strings.Split(strings.Replace(authHeader, "Bearer ", "", 1), ",")
-
-		m := map[string]string{}
-		for _, part := range parts {
-			if splits := strings.Split(part, "="); len(splits) == 2 {
-				m[splits[0]] = strings.Replace(splits[1], "\"", "", 2)
-			}
-		}
-		if _, ok := m["realm"]; !ok {
-			return portainer.ErrRegistryInvalid
-		}
-
-		authURL = m["realm"]
-		if v, ok := m["service"]; ok {
-			authURL += "?service=" + v
-		}
+	_, authURL := getRegistryAuthHeaderInfos(resp.Header.Get("Www-Authenticate"))
+	if authURL == "" {
+		authURL = url
 	}
 
-	authReq, err := http.NewRequest("GET", authURL, nil)
+	authReq, err := http.NewRequest(http.MethodGet, authURL, nil)
 	if err != nil {
 		return portainer.ErrRegistryInvalid
 	}
