@@ -545,7 +545,7 @@ func checkRegistryURL(client *http.Client, url string) error {
 }
 
 func registryAuthAttempt(client *http.Client, url, username, password string) error {
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return portainer.ErrRegistryInvalid
 	}
