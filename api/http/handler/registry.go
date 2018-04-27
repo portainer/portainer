@@ -504,7 +504,7 @@ func validateRegistryURL(url string, auth bool, username, password string, tlsVe
 		if auth {
 			if err := registryAuthAttempt(client, url, username, password); err == nil {
 				return config.protocol, config.version, nil
-			} else if err == portainer.ErrRegistryInvalidAuthCreds || err == portainer.ErrRegistryInvalidServerCert {
+			} else if err == portainer.ErrRegistryInvalidAuthCredentials || err == portainer.ErrRegistryInvalidServerCert {
 				return "", "", err
 			}
 			continue
@@ -591,5 +591,5 @@ func registryAuthAttempt(client *http.Client, url, username, password string) er
 	if resp.StatusCode == http.StatusOK {
 		return nil
 	}
-	return portainer.ErrRegistryInvalidAuthCreds
+	return portainer.ErrRegistryInvalidAuthCredentials
 }
