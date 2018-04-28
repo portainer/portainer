@@ -10,49 +10,46 @@ module.exports = function (grunt) {
     pattern: ['grunt-*', 'gruntify-*']
   });
 
-  grunt.registerTask('default', ['eslint', 'build']);
-  grunt.registerTask('before-copy', [
-    'vendor',
-    'html2js',
-    'useminPrepare:release',
-    'concat',
-    'clean:tmpl',
-    'replace',
-    'postcss:build',
-    'uglify'
-  ]);
-  grunt.registerTask('after-copy', [
-    'filerev',
-    'usemin',
-    'clean:tmp'
-  ]);
-  grunt.registerTask('build-webapp', [
-    'config:prod',
-    'clean:all',
-    'before-copy',
-    'copy:assets',
-    'after-copy'
-  ]);
-  grunt.registerTask('build', [
-    'config:dev',
-    'clean:app',
-    'shell:buildBinary:linux:' + arch,
-    'shell:downloadDockerBinary:linux:' + arch,
-    'vendor',
-    'html2js',
-    'useminPrepare:dev',
-    'concat',
-    'clean:tmpl',
-    'replace',
-    'copy',
-    'after-copy'
-  ]);
-  grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
-    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:'+p+':'+a, 'shell:downloadDockerBinary:'+p+':'+a, 'before-copy', 'copy:assets', 'after-copy' ]);
-  });
+  grunt.registerTask('default', ['eslint', 'dev']);
   grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('run-dev', ['build', 'shell:run:'+arch, 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
+
+  grunt.registerTask('dev', ['frontend:dev', 'build:linux:' + arch]);
+  grunt.registerTask('run-dev', ['dev', 'shell:run:'+arch, 'watch:frontend']);
+  grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
+    grunt.task.run(['frontend:release', 'build:'+p+':'+a]);
+  });
+
+  grunt.task.registerTask('build', 'build:<platform>:<arch>', function(p, a) {
+    grunt.task.run([
+      'shell:buildBinary:' + p + ':' + a,
+      'shell:downloadDockerBinary:' + p + ':' + a
+    ]);
+  });
+
+  grunt.task.registerTask('frontend', 'frontend:dev|release', function(d) {
+    grunt.task.run([
+      'config:' + d,
+      'clean:' + ((d === 'dev') ? 'app' : 'all'),
+      'vendor:' + ((d === 'dev') ? 'regular' : ''),
+      'html2js',
+      'useminPrepare:' + d,
+      'concat'
+    ]);
+    if (d === 'release') {
+      grunt.task.run('postcss:build');
+    }
+    grunt.task.run(['clean:tmpl', 'replace']);
+    if (d === 'release') {
+      grunt.task.run('uglify');
+    }
+    grunt.task.run([
+      'copy' + ((d === 'dev') ? '' : ':assets'),
+      'filerev',
+      'usemin',
+      'clean:tmp'
+    ]);
+  });
 
   // Load content of `vendor.yml` to src.jsVendor, src.cssVendor and src.angularVendor
   grunt.registerTask('vendor', function() {
@@ -73,7 +70,7 @@ module.exports = function (grunt) {
               // If none is missing, save the list
               grunt.config('src.' + filelist + 'Vendor', list);
           }
-      }
+        }
   });
 
   // Project configuration.
@@ -108,7 +105,7 @@ var fs = require('fs');
 
 gruntfile_cfg.config = {
   dev:  { options: { variables: { 'environment': 'development' }}},
-  prod: { options: { variables: { 'environment': 'production'  }}}
+  release: { options: { variables: { 'environment': 'production'  }}}
 };
 
 gruntfile_cfg.src = {
@@ -225,7 +222,7 @@ gruntfile_cfg.postcss = {
 gruntfile_cfg.watch = {
   build: {
     files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-    tasks: ['build']
+    tasks: ['dev']
   }
 };
 
