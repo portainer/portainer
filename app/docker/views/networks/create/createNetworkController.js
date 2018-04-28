@@ -1,13 +1,14 @@
 angular.module('portainer.docker')
-.controller('CreateNetworkController', ['$q', '$scope', '$state', 'PluginService', 'Notifications', 'NetworkService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator',
-function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator) {
+.controller('CreateNetworkController', ['$q', '$scope', '$state', 'PluginService', 'Notifications', 'NetworkService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator', 'HttpRequestHelper',
+function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator, HttpRequestHelper) {
 
   $scope.formValues = {
     DriverOptions: [],
     Subnet: '',
     Gateway: '',
     Labels: [],
-    AccessControlData: new AccessControlFormData()
+    AccessControlData: new AccessControlFormData(),
+    NodeName: null
   };
 
   $scope.state = {
@@ -98,6 +99,9 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
     if (!validateForm(accessControlData, isAdmin)) {
       return;
     }
+
+    var nodeName = $scope.formValues.NodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
     $scope.state.actionInProgress = true;
     NetworkService.create(networkConfiguration)

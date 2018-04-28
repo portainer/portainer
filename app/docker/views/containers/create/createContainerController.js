@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService',
-function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'HttpRequestHelper',
+function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, HttpRequestHelper) {
 
   $scope.formValues = {
     alwaysPull: true,
@@ -15,7 +15,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     AccessControlData: new AccessControlFormData(),
     CpuLimit: 0,
     MemoryLimit: 0,
-    MemoryReservation: 0
+    MemoryReservation: 0,
+    NodeName: null
   };
 
   $scope.state = {
@@ -587,6 +588,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
       $scope.state.actionInProgress = true;
       var config = prepareConfiguration();
+      var nodeName = $scope.formValues.NodeName;
+      HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
       createContainer(config, accessControlData);
     })
     .catch(function error(err) {
