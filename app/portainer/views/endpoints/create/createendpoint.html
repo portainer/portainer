@@ -9,7 +9,7 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="endpointCreationForm">
           <div class="col-sm-12 form-section-title">
             Environment type
           </div>
@@ -66,7 +66,14 @@
           <div class="form-group">
             <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="container_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01">
+              <input type="text" class="form-control" name="container_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01" required auto-focus>
+            </div>
+          </div>
+          <div class="form-group" ng-show="endpointCreationForm.container_name.$invalid">
+            <div class="col-sm-12 small text-danger">
+              <div ng-messages="endpointCreationForm.container_name.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              </div>
             </div>
           </div>
           <!-- !name-input -->
@@ -77,8 +84,15 @@
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
-              <input ng-if="state.EnvironmentType === 'docker'" type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
-              <input ng-if="state.EnvironmentType === 'agent'" type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:9001 or tasks.portainer_agent:9001">
+              <input ng-if="state.EnvironmentType === 'docker'" type="text" class="form-control" name="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375" required>
+              <input ng-if="state.EnvironmentType === 'agent'" type="text" class="form-control" name="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:9001 or tasks.portainer_agent:9001" required>
+            </div>
+          </div>
+          <div class="form-group" ng-show="endpointCreationForm.endpoint_url.$invalid">
+            <div class="col-sm-12 small text-danger">
+              <div ng-messages="endpointCreationForm.endpoint_url.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              </div>
             </div>
           </div>
           <!-- !endpoint-url-input -->
@@ -109,11 +123,11 @@
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button ng-if="state.EnvironmentType === 'docker'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addDockerEndpoint()" button-spinner="state.actionInProgress">
+              <button ng-if="state.EnvironmentType === 'docker'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !endpointCreationForm.$valid || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addDockerEndpoint()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
                 <span ng-show="state.actionInProgress">Creating endpoint...</span>
               </button>
-              <button ng-if="state.EnvironmentType === 'agent'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL" ng-click="addAgentEndpoint()" button-spinner="state.actionInProgress">
+              <button ng-if="state.EnvironmentType === 'agent'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !endpointCreationForm.$valid" ng-click="addAgentEndpoint()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
                 <span ng-show="state.actionInProgress">Creating endpoint...</span>
               </button>

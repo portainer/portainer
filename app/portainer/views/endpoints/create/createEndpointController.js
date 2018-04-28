@@ -30,7 +30,7 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-    addEndpoint(name, URL, publicURL, groupdId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+    addEndpoint(name, URL, publicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
   };
 
   $scope.addAgentEndpoint = function() {
@@ -47,7 +47,7 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     EndpointService.createRemoteEndpoint(name, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success() {
       Notifications.success('Endpoint created', name);
-      $state.reload();
+      $state.go('portainer.endpoints', {}, {reload: true});
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to create endpoint');
