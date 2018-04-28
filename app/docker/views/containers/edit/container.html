@@ -6,11 +6,30 @@
   </rd-header-content>
 </rd-header>
 
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget-body>
+      <label class="interactive no-padding btn btn-default widget-body-toggle" ng-click="state.Show.toggleAll()">
+        <i class="fa fa-angle-double-{{(state.Show.any())?'up':'down'}}"></i>
+      </label>
+    </rd-widget-body>
+  </div>
+</div>
+
+  <!-- access-control-panel -->
+  <por-access-control-panel
+    ng-if="container && applicationState.application.authentication"
+    resource-id="container.Id"
+    resource-control="container.ResourceControl"
+    resource-type="'container'">
+  </por-access-control-panel>
+  <!-- !access-control-panel -->
+
   <div class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-cogs" title="Actions"></rd-widget-header>
-        <rd-widget-body classes="padding">
+        <rd-widget-header icon="fa-cogs" title="Actions" toggle-fn="state.Show.toggle('Actions')" toggle="state.Show.Vars.Actions"></rd-widget-header>
+        <rd-widget-body classes="padding" ng-show="state.Show.Vars.Actions">
           <div class="btn-group" role="group" aria-label="...">
             <button class="btn btn-success btn-sm" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
             <button class="btn btn-danger btn-sm" ng-click="stop()" ng-disabled="!container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
@@ -35,8 +54,8 @@
   <div class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-server" title="Container status"></rd-widget-header>
-        <rd-widget-body classes="no-padding">
+        <rd-widget-header icon="fa-server" title="Container status" toggle-fn="state.Show.toggle('Status')" toggle="state.Show.Vars.Status"></rd-widget-header>
+        <rd-widget-body classes="no-padding" ng-show="state.Show.Vars.Status">
           <table class="table">
             <tbody>
               <tr>
@@ -98,20 +117,11 @@
     </div>
   </div>
 
-  <!-- access-control-panel -->
-  <por-access-control-panel
-    ng-if="container && applicationState.application.authentication"
-    resource-id="container.Id"
-    resource-control="container.ResourceControl"
-    resource-type="'container'">
-  </por-access-control-panel>
-  <!-- !access-control-panel -->
-
   <div ng-if="container.State.Health" class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-server" title="Container health"></rd-widget-header>
-        <rd-widget-body classes="no-padding">
+        <rd-widget-header icon="fa-server" title="Container health" toggle-fn="state.Show.toggle('Health')" toggle="state.Show.Vars.Health"></rd-widget-header>
+        <rd-widget-body classes="no-padding" ng-show="state.Show.Vars.Health">
           <table class="table">
             <tbody>
               <tr>
@@ -139,8 +149,8 @@
   <div class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-clone" title="Create image"></rd-widget-header>
-        <rd-widget-body>
+        <rd-widget-header icon="fa-clone" title="Create image" toggle-fn="state.Show.toggle('CreateImage')" toggle="state.Show.Vars.CreateImage"></rd-widget-header>
+        <rd-widget-body ng-show="state.Show.Vars.CreateImage">
           <form class="form-horizontal">
             <!-- tag-description -->
             <div class="form-group">
@@ -178,8 +188,8 @@
   <div class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-server" title="Container details"></rd-widget-header>
-        <rd-widget-body classes="no-padding">
+        <rd-widget-header icon="fa-server" title="Container details" toggle-fn="state.Show.toggle('Details')" toggle="state.Show.Vars.Details"></rd-widget-header>
+        <rd-widget-body classes="no-padding" ng-show="state.Show.Vars.Details">
           <table class="table">
             <tbody>
               <tr>
@@ -247,8 +257,8 @@
   <div class="row" ng-if="container.Mounts.length > 0">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-cubes" title="Volumes"></rd-widget-header>
-        <rd-widget-body classes="no-padding">
+        <rd-widget-header icon="fa-cubes" title="Volumes" toggle-fn="state.Show.toggle('Volumes')" toggle="state.Show.Vars.Volumes"></rd-widget-header>
+        <rd-widget-body classes="no-padding" ng-show="state.Show.Vars.Volumes">
           <table class="table">
             <thead>
               <tr>
@@ -283,3 +293,6 @@
       ></container-networks-datatable>
     </div>
   </div>
+
+  <!-- <rd-widget-header icon="fa-sitemap" title="Connected networks" toggle-fn="state.Show.toggle('Networks')" toggle="state.Show.Vars.Networks"> -->
+  <!-- <rd-widget-body classes="no-padding" ng-show="state.Show.Vars.Networks"> -->

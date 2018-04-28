@@ -12,7 +12,29 @@ function ($q, $scope, $state, $transition$, $filter, Container, Commit, Containe
   $scope.state = {
     recreateContainerInProgress: false,
     joinNetworkInProgress: false,
-    leaveNetworkInProgress: false
+    leaveNetworkInProgress: false,
+    pagination_count: Pagination.getPaginationCount('container_networks')
+  };
+
+  $scope.state.Show = {
+    Vars: { Actions:true, Status:true, Health:true, Access:true, CreateImage:true, Details:true, Volumes:true, Networks:true },
+    toggle: function(row) { this.Vars[row] = !this.Vars[row]; },
+    any: function() {
+      for (var key in this.Vars) {
+        if (this.Vars.hasOwnProperty(key) && this.Vars[key]) {
+          return true;
+        }
+      }
+      return false;
+    },
+    toggleAll: function() {
+      var anyTrueNot = !this.any();
+      for (var key in this.Vars) {
+        if (this.Vars.hasOwnProperty(key)) {
+          this.Vars[key] = anyTrueNot;
+        }
+      }
+    }
   };
 
   var update = function () {

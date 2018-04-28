@@ -5,11 +5,21 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="image.RepoTags.length > 0">
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget-body>
+      <label class="interactive no-padding btn btn-default widget-body-toggle" ng-click="state.Show.toggleAll()">
+        <i class="fa fa-angle-double-{{(state.Show.any())?'up':'down'}}"></i>
+      </label>
+    </rd-widget-body>
+  </div>
+</div>
+
+<div class="row" ng-if="(image.RepoTags.length > 0)">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa fa-tags" title="Image tags"></rd-widget-header>
-      <rd-widget-body>
+      <rd-widget-header icon="fa fa-tags" title="Image tags" toggle-fn="state.Show.toggle('Tags')" toggle="state.Show.Vars.Tags"></rd-widget-header>
+      <rd-widget-body ng-show="state.Show.Vars.Tags">
         <form class="form-horizontal">
           <div class="form-group">
             <div class="row">
@@ -59,8 +69,8 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tag" title="Tag the image"></rd-widget-header>
-      <rd-widget-body>
+      <rd-widget-header icon="fa-tag" title="Tag the image" toggle-fn="state.Show.toggle('Tag')" toggle="state.Show.Vars.Tag"></rd-widget-header>
+      <rd-widget-body ng-show="state.Show.Vars.Tag">
         <form class="form-horizontal">
           <!-- image-and-registry -->
           <div class="form-group">
@@ -88,8 +98,8 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Image details"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
+      <rd-widget-header icon="fa-clone" title="Image details" toggle-fn="state.Show.toggle('Details')" toggle="state.Show.Vars.Details"></rd-widget-header>
+      <rd-widget-body classes="no-padding" ng-show="state.Show.Vars.Details">
         <table class="table">
           <tbody>
             <tr>
@@ -129,11 +139,11 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Dockerfile details"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
+      <rd-widget-header icon="fa-file-text-o" title="Dockerfile details" toggle-fn="state.Show.toggle('Dockerfile')" toggle="state.Show.Vars.Dockerfile"></rd-widget-header>
+      <rd-widget-body classes="no-padding" ng-show="state.Show.Vars.Dockerfile">
         <table class="table">
           <tbody>
-            <tr>
+            <tr ng-if="image.Command">
               <td>CMD</td>
               <td><code>{{ image.Command|command }}</code></td>
             </tr>
@@ -178,8 +188,8 @@
 <div class="row" ng-if="history.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Image layers"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
+      <rd-widget-header icon="fa-clone" title="Image layers" toggle-fn="state.Show.toggle('Layers')" toggle="state.Show.Vars.Layers"></rd-widget-header>
+      <rd-widget-body classes="no-padding" ng-show="state.Show.Vars.Layers">
         <table id="image-layers" class="table">
           <thead>
             <th style="white-space:nowrap;">

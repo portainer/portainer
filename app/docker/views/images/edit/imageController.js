@@ -9,6 +9,27 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 	$scope.sortType = 'Order';
 	$scope.sortReverse = false;
 
+  $scope.state = { Show: {
+    Vars: { Tags:true, Tag:true, Details:true, Dockerfile:true, Layers:true },
+		toggle: function(row) { this.Vars[row] = !this.Vars[row]; },
+		any: function() {
+      for (var key in this.Vars) {
+        if (this.Vars.hasOwnProperty(key) && this.Vars[key]) {
+          return true;
+        }
+      }
+      return false;
+    },
+    toggleAll: function() {
+      var anyTrueNot = !this.any();
+      for (var key in this.Vars) {
+        if (this.Vars.hasOwnProperty(key)) {
+          this.Vars[key] = anyTrueNot;
+        }
+      }
+    }
+  }};
+
 	$scope.order = function(sortType) {
     $scope.sortReverse = ($scope.sortType === sortType) ? !$scope.sortReverse : false;
     $scope.sortType = sortType;

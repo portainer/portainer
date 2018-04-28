@@ -792,6 +792,17 @@ json-tree .branch-preview {
   opacity: .5;
 }
 
+/***/
+
 .row.header .meta .page {
   padding-top: 7px;
+}
+
+.widget-body-toggle {
+  text-align: center;
+  width: 100%;
+  margin: 0;
+  padding:0;
+  border-radius:1px;
+  border-width:0;
 }
