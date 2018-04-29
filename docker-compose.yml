@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  portainer:
+    image: portainer/portainer:latest
+    command: -H unix:///var/run/docker.sock
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.role == manager]
+
+volumes:
+  portainer_data:
