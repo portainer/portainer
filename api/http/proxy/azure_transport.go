@@ -57,7 +57,7 @@ func (transport *AzureTransport) retrieveAuthenticationToken() error {
 	}
 
 	timeLimit := time.Now().Add(-5 * time.Minute)
-	if transport.token.expirationTime.After(timeLimit) {
+	if timeLimit.After(transport.token.expirationTime) {
 		return transport.authenticate()
 	}
 
