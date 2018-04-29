@@ -175,18 +175,17 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
-		ID              EndpointID          `json:"Id"`
-		Name            string              `json:"Name"`
-		Type            EndpointType        `json:"Type"`
-		URL             string              `json:"URL"`
-		GroupID         EndpointGroupID     `json:"GroupId"`
-		PublicURL       string              `json:"PublicURL"`
-		TLSConfig       TLSConfiguration    `json:"TLSConfig"`
-		AuthorizedUsers []UserID            `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID            `json:"AuthorizedTeams"`
-		Extensions      []EndpointExtension `json:"Extensions"`
-		// TODO: should not be retrievable via API (in get /endpoints and get /endpoint/:id)
-		AzureCredentials AzureCredentials `json:"AzureCredentials"`
+		ID               EndpointID          `json:"Id"`
+		Name             string              `json:"Name"`
+		Type             EndpointType        `json:"Type"`
+		URL              string              `json:"URL"`
+		GroupID          EndpointGroupID     `json:"GroupId"`
+		PublicURL        string              `json:"PublicURL"`
+		TLSConfig        TLSConfiguration    `json:"TLSConfig"`
+		AuthorizedUsers  []UserID            `json:"AuthorizedUsers"`
+		AuthorizedTeams  []TeamID            `json:"AuthorizedTeams"`
+		Extensions       []EndpointExtension `json:"Extensions"`
+		AzureCredentials AzureCredentials    `json:"AzureCredentials,omitempty"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4

@@ -95,5 +95,19 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return deferred.promise;
   };
 
+  service.createAzureEndpoint = function(name, applicationId, tenantId, authenticationKey) {
+    var deferred = $q.defer();
+
+    FileUploadService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey)
+    .then(function success(response) {
+      deferred.resolve(response.data);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to connect to Azure', err: err});
+    });
+
+    return deferred.promise;
+  };
+
   return service;
 }]);

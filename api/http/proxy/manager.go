@@ -65,7 +65,7 @@ func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler,
 	case portainer.AgentOnDockerEnvironment:
 		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, true)
 	case portainer.AzureEnvironment:
-		return newAzureHTTPSPRoxy(&endpoint.AzureCredentials, &endpoint.TLSConfig)
+		return newAzureProxy(&endpoint.AzureCredentials)
 	default:
 		return manager.createDockerProxy(endpointURL, &endpoint.TLSConfig)
 	}

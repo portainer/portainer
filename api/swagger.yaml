@@ -2428,16 +2428,21 @@ definitions:
     type: "object"
     required:
     - "Name"
-    - "URL"
+    - "EndpointType"
     properties:
       Name:
         type: "string"
         example: "my-endpoint"
         description: "Name that will be used to identify this endpoint"
+      EndpointType:
+        type: "integer"
+        example: 1
+        description: "Environment type. Can be 1 for Docker environment,\
+        \ 2 for an Agent environment or 3 for an Azure Environment"
       URL:
         type: "string"
         example: "docker.mydomain.tld:2375"
-        description: "URL or IP address of a Docker host"
+        description: "URL or IP address of a Docker host. Required if EndpointType value is 1 or 2."
       PublicURL:
         type: "string"
         example: "docker.mydomain.tld:2375"
@@ -2463,7 +2468,16 @@ definitions:
         description: "TLS client certificate file"
       TLSKeyFile:
         type: "file"
-        description: "TLS client key file"    
+        description: "TLS client key file"
+      AzureApplicationID:
+        type: "string"
+        description: "Azure application ID used for authentication against the Azure API. Required if EndpointType value is 3."
+      AzureTenantID:
+        type: "string"
+        description: "Azure tenant ID used for authentication against the Azure API. Required if EndpointType value is 3."
+      AzureAuthenticationKey:
+        type: "string"
+        description: "Azure authentication key used for authentication against the Azure API. Required if EndpointType value is 3."
   EndpointCreateResponse:
     type: "object"
     properties:

@@ -121,6 +121,10 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 		return
 	}
 
+	for i := range filteredEndpoints {
+		filteredEndpoints[i].AzureCredentials = portainer.AzureCredentials{}
+	}
+
 	encodeJSON(w, filteredEndpoints, handler.Logger)
 }
 
@@ -131,21 +135,18 @@ func (handler *EndpointHandler) createAzureEndpoint(payload *postEndpointPayload
 		AuthenticationKey: payload.azureAuthenticationKey,
 	}
 
-	err := client.ExecuteAzureAuthenticationRequest(credentials)
+	httpClient := client.NewHTTPClient()
+	_, err := httpClient.ExecuteAzureAuthenticationRequest(&credentials)
 	if err != nil {
 		return nil, err
 	}
 
 	endpoint := &portainer.Endpoint{
-		Name:      payload.name,
-		URL:       payload.url,
-		Type:      portainer.AzureEnvironment,
-		GroupID:   portainer.EndpointGroupID(payload.groupID),
-		PublicURL: payload.publicURL,
-		TLSConfig: portainer.TLSConfiguration{
-			TLS:           payload.useTLS,
-			TLSSkipVerify: payload.skipTLSServerVerification,
-		},
+		Name:             payload.name,
+		URL:              payload.url,
+		Type:             portainer.AzureEnvironment,
+		GroupID:          portainer.EndpointGroupID(payload.groupID),
+		PublicURL:        payload.publicURL,
 		AuthorizedUsers:  []portainer.UserID{},
 		AuthorizedTeams:  []portainer.TeamID{},
 		Extensions:       []portainer.EndpointExtension{},
@@ -287,13 +288,12 @@ func (handler *EndpointHandler) createEndpoint(payload *postEndpointPayload) (*p
 }
 
 func convertPostEndpointRequestToPayload(r *http.Request) (*postEndpointPayload, error) {
-	// TODO: update Swagger file
 	payload := &postEndpointPayload{}
 	payload.name = r.FormValue("Name")
-	payload.url = r.FormValue("URL")
+
 	endpointType := r.FormValue("EndpointType")
 
-	if payload.name == "" || payload.url == "" || endpointType == "" {
+	if payload.name == "" || endpointType == "" {
 		return nil, ErrInvalidRequestFormat
 	}
 
@@ -301,7 +301,14 @@ func convertPostEndpointRequestToPayload(r *http.Request) (*postEndpointPayload,
 	if err != nil {
 		return nil, err
 	}
+
+	payload.url = r.FormValue("URL")
 	payload.endpointType = parsedType
+
+	if portainer.EndpointType(payload.endpointType) != portainer.AzureEnvironment && payload.url == "" {
+		return nil, ErrInvalidRequestFormat
+	}
+
 	payload.publicURL = r.FormValue("PublicURL")
 
 	if portainer.EndpointType(payload.endpointType) == portainer.AzureEnvironment {
@@ -397,6 +404,8 @@ func (handler *EndpointHandler) handleGetEndpoint(w http.ResponseWriter, r *http
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+
+	endpoint.AzureCredentials = portainer.AzureCredentials{}
 
 	encodeJSON(w, endpoint, handler.Logger)
 }

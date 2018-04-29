@@ -27,24 +27,14 @@ func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
 	return newSingleHostReverseProxyWithHostHeader(u)
 }
 
-func newAzureHTTPSPRoxy(credentials *portainer.AzureCredentials, tlsConfig *portainer.TLSConfiguration) (http.Handler, error) {
+func newAzureProxy(credentials *portainer.AzureCredentials) (http.Handler, error) {
 	url, err := url.Parse(azureAPIBaseURL)
 	if err != nil {
 		return nil, err
 	}
 
-	config, err := crypto.CreateTLSConfiguration(tlsConfig)
-	if err != nil {
-		return nil, err
-	}
-
 	proxy := newSingleHostReverseProxyWithHostHeader(url)
-	proxy.Transport = &azureTransport{
-		credentials: credentials,
-		httpsRoundTripper: http.Transport{
-			TLSClientConfig: config,
-		},
-	}
+	proxy.Transport = NewAzureTransport(credentials)
 
 	return proxy, nil
 }

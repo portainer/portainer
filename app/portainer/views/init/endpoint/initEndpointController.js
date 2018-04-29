@@ -22,7 +22,10 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     TLSSKipClientVerify: false,
     TLSCACert: null,
     TLSCert: null,
-    TLSKey: null
+    TLSKey: null,
+    AzureApplicationId: '',
+    AzureTenantId: '',
+    AzureAuthenticationKey: ''
   };
 
   $scope.createLocalEndpoint = function() {
@@ -52,6 +55,15 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     });
   };
 
+  $scope.createAzureEndpoint = function() {
+    var name = $scope.formValues.Name;
+    var applicationId = $scope.formValues.AzureApplicationId;
+    var tenantId = $scope.formValues.AzureTenantId;
+    var authenticationKey = $scope.formValues.AzureAuthenticationKey;
+
+    createAzureEndpoint(name, applicationId, tenantId, authenticationKey);
+  };
+
   $scope.createAgentEndpoint = function() {
     var name = $scope.formValues.Name;
     var URL = $scope.formValues.URL;
@@ -74,8 +86,30 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     createRemoteEndpoint(name, 1, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
   };
 
+  function createAzureEndpoint(name, applicationId, tenantId, authenticationKey) {
+    var endpoint;
+
+    $scope.state.actionInProgress = true;
+    EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey)
+    .then(function success(data) {
+      endpoint = data;
+      EndpointProvider.setEndpointID(endpoint.Id);
+      return StateManager.updateEndpointState(false, endpoint.Type, []);
+    })
+    .then(function success(data) {
+      $state.go('azure.dashboard');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to connect to the Azure environment');
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
+    });
+  }
+
   function createRemoteEndpoint(name, type, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var endpoint;
+
     $scope.state.actionInProgress = true;
     EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, 1, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {

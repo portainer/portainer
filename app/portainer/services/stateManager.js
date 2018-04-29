@@ -128,6 +128,13 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     if (loading) {
       state.loading = true;
     }
+
+    if (type === 3) {
+      state.endpoint.mode = { provider: 'AZURE' };
+      deferred.resolve();
+      return deferred.promise;
+    }
+
     $q.all({
       version: SystemService.version(),
       info: SystemService.info()
