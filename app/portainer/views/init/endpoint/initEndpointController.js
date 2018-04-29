@@ -57,7 +57,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var URL = $scope.formValues.URL;
     var PublicURL = URL.split(':')[0];
 
-    createRemoteEndpoint(name, URL, PublicURL, true, true, true, null, null, null);
+    createRemoteEndpoint(name, 2, URL, PublicURL, true, true, true, null, null, null);
   };
 
   $scope.createRemoteEndpoint = function() {
@@ -71,13 +71,13 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var TLSCertFile = TLSSKipClientVerify ? null : $scope.formValues.TLSCert;
     var TLSKeyFile = TLSSKipClientVerify ? null : $scope.formValues.TLSKey;
 
-    createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+    createRemoteEndpoint(name, 1, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
   };
 
-  function createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  function createRemoteEndpoint(name, type, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var endpoint;
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, 1, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, 1, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       endpoint = data;
       EndpointProvider.setEndpointID(endpoint.Id);

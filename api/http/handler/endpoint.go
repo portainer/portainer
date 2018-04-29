@@ -80,6 +80,7 @@ type (
 	postEndpointPayload struct {
 		name                      string
 		url                       string
+		endpointType              int
 		publicURL                 string
 		groupID                   int
 		useTLS                    bool
@@ -88,6 +89,9 @@ type (
 		caCert                    []byte
 		cert                      []byte
 		key                       []byte
+		azureApplicationID        string
+		azureTenantID             string
+		azureAuthenticationKey    string
 	}
 )
 
@@ -118,6 +122,42 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 	}
 
 	encodeJSON(w, filteredEndpoints, handler.Logger)
+}
+
+func (handler *EndpointHandler) createAzureEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
+	credentials := portainer.AzureCredentials{
+		ApplicationID:     payload.azureApplicationID,
+		TenantID:          payload.azureTenantID,
+		AuthenticationKey: payload.azureAuthenticationKey,
+	}
+
+	err := client.ExecuteAzureAuthenticationRequest(credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := &portainer.Endpoint{
+		Name:      payload.name,
+		URL:       payload.url,
+		Type:      portainer.AzureEnvironment,
+		GroupID:   portainer.EndpointGroupID(payload.groupID),
+		PublicURL: payload.publicURL,
+		TLSConfig: portainer.TLSConfiguration{
+			TLS:           payload.useTLS,
+			TLSSkipVerify: payload.skipTLSServerVerification,
+		},
+		AuthorizedUsers:  []portainer.UserID{},
+		AuthorizedTeams:  []portainer.TeamID{},
+		Extensions:       []portainer.EndpointExtension{},
+		AzureCredentials: credentials,
+	}
+
+	err = handler.EndpointService.CreateEndpoint(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return endpoint, nil
 }
 
 func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
@@ -236,6 +276,10 @@ func (handler *EndpointHandler) createUnsecuredEndpoint(payload *postEndpointPay
 }
 
 func (handler *EndpointHandler) createEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
+	if portainer.EndpointType(payload.endpointType) == portainer.AzureEnvironment {
+		return handler.createAzureEndpoint(payload)
+	}
+
 	if payload.useTLS {
 		return handler.createTLSSecuredEndpoint(payload)
 	}
@@ -243,13 +287,31 @@ func (handler *EndpointHandler) createEndpoint(payload *postEndpointPayload) (*p
 }
 
 func convertPostEndpointRequestToPayload(r *http.Request) (*postEndpointPayload, error) {
+	// TODO: update Swagger file
 	payload := &postEndpointPayload{}
 	payload.name = r.FormValue("Name")
 	payload.url = r.FormValue("URL")
+	endpointType := r.FormValue("EndpointType")
+
+	if payload.name == "" || payload.url == "" || endpointType == "" {
+		return nil, ErrInvalidRequestFormat
+	}
+
+	parsedType, err := strconv.Atoi(endpointType)
+	if err != nil {
+		return nil, err
+	}
+	payload.endpointType = parsedType
 	payload.publicURL = r.FormValue("PublicURL")
 
-	if payload.name == "" || payload.url == "" {
-		return nil, ErrInvalidRequestFormat
+	if portainer.EndpointType(payload.endpointType) == portainer.AzureEnvironment {
+		payload.azureApplicationID = r.FormValue("AzureApplicationID")
+		payload.azureTenantID = r.FormValue("AzureTenantID")
+		payload.azureAuthenticationKey = r.FormValue("AzureAuthenticationKey")
+
+		if payload.azureApplicationID == "" || payload.azureTenantID == "" || payload.azureAuthenticationKey == "" {
+			return nil, ErrInvalidRequestFormat
+		}
 	}
 
 	rawGroupID := r.FormValue("GroupID")

@@ -185,6 +185,8 @@ type (
 		AuthorizedUsers []UserID            `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID            `json:"AuthorizedTeams"`
 		Extensions      []EndpointExtension `json:"Extensions"`
+		// TODO: should not be retrievable via API (in get /endpoints and get /endpoint/:id)
+		AzureCredentials AzureCredentials `json:"AzureCredentials"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -192,6 +194,14 @@ type (
 		TLSCACertPath string `json:"TLSCACert,omitempty"`
 		TLSCertPath   string `json:"TLSCert,omitempty"`
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
+	}
+
+	// AzureCredentials represents the credentials used to connect to an Azure
+	// environment.
+	AzureCredentials struct {
+		ApplicationID     string `json:"ApplicationID"`
+		TenantID          string `json:"TenantID"`
+		AuthenticationKey string `json:"AuthenticationKey"`
 	}
 
 	// EndpointGroupID represents an endpoint group identifier.
@@ -530,4 +540,6 @@ const (
 	DockerEnvironment
 	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
 	AgentOnDockerEnvironment
+	// AzureEnvironment represents an endpoint connected to an Azure environment
+	AzureEnvironment
 )

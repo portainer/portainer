@@ -30,7 +30,7 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-    addEndpoint(name, URL, publicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+    addEndpoint(name, 1, URL, publicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
   };
 
   $scope.addAgentEndpoint = function() {
@@ -39,12 +39,12 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
     var groupId = $scope.formValues.GroupId;
 
-    addEndpoint(name, URL, publicURL, groupId, true, true, true, null, null, null);
+    addEndpoint(name, 2, URL, publicURL, groupId, true, true, true, null, null, null);
   };
 
-  function addEndpoint(name, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  function addEndpoint(name, type, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success() {
       Notifications.success('Endpoint created', name);
       $state.go('portainer.endpoints', {}, {reload: true});

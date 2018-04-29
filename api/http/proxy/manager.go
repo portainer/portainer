@@ -44,33 +44,39 @@ func NewManager(parameters *ManagerParams) *Manager {
 	}
 }
 
-// CreateAndRegisterProxy creates a new HTTP reverse proxy and adds it to the registered proxies.
-// It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
-func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	var proxy http.Handler
+func (manager *Manager) createDockerProxy(endpointURL *url.URL, tlsConfig *portainer.TLSConfiguration) (http.Handler, error) {
+	if endpointURL.Scheme == "tcp" {
+		if tlsConfig.TLS || tlsConfig.TLSSkipVerify {
+			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, tlsConfig, false)
+		}
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false), nil
+	}
+	// Assume unix:// scheme
+	return manager.proxyFactory.newDockerSocketProxy(endpointURL.Path), nil
+}
 
+func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	endpointURL, err := url.Parse(endpoint.URL)
 	if err != nil {
 		return nil, err
 	}
 
-	enableSignature := false
-	if endpoint.Type == portainer.AgentOnDockerEnvironment {
-		enableSignature = true
+	switch endpoint.Type {
+	case portainer.AgentOnDockerEnvironment:
+		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, true)
+	case portainer.AzureEnvironment:
+		return newAzureHTTPSPRoxy(&endpoint.AzureCredentials, &endpoint.TLSConfig)
+	default:
+		return manager.createDockerProxy(endpointURL, &endpoint.TLSConfig)
 	}
+}
 
-	if endpointURL.Scheme == "tcp" {
-		if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
-			proxy, err = manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, enableSignature)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			proxy = manager.proxyFactory.newDockerHTTPProxy(endpointURL, enableSignature)
-		}
-	} else {
-		// Assume unix:// scheme
-		proxy = manager.proxyFactory.newDockerSocketProxy(endpointURL.Path)
+// CreateAndRegisterProxy creates a new HTTP reverse proxy based on endpoint properties and and adds it to the registered proxies.
+// It can also be used to create a new HTTP reverse proxy and replace an already registered proxy.
+func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	proxy, err := manager.createProxy(endpoint)
+	if err != nil {
+		return nil, err
 	}
 
 	manager.proxies.Set(string(endpoint.ID), proxy)
@@ -99,7 +105,7 @@ func (manager *Manager) CreateAndRegisterExtensionProxy(key, extensionAPIURL str
 		return nil, err
 	}
 
-	proxy := manager.proxyFactory.newExtensionHTTPPRoxy(extensionURL)
+	proxy := manager.proxyFactory.newHTTPProxy(extensionURL)
 	manager.extensionProxies.Set(key, proxy)
 	return proxy, nil
 }

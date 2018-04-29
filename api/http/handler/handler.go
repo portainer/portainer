@@ -30,6 +30,7 @@ type Handler struct {
 	SettingsHandler       *SettingsHandler
 	TemplatesHandler      *TemplatesHandler
 	DockerHandler         *DockerHandler
+	AzureHandler          *AzureHandler
 	WebSocketHandler      *WebSocketHandler
 	UploadHandler         *UploadHandler
 	FileHandler           *FileHandler
@@ -64,6 +65,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.StripPrefix("/api/endpoints", h.StoridgeHandler).ServeHTTP(w, r)
 		case strings.Contains(r.URL.Path, "/extensions"):
 			http.StripPrefix("/api/endpoints", h.ExtensionHandler).ServeHTTP(w, r)
+		case strings.Contains(r.URL.Path, "/azure/"):
+			http.StripPrefix("/api/endpoints", h.AzureHandler).ServeHTTP(w, r)
 		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}

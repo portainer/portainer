@@ -2,7 +2,10 @@ package client
 
 import (
 	"crypto/tls"
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -38,6 +41,53 @@ func ExecutePingOperationFromEndpoint(endpoint *portainer.Endpoint) (bool, error
 
 	target := strings.Replace(endpoint.URL, "tcp://", scheme+"://", 1)
 	return pingOperation(client, target)
+}
+
+type tokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	ExpiresIn    int    `json:"expires_in"`
+	ExpiresOn    int    `json:"expires_on"`
+	ExtExpiresIn int    `json:"ext_expires_in"`
+	NotBefore    int    `json:"not_before"`
+	Resource     string `json:"resource"`
+	TokenType    string `json:"token_type"`
+}
+
+// $ http --form POST https://login.microsoftonline.com/TENANT_ID/oauth2/token \
+// grant_type="client_credentials" \
+// client_id=APP_ID \
+// client_secret=KEY \
+// resource=https://management.azure.com/
+// TODO: godoc
+func ExecuteAzureAuthenticationRequest(credentials portainer.AzureCredentials) error {
+	client := &http.Client{
+		Timeout: time.Second * 3,
+	}
+
+	loginURL := fmt.Sprintf("https://login.microsoftonline.com/%s/oauth2/token", credentials.TenantID)
+	params := url.Values{
+		"grant_type":    {"client_credentials"},
+		"client_id":     {credentials.ApplicationID},
+		"client_secret": {credentials.AuthenticationKey},
+		"resource":      {"https://management.azure.com/"},
+	}
+
+	response, err := client.PostForm(loginURL, params)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return portainer.ErrAzureInvalidCredentials
+	}
+
+	var token tokenResponse
+	err = json.NewDecoder(response.Body).Decode(token)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // ExecutePingOperation will send a SystemPing operation HTTP request to a Docker environment
