@@ -3,9 +3,13 @@ angular.module('portainer.azure')
 function ($scope, $state, AzureService, Notifications) {
 
   function initView() {
-    AzureService.containerGroups()
+    AzureService.subscriptions()
     .then(function success(data) {
-      $scope.containerGroups = data;
+      var subscriptions = data;
+      return AzureService.containerGroups(subscriptions);
+    })
+    .then(function success(data) {
+      $scope.containerGroups = AzureService.aggregate(data);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to load container groups');

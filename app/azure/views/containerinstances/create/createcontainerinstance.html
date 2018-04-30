@@ -17,7 +17,7 @@
           <div class="form-group">
             <label for="azure_subscription" class="col-sm-1 control-label text-left">Subscription</label>
             <div class="col-sm-11">
-              <select class="form-control" name="azure_subscription" ng-model="state.selectedSubscription" ng-options="subscription.Name for subscription in subscriptions"></select>
+              <select class="form-control" name="azure_subscription" ng-model="state.selectedSubscription" ng-options="subscription.Name for subscription in subscriptions" ng-change="changeSubscription()"></select>
             </div>
           </div>
           <!-- !subscription-input -->
@@ -33,7 +33,7 @@
           <div class="form-group">
             <label for="azure_location" class="col-sm-1 control-label text-left">Location</label>
             <div class="col-sm-11">
-              <select class="form-control" name="azure_location" ng-model="model.Location" ng-options="location.Name as location.DisplayName for location in locations"></select>
+              <select class="form-control" name="azure_location" ng-model="model.Location" ng-options="location for location in locations"></select>
             </div>
           </div>
           <!-- !location-input -->

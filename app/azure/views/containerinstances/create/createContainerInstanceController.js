@@ -1,11 +1,27 @@
 angular.module('portainer.azure')
-.controller('AzureCreateContainerInstanceController', ['$q', '$scope', '$state', 'SubscriptionService', 'ContainerGroupService', 'AzureService', 'Notifications',
-function ($q, $scope, $state, SubscriptionService, ContainerGroupService, AzureService, Notifications) {
+.controller('AzureCreateContainerInstanceController', ['$q', '$scope', '$state', 'AzureService', 'Notifications',
+function ($q, $scope, $state, AzureService, Notifications) {
+
+  var allResourceGroups = [];
+  var allProviders = [];
 
   $scope.state = {
     actionInProgress: false,
     selectedSubscription: null,
     selectedResourceGroup: null
+  };
+
+  $scope.changeSubscription = function() {
+    var selectedSubscription = $scope.state.selectedSubscription;
+    updateResourceGroupsAndLocations(selectedSubscription, allResourceGroups, allProviders);
+  };
+
+  $scope.addPortBinding = function() {
+    $scope.model.Ports.push({ host: '', container: '', protocol: 'TCP' });
+  };
+
+  $scope.removePortBinding = function(index) {
+    $scope.model.Ports.splice(index, 1);
   };
 
   $scope.create = function() {
@@ -14,7 +30,7 @@ function ($q, $scope, $state, SubscriptionService, ContainerGroupService, AzureS
     var resourceGroupName = $scope.state.selectedResourceGroup.Name;
 
     $scope.state.actionInProgress = true;
-    ContainerGroupService.create(model, subscriptionId, resourceGroupName)
+    AzureService.createContainerGroup(model, subscriptionId, resourceGroupName)
     .then(function success(data) {
       Notifications.success('Container successfully created', model.Name);
       $state.go('azure.containerinstances');
@@ -27,38 +43,40 @@ function ($q, $scope, $state, SubscriptionService, ContainerGroupService, AzureS
     });
   };
 
-  $scope.addPortBinding = function() {
-    $scope.model.Ports.push({ host: '', container: '', protocol: 'TCP' });
-  };
+  function updateResourceGroupsAndLocations(subscription, resourceGroups, providers) {
+    $scope.state.selectedResourceGroup = resourceGroups[subscription.Id][0];
+    $scope.resourceGroups = resourceGroups[subscription.Id];
 
-  $scope.removePortBinding = function(index) {
-    $scope.model.Ports.splice(index, 1);
-  };
+    var currentSubLocations = providers[subscription.Id].Locations;
+    $scope.model.Location = currentSubLocations[0];
+    $scope.locations = currentSubLocations;
+  }
 
   function initView() {
     var model = new ContainerGroupDefaultModel();
 
-    $q.all({
-      subscriptions: SubscriptionService.subscriptions(),
-      resourceGroups: AzureService.resourceGroups(),
-      locations: AzureService.locations()
+    AzureService.subscriptions()
+    .then(function success(data) {
+      var subscriptions = data;
+      $scope.state.selectedSubscription = subscriptions[0];
+      $scope.subscriptions = subscriptions;
+
+      return $q.all({
+        resourceGroups: AzureService.resourceGroups(subscriptions),
+        containerInstancesProviders: AzureService.containerInstanceProvider(subscriptions)
+      });
     })
     .then(function success(data) {
-      var subscriptions = data.subscriptions;
       var resourceGroups = data.resourceGroups;
-      var locations = data.locations;
+      allResourceGroups = resourceGroups;
 
-      // TODO: resource groups and locations should be based on the selected subscription.
-      // Should be updated when the subscription is changed as well.
+      var containerInstancesProviders = data.containerInstancesProviders;
+      allProviders = containerInstancesProviders;
 
-      $scope.state.selectedSubscription = subscriptions[0];
-      $scope.state.selectedResourceGroup = resourceGroups[0];
-      model.Location = locations[0].Name;
-
-      $scope.subscriptions = subscriptions;
-      $scope.resourceGroups = resourceGroups;
-      $scope.locations = locations;
       $scope.model = model;
+
+      var selectedSubscription = $scope.state.selectedSubscription;
+      updateResourceGroupsAndLocations(selectedSubscription, resourceGroups, containerInstancesProviders);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve Azure resources');

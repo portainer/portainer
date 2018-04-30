@@ -8,10 +8,8 @@ angular.module('portainer.azure')
 
     Provider.get({ subscriptionId: subscriptionId, providerNamespace: 'Microsoft.ContainerInstance' }).$promise
     .then(function success(data) {
-      var locations = data.value.map(function (item) {
-        return new ProviderViewModel(item);
-      });
-      deferred.resolve(locations);
+      var provider = new ContainerInstanceProviderViewModel(data);
+      deferred.resolve(provider);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve provider', err: err });
