@@ -1,6 +1,6 @@
 angular.module('portainer.azure')
-.controller('AzureCreateContainerInstanceController', ['$q', '$scope', '$state', 'SubscriptionService', 'ContainerGroupService', 'AzureResourceService', 'Notifications',
-function ($q, $scope, $state, SubscriptionService, ContainerGroupService, AzureResourceService, Notifications) {
+.controller('AzureCreateContainerInstanceController', ['$q', '$scope', '$state', 'SubscriptionService', 'ContainerGroupService', 'AzureService', 'Notifications',
+function ($q, $scope, $state, SubscriptionService, ContainerGroupService, AzureService, Notifications) {
 
   $scope.state = {
     actionInProgress: false,
@@ -40,8 +40,8 @@ function ($q, $scope, $state, SubscriptionService, ContainerGroupService, AzureR
 
     $q.all({
       subscriptions: SubscriptionService.subscriptions(),
-      resourceGroups: AzureResourceService.resourceGroups(),
-      locations: AzureResourceService.locations()
+      resourceGroups: AzureService.resourceGroups(),
+      locations: AzureService.locations()
     })
     .then(function success(data) {
       var subscriptions = data.subscriptions;

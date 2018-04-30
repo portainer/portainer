@@ -1,8 +1,12 @@
 angular.module('portainer.azure')
-.factory('AzureResourceService', ['$q', 'SubscriptionService', 'ResourceGroupService', 'ContainerGroupService', 'LocationService',
-function AzureResourceServiceFactory($q, SubscriptionService, ResourceGroupService, ContainerGroupService, LocationService) {
+.factory('AzureService', ['$q', 'Azure', 'SubscriptionService', 'ResourceGroupService', 'ContainerGroupService', 'LocationService',
+function AzureServiceFactory($q, Azure, SubscriptionService, ResourceGroupService, ContainerGroupService, LocationService) {
   'use strict';
   var service = {};
+
+  service.deleteContainerGroup = function(id) {
+    return Azure.delete(id, '2018-04-01');
+  };
 
   service.resourceGroups = function() {
     return retrieveResourcesForAllSubscriptions(ResourceGroupService.resourceGroups);
