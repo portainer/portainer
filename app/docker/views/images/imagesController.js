@@ -7,12 +7,16 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
 
   $scope.formValues = {
     Image: '',
-    Registry: ''
+    Registry: '',
+    NodeName: null
   };
 
   $scope.pullImage = function() {
     var image = $scope.formValues.Image;
     var registry = $scope.formValues.Registry;
+
+    var nodeName = $scope.formValues.NodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
     $scope.state.actionInProgress = true;
     ImageService.pullImage(image, registry, false)
