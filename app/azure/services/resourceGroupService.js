@@ -9,7 +9,7 @@ angular.module('portainer.azure')
     ResourceGroup.query({ subscriptionId: subscriptionId }).$promise
     .then(function success(data) {
       var resourceGroups = data.value.map(function (item) {
-        return new ResourceGroupViewModel(item);
+        return new ResourceGroupViewModel(item, subscriptionId);
       });
       deferred.resolve(resourceGroups);
     })

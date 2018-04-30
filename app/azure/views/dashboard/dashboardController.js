@@ -1,11 +1,11 @@
 angular.module('portainer.azure')
-.controller('AzureDashboardController', ['$q', '$scope', 'AzureDashboardService', 'SubscriptionService', 'Notifications',
-function ($q, $scope, AzureDashboardService, SubscriptionService, Notifications) {
+.controller('AzureDashboardController', ['$q', '$scope', 'AzureResourceService', 'SubscriptionService', 'Notifications',
+function ($q, $scope, AzureResourceService, SubscriptionService, Notifications) {
 
   function initView() {
     $q.all({
       subscriptions: SubscriptionService.subscriptions(),
-      resourceGroups: AzureDashboardService.resourceGroups()
+      resourceGroups: AzureResourceService.resourceGroups()
     })
     .then(function success(data) {
       $scope.subscriptions = data.subscriptions;
