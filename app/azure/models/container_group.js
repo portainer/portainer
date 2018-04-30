@@ -15,6 +15,14 @@ function ContainerGroupDefaultModel() {
   this.Memory = 1;
 }
 
+function ContainerGroupViewModel(data) {
+  this.Id = data.id;
+  this.Name = data.name;
+  this.Location = data.location;
+  this.IPAddress = data.properties.ipAddress.ip;
+  this.Ports = data.properties.ipAddress.ports;
+}
+
 function CreateContainerGroupRequest(model) {
   this.location = model.Location;
 
@@ -55,10 +63,4 @@ function CreateContainerGroupRequest(model) {
       ports: addressPorts
     }
   };
-}
-
-function ContainerGroupViewModel(data) {
-  this.Id = data.id;
-  this.Name = data.name;
-  this.Location = data.location;
 }

@@ -46,6 +46,9 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Location' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th>
+                Published Ports
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -58,6 +61,12 @@
                 <a ui-sref="azure.containerinstances.container({ id: item.Id })">{{ item.Name | truncate:50 }}</a>
               </td>
               <td>{{ item.Location }}</td>
+              <td>
+                <a ng-if="item.Ports.length > 0" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ item.IPAddress }}:{{ p.port }}" target="_blank">
+                  <i class="fa fa-external-link-alt" aria-hidden="true"></i> :{{ p.port }}
+                </a>
+                <span ng-if="item.Ports.length == 0" >-</span>
+              </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="2" class="text-center text-muted">Loading...</td>
