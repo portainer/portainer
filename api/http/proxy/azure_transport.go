@@ -3,6 +3,7 @@ package proxy
 import (
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/portainer/portainer"
@@ -21,6 +22,7 @@ type (
 		credentials *portainer.AzureCredentials
 		client      *client.HTTPClient
 		token       *azureAPIToken
+		mutex       sync.Mutex
 	}
 )
 
@@ -52,6 +54,9 @@ func (transport *AzureTransport) authenticate() error {
 }
 
 func (transport *AzureTransport) retrieveAuthenticationToken() error {
+	transport.mutex.Lock()
+	defer transport.mutex.Unlock()
+
 	if transport.token == nil {
 		return transport.authenticate()
 	}
