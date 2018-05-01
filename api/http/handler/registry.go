@@ -372,7 +372,7 @@ func getRegistryAuthHeaderInfos(authHeader string) (authType string, authURL str
 			}
 		}
 
-		authURL := m["realm"]
+		authURL = m["realm"]
 		if v, ok := m["service"]; ok {
 			authURL += "?service=" + v
 			if v, ok = m["scope"]; ok {
@@ -417,14 +417,14 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 	req.RequestURI = ""
 	u, err := url.Parse(registry.Protocol + "://" + registry.URL + "/" + uri)
 	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
 
 	req.URL = u
 	req.Host = registry.URL
 	resp, err := handler.HttpClient.Do(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
 
 	// Get Www-Authenticate header to find requested auth method
@@ -437,13 +437,13 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 		// Call auth URI to get token, and recall registry with token
 		authReq, err := http.NewRequest(http.MethodGet, authURL, nil)
 		if err != nil {
-			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		}
 		authReq.SetBasicAuth(registry.Username, registry.Password)
 
 		resp, err = handler.HttpClient.Do(authReq)
 		if err != nil {
-			httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		}
 		if resp.StatusCode == http.StatusOK {
 			// Parse response into RegistryAuthResponse
@@ -451,7 +451,7 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 			respJson := &RegistryAuthResponse{}
 			err = json.NewDecoder(resp.Body).Decode(respJson)
 			if err != nil {
-				httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+				httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			}
 
 			// Forward to registry with bearer token
