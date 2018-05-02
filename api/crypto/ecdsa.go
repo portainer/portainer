@@ -7,7 +7,6 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/hex"
-	"fmt"
 	"math/big"
 )
 
@@ -96,20 +95,29 @@ func (service *ECDSAService) GenerateKeyPair() ([]byte, []byte, error) {
 // It automatically hash the message using MD5 and creates a signature from
 // that hash.
 func (service *ECDSAService) Sign(message string) ([]byte, error) {
-	hasher := md5.New()
-	hasher.Write([]byte(message))
-	hash := fmt.Sprintf("%x", hasher.Sum(nil))
+	digest := md5.New()
+	digest.Write([]byte(message))
+	hash := digest.Sum(nil)
 
 	r := big.NewInt(0)
 	s := big.NewInt(0)
 
-	r, s, err := ecdsa.Sign(rand.Reader, service.privateKey, []byte(hash))
+	r, s, err := ecdsa.Sign(rand.Reader, service.privateKey, hash)
 	if err != nil {
 		return nil, err
 	}
 
-	signature := r.Bytes()
-	signature = append(signature, s.Bytes()...)
+	keyBytes := service.privateKey.Params().BitSize / 8
+
+	rBytes := r.Bytes()
+	rBytesPadded := make([]byte, keyBytes)
+	copy(rBytesPadded[keyBytes-len(rBytes):], rBytes)
+
+	sBytes := s.Bytes()
+	sBytesPadded := make([]byte, keyBytes)
+	copy(sBytesPadded[keyBytes-len(sBytes):], sBytes)
+
+	signature := append(rBytesPadded, sBytesPadded...)
 
 	return signature, nil
 }

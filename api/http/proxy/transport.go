@@ -3,7 +3,6 @@ package proxy
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"path"
 	"regexp"
@@ -60,13 +59,13 @@ func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Resp
 	return p.dockerTransport.RoundTrip(request)
 }
 
-func (p *proxyTransport) createSignature() (string, error) {
+func (p *proxyTransport) createEncodedSignature() (string, error) {
 	signature, err := p.SignatureService.Sign(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
 		return "", err
 	}
 
-	return fmt.Sprintf("%x", signature), nil
+	return base64.RawStdEncoding.EncodeToString(signature), nil
 }
 
 func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Response, error) {
@@ -74,10 +73,11 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 	request.URL.Path = path
 
 	if p.enableSignature {
-		signature, err := p.createSignature()
+		signature, err := p.createEncodedSignature()
 		if err != nil {
 			return nil, err
 		}
+
 		request.Header.Set(portainer.PortainerAgentPublicKeyHeader, p.SignatureService.EncodedPublicKey())
 		request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
 	}
