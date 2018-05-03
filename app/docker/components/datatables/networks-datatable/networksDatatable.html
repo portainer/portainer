@@ -81,7 +81,7 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.Config[0].Gateway' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th ng-if="$ctrl.showHostColumn">
                 <a ng-click="$ctrl.changeOrderBy('NodeName')">
                   Host
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
@@ -112,7 +112,7 @@
               <td>{{ item.IPAM.Driver }}</td>
               <td>{{ item.IPAM.Config[0].Subnet ? item.IPAM.Config[0].Subnet : '-' }}</td>
               <td>{{ item.IPAM.Config[0].Gateway ? item.IPAM.Config[0].Gateway : '-' }}</td>
-              <td>{{ item.NodeName ? item.NodeName : '-' }}</td>
+              <td ng-if="$ctrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
               <td ng-if="$ctrl.showOwnershipColumn">
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
