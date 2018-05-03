@@ -17,6 +17,7 @@ function ImageFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpR
     push: {
       method: 'POST', params: {action: 'push', id: '@tag'},
       isArray: true, transformResponse: jsonObjectsToArrayHandler,
+      headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader },
       ignoreLoadingBar: true
     },
     create: {

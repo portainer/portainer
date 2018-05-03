@@ -2,7 +2,7 @@ package exec
 
 import (
 	"bytes"
-	"fmt"
+	"encoding/base64"
 	"os"
 	"os/exec"
 	"path"
@@ -68,11 +68,6 @@ func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
 
 // Deploy executes the docker stack deploy command.
 func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
-	err := manager.updateDockerCLIConfiguration(manager.binaryPath)
-	if err != nil {
-		return err
-	}
-
 	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 
@@ -92,11 +87,6 @@ func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint
 
 // Remove executes the docker stack rm command.
 func (manager *StackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	err := manager.updateDockerCLIConfiguration(manager.binaryPath)
-	if err != nil {
-		return err
-	}
-
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
 	args = append(args, "stack", "rm", stack.Name)
 	return runCommandAndCaptureStdErr(command, args, nil, "")
@@ -158,7 +148,7 @@ func (manager *StackManager) updateDockerCLIConfiguration(binaryPath string) err
 	if err != nil {
 		return err
 	}
-	config.HTTPHeaders.SignatureHeader = fmt.Sprintf("%x", signature)
+	config.HTTPHeaders.SignatureHeader = base64.RawStdEncoding.EncodeToString(signature)
 	config.HTTPHeaders.PublicKey = manager.signatureService.EncodedPublicKey()
 
 	err = manager.fileService.WriteJSONToFile(path.Join(binaryPath, "config.json"), config)
