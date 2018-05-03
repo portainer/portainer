@@ -45,15 +45,11 @@ function genericHandler(data) {
 }
 
 // The Docker API returns the logs as a single string.
-// This handler will return an array with each line being an entry.
-// It will also strip the 8 first characters of each line and remove any ANSI code related character sequences.
+// This handler wraps the data in a JSON object under the "logs" property.
 function logsHandler(data) {
-  var logs = data;
-  logs = logs.substring(8);
-  logs = logs.replace(/\n(.{8})/g, '\n\r');
-  logs = logs.replace(
-    /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
-  return logs.split('\n');
+  return {
+    logs: data
+  };
 }
 
 // Image delete API returns an array on success (Docker 1.9 -> Docker 1.12).

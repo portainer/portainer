@@ -1,5 +1,6 @@
 angular.module('portainer.docker')
-.factory('ContainerService', ['$q', 'Container', 'ResourceControlService', function ContainerServiceFactory($q, Container, ResourceControlService) {
+.factory('ContainerService', ['$q', 'Container', 'ResourceControlService', 'LogHelper',
+function ContainerServiceFactory($q, Container, ResourceControlService, LogHelper) {
   'use strict';
   var service = {};
 
@@ -131,7 +132,9 @@ angular.module('portainer.docker')
     return deferred.promise;
   };
 
-  service.logs = function(id, stdout, stderr, timestamps, tail) {
+  service.logs = function(id, stdout, stderr, timestamps, tail, stripHeaders) {
+    var deferred = $q.defer();
+
     var parameters = {
       id: id,
       stdout: stdout || 0,
@@ -140,7 +143,16 @@ angular.module('portainer.docker')
       tail: tail || 'all'
     };
 
-    return Container.logs(parameters).$promise;
+    Container.logs(parameters).$promise
+    .then(function success(data) {
+      var logs = LogHelper.formatLogs(data.logs, stripHeaders);
+      deferred.resolve(logs);
+    })
+    .catch(function error(err) {
+      deferred.reject(err);
+    });
+
+    return deferred.promise;
   };
 
   service.containerStats = function(id) {
