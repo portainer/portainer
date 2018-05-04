@@ -389,12 +389,14 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     // Mac Address
     $scope.formValues.MacAddress = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].MacAddress;
     // ExtraHosts
-    var extraHosts = $scope.config.HostConfig.ExtraHosts;
-    for (var i = 0; i < extraHosts.length; i++) {
-      var host = extraHosts[i];
-      $scope.formValues.ExtraHosts.push({ 'value': host });
+    if ($scope.config.HostConfig.ExtraHosts) {
+      var extraHosts = $scope.config.HostConfig.ExtraHosts;
+      for (var i = 0; i < extraHosts.length; i++) {
+        var host = extraHosts[i];
+        $scope.formValues.ExtraHosts.push({ 'value': host });
+      }
+      $scope.config.HostConfig.ExtraHosts = [];
     }
-    $scope.config.HostConfig.ExtraHosts = [];
   }
 
   function loadFromContainerEnvironmentVariables(d) {
@@ -492,6 +494,10 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   }
 
   function initView() {
+    var nodeName = $transition$.params().nodeName;
+    $scope.formValues.NodeName = nodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+
     Volume.query({}, function (d) {
       $scope.availableVolumes = d.Volumes;
     }, function (e) {
@@ -521,7 +527,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     Container.query({}, function (d) {
       var containers = d;
       $scope.runningContainers = containers;
-      if ($transition$.params().from !== '') {
+      if ($transition$.params().from) {
         loadFromContainerSpec();
       } else {
         $scope.fromContainer = {};

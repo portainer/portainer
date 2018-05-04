@@ -144,11 +144,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       $scope.state.joinNetworkInProgress = false;
     });
   };
-
-  $scope.duplicate = function() {
-    $state.go('docker.containers.new', { from: $transition$.params().id }, { reload: true });
-  };
-
+  
   $scope.commit = function () {
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;
