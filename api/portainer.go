@@ -389,7 +389,7 @@ type (
 		GenerateKeyPair() ([]byte, []byte, error)
 		EncodedPublicKey() string
 		PEMHeaders() (string, string)
-		Sign(message string) ([]byte, error)
+		Sign(message string) (string, error)
 	}
 
 	// JWTService represents a service for managing JWT tokens.

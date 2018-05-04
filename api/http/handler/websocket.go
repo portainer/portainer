@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -131,10 +130,8 @@ func (handler *WebSocketHandler) proxyWebsocketRequest(w http.ResponseWriter, r 
 		return err
 	}
 
-	signatureHeader := base64.RawStdEncoding.EncodeToString(signature)
-
 	proxy.Director = func(incoming *http.Request, out http.Header) {
-		out.Set(portainer.PortainerAgentSignatureHeader, signatureHeader)
+		out.Set(portainer.PortainerAgentSignatureHeader, signature)
 		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
 	}
 

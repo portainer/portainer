@@ -59,21 +59,12 @@ func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Resp
 	return p.dockerTransport.RoundTrip(request)
 }
 
-func (p *proxyTransport) createEncodedSignature() (string, error) {
-	signature, err := p.SignatureService.Sign(portainer.PortainerAgentSignatureMessage)
-	if err != nil {
-		return "", err
-	}
-
-	return base64.RawStdEncoding.EncodeToString(signature), nil
-}
-
 func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Response, error) {
 	path := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 	request.URL.Path = path
 
 	if p.enableSignature {
-		signature, err := p.createEncodedSignature()
+		signature, err := p.SignatureService.Sign(portainer.PortainerAgentSignatureMessage)
 		if err != nil {
 			return nil, err
 		}

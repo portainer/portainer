@@ -6,6 +6,7 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/hex"
 	"math/big"
 )
@@ -94,7 +95,8 @@ func (service *ECDSAService) GenerateKeyPair() ([]byte, []byte, error) {
 // Sign creates a signature from a message.
 // It automatically hash the message using MD5 and creates a signature from
 // that hash.
-func (service *ECDSAService) Sign(message string) ([]byte, error) {
+// It then encodes the generated signature in base64.
+func (service *ECDSAService) Sign(message string) (string, error) {
 	digest := md5.New()
 	digest.Write([]byte(message))
 	hash := digest.Sum(nil)
@@ -104,7 +106,7 @@ func (service *ECDSAService) Sign(message string) ([]byte, error) {
 
 	r, s, err := ecdsa.Sign(rand.Reader, service.privateKey, hash)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	keyBytes := service.privateKey.Params().BitSize / 8
@@ -119,5 +121,5 @@ func (service *ECDSAService) Sign(message string) ([]byte, error) {
 
 	signature := append(rBytesPadded, sBytesPadded...)
 
-	return signature, nil
+	return base64.RawStdEncoding.EncodeToString(signature), nil
 }

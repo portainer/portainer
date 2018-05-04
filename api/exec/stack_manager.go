@@ -2,7 +2,6 @@ package exec
 
 import (
 	"bytes"
-	"encoding/base64"
 	"os"
 	"os/exec"
 	"path"
@@ -148,7 +147,7 @@ func (manager *StackManager) updateDockerCLIConfiguration(binaryPath string) err
 	if err != nil {
 		return err
 	}
-	config.HTTPHeaders.SignatureHeader = base64.RawStdEncoding.EncodeToString(signature)
+	config.HTTPHeaders.SignatureHeader = signature
 	config.HTTPHeaders.PublicKey = manager.signatureService.EncodedPublicKey()
 
 	err = manager.fileService.WriteJSONToFile(path.Join(binaryPath, "config.json"), config)
