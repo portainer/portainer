@@ -389,12 +389,12 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     // Mac Address
     $scope.formValues.MacAddress = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].MacAddress;
     // ExtraHosts
-    for (var h in $scope.config.HostConfig.ExtraHosts) {
-      if ({}.hasOwnProperty.call($scope.config.HostConfig.ExtraHosts, h)) {
-        $scope.formValues.ExtraHosts.push({'value': $scope.config.HostConfig.ExtraHosts[h]});
-        $scope.config.HostConfig.ExtraHosts = [];
-      }
+    var extraHosts = $scope.config.HostConfig.ExtraHosts;
+    for (var i = 0; i < extraHosts.length; i++) {
+      var host = extraHosts[i];
+      $scope.formValues.ExtraHosts.push({ 'value': host });
     }
+    $scope.config.HostConfig.ExtraHosts = [];
   }
 
   function loadFromContainerEnvironmentVariables(d) {
