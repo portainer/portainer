@@ -84,7 +84,7 @@
           </thead>
           <tbody>
             <tr ng-repeat="container in containersUsingVolume">
-              <td><a ui-sref="docker.containers.container({id: container.Id})">{{ container | containername }}</a></td>
+              <td><a ui-sref="docker.containers.container({ id: container.Id, nodeName: container.NodeName })">{{ container | containername }}</a></td>
               <td>{{ container.volumeData.Destination }}</td>
               <td>{{ !container.volumeData.RW }}</td>
             </tr>

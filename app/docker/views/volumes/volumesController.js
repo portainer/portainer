@@ -1,10 +1,11 @@
 angular.module('portainer.docker')
-.controller('VolumesController', ['$q', '$scope', '$state', 'VolumeService', 'ServiceService', 'VolumeHelper', 'Notifications',
-function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications) {
+.controller('VolumesController', ['$q', '$scope', '$state', 'VolumeService', 'ServiceService', 'VolumeHelper', 'Notifications', 'HttpRequestHelper',
+function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper) {
 
   $scope.removeAction = function (selectedItems) {
     var actionCount = selectedItems.length;
     angular.forEach(selectedItems, function (volume) {
+      HttpRequestHelper.setPortainerAgentTargetHeader(volume.NodeName);
       VolumeService.remove(volume)
       .then(function success() {
         Notifications.success('Volume successfully removed', volume.Id);

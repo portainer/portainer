@@ -4,11 +4,19 @@ angular.module('portainer.docker')
 
   var helper = {};
 
-  helper.determineEndpointMode = function(info) {
+  helper.determineEndpointMode = function(info, type) {
     var mode = {
       provider: '',
-      role: ''
+      role: '',
+      agentProxy: false
     };
+
+    if (type === 2) {
+      mode.provider = 'DOCKER_SWARM_MODE';
+      mode.role = 'MANAGER';
+      mode.agentProxy = true;
+      return mode;
+    }
 
     if (!info.Swarm || _.isEmpty(info.Swarm.NodeID)) {
       if (info.ID === 'vSphere Integrated Containers') {

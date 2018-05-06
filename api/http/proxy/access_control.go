@@ -98,9 +98,12 @@ func canUserAccessResource(userID portainer.UserID, userTeamIDs []portainer.Team
 }
 
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {
-	metadata := make(map[string]interface{})
-	metadata["ResourceControl"] = resourceControl
-	object["Portainer"] = metadata
+	if object["Portainer"] == nil {
+		object["Portainer"] = make(map[string]interface{})
+	}
+
+	portainerMetadata := object["Portainer"].(map[string]interface{})
+	portainerMetadata["ResourceControl"] = resourceControl
 	return object
 }
 

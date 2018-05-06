@@ -3,27 +3,39 @@ angular.module('portainer.app')
 function ($q, $scope, $state, EndpointService, GroupService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
 
   $scope.switchEndpoint = function(endpoint) {
-    var activeEndpointID = EndpointProvider.endpointID();
-    var activeEndpointPublicURL = EndpointProvider.endpointPublicURL();
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-
     ExtensionManager.initEndpointExtensions(endpoint.Id)
     .then(function success(data) {
       var extensions = data;
-      return StateManager.updateEndpointState(true, extensions);
+      return StateManager.updateEndpointState(true, endpoint.Type, extensions);
     })
     .then(function success() {
+      $scope.currentEndpoint = endpoint;
       $state.go('docker.dashboard');
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
-      EndpointProvider.setEndpointID(activeEndpointID);
-      EndpointProvider.setEndpointPublicURL(activeEndpointPublicURL);
-      StateManager.updateEndpointState(true)
-      .then(function success() {});
+      var currentEndpoint = $scope.currentEndpoint;
+      EndpointProvider.setEndpointID(currentEndpoint.Id);
+      EndpointProvider.setEndpointPublicURL(currentEndpoint.PublicURL);
+      return StateManager.updateEndpointState(true, currentEndpoint.Type, currentEndpoint.Extensions);
     });
   };
+
+  function setActiveEndpoint(endpoints) {
+    var activeEndpointID = EndpointProvider.endpointID();
+
+    for (var i = 0; i < endpoints.length; i++) {
+      var endpoint = endpoints[i];
+      if (endpoint.Id === activeEndpointID) {
+        $scope.activeEndpoint = endpoint;
+        $scope.currentEndpoint = endpoint;
+        EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+        break;
+      }
+    }
+  }
 
   function checkPermissions(memberships) {
     var isLeader = false;
@@ -49,14 +61,7 @@ function ($q, $scope, $state, EndpointService, GroupService, StateManager, Endpo
       $scope.groups = data.groups;
       $scope.endpoints = endpoints;
 
-      var activeEndpointID = EndpointProvider.endpointID();
-      for (var i = 0; i < endpoints.length; i++) {
-        var endpoint = endpoints[i];
-        if (endpoint.Id === activeEndpointID) {
-          $scope.activeEndpoint = endpoint;
-          break;
-        }
-      }
+      setActiveEndpoint(endpoints);
 
       if (StateManager.getState().application.authentication) {
         var userDetails = Authentication.getUserDetails();

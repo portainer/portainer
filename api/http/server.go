@@ -34,6 +34,7 @@ type Server struct {
 	StackManager           portainer.StackManager
 	LDAPService            portainer.LDAPService
 	GitService             portainer.GitService
+	SignatureService       portainer.DigitalSignatureService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
@@ -43,7 +44,15 @@ type Server struct {
 // Start starts the HTTP server
 func (server *Server) Start() error {
 	requestBouncer := security.NewRequestBouncer(server.JWTService, server.UserService, server.TeamMembershipService, server.AuthDisabled)
-	proxyManager := proxy.NewManager(server.ResourceControlService, server.TeamMembershipService, server.SettingsService, server.RegistryService, server.DockerHubService)
+	proxyManagerParameters := &proxy.ManagerParams{
+		ResourceControlService: server.ResourceControlService,
+		TeamMembershipService:  server.TeamMembershipService,
+		SettingsService:        server.SettingsService,
+		RegistryService:        server.RegistryService,
+		DockerHubService:       server.DockerHubService,
+		SignatureService:       server.SignatureService,
+	}
+	proxyManager := proxy.NewManager(proxyManagerParameters)
 
 	var fileHandler = handler.NewFileHandler(filepath.Join(server.AssetsPath, "public"))
 	var authHandler = handler.NewAuthHandler(requestBouncer, server.AuthDisabled)
@@ -78,6 +87,7 @@ func (server *Server) Start() error {
 	dockerHandler.ProxyManager = proxyManager
 	var websocketHandler = handler.NewWebSocketHandler()
 	websocketHandler.EndpointService = server.EndpointService
+	websocketHandler.SignatureService = server.SignatureService
 	var endpointHandler = handler.NewEndpointHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.EndpointGroupService = server.EndpointGroupService

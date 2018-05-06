@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerStatsController', ['$q', '$scope', '$transition$', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications',
-function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications) {
+.controller('ContainerStatsController', ['$q', '$scope', '$transition$', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'HttpRequestHelper',
+function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications, HttpRequestHelper) {
 
   $scope.state = {
     refreshRate: '5',
@@ -126,6 +126,7 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
   }
 
   function initView() {
+    HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
     ContainerService.container($transition$.params().id)
     .then(function success(data) {
       $scope.container = data;

@@ -9,6 +9,7 @@ const (
 	defaultNoAuth          = "false"
 	defaultNoAnalytics     = "false"
 	defaultTLSVerify       = "false"
+	defaultTLSSkipVerify   = "false"
 	defaultTLSCACertPath   = "/certs/ca.pem"
 	defaultTLSCertPath     = "/certs/cert.pem"
 	defaultTLSKeyPath      = "/certs/key.pem"

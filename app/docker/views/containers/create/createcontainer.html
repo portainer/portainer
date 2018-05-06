@@ -103,6 +103,16 @@
             <!-- !port-mapping-input-list -->
           </div>
           <!-- !port-mapping -->
+          <div ng-if="applicationState.endpoint.mode.agentProxy">
+            <div class="col-sm-12 form-section-title">
+              Deployment
+            </div>
+            <!-- node-selection -->
+            <node-selector
+              model="formValues.NodeName">
+            </node-selector>
+            <!-- !node-selection -->
+          </div>
           <!-- access-control -->
           <por-access-control-form form-data="formValues.AccessControlData" resource-control="fromContainer.ResourceControl" ng-if="applicationState.application.authentication && fromContainer"></por-access-control-form>
           <!-- !access-control -->

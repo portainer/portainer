@@ -122,18 +122,18 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     return extensions;
   }
 
-  manager.updateEndpointState = function(loading, extensions) {
+  manager.updateEndpointState = function(loading, type, extensions) {
     var deferred = $q.defer();
 
     if (loading) {
       state.loading = true;
     }
     $q.all({
-      info: SystemService.info(),
-      version: SystemService.version()
+      version: SystemService.version(),
+      info: SystemService.info()
     })
     .then(function success(data) {
-      var endpointMode = InfoHelper.determineEndpointMode(data.info);
+      var endpointMode = InfoHelper.determineEndpointMode(data.info, type);
       var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
       state.endpoint.apiVersion = endpointAPIVersion;

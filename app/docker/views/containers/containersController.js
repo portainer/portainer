@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', '$transition$', 'ContainerService', 'SystemService', 'Notifications', 'ModalService', 'EndpointProvider',
-  function ($q, $scope, $state, $filter, $transition$, ContainerService, SystemService, Notifications, ModalService, EndpointProvider) {
+  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', '$transition$', 'ContainerService', 'SystemService', 'Notifications', 'ModalService', 'EndpointProvider', 'HttpRequestHelper',
+  function ($q, $scope, $state, $filter, $transition$, ContainerService, SystemService, Notifications, ModalService, EndpointProvider, HttpRequestHelper) {
   $scope.state = {
     publicURL: EndpointProvider.endpointPublicURL()
   };
@@ -70,6 +70,7 @@ angular.module('portainer.docker')
   function executeActionOnContainerList(containers, action, successMessage, errorMessage) {
     var actionCount = containers.length;
     angular.forEach(containers, function (container) {
+      HttpRequestHelper.setPortainerAgentTargetHeader(container.NodeName);
       action(container.Id)
       .then(function success() {
         Notifications.success(successMessage, container.Names[0]);
@@ -89,6 +90,7 @@ angular.module('portainer.docker')
   function removeAction(containers, cleanVolumes) {
     var actionCount = containers.length;
     angular.forEach(containers, function (container) {
+      HttpRequestHelper.setPortainerAgentTargetHeader(container.NodeName);
       ContainerService.remove(container, cleanVolumes)
       .then(function success() {
         Notifications.success('Container successfully removed', container.Names[0]);

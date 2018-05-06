@@ -81,6 +81,13 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.Config[0].Gateway' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th ng-if="$ctrl.showHostColumn">
+                <a ng-click="$ctrl.changeOrderBy('NodeName')">
+                  Host
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
               <th ng-if="$ctrl.showOwnershipColumn">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
@@ -97,7 +104,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="docker.networks.network({id: item.Id})" title="{{ item.Name }}">{{ item.Name | truncate:40 }}</a>
+                <a ui-sref="docker.networks.network({ id: item.Id, nodeName: item.NodeName })" title="{{ item.Name }}">{{ item.Name | truncate:40 }}</a>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
               <td>{{ item.Scope }}</td>
@@ -105,6 +112,7 @@
               <td>{{ item.IPAM.Driver }}</td>
               <td>{{ item.IPAM.Config[0].Subnet ? item.IPAM.Config[0].Subnet : '-' }}</td>
               <td>{{ item.IPAM.Config[0].Gateway ? item.IPAM.Config[0].Gateway : '-' }}</td>
+              <td ng-if="$ctrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
               <td ng-if="$ctrl.showOwnershipColumn">
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
@@ -113,10 +121,10 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="8" class="text-center text-muted">Loading...</td>
+              <td colspan="9" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="8" class="text-center text-muted">No network available.</td>
+              <td colspan="9" class="text-center text-muted">No network available.</td>
             </tr>
           </tbody>
         </table>

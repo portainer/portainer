@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService) {
 
   $scope.state = {
     updateInProgress: false,
@@ -407,6 +407,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
     ServiceService.service($transition$.params().id)
     .then(function success(data) {
@@ -425,6 +426,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       return $q.all({
         volumes: VolumeService.volumes(),
         tasks: TaskService.tasks({ service: [service.Name] }),
+        containers: agentProxy ? ContainerService.containers() : [],
         nodes: NodeService.nodes(),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
@@ -434,7 +436,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       });
     })
     .then(function success(data) {
-      $scope.tasks = data.tasks;
       $scope.nodes = data.nodes;
       $scope.configs = data.configs;
       $scope.secrets = data.secrets;
@@ -444,6 +445,19 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
       $scope.isAdmin = userDetails.role === 1;
+
+      var tasks = data.tasks;
+
+      if (agentProxy) {
+        var containers = data.containers;
+        for (var i = 0; i < tasks.length; i++) {
+          var task = tasks[i];
+          TaskHelper.associateContainerToTask(task, containers);
+        }
+      }
+
+      $scope.tasks = data.tasks;
+
 
       // Set max cpu value
       var maxCpus = 0;

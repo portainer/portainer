@@ -104,6 +104,14 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	// https://github.com/portainer/portainer/issues/461
+	if m.CurrentDBVersion < 10 {
+		err := m.updateEndpointsToVersion10()
+		if err != nil {
+			return err
+		}
+	}
+
 	err := m.VersionService.StoreDBVersion(portainer.DBVersion)
 	if err != nil {
 		return err

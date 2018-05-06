@@ -35,6 +35,34 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
     return deferred.promise;
   };
 
+  service.startContainer = function(id) {
+    return Container.start({ id: id }, {}).$promise;
+  };
+
+  service.stopContainer = function(id) {
+    return Container.stop({ id: id }, {}).$promise;
+  };
+
+  service.restartContainer = function(id) {
+    return Container.restart({ id: id }, {}).$promise;
+  };
+
+  service.killContainer = function(id) {
+    return Container.kill({ id: id }, {}).$promise;
+  };
+
+  service.pauseContainer = function(id) {
+    return Container.pause({ id: id }, {}).$promise;
+  };
+
+  service.resumeContainer = function(id) {
+    return Container.unpause({ id: id }, {}).$promise;
+  };
+
+  service.renameContainer = function(id, newContainerName) {
+    return Container.rename({id: id, name: newContainerName }, {}).$promise;
+  };
+
   service.createContainer = function(configuration) {
     var deferred = $q.defer();
     Container.create(configuration).$promise
@@ -49,30 +77,6 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
       deferred.reject({ msg: 'Unable to create container', err: err });
     });
     return deferred.promise;
-  };
-
-  service.startContainer = function(containerID) {
-    return Container.start({ id: containerID }, {}).$promise;
-  };
-
-  service.stopContainer = function(containerID) {
-    return Container.stop({ id: containerID }, {}).$promise;
-  };
-
-  service.restartContainer = function(containerID) {
-    return Container.restart({ id: containerID }, {}).$promise;
-  };
-
-  service.killContainer = function(containerID) {
-    return Container.kill({ id: containerID }, {}).$promise;
-  };
-
-  service.pauseContainer = function(containerID) {
-    return Container.pause({ id: containerID }, {}).$promise;
-  };
-
-  service.resumeContainer = function(containerID) {
-    return Container.unpause({ id: containerID }, {}).$promise;
   };
 
   service.createAndStartContainer = function(configuration) {
@@ -95,7 +99,7 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
   service.remove = function(container, removeVolumes) {
     var deferred = $q.defer();
 
-    Container.remove({id: container.Id, v: (removeVolumes) ? 1 : 0, force: true}).$promise
+    Container.remove({ id: container.Id, v: (removeVolumes) ? 1 : 0, force: true }).$promise
     .then(function success(data) {
       if (data.message) {
         deferred.reject({ msg: data.message, err: data.message });
@@ -117,7 +121,7 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
   service.createExec = function(execConfig) {
     var deferred = $q.defer();
 
-    Container.exec(execConfig).$promise
+    Container.exec({}, execConfig).$promise
     .then(function success(data) {
       if (data.message) {
         deferred.reject({ msg: data.message, err: data.message });
@@ -158,7 +162,7 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
   service.containerStats = function(id) {
     var deferred = $q.defer();
 
-    Container.stats({id: id}).$promise
+    Container.stats({ id: id }).$promise
     .then(function success(data) {
       var containerStats = new ContainerStatsViewModel(data);
       deferred.resolve(containerStats);
@@ -171,11 +175,11 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
   };
 
   service.containerTop = function(id) {
-    return Container.top({id: id}).$promise;
+    return Container.top({ id: id }).$promise;
   };
 
   service.inspect = function(id) {
-    return Container.inspect({id: id}).$promise;
+    return Container.inspect({ id: id }).$promise;
   };
 
   return service;

@@ -99,7 +99,7 @@
         ></group-association-table>
       </div>
     </div>
-    <div class="col-sm-12">
+    <div class="col-sm-12" ng-if="$ctrl.associatedEndpoints.length ===  0">
       <span class="text-muted small">All the endpoints are assigned to a group.</span>
     </div>
   </div>

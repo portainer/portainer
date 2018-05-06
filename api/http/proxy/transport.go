@@ -17,11 +17,13 @@ var apiVersionRe = regexp.MustCompile(`(/v[0-9]\.[0-9]*)?`)
 type (
 	proxyTransport struct {
 		dockerTransport        *http.Transport
+		enableSignature        bool
 		ResourceControlService portainer.ResourceControlService
 		TeamMembershipService  portainer.TeamMembershipService
 		RegistryService        portainer.RegistryService
 		DockerHubService       portainer.DockerHubService
 		SettingsService        portainer.SettingsService
+		SignatureService       portainer.DigitalSignatureService
 	}
 	restrictedOperationContext struct {
 		isAdmin          bool
@@ -45,7 +47,7 @@ type (
 		operationContext *restrictedOperationContext
 		labelBlackList   []portainer.Pair
 	}
-	restrictedOperationRequest func(*http.Request, *http.Response, *operationExecutor) error
+	restrictedOperationRequest func(*http.Response, *operationExecutor) error
 	operationRequest           func(*http.Request) error
 )
 
@@ -60,6 +62,16 @@ func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Resp
 func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Response, error) {
 	path := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 	request.URL.Path = path
+
+	if p.enableSignature {
+		signature, err := p.SignatureService.Sign(portainer.PortainerAgentSignatureMessage)
+		if err != nil {
+			return nil, err
+		}
+
+		request.Header.Set(portainer.PortainerAgentPublicKeyHeader, p.SignatureService.EncodedPublicKey())
+		request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
+	}
 
 	switch {
 	case strings.HasPrefix(path, "/configs"):
@@ -392,7 +404,7 @@ func (p *proxyTransport) executeRequestAndRewriteResponse(request *http.Request,
 		return response, err
 	}
 
-	err = operation(request, response, executor)
+	err = operation(response, executor)
 	return response, err
 }
 

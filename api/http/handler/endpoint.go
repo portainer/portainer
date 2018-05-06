@@ -2,12 +2,11 @@ package handler
 
 import (
 	"bytes"
-	"crypto/tls"
 	"strings"
-	"time"
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/http/client"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
@@ -63,10 +62,6 @@ func NewEndpointHandler(bouncer *security.RequestBouncer, authorizeEndpointManag
 }
 
 type (
-	postEndpointsResponse struct {
-		ID int `json:"Id"`
-	}
-
 	putEndpointAccessRequest struct {
 		AuthorizedUsers []int `valid:"-"`
 		AuthorizedTeams []int `valid:"-"`
@@ -125,44 +120,26 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 	encodeJSON(w, filteredEndpoints, handler.Logger)
 }
 
-func sendPingRequest(host string, tlsConfig *tls.Config) error {
-	transport := &http.Transport{}
-
-	scheme := "http"
-	if tlsConfig != nil {
-		transport.TLSClientConfig = tlsConfig
-		scheme = "https"
-	}
-
-	client := &http.Client{
-		Timeout:   time.Second * 3,
-		Transport: transport,
-	}
-
-	pingOperationURL := strings.Replace(host, "tcp://", scheme+"://", 1) + "/_ping"
-	_, err := client.Get(pingOperationURL)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
-
 	tlsConfig, err := crypto.CreateTLSConfig(payload.caCert, payload.cert, payload.key, payload.skipTLSClientVerification, payload.skipTLSServerVerification)
 	if err != nil {
 		return nil, err
 	}
 
-	err = sendPingRequest(payload.url, tlsConfig)
+	agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.url, tlsConfig)
 	if err != nil {
 		return nil, err
+	}
+
+	endpointType := portainer.DockerEnvironment
+	if agentOnDockerEnvironment {
+		endpointType = portainer.AgentOnDockerEnvironment
 	}
 
 	endpoint := &portainer.Endpoint{
 		Name:      payload.name,
 		URL:       payload.url,
+		Type:      endpointType,
 		GroupID:   portainer.EndpointGroupID(payload.groupID),
 		PublicURL: payload.publicURL,
 		TLSConfig: portainer.TLSConfiguration{
@@ -224,17 +201,22 @@ func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPa
 }
 
 func (handler *EndpointHandler) createUnsecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
+	endpointType := portainer.DockerEnvironment
 
 	if !strings.HasPrefix(payload.url, "unix://") {
-		err := sendPingRequest(payload.url, nil)
+		agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.url, nil)
 		if err != nil {
 			return nil, err
+		}
+		if agentOnDockerEnvironment {
+			endpointType = portainer.AgentOnDockerEnvironment
 		}
 	}
 
 	endpoint := &portainer.Endpoint{
 		Name:      payload.name,
 		URL:       payload.url,
+		Type:      endpointType,
 		GroupID:   portainer.EndpointGroupID(payload.groupID),
 		PublicURL: payload.publicURL,
 		TLSConfig: portainer.TLSConfiguration{
@@ -331,7 +313,7 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		return
 	}
 
-	encodeJSON(w, &postEndpointsResponse{ID: int(endpoint.ID)}, handler.Logger)
+	encodeJSON(w, &endpoint, handler.Logger)
 }
 
 // handleGetEndpoint handles GET requests on /endpoints/:id

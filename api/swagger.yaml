@@ -238,7 +238,7 @@ paths:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/EndpointCreateResponse"
+            $ref: "#/definitions/Endpoint"
         400:
           description: "Invalid request"
           schema:

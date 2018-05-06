@@ -20,12 +20,12 @@
             <button class="btn btn-primary btn-sm" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
             <button class="btn btn-danger btn-sm" ng-click="confirmRemove()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button>
           </div>
-          <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-danger btn-sm" ng-disabled="state.recreateContainerInProgress" ng-click="recreate()" button-spinner="state.recreateContainerInProgress" ng-if="!container.Config.Labels['com.docker.swarm.service.id']">
+          <div class="btn-group" role="group" aria-label="..." ng-if="!container.Config.Labels['com.docker.swarm.service.id']">
+            <button type="button" class="btn btn-danger btn-sm" ng-disabled="state.recreateContainerInProgress" ng-click="recreate()" button-spinner="state.recreateContainerInProgress">
               <span ng-hide="state.recreateContainerInProgress"><i class="fa fa-sync space-right" aria-hidden="true"></i>Recreate</span>
               <span ng-show="state.recreateContainerInProgress">Recreation in progress...</span>
             </button>
-            <button class="btn btn-primary btn-sm" ng-click="duplicate()" ng-if="!container.Config.Labels['com.docker.swarm.service.id']"><i class="fa fa-copy space-right" aria-hidden="true"></i>Duplicate/Edit</button>
+            <a class="btn btn-primary btn-sm" type="button" ui-sref="docker.containers.new({ from: container.Id, nodeName: nodeName })"><i class="fa fa-copy space-right" aria-hidden="true"></i>Duplicate/Edit</a>
           </div>
         </rd-widget-body>
       </rd-widget>
@@ -84,10 +84,10 @@
               <tr>
                 <td colspan="2">
                   <div class="btn-group" role="group" aria-label="...">
-                    <a class="btn" type="button" ui-sref="docker.containers.container.stats({id: container.Id})"><i class="fa fa-chart-area space-right" aria-hidden="true"></i>Stats</a>
-                    <a class="btn" type="button" ui-sref="docker.containers.container.logs({id: container.Id})"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Logs</a>
-                    <a class="btn" type="button" ui-sref="docker.containers.container.console({id: container.Id})"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
-                    <a class="btn" type="button" ui-sref="docker.containers.container.inspect({id: container.Id})"><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Inspect</a>
+                    <a class="btn" type="button" ui-sref="docker.containers.container.stats({ id: container.Id })"><i class="fa fa-chart-area space-right" aria-hidden="true"></i>Stats</a>
+                    <a class="btn" type="button" ui-sref="docker.containers.container.logs({ id: container.Id })"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Logs</a>
+                    <a class="btn" type="button" ui-sref="docker.containers.container.console({ id: container.Id })"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
+                    <a class="btn" type="button" ui-sref="docker.containers.container.inspect({ id: container.Id })"><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Inspect</a>
                   </div>
                 </td>
               </tr>
@@ -184,7 +184,7 @@
             <tbody>
               <tr>
                 <td>Image</td>
-                <td><a ui-sref="docker.images.image({id: container.Image})">{{ container.Image }}</a></td>
+                <td><a ui-sref="docker.images.image({ id: container.Image, nodeName: nodeName })">{{ container.Image }}</a></td>
               </tr>
               <tr ng-if="portBindings.length > 0">
                 <td>Port configuration</td>
@@ -259,7 +259,7 @@
             <tbody>
               <tr ng-repeat="vol in container.Mounts">
                 <td ng-if="vol.Type === 'bind'">{{ vol.Source }}</td>
-                <td ng-if="vol.Type === 'volume'"><a ui-sref="docker.volumes.volume({id: vol.Name})">{{ vol.Name }}</a></td>
+                <td ng-if="vol.Type === 'volume'"><a ui-sref="docker.volumes.volume({ id: vol.Name, nodeName: nodeName })">{{ vol.Name }}</a></td>
                 <td>{{ vol.Destination }}</td>
               </tr>
             </tbody>
@@ -280,6 +280,7 @@
       join-network-action-in-progress="state.joinNetworkInProgress"
       leave-network-action="containerLeaveNetwork"
       leave-network-action-in-progress="state.leaveNetworkInProgress"
+      node-name="nodeName"
       ></container-networks-datatable>
     </div>
   </div>

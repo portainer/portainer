@@ -22,7 +22,7 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     ExtensionManager.initEndpointExtensions(endpoint.Id)
     .then(function success(data) {
       var extensions = data;
-      return StateManager.updateEndpointState(true, extensions);
+      return StateManager.updateEndpointState(true, endpoint.Type, extensions);
     })
     .then(function success(data) {
       $state.go('docker.dashboard');

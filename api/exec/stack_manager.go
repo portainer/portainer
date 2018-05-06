@@ -12,14 +12,34 @@ import (
 
 // StackManager represents a service for managing stacks.
 type StackManager struct {
-	binaryPath string
+	binaryPath       string
+	signatureService portainer.DigitalSignatureService
+	fileService      portainer.FileService
+}
+
+type dockerCLIConfiguration struct {
+	HTTPHeaders struct {
+		ManagerOperationHeader string `json:"X-PortainerAgent-ManagerOperation"`
+		SignatureHeader        string `json:"X-PortainerAgent-Signature"`
+		PublicKey              string `json:"X-PortainerAgent-PublicKey"`
+	} `json:"HttpHeaders"`
 }
 
 // NewStackManager initializes a new StackManager service.
-func NewStackManager(binaryPath string) *StackManager {
-	return &StackManager{
-		binaryPath: binaryPath,
+// It also updates the configuration of the Docker CLI binary.
+func NewStackManager(binaryPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (*StackManager, error) {
+	manager := &StackManager{
+		binaryPath:       binaryPath,
+		signatureService: signatureService,
+		fileService:      fileService,
 	}
+
+	err := manager.updateDockerCLIConfiguration(binaryPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return manager, nil
 }
 
 // Login executes the docker login command against a list of registries (including DockerHub).
@@ -99,9 +119,12 @@ func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint
 	}
 
 	args := make([]string, 0)
+	args = append(args, "--config", binaryPath)
 	args = append(args, "-H", endpoint.URL)
 
-	if endpoint.TLSConfig.TLS {
+	if !endpoint.TLSConfig.TLS && endpoint.TLSConfig.TLSSkipVerify {
+		args = append(args, "--tls")
+	} else if endpoint.TLSConfig.TLS {
 		args = append(args, "--tls")
 
 		if !endpoint.TLSConfig.TLSSkipVerify {
@@ -114,4 +137,23 @@ func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint
 	}
 
 	return command, args
+}
+
+func (manager *StackManager) updateDockerCLIConfiguration(binaryPath string) error {
+	config := dockerCLIConfiguration{}
+	config.HTTPHeaders.ManagerOperationHeader = "1"
+
+	signature, err := manager.signatureService.Sign(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return err
+	}
+	config.HTTPHeaders.SignatureHeader = signature
+	config.HTTPHeaders.PublicKey = manager.signatureService.EncodedPublicKey()
+
+	err = manager.fileService.WriteJSONToFile(path.Join(binaryPath, "config.json"), config)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
