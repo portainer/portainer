@@ -1,6 +1,8 @@
 package http
 
 import (
+	"time"
+
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/extensions"
@@ -53,9 +55,10 @@ func (server *Server) Start() error {
 		SignatureService:       server.SignatureService,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
+	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
 	var fileHandler = handler.NewFileHandler(filepath.Join(server.AssetsPath, "public"))
-	var authHandler = handler.NewAuthHandler(requestBouncer, server.AuthDisabled)
+	var authHandler = handler.NewAuthHandler(requestBouncer, rateLimiter, server.AuthDisabled)
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
