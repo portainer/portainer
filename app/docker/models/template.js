@@ -1,6 +1,7 @@
 function TemplateViewModel(data) {
   this.Type = data.type;
   this.Name = data.name;
+  this.Hostname = data.hostname;
   this.Title = data.title;
   this.Description = data.description;
   this.Note = data.note;

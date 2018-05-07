@@ -107,9 +107,8 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     });
   }
 
-  function createRemoteEndpoint(name, type, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  function createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var endpoint;
-
     $scope.state.actionInProgress = true;
     EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, 1, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {

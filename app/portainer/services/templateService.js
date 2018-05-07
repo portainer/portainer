@@ -44,7 +44,7 @@ angular.module('portainer.app')
     configuration.HostConfig.RestartPolicy = { Name: template.RestartPolicy };
     configuration.HostConfig.ExtraHosts = template.Hosts ? template.Hosts : [];
     configuration.name = containerName;
-    configuration.Hostname = containerName;
+    configuration.Hostname = template.Hostname;
     configuration.Image = template.Image;
     configuration.Env = TemplateHelper.EnvToStringArray(template.Env, containerMapping);
     configuration.Cmd = ContainerHelper.commandStringToArray(template.Command);

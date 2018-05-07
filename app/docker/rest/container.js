@@ -32,7 +32,7 @@ function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     logs: {
       method: 'GET', params: { id: '@id', action: 'logs' },
       timeout: 4500, ignoreLoadingBar: true,
-      transformResponse: logsHandler, isArray: true
+      transformResponse: logsHandler
     },
     stats: {
       method: 'GET', params: { id: '@id', stream: false, action: 'stats' },

@@ -6,7 +6,9 @@ angular.module('portainer.agent')
     AgentService.agents()
     .then(function success(data) {
       ctrl.agents = data;
-      ctrl.model = data[0].NodeName;
+      if (!ctrl.model) {
+        ctrl.model = data[0].NodeName;
+      }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to load agents');

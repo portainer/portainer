@@ -2,7 +2,6 @@ package exec
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -87,7 +86,8 @@ func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint
 		env = append(env, envvar.Name+"="+envvar.Value)
 	}
 
-	return runCommandAndCaptureStdErr(command, args, env, stack.ProjectPath)
+	stackFolder := path.Dir(stackFilePath)
+	return runCommandAndCaptureStdErr(command, args, env, stackFolder)
 }
 
 // Remove executes the docker stack rm command.
@@ -158,7 +158,7 @@ func (manager *StackManager) updateDockerCLIConfiguration(binaryPath string) err
 	if err != nil {
 		return err
 	}
-	config.HTTPHeaders.SignatureHeader = fmt.Sprintf("%x", signature)
+	config.HTTPHeaders.SignatureHeader = signature
 	config.HTTPHeaders.PublicKey = manager.signatureService.EncodedPublicKey()
 
 	err = manager.fileService.WriteJSONToFile(path.Join(binaryPath, "config.json"), config)

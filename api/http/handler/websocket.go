@@ -130,10 +130,8 @@ func (handler *WebSocketHandler) proxyWebsocketRequest(w http.ResponseWriter, r 
 		return err
 	}
 
-	signatureHeader := fmt.Sprintf("%x", signature)
-
 	proxy.Director = func(incoming *http.Request, out http.Header) {
-		out.Set(portainer.PortainerAgentSignatureHeader, signatureHeader)
+		out.Set(portainer.PortainerAgentSignatureHeader, signature)
 		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
 	}
 

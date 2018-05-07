@@ -79,15 +79,12 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var containerCreation = {
     name: 'docker.containers.new',
-    url: '/new',
+    url: '/new?nodeName&from',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/containers/create/createcontainer.html',
         controller: 'CreateContainerController'
       }
-    },
-    params: {
-      from: ''
     }
   };
 

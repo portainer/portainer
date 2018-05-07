@@ -564,6 +564,10 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   font-weight: bold;
 }
 
+.boxselector_header .fa,.fab {
+  font-weight: normal;
+}
+
 .boxselector_wrapper input[type="radio"] {
   display: none;
 }

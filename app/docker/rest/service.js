@@ -18,7 +18,7 @@ function ServiceFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, Htt
     logs: {
       method: 'GET', params: { id: '@id', action: 'logs' },
       timeout: 4500, ignoreLoadingBar: true,
-      transformResponse: logsHandler, isArray: true
+      transformResponse: logsHandler
     }
   });
 }]);
