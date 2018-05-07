@@ -81,7 +81,8 @@ func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint
 		env = append(env, envvar.Name+"="+envvar.Value)
 	}
 
-	return runCommandAndCaptureStdErr(command, args, env, stack.ProjectPath)
+	stackFolder := path.Dir(stackFilePath)
+	return runCommandAndCaptureStdErr(command, args, env, stackFolder)
 }
 
 // Remove executes the docker stack rm command.
