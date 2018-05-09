@@ -21,6 +21,7 @@ steps:
     image: busybox
     working_directory: ${{build_frontend}}
     commands:
+      - DOCKER_VERSION=`cat gruntfile.js | grep -m 1 'shippedDockerVersion' | cut -d\' -f2`
       - wget -O /tmp/docker-binaries.tgz https://download.docker.com/linux/static/stable/x86_64/docker-${{DOCKER_VERSION}}.tgz
       - tar -xf /tmp/docker-binaries.tgz -C /tmp
       - mv /tmp/docker/docker dist/
