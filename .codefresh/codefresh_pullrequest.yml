@@ -18,10 +18,12 @@ steps:
   #     - mv api/cmd/portainer/portainer dist/
 
   download_docker_binary:
-    image: alpine:latest
+    image: busybox
     # working_directory: ${{build_frontend}}
     working_directory: ${{main_clone}}
     commands:
+      - echo "test"
+      - echo `cat gruntfile.js | grep -m 1 'shippedDockerVersion' | cut -d\' -f2`
       - export DOCKER_VERSION=`cat gruntfile.js | grep -m 1 'shippedDockerVersion' | cut -d\' -f2`
       - echo ${{DOCKER_VERSION}}
       - wget -O /tmp/docker-binaries.tgz https://download.docker.com/linux/static/stable/x86_64/docker-${{DOCKER_VERSION}}.tgz
