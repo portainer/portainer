@@ -17,12 +17,18 @@ steps:
   #     - yarn grunt build-webapp
   #     - mv api/cmd/portainer/portainer dist/
 
-  download_docker_binary:
+  get_docker_version:
     image: alpine:latest
     # working_directory: ${{build_frontend}}
     working_directory: ${{main_clone}}
     commands:
       - cf_export DOCKER_VERSION=`cat gruntfile.js | grep -m 1 'shippedDockerVersion' | cut -d\' -f2`
+
+  download_docker_binary:
+    image: alpine:latest
+    # working_directory: ${{build_frontend}}
+    working_directory: ${{main_clone}}
+    commands:
       - echo ${{DOCKER_VERSION}}
       - wget -O /tmp/docker-binaries.tgz https://download.docker.com/linux/static/stable/x86_64/docker-${{DOCKER_VERSION}}.tgz
       - tar -xf /tmp/docker-binaries.tgz -C /tmp
