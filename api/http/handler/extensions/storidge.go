@@ -20,6 +20,7 @@ type StoridgeHandler struct {
 	*mux.Router
 	Logger                *log.Logger
 	EndpointService       portainer.EndpointService
+	EndpointGroupService  portainer.EndpointGroupService
 	TeamMembershipService portainer.TeamMembershipService
 	ProxyManager          *proxy.Manager
 }
@@ -64,9 +65,17 @@ func (handler *StoridgeHandler) proxyRequestsToStoridgeAPI(w http.ResponseWriter
 		return
 	}
 
-	if tokenData.Role != portainer.AdministratorRole && !security.AuthorizedEndpointAccess(endpoint, tokenData.ID, memberships) {
-		httperror.WriteErrorResponse(w, portainer.ErrEndpointAccessDenied, http.StatusForbidden, handler.Logger)
-		return
+	if tokenData.Role != portainer.AdministratorRole {
+		group, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+		if err != nil {
+			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+			return
+		}
+
+		if !security.AuthorizedEndpointAccess(endpoint, group, tokenData.ID, memberships) {
+			httperror.WriteErrorResponse(w, portainer.ErrEndpointAccessDenied, http.StatusForbidden, handler.Logger)
+			return
+		}
 	}
 
 	var storidgeExtension *portainer.EndpointExtension

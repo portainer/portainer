@@ -84,7 +84,6 @@
           {{ $ctrl.formData.TLSCACert.name }}
           <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSCACert && $ctrl.formData.TLSCACert === $ctrl.endpoint.TLSConfig.TLSCACert" aria-hidden="true"></i>
           <i class="fa fa-times red-icon" ng-if="!$ctrl.formData.TLSCACert" aria-hidden="true"></i>
-          <i class="fa fa-circle-notch fa-spin" ng-if="state.uploadInProgress"></i>
         </span>
       </div>
     </div>
@@ -100,7 +99,6 @@
             {{ $ctrl.formData.TLSCert.name }}
             <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSCert && $ctrl.formData.TLSCert === $ctrl.endpoint.TLSConfig.TLSCert" aria-hidden="true"></i>
             <i class="fa fa-times red-icon" ng-if="!$ctrl.formData.TLSCert" aria-hidden="true"></i>
-            <i class="fa fa-circle-notch fa-spin" ng-if="state.uploadInProgress"></i>
           </span>
         </div>
       </div>
@@ -114,7 +112,6 @@
             {{ $ctrl.formData.TLSKey.name }}
             <i class="fa fa-check green-icon" ng-if="$ctrl.formData.TLSKey && $ctrl.formData.TLSKey === $ctrl.endpoint.TLSConfig.TLSKey" aria-hidden="true"></i>
             <i class="fa fa-times red-icon" ng-if="!$ctrl.formData.TLSKey" aria-hidden="true"></i>
-            <i class="fa fa-circle-notch fa-spin" ng-if="state.uploadInProgress"></i>
           </span>
         </div>
       </div>

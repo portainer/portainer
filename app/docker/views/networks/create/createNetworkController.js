@@ -1,13 +1,14 @@
 angular.module('portainer.docker')
-.controller('CreateNetworkController', ['$q', '$scope', '$state', 'PluginService', 'Notifications', 'NetworkService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator',
-function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator) {
+.controller('CreateNetworkController', ['$q', '$scope', '$state', 'PluginService', 'Notifications', 'NetworkService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator', 'HttpRequestHelper',
+function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator, HttpRequestHelper) {
 
   $scope.formValues = {
     DriverOptions: [],
     Subnet: '',
     Gateway: '',
     Labels: [],
-    AccessControlData: new AccessControlFormData()
+    AccessControlData: new AccessControlFormData(),
+    NodeName: null
   };
 
   $scope.state = {
@@ -99,6 +100,9 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
       return;
     }
 
+    var nodeName = $scope.formValues.NodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+
     $scope.state.actionInProgress = true;
     NetworkService.create(networkConfiguration)
     .then(function success(data) {
@@ -119,17 +123,15 @@ function ($q, $scope, $state, PluginService, Notifications, NetworkService, Labe
   };
 
   function initView() {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    if(endpointProvider !== 'DOCKER_SWARM') {
-      PluginService.networkPlugins(apiVersion < 1.25)
-      .then(function success(data){
-          $scope.availableNetworkDrivers = data;
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve network drivers');
-      });
-    }
+
+    PluginService.networkPlugins(apiVersion < 1.25)
+    .then(function success(data){
+        $scope.availableNetworkDrivers = data;
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve network drivers');
+    });
   }
 
   initView();

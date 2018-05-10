@@ -1,0 +1,27 @@
+<div ng-if="$ctrl.endpoints.length > 1">
+  <div ng-if="!$ctrl.state.show">
+    <li class="sidebar-title">
+      <span class="interactive" style="color: #fff;" ng-click="$ctrl.state.show = true;">
+        <span class="fa fa-plug space-right"></span>Change environment
+      </span>
+    </li>
+  </div>
+  <div ng-if="$ctrl.state.show">
+    <div ng-if="$ctrl.availableGroups.length > 1">
+      <li class="sidebar-title"><span>Group</span></li>
+      <li class="sidebar-title">
+        <select class="select-endpoint form-control" ng-options="group.Name for group in $ctrl.availableGroups" ng-model="$ctrl.state.selectedGroup" ng-change="$ctrl.selectGroup()">
+          <option value="">Select a group</option>
+        </select>
+      </li>
+    </div>
+    <div ng-if="$ctrl.state.selectedGroup || $ctrl.availableGroups.length <= 1">
+      <li class="sidebar-title"><span>Endpoint</span></li>
+      <li class="sidebar-title">
+        <select class="select-endpoint form-control" ng-options="endpoint.Name for endpoint in $ctrl.availableEndpoints" ng-model="$ctrl.state.selectedEndpoint" ng-change="$ctrl.selectEndpoint($ctrl.state.selectedEndpoint)">
+          <option value="">Select an endpoint</option>
+        </select>
+      </li>
+    </div>
+  </div>
+</div>

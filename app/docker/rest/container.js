@@ -1,22 +1,38 @@
 angular.module('portainer.docker')
-.factory('Container', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+.factory('Container', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
+function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
   return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/containers/:id/:action', {
     name: '@name',
     endpointId: EndpointProvider.endpointID
   },
   {
-    query: {method: 'GET', params: {all: 0, action: 'json', filters: '@filters' }, isArray: true},
-    get: {method: 'GET', params: {action: 'json'}},
-    stop: {method: 'POST', params: {id: '@id', t: 5, action: 'stop'}},
-    restart: {method: 'POST', params: {id: '@id', t: 5, action: 'restart'}},
-    kill: {method: 'POST', params: {id: '@id', action: 'kill'}},
-    pause: {method: 'POST', params: {id: '@id', action: 'pause'}},
-    unpause: {method: 'POST', params: {id: '@id', action: 'unpause'}},
+    query: {
+      method: 'GET', params: { all: 0, action: 'json', filters: '@filters' },
+      isArray: true
+    },
+    get: {
+      method: 'GET', params: { action: 'json' }
+    },
+    stop: {
+      method: 'POST', params: { id: '@id', t: 5, action: 'stop' }
+    },
+    restart: {
+      method: 'POST', params: { id: '@id', t: 5, action: 'restart' }
+    },
+    kill: {
+      method: 'POST', params: { id: '@id', action: 'kill' }
+    },
+    pause: {
+      method: 'POST', params: { id: '@id', action: 'pause' }
+    },
+    unpause: {
+      method: 'POST', params: { id: '@id', action: 'unpause' }
+    },
     logs: {
       method: 'GET', params: { id: '@id', action: 'logs' },
       timeout: 4500, ignoreLoadingBar: true,
-      transformResponse: logsHandler, isArray: true
+      transformResponse: logsHandler
     },
     stats: {
       method: 'GET', params: { id: '@id', stream: false, action: 'stats' },
@@ -40,7 +56,7 @@ angular.module('portainer.docker')
       transformResponse: genericHandler
     },
     rename: {
-      method: 'POST', params: {id: '@id', action: 'rename', name: '@name'},
+      method: 'POST', params: { id: '@id', action: 'rename', name: '@name' },
       transformResponse: genericHandler
     },
     exec: {

@@ -7,7 +7,7 @@ angular.module('portainer.docker')
     var deferred = $q.defer();
 
     $timeout(function() {
-      Exec.resize({id: execId, height: height, width: width}).$promise
+      Exec.resize({}, { id: execId, height: height, width: width }).$promise
       .then(function success(data) {
         if (data.message) {
           deferred.reject({ msg: 'Unable to exec into container', err: data.message });

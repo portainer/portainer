@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService) {
 
   $scope.state = {
     updateInProgress: false,
@@ -254,28 +254,32 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(service.ServiceConstraints);
     config.TaskTemplate.Placement.Preferences = ServiceHelper.translateKeyValueToPlacementPreferences(service.ServicePreferences);
 
-    // Round memory values to 0.125 and convert MB to B
-    var memoryLimit = (Math.round(service.LimitMemoryBytes * 8) / 8).toFixed(3);
-    memoryLimit *= 1024 * 1024;
-    var memoryReservation = (Math.round(service.ReservationMemoryBytes * 8) / 8).toFixed(3);
-    memoryReservation *= 1024 * 1024;
-    config.TaskTemplate.Resources = {
-      Limits: {
-        NanoCPUs: service.LimitNanoCPUs * 1000000000,
-        MemoryBytes: memoryLimit
-      },
-      Reservations: {
-        NanoCPUs: service.ReservationNanoCPUs * 1000000000,
-        MemoryBytes: memoryReservation
-      }
-    };
+    if ($scope.hasChanges(service, ['LimitNanoCPUs', 'LimitMemoryBytes', 'ReservationNanoCPUs', 'ReservationMemoryBytes'])) {
+      // Round memory values to 0.125 and convert MB to B
+      var memoryLimit = (Math.round(service.LimitMemoryBytes * 8) / 8).toFixed(3);
+      memoryLimit *= 1024 * 1024;
+      var memoryReservation = (Math.round(service.ReservationMemoryBytes * 8) / 8).toFixed(3);
+      memoryReservation *= 1024 * 1024;
+      config.TaskTemplate.Resources = {
+        Limits: {
+          NanoCPUs: service.LimitNanoCPUs * 1000000000,
+          MemoryBytes: memoryLimit
+        },
+        Reservations: {
+          NanoCPUs: service.ReservationNanoCPUs * 1000000000,
+          MemoryBytes: memoryReservation
+        }
+      };
+    }
 
-    config.UpdateConfig = {
-      Parallelism: service.UpdateParallelism,
-      Delay: ServiceHelper.translateHumanDurationToNanos(service.UpdateDelay) || 0,
-      FailureAction: service.UpdateFailureAction,
-      Order: service.UpdateOrder
-    };
+    if($scope.hasChanges(service, ['UpdateFailureAction', 'UpdateDelay', 'UpdateParallelism', 'UpdateOrder'])) {
+      config.UpdateConfig = {
+        Parallelism: service.UpdateParallelism,
+        Delay: ServiceHelper.translateHumanDurationToNanos(service.UpdateDelay) || 0,
+        FailureAction: service.UpdateFailureAction,
+        Order: service.UpdateOrder
+      };
+    }
 
     if ($scope.hasChanges(service, ['RestartCondition', 'RestartDelay', 'RestartMaxAttempts', 'RestartWindow'])){
       config.TaskTemplate.RestartPolicy = {
@@ -407,10 +411,12 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
+    var service = null;
     ServiceService.service($transition$.params().id)
     .then(function success(data) {
-      var service = data;
+      service = data;
       $scope.isUpdating = $scope.lastVersion >= service.Version;
       if (!$scope.isUpdating) {
         $scope.lastVersion = service.Version;
@@ -425,6 +431,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       return $q.all({
         volumes: VolumeService.volumes(),
         tasks: TaskService.tasks({ service: [service.Name] }),
+        containers: agentProxy ? ContainerService.containers() : [],
         nodes: NodeService.nodes(),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
@@ -434,7 +441,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       });
     })
     .then(function success(data) {
-      $scope.tasks = data.tasks;
       $scope.nodes = data.nodes;
       $scope.configs = data.configs;
       $scope.secrets = data.secrets;
@@ -444,6 +450,21 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
       $scope.isAdmin = userDetails.role === 1;
+
+      var tasks = data.tasks;
+
+      if (agentProxy) {
+        var containers = data.containers;
+        for (var i = 0; i < tasks.length; i++) {
+          var task = tasks[i];
+          TaskHelper.associateContainerToTask(task, containers);
+        }
+      }
+
+      ServiceHelper.associateTasksToService(service, tasks);
+
+      $scope.tasks = data.tasks;
+
 
       // Set max cpu value
       var maxCpus = 0;

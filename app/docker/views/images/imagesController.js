@@ -1,18 +1,22 @@
 angular.module('portainer.docker')
-.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService',
-function ($scope, $state, ImageService, Notifications, ModalService) {
+.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper',
+function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper) {
   $scope.state = {
     actionInProgress: false
   };
 
   $scope.formValues = {
     Image: '',
-    Registry: ''
+    Registry: '',
+    NodeName: null
   };
 
   $scope.pullImage = function() {
     var image = $scope.formValues.Image;
     var registry = $scope.formValues.Registry;
+
+    var nodeName = $scope.formValues.NodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
     $scope.state.actionInProgress = true;
     ImageService.pullImage(image, registry, false)
@@ -38,6 +42,7 @@ function ($scope, $state, ImageService, Notifications, ModalService) {
   $scope.removeAction = function (selectedItems, force) {
     var actionCount = selectedItems.length;
     angular.forEach(selectedItems, function (image) {
+      HttpRequestHelper.setPortainerAgentTargetHeader(image.NodeName);
       ImageService.deleteImage(image.Id, force)
       .then(function success() {
         Notifications.success('Image successfully removed', image.Id);
@@ -57,9 +62,6 @@ function ($scope, $state, ImageService, Notifications, ModalService) {
   };
 
   function initView() {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
-
     ImageService.images(true)
     .then(function success(data) {
       $scope.images = data;

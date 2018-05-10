@@ -1,5 +1,6 @@
 angular.module('portainer.docker')
-.factory('TaskService', ['$q', 'Task', function TaskServiceFactory($q, Task) {
+.factory('TaskService', ['$q', 'Task', 'LogHelper',
+function TaskServiceFactory($q, Task, LogHelper) {
   'use strict';
   var service = {};
 
@@ -36,6 +37,8 @@ angular.module('portainer.docker')
   };
 
   service.logs = function(id, stdout, stderr, timestamps, tail) {
+    var deferred = $q.defer();
+
     var parameters = {
       id: id,
       stdout: stdout || 0,
@@ -44,7 +47,16 @@ angular.module('portainer.docker')
       tail: tail || 'all'
     };
 
-    return Task.logs(parameters).$promise;
+    Task.logs(parameters).$promise
+    .then(function success(data) {
+      var logs = LogHelper.formatLogs(data.logs, true);
+      deferred.resolve(logs);
+    })
+    .catch(function error(err) {
+      deferred.reject(err);
+    });
+
+    return deferred.promise;
   };
 
   return service;

@@ -119,6 +119,16 @@
             </div>
           </div>
           <!-- !internal -->
+          <div ng-if="applicationState.endpoint.mode.agentProxy && config.Driver !== 'overlay'">
+            <div class="col-sm-12 form-section-title">
+              Deployment
+            </div>
+            <!-- node-selection -->
+            <node-selector
+              model="formValues.NodeName">
+            </node-selector>
+            <!-- !node-selection -->
+          </div>
           <!-- access-control -->
           <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
           <!-- !access-control -->

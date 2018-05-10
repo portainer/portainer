@@ -24,6 +24,7 @@ type (
 		NoAnalytics       *bool
 		Templates         *string
 		TLSVerify         *bool
+		TLSSkipVerify     *bool
 		TLSCacert         *string
 		TLSCert           *string
 		TLSKey            *string
@@ -168,12 +169,17 @@ type (
 	// EndpointID represents an endpoint identifier.
 	EndpointID int
 
+	// EndpointType represents the type of an endpoint.
+	EndpointType int
+
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
 		ID              EndpointID          `json:"Id"`
 		Name            string              `json:"Name"`
+		Type            EndpointType        `json:"Type"`
 		URL             string              `json:"URL"`
+		GroupID         EndpointGroupID     `json:"GroupId"`
 		PublicURL       string              `json:"PublicURL"`
 		TLSConfig       TLSConfiguration    `json:"TLSConfig"`
 		AuthorizedUsers []UserID            `json:"AuthorizedUsers"`
@@ -186,6 +192,19 @@ type (
 		TLSCACertPath string `json:"TLSCACert,omitempty"`
 		TLSCertPath   string `json:"TLSCert,omitempty"`
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
+	}
+
+	// EndpointGroupID represents an endpoint group identifier.
+	EndpointGroupID int
+
+	// EndpointGroup represents a group of endpoints.
+	EndpointGroup struct {
+		ID              EndpointGroupID `json:"Id"`
+		Name            string          `json:"Name"`
+		Description     string          `json:"Description"`
+		AuthorizedUsers []UserID        `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID        `json:"AuthorizedTeams"`
+		Labels          []Pair          `json:"Labels"`
 	}
 
 	// EndpointExtension represents a extension associated to an endpoint.
@@ -248,6 +267,7 @@ type (
 	// DataStore defines the interface to manage the data.
 	DataStore interface {
 		Open() error
+		Init() error
 		Close() error
 		MigrateData() error
 	}
@@ -299,6 +319,15 @@ type (
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
+	}
+
+	// EndpointGroupService represents a service for managing endpoint group data.
+	EndpointGroupService interface {
+		EndpointGroup(ID EndpointGroupID) (*EndpointGroup, error)
+		EndpointGroups() ([]EndpointGroup, error)
+		CreateEndpointGroup(group *EndpointGroup) error
+		UpdateEndpointGroup(ID EndpointGroupID, group *EndpointGroup) error
+		DeleteEndpointGroup(ID EndpointGroupID) error
 	}
 
 	// RegistryService represents a service for managing registry data.
@@ -354,6 +383,15 @@ type (
 		CompareHashAndData(hash string, data string) error
 	}
 
+	// DigitalSignatureService represents a service to manage digital signatures.
+	DigitalSignatureService interface {
+		ParseKeyPair(private, public []byte) error
+		GenerateKeyPair() ([]byte, []byte, error)
+		EncodedPublicKey() string
+		PEMHeaders() (string, string)
+		Sign(message string) (string, error)
+	}
+
 	// JWTService represents a service for managing JWT tokens.
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
@@ -371,6 +409,10 @@ type (
 		GetStackProjectPath(stackIdentifier string) string
 		StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error)
 		StoreStackFileFromReader(stackIdentifier, fileName string, r io.Reader) (string, error)
+		KeyPairFilesExist() (bool, error)
+		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
+		LoadKeyPair() ([]byte, []byte, error)
+		WriteJSONToFile(path string, content interface{}) error
 	}
 
 	// GitService represents a service for managing Git.
@@ -401,11 +443,22 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.16.5"
+	APIVersion = "1.17.0"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 8
+	DBVersion = 10
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
+	// PortainerAgentHeader represents the name of the header available in any agent response
+	PortainerAgentHeader = "Portainer-Agent"
+	// PortainerAgentTargetHeader represent the name of the header containing the target node name.
+	PortainerAgentTargetHeader = "X-PortainerAgent-Target"
+	// PortainerAgentSignatureHeader represent the name of the header containing the digital signature
+	PortainerAgentSignatureHeader = "X-PortainerAgent-Signature"
+	// PortainerAgentPublicKeyHeader represent the name of the header containing the public key
+	PortainerAgentPublicKeyHeader = "X-PortainerAgent-PublicKey"
+	// PortainerAgentSignatureMessage represents the message used to create a digital signature
+	// to be used when communicating with an agent
+	PortainerAgentSignatureMessage = "Portainer-App"
 )
 
 const (
@@ -469,4 +522,12 @@ const (
 	_ EndpointExtensionType = iota
 	// StoridgeEndpointExtension represents the Storidge extension
 	StoridgeEndpointExtension
+)
+
+const (
+	_ EndpointType = iota
+	// DockerEnvironment represents an endpoint connected to a Docker environment
+	DockerEnvironment
+	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
+	AgentOnDockerEnvironment
 )

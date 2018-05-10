@@ -57,7 +57,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var container = {
     name: 'docker.containers.container',
-    url: '/:id',
+    url: '/:id?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/containers/edit/container.html',
@@ -79,15 +79,12 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var containerCreation = {
     name: 'docker.containers.new',
-    url: '/new',
+    url: '/new?nodeName&from',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/containers/create/createcontainer.html',
         controller: 'CreateContainerController'
       }
-    },
-    params: {
-      from: ''
     }
   };
 
@@ -170,7 +167,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var image = {
     name: 'docker.images.image',
-    url: '/:id',
+    url: '/:id?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/images/edit/image.html',
@@ -203,7 +200,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var network = {
     name: 'docker.networks.network',
-    url: '/:id',
+    url: '/:id?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/networks/edit/network.html',
@@ -443,7 +440,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var volume = {
     name: 'docker.volumes.volume',
-    url: '/:id',
+    url: '/:id?nodeName',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/volumes/edit/volume.html',

@@ -1,7 +1,12 @@
 package handler
 
 import (
+	"bytes"
+	"strings"
+
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/http/client"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
@@ -22,6 +27,7 @@ type EndpointHandler struct {
 	Logger                      *log.Logger
 	authorizeEndpointManagement bool
 	EndpointService             portainer.EndpointService
+	EndpointGroupService        portainer.EndpointGroupService
 	FileService                 portainer.FileService
 	ProxyManager                *proxy.Manager
 }
@@ -56,19 +62,6 @@ func NewEndpointHandler(bouncer *security.RequestBouncer, authorizeEndpointManag
 }
 
 type (
-	postEndpointsRequest struct {
-		Name                string `valid:"required"`
-		URL                 string `valid:"required"`
-		PublicURL           string `valid:"-"`
-		TLS                 bool
-		TLSSkipVerify       bool
-		TLSSkipClientVerify bool
-	}
-
-	postEndpointsResponse struct {
-		ID int `json:"Id"`
-	}
-
 	putEndpointAccessRequest struct {
 		AuthorizedUsers []int `valid:"-"`
 		AuthorizedTeams []int `valid:"-"`
@@ -78,9 +71,23 @@ type (
 		Name                string `valid:"-"`
 		URL                 string `valid:"-"`
 		PublicURL           string `valid:"-"`
+		GroupID             int    `valid:"-"`
 		TLS                 bool   `valid:"-"`
 		TLSSkipVerify       bool   `valid:"-"`
 		TLSSkipClientVerify bool   `valid:"-"`
+	}
+
+	postEndpointPayload struct {
+		name                      string
+		url                       string
+		publicURL                 string
+		groupID                   int
+		useTLS                    bool
+		skipTLSServerVerification bool
+		skipTLSClientVerification bool
+		caCert                    []byte
+		cert                      []byte
+		key                       []byte
 	}
 )
 
@@ -98,13 +105,193 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 		return
 	}
 
-	filteredEndpoints, err := security.FilterEndpoints(endpoints, securityContext)
+	groups, err := handler.EndpointGroupService.EndpointGroups()
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	filteredEndpoints, err := security.FilterEndpoints(endpoints, groups, securityContext)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
 	encodeJSON(w, filteredEndpoints, handler.Logger)
+}
+
+func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
+	tlsConfig, err := crypto.CreateTLSConfig(payload.caCert, payload.cert, payload.key, payload.skipTLSClientVerification, payload.skipTLSServerVerification)
+	if err != nil {
+		return nil, err
+	}
+
+	agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.url, tlsConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	endpointType := portainer.DockerEnvironment
+	if agentOnDockerEnvironment {
+		endpointType = portainer.AgentOnDockerEnvironment
+	}
+
+	endpoint := &portainer.Endpoint{
+		Name:      payload.name,
+		URL:       payload.url,
+		Type:      endpointType,
+		GroupID:   portainer.EndpointGroupID(payload.groupID),
+		PublicURL: payload.publicURL,
+		TLSConfig: portainer.TLSConfiguration{
+			TLS:           payload.useTLS,
+			TLSSkipVerify: payload.skipTLSServerVerification,
+		},
+		AuthorizedUsers: []portainer.UserID{},
+		AuthorizedTeams: []portainer.TeamID{},
+		Extensions:      []portainer.EndpointExtension{},
+	}
+
+	err = handler.EndpointService.CreateEndpoint(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	folder := strconv.Itoa(int(endpoint.ID))
+
+	if !payload.skipTLSServerVerification {
+		r := bytes.NewReader(payload.caCert)
+		// TODO: review the API exposed by the FileService to store
+		// a file from a byte slice and return the path to the stored file instead
+		// of using multiple legacy calls (StoreTLSFile, GetPathForTLSFile) here.
+		err = handler.FileService.StoreTLSFile(folder, portainer.TLSFileCA, r)
+		if err != nil {
+			handler.EndpointService.DeleteEndpoint(endpoint.ID)
+			return nil, err
+		}
+		caCertPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCA)
+		endpoint.TLSConfig.TLSCACertPath = caCertPath
+	}
+
+	if !payload.skipTLSClientVerification {
+		r := bytes.NewReader(payload.cert)
+		err = handler.FileService.StoreTLSFile(folder, portainer.TLSFileCert, r)
+		if err != nil {
+			handler.EndpointService.DeleteEndpoint(endpoint.ID)
+			return nil, err
+		}
+		certPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCert)
+		endpoint.TLSConfig.TLSCertPath = certPath
+
+		r = bytes.NewReader(payload.key)
+		err = handler.FileService.StoreTLSFile(folder, portainer.TLSFileKey, r)
+		if err != nil {
+			handler.EndpointService.DeleteEndpoint(endpoint.ID)
+			return nil, err
+		}
+		keyPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileKey)
+		endpoint.TLSConfig.TLSKeyPath = keyPath
+	}
+
+	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return endpoint, nil
+}
+
+func (handler *EndpointHandler) createUnsecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
+	endpointType := portainer.DockerEnvironment
+
+	if !strings.HasPrefix(payload.url, "unix://") {
+		agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.url, nil)
+		if err != nil {
+			return nil, err
+		}
+		if agentOnDockerEnvironment {
+			endpointType = portainer.AgentOnDockerEnvironment
+		}
+	}
+
+	endpoint := &portainer.Endpoint{
+		Name:      payload.name,
+		URL:       payload.url,
+		Type:      endpointType,
+		GroupID:   portainer.EndpointGroupID(payload.groupID),
+		PublicURL: payload.publicURL,
+		TLSConfig: portainer.TLSConfiguration{
+			TLS: false,
+		},
+		AuthorizedUsers: []portainer.UserID{},
+		AuthorizedTeams: []portainer.TeamID{},
+		Extensions:      []portainer.EndpointExtension{},
+	}
+
+	err := handler.EndpointService.CreateEndpoint(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return endpoint, nil
+}
+
+func (handler *EndpointHandler) createEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
+	if payload.useTLS {
+		return handler.createTLSSecuredEndpoint(payload)
+	}
+	return handler.createUnsecuredEndpoint(payload)
+}
+
+func convertPostEndpointRequestToPayload(r *http.Request) (*postEndpointPayload, error) {
+	payload := &postEndpointPayload{}
+	payload.name = r.FormValue("Name")
+	payload.url = r.FormValue("URL")
+	payload.publicURL = r.FormValue("PublicURL")
+
+	if payload.name == "" || payload.url == "" {
+		return nil, ErrInvalidRequestFormat
+	}
+
+	rawGroupID := r.FormValue("GroupID")
+	if rawGroupID == "" {
+		payload.groupID = 1
+	} else {
+		groupID, err := strconv.Atoi(rawGroupID)
+		if err != nil {
+			return nil, err
+		}
+		payload.groupID = groupID
+	}
+
+	payload.useTLS = r.FormValue("TLS") == "true"
+
+	if payload.useTLS {
+		payload.skipTLSServerVerification = r.FormValue("TLSSkipVerify") == "true"
+		payload.skipTLSClientVerification = r.FormValue("TLSSkipClientVerify") == "true"
+
+		if !payload.skipTLSServerVerification {
+			caCert, err := getUploadedFileContent(r, "TLSCACertFile")
+			if err != nil {
+				return nil, err
+			}
+			payload.caCert = caCert
+		}
+
+		if !payload.skipTLSClientVerification {
+			cert, err := getUploadedFileContent(r, "TLSCertFile")
+			if err != nil {
+				return nil, err
+			}
+			payload.cert = cert
+			key, err := getUploadedFileContent(r, "TLSKeyFile")
+			if err != nil {
+				return nil, err
+			}
+			payload.key = key
+		}
+	}
+
+	return payload, nil
 }
 
 // handlePostEndpoints handles POST requests on /endpoints
@@ -114,60 +301,19 @@ func (handler *EndpointHandler) handlePostEndpoints(w http.ResponseWriter, r *ht
 		return
 	}
 
-	var req postEndpointsRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
-		return
-	}
-
-	_, err := govalidator.ValidateStruct(req)
+	payload, err := convertPostEndpointRequestToPayload(r)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
-	endpoint := &portainer.Endpoint{
-		Name:      req.Name,
-		URL:       req.URL,
-		PublicURL: req.PublicURL,
-		TLSConfig: portainer.TLSConfiguration{
-			TLS:           req.TLS,
-			TLSSkipVerify: req.TLSSkipVerify,
-		},
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-	}
-
-	err = handler.EndpointService.CreateEndpoint(endpoint)
+	endpoint, err := handler.createEndpoint(payload)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	if req.TLS {
-		folder := strconv.Itoa(int(endpoint.ID))
-
-		if !req.TLSSkipVerify {
-			caCertPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCA)
-			endpoint.TLSConfig.TLSCACertPath = caCertPath
-		}
-
-		if !req.TLSSkipClientVerify {
-			certPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileCert)
-			endpoint.TLSConfig.TLSCertPath = certPath
-			keyPath, _ := handler.FileService.GetPathForTLSFile(folder, portainer.TLSFileKey)
-			endpoint.TLSConfig.TLSKeyPath = keyPath
-		}
-
-		err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
-		if err != nil {
-			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-			return
-		}
-	}
-
-	encodeJSON(w, &postEndpointsResponse{ID: int(endpoint.ID)}, handler.Logger)
+	encodeJSON(w, &endpoint, handler.Logger)
 }
 
 // handleGetEndpoint handles GET requests on /endpoints/:id
@@ -300,6 +446,10 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 
 	if req.PublicURL != "" {
 		endpoint.PublicURL = req.PublicURL
+	}
+
+	if req.GroupID != 0 {
+		endpoint.GroupID = portainer.EndpointGroupID(req.GroupID)
 	}
 
 	folder := strconv.Itoa(int(endpoint.ID))

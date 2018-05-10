@@ -10,6 +10,7 @@ angular.module('portainer.docker').component('volumesDatatable', {
     reverseOrder: '<',
     showTextFilter: '<',
     showOwnershipColumn: '<',
+    showHostColumn: '<',
     removeAction: '<'
   }
 });

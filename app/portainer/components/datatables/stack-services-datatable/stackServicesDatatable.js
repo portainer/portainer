@@ -9,6 +9,7 @@ angular.module('portainer.app').component('stackServicesDatatable', {
     orderBy: '@',
     reverseOrder: '<',
     nodes: '<',
+    scaleAction: '<',
     publicUrl: '<',
     showTextFilter: '<'
   }

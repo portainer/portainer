@@ -198,11 +198,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
   }
 
   function determineContainerMapping(network) {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var containerMapping = 'BY_CONTAINER_IP';
-    if (endpointProvider === 'DOCKER_SWARM' && network.Scope === 'global') {
-      containerMapping = 'BY_SWARM_CONTAINER_NAME';
-    } else if (network.Name !== 'bridge') {
+    if (network.Name !== 'bridge') {
       containerMapping = 'BY_CONTAINER_NAME';
     }
     return containerMapping;
@@ -231,8 +228,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       networks: NetworkService.networks(
         provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
         false,
-        provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25,
-        provider === 'DOCKER_SWARM'),
+        provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
+      ),
       settings: SettingsService.publicSettings()
     })
     .then(function success(data) {

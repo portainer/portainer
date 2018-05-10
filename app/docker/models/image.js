@@ -7,6 +7,10 @@ function ImageViewModel(data) {
   this.RepoTags = data.RepoTags;
   this.VirtualSize = data.VirtualSize;
   this.ContainerCount = data.ContainerCount;
+
+  if (data.Portainer && data.Portainer.Agent && data.Portainer.Agent.NodeName) {
+    this.NodeName = data.Portainer.Agent.NodeName;
+  }
 }
 
 function ImageBuildModel(data) {

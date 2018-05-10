@@ -17,6 +17,7 @@ angular.module('portainer', [
   'luegg.directives',
   'portainer.templates',
   'portainer.app',
+  'portainer.agent',
   'portainer.docker',
   'extension.storidge',
   'rzModule']);

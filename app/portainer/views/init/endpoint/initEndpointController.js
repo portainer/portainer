@@ -28,29 +28,36 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
   $scope.createLocalEndpoint = function() {
     var name = 'local';
     var URL = 'unix:///var/run/docker.sock';
-    var endpointID = 1;
+    var endpoint;
 
     $scope.state.actionInProgress = true;
-    EndpointService.createLocalEndpoint(name, URL, false, true)
+    EndpointService.createLocalEndpoint()
     .then(function success(data) {
-      endpointID = data.Id;
-      EndpointProvider.setEndpointID(endpointID);
-      return ExtensionManager.initEndpointExtensions(endpointID);
+      endpoint = data;
+      EndpointProvider.setEndpointID(endpoint.Id);
+      return ExtensionManager.initEndpointExtensions(endpoint.Id);
     })
     .then(function success(data) {
       var extensions = data;
-      return StateManager.updateEndpointState(false, extensions);
+      return StateManager.updateEndpointState(false, endpoint.Type, extensions);
     })
     .then(function success(data) {
       $state.go('docker.dashboard');
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
-      EndpointService.deleteEndpoint(endpointID);
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;
     });
+  };
+
+  $scope.createAgentEndpoint = function() {
+    var name = $scope.formValues.Name;
+    var URL = $scope.formValues.URL;
+    var PublicURL = URL.split(':')[0];
+
+    createRemoteEndpoint(name, URL, PublicURL, true, true, true, null, null, null);
   };
 
   $scope.createRemoteEndpoint = function() {
@@ -63,28 +70,31 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var TLSCAFile = TLSSkipVerify ? null : $scope.formValues.TLSCACert;
     var TLSCertFile = TLSSKipClientVerify ? null : $scope.formValues.TLSCert;
     var TLSKeyFile = TLSSKipClientVerify ? null : $scope.formValues.TLSKey;
-    var endpointID = 1;
 
+    createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+  };
+
+  function createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    var endpoint;
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, URL, PublicURL, 1, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
-      endpointID = data.Id;
-      EndpointProvider.setEndpointID(endpointID);
-      return ExtensionManager.initEndpointExtensions(endpointID);
+      endpoint = data;
+      EndpointProvider.setEndpointID(endpoint.Id);
+      return ExtensionManager.initEndpointExtensions(endpoint.Id);
     })
     .then(function success(data) {
       var extensions = data;
-      return StateManager.updateEndpointState(false, extensions);
+      return StateManager.updateEndpointState(false, endpoint.Type, extensions);
     })
     .then(function success(data) {
       $state.go('docker.dashboard');
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
-      EndpointService.deleteEndpoint(endpointID);
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;
     });
-  };
+  }
 }]);

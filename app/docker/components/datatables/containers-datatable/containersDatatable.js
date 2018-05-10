@@ -10,7 +10,7 @@ angular.module('portainer.docker').component('containersDatatable', {
     reverseOrder: '<',
     showTextFilter: '<',
     showOwnershipColumn: '<',
-    swarmContainers: '<',
+    showHostColumn: '<',
     publicUrl: '<',
     containerNameTruncateSize: '<',
     startAction: '<',
