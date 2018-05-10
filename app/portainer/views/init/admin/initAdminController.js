@@ -36,7 +36,7 @@ function ($scope, $state, $sanitize, Notifications, Authentication, StateManager
         ExtensionManager.initEndpointExtensions(endpointID)
         .then(function success(data) {
           var extensions = data;
-          return StateManager.updateEndpointState(false, extensions);
+          return StateManager.updateEndpointState(false, endpoint.Type, extensions);
         })
         .then(function success() {
           $state.go('docker.dashboard');

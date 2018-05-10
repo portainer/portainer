@@ -6,7 +6,10 @@ angular.module('portainer.docker')
     endpointId: EndpointProvider.endpointID
   },
   {
-    info: { method: 'GET', params: { action: 'info' }, ignoreLoadingBar: true },
+    info: {
+      method: 'GET', params: { action: 'info' },
+      ignoreLoadingBar: true
+    },
     version: { method: 'GET', params: { action: 'version' }, ignoreLoadingBar: true, timeout: 4500 },
     events: {
       method: 'GET', params: { action: 'events', since: '@since', until: '@until' },

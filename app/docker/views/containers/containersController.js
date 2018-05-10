@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', '$transition$', 'ContainerService', 'SystemService', 'Notifications', 'ModalService', 'EndpointProvider',
-  function ($q, $scope, $state, $filter, $transition$, ContainerService, SystemService, Notifications, ModalService, EndpointProvider) {
+  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', '$transition$', 'ContainerService', 'SystemService', 'Notifications', 'ModalService', 'EndpointProvider', 'HttpRequestHelper',
+  function ($q, $scope, $state, $filter, $transition$, ContainerService, SystemService, Notifications, ModalService, EndpointProvider, HttpRequestHelper) {
   $scope.state = {
     publicURL: EndpointProvider.endpointPublicURL()
   };
@@ -70,6 +70,7 @@ angular.module('portainer.docker')
   function executeActionOnContainerList(containers, action, successMessage, errorMessage) {
     var actionCount = containers.length;
     angular.forEach(containers, function (container) {
+      HttpRequestHelper.setPortainerAgentTargetHeader(container.NodeName);
       action(container.Id)
       .then(function success() {
         Notifications.success(successMessage, container.Names[0]);
@@ -89,6 +90,7 @@ angular.module('portainer.docker')
   function removeAction(containers, cleanVolumes) {
     var actionCount = containers.length;
     angular.forEach(containers, function (container) {
+      HttpRequestHelper.setPortainerAgentTargetHeader(container.NodeName);
       ContainerService.remove(container, cleanVolumes)
       .then(function success() {
         Notifications.success('Container successfully removed', container.Names[0]);
@@ -105,28 +107,10 @@ angular.module('portainer.docker')
     });
   }
 
-  function retrieveSwarmHostsInfo(data) {
-    var swarm_hosts = {};
-    var systemStatus = data.SystemStatus;
-    var node_count = parseInt(systemStatus[3][1], 10);
-    var node_offset = 4;
-    for (i = 0; i < node_count; i++) {
-      var host = {};
-      host.name = _.trim(systemStatus[node_offset][0]);
-      host.ip = _.split(systemStatus[node_offset][1], ':')[0];
-      swarm_hosts[host.name] = host.ip;
-      node_offset += 9;
-    }
-    return swarm_hosts;
-  }
-
-  function assignContainers(containers, provider) {
+  function assignContainers(containers) {
     var previouslySelectedContainers = $transition$.params().selectedContainers || [];
     $scope.containers = containers.map(function (container) {
       container.Status = $filter('containerstatus')(container.Status);
-      if (provider === 'DOCKER_SWARM') {
-        container.hostIP = $scope.swarm_hosts[_.split(container.Names[0], '/')[1]];
-      }
 
       var previousContainer = _.find(previouslySelectedContainers, function(item) {
         return item.Id === container.Id;
@@ -143,15 +127,9 @@ angular.module('portainer.docker')
   function initView() {
     var provider = $scope.applicationState.endpoint.mode.provider;
 
-    $q.all({
-      swarm: provider !== 'DOCKER_SWARM' || SystemService.info(),
-      containers: ContainerService.containers(1)
-    })
+    ContainerService.containers(1)
     .then(function success(data) {
-      if (provider === 'DOCKER_SWARM') {
-        $scope.swarm_hosts = retrieveSwarmHostsInfo(data.swarm);
-      }
-      assignContainers(data.containers, provider);
+      assignContainers(data);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve containers');

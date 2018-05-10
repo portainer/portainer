@@ -1,5 +1,6 @@
 angular.module('portainer.docker')
-.factory('Exec', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function ExecFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+.factory('Exec', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
+function ExecFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
   return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/exec/:id/:action', {
     endpointId: EndpointProvider.endpointID

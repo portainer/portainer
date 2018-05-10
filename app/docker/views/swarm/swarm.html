@@ -16,48 +16,21 @@
           <tbody>
             <tr>
               <td>Nodes</td>
-              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">{{ swarm.Nodes }}</td>
-              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">{{ info.Swarm.Nodes }}</td>
-            </tr>
-            <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
-              <td>Images</td>
-              <td>{{ info.Images }}</td>
-            </tr>
-            <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
-              <td>Swarm version</td>
-              <td>{{ docker.Version|swarmversion }}</td>
+              <td>{{ info.Swarm.Nodes }}</td>
             </tr>
             <tr>
               <td>Docker API version</td>
               <td>{{ docker.ApiVersion }}</td>
             </tr>
-            <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
-              <td>Strategy</td>
-              <td>{{ swarm.Strategy }}</td>
-            </tr>
             <tr>
               <td>Total CPU</td>
-              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">{{ info.NCPU }}</td>
-              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">{{ totalCPU }}</td>
+              <td>{{ totalCPU }}</td>
             </tr>
             <tr>
               <td>Total memory</td>
-              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">{{ info.MemTotal|humansize: 2 }}</td>
-              <td ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">{{ totalMemory|humansize: 2 }}</td>
+              <td>{{ totalMemory|humansize: 2 }}</td>
             </tr>
-            <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
-              <td>Operating system</td>
-              <td>{{ info.OperatingSystem }}</td>
-            </tr>
-            <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
-              <td>Kernel version</td>
-              <td>{{ info.KernelVersion }}</td>
-            </tr>
-            <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
-              <td>Go version</td>
-              <td>{{ docker.GoVersion }}</td>
-            </tr>
-            <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+            <tr>
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
                   <a ui-sref="docker.swarm.visualizer"><i class="fa fa-object-group space-right" aria-hidden="true"></i>Go to cluster visualizer</a>
@@ -72,14 +45,7 @@
 </div>
 
 <div class="row">
-  <div class="col-sm-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM'">
-    <nodes-ss-datatable
-    title="Nodes" title-icon="fa-hdd"
-    dataset="swarm.Status" table-key="nodes"
-    order-by="name" show-text-filter="true"
-    ></nodes-ss-datatable>
-  </div>
-  <div class="col-sm-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+  <div class="col-sm-12">
     <nodes-datatable
     title="Nodes" title-icon="fa-hdd"
     dataset="nodes" table-key="nodes"

@@ -27,6 +27,7 @@
       nodes="nodes"
       public-url="state.publicURL"
       show-text-filter="true"
+      scale-action="scaleAction"
     ></stack-services-datatable>
   </div>
 </div>
@@ -41,6 +42,7 @@
       show-text-filter="true"
       show-slot-column="true"
       show-logs-button="applicationState.endpoint.apiVersion >= 1.30"
+      agent-proxy="applicationState.endpoint.mode.agentProxy"
     ></tasks-datatable>
   </div>
 </div>

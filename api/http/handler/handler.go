@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -18,6 +19,7 @@ type Handler struct {
 	TeamHandler           *TeamHandler
 	TeamMembershipHandler *TeamMembershipHandler
 	EndpointHandler       *EndpointHandler
+	EndpointGroupHandler  *EndpointGroupHandler
 	RegistryHandler       *RegistryHandler
 	DockerHubHandler      *DockerHubHandler
 	ExtensionHandler      *ExtensionHandler
@@ -50,6 +52,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/dockerhub"):
 		http.StripPrefix("/api", h.DockerHubHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/endpoint_groups"):
+		http.StripPrefix("/api", h.EndpointGroupHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/endpoints"):
 		switch {
 		case strings.Contains(r.URL.Path, "/docker/"):
@@ -90,7 +94,24 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // encodeJSON encodes v to w in JSON format. WriteErrorResponse() is called if encoding fails.
 func encodeJSON(w http.ResponseWriter, v interface{}, logger *log.Logger) {
+	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(v); err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, logger)
 	}
+}
+
+// getUploadedFileContent retrieve the content of a file uploaded in the request.
+// Uses requestParameter as the key to retrieve the file in the request payload.
+func getUploadedFileContent(request *http.Request, requestParameter string) ([]byte, error) {
+	file, _, err := request.FormFile(requestParameter)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	fileContent, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	return fileContent, nil
 }

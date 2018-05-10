@@ -156,11 +156,11 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th ng-if="$ctrl.swarmContainers">
-                <a ng-click="$ctrl.changeOrderBy('Host')">
-                  Host IP
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Host' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Host' && $ctrl.state.reverseOrder"></i>
+              <th ng-if="$ctrl.showHostColumn">
+                <a ng-click="$ctrl.changeOrderBy('NodeName')">
+                  Host
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -186,8 +186,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="docker.containers.container({ id: item.Id })" ng-if="!$ctrl.swarmContainers">{{ item | containername | truncate: $ctrl.settings.containerNameTruncateSize }}</a>
-                <a ui-sref="docker.containers.container({ id: item.Id })" ng-if="$ctrl.swarmContainers">{{ item | swarmcontainername | truncate: $ctrl.settings.containerNameTruncateSize }}</a>
+                <a ui-sref="docker.containers.container({ id: item.Id, nodeName: item.NodeName })">{{ item | containername | truncate: $ctrl.settings.containerNameTruncateSize }}</a>
               </td>
               <td>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) !== -1" class="label label-{{ item.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ item.Status }}</span>
@@ -195,16 +194,16 @@
               </td>
               <td ng-if="$ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect">
                 <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:inline-flex;">
-                  <a ng-if="$ctrl.settings.showQuickActionStats" style="margin: 0 2.5px;" ui-sref="docker.containers.container.stats({id: item.Id})" title="Stats"><i class="fa fa-chart-area space-right" aria-hidden="true"></i></a>
-                  <a ng-if="$ctrl.settings.showQuickActionLogs" style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({id: item.Id})" title="Logs"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
-                  <a ng-if="$ctrl.settings.showQuickActionConsole" style="margin: 0 2.5px;" ui-sref="docker.containers.container.console({id: item.Id})" title="Console"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
-                  <a ng-if="$ctrl.settings.showQuickActionInspect" style="margin: 0 2.5px;" ui-sref="docker.containers.container.inspect({id: item.Id})" title="Inspect"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionStats" style="margin: 0 2.5px;" ui-sref="docker.containers.container.stats({id: item.Id, nodeName: item.NodeName})" title="Stats"><i class="fa fa-chart-area space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionLogs" style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({id: item.Id, nodeName: item.NodeName})" title="Logs"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionConsole" style="margin: 0 2.5px;" ui-sref="docker.containers.container.console({id: item.Id, nodeName: item.NodeName})" title="Console"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
+                  <a ng-if="$ctrl.settings.showQuickActionInspect" style="margin: 0 2.5px;" ui-sref="docker.containers.container.inspect({id: item.Id, nodeName: item.NodeName})" title="Inspect"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
                 </div>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
               <td><a ui-sref="docker.images.image({ id: item.Image })">{{ item.Image | trimshasum }}</a></td>
               <td>{{ item.IP ? item.IP : '-' }}</td>
-              <td ng-if="$ctrl.swarmContainers">{{ item.hostIP }}</td>
+              <td ng-if="$ctrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
               <td>
                 <a ng-if="item.Ports.length > 0" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.publicUrl || p.host }}:{{p.public}}" target="_blank">
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ p.public }}:{{ p.private }}
@@ -219,10 +218,10 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="8" class="text-center text-muted">Loading...</td>
+              <td colspan="9" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="8" class="text-center text-muted">No container available.</td>
+              <td colspan="9" class="text-center text-muted">No container available.</td>
             </tr>
           </tbody>
         </table>

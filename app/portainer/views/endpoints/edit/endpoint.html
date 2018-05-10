@@ -43,6 +43,19 @@
             </div>
           </div>
           <!-- !endpoint-public-url-input -->
+          <div class="col-sm-12 form-section-title">
+            Grouping
+          </div>
+          <!-- group -->
+          <div class="form-group">
+            <label for="endpoint_group" class="col-sm-3 col-lg-2 control-label text-left">
+              Group
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <select ng-options="group.Id as group.Name for group in groups" ng-model="endpoint.GroupId" id="endpoint_group" class="form-control"></select>
+            </div>
+          </div>
+          <!-- !group -->
           <!-- endpoint-security -->
           <div ng-if="endpointType === 'remote'">
             <div class="col-sm-12 form-section-title">

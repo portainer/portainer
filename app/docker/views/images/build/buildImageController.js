@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('BuildImageController', ['$scope', '$state', 'BuildService', 'Notifications',
-function ($scope, $state, BuildService, Notifications) {
+.controller('BuildImageController', ['$scope', '$state', 'BuildService', 'Notifications', 'HttpRequestHelper',
+function ($scope, $state, BuildService, Notifications, HttpRequestHelper) {
 
 	$scope.state = {
 		BuildType: 'editor',
@@ -13,7 +13,8 @@ function ($scope, $state, BuildService, Notifications) {
 		UploadFile: null,
 		DockerFileContent: '',
 		URL: '',
-		Path: 'Dockerfile'
+		Path: 'Dockerfile',
+		NodeName: null
 	};
 
 	$scope.addImageName = function() {
@@ -55,6 +56,9 @@ function ($scope, $state, BuildService, Notifications) {
 		}).map(function getNames(x) {
 			return x.Name;
 		});
+
+		var nodeName = $scope.formValues.NodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
 		buildImageBasedOnBuildType(buildType, imageNames)
 		.then(function success(data) {

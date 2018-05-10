@@ -12,6 +12,23 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.query({}).$promise;
   };
 
+  service.endpointsByGroup = function(groupId) {
+    var deferred = $q.defer();
+
+    Endpoints.query({}).$promise
+    .then(function success(data) {
+      var endpoints = data.filter(function (endpoint) {
+        return endpoint.GroupId === groupId;
+      });
+      deferred.resolve(endpoints);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve endpoints', err: err});
+    });
+
+    return deferred.promise;
+  };
+
   service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
     return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
   };
@@ -20,6 +37,7 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     var query = {
       name: endpointParams.name,
       PublicURL: endpointParams.PublicURL,
+      GroupId: endpointParams.GroupId,
       TLS: endpointParams.TLS,
       TLSSkipVerify: endpointParams.TLSSkipVerify,
       TLSSkipClientVerify: endpointParams.TLSSkipClientVerify,
@@ -49,43 +67,29 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.remove({id: endpointID}).$promise;
   };
 
-  service.createLocalEndpoint = function(name, URL, TLS, active) {
-    var endpoint = {
-      Name: 'local',
-      URL: 'unix:///var/run/docker.sock',
-      TLS: false
-    };
-    return Endpoints.create({}, endpoint).$promise;
-  };
-
-  service.createRemoteEndpoint = function(name, URL, PublicURL, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
-    var endpoint = {
-      Name: name,
-      URL: 'tcp://' + URL,
-      PublicURL: PublicURL,
-      TLS: TLS,
-      TLSSkipVerify: TLSSkipVerify,
-      TLSSkipClientVerify: TLSSkipClientVerify
-    };
-
+  service.createLocalEndpoint = function() {
     var deferred = $q.defer();
-    Endpoints.create({}, endpoint).$promise
-    .then(function success(data) {
-      var endpointID = data.Id;
-      if (!TLSSkipVerify || !TLSSkipClientVerify) {
-        deferred.notify({upload: true});
-        FileUploadService.uploadTLSFilesForEndpoint(endpointID, TLSCAFile, TLSCertFile, TLSKeyFile)
-        .then(function success() {
-          deferred.notify({upload: false});
-          deferred.resolve(data);
-        });
-      } else {
-        deferred.resolve(data);
-      }
+
+    FileUploadService.createEndpoint('local', 'unix:///var/run/docker.sock', '', 1, false)
+    .then(function success(response) {
+      deferred.resolve(response.data);
     })
     .catch(function error(err) {
-      deferred.notify({upload: false});
-      deferred.reject({msg: 'Unable to upload TLS certs', err: err});
+      deferred.reject({msg: 'Unable to create endpoint', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+  service.createRemoteEndpoint = function(name, URL, PublicURL, groupID, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    var deferred = $q.defer();
+
+    FileUploadService.createEndpoint(name, 'tcp://' + URL, PublicURL, groupID, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    .then(function success(response) {
+      deferred.resolve(response.data);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to create endpoint', err: err});
     });
 
     return deferred.promise;

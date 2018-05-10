@@ -19,7 +19,7 @@ angular.module('portainer.docker')
   service.network = function(id) {
     var deferred = $q.defer();
 
-    Network.get({id: id}).$promise
+    Network.get({ id: id }).$promise
     .then(function success(data) {
       var network = new NetworkViewModel(data);
       deferred.resolve(network);
@@ -31,7 +31,7 @@ angular.module('portainer.docker')
     return deferred.promise;
   };
 
-  service.networks = function(localNetworks, swarmNetworks, swarmAttachableNetworks, globalNetworks) {
+  service.networks = function(localNetworks, swarmNetworks, swarmAttachableNetworks) {
     var deferred = $q.defer();
 
     Network.query({}).$promise
@@ -46,9 +46,6 @@ angular.module('portainer.docker')
           return network;
         }
         if (swarmAttachableNetworks && network.Scope === 'swarm' && network.Attachable === true) {
-          return network;
-        }
-        if (globalNetworks && network.Scope === 'global') {
           return network;
         }
       }).map(function (item) {
@@ -66,6 +63,14 @@ angular.module('portainer.docker')
 
   service.remove = function(id) {
     return Network.remove({ id: id }).$promise;
+  };
+
+  service.disconnectContainer = function(networkId, containerId, force) {
+    return Network.disconnect({ id: networkId }, { Container: containerId, Force: force }).$promise;
+  };
+
+  service.connectContainer = function(networkId, containerId) {
+    return Network.connect({ id: networkId }, { Container: containerId }).$promise;
   };
 
   return service;

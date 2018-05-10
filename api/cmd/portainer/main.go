@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/filesystem"
 	"github.com/portainer/portainer/git"
 	"github.com/portainer/portainer/http"
+	"github.com/portainer/portainer/http/client"
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
 
@@ -49,6 +50,11 @@ func initStore(dataStorePath string) *bolt.Store {
 		log.Fatal(err)
 	}
 
+	err = store.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = store.MigrateData()
 	if err != nil {
 		log.Fatal(err)
@@ -56,8 +62,8 @@ func initStore(dataStorePath string) *bolt.Store {
 	return store
 }
 
-func initStackManager(assetsPath string) portainer.StackManager {
-	return exec.NewStackManager(assetsPath)
+func initStackManager(assetsPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.StackManager, error) {
+	return exec.NewStackManager(assetsPath, signatureService, fileService)
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -69,6 +75,10 @@ func initJWTService(authenticationEnabled bool) portainer.JWTService {
 		return jwtService
 	}
 	return nil
+}
+
+func initDigitalSignatureService() portainer.DigitalSignatureService {
+	return &crypto.ECDSAService{}
 }
 
 func initCryptoService() portainer.CryptoService {
@@ -168,6 +178,35 @@ func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService
 	return &endpoints[0]
 }
 
+func loadAndParseKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
+	private, public, err := fileService.LoadKeyPair()
+	if err != nil {
+		return err
+	}
+	return signatureService.ParseKeyPair(private, public)
+}
+
+func generateAndStoreKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
+	private, public, err := signatureService.GenerateKeyPair()
+	if err != nil {
+		return err
+	}
+	privateHeader, publicHeader := signatureService.PEMHeaders()
+	return fileService.StoreKeyPair(private, public, privateHeader, publicHeader)
+}
+
+func initKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
+	existingKeyPair, err := fileService.KeyPairFilesExist()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if existingKeyPair {
+		return loadAndParseKeyPair(fileService, signatureService)
+	}
+	return generateAndStoreKeyPair(fileService, signatureService)
+}
+
 func main() {
 	flags := initCLI()
 
@@ -176,11 +215,11 @@ func main() {
 	store := initStore(*flags.Data)
 	defer store.Close()
 
-	stackManager := initStackManager(*flags.Assets)
-
 	jwtService := initJWTService(!*flags.NoAuth)
 
 	cryptoService := initCryptoService()
+
+	digitalSignatureService := initDigitalSignatureService()
 
 	ldapService := initLDAPService()
 
@@ -188,7 +227,17 @@ func main() {
 
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
-	err := initSettings(store.SettingsService, flags)
+	err := initKeyPair(fileService, digitalSignatureService)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stackManager, err := initStackManager(*flags.Assets, digitalSignatureService, fileService)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = initSettings(store.SettingsService, flags)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -209,9 +258,10 @@ func main() {
 			endpoint := &portainer.Endpoint{
 				Name: "primary",
 				URL:  *flags.Endpoint,
+				Type: portainer.DockerEnvironment,
 				TLSConfig: portainer.TLSConfiguration{
 					TLS:           *flags.TLSVerify,
-					TLSSkipVerify: false,
+					TLSSkipVerify: *flags.TLSSkipVerify,
 					TLSCACertPath: *flags.TLSCacert,
 					TLSCertPath:   *flags.TLSCert,
 					TLSKeyPath:    *flags.TLSKey,
@@ -220,6 +270,16 @@ func main() {
 				AuthorizedTeams: []portainer.TeamID{},
 				Extensions:      []portainer.EndpointExtension{},
 			}
+
+			agentOnDockerEnvironment, err := client.ExecutePingOperationFromEndpoint(endpoint)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			if agentOnDockerEnvironment {
+				endpoint.Type = portainer.AgentOnDockerEnvironment
+			}
+
 			err = store.EndpointService.CreateEndpoint(endpoint)
 			if err != nil {
 				log.Fatal(err)
@@ -275,6 +335,7 @@ func main() {
 		TeamService:            store.TeamService,
 		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
+		EndpointGroupService:   store.EndpointGroupService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,
@@ -286,6 +347,7 @@ func main() {
 		FileService:            fileService,
 		LDAPService:            ldapService,
 		GitService:             gitService,
+		SignatureService:       digitalSignatureService,
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,

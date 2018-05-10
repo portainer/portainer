@@ -194,6 +194,16 @@
                 </div>
               </div>
               <!-- !url -->
+              <div ng-if="applicationState.endpoint.mode.agentProxy">
+                <div class="col-sm-12 form-section-title">
+                  Deployment
+                </div>
+                <!-- node-selection -->
+                <node-selector
+                  model="formValues.NodeName">
+                </node-selector>
+                <!-- !node-selection -->
+              </div>
               <!-- actions -->
               <div class="col-sm-12 form-section-title">
                 Actions

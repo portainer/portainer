@@ -13,6 +13,8 @@ import (
 const (
 	// ErrEmptyResponseBody defines an error raised when portainer excepts to parse the body of a HTTP response and there is nothing to parse
 	ErrEmptyResponseBody = portainer.Error("Empty response body")
+	// ErrInvalidResponseContent defines an error raised when Portainer excepts a JSON array and get something else.
+	ErrInvalidResponseContent = portainer.Error("Invalid Docker response")
 )
 
 func extractJSONField(jsonObject map[string]interface{}, key string) map[string]interface{} {
@@ -39,8 +41,17 @@ func getResponseAsJSONArray(response *http.Response) ([]interface{}, error) {
 		return nil, err
 	}
 
-	responseObject := responseData.([]interface{})
-	return responseObject, nil
+	switch responseObject := responseData.(type) {
+	case []interface{}:
+		return responseObject, nil
+	case map[string]interface{}:
+		if responseObject["message"] != nil {
+			return nil, portainer.Error(responseObject["message"].(string))
+		}
+		return nil, ErrInvalidResponseContent
+	default:
+		return nil, ErrInvalidResponseContent
+	}
 }
 
 func getResponseBodyAsGenericJSON(response *http.Response) (interface{}, error) {

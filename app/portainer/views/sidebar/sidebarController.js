@@ -1,38 +1,40 @@
 angular.module('portainer.app')
-.controller('SidebarController', ['$q', '$scope', '$state', 'Settings', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
-function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
+.controller('SidebarController', ['$q', '$scope', '$state', 'EndpointService', 'GroupService', 'StateManager', 'EndpointProvider', 'Notifications', 'Authentication', 'UserService', 'ExtensionManager',
+function ($q, $scope, $state, EndpointService, GroupService, StateManager, EndpointProvider, Notifications, Authentication, UserService, ExtensionManager) {
 
   $scope.switchEndpoint = function(endpoint) {
-    var activeEndpointID = EndpointProvider.endpointID();
-    var activeEndpointPublicURL = EndpointProvider.endpointPublicURL();
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-
     ExtensionManager.initEndpointExtensions(endpoint.Id)
     .then(function success(data) {
       var extensions = data;
-      return StateManager.updateEndpointState(true, extensions);
+      return StateManager.updateEndpointState(true, endpoint.Type, extensions);
     })
     .then(function success() {
+      $scope.currentEndpoint = endpoint;
       $state.go('docker.dashboard');
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
-      EndpointProvider.setEndpointID(activeEndpointID);
-      EndpointProvider.setEndpointPublicURL(activeEndpointPublicURL);
-      StateManager.updateEndpointState(true)
-      .then(function success() {});
+      var currentEndpoint = $scope.currentEndpoint;
+      EndpointProvider.setEndpointID(currentEndpoint.Id);
+      EndpointProvider.setEndpointPublicURL(currentEndpoint.PublicURL);
+      return StateManager.updateEndpointState(true, currentEndpoint.Type, currentEndpoint.Extensions);
     });
   };
 
   function setActiveEndpoint(endpoints) {
     var activeEndpointID = EndpointProvider.endpointID();
-    angular.forEach(endpoints, function (endpoint) {
+
+    for (var i = 0; i < endpoints.length; i++) {
+      var endpoint = endpoints[i];
       if (endpoint.Id === activeEndpointID) {
         $scope.activeEndpoint = endpoint;
+        $scope.currentEndpoint = endpoint;
         EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+        break;
       }
-    });
+    }
   }
 
   function checkPermissions(memberships) {
@@ -49,12 +51,16 @@ function ($q, $scope, $state, Settings, EndpointService, StateManager, EndpointP
     $scope.uiVersion = StateManager.getState().application.version;
     $scope.displayExternalContributors = StateManager.getState().application.displayExternalContributors;
     $scope.logo = StateManager.getState().application.logo;
-    $scope.endpoints = [];
 
-    EndpointService.endpoints()
+    $q.all({
+      endpoints: EndpointService.endpoints(),
+      groups: GroupService.groups()
+    })
     .then(function success(data) {
-      var endpoints = data;
-      $scope.endpoints = _.sortBy(endpoints, ['Name']);
+      var endpoints = data.endpoints;
+      $scope.groups = data.groups;
+      $scope.endpoints = endpoints;
+
       setActiveEndpoint(endpoints);
 
       if (StateManager.getState().application.authentication) {

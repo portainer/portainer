@@ -14,7 +14,7 @@ const (
 
 // configListOperation extracts the response as a JSON object, loop through the configs array
 // decorate and/or filter the configs based on resource controls before rewriting the response
-func configListOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
+func configListOperation(response *http.Response, executor *operationExecutor) error {
 	var err error
 
 	// ConfigList response is a JSON array
@@ -39,7 +39,7 @@ func configListOperation(request *http.Request, response *http.Response, executo
 // configInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the config based on resource control (check are done based on the configID and optional Swarm service ID)
 // and either rewrite an access denied response or a decorated config.
-func configInspectOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
+func configInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ConfigInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.30/#operation/ConfigInspect
 	responseObject, err := getResponseAsJSONOBject(response)
