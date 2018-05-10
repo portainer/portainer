@@ -413,9 +413,10 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
     var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
+    var service = null;
     ServiceService.service($transition$.params().id)
     .then(function success(data) {
-      var service = data;
+      service = data;
       $scope.isUpdating = $scope.lastVersion >= service.Version;
       if (!$scope.isUpdating) {
         $scope.lastVersion = service.Version;
@@ -459,6 +460,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
           TaskHelper.associateContainerToTask(task, containers);
         }
       }
+
+      ServiceHelper.associateTasksToService(service, tasks);
 
       $scope.tasks = data.tasks;
 
