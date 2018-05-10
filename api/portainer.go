@@ -443,7 +443,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.16.5"
+	APIVersion = "1.17.0"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 10
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
