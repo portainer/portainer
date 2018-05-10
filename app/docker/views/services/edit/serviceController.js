@@ -254,28 +254,32 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.Placement.Constraints = ServiceHelper.translateKeyValueToPlacementConstraints(service.ServiceConstraints);
     config.TaskTemplate.Placement.Preferences = ServiceHelper.translateKeyValueToPlacementPreferences(service.ServicePreferences);
 
-    // Round memory values to 0.125 and convert MB to B
-    var memoryLimit = (Math.round(service.LimitMemoryBytes * 8) / 8).toFixed(3);
-    memoryLimit *= 1024 * 1024;
-    var memoryReservation = (Math.round(service.ReservationMemoryBytes * 8) / 8).toFixed(3);
-    memoryReservation *= 1024 * 1024;
-    config.TaskTemplate.Resources = {
-      Limits: {
-        NanoCPUs: service.LimitNanoCPUs * 1000000000,
-        MemoryBytes: memoryLimit
-      },
-      Reservations: {
-        NanoCPUs: service.ReservationNanoCPUs * 1000000000,
-        MemoryBytes: memoryReservation
-      }
-    };
+    if ($scope.hasChanges(service, ['LimitNanoCPUs', 'LimitMemoryBytes', 'ReservationNanoCPUs', 'ReservationMemoryBytes'])) {
+      // Round memory values to 0.125 and convert MB to B
+      var memoryLimit = (Math.round(service.LimitMemoryBytes * 8) / 8).toFixed(3);
+      memoryLimit *= 1024 * 1024;
+      var memoryReservation = (Math.round(service.ReservationMemoryBytes * 8) / 8).toFixed(3);
+      memoryReservation *= 1024 * 1024;
+      config.TaskTemplate.Resources = {
+        Limits: {
+          NanoCPUs: service.LimitNanoCPUs * 1000000000,
+          MemoryBytes: memoryLimit
+        },
+        Reservations: {
+          NanoCPUs: service.ReservationNanoCPUs * 1000000000,
+          MemoryBytes: memoryReservation
+        }
+      };
+    }
 
-    config.UpdateConfig = {
-      Parallelism: service.UpdateParallelism,
-      Delay: ServiceHelper.translateHumanDurationToNanos(service.UpdateDelay) || 0,
-      FailureAction: service.UpdateFailureAction,
-      Order: service.UpdateOrder
-    };
+    if($scope.hasChanges(service, ['UpdateFailureAction', 'UpdateDelay', 'UpdateParallelism', 'UpdateOrder'])) {
+      config.UpdateConfig = {
+        Parallelism: service.UpdateParallelism,
+        Delay: ServiceHelper.translateHumanDurationToNanos(service.UpdateDelay) || 0,
+        FailureAction: service.UpdateFailureAction,
+        Order: service.UpdateOrder
+      };
+    }
 
     if ($scope.hasChanges(service, ['RestartCondition', 'RestartDelay', 'RestartMaxAttempts', 'RestartWindow'])){
       config.TaskTemplate.RestartPolicy = {
