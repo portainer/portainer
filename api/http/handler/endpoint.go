@@ -472,7 +472,7 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		}
 	} else {
 		endpoint.TLSConfig.TLS = false
-		endpoint.TLSConfig.TLSSkipVerify = true
+		endpoint.TLSConfig.TLSSkipVerify = false
 		endpoint.TLSConfig.TLSCACertPath = ""
 		endpoint.TLSConfig.TLSCertPath = ""
 		endpoint.TLSConfig.TLSKeyPath = ""
