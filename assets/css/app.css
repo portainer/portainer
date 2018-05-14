@@ -315,6 +315,11 @@ ul.sidebar .sidebar-list a.active {
   background: #2d3e63;
 }
 
+.sidebar-content .ads {
+  width: 200px;
+  height: 200px;
+}
+
 .sidebar-header {
   height: 60px;
   list-style: none;
@@ -419,6 +424,9 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 }
 
 @media (max-height: 785px) {
+  .sidebar-content .ads {
+    height: 130px;
+  }
   ul.sidebar .sidebar-title {
     line-height: 26px;
   }
@@ -439,6 +447,9 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 }
 
 @media(min-height: 786px) and (max-height: 924px) {
+  .sidebar-content .ads {
+    height: 180px;
+  }
   ul.sidebar .sidebar-title {
     line-height: 30px;
   }

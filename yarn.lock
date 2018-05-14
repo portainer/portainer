@@ -99,6 +99,10 @@ angular-cookies@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.5.11.tgz#88558de7c5044dcc3abeb79614d7ef8107ba49c0"
 
+angular-google-adsense@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/angular-google-adsense/-/angular-google-adsense-0.6.0.tgz#1fe077a785ce94a7ffc1c94789af2fbf7a0b7760"
+
 "angular-google-analytics@github:revolunet/angular-google-analytics#~1.1.9":
   version "1.1.8"
   resolved "https://codeload.github.com/revolunet/angular-google-analytics/tar.gz/92768a525870bc066dcf85fbe9d9f115358a6d91"

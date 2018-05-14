@@ -37,6 +37,7 @@ angular:
   - 'angular-ui-bootstrap/dist/ui-bootstrap-tpls.js'
   - 'angular-cookies/angular-cookies.js'
   - 'angular-google-analytics/dist/angular-google-analytics.js'
+  - 'angular-google-adsense/dist/angular-google-adsense.js'
   - 'angular-jwt/dist/angular-jwt.js'
   - 'angular-local-storage/dist/angular-local-storage.js'
   - 'angular-messages/angular-messages.js'
