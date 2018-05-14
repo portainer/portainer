@@ -256,9 +256,10 @@ func main() {
 		}
 		if len(endpoints) == 0 {
 			endpoint := &portainer.Endpoint{
-				Name: "primary",
-				URL:  *flags.Endpoint,
-				Type: portainer.DockerEnvironment,
+				Name:    "primary",
+				URL:     *flags.Endpoint,
+				GroupID: portainer.EndpointGroupID(1),
+				Type:    portainer.DockerEnvironment,
 				TLSConfig: portainer.TLSConfiguration{
 					TLS:           *flags.TLSVerify,
 					TLSSkipVerify: *flags.TLSSkipVerify,
