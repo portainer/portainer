@@ -62,8 +62,8 @@ func initStore(dataStorePath string) *bolt.Store {
 	return store
 }
 
-func initStackManager(assetsPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.StackManager, error) {
-	return exec.NewStackManager(assetsPath, signatureService, fileService)
+func initStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.StackManager, error) {
+	return exec.NewStackManager(assetsPath, dataStorePath, signatureService, fileService)
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -232,7 +232,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	stackManager, err := initStackManager(*flags.Assets, digitalSignatureService, fileService)
+	stackManager, err := initStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
 	if err != nil {
 		log.Fatal(err)
 	}
