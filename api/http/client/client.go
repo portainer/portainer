@@ -22,7 +22,7 @@ func ExecutePingOperationFromEndpoint(endpoint *portainer.Endpoint) (bool, error
 
 	scheme := "http"
 
-	if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
+	if endpoint.TLSConfig.TLS {
 		tlsConfig, err := crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
 		if err != nil {
 			return false, err
