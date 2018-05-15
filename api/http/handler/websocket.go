@@ -131,6 +131,7 @@ func (handler *WebSocketHandler) proxyWebsocketRequest(w http.ResponseWriter, r 
 	}
 
 	proxy.Director = func(incoming *http.Request, out http.Header) {
+		out.Set("Host", incoming.Header.Get("Host"))
 		out.Set(portainer.PortainerAgentSignatureHeader, signature)
 		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
 	}
