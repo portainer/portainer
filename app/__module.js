@@ -11,6 +11,7 @@ angular.module('portainer', [
   'LocalStorageModule',
   'angular-jwt',
   'angular-google-analytics',
+  'angular-google-adsense',
   'angular-json-tree',
   'angular-loading-bar',
   'angular-clipboard',
