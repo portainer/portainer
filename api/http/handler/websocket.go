@@ -94,6 +94,8 @@ func (handler *WebSocketHandler) handleWebsocketExec(w http.ResponseWriter, r *h
 }
 
 func (handler *WebSocketHandler) handleRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
+	r.Header.Del("Origin")
+
 	if params.nodeName != "" {
 		return handler.proxyWebsocketRequest(w, r, params)
 	}
@@ -135,7 +137,6 @@ func (handler *WebSocketHandler) proxyWebsocketRequest(w http.ResponseWriter, r 
 		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
 	}
 
-	r.Header.Del("Origin")
 	proxy.ServeHTTP(w, r)
 
 	return nil
