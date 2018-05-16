@@ -47,24 +47,10 @@ type (
 
 // NewWebSocketHandler returns a new instance of WebSocketHandler.
 func NewWebSocketHandler() *WebSocketHandler {
-	upgrader := websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
-			log.Printf("Origin header: %s, Host header: %s, request host: %s\n", r.Header.Get("Origin"), r.Header.Get("Host"), r.Host)
-			if r.Header.Get("Origin") != "" {
-				if r.Header.Get("Origin") == r.Host {
-					return true
-				}
-				return false
-			}
-			return true
-		},
-	}
-
 	h := &WebSocketHandler{
-		Router: mux.NewRouter(),
-		Logger: log.New(os.Stderr, "", log.LstdFlags),
-		// connectionUpgrader: websocket.Upgrader{},
-		connectionUpgrader: upgrader,
+		Router:             mux.NewRouter(),
+		Logger:             log.New(os.Stderr, "", log.LstdFlags),
+		connectionUpgrader: websocket.Upgrader{},
 	}
 	h.HandleFunc("/websocket/exec", h.handleWebsocketExec).Methods(http.MethodGet)
 	return h
@@ -108,6 +94,8 @@ func (handler *WebSocketHandler) handleWebsocketExec(w http.ResponseWriter, r *h
 }
 
 func (handler *WebSocketHandler) handleRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
+	r.Header.Del("Origin")
+
 	if params.nodeName != "" {
 		return handler.proxyWebsocketRequest(w, r, params)
 	}
@@ -145,12 +133,10 @@ func (handler *WebSocketHandler) proxyWebsocketRequest(w http.ResponseWriter, r 
 	}
 
 	proxy.Director = func(incoming *http.Request, out http.Header) {
-		out.Set("Host", incoming.Header.Get("Host"))
 		out.Set(portainer.PortainerAgentSignatureHeader, signature)
 		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
 	}
 
-	r.Header.Del("Origin")
 	proxy.ServeHTTP(w, r)
 
 	return nil
