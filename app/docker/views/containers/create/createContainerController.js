@@ -387,7 +387,14 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
     $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode] = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode];
     // Mac Address
-    $scope.formValues.MacAddress = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode].MacAddress;
+    if(Object.keys(d.NetworkSettings.Networks).length) {
+      var firstNetwork = d.NetworkSettings.Networks[Object.keys(d.NetworkSettings.Networks)[0]];
+      $scope.formValues.MacAddress = firstNetwork.MacAddress;
+      $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode] = firstNetwork;
+    } else {
+      $scope.formValues.MacAddress = '';
+    }
+    
     // ExtraHosts
     if ($scope.config.HostConfig.ExtraHosts) {
       var extraHosts = $scope.config.HostConfig.ExtraHosts;
