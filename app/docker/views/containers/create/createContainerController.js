@@ -19,6 +19,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     NodeName: null
   };
 
+  $scope.extraNetworks = {};
+
   $scope.state = {
     formValidationError: '',
     actionInProgress: false
@@ -317,7 +319,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     var bindings = [];
     for (var p in $scope.config.HostConfig.PortBindings) {
       if ({}.hasOwnProperty.call($scope.config.HostConfig.PortBindings, p)) {
-	var hostPort = '';
+        var hostPort = '';
         if ($scope.config.HostConfig.PortBindings[p][0].HostIp) {
           hostPort = $scope.config.HostConfig.PortBindings[p][0].HostIp + ':';
         }
@@ -391,6 +393,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       var firstNetwork = d.NetworkSettings.Networks[Object.keys(d.NetworkSettings.Networks)[0]];
       $scope.formValues.MacAddress = firstNetwork.MacAddress;
       $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode] = firstNetwork;
+      $scope.extraNetworks = angular.copy(d.NetworkSettings.Networks);
+      delete $scope.extraNetworks[Object.keys(d.NetworkSettings.Networks)[0]];
     } else {
       $scope.formValues.MacAddress = '';
     }
@@ -611,13 +615,23 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   };
 
   function createContainer(config, accessControlData) {
+    var containerIdentifier;
     $q.when(!$scope.formValues.alwaysPull || ImageService.pullImage($scope.config.Image, $scope.formValues.Registry, true))
     .finally(function final() {
       ContainerService.createAndStartContainer(config)
       .then(function success(data) {
-        var containerIdentifier = data.Id;
+        containerIdentifier = data.Id;
         var userId = Authentication.getUserDetails().ID;
         return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData, []);
+      })
+      .then(function success() {
+        if($scope.extraNetworks) {
+          return $q.all(
+            Object.keys($scope.extraNetworks).map(function(networkName) {
+              return NetworkService.connectContainer(networkName, containerIdentifier);
+            })
+          );
+        }
       })
       .then(function success() {
         Notifications.success('Container successfully created');
