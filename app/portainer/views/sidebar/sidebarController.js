@@ -58,8 +58,8 @@ function ($q, $scope, $state, EndpointService, GroupService, StateManager, Endpo
     })
     .then(function success(data) {
       var endpoints = data.endpoints;
-      $scope.groups = data.groups;
-      $scope.endpoints = endpoints;
+      $scope.groups = _.sortBy(data.groups, ['Name']);
+      $scope.endpoints = _.sortBy(endpoints, ['Name']);
 
       setActiveEndpoint(endpoints);
 
