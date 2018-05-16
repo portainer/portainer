@@ -47,10 +47,24 @@ type (
 
 // NewWebSocketHandler returns a new instance of WebSocketHandler.
 func NewWebSocketHandler() *WebSocketHandler {
+	upgrader := websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			log.Printf("Origin header: %s, Host header: %s, request host: %s\n", r.Header.Get("Origin"), r.Header.Get("Host"), r.Host)
+			if r.Header.Get("Origin") != "" {
+				if r.Header.Get("Origin") == r.Host {
+					return true
+				}
+				return false
+			}
+			return true
+		},
+	}
+
 	h := &WebSocketHandler{
-		Router:             mux.NewRouter(),
-		Logger:             log.New(os.Stderr, "", log.LstdFlags),
-		connectionUpgrader: websocket.Upgrader{},
+		Router: mux.NewRouter(),
+		Logger: log.New(os.Stderr, "", log.LstdFlags),
+		// connectionUpgrader: websocket.Upgrader{},
+		connectionUpgrader: upgrader,
 	}
 	h.HandleFunc("/websocket/exec", h.handleWebsocketExec).Methods(http.MethodGet)
 	return h
