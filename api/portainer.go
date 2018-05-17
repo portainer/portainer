@@ -445,7 +445,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.17.0"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 10
+	DBVersion = 11
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response

@@ -30,6 +30,7 @@ function ($q, $scope, $state, EndpointService, GroupService, EndpointHelper, Not
     })
     .then(function success(data) {
       var endpoints = data.endpoints;
+      console.log(JSON.stringify(endpoints, null, 4));
       var groups = data.groups;
       EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
       $scope.groups = groups;
