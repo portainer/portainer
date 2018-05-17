@@ -55,7 +55,7 @@ func searchUser(username string, conn *ldap.Conn, settings []portainer.LDAPSearc
 func createConnection(settings *portainer.LDAPSettings) (*ldap.Conn, error) {
 
 	if settings.TLSConfig.TLS || settings.StartTLS {
-		config, err := crypto.CreateTLSConfiguration(&settings.TLSConfig)
+		config, err := crypto.CreateTLSConfigurationFromDisk(settings.TLSConfig.TLSCACertPath, settings.TLSConfig.TLSCertPath, settings.TLSConfig.TLSKeyPath, settings.TLSConfig.TLSSkipVerify)
 		if err != nil {
 			return nil, err
 		}

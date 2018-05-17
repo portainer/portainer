@@ -16,14 +16,14 @@ type (
 		AdminPasswordFile *string
 		Assets            *string
 		Data              *string
-		Endpoint          *string
+		EndpointURL       *string
 		ExternalEndpoints *string
 		Labels            *[]Pair
 		Logo              *string
 		NoAuth            *bool
 		NoAnalytics       *bool
 		Templates         *string
-		TLSVerify         *bool
+		TLS               *bool
 		TLSSkipVerify     *bool
 		TLSCacert         *string
 		TLSCert           *string

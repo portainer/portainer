@@ -118,9 +118,7 @@ func prepareDockerCommandAndArgs(binaryPath, dataPath string, endpoint *portaine
 	args = append(args, "--config", dataPath)
 	args = append(args, "-H", endpoint.URL)
 
-	if !endpoint.TLSConfig.TLS && endpoint.TLSConfig.TLSSkipVerify {
-		args = append(args, "--tls")
-	} else if endpoint.TLSConfig.TLS {
+	if endpoint.TLSConfig.TLS {
 		args = append(args, "--tls")
 
 		if !endpoint.TLSConfig.TLSSkipVerify {
