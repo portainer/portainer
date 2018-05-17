@@ -254,6 +254,17 @@
                         <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
                       </div>
                     </div>
+                    <div class="form-group" style="margin-top: 10px;">
+                        <div class="col-sm-12">
+                          <label class="control-label text-left">
+                            Inherit SELinux labels from Host system?
+                            <portainer-tooltip position="right" message="When enabled, the :z flag will be added to you bind mount. By adding the :z flag to your mount the SELinux labels, will also be available inside the Container"></portainer-tooltip>
+                          </label>
+                          <label class="switch" style="margin-left: 20px;">
+                            <input type="checkbox" ng-model="volume.zFlag"><i></i>
+                          </label>
+                        </div>
+                    </div>
                     <!-- !read-only -->
                   </div>
                   <!-- !volume-line2 -->
