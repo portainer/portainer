@@ -168,8 +168,14 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       if (name && containerPath) {
         var bind = name + ':' + containerPath;
         volumes[containerPath] = {};
+        if(volume.readOnly || volume.zFlag){
+          bind += ':';
+        }
         if (volume.readOnly) {
-          bind += ':ro';
+          bind += 'ro';
+        }
+        if (volume.zFlag) {
+          bind += 'z';
         }
         binds.push(bind);
       }
