@@ -11,7 +11,7 @@ angular.module('portainer.docker')
       var task = tasks[i];
       if (task.ServiceId === service.Id) {
         service.Tasks.push(task);
-        task.Service = service;
+        task.ServiceName = service.Name;
       } else {
         otherServicesTasks.push(task);
       }
