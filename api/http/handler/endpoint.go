@@ -121,7 +121,7 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 }
 
 func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
-	tlsConfig, err := crypto.CreateTLSConfig(payload.caCert, payload.cert, payload.key, payload.skipTLSClientVerification, payload.skipTLSServerVerification)
+	tlsConfig, err := crypto.CreateTLSConfigurationFromBytes(payload.caCert, payload.cert, payload.key, payload.skipTLSClientVerification, payload.skipTLSServerVerification)
 	if err != nil {
 		return nil, err
 	}

@@ -33,11 +33,11 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		Addr:              kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
 		Assets:            kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
 		Data:              kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
-		Endpoint:          kingpin.Flag("host", "Dockerd endpoint").Short('H').String(),
+		EndpointURL:       kingpin.Flag("host", "Endpoint URL").Short('H').String(),
 		ExternalEndpoints: kingpin.Flag("external-endpoints", "Path to a file defining available endpoints").String(),
 		NoAuth:            kingpin.Flag("no-auth", "Disable authentication").Default(defaultNoAuth).Bool(),
 		NoAnalytics:       kingpin.Flag("no-analytics", "Disable Analytics in app").Default(defaultNoAnalytics).Bool(),
-		TLSVerify:         kingpin.Flag("tlsverify", "TLS support").Default(defaultTLSVerify).Bool(),
+		TLS:               kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).Bool(),
 		TLSSkipVerify:     kingpin.Flag("tlsskipverify", "Disable TLS server verification").Default(defaultTLSSkipVerify).Bool(),
 		TLSCacert:         kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String(),
 		TLSCert:           kingpin.Flag("tlscert", "Path to the TLS certificate file").Default(defaultTLSCertPath).String(),
@@ -69,11 +69,11 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 // ValidateFlags validates the values of the flags.
 func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 
-	if *flags.Endpoint != "" && *flags.ExternalEndpoints != "" {
+	if *flags.EndpointURL != "" && *flags.ExternalEndpoints != "" {
 		return errEndpointExcludeExternal
 	}
 
-	err := validateEndpoint(*flags.Endpoint)
+	err := validateEndpointURL(*flags.EndpointURL)
 	if err != nil {
 		return err
 	}
@@ -99,14 +99,14 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 	return nil
 }
 
-func validateEndpoint(endpoint string) error {
-	if endpoint != "" {
-		if !strings.HasPrefix(endpoint, "unix://") && !strings.HasPrefix(endpoint, "tcp://") {
+func validateEndpointURL(endpointURL string) error {
+	if endpointURL != "" {
+		if !strings.HasPrefix(endpointURL, "unix://") && !strings.HasPrefix(endpointURL, "tcp://") {
 			return errInvalidEndpointProtocol
 		}
 
-		if strings.HasPrefix(endpoint, "unix://") {
-			socketPath := strings.TrimPrefix(endpoint, "unix://")
+		if strings.HasPrefix(endpointURL, "unix://") {
+			socketPath := strings.TrimPrefix(endpointURL, "unix://")
 			if _, err := os.Stat(socketPath); err != nil {
 				if os.IsNotExist(err) {
 					return errSocketNotFound

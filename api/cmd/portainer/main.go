@@ -1,6 +1,8 @@
 package main // import "github.com/portainer/portainer"
 
 import (
+	"strings"
+
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/bolt"
 	"github.com/portainer/portainer/cli"
@@ -207,6 +209,93 @@ func initKeyPair(fileService portainer.FileService, signatureService portainer.D
 	return generateAndStoreKeyPair(fileService, signatureService)
 }
 
+func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService) error {
+	tlsConfiguration := portainer.TLSConfiguration{
+		TLS:           *flags.TLS,
+		TLSSkipVerify: *flags.TLSSkipVerify,
+	}
+
+	if *flags.TLS {
+		tlsConfiguration.TLSCACertPath = *flags.TLSCacert
+		tlsConfiguration.TLSCertPath = *flags.TLSCert
+		tlsConfiguration.TLSKeyPath = *flags.TLSKey
+	} else if !*flags.TLS && *flags.TLSSkipVerify {
+		tlsConfiguration.TLS = true
+	}
+
+	endpoint := &portainer.Endpoint{
+		Name:            "primary",
+		URL:             *flags.EndpointURL,
+		GroupID:         portainer.EndpointGroupID(1),
+		Type:            portainer.DockerEnvironment,
+		TLSConfig:       tlsConfiguration,
+		AuthorizedUsers: []portainer.UserID{},
+		AuthorizedTeams: []portainer.TeamID{},
+		Extensions:      []portainer.EndpointExtension{},
+	}
+
+	if strings.HasPrefix(endpoint.URL, "tcp://") {
+		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(tlsConfiguration.TLSCACertPath, tlsConfiguration.TLSCertPath, tlsConfiguration.TLSKeyPath, tlsConfiguration.TLSSkipVerify)
+		if err != nil {
+			return err
+		}
+
+		agentOnDockerEnvironment, err := client.ExecutePingOperation(endpoint.URL, tlsConfig)
+		if err != nil {
+			return err
+		}
+
+		if agentOnDockerEnvironment {
+			endpoint.Type = portainer.AgentOnDockerEnvironment
+		}
+	}
+
+	return endpointService.CreateEndpoint(endpoint)
+}
+
+func createUnsecuredEndpoint(endpointURL string, endpointService portainer.EndpointService) error {
+	if strings.HasPrefix(endpointURL, "tcp://") {
+		_, err := client.ExecutePingOperation(endpointURL, nil)
+		if err != nil {
+			return err
+		}
+	}
+
+	endpoint := &portainer.Endpoint{
+		Name:            "primary",
+		URL:             endpointURL,
+		GroupID:         portainer.EndpointGroupID(1),
+		Type:            portainer.DockerEnvironment,
+		TLSConfig:       portainer.TLSConfiguration{},
+		AuthorizedUsers: []portainer.UserID{},
+		AuthorizedTeams: []portainer.TeamID{},
+		Extensions:      []portainer.EndpointExtension{},
+	}
+
+	return endpointService.CreateEndpoint(endpoint)
+}
+
+func initEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService) error {
+	if *flags.EndpointURL == "" {
+		return nil
+	}
+
+	endpoints, err := endpointService.Endpoints()
+	if err != nil {
+		return err
+	}
+
+	if len(endpoints) > 0 {
+		log.Println("Instance already has defined endpoints. Skipping the endpoint defined via CLI.")
+		return nil
+	}
+
+	if *flags.TLS || *flags.TLSSkipVerify {
+		return createTLSSecuredEndpoint(flags, endpointService)
+	}
+	return createUnsecuredEndpoint(*flags.EndpointURL, endpointService)
+}
+
 func main() {
 	flags := initCLI()
 
@@ -249,45 +338,9 @@ func main() {
 
 	applicationStatus := initStatus(authorizeEndpointMgmt, flags)
 
-	if *flags.Endpoint != "" {
-		endpoints, err := store.EndpointService.Endpoints()
-		if err != nil {
-			log.Fatal(err)
-		}
-		if len(endpoints) == 0 {
-			endpoint := &portainer.Endpoint{
-				Name:    "primary",
-				URL:     *flags.Endpoint,
-				GroupID: portainer.EndpointGroupID(1),
-				Type:    portainer.DockerEnvironment,
-				TLSConfig: portainer.TLSConfiguration{
-					TLS:           *flags.TLSVerify,
-					TLSSkipVerify: *flags.TLSSkipVerify,
-					TLSCACertPath: *flags.TLSCacert,
-					TLSCertPath:   *flags.TLSCert,
-					TLSKeyPath:    *flags.TLSKey,
-				},
-				AuthorizedUsers: []portainer.UserID{},
-				AuthorizedTeams: []portainer.TeamID{},
-				Extensions:      []portainer.EndpointExtension{},
-			}
-
-			agentOnDockerEnvironment, err := client.ExecutePingOperationFromEndpoint(endpoint)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			if agentOnDockerEnvironment {
-				endpoint.Type = portainer.AgentOnDockerEnvironment
-			}
-
-			err = store.EndpointService.CreateEndpoint(endpoint)
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else {
-			log.Println("Instance already has defined endpoints. Skipping the endpoint defined via CLI.")
-		}
+	err = initEndpoint(flags, store.EndpointService)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	adminPasswordHash := ""

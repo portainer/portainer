@@ -188,7 +188,7 @@ func createDial(endpoint *portainer.Endpoint) (net.Conn, error) {
 	}
 
 	if endpoint.TLSConfig.TLS {
-		tlsConfig, err := crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
+		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
 		if err != nil {
 			return nil, err
 		}
