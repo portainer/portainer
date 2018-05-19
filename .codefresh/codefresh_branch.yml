@@ -44,7 +44,3 @@ steps:
     candidate: '${{build_image}}'
     tag: '${{CF_BRANCH}}'
     registry: dockerhub
-    when:
-      branch:
-        only:
-          - develop
