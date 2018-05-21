@@ -94,6 +94,8 @@ func (handler *WebSocketHandler) handleWebsocketExec(w http.ResponseWriter, r *h
 }
 
 func (handler *WebSocketHandler) handleRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
+	r.Header.Del("Origin")
+
 	if params.nodeName != "" {
 		return handler.proxyWebsocketRequest(w, r, params)
 	}
@@ -135,7 +137,6 @@ func (handler *WebSocketHandler) proxyWebsocketRequest(w http.ResponseWriter, r 
 		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
 	}
 
-	r.Header.Del("Origin")
 	proxy.ServeHTTP(w, r)
 
 	return nil
@@ -187,7 +188,7 @@ func createDial(endpoint *portainer.Endpoint) (net.Conn, error) {
 	}
 
 	if endpoint.TLSConfig.TLS {
-		tlsConfig, err := crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
+		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
 		if err != nil {
 			return nil, err
 		}

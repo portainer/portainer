@@ -14,7 +14,7 @@
       groups="groups"
       select-endpoint="switchEndpoint"
     ></endpoint-selector>
-    <li class="sidebar-title"><span>{{ activeEndpoint.Name }}</span></li>
+    <li class="sidebar-title"><span class="endpoint-name">{{ activeEndpoint.Name }}</span></li>
     <docker-sidebar-content
       endpoint-api-version="applicationState.endpoint.apiVersion"
       swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
