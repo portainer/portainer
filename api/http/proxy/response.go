@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -48,8 +49,10 @@ func getResponseAsJSONArray(response *http.Response) ([]interface{}, error) {
 		if responseObject["message"] != nil {
 			return nil, portainer.Error(responseObject["message"].(string))
 		}
+		log.Printf("Response: %+v\n", responseObject)
 		return nil, ErrInvalidResponseContent
 	default:
+		log.Printf("Response: %+v\n", responseObject)
 		return nil, ErrInvalidResponseContent
 	}
 }

@@ -16,14 +16,14 @@ type (
 		AdminPasswordFile *string
 		Assets            *string
 		Data              *string
-		Endpoint          *string
+		EndpointURL       *string
 		ExternalEndpoints *string
 		Labels            *[]Pair
 		Logo              *string
 		NoAuth            *bool
 		NoAnalytics       *bool
 		Templates         *string
-		TLSVerify         *bool
+		TLS               *bool
 		TLSSkipVerify     *bool
 		TLSCacert         *string
 		TLSCert           *string
@@ -443,9 +443,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.17.0"
+	APIVersion = "1.17.1"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 10
+	DBVersion = 11
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response

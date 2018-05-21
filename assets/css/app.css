@@ -304,6 +304,10 @@ ul.sidebar .sidebar-title {
   height: auto;
 }
 
+ul.sidebar .sidebar-title .endpoint-name {
+  color: #fff;
+}
+
 ul.sidebar .sidebar-list a {
   font-size: 14px;
 }
