@@ -196,15 +196,15 @@
               </tr>
               <tr>
                 <td>CMD</td>
-                <td><code>{{ container.Config.Cmd|command }}</code></td>
+                <td style="width:auto;word-break:break-word;word-break:break-all;white-space:pre-wrap;"><code>{{ container.Config.Cmd|command }}</code></td>
               </tr>
               <tr>
                 <td>ENV</td>
                 <td>
                   <table class="table table-bordered table-condensed">
                     <tr ng-repeat="var in container.Config.Env track by $index">
-                      <td>{{ var|key: '=' }}</td>
-                      <td>{{ var|value: '=' }}</td>
+                      <td style="width:auto;word-break:break-word;word-break:break-all;white-space:pre-wrap;">{{ var|key: '=' }}</td>
+                      <td style="width:auto;word-break:break-word;word-break:break-all;white-space:pre-wrap;">{{ var|value: '=' }}</td>
                     </tr>
                   </table>
                 </td>
@@ -214,8 +214,8 @@
                 <td>
                   <table class="table table-bordered table-condensed">
                     <tr ng-repeat="(k, v) in container.Config.Labels">
-                      <td>{{ k }}</td>
-                      <td>{{ v }}</td>
+                      <td style="width:auto;word-break:break-word;word-break:break-all;white-space:pre-wrap;">{{ k }}</td>
+                      <td style="width:auto;word-break:break-word;word-break:break-all;white-space:pre-wrap;">{{ v }}</td>
                     </tr>
                   </table>
                 </td>
