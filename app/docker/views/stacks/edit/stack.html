@@ -18,7 +18,29 @@
 </por-access-control-panel>
 <!-- !access-control-panel -->
 
-<div class="row">
+<div class="row" ng-if="stack && stack.Type === 2 && containers">
+  <div class="col-sm-12">
+    <containers-datatable
+      title="Containers" title-icon="fa-server"
+      dataset="containers" table-key="containers"
+      order-by="Status" show-text-filter="true"
+      show-ownership-column="applicationState.application.authentication"
+      show-host-column="false"
+      public-url="state.publicURL"
+      container-name-truncate-size="truncate_size"
+      start-action="startAction"
+      stop-action="stopAction"
+      restart-action="restartAction"
+      kill-action="killAction"
+      pause-action="pauseAction"
+      resume-action="resumeAction"
+      remove-action="confirmRemoveAction"
+    ></containers-datatable>
+  </div>
+</div>
+
+
+<div class="row" ng-if="stack && stack.Type === 1">
   <div class="col-sm-12">
     <stack-services-datatable
       title="Services" title-icon="fa-list-alt"
@@ -32,7 +54,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" ng-if="stack && stack.Type === 1">
   <div class="col-sm-12">
     <tasks-datatable
       title="Tasks" title-icon="fa-tasks"
@@ -69,49 +91,53 @@
               ></code-editor>
             </div>
           </div>
-          <div class="col-sm-12 form-section-title">
-            Environment
-          </div>
           <!-- environment-variables -->
-          <div class="form-group">
-            <div class="col-sm-12" style="margin-top: 5px;">
-              <label class="control-label text-left">Environment variables</label>
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
-              </span>
+          <div ng-if="stack && stack.Type === 1">
+            <div class="col-sm-12 form-section-title">
+              Environment
             </div>
-            <!-- environment-variable-input-list -->
-            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="variable in stack.Env" style="margin-top: 2px;">
-                <div class="input-group col-sm-5 input-group-sm">
-                  <span class="input-group-addon">name</span>
-                  <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO">
-                </div>
-                <div class="input-group col-sm-5 input-group-sm">
-                  <span class="input-group-addon">value</span>
-                  <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
-                </div>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
-                  <i class="fa fa-trash" aria-hidden="true"></i>
-                </button>
+            <div class="form-group">
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Environment variables</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
+                </span>
               </div>
+              <!-- environment-variable-input-list -->
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                <div ng-repeat="variable in stack.Env" style="margin-top: 2px;">
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">name</span>
+                    <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO">
+                  </div>
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">value</span>
+                    <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
+                  </div>
+                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- !environment-variable-input-list -->
             </div>
-            <!-- !environment-variable-input-list -->
           </div>
           <!-- !environment-variables -->
           <!-- options -->
-          <div class="col-sm-12 form-section-title" ng-if="applicationState.endpoint.apiVersion >= 1.27">
-          Options
-          </div>
-          <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.27">
-            <div class="col-sm-12">
-              <label for="prune" class="control-label text-left">
-                Prune services
-                <portainer-tooltip position="bottom" message="Prune services that are no longer referenced."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input name="prune" type="checkbox" ng-model="formValues.Prune"><i></i>
-              </label>
+          <div ng-if="stack.Type === 1 && applicationState.endpoint.apiVersion >= 1.27">
+            <div class="col-sm-12 form-section-title">
+            Options
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="prune" class="control-label text-left">
+                  Prune services
+                  <portainer-tooltip position="bottom" message="Prune services that are no longer referenced."></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input name="prune" type="checkbox" ng-model="formValues.Prune"><i></i>
+                </label>
+              </div>
             </div>
           </div>
           <!-- !options -->

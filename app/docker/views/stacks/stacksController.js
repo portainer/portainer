@@ -37,8 +37,8 @@ function ($scope, $state, Notifications, StackService, ModalService) {
     });
   }
 
-  function initView() {
-    StackService.stacks(true)
+  function loadStacks(loadingService) {
+    loadingService(true)
     .then(function success(data) {
       var stacks = data;
       for (var i = 0; i < stacks.length; i++) {
@@ -54,6 +54,15 @@ function ($scope, $state, Notifications, StackService, ModalService) {
       $scope.stacks = [];
       Notifications.error('Failure', err, 'Unable to retrieve stacks');
     });
+  }
+
+  function initView() {
+    var endpointMode = $scope.applicationState.endpoint.mode;
+    if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
+      loadStacks(StackService.swarmStacks);
+    } else {
+      loadStacks(StackService.composeStacks);
+    }
   }
 
   initView();

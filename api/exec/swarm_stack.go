@@ -11,18 +11,18 @@ import (
 	"github.com/portainer/portainer"
 )
 
-// StackManager represents a service for managing stacks.
-type StackManager struct {
+// SwarmStackManager represents a service for managing stacks.
+type SwarmStackManager struct {
 	binaryPath       string
 	dataPath         string
 	signatureService portainer.DigitalSignatureService
 	fileService      portainer.FileService
 }
 
-// NewStackManager initializes a new StackManager service.
+// NewSwarmStackManager initializes a new SwarmStackManager service.
 // It also updates the configuration of the Docker CLI binary.
-func NewStackManager(binaryPath, dataPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (*StackManager, error) {
-	manager := &StackManager{
+func NewSwarmStackManager(binaryPath, dataPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (*SwarmStackManager, error) {
+	manager := &SwarmStackManager{
 		binaryPath:       binaryPath,
 		dataPath:         dataPath,
 		signatureService: signatureService,
@@ -38,7 +38,7 @@ func NewStackManager(binaryPath, dataPath string, signatureService portainer.Dig
 }
 
 // Login executes the docker login command against a list of registries (including DockerHub).
-func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []portainer.Registry, endpoint *portainer.Endpoint) {
+func (manager *SwarmStackManager) Login(dockerhub *portainer.DockerHub, registries []portainer.Registry, endpoint *portainer.Endpoint) {
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 	for _, registry := range registries {
 		if registry.Authentication {
@@ -54,14 +54,14 @@ func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []
 }
 
 // Logout executes the docker logout command.
-func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
+func (manager *SwarmStackManager) Logout(endpoint *portainer.Endpoint) error {
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 	args = append(args, "logout")
 	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
 
 // Deploy executes the docker stack deploy command.
-func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
+func (manager *SwarmStackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
 	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 
@@ -81,7 +81,7 @@ func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint
 }
 
 // Remove executes the docker stack rm command.
-func (manager *StackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (manager *SwarmStackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 	args = append(args, "stack", "rm", stack.Name)
 	return runCommandAndCaptureStdErr(command, args, nil, "")
@@ -133,7 +133,7 @@ func prepareDockerCommandAndArgs(binaryPath, dataPath string, endpoint *portaine
 	return command, args
 }
 
-func (manager *StackManager) updateDockerCLIConfiguration(dataPath string) error {
+func (manager *SwarmStackManager) updateDockerCLIConfiguration(dataPath string) error {
 	configFilePath := path.Join(dataPath, "config.json")
 	config, err := manager.retrieveConfigurationFromDisk(configFilePath)
 	if err != nil {
@@ -161,7 +161,7 @@ func (manager *StackManager) updateDockerCLIConfiguration(dataPath string) error
 	return nil
 }
 
-func (manager *StackManager) retrieveConfigurationFromDisk(path string) (map[string]interface{}, error) {
+func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (map[string]interface{}, error) {
 	var config map[string]interface{}
 
 	raw, err := manager.fileService.GetFileContent(path)

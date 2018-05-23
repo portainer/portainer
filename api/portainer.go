@@ -132,6 +132,9 @@ type (
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier).
 	StackID string
 
+	// StackType represents the type of the stack (compose v2, stack deploy v3).
+	StackType int
+
 	// Stack represents a Docker stack created via docker stack deploy.
 	Stack struct {
 		ID          StackID `json:"Id"`
@@ -139,7 +142,9 @@ type (
 		EntryPoint  string  `json:"EntryPoint"`
 		SwarmID     string  `json:"SwarmId"`
 		ProjectPath string
-		Env         []Pair `json:"Env"`
+		Env         []Pair     `json:"Env"`
+		Type        StackType  `json:"Type"`
+		EndpointID  EndpointID `json:"EndpointId"`
 	}
 
 	// RegistryID represents a registry identifier.
@@ -343,7 +348,8 @@ type (
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
 		Stacks() ([]Stack, error)
-		StacksBySwarmID(ID string) ([]Stack, error)
+		StacksBySwarmID(swarmID string) ([]Stack, error)
+		StacksByEndpointID(endpointID EndpointID) ([]Stack, error)
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
@@ -432,12 +438,18 @@ type (
 		TestConnectivity(settings *LDAPSettings) error
 	}
 
-	// StackManager represents a service to manage stacks.
-	StackManager interface {
+	// SwarmStackManager represents a service to manage Swarm stacks.
+	SwarmStackManager interface {
 		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
+	}
+
+	// ComposeStackManager represents a service to manage Compose stacks.
+	ComposeStackManager interface {
+		Up(stack *Stack, endpoint *Endpoint) error
+		Down(stack *Stack, endpoint *Endpoint) error
 	}
 )
 
@@ -530,4 +542,12 @@ const (
 	DockerEnvironment
 	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
 	AgentOnDockerEnvironment
+)
+
+const (
+	_ StackType = iota
+	// DockerSwarmStack represents a stack managed via docker stack
+	DockerSwarmStack
+	// DockerComposeStack represents a stack managed via docker-compose
+	DockerComposeStack
 )

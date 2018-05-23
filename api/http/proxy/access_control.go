@@ -10,7 +10,7 @@ type (
 	}
 )
 
-// applyResourceAccessControl returns an optionally decorated object as the first return value and the
+// applyResourceAccessControlFromLabel returns an optionally decorated object as the first return value and the
 // access level for the user (granted or denied) as the second return value.
 // It will retrieve an identifier from the labels object. If an identifier exists, it will check for
 // an existing resource control associated to it.

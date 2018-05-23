@@ -18,7 +18,8 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
   $scope.state = {
     Method: 'editor',
     formValidationError: '',
-    actionInProgress: false
+    actionInProgress: false,
+    StackType: null
   };
 
   $scope.addEnvironmentVariable = function() {
@@ -41,15 +42,15 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     return true;
   }
 
-  function createStack(name, method) {
+  function createStack(name, type, method) {
     var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
 
     if (method === 'editor') {
       var stackFileContent = $scope.formValues.StackFileContent;
-      return StackService.createStackFromFileContent(name, stackFileContent, env);
+      return StackService.createStackFromFileContent(name, type, stackFileContent, env);
     } else if (method === 'upload') {
       var stackFile = $scope.formValues.StackFile;
-      return StackService.createStackFromFileUpload(name, stackFile, env);
+      return StackService.createStackFromFileUpload(name, type, stackFile, env);
     } else if (method === 'repository') {
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
@@ -58,7 +59,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
         RepositoryUsername: $scope.formValues.RepositoryUsername,
         RepositoryPassword: $scope.formValues.RepositoryPassword
       };
-      return StackService.createStackFromGitRepository(name, repositoryOptions, env);
+      return StackService.createStackFromGitRepository(name, type, repositoryOptions, env);
     }
   }
 
@@ -80,8 +81,9 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       return;
     }
 
+    var type = $scope.state.StackType;
     $scope.state.actionInProgress = true;
-    createStack(name, method)
+    createStack(name, type, method)
     .then(function success(data) {
       return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, []);
     })
@@ -90,7 +92,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       $state.go('docker.stacks');
     })
     .catch(function error(err) {
-      Notifications.warning('Deployment error', err.err.data.err);
+      Notifications.warning('Deployment error', type === 1 ? err.err.data.err : err.data.err);
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;
@@ -100,4 +102,14 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
   $scope.editorUpdate = function(cm) {
     $scope.formValues.StackFileContent = cm.getValue();
   };
+
+  function initView() {
+    var endpointMode = $scope.applicationState.endpoint.mode;
+    $scope.state.StackType = 2;
+    if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
+      $scope.state.StackType = 1;
+    }
+  }
+
+  initView();
 }]);

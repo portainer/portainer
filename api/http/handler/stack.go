@@ -34,7 +34,8 @@ type StackHandler struct {
 	ResourceControlService portainer.ResourceControlService
 	RegistryService        portainer.RegistryService
 	DockerHubService       portainer.DockerHubService
-	StackManager           portainer.StackManager
+	SwarmStackManager      portainer.SwarmStackManager
+	ComposeStackManager    portainer.ComposeStackManager
 }
 
 type stackDeploymentConfig struct {
@@ -71,7 +72,9 @@ func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
 type (
 	postStacksRequest struct {
 		Name                        string           `valid:"required"`
-		SwarmID                     string           `valid:"required"`
+		Type                        int              `valid:"required"`
+		SwarmID                     string           `valid:""`
+		EndpointID                  int              `valid:""`
 		StackFileContent            string           `valid:""`
 		RepositoryURL               string           `valid:""`
 		RepositoryAuthentication    bool             `valid:""`
@@ -144,7 +147,8 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 	}
 
 	stackName := req.Name
-	if stackName == "" {
+	stackType := req.Type
+	if stackName == "" || stackType == 0 {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
@@ -156,7 +160,7 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 	}
 
 	swarmID := req.SwarmID
-	if swarmID == "" {
+	if stackType == 1 && swarmID == "" {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
@@ -175,11 +179,18 @@ func (handler *StackHandler) handlePostStacksStringMethod(w http.ResponseWriter,
 	}
 
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackName + "_" + swarmID),
 		Name:       stackName,
-		SwarmID:    swarmID,
+		Type:       portainer.StackType(stackType),
 		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        req.Env,
+	}
+
+	if stackType == 1 {
+		stack.ID = portainer.StackID(stackName + "_" + swarmID)
+		stack.SwarmID = swarmID
+	} else {
+		stack.ID = portainer.StackID(stackName + "_" + vars["endpointId"])
+		stack.EndpointID = endpointID
 	}
 
 	projectPath, err := handler.FileService.StoreStackFileFromString(string(stack.ID), stack.EntryPoint, stackFileContent)
@@ -266,9 +277,15 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 	}
 
 	stackName := req.Name
-	swarmID := req.SwarmID
+	stackType := req.Type
 
-	if stackName == "" || swarmID == "" || req.RepositoryURL == "" {
+	if stackName == "" || stackType == 0 || req.RepositoryURL == "" {
+		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
+	swarmID := req.SwarmID
+	if stackType == 1 && swarmID == "" {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
@@ -296,11 +313,18 @@ func (handler *StackHandler) handlePostStacksRepositoryMethod(w http.ResponseWri
 	}
 
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackName + "_" + swarmID),
+		Type:       portainer.StackType(stackType),
 		Name:       stackName,
-		SwarmID:    swarmID,
 		EntryPoint: req.ComposeFilePathInRepository,
 		Env:        req.Env,
+	}
+
+	if stackType == 1 {
+		stack.ID = portainer.StackID(stackName + "_" + swarmID)
+		stack.SwarmID = swarmID
+	} else {
+		stack.ID = portainer.StackID(stackName + "_" + vars["endpointId"])
+		stack.EndpointID = endpointID
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(string(stack.ID))
@@ -388,16 +412,25 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 	}
 
 	stackName := r.FormValue("Name")
-	if stackName == "" {
+	stackType := r.FormValue("Type")
+	if stackName == "" || stackType == "" {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	swarmID := r.FormValue("SwarmID")
-	if swarmID == "" {
+	// endpointID := r.FormValue("EndpointID")
+	if stackType == "1" && swarmID == "" {
 		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
+	//  else if stackType == "2" && endpointID == "" {
+	// 	httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+	// 	return
+	// } else if stackType != "1" && stackType != "2" {
+	// 	httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+	// 	return
+	// }
 
 	envParam := r.FormValue("Env")
 	var env []portainer.Pair
@@ -426,12 +459,25 @@ func (handler *StackHandler) handlePostStacksFileMethod(w http.ResponseWriter, r
 		}
 	}
 
+	stype, err := strconv.Atoi(stackType)
+	if err != nil {
+		httperror.WriteErrorResponse(w, err, http.StatusBadRequest, handler.Logger)
+		return
+	}
+
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackName + "_" + swarmID),
+		Type:       portainer.StackType(stype),
 		Name:       stackName,
-		SwarmID:    swarmID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        env,
+	}
+
+	if stype == 1 {
+		stack.ID = portainer.StackID(stackName + "_" + swarmID)
+		stack.SwarmID = swarmID
+	} else {
+		stack.ID = portainer.StackID(stackName + "_" + vars["endpointId"])
+		stack.EndpointID = endpointID
 	}
 
 	projectPath, err := handler.FileService.StoreStackFileFromReader(string(stack.ID), stack.EntryPoint, stackFile)
@@ -517,7 +563,8 @@ func (handler *StackHandler) handleGetStacks(w http.ResponseWriter, r *http.Requ
 
 	var stacks []portainer.Stack
 	if swarmID == "" {
-		stacks, err = handler.StackService.Stacks()
+		// TODO: should change after relocating stacks to /api/stacks
+		stacks, err = handler.StackService.StacksByEndpointID(endpointID)
 	} else {
 		stacks, err = handler.StackService.StacksBySwarmID(swarmID)
 	}
@@ -751,13 +798,11 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	handler.stackDeletionMutex.Lock()
-	err = handler.StackManager.Remove(stack, endpoint)
+	err = handler.deleteStack(stack, endpoint)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
-	handler.stackDeletionMutex.Unlock()
 
 	err = handler.StackService.DeleteStack(portainer.StackID(stackID))
 	if err != nil {
@@ -772,23 +817,60 @@ func (handler *StackHandler) handleDeleteStack(w http.ResponseWriter, r *http.Re
 	}
 }
 
+func (handler *StackHandler) deleteStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	if stack.Type == portainer.DockerSwarmStack {
+		return handler.deleteSwarmStack(stack, endpoint)
+	}
+	return handler.deleteComposeStack(stack, endpoint)
+}
+
+func (handler *StackHandler) deleteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	handler.stackDeletionMutex.Lock()
+	defer handler.stackDeletionMutex.Unlock()
+
+	return handler.SwarmStackManager.Remove(stack, endpoint)
+}
+
+func (handler *StackHandler) deleteComposeStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+	return handler.ComposeStackManager.Down(stack, endpoint)
+}
+
 func (handler *StackHandler) deployStack(config *stackDeploymentConfig) error {
+	if config.stack.Type == portainer.DockerSwarmStack {
+		return handler.deploySwarmStack(config)
+	}
+	return handler.deployComposeStack(config)
+}
+
+func (handler *StackHandler) deployComposeStack(config *stackDeploymentConfig) error {
 	handler.stackCreationMutex.Lock()
+	defer handler.stackCreationMutex.Unlock()
 
-	handler.StackManager.Login(config.dockerhub, config.registries, config.endpoint)
+	handler.SwarmStackManager.Login(config.dockerhub, config.registries, config.endpoint)
 
-	err := handler.StackManager.Deploy(config.stack, config.prune, config.endpoint)
+	err := handler.ComposeStackManager.Up(config.stack, config.endpoint)
 	if err != nil {
-		handler.stackCreationMutex.Unlock()
 		return err
 	}
 
-	err = handler.StackManager.Logout(config.endpoint)
+	return handler.SwarmStackManager.Logout(config.endpoint)
+}
+
+func (handler *StackHandler) deploySwarmStack(config *stackDeploymentConfig) error {
+	handler.stackCreationMutex.Lock()
+	defer handler.stackCreationMutex.Unlock()
+
+	handler.SwarmStackManager.Login(config.dockerhub, config.registries, config.endpoint)
+
+	err := handler.SwarmStackManager.Deploy(config.stack, config.prune, config.endpoint)
 	if err != nil {
-		handler.stackCreationMutex.Unlock()
 		return err
 	}
 
-	handler.stackCreationMutex.Unlock()
+	err = handler.SwarmStackManager.Logout(config.endpoint)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -1,5 +1,6 @@
 function StackViewModel(data) {
   this.Id = data.Id;
+  this.Type = data.Type;
   this.Name = data.Name;
   this.Checked = false;
   this.Env = data.Env ? data.Env : [];

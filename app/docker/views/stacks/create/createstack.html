@@ -19,8 +19,11 @@
           </div>
           <!-- !name-input -->
           <div class="form-group">
-            <span class="col-sm-12 text-muted small">
+            <span class="col-sm-12 text-muted small" ng-if="state.StackType === 1">
               This stack will be deployed using the equivalent of the <code>docker stack deploy</code> command.
+            </span>
+            <span class="col-sm-12 text-muted small" ng-if="state.StackType === 2">
+              This stack will be deployed using the equivalent of <code>docker-compose</code>.
             </span>
           </div>
           <!-- build-method -->
@@ -156,34 +159,36 @@
               </div>
             </div>
           </div>
-          <div class="col-sm-12 form-section-title">
-            Environment
-          </div>
           <!-- environment-variables -->
-          <div class="form-group">
-            <div class="col-sm-12" style="margin-top: 5px;">
-              <label class="control-label text-left">Environment variables</label>
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
-              </span>
+          <div ng-if="state.StackType === 1">
+            <div class="col-sm-12 form-section-title">
+              Environment
             </div>
-            <!-- environment-variable-input-list -->
-            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="variable in formValues.Env" style="margin-top: 2px;">
-                <div class="input-group col-sm-5 input-group-sm">
-                  <span class="input-group-addon">name</span>
-                  <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO">
-                </div>
-                <div class="input-group col-sm-5 input-group-sm">
-                  <span class="input-group-addon">value</span>
-                  <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
-                </div>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
-                  <i class="fa fa-trash" aria-hidden="true"></i>
-                </button>
+            <div class="form-group">
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Environment variables</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
+                </span>
               </div>
+              <!-- environment-variable-input-list -->
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                <div ng-repeat="variable in formValues.Env" style="margin-top: 2px;">
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">name</span>
+                    <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO">
+                  </div>
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">value</span>
+                    <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
+                  </div>
+                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- !environment-variable-input-list -->
             </div>
-            <!-- !environment-variable-input-list -->
           </div>
           <!-- !environment-variables -->
           <!-- !repository -->

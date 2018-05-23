@@ -33,7 +33,8 @@ type Server struct {
 	RegistryService        portainer.RegistryService
 	DockerHubService       portainer.DockerHubService
 	StackService           portainer.StackService
-	StackManager           portainer.StackManager
+	SwarmStackManager      portainer.SwarmStackManager
+	ComposeStackManager    portainer.ComposeStackManager
 	LDAPService            portainer.LDAPService
 	GitService             portainer.GitService
 	SignatureService       portainer.DigitalSignatureService
@@ -112,7 +113,8 @@ func (server *Server) Start() error {
 	stackHandler.StackService = server.StackService
 	stackHandler.EndpointService = server.EndpointService
 	stackHandler.ResourceControlService = server.ResourceControlService
-	stackHandler.StackManager = server.StackManager
+	stackHandler.SwarmStackManager = server.SwarmStackManager
+	stackHandler.ComposeStackManager = server.ComposeStackManager
 	stackHandler.GitService = server.GitService
 	stackHandler.RegistryService = server.RegistryService
 	stackHandler.DockerHubService = server.DockerHubService

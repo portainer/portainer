@@ -61,6 +61,7 @@ const (
 	ErrStackNotFound                   = Error("Stack not found")
 	ErrStackAlreadyExists              = Error("A stack already exists with this name")
 	ErrComposeFileNotFoundInRepository = Error("Unable to find a Compose file in the repository")
+	ErrUnsupportedStackOperation       = Error("Operation not supported for this type of stack")
 )
 
 // Endpoint extensions error
