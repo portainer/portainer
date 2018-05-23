@@ -30,7 +30,8 @@
 }
 
 .datatable .searchBar {
-  border-top: 1px solid #f6f6f6;
+  border: 1px solid #767676;
+  margin: 5px;
   padding: 10px;
 }
 
