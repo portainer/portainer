@@ -56,7 +56,7 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 **_Portainer_** has full support for the following Docker versions:
 
 * Docker 1.10 to the latest version
-* Docker Swarm >= 1.2.3
+* Docker Swarm >= 1.2.3 (support for standalone Docker Swarm is dropped in Portainer 1.17.0, but the built-in Swarm Mode is fully supported)
 
 Partial support for the following Docker versions (some features may not be available):
 
