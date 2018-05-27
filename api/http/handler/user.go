@@ -397,11 +397,6 @@ func (handler *UserHandler) handleDeleteUser(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if userID == 1 {
-		httperror.WriteErrorResponse(w, portainer.ErrCannotRemoveAdmin, http.StatusForbidden, handler.Logger)
-		return
-	}
-
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
