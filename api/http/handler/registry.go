@@ -412,16 +412,20 @@ func (handler *RegistryHandler) proxyRequestsToRegistryAPI(w http.ResponseWriter
 	}
 
 	// Build first request (without auth)
-	uri := strings.Replace(r.RequestURI, "/api/registries/"+id+"/", "", 1)
+	// Copy original request to req
 	req := r
-	req.RequestURI = ""
+	// Build new URI from old URI
+	uri := strings.Replace(r.RequestURI, "/api/registries/"+id+"/", "", 1)
+	// Build Full URL to registry
 	u, err := url.Parse(registry.Protocol + "://" + registry.URL + "/" + uri)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 	}
-
+	// Set URI to empty string and URL to new URL
+	req.RequestURI = ""
 	req.URL = u
 	req.Host = registry.URL
+	// Do request
 	resp, err := handler.HttpClient.Do(req)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
