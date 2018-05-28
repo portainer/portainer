@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// NewSingleHostReverseProxyWithHostHeader is based on NewSingleHostReverseProxy
+// newSingleHostReverseProxyWithHostHeader is based on NewSingleHostReverseProxy
 // from golang.org/src/net/http/httputil/reverseproxy.go and merely sets the Host
 // HTTP header, which NewSingleHostReverseProxy deliberately preserves.
 func newSingleHostReverseProxyWithHostHeader(target *url.URL) *httputil.ReverseProxy {

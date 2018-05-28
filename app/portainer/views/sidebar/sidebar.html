@@ -15,7 +15,9 @@
       select-endpoint="switchEndpoint"
     ></endpoint-selector>
     <li class="sidebar-title"><span class="endpoint-name">{{ activeEndpoint.Name }}</span></li>
-    <docker-sidebar-content
+    <azure-sidebar-content ng-if="applicationState.endpoint.mode.provider === 'AZURE'">
+    </azure-sidebar-content>
+    <docker-sidebar-content ng-if="applicationState.endpoint.mode.provider !== 'AZURE'"
       endpoint-api-version="applicationState.endpoint.apiVersion"
       swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
       standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'"

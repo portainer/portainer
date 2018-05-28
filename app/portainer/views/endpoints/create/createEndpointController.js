@@ -12,7 +12,10 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     URL: '',
     PublicURL: '',
     GroupId: 1,
-    SecurityFormData: new EndpointSecurityFormData()
+    SecurityFormData: new EndpointSecurityFormData(),
+    AzureApplicationId: '',
+    AzureTenantId: '',
+    AzureAuthenticationKey: ''
   };
 
   $scope.addDockerEndpoint = function() {
@@ -30,7 +33,7 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-    addEndpoint(name, URL, publicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+    addEndpoint(name, 1, URL, publicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
   };
 
   $scope.addAgentEndpoint = function() {
@@ -39,12 +42,38 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
     var groupId = $scope.formValues.GroupId;
 
-    addEndpoint(name, URL, publicURL, groupId, true, true, true, null, null, null);
+    addEndpoint(name, 2, URL, publicURL, groupId, true, true, true, null, null, null);
   };
 
-  function addEndpoint(name, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  $scope.addAzureEndpoint = function() {
+    var name = $scope.formValues.Name;
+    var applicationId = $scope.formValues.AzureApplicationId;
+    var tenantId = $scope.formValues.AzureTenantId;
+    var authenticationKey = $scope.formValues.AzureAuthenticationKey;
+
+    createAzureEndpoint(name, applicationId, tenantId, authenticationKey);
+  };
+
+  function createAzureEndpoint(name, applicationId, tenantId, authenticationKey) {
+    var endpoint;
+
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey)
+    .then(function success() {
+      Notifications.success('Endpoint created', name);
+      $state.go('portainer.endpoints', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to create endpoint');
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
+    });
+  }
+
+  function addEndpoint(name, type, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    $scope.state.actionInProgress = true;
+    EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success() {
       Notifications.success('Endpoint created', name);
       $state.go('portainer.endpoints', {}, {reload: true});

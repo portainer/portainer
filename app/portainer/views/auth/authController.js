@@ -13,12 +13,7 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     AuthenticationError: ''
   };
 
-  function setActiveEndpointAndRedirectToDashboard(endpoint) {
-    var endpointID = EndpointProvider.endpointID();
-    if (!endpointID) {
-      EndpointProvider.setEndpointID(endpoint.Id);
-    }
-
+  function redirectToDockerDashboard(endpoint) {
     ExtensionManager.initEndpointExtensions(endpoint.Id)
     .then(function success(data) {
       var extensions = data;
@@ -32,12 +27,31 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     });
   }
 
+  function redirectToAzureDashboard(endpoint) {
+    StateManager.updateEndpointState(false, endpoint.Type, [])
+    .then(function success(data) {
+      $state.go('azure.dashboard');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
+    });
+  }
+
+  function redirectToDashboard(endpoint) {
+    EndpointProvider.setEndpointID(endpoint.Id);
+
+    if (endpoint.Type === 3) {
+      return redirectToAzureDashboard(endpoint);
+    }
+    redirectToDockerDashboard(endpoint);
+  }
+
   function unauthenticatedFlow() {
     EndpointService.endpoints()
     .then(function success(data) {
       var endpoints = data;
       if (endpoints.length > 0)  {
-        setActiveEndpointAndRedirectToDashboard(endpoints[0]);
+        redirectToDashboard(endpoints[0]);
       } else {
         $state.go('portainer.init.endpoint');
       }
@@ -79,7 +93,7 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
       var endpoints = data;
       var userDetails = Authentication.getUserDetails();
       if (endpoints.length > 0)  {
-        setActiveEndpointAndRedirectToDashboard(endpoints[0]);
+        redirectToDashboard(endpoints[0]);
       } else if (endpoints.length === 0 && userDetails.role === 1) {
         $state.go('portainer.init.endpoint');
       } else if (endpoints.length === 0 && userDetails.role === 2) {

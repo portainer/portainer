@@ -88,6 +88,11 @@ func (server *Server) Start() error {
 	dockerHandler.EndpointGroupService = server.EndpointGroupService
 	dockerHandler.TeamMembershipService = server.TeamMembershipService
 	dockerHandler.ProxyManager = proxyManager
+	var azureHandler = handler.NewAzureHandler(requestBouncer)
+	azureHandler.EndpointService = server.EndpointService
+	azureHandler.EndpointGroupService = server.EndpointGroupService
+	azureHandler.TeamMembershipService = server.TeamMembershipService
+	azureHandler.ProxyManager = proxyManager
 	var websocketHandler = handler.NewWebSocketHandler()
 	websocketHandler.EndpointService = server.EndpointService
 	websocketHandler.SignatureService = server.SignatureService
@@ -140,6 +145,7 @@ func (server *Server) Start() error {
 		StackHandler:          stackHandler,
 		TemplatesHandler:      templatesHandler,
 		DockerHandler:         dockerHandler,
+		AzureHandler:          azureHandler,
 		WebSocketHandler:      websocketHandler,
 		FileHandler:           fileHandler,
 		UploadHandler:         uploadHandler,
