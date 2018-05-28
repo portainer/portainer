@@ -62,11 +62,6 @@ func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
 
 // Deploy executes the docker stack deploy command.
 func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
-	err := manager.updateDockerCLIConfiguration(manager.binaryPath)
-	if err != nil {
-		return err
-	}
-
 	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
 	command, args := prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 
