@@ -3,7 +3,6 @@ package proxy
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"path"
 	"regexp"
@@ -58,15 +57,6 @@ func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error
 
 func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Response, error) {
 	return p.dockerTransport.RoundTrip(request)
-}
-
-func (p *proxyTransport) createSignature() (string, error) {
-	signature, err := p.SignatureService.Sign(portainer.PortainerAgentSignatureMessage)
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%x", signature), nil
 }
 
 func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Response, error) {

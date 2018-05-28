@@ -164,13 +164,6 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('NodeName')">
-                  Host
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
                 <a ng-click="$ctrl.changeOrderBy('Ports')">
                   Published Ports
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
