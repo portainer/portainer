@@ -5,6 +5,7 @@ import (
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/handler"
+	"github.com/portainer/portainer/http/handler/auth"
 	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/proxy"
@@ -60,7 +61,7 @@ func (server *Server) Start() error {
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
 	var fileHandler = handler.NewFileHandler(filepath.Join(server.AssetsPath, "public"))
-	var authHandler = handler.NewAuthHandler(requestBouncer, rateLimiter, server.AuthDisabled)
+	var authHandler = auth.NewAuthHandler(requestBouncer, rateLimiter, server.AuthDisabled)
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
@@ -90,6 +91,11 @@ func (server *Server) Start() error {
 	dockerHandler.EndpointGroupService = server.EndpointGroupService
 	dockerHandler.TeamMembershipService = server.TeamMembershipService
 	dockerHandler.ProxyManager = proxyManager
+	var azureHandler = handler.NewAzureHandler(requestBouncer)
+	azureHandler.EndpointService = server.EndpointService
+	azureHandler.EndpointGroupService = server.EndpointGroupService
+	azureHandler.TeamMembershipService = server.TeamMembershipService
+	azureHandler.ProxyManager = proxyManager
 	var websocketHandler = handler.NewWebSocketHandler()
 	websocketHandler.EndpointService = server.EndpointService
 	websocketHandler.SignatureService = server.SignatureService
@@ -143,6 +149,7 @@ func (server *Server) Start() error {
 		StackHandler:          stackHandler,
 		TemplatesHandler:      templatesHandler,
 		DockerHandler:         dockerHandler,
+		AzureHandler:          azureHandler,
 		WebSocketHandler:      websocketHandler,
 		FileHandler:           fileHandler,
 		UploadHandler:         uploadHandler,

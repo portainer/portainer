@@ -18,6 +18,7 @@ angular.module('portainer', [
   'portainer.templates',
   'portainer.app',
   'portainer.agent',
+  'portainer.azure',
   'portainer.docker',
   'extension.storidge',
   'rzModule']);

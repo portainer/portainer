@@ -1,4 +1,4 @@
-package handler
+package auth
 
 import (
 	"github.com/portainer/portainer"
@@ -11,6 +11,7 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/portainer/http/error"
+	"github.com/portainer/portainer/http/response"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -122,5 +123,5 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	encodeJSON(w, &postAuthResponse{JWT: token}, handler.Logger)
+	response.WriteJSONResponse(w, &postAuthResponse{JWT: token})
 }

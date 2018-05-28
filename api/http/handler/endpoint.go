@@ -80,6 +80,7 @@ type (
 	postEndpointPayload struct {
 		name                      string
 		url                       string
+		endpointType              int
 		publicURL                 string
 		groupID                   int
 		useTLS                    bool
@@ -88,6 +89,9 @@ type (
 		caCert                    []byte
 		cert                      []byte
 		key                       []byte
+		azureApplicationID        string
+		azureTenantID             string
+		azureAuthenticationKey    string
 	}
 )
 
@@ -117,7 +121,44 @@ func (handler *EndpointHandler) handleGetEndpoints(w http.ResponseWriter, r *htt
 		return
 	}
 
+	for i := range filteredEndpoints {
+		filteredEndpoints[i].AzureCredentials = portainer.AzureCredentials{}
+	}
+
 	encodeJSON(w, filteredEndpoints, handler.Logger)
+}
+
+func (handler *EndpointHandler) createAzureEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
+	credentials := portainer.AzureCredentials{
+		ApplicationID:     payload.azureApplicationID,
+		TenantID:          payload.azureTenantID,
+		AuthenticationKey: payload.azureAuthenticationKey,
+	}
+
+	httpClient := client.NewHTTPClient()
+	_, err := httpClient.ExecuteAzureAuthenticationRequest(&credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := &portainer.Endpoint{
+		Name:             payload.name,
+		URL:              payload.url,
+		Type:             portainer.AzureEnvironment,
+		GroupID:          portainer.EndpointGroupID(payload.groupID),
+		PublicURL:        payload.publicURL,
+		AuthorizedUsers:  []portainer.UserID{},
+		AuthorizedTeams:  []portainer.TeamID{},
+		Extensions:       []portainer.EndpointExtension{},
+		AzureCredentials: credentials,
+	}
+
+	err = handler.EndpointService.CreateEndpoint(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return endpoint, nil
 }
 
 func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
@@ -236,6 +277,10 @@ func (handler *EndpointHandler) createUnsecuredEndpoint(payload *postEndpointPay
 }
 
 func (handler *EndpointHandler) createEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
+	if portainer.EndpointType(payload.endpointType) == portainer.AzureEnvironment {
+		return handler.createAzureEndpoint(payload)
+	}
+
 	if payload.useTLS {
 		return handler.createTLSSecuredEndpoint(payload)
 	}
@@ -245,11 +290,39 @@ func (handler *EndpointHandler) createEndpoint(payload *postEndpointPayload) (*p
 func convertPostEndpointRequestToPayload(r *http.Request) (*postEndpointPayload, error) {
 	payload := &postEndpointPayload{}
 	payload.name = r.FormValue("Name")
+
+	endpointType := r.FormValue("EndpointType")
+
+	if payload.name == "" || endpointType == "" {
+		return nil, httperror.ErrInvalidRequestFormat
+	}
+
+	parsedType, err := strconv.Atoi(endpointType)
+	if err != nil {
+		return nil, err
+	}
+
 	payload.url = r.FormValue("URL")
+	payload.endpointType = parsedType
+
+	if payload.name == "" {
+		return nil, httperror.ErrInvalidRequestFormat
+	}
+
+	if portainer.EndpointType(payload.endpointType) != portainer.AzureEnvironment && payload.url == "" {
+		return nil, httperror.ErrInvalidRequestFormat
+	}
+
 	payload.publicURL = r.FormValue("PublicURL")
 
-	if payload.name == "" || payload.url == "" {
-		return nil, httperror.ErrInvalidRequestFormat
+	if portainer.EndpointType(payload.endpointType) == portainer.AzureEnvironment {
+		payload.azureApplicationID = r.FormValue("AzureApplicationID")
+		payload.azureTenantID = r.FormValue("AzureTenantID")
+		payload.azureAuthenticationKey = r.FormValue("AzureAuthenticationKey")
+
+		if payload.azureApplicationID == "" || payload.azureTenantID == "" || payload.azureAuthenticationKey == "" {
+			return nil, httperror.ErrInvalidRequestFormat
+		}
 	}
 
 	rawGroupID := r.FormValue("GroupID")
@@ -335,6 +408,8 @@ func (handler *EndpointHandler) handleGetEndpoint(w http.ResponseWriter, r *http
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
+
+	endpoint.AzureCredentials = portainer.AzureCredentials{}
 
 	encodeJSON(w, endpoint, handler.Logger)
 }

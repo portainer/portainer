@@ -44,6 +44,11 @@ const (
 	ErrEndpointAccessDenied = Error("Access denied to endpoint")
 )
 
+// Azure environment errors
+const (
+	ErrAzureInvalidCredentials = Error("Invalid Azure credentials")
+)
+
 // Endpoint group errors.
 const (
 	ErrEndpointGroupNotFound    = Error("Endpoint group not found")

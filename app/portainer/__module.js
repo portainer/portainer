@@ -253,35 +253,12 @@ angular.module('portainer.app', [])
     }
   };
 
-  var stacks = {
-    name: 'docker.stacks',
-    url: '/stacks',
+  var support = {
+    name: 'portainer.support',
+    url: '/support',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/stacks/stacks.html',
-        controller: 'StacksController'
-      }
-    }
-  };
-
-  var stack = {
-    name: 'docker.stacks.stack',
-    url: '/:id',
-    views: {
-      'content@': {
-        templateUrl: 'app/portainer/views/stacks/edit/stack.html',
-        controller: 'StackController'
-      }
-    }
-  };
-
-  var stackCreation = {
-    name: 'docker.stacks.new',
-    url: '/new',
-    views: {
-      'content@': {
-        templateUrl: 'app/portainer/views/stacks/create/createstack.html',
-        controller: 'CreateStackController'
+        templateUrl: 'app/portainer/views/support/support.html'
       }
     }
   };
@@ -355,6 +332,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(stacks);
   $stateRegistryProvider.register(stack);
   $stateRegistryProvider.register(stackCreation);
+  $stateRegistryProvider.register(support);
   $stateRegistryProvider.register(users);
   $stateRegistryProvider.register(user);
   $stateRegistryProvider.register(teams);
