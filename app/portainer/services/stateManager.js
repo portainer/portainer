@@ -30,18 +30,12 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     LocalStorage.storeApplicationState(state.application);
   };
 
-  manager.updateDonationHeader = function(displayDonationHeader) {
-    state.application.displayDonationHeader = displayDonationHeader;
-    LocalStorage.storeApplicationState(state.application);
-  };
-
  function assignStateFromStatusAndSettings(status, settings) {
    state.application.authentication = status.Authentication;
    state.application.analytics = status.Analytics;
    state.application.endpointManagement = status.EndpointManagement;
    state.application.version = status.Version;
    state.application.logo = settings.LogoURL;
-   state.application.displayDonationHeader = settings.DisplayDonationHeader;
    state.application.displayExternalContributors = settings.DisplayExternalContributors;
    state.application.validity = moment().unix();
  }
