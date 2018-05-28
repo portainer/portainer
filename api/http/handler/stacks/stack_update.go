@@ -18,7 +18,7 @@ type updateComposeStackPayload struct {
 
 func (payload *updateComposeStackPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.StackFileContent) {
-		return portainer.Error("Invalid stack file content.")
+		return portainer.Error("Invalid stack file content")
 	}
 	return nil
 }
@@ -31,13 +31,13 @@ type updateSwarmStackPayload struct {
 
 func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.StackFileContent) {
-		return portainer.Error("Invalid stack file content.")
+		return portainer.Error("Invalid stack file content")
 	}
 	return nil
 }
 
 // PUT request on /api/stacks/:id
-func (handler *StackHandler) stackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{err, "Invalid stack identifier route variable", http.StatusBadRequest}
@@ -86,14 +86,14 @@ func (handler *StackHandler) stackUpdate(w http.ResponseWriter, r *http.Request)
 	return response.WriteJSONResponse(w, stack)
 }
 
-func (handler *StackHandler) updateAndDeployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) updateAndDeployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	if stack.Type == portainer.DockerSwarmStack {
 		return handler.updateSwarmStack(r, stack, endpoint)
 	}
 	return handler.updateComposeStack(r, stack, endpoint)
 }
 
-func (handler *StackHandler) updateComposeStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	var payload updateComposeStackPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -118,7 +118,7 @@ func (handler *StackHandler) updateComposeStack(r *http.Request, stack *portaine
 	return nil
 }
 
-func (handler *StackHandler) updateSwarmStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	var payload updateSwarmStackPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {

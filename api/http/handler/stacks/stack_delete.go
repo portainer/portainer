@@ -12,7 +12,7 @@ import (
 )
 
 // DELETE request on /api/stacks/:id
-func (handler *StackHandler) stackDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{err, "Invalid stack identifier route variable", http.StatusBadRequest}
@@ -66,7 +66,7 @@ func (handler *StackHandler) stackDelete(w http.ResponseWriter, r *http.Request)
 	return response.EmptyResponse(w)
 }
 
-func (handler *StackHandler) deleteStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
+func (handler *Handler) deleteStack(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 	if stack.Type == portainer.DockerSwarmStack {
 		return handler.SwarmStackManager.Remove(stack, endpoint)
 	}

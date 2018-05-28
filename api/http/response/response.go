@@ -29,6 +29,7 @@ func WriteJSONResponse(rw http.ResponseWriter, data interface{}) *httperror.Hand
 	return nil
 }
 
+// TODO: rename ? response.EmptyResponse seems redondant. response.Empty() better?
 // EmptyResponse merely sets the response code to NoContent (204).
 func EmptyResponse(rw http.ResponseWriter) *httperror.HandlerError {
 	rw.WriteHeader(http.StatusNoContent)

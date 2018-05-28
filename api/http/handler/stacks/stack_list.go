@@ -17,7 +17,7 @@ type stackListOperationFilters struct {
 }
 
 // GET request on /api/stacks?(filters=<filters>)
-func (handler *StackHandler) stackList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var filters stackListOperationFilters
 	err := request.RetrieveJSONQueryParameter(r, "filters", &filters, true)
 	if err != nil {

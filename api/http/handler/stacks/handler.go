@@ -11,8 +11,8 @@ import (
 	"github.com/portainer/portainer/http/security"
 )
 
-// StackHandler represents an HTTP API handler for managing Stack.
-type StackHandler struct {
+// Handler is the HTTP handler used to handle stack operations.
+type Handler struct {
 	stackCreationMutex *sync.Mutex
 	stackDeletionMutex *sync.Mutex
 	*mux.Router
@@ -28,9 +28,9 @@ type StackHandler struct {
 	ComposeStackManager    portainer.ComposeStackManager
 }
 
-// NewStackHandler returns a new instance of StackHandler.
-func NewStackHandler(bouncer *security.RequestBouncer) *StackHandler {
-	h := &StackHandler{
+// NewHandler creates a handler to manage stack operations.
+func NewHandler(bouncer *security.RequestBouncer) *Handler {
+	h := &Handler{
 		Router:             mux.NewRouter(),
 		stackCreationMutex: &sync.Mutex{},
 		stackDeletionMutex: &sync.Mutex{},

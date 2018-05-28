@@ -9,24 +9,25 @@ import (
 
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/handler/auth"
+	"github.com/portainer/portainer/http/handler/dockerhub"
 	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/handler/stacks"
 )
 
 // Handler is a collection of all the service handlers.
 type Handler struct {
-	AuthHandler           *auth.AuthHandler
+	AuthHandler           *auth.Handler
 	UserHandler           *UserHandler
 	TeamHandler           *TeamHandler
 	TeamMembershipHandler *TeamMembershipHandler
 	EndpointHandler       *EndpointHandler
 	EndpointGroupHandler  *EndpointGroupHandler
 	RegistryHandler       *RegistryHandler
-	DockerHubHandler      *DockerHubHandler
+	DockerHubHandler      *dockerhub.Handler
 	ExtensionHandler      *ExtensionHandler
 	StoridgeHandler       *extensions.StoridgeHandler
 	ResourceHandler       *ResourceHandler
-	StackHandler          *stacks.StackHandler
+	StackHandler          *stacks.Handler
 	StatusHandler         *StatusHandler
 	SettingsHandler       *SettingsHandler
 	TemplatesHandler      *TemplatesHandler

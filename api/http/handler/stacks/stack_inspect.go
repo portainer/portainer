@@ -12,7 +12,7 @@ import (
 )
 
 // GET request on /api/stacks/:id
-func (handler *StackHandler) stackInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{err, "Invalid stack identifier route variable", http.StatusBadRequest}

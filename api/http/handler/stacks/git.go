@@ -8,7 +8,7 @@ type cloneRepositoryParameters struct {
 	password       string
 }
 
-func (handler *StackHandler) cloneGitRepository(parameters *cloneRepositoryParameters) error {
+func (handler *Handler) cloneGitRepository(parameters *cloneRepositoryParameters) error {
 	if parameters.authentication {
 		return handler.GitService.ClonePrivateRepositoryWithBasicAuth(parameters.url, parameters.path, parameters.username, parameters.password)
 	}

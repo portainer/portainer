@@ -26,18 +26,18 @@ func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error
 		return portainer.Error("Invalid stack name")
 	}
 	if payload.EndpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number.")
+		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
 	}
 	if govalidator.IsNull(payload.SwarmID) {
 		return portainer.Error("Invalid Swarm ID")
 	}
 	if govalidator.IsNull(payload.StackFileContent) {
-		return portainer.Error("Invalid stack file content.")
+		return portainer.Error("Invalid stack file content")
 	}
 	return nil
 }
 
-func (handler *StackHandler) createSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload swarmStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -118,16 +118,16 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 		return portainer.Error("Invalid stack name")
 	}
 	if payload.EndpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number.")
+		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
 	}
 	if govalidator.IsNull(payload.SwarmID) {
 		return portainer.Error("Invalid Swarm ID")
 	}
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
-		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format.")
+		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
 	}
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return portainer.Error("Invalid repository credentials. Username and password must be specified when authentication is enabled.")
+		return portainer.Error("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
@@ -135,7 +135,7 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 	return nil
 }
 
-func (handler *StackHandler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload swarmStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -225,7 +225,7 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 
 	endpointID, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointID", false)
 	if err != nil || endpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number.")
+		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
 	}
 	payload.EndpointID = endpointID
 
@@ -237,7 +237,7 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 
 	composeFileContent, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return portainer.Error("Invalid Compose file. Ensure that the Compose file is uploaded correctly.")
+		return portainer.Error("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
 	}
 	payload.StackFileContent = composeFileContent
 
@@ -250,7 +250,7 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 	return nil
 }
 
-func (handler *StackHandler) createSwarmStackFromFileUpload(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	payload := &swarmStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
@@ -322,7 +322,7 @@ type swarmStackDeploymentConfig struct {
 	prune      bool
 }
 
-func (handler *StackHandler) createSwarmDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool) (*swarmStackDeploymentConfig, *httperror.HandlerError) {
+func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool) (*swarmStackDeploymentConfig, *httperror.HandlerError) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return nil, &httperror.HandlerError{err, "Unable to retrieve info from request context", http.StatusInternalServerError}
@@ -350,7 +350,7 @@ func (handler *StackHandler) createSwarmDeployConfig(r *http.Request, stack *por
 	return config, nil
 }
 
-func (handler *StackHandler) deploySwarmStack(config *swarmStackDeploymentConfig) error {
+func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) error {
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 

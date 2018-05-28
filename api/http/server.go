@@ -6,6 +6,7 @@ import (
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/auth"
+	"github.com/portainer/portainer/http/handler/dockerhub"
 	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/proxy"
@@ -61,7 +62,7 @@ func (server *Server) Start() error {
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
 	var fileHandler = handler.NewFileHandler(filepath.Join(server.AssetsPath, "public"))
-	var authHandler = auth.NewAuthHandler(requestBouncer, rateLimiter, server.AuthDisabled)
+	var authHandler = auth.NewHandler(requestBouncer, rateLimiter, server.AuthDisabled)
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
@@ -109,13 +110,13 @@ func (server *Server) Start() error {
 	endpointGroupHandler.EndpointService = server.EndpointService
 	var registryHandler = handler.NewRegistryHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
-	var dockerHubHandler = handler.NewDockerHubHandler(requestBouncer)
+	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
 	dockerHubHandler.DockerHubService = server.DockerHubService
 	var resourceHandler = handler.NewResourceHandler(requestBouncer)
 	resourceHandler.ResourceControlService = server.ResourceControlService
 	var uploadHandler = handler.NewUploadHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
-	var stackHandler = stacks.NewStackHandler(requestBouncer)
+	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.FileService = server.FileService
 	stackHandler.StackService = server.StackService
 	stackHandler.EndpointService = server.EndpointService

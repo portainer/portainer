@@ -24,15 +24,15 @@ func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) err
 		return portainer.Error("Invalid stack name")
 	}
 	if payload.EndpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number.")
+		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
 	}
 	if govalidator.IsNull(payload.StackFileContent) {
-		return portainer.Error("Invalid stack file content.")
+		return portainer.Error("Invalid stack file content")
 	}
 	return nil
 }
 
-func (handler *StackHandler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload composeStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -109,13 +109,13 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 		return portainer.Error("Invalid stack name")
 	}
 	if payload.EndpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number.")
+		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
 	}
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
-		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format.")
+		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
 	}
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return portainer.Error("Invalid repository credentials. Username and password must be specified when authentication is enabled.")
+		return portainer.Error("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
@@ -123,7 +123,7 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	return nil
 }
 
-func (handler *StackHandler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload composeStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -209,20 +209,20 @@ func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) erro
 
 	endpointID, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointID", false)
 	if err != nil || endpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number.")
+		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
 	}
 	payload.EndpointID = endpointID
 
 	composeFileContent, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return portainer.Error("Invalid Compose file. Ensure that the Compose file is uploaded correctly.")
+		return portainer.Error("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
 	}
 	payload.StackFileContent = composeFileContent
 
 	return nil
 }
 
-func (handler *StackHandler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	payload := &composeStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
@@ -291,7 +291,7 @@ type composeStackDeploymentConfig struct {
 	registries []portainer.Registry
 }
 
-func (handler *StackHandler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
+func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return nil, &httperror.HandlerError{err, "Unable to retrieve info from request context", http.StatusInternalServerError}
@@ -323,7 +323,7 @@ func (handler *StackHandler) createComposeDeployConfig(r *http.Request, stack *p
 // to login/logout, which will generate the required data in the config.json file and then
 // clean it. Hence the use of the mutex.
 // We should contribute to libcompose to support authentication without using the config.json file.
-func (handler *StackHandler) deployComposeStack(config *composeStackDeploymentConfig) error {
+func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig) error {
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
