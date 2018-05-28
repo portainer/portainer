@@ -254,33 +254,33 @@ angular.module('portainer.app', [])
   };
 
   var stacks = {
-    name: 'docker.stacks',
+    name: 'portainer.stacks',
     url: '/stacks',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/stacks/stacks.html',
+        templateUrl: 'app/portainer/views/stacks/stacks.html',
         controller: 'StacksController'
       }
     }
   };
 
   var stack = {
-    name: 'docker.stacks.stack',
+    name: 'portainer.stacks.stack',
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/stacks/edit/stack.html',
+        templateUrl: 'app/portainer/views/stacks/edit/stack.html',
         controller: 'StackController'
       }
     }
   };
 
   var stackCreation = {
-    name: 'docker.stacks.new',
+    name: 'portainer.stacks.new',
     url: '/new',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/stacks/create/createstack.html',
+        templateUrl: 'app/portainer/views/stacks/create/createstack.html',
         controller: 'CreateStackController'
       }
     }
