@@ -1,6 +1,6 @@
-angular.module('portainer.docker')
-.controller('StacksController', ['$scope', '$state', 'Notifications', 'StackService', 'ModalService',
-function ($scope, $state, Notifications, StackService, ModalService) {
+angular.module('portainer.app')
+.controller('StacksController', ['$scope', '$state', 'Notifications', 'StackService', 'ModalService', 'EndpointProvider',
+function ($scope, $state, Notifications, StackService, ModalService, EndpointProvider) {
   $scope.state = {
     displayInformationPanel: false,
     displayExternalStacks: true
@@ -37,8 +37,28 @@ function ($scope, $state, Notifications, StackService, ModalService) {
     });
   }
 
-  function loadStacks(loadingService) {
-    loadingService(true)
+  function loadComposeStacks() {
+    var endpointId = EndpointProvider.endpointID();
+    StackService.composeStacks(true, { EndpointID: endpointId })
+    .then(function success(data) {
+      var stacks = data;
+      for (var i = 0; i < stacks.length; i++) {
+        var stack = stacks[i];
+        if (stack.External) {
+          $scope.state.displayInformationPanel = true;
+          break;
+        }
+      }
+      $scope.stacks = stacks;
+    })
+    .catch(function error(err) {
+      $scope.stacks = [];
+      Notifications.error('Failure', err, 'Unable to retrieve stacks');
+    });
+  }
+
+  function loadSwarmStacks() {
+    StackService.swarmStacks(true)
     .then(function success(data) {
       var stacks = data;
       for (var i = 0; i < stacks.length; i++) {
@@ -59,9 +79,9 @@ function ($scope, $state, Notifications, StackService, ModalService) {
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
-      loadStacks(StackService.swarmStacks);
+      loadSwarmStacks();
     } else {
-      loadStacks(StackService.composeStacks);
+      loadComposeStacks();
     }
   }
 

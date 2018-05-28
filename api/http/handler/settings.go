@@ -107,13 +107,13 @@ func (handler *SettingsHandler) handleGetPublicSettings(w http.ResponseWriter, r
 func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http.Request) {
 	var req putSettingsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err := govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -133,7 +133,7 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 	} else if req.AuthenticationMethod == 2 {
 		settings.AuthenticationMethod = portainer.AuthenticationLDAP
 	} else {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -158,13 +158,13 @@ func (handler *SettingsHandler) handlePutSettings(w http.ResponseWriter, r *http
 func (handler *SettingsHandler) handlePutSettingsLDAPCheck(w http.ResponseWriter, r *http.Request) {
 	var req putSettingsLDAPCheckRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err := govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 

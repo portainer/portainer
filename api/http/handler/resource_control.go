@@ -60,13 +60,13 @@ type (
 func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *http.Request) {
 	var req postResourcesRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err := govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (handler *ResourceHandler) handlePostResources(w http.ResponseWriter, r *ht
 	}
 
 	if len(req.Users) == 0 && len(req.Teams) == 0 && !req.AdministratorsOnly {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -166,13 +166,13 @@ func (handler *ResourceHandler) handlePutResources(w http.ResponseWriter, r *htt
 
 	var req putResourcesRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err = govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 

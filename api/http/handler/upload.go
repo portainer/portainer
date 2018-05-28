@@ -37,7 +37,7 @@ func (handler *UploadHandler) handlePostUploadTLS(w http.ResponseWriter, r *http
 
 	folder := r.FormValue("folder")
 	if folder == "" {
-		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 

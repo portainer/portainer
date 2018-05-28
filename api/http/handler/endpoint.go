@@ -249,7 +249,7 @@ func convertPostEndpointRequestToPayload(r *http.Request) (*postEndpointPayload,
 	payload.publicURL = r.FormValue("PublicURL")
 
 	if payload.name == "" || payload.url == "" {
-		return nil, ErrInvalidRequestFormat
+		return nil, httperror.ErrInvalidRequestFormat
 	}
 
 	rawGroupID := r.FormValue("GroupID")
@@ -352,13 +352,13 @@ func (handler *EndpointHandler) handlePutEndpointAccess(w http.ResponseWriter, r
 
 	var req putEndpointAccessRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err = govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -412,13 +412,13 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 
 	var req putEndpointsRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err = govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 

@@ -97,13 +97,13 @@ func (handler *EndpointGroupHandler) handleGetEndpointGroups(w http.ResponseWrit
 func (handler *EndpointGroupHandler) handlePostEndpointGroups(w http.ResponseWriter, r *http.Request) {
 	var req postEndpointGroupsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err := govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -176,13 +176,13 @@ func (handler *EndpointGroupHandler) handlePutEndpointGroupAccess(w http.Respons
 
 	var req putEndpointGroupAccessRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err = govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -231,13 +231,13 @@ func (handler *EndpointGroupHandler) handlePutEndpointGroup(w http.ResponseWrite
 
 	var req putEndpointGroupsRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err = govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 

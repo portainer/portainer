@@ -22,7 +22,7 @@
   <div class="col-sm-12">
     <containers-datatable
       title="Containers" title-icon="fa-server"
-      dataset="containers" table-key="containers"
+      dataset="containers" table-key="stack-containers"
       order-by="Status" show-text-filter="true"
       show-ownership-column="applicationState.application.authentication"
       show-host-column="false"
@@ -39,6 +39,31 @@
   </div>
 </div>
 
+<div class="row" ng-if="stack && stack.Type === 2 && networks">
+  <div class="col-sm-12">
+    <networks-datatable
+    title="Networks" title-icon="fa-sitemap"
+    dataset="networks" table-key="stack-networks"
+    order-by="Name" show-text-filter="true"
+    remove-action="removeAction"
+    show-ownership-column="applicationState.application.authentication"
+    show-host-column="applicationState.endpoint.mode.agentProxy"
+    ></networks-datatable>
+  </div>
+</div>
+
+<div class="row" ng-if="stack && stack.Type === 2 && volumes">
+  <div class="col-sm-12">
+    <volumes-datatable
+    title="Volumes" title-icon="fa-cubes"
+    dataset="volumes" table-key="stack-volumes"
+    order-by="Id" show-text-filter="true"
+    remove-action="removeAction"
+    show-ownership-column="applicationState.application.authentication"
+    show-host-column="applicationState.endpoint.mode.agentProxy"
+    ></volumes-datatable>
+  </div>
+</div>
 
 <div class="row" ng-if="stack && stack.Type === 1">
   <div class="col-sm-12">

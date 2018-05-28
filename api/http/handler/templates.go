@@ -38,7 +38,7 @@ func NewTemplatesHandler(bouncer *security.RequestBouncer) *TemplatesHandler {
 func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *http.Request) {
 	key := r.FormValue("key")
 	if key == "" {
-		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (handler *TemplatesHandler) handleGetTemplates(w http.ResponseWriter, r *ht
 	case "linuxserver.io":
 		templatesURL = containerTemplatesURLLinuxServerIo
 	default:
-		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 

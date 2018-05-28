@@ -28,14 +28,13 @@ angular.module('portainer.app')
     });
   };
 
-  service.createSwarmStack = function(stackName, swarmId, file, env) {
-    var endpointID = EndpointProvider.endpointID();
+  service.createSwarmStack = function(stackName, swarmId, file, env, endpointId) {
     return Upload.upload({
-      url: 'api/endpoints/' + endpointID + '/stacks?method=file',
+      url: 'api/stacks?method=file&type=1',
       data: {
         file: file,
-        Type: '1',
         Name: stackName,
+        EndpointID: endpointId,
         SwarmID: swarmId,
         Env: Upload.json(env)
       },
@@ -43,15 +42,13 @@ angular.module('portainer.app')
     });
   };
 
-  service.createComposeStack = function(stackName, file, env) {
-    var endpointID = EndpointProvider.endpointID();
+  service.createComposeStack = function(stackName, file, endpointId) {
     return Upload.upload({
-      url: 'api/endpoints/' + endpointID + '/stacks?method=file',
+      url: 'api/stacks?method=file&type=2',
       data: {
         file: file,
-        Type: '2',
         Name: stackName,
-        Env: Upload.json(env)
+        EndpointID: endpointId
       },
       ignoreLoadingBar: true
     });

@@ -1,4 +1,4 @@
-angular.module('portainer.docker')
+angular.module('portainer.app')
 .factory('StackService', ['$q', 'Stack', 'ResourceControlService', 'FileUploadService', 'StackHelper', 'ServiceService', 'ContainerService', 'SwarmService',
 function StackServiceFactory($q, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService) {
   'use strict';
@@ -72,11 +72,11 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.composeStacks = function(includeExternalStacks) {
+  service.composeStacks = function(includeExternalStacks, filters) {
     var deferred = $q.defer();
 
     $q.all({
-      stacks: Stack.query().$promise,
+      stacks: Stack.query({filters: filters}).$promise,
       externalStacks: includeExternalStacks ? service.externalComposeStacks() : []
     })
     .then(function success(data) {
@@ -102,9 +102,10 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     SwarmService.swarm()
     .then(function success(data) {
       var swarm = data;
+      var filters = { SwarmID: swarm.Id };
 
       return $q.all({
-        stacks: Stack.query({ swarmId: swarm.Id }).$promise,
+        stacks: Stack.query({ filters: filters }).$promise,
         externalStacks: includeExternalStacks ? service.externalSwarmStacks() : []
       });
     })
@@ -144,38 +145,21 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.createStackFromFileContent = function(name, type, stackFileContent, env) {
-    if (type === 1) {
-      return createSwarmStackFromFileContent(name, stackFileContent, env);
-    }
-    return createComposeStackFromFileContent(name, stackFileContent, env);
-  };
-
-  service.createStackFromGitRepository = function(name, type, repositoryOptions, env) {
-    if (type === 1) {
-      return createSwarmStackFromGitRepository(name, repositoryOptions, env);
-    }
-    return createComposeStackFromGitRepository(name, repositoryOptions, env);
-  };
-
-  service.createStackFromFileUpload = function(name, type, stackFile, env) {
-    if (type === 1) {
-      return createSwarmStackFromFileUpload(name, stackFile, env);
-    }
-    return createComposeStackFromFileUpload(name, stackFile, env);
-  };
-
   service.updateStack = function(id, stackFile, env, prune) {
     return Stack.update({ id: id, StackFileContent: stackFile, Env: env, Prune: prune}).$promise;
   };
 
-  function createSwarmStackFromFileUpload(name, stackFile, env) {
+  service.createComposeStackFromFileUpload = function(name, stackFile, endpointId) {
+    return FileUploadService.createComposeStack(name, stackFile, endpointId);
+  };
+
+  service.createSwarmStackFromFileUpload = function(name, stackFile, env, endpointId) {
     var deferred = $q.defer();
 
     SwarmService.swarm()
     .then(function success(data) {
       var swarm = data;
-      return FileUploadService.createSwarmStack(name, swarm.Id, stackFile, env);
+      return FileUploadService.createSwarmStack(name, swarm.Id, stackFile, env, endpointId);
     })
     .then(function success(data) {
       deferred.resolve(data.data);
@@ -185,23 +169,18 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     });
 
     return deferred.promise;
-  }
+  };
 
-  function createComposeStackFromGitRepository(name, repositoryOptions, env) {
+  service.createComposeStackFromFileContent = function(name, stackFileContent, endpointId) {
     var payload = {
       Name: name,
-      Type: 2,
-      RepositoryURL: repositoryOptions.RepositoryURL,
-      ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
-      RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
-      RepositoryUsername: repositoryOptions.RepositoryUsername,
-      RepositoryPassword: repositoryOptions.RepositoryPassword,
-      Env: env
+      EndpointID: endpointId,
+      StackFileContent: stackFileContent
     };
-    return Stack.create({ method: 'repository' }, payload).$promise;
-  }
+    return Stack.create({ method: 'string', type: 2 }, payload).$promise;
+  };
 
-  function createSwarmStackFromGitRepository(name, repositoryOptions, env) {
+  service.createSwarmStackFromFileContent = function(name, stackFileContent, env, endpointId) {
     var deferred = $q.defer();
 
     SwarmService.swarm()
@@ -209,7 +188,45 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
       var swarm = data;
       var payload = {
         Name: name,
-        Type: 1,
+        EndpointID: endpointId,
+        SwarmID: swarm.Id,
+        StackFileContent: stackFileContent,
+        Env: env
+      };
+      return Stack.create({ method: 'string', type: 1 }, payload).$promise;
+    })
+    .then(function success(data) {
+      deferred.resolve(data);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to create the stack', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.createComposeStackFromGitRepository = function(name, repositoryOptions, endpointId) {
+    var payload = {
+      Name: name,
+      EndpointID: endpointId,
+      RepositoryURL: repositoryOptions.RepositoryURL,
+      ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
+      RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
+      RepositoryUsername: repositoryOptions.RepositoryUsername,
+      RepositoryPassword: repositoryOptions.RepositoryPassword
+    };
+    return Stack.create({ method: 'repository', type: 2 }, payload).$promise;
+  };
+
+  service.createSwarmStackFromGitRepository = function(name, repositoryOptions, env, endpointId) {
+    var deferred = $q.defer();
+
+    SwarmService.swarm()
+    .then(function success(data) {
+      var swarm = data;
+      var payload = {
+        Name: name,
+        EndpointID: endpointId,
         SwarmID: swarm.Id,
         RepositoryURL: repositoryOptions.RepositoryURL,
         ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
@@ -218,7 +235,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
         RepositoryPassword: repositoryOptions.RepositoryPassword,
         Env: env
       };
-      return Stack.create({ method: 'repository' }, payload).$promise;
+      return Stack.create({ method: 'repository', type: 1 }, payload).$promise;
     })
     .then(function success(data) {
       deferred.resolve(data);
@@ -228,46 +245,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     });
 
     return deferred.promise;
-  }
-
-  function createComposeStackFromFileUpload(name, stackFile, env) {
-    return FileUploadService.createComposeStack(name, stackFile, env);
-  }
-
-  function createComposeStackFromFileContent(name, stackFileContent, env) {
-    var payload = {
-      Name: name,
-      Type: 2,
-      StackFileContent: stackFileContent,
-      Env: env
-    };
-    return Stack.create({ method: 'string' }, payload).$promise;
-  }
-
-  function createSwarmStackFromFileContent(name, stackFileContent, env) {
-    var deferred = $q.defer();
-
-    SwarmService.swarm()
-    .then(function success(data) {
-      var swarm = data;
-      var payload = {
-        Name: name,
-        Type: 1,
-        SwarmID: swarm.Id,
-        StackFileContent: stackFileContent,
-        Env: env
-      };
-      return Stack.create({ method: 'string' }, payload).$promise;
-    })
-    .then(function success(data) {
-      deferred.resolve(data);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to create the stack', err: err });
-    });
-
-    return deferred.promise;
-  }
+  };
 
   return service;
 }]);

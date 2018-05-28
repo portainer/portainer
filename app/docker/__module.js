@@ -314,39 +314,6 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
-  var stacks = {
-    name: 'docker.stacks',
-    url: '/stacks',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/stacks/stacks.html',
-        controller: 'StacksController'
-      }
-    }
-  };
-
-  var stack = {
-    name: 'docker.stacks.stack',
-    url: '/:id',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/stacks/edit/stack.html',
-        controller: 'StackController'
-      }
-    }
-  };
-
-  var stackCreation = {
-    name: 'docker.stacks.new',
-    url: '/new',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/stacks/create/createstack.html',
-        controller: 'CreateStackController'
-      }
-    }
-  };
-
   var swarm = {
     name: 'docker.swarm',
     url: '/swarm',
@@ -489,9 +456,6 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(service);
   $stateRegistryProvider.register(serviceCreation);
   $stateRegistryProvider.register(serviceLogs);
-  $stateRegistryProvider.register(stacks);
-  $stateRegistryProvider.register(stack);
-  $stateRegistryProvider.register(stackCreation);
   $stateRegistryProvider.register(swarm);
   $stateRegistryProvider.register(swarmVisualizer);
   $stateRegistryProvider.register(tasks);

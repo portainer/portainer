@@ -64,7 +64,7 @@ func (handler *WebSocketHandler) handleWebsocketExec(w http.ResponseWriter, r *h
 	paramExecID := r.FormValue("id")
 	paramEndpointID := r.FormValue("endpointId")
 	if paramExecID == "" || paramEndpointID == "" {
-		httperror.WriteErrorResponse(w, ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidQueryFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 

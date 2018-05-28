@@ -253,6 +253,39 @@ angular.module('portainer.app', [])
     }
   };
 
+  var stacks = {
+    name: 'docker.stacks',
+    url: '/stacks',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/stacks/stacks.html',
+        controller: 'StacksController'
+      }
+    }
+  };
+
+  var stack = {
+    name: 'docker.stacks.stack',
+    url: '/:id',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/stacks/edit/stack.html',
+        controller: 'StackController'
+      }
+    }
+  };
+
+  var stackCreation = {
+    name: 'docker.stacks.new',
+    url: '/new',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/stacks/create/createstack.html',
+        controller: 'CreateStackController'
+      }
+    }
+  };
+
   var users = {
     name: 'portainer.users',
     url: '/users',
@@ -319,6 +352,9 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(registryCreation);
   $stateRegistryProvider.register(settings);
   $stateRegistryProvider.register(settingsAuthentication);
+  $stateRegistryProvider.register(stacks);
+  $stateRegistryProvider.register(stack);
+  $stateRegistryProvider.register(stackCreation);
   $stateRegistryProvider.register(users);
   $stateRegistryProvider.register(user);
   $stateRegistryProvider.register(teams);

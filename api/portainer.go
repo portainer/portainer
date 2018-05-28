@@ -137,14 +137,14 @@ type (
 
 	// Stack represents a Docker stack created via docker stack deploy.
 	Stack struct {
-		ID          StackID `json:"Id"`
-		Name        string  `json:"Name"`
-		EntryPoint  string  `json:"EntryPoint"`
-		SwarmID     string  `json:"SwarmId"`
-		ProjectPath string
-		Env         []Pair     `json:"Env"`
+		ID          StackID    `json:"Id"`
+		Name        string     `json:"Name"`
 		Type        StackType  `json:"Type"`
 		EndpointID  EndpointID `json:"EndpointId"`
+		SwarmID     string     `json:"SwarmId"`
+		EntryPoint  string     `json:"EntryPoint"`
+		Env         []Pair     `json:"Env"`
+		ProjectPath string
 	}
 
 	// RegistryID represents a registry identifier.
@@ -348,7 +348,9 @@ type (
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
 		Stacks() ([]Stack, error)
+		// TODO: I think it's useless now, remove
 		StacksBySwarmID(swarmID string) ([]Stack, error)
+		// TODO: I think it's useless now, remove
 		StacksByEndpointID(endpointID EndpointID) ([]Stack, error)
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
@@ -413,7 +415,10 @@ type (
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
+		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		// TODO: remove
 		StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error)
+		// TODO: remove
 		StoreStackFileFromReader(stackIdentifier, fileName string, r io.Reader) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error

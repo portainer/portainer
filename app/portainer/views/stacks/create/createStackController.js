@@ -1,6 +1,6 @@
-angular.module('portainer.docker')
-.controller('CreateStackController', ['$scope', '$state', 'StackService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService', 'FormHelper',
-function ($scope, $state, StackService, Authentication, Notifications, FormValidator, ResourceControlService, FormHelper) {
+angular.module('portainer.app')
+.controller('CreateStackController', ['$scope', '$state', 'StackService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService', 'FormHelper', 'EndpointProvider',
+function ($scope, $state, StackService, Authentication, Notifications, FormValidator, ResourceControlService, FormHelper, EndpointProvider) {
 
   $scope.formValues = {
     Name: '',
@@ -42,15 +42,16 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     return true;
   }
 
-  function createStack(name, type, method) {
+  function createSwarmStack(name, method) {
     var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
+    var endpointId = EndpointProvider.endpointID();
 
     if (method === 'editor') {
       var stackFileContent = $scope.formValues.StackFileContent;
-      return StackService.createStackFromFileContent(name, type, stackFileContent, env);
+      return StackService.createSwarmStackFromFileContent(name, stackFileContent, env, endpointId);
     } else if (method === 'upload') {
       var stackFile = $scope.formValues.StackFile;
-      return StackService.createStackFromFileUpload(name, type, stackFile, env);
+      return StackService.createSwarmStackFromFileUpload(name, stackFile, env, endpointId);
     } else if (method === 'repository') {
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
@@ -59,7 +60,29 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
         RepositoryUsername: $scope.formValues.RepositoryUsername,
         RepositoryPassword: $scope.formValues.RepositoryPassword
       };
-      return StackService.createStackFromGitRepository(name, type, repositoryOptions, env);
+      return StackService.createSwarmStackFromGitRepository(name, repositoryOptions, env, endpointId);
+    }
+  }
+
+  function createComposeStack(name, method) {
+    var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
+    var endpointId = EndpointProvider.endpointID();
+
+    if (method === 'editor') {
+      var stackFileContent = $scope.formValues.StackFileContent;
+      return StackService.createComposeStackFromFileContent(name, stackFileContent, endpointId);
+    } else if (method === 'upload') {
+      var stackFile = $scope.formValues.StackFile;
+      return StackService.createComposeStackFromFileUpload(name, stackFile, endpointId);
+    } else if (method === 'repository') {
+      var repositoryOptions = {
+        RepositoryURL: $scope.formValues.RepositoryURL,
+        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
+        RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
+        RepositoryUsername: $scope.formValues.RepositoryUsername,
+        RepositoryPassword: $scope.formValues.RepositoryPassword
+      };
+      return StackService.createComposeStackFromGitRepository(name, repositoryOptions, endpointId);
     }
   }
 
@@ -81,9 +104,14 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       return;
     }
 
+    // TODO: review this flow.
     var type = $scope.state.StackType;
+    var action = createSwarmStack;
+    if (type === 2) {
+      action = createComposeStack;
+    }
     $scope.state.actionInProgress = true;
-    createStack(name, type, method)
+    action(name, method)
     .then(function success(data) {
       return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, []);
     })
@@ -92,6 +120,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       $state.go('docker.stacks');
     })
     .catch(function error(err) {
+      // TODO: might want to display warning only when stack deployment fails. If internal server error, display error.
       Notifications.warning('Deployment error', type === 1 ? err.err.data.err : err.data.err);
     })
     .finally(function final() {

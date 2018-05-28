@@ -77,6 +77,26 @@ func (service *Service) GetStackProjectPath(stackIdentifier string) string {
 	return path.Join(service.fileStorePath, ComposeStorePath, stackIdentifier)
 }
 
+// StoreStackFileFromBytes creates a subfolder in the ComposeStorePath and stores a new file using from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error) {
+	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
+	err := service.createDirectoryInStore(stackStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := path.Join(stackStorePath, fileName)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, stackStorePath), nil
+}
+
 // StoreStackFileFromString creates a subfolder in the ComposeStorePath and stores a new file using the content from a string.
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error) {

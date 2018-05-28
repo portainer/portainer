@@ -6,6 +6,7 @@ import (
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/extensions"
+	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
 
@@ -108,7 +109,7 @@ func (server *Server) Start() error {
 	resourceHandler.ResourceControlService = server.ResourceControlService
 	var uploadHandler = handler.NewUploadHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
-	var stackHandler = handler.NewStackHandler(requestBouncer)
+	var stackHandler = stacks.NewStackHandler(requestBouncer)
 	stackHandler.FileService = server.FileService
 	stackHandler.StackService = server.StackService
 	stackHandler.EndpointService = server.EndpointService

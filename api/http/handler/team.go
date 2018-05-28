@@ -65,13 +65,13 @@ type (
 func (handler *TeamHandler) handlePostTeams(w http.ResponseWriter, r *http.Request) {
 	var req postTeamsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err := govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
@@ -165,13 +165,13 @@ func (handler *TeamHandler) handlePutTeam(w http.ResponseWriter, r *http.Request
 
 	var req putTeamRequest
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidJSON, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
 	_, err = govalidator.ValidateStruct(req)
 	if err != nil {
-		httperror.WriteErrorResponse(w, ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
+		httperror.WriteErrorResponse(w, httperror.ErrInvalidRequestFormat, http.StatusBadRequest, handler.Logger)
 		return
 	}
 

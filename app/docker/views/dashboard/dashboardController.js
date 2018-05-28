@@ -75,7 +75,7 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
       Network.query({}).$promise,
       SystemService.info(),
       endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? ServiceService.services() : [],
-      endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? StackService.stacks(true) : []
+      endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? StackService.swarmStacks(true) : StackService.composeStacks(true)
     ]).then(function (d) {
       prepareContainerData(d[0]);
       prepareImageData(d[1]);

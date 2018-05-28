@@ -1,6 +1,6 @@
-angular.module('portainer.docker')
-.controller('StackController', ['$q', '$scope', '$state', '$transition$', '$filter', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ContainerService', 'ServiceHelper', 'TaskHelper', 'Notifications', 'FormHelper', 'EndpointProvider',
-function ($q, $scope, $state, $transition$, $filter, StackService, NodeService, ServiceService, TaskService, ContainerService, ServiceHelper, TaskHelper, Notifications, FormHelper, EndpointProvider) {
+angular.module('portainer.app')
+.controller('StackController', ['$q', '$scope', '$state', '$transition$', '$filter', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ContainerService', 'ServiceHelper', 'TaskHelper', 'Notifications', 'FormHelper', 'EndpointProvider', 'ModalService', 'NetworkService', 'VolumeService',
+function ($q, $scope, $state, $transition$, $filter, StackService, NodeService, ServiceService, TaskService, ContainerService, ServiceHelper, TaskHelper, Notifications, FormHelper, EndpointProvider, ModalService, NetworkService, VolumeService) {
 
   $scope.state = {
     actionInProgress: false,
@@ -97,7 +97,6 @@ function ($q, $scope, $state, $transition$, $filter, StackService, NodeService, 
   function removeAction(containers, cleanVolumes) {
     var actionCount = containers.length;
     angular.forEach(containers, function (container) {
-      HttpRequestHelper.setPortainerAgentTargetHeader(container.NodeName);
       ContainerService.remove(container, cleanVolumes)
       .then(function success() {
         Notifications.success('Container successfully removed', container.Names[0]);
@@ -215,13 +214,16 @@ function ($q, $scope, $state, $transition$, $filter, StackService, NodeService, 
       var stack = data;
       $scope.stack = stack;
 
-      var containerFilters = {
+      var stackFilter = {
         label: ['com.docker.compose.project=' + stack.Name]
       };
+      var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
       return $q.all({
         stackFile: StackService.getStackFile(stackId),
-        containers: ContainerService.containers(1, containerFilters)
+        containers: ContainerService.containers(1, stackFilter),
+        networks: NetworkService.networks(true, false, false, stackFilter),
+        volumes: apiVersion >= 1.26 ? VolumeService.volumes({ filters: stackFilter }) : []
       });
     })
     .then(function success(data) {
