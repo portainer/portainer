@@ -17,10 +17,17 @@ steps:
       - yarn grunt build-webapp
       - mv api/cmd/portainer/portainer dist/
 
+  get_docker_version:
+    image: alpine
+    working_directory: ${{build_frontend}}
+    commands:
+      - cf_export DOCKER_VERSION=`cat gruntfile.js | grep -m 1 'shippedDockerVersion' | cut -d\' -f2`
+
   download_docker_binary:
     image: busybox
     working_directory: ${{build_frontend}}
     commands:
+      - echo ${{DOCKER_VERSION}}
       - wget -O /tmp/docker-binaries.tgz https://download.docker.com/linux/static/stable/x86_64/docker-${{DOCKER_VERSION}}.tgz
       - tar -xf /tmp/docker-binaries.tgz -C /tmp
       - mv /tmp/docker/docker dist/
@@ -37,7 +44,3 @@ steps:
     candidate: '${{build_image}}'
     tag: '${{CF_BRANCH}}'
     registry: dockerhub
-    when:
-      branch:
-        only:
-          - develop

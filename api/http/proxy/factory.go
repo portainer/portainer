@@ -43,7 +43,7 @@ func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portaine
 	u.Scheme = "https"
 
 	proxy := factory.createDockerReverseProxy(u, enableSignature)
-	config, err := crypto.CreateTLSConfiguration(tlsConfig)
+	config, err := crypto.CreateTLSConfigurationFromDisk(tlsConfig.TLSCACertPath, tlsConfig.TLSCertPath, tlsConfig.TLSKeyPath, tlsConfig.TLSSkipVerify)
 	if err != nil {
 		return nil, err
 	}

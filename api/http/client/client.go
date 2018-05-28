@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/crypto"
 )
 
 // HTTPClient represents a client to send HTTP requests.
@@ -60,36 +59,6 @@ func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portain
 	}
 
 	return &token, nil
-}
-
-// ExecutePingOperationFromEndpoint will send a SystemPing operation HTTP request to a Docker environment
-// using the specified endpoint configuration. It is used exclusively when
-// specifying an endpoint from the CLI via the -H flag.
-// It uses a new Http.Client for each operation.
-func ExecutePingOperationFromEndpoint(endpoint *portainer.Endpoint) (bool, error) {
-	if strings.HasPrefix(endpoint.URL, "unix://") {
-		return false, nil
-	}
-
-	transport := &http.Transport{}
-	scheme := "http"
-
-	if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
-		tlsConfig, err := crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
-		if err != nil {
-			return false, err
-		}
-		scheme = "https"
-		transport.TLSClientConfig = tlsConfig
-	}
-
-	client := &http.Client{
-		Timeout:   time.Second * 3,
-		Transport: transport,
-	}
-
-	target := strings.Replace(endpoint.URL, "tcp://", scheme+"://", 1)
-	return pingOperation(client, target)
 }
 
 // ExecutePingOperation will send a SystemPing operation HTTP request to a Docker environment

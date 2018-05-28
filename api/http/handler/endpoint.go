@@ -162,7 +162,7 @@ func (handler *EndpointHandler) createAzureEndpoint(payload *postEndpointPayload
 }
 
 func (handler *EndpointHandler) createTLSSecuredEndpoint(payload *postEndpointPayload) (*portainer.Endpoint, error) {
-	tlsConfig, err := crypto.CreateTLSConfig(payload.caCert, payload.cert, payload.key, payload.skipTLSClientVerification, payload.skipTLSServerVerification)
+	tlsConfig, err := crypto.CreateTLSConfigurationFromBytes(payload.caCert, payload.cert, payload.key, payload.skipTLSClientVerification, payload.skipTLSServerVerification)
 	if err != nil {
 		return nil, err
 	}
@@ -543,7 +543,7 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 		}
 	} else {
 		endpoint.TLSConfig.TLS = false
-		endpoint.TLSConfig.TLSSkipVerify = true
+		endpoint.TLSConfig.TLSSkipVerify = false
 		endpoint.TLSConfig.TLSCACertPath = ""
 		endpoint.TLSConfig.TLSCertPath = ""
 		endpoint.TLSConfig.TLSKeyPath = ""

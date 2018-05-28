@@ -135,7 +135,7 @@
     <rd-widget>
       <rd-widget-header icon="fa-tags" title="Hidden containers"></rd-widget-header>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" ng-submit="addFilteredContainerLabel()" name="addTagForm">
           <div class="form-group">
             <span class="col-sm-12 text-muted small">
               You can hide containers with specific labels from Portainer UI. You need to specify the label name and value.
@@ -144,14 +144,14 @@
           <div class="form-group">
             <label for="header_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11 col-md-4">
-              <input type="text" class="form-control" id="header_name" ng-model="formValues.labelName" placeholder="e.g. com.example.foo">
+              <input type="text" required class="form-control" id="header_name" name="label_name" ng-model="formValues.labelName" placeholder="e.g. com.example.foo">
             </div>
             <label for="header_value" class="col-sm-1 margin-sm-top control-label text-left">Value</label>
             <div class="col-sm-11 col-md-4 margin-sm-top">
               <input type="text" class="form-control" id="header_value" ng-model="formValues.labelValue" placeholder="e.g. bar">
             </div>
             <div class="col-sm-12 col-md-2 margin-sm-top">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="addFilteredContainerLabel()" ng-disabled="!formValues.labelValue || !formValues.labelName"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add filter</button>
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.labelName"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add filter</button>
             </div>
           </div>
           <div class="form-group">

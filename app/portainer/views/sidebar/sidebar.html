@@ -14,7 +14,7 @@
       groups="groups"
       select-endpoint="switchEndpoint"
     ></endpoint-selector>
-    <li class="sidebar-title"><span>{{ activeEndpoint.Name }}</span></li>
+    <li class="sidebar-title"><span class="endpoint-name">{{ activeEndpoint.Name }}</span></li>
     <azure-sidebar-content ng-if="applicationState.endpoint.mode.provider === 'AZURE'">
     </azure-sidebar-content>
     <docker-sidebar-content ng-if="applicationState.endpoint.mode.provider !== 'AZURE'"
@@ -22,7 +22,7 @@
       swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
       standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'"
       admin-access="!applicationState.application.authentication || isAdmin"
-      external-contributions="displayExternalContributors"
+      external-contributions="displasyExternalContributors"
       sidebar-toggled-on="toggle"
       current-state="$state.current.name"
     ></docker-sidebar-content>

@@ -67,17 +67,17 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
       var services = data.services;
       var tasks = data.tasks;
 
-      for (var i = 0; i < services.length; i++) {
-        var service = services[i];
-        ServiceHelper.associateTasksToService(service, tasks);
-      }
-
       if (agentProxy) {
         var containers = data.containers;
         for (var j = 0; j < tasks.length; j++) {
           var task = tasks[j];
           TaskHelper.associateContainerToTask(task, containers);
         }
+      }
+
+      for (var i = 0; i < services.length; i++) {
+        var service = services[i];
+        ServiceHelper.associateTasksToService(service, tasks);
       }
 
       $scope.tasks = tasks;
