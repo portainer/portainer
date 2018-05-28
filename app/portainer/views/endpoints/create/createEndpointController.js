@@ -12,7 +12,10 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     URL: '',
     PublicURL: '',
     GroupId: 1,
-    SecurityFormData: new EndpointSecurityFormData()
+    SecurityFormData: new EndpointSecurityFormData(),
+    AzureApplicationId: '',
+    AzureTenantId: '',
+    AzureAuthenticationKey: ''
   };
 
   $scope.addDockerEndpoint = function() {
@@ -41,6 +44,32 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
 
     addEndpoint(name, 2, URL, publicURL, groupId, true, true, true, null, null, null);
   };
+
+  $scope.addAzureEndpoint = function() {
+    var name = $scope.formValues.Name;
+    var applicationId = $scope.formValues.AzureApplicationId;
+    var tenantId = $scope.formValues.AzureTenantId;
+    var authenticationKey = $scope.formValues.AzureAuthenticationKey;
+
+    createAzureEndpoint(name, applicationId, tenantId, authenticationKey);
+  };
+
+  function createAzureEndpoint(name, applicationId, tenantId, authenticationKey) {
+    var endpoint;
+
+    $scope.state.actionInProgress = true;
+    EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey)
+    .then(function success() {
+      Notifications.success('Endpoint created', name);
+      $state.go('portainer.endpoints', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to create endpoint');
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
+    });
+  }
 
   function addEndpoint(name, type, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     $scope.state.actionInProgress = true;

@@ -5,6 +5,29 @@ function ($q, $scope, $state, EndpointService, GroupService, StateManager, Endpo
   $scope.switchEndpoint = function(endpoint) {
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+    if (endpoint.Type === 3) {
+      switchToAzureEndpoint(endpoint);
+    } else {
+      switchToDockerEndpoint(endpoint);
+    }
+  };
+
+  function switchToAzureEndpoint(endpoint) {
+    StateManager.updateEndpointState(false, endpoint.Type, [])
+    .then(function success() {
+      $scope.currentEndpoint = endpoint;
+      $state.go('azure.dashboard');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
+      var currentEndpoint = $scope.currentEndpoint;
+      EndpointProvider.setEndpointID(currentEndpoint.Id);
+      EndpointProvider.setEndpointPublicURL(currentEndpoint.PublicURL);
+      return StateManager.updateEndpointState(true, currentEndpoint.Type, currentEndpoint.Extensions);
+    });
+  }
+
+  function switchToDockerEndpoint(endpoint) {
     ExtensionManager.initEndpointExtensions(endpoint.Id)
     .then(function success(data) {
       var extensions = data;
@@ -21,7 +44,7 @@ function ($q, $scope, $state, EndpointService, GroupService, StateManager, Endpo
       EndpointProvider.setEndpointPublicURL(currentEndpoint.PublicURL);
       return StateManager.updateEndpointState(true, currentEndpoint.Type, currentEndpoint.Extensions);
     });
-  };
+  }
 
   function setActiveEndpoint(endpoints) {
     var activeEndpointID = EndpointProvider.endpointID();
