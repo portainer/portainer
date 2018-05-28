@@ -253,6 +253,16 @@ angular.module('portainer.app', [])
     }
   };
 
+  var support = {
+    name: 'portainer.support',
+    url: '/support',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/support/support.html'
+      }
+    }
+  };
+
   var users = {
     name: 'portainer.users',
     url: '/users',
@@ -319,6 +329,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(registryCreation);
   $stateRegistryProvider.register(settings);
   $stateRegistryProvider.register(settingsAuthentication);
+  $stateRegistryProvider.register(support);
   $stateRegistryProvider.register(users);
   $stateRegistryProvider.register(user);
   $stateRegistryProvider.register(teams);
