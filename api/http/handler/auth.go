@@ -80,77 +80,40 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var username = req.Username
-	var password = req.Password
-
 	settings, err := handler.SettingsService.Settings()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	u, err := handler.UserService.UserByUsername(username)
+	u, err := handler.UserService.UserByUsername(req.Username)
 	if err != nil && err != portainer.ErrUserNotFound {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
 	if (u != nil && u.ID == 1) || settings.AuthenticationMethod == portainer.AuthenticationInternal {
-		if u == nil {
+		if !handler.authInternal(u, req.Password) {
 			httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
 			return
 		}
-
-		err = handler.CryptoService.CompareHashAndData(u.Password, password)
-		if err != nil {
-			httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
-			return
-		}
-
 	} else if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
-
-		err = handler.LDAPService.AuthenticateUser(username, password, &settings.LDAPSettings)
-		if err != nil {
-			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-			return
-		}
-
+		u = handler.authLdap(u, req.Username, req.Password, &settings.LDAPSettings)
 		if u == nil {
-			u = &portainer.User{
-				Username: username,
-				Role:     portainer.StandardUserRole,
-			}
-			err = handler.UserService.CreateUser(u)
-			if err != nil {
-				httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-				return
-			}
-		}
-
-		err = handler.addLdapUserIntoTeams(u, settings)
-		if err != nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return
 		}
 	} else {
-		// Unknown auth method
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
 	if u == nil {
-		// User not found in any auth provider
 		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
 		return
 	}
 
-	tokenData := &portainer.TokenData{
-		ID:       u.ID,
-		Username: u.Username,
-		Role:     u.Role,
-	}
-
-	token, err := handler.JWTService.GenerateToken(tokenData)
+	token, err := handler.generateToken(u)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
@@ -159,13 +122,61 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 	encodeJSON(w, &postAuthResponse{JWT: token}, handler.Logger)
 }
 
-func (handler *AuthHandler) addLdapUserIntoTeams(user *portainer.User, settings *portainer.Settings) error {
+func (handler *AuthHandler) generateToken(user *portainer.User) (string, error) {
+	tokenData := &portainer.TokenData{
+		ID:       user.ID,
+		Username: user.Username,
+		Role:     user.Role,
+	}
+
+	token, err := handler.JWTService.GenerateToken(tokenData)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func (handler *AuthHandler) authInternal(user *portainer.User, password string) bool {
+	if user == nil {
+		return false
+	}
+
+	err := handler.CryptoService.CompareHashAndData(user.Password, password)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (handler *AuthHandler) authLdap(user *portainer.User, username string, password string, settings *portainer.LDAPSettings) *portainer.User {
+	if err := handler.LDAPService.AuthenticateUser(username, password, settings); err != nil {
+		return nil
+	}
+
+	if user == nil {
+		user = &portainer.User{
+			Username: username,
+			Role:     portainer.StandardUserRole,
+		}
+		if err := handler.UserService.CreateUser(user); err != nil {
+			return nil
+		}
+	}
+
+	if err := handler.addLdapUserIntoTeams(user, settings); err != nil {
+		return nil
+	}
+
+	return user
+}
+
+func (handler *AuthHandler) addLdapUserIntoTeams(user *portainer.User, settings *portainer.LDAPSettings) error {
 	teams, err := handler.TeamService.Teams()
 	if err != nil {
 		return err
 	}
 
-	userLdapGroups, err := handler.LDAPService.GetUserGroups(user.Username, &settings.LDAPSettings)
+	userLdapGroups, err := handler.LDAPService.GetUserGroups(user.Username, settings)
 	if err != nil {
 		return err
 	}
@@ -190,10 +201,7 @@ func (handler *AuthHandler) addLdapUserIntoTeams(user *portainer.User, settings 
 				Role:   portainer.TeamMember,
 			}
 
-			err = handler.TeamMembershipService.CreateTeamMembership(membership)
-			if err != nil {
-				return err
-			}
+			handler.TeamMembershipService.CreateTeamMembership(membership)
 		}
 	}
 	return nil

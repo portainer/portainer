@@ -126,17 +126,13 @@ func (*Service) GetUserGroups(username string, settings *portainer.LDAPSettings)
 		return nil, err
 	}
 
-	userGroups, err := getGroups(userDN, connection, settings.SearchSettings)
-	if err != nil {
-		fmt.Println("Failed to retrieve groups from LDAP")
-		return nil, err
-	}
+	userGroups := getGroups(userDN, connection, settings.SearchSettings)
 
 	return userGroups, nil
 }
 
-// Get a list of group names for specified user from lDAP
-func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPSearchSettings) ([]string, error) {
+// Get a list of group names for specified user from LDAP/AD
+func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPSearchSettings) []string {
 	groups := make([]string, 0)
 
 	for _, searchSettings := range settings {
@@ -163,7 +159,7 @@ func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPSearchSe
 		}
 	}
 
-	return groups, nil
+	return groups
 }
 
 // TestConnectivity is used to test a connection against the LDAP server using the credentials
