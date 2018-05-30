@@ -30,18 +30,12 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     LocalStorage.storeApplicationState(state.application);
   };
 
-  manager.updateDonationHeader = function(displayDonationHeader) {
-    state.application.displayDonationHeader = displayDonationHeader;
-    LocalStorage.storeApplicationState(state.application);
-  };
-
  function assignStateFromStatusAndSettings(status, settings) {
    state.application.authentication = status.Authentication;
    state.application.analytics = status.Analytics;
    state.application.endpointManagement = status.EndpointManagement;
    state.application.version = status.Version;
    state.application.logo = settings.LogoURL;
-   state.application.displayDonationHeader = settings.DisplayDonationHeader;
    state.application.displayExternalContributors = settings.DisplayExternalContributors;
    state.application.validity = moment().unix();
  }
@@ -122,18 +116,26 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     return extensions;
   }
 
-  manager.updateEndpointState = function(loading, extensions) {
+  manager.updateEndpointState = function(loading, type, extensions) {
     var deferred = $q.defer();
 
     if (loading) {
       state.loading = true;
     }
+
+    if (type === 3) {
+      state.endpoint.mode = { provider: 'AZURE' };
+      LocalStorage.storeEndpointState(state.endpoint);
+      deferred.resolve();
+      return deferred.promise;
+    }
+
     $q.all({
-      info: SystemService.info(),
-      version: SystemService.version()
+      version: SystemService.version(),
+      info: SystemService.info()
     })
     .then(function success(data) {
-      var endpointMode = InfoHelper.determineEndpointMode(data.info);
+      var endpointMode = InfoHelper.determineEndpointMode(data.info, type);
       var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
       state.endpoint.apiVersion = endpointAPIVersion;

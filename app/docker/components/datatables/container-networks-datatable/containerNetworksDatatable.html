@@ -38,7 +38,7 @@
           </thead>
           <tbody>
             <tr dir-paginate="(key, value) in $ctrl.dataset | itemsPerPage: $ctrl.state.paginatedItemLimit" ng-class="{active: item.Checked}">
-              <td><a ui-sref="docker.networks.network({id: value.NetworkID})">{{ key }}</a></td>
+              <td><a ui-sref="docker.networks.network({ id: value.NetworkID, nodeName: $ctrl.nodeName })">{{ key }}</a></td>
               <td>{{ value.IPAddress || '-' }}</td>
               <td>{{ value.Gateway || '-' }}</td>
               <td>{{ value.MacAddress || '-' }}</td>

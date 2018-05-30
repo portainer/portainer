@@ -17,6 +17,7 @@ func WriteErrorResponse(w http.ResponseWriter, err error, code int, logger *log.
 		logger.Printf("http error: %s (code=%d)", err, code)
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(&errorResponse{Err: err.Error()})
 }

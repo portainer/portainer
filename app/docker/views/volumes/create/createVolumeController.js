@@ -1,11 +1,12 @@
 angular.module('portainer.docker')
-.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator',
-function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator) {
+.controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator', 'HttpRequestHelper',
+function ($q, $scope, $state, VolumeService, PluginService, ResourceControlService, Authentication, Notifications, FormValidator, HttpRequestHelper) {
 
   $scope.formValues = {
     Driver: 'local',
     DriverOptions: [],
-    AccessControlData: new AccessControlFormData()
+    AccessControlData: new AccessControlFormData(),
+    NodeName: null
   };
 
   $scope.state = {
@@ -55,6 +56,9 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
       return;
     }
 
+    var nodeName = $scope.formValues.NodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+
     $scope.state.actionInProgress = true;
     VolumeService.createVolume(volumeConfiguration)
     .then(function success(data) {
@@ -76,6 +80,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
 
     PluginService.volumePlugins(apiVersion < 1.25 || endpointProvider === 'VMWARE_VIC')
     .then(function success(data) {

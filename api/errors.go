@@ -28,7 +28,7 @@ const (
 // TeamMembership errors.
 const (
 	ErrTeamMembershipNotFound      = Error("Team membership not found")
-	ErrTeamMembershipAlreadyExists = Error("Team membership already exists for this user and team.")
+	ErrTeamMembershipAlreadyExists = Error("Team membership already exists for this user and team")
 )
 
 // ResourceControl errors.
@@ -42,6 +42,17 @@ const (
 const (
 	ErrEndpointNotFound     = Error("Endpoint not found")
 	ErrEndpointAccessDenied = Error("Access denied to endpoint")
+)
+
+// Azure environment errors
+const (
+	ErrAzureInvalidCredentials = Error("Invalid Azure credentials")
+)
+
+// Endpoint group errors.
+const (
+	ErrEndpointGroupNotFound    = Error("Endpoint group not found")
+	ErrCannotRemoveDefaultGroup = Error("Cannot remove the default endpoint group")
 )
 
 // Registry errors.

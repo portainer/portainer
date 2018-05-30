@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Container', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'Network', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService',
-function ($q, $scope, $state, $transition$, $filter, Container, Commit, ContainerHelper, ContainerService, ImageHelper, Network, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService) {
+.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService', 'HttpRequestHelper',
+function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, ContainerService, ImageHelper, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService, HttpRequestHelper) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
 
@@ -16,8 +16,13 @@ function ($q, $scope, $state, $transition$, $filter, Container, Commit, Containe
   };
 
   var update = function () {
-    Container.get({id: $transition$.params().id}, function (d) {
-      var container = new ContainerDetailsViewModel(d);
+    var nodeName = $transition$.params().nodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+    $scope.nodeName = nodeName;
+
+    ContainerService.container($transition$.params().id)
+    .then(function success(data) {
+      var container = data;
       $scope.container = container;
       $scope.container.edit = false;
       $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
@@ -41,38 +46,102 @@ function ($q, $scope, $state, $transition$, $filter, Container, Commit, Containe
           }
         });
       }
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to retrieve container info');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve container info');
     });
   };
 
-  $scope.start = function () {
-    Container.start({id: $scope.container.Id}, {}, function (d) {
+  function executeContainerAction(id, action, successMessage, errorMessage) {
+    action(id)
+    .then(function success(data) {
+      Notifications.success(successMessage, id);
       update();
-      Notifications.success('Container started', $transition$.params().id);
-    }, function (e) {
-      update();
-      Notifications.error('Failure', e, 'Unable to start container');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, errorMessage);
     });
+  }
+
+  $scope.start = function () {
+    var successMessage = 'Container successfully started';
+    var errorMessage = 'Unable to start container';
+    executeContainerAction($transition$.params().id, ContainerService.startContainer, successMessage, errorMessage);
   };
 
   $scope.stop = function () {
-    Container.stop({id: $transition$.params().id}, function (d) {
-      update();
-      Notifications.success('Container stopped', $transition$.params().id);
-    }, function (e) {
-      update();
-      Notifications.error('Failure', e, 'Unable to stop container');
-    });
+    var successMessage = 'Container successfully stopped';
+    var errorMessage = 'Unable to stop container';
+    executeContainerAction($transition$.params().id, ContainerService.stopContainer, successMessage, errorMessage);
   };
 
   $scope.kill = function () {
-    Container.kill({id: $transition$.params().id}, function (d) {
-      update();
-      Notifications.success('Container killed', $transition$.params().id);
-    }, function (e) {
-      update();
-      Notifications.error('Failure', e, 'Unable to kill container');
+    var successMessage = 'Container successfully killed';
+    var errorMessage = 'Unable to kill container';
+    executeContainerAction($transition$.params().id, ContainerService.killContainer, successMessage, errorMessage);
+  };
+
+  $scope.pause = function() {
+    var successMessage = 'Container successfully paused';
+    var errorMessage = 'Unable to pause container';
+    executeContainerAction($transition$.params().id, ContainerService.pauseContainer, successMessage, errorMessage);
+  };
+
+  $scope.unpause = function() {
+    var successMessage = 'Container successfully resumed';
+    var errorMessage = 'Unable to resume container';
+    executeContainerAction($transition$.params().id, ContainerService.resumeContainer, successMessage, errorMessage);
+  };
+
+  $scope.restart = function () {
+    var successMessage = 'Container successfully restarted';
+    var errorMessage = 'Unable to restart container';
+    executeContainerAction($transition$.params().id, ContainerService.restartContainer, successMessage, errorMessage);
+  };
+
+  $scope.renameContainer = function () {
+    var container = $scope.container;
+    ContainerService.renameContainer($transition$.params().id, container.newContainerName)
+    .then(function success(data) {
+      container.Name = container.newContainerName;
+      Notifications.success('Container successfully renamed', container.Name);
+    })
+    .catch(function error(err) {
+      container.newContainerName = container.Name;
+      Notifications.error('Failure', err, 'Unable to rename container');
+    })
+    .finally(function final() {
+      $scope.container.edit = false;
+    });
+  };
+
+  $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
+    $scope.state.leaveNetworkInProgress = true;
+    NetworkService.disconnectContainer(networkId, container.Id, false)
+    .then(function success(data) {
+      Notifications.success('Container left network', container.Id);
+      $state.reload();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to disconnect container from network');
+    })
+    .finally(function final() {
+      $scope.state.leaveNetworkInProgress = false;
+    });
+  };
+
+  $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
+    $scope.state.joinNetworkInProgress = true;
+    NetworkService.connectContainer(networkId, container.Id)
+    .then(function success(data) {
+      Notifications.success('Container joined network', container.Id);
+      $state.reload();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to connect container to network');
+    })
+    .finally(function final() {
+      $scope.state.joinNetworkInProgress = false;
     });
   };
 
@@ -89,25 +158,6 @@ function ($q, $scope, $state, $transition$, $filter, Container, Commit, Containe
     });
   };
 
-  $scope.pause = function () {
-    Container.pause({id: $transition$.params().id}, function (d) {
-      update();
-      Notifications.success('Container paused', $transition$.params().id);
-    }, function (e) {
-      update();
-      Notifications.error('Failure', e, 'Unable to pause container');
-    });
-  };
-
-  $scope.unpause = function () {
-    Container.unpause({id: $transition$.params().id}, function (d) {
-      update();
-      Notifications.success('Container unpaused', $transition$.params().id);
-    }, function (e) {
-      update();
-      Notifications.error('Failure', e, 'Unable to unpause container');
-    });
-  };
 
   $scope.confirmRemove = function () {
     var title = 'You are about to remove a container.';
@@ -122,12 +172,12 @@ function ($q, $scope, $state, $transition$, $filter, Container, Commit, Containe
         if (result[0]) {
           cleanAssociatedVolumes = true;
         }
-        $scope.remove(cleanAssociatedVolumes);
+        removeContainer(cleanAssociatedVolumes);
       }
     );
   };
 
-  $scope.remove = function(cleanAssociatedVolumes) {
+  function removeContainer(cleanAssociatedVolumes) {
     ContainerService.remove($scope.container, cleanAssociatedVolumes)
     .then(function success() {
       Notifications.success('Container successfully removed');
@@ -136,71 +186,7 @@ function ($q, $scope, $state, $transition$, $filter, Container, Commit, Containe
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to remove container');
     });
-  };
-
-  $scope.restart = function () {
-    Container.restart({id: $transition$.params().id}, function (d) {
-      update();
-      Notifications.success('Container restarted', $transition$.params().id);
-    }, function (e) {
-      update();
-      Notifications.error('Failure', e, 'Unable to restart container');
-    });
-  };
-
-  $scope.renameContainer = function () {
-    var container = $scope.container;
-    Container.rename({id: $transition$.params().id, 'name': container.newContainerName}, function (d) {
-      if (d.message) {
-        container.newContainerName = container.Name;
-        Notifications.error('Unable to rename container', {}, d.message);
-      } else {
-        container.Name = container.newContainerName;
-        Notifications.success('Container successfully renamed', container.Name);
-      }
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to rename container');
-    });
-    $scope.container.edit = false;
-  };
-
-  $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
-    $scope.state.leaveNetworkInProgress = true;
-    Network.disconnect({id: networkId}, { Container: $transition$.params().id, Force: false }, function (d) {
-      if (container.message) {
-        Notifications.error('Error', d, 'Unable to disconnect container from network');
-      } else {
-        Notifications.success('Container left network', $transition$.params().id);
-        $state.go('docker.containers.container', {id: $transition$.params().id}, {reload: true});
-      }
-      $scope.state.leaveNetworkInProgress = false;
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to disconnect container from network');
-      $scope.state.leaveNetworkInProgress = false;
-    });
-  };
-
-  $scope.duplicate = function() {
-    $state.go('docker.containers.new', {from: $transition$.params().id}, {reload: true});
-  };
-
-  $scope.confirmRemove = function () {
-    var title = 'You are about to remove a container.';
-    if ($scope.container.State.Running) {
-      title = 'You are about to remove a running container.';
-    }
-    ModalService.confirmContainerDeletion(
-      title,
-      function (result) {
-        if(!result) { return; }
-        var cleanAssociatedVolumes = false;
-        if (result[0]) {
-          cleanAssociatedVolumes = true;
-        }
-        $scope.remove(cleanAssociatedVolumes);
-      }
-    );
-  };
+  }
 
   function recreateContainer(pullImage) {
     var container = $scope.container;
@@ -250,22 +236,6 @@ function ($q, $scope, $state, $transition$, $filter, Container, Commit, Containe
         pullImage = true;
       }
       recreateContainer(pullImage);
-    });
-  };
-
-  $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
-    $scope.state.joinNetworkInProgress = true;
-    Network.connect({id: networkId}, { Container: $transition$.params().id }, function (d) {
-      if (container.message) {
-        Notifications.error('Error', d, 'Unable to connect container to network');
-      } else {
-        Notifications.success('Container joined network', $transition$.params().id);
-        $state.go('docker.containers.container', {id: $transition$.params().id}, {reload: true});
-      }
-      $scope.state.joinNetworkInProgress = false;
-    }, function (e) {
-      Notifications.error('Failure', e, 'Unable to connect container to network');
-      $scope.state.joinNetworkInProgress = false;
     });
   };
 

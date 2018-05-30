@@ -6,7 +6,7 @@
 </rd-header>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
+  <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
         <form class="form-horizontal">
@@ -70,6 +70,16 @@
             <storidge-profile-selector storidge-profile="formValues.StoridgeProfile"></storidge-profile-selector>
           </div>
           <!-- storidge -->
+          <div ng-if="applicationState.endpoint.mode.agentProxy && formValues.Driver === 'local'">
+            <div class="col-sm-12 form-section-title">
+              Deployment
+            </div>
+            <!-- node-selection -->
+            <node-selector
+              model="formValues.NodeName">
+            </node-selector>
+            <!-- !node-selection -->
+          </div>
           <!-- access-control -->
           <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
           <!-- !access-control -->

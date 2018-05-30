@@ -10,6 +10,7 @@ angular.module('portainer.docker').component('networksDatatable', {
     reverseOrder: '<',
     showTextFilter: '<',
     showOwnershipColumn: '<',
+    showHostColumn: '<',
     removeAction: '<'
   }
 });

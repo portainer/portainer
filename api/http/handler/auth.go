@@ -37,14 +37,14 @@ const (
 )
 
 // NewAuthHandler returns a new instance of AuthHandler.
-func NewAuthHandler(bouncer *security.RequestBouncer, authDisabled bool) *AuthHandler {
+func NewAuthHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, authDisabled bool) *AuthHandler {
 	h := &AuthHandler{
 		Router:       mux.NewRouter(),
 		Logger:       log.New(os.Stderr, "", log.LstdFlags),
 		authDisabled: authDisabled,
 	}
 	h.Handle("/auth",
-		bouncer.PublicAccess(http.HandlerFunc(h.handlePostAuth))).Methods(http.MethodPost)
+		rateLimiter.LimitAccess(bouncer.PublicAccess(http.HandlerFunc(h.handlePostAuth)))).Methods(http.MethodPost)
 
 	return h
 }

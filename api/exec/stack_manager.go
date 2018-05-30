@@ -2,6 +2,7 @@ package exec
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path"
@@ -12,19 +13,33 @@ import (
 
 // StackManager represents a service for managing stacks.
 type StackManager struct {
-	binaryPath string
+	binaryPath       string
+	dataPath         string
+	signatureService portainer.DigitalSignatureService
+	fileService      portainer.FileService
 }
 
 // NewStackManager initializes a new StackManager service.
-func NewStackManager(binaryPath string) *StackManager {
-	return &StackManager{
-		binaryPath: binaryPath,
+// It also updates the configuration of the Docker CLI binary.
+func NewStackManager(binaryPath, dataPath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (*StackManager, error) {
+	manager := &StackManager{
+		binaryPath:       binaryPath,
+		dataPath:         dataPath,
+		signatureService: signatureService,
+		fileService:      fileService,
 	}
+
+	err := manager.updateDockerCLIConfiguration(dataPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return manager, nil
 }
 
 // Login executes the docker login command against a list of registries (including DockerHub).
 func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []portainer.Registry, endpoint *portainer.Endpoint) {
-	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
+	command, args := prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 	for _, registry := range registries {
 		if registry.Authentication {
 			registryArgs := append(args, "login", "--username", registry.Username, "--password", registry.Password, registry.URL)
@@ -40,7 +55,7 @@ func (manager *StackManager) Login(dockerhub *portainer.DockerHub, registries []
 
 // Logout executes the docker logout command.
 func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
-	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
+	command, args := prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 	args = append(args, "logout")
 	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
@@ -48,7 +63,7 @@ func (manager *StackManager) Logout(endpoint *portainer.Endpoint) error {
 // Deploy executes the docker stack deploy command.
 func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint *portainer.Endpoint) error {
 	stackFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
-	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
+	command, args := prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 
 	if prune {
 		args = append(args, "stack", "deploy", "--prune", "--with-registry-auth", "--compose-file", stackFilePath, stack.Name)
@@ -61,12 +76,13 @@ func (manager *StackManager) Deploy(stack *portainer.Stack, prune bool, endpoint
 		env = append(env, envvar.Name+"="+envvar.Value)
 	}
 
-	return runCommandAndCaptureStdErr(command, args, env, stack.ProjectPath)
+	stackFolder := path.Dir(stackFilePath)
+	return runCommandAndCaptureStdErr(command, args, env, stackFolder)
 }
 
 // Remove executes the docker stack rm command.
 func (manager *StackManager) Remove(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	command, args := prepareDockerCommandAndArgs(manager.binaryPath, endpoint)
+	command, args := prepareDockerCommandAndArgs(manager.binaryPath, manager.dataPath, endpoint)
 	args = append(args, "stack", "rm", stack.Name)
 	return runCommandAndCaptureStdErr(command, args, nil, "")
 }
@@ -90,7 +106,7 @@ func runCommandAndCaptureStdErr(command string, args []string, env []string, wor
 	return nil
 }
 
-func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint) (string, []string) {
+func prepareDockerCommandAndArgs(binaryPath, dataPath string, endpoint *portainer.Endpoint) (string, []string) {
 	// Assume Linux as a default
 	command := path.Join(binaryPath, "docker")
 
@@ -99,6 +115,7 @@ func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint
 	}
 
 	args := make([]string, 0)
+	args = append(args, "--config", dataPath)
 	args = append(args, "-H", endpoint.URL)
 
 	if endpoint.TLSConfig.TLS {
@@ -114,4 +131,48 @@ func prepareDockerCommandAndArgs(binaryPath string, endpoint *portainer.Endpoint
 	}
 
 	return command, args
+}
+
+func (manager *StackManager) updateDockerCLIConfiguration(dataPath string) error {
+	configFilePath := path.Join(dataPath, "config.json")
+	config, err := manager.retrieveConfigurationFromDisk(configFilePath)
+	if err != nil {
+		return err
+	}
+
+	signature, err := manager.signatureService.Sign(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return err
+	}
+
+	if config["HttpHeaders"] == nil {
+		config["HttpHeaders"] = make(map[string]interface{})
+	}
+	headersObject := config["HttpHeaders"].(map[string]interface{})
+	headersObject["X-PortainerAgent-ManagerOperation"] = "1"
+	headersObject["X-PortainerAgent-Signature"] = signature
+	headersObject["X-PortainerAgent-PublicKey"] = manager.signatureService.EncodedPublicKey()
+
+	err = manager.fileService.WriteJSONToFile(configFilePath, config)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (manager *StackManager) retrieveConfigurationFromDisk(path string) (map[string]interface{}, error) {
+	var config map[string]interface{}
+
+	raw, err := manager.fileService.GetFileContent(path)
+	if err != nil {
+		return make(map[string]interface{}), nil
+	}
+
+	err = json.Unmarshal([]byte(raw), &config)
+	if err != nil {
+		return nil, err
+	}
+
+	return config, nil
 }

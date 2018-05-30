@@ -3,7 +3,13 @@
   <rd-header-content>Dashboard</rd-header-content>
 </rd-header>
 
-<div class="row">
+<div class="row" ng-if="applicationState.endpoint.mode.agentProxy">
+  <div class="col-sm-12">
+    <dashboard-cluster-agent-info></dashboard-cluster-agent-info>
+  </div>
+</div>
+
+<div class="row" ng-if="!applicationState.endpoint.mode.agentProxy">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-tachometer-alt" title="Node info"></rd-widget-header>
