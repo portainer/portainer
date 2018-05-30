@@ -66,6 +66,9 @@ type (
 		BaseDN            string `json:"BaseDN"`
 		Filter            string `json:"Filter"`
 		UserNameAttribute string `json:"UserNameAttribute"`
+		GroupBaseDN       string `json:"GroupBaseDN"`
+		GroupFilter       string `json:"GroupFilter"`
+		GroupAttribute    string `json:"GroupAttribute"`
 	}
 
 	// Settings represents the application settings.
@@ -440,6 +443,7 @@ type (
 	LDAPService interface {
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
+		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
 	}
 
 	// StackManager represents a service to manage stacks.
