@@ -31,36 +31,36 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 
 func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	if handler.authDisabled {
-		return &httperror.HandlerError{ErrAuthDisabled, "Cannot authenticate user. Portainer was started with the --no-auth flag", http.StatusServiceUnavailable}
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Cannot authenticate user. Portainer was started with the --no-auth flag", ErrAuthDisabled}
 	}
 
 	var payload authenticatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid request payload", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	u, err := handler.UserService.UserByUsername(payload.Username)
 	if err == portainer.ErrUserNotFound {
-		return &httperror.HandlerError{ErrInvalidCredentials, "Invalid credentials", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid credentials", ErrInvalidCredentials}
 	} else if err != nil {
-		return &httperror.HandlerError{err, "Unable to retrieve a user with the specified username from the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
 	}
 
 	settings, err := handler.SettingsService.Settings()
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to retrieve settings from the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationLDAP && u.ID != 1 {
 		err = handler.LDAPService.AuthenticateUser(payload.Username, payload.Password, &settings.LDAPSettings)
 		if err != nil {
-			return &httperror.HandlerError{err, "Unable to authenticate user via LDAP/AD", http.StatusInternalServerError}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate user via LDAP/AD", err}
 		}
 	} else {
 		err = handler.CryptoService.CompareHashAndData(u.Password, payload.Password)
 		if err != nil {
-			return &httperror.HandlerError{ErrInvalidCredentials, "Invalid credentials", http.StatusUnprocessableEntity}
+			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", ErrInvalidCredentials}
 		}
 	}
 
@@ -72,8 +72,8 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to generate JWT token", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate JWT token", err}
 	}
 
-	return response.WriteJSONResponse(w, &authenticateResponse{JWT: token})
+	return response.JSON(w, &authenticateResponse{JWT: token})
 }

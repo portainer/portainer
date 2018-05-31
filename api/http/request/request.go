@@ -7,7 +7,18 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	httperror "github.com/portainer/portainer/http/error"
+	"github.com/portainer/portainer"
+)
+
+const (
+	// ErrInvalidQueryParameter defines an error raised when a mandatory query parameter has an invalid value.
+	ErrInvalidQueryParameter = portainer.Error("Invalid query parameter")
+	// errInvalidRequestURL defines an error raised when the data sent in the query or the URL is invalid
+	errInvalidRequestURL = portainer.Error("Invalid request URL")
+	// errMissingQueryParameter defines an error raised when a mandatory query parameter is missing.
+	errMissingQueryParameter = portainer.Error("Missing query parameter")
+	// errMissingFormDataValue defines an error raised when a mandatory form data value is missing.
+	errMissingFormDataValue = portainer.Error("Missing form data value")
 )
 
 // PayloadValidation is an interface used to validate the payload of a request.
@@ -58,7 +69,7 @@ func RetrieveMultiPartFormJSONValue(request *http.Request, name string, target i
 func RetrieveMultiPartFormValue(request *http.Request, name string, optional bool) (string, error) {
 	value := request.FormValue(name)
 	if value == "" && !optional {
-		return "", httperror.ErrMissingFormDataValue
+		return "", errMissingFormDataValue
 	}
 	return value, nil
 }
@@ -73,15 +84,25 @@ func RetrieveNumericMultiPartFormValue(request *http.Request, name string, optio
 	return strconv.Atoi(value)
 }
 
+// RetrieveBooleanMultiPartFormValue returns the value of some form data as a boolean.
+// If optional is set to true, will not return an error when the form data value is not found.
+func RetrieveBooleanMultiPartFormValue(request *http.Request, name string, optional bool) (bool, error) {
+	value, err := RetrieveMultiPartFormValue(request, name, optional)
+	if err != nil {
+		return false, err
+	}
+	return value == "true", nil
+}
+
 // RetrieveRouteVariableValue returns the value of a route variable as a string.
 func RetrieveRouteVariableValue(request *http.Request, name string) (string, error) {
 	routeVariables := mux.Vars(request)
 	if routeVariables == nil {
-		return "", httperror.ErrInvalidQueryFormat
+		return "", errInvalidRequestURL
 	}
 	routeVar := routeVariables[name]
 	if routeVar == "" {
-		return "", httperror.ErrInvalidQueryFormat
+		return "", errInvalidRequestURL
 	}
 	return routeVar, nil
 }
@@ -100,14 +121,13 @@ func RetrieveNumericRouteVariableValue(request *http.Request, name string) (int,
 func RetrieveQueryParameter(request *http.Request, name string, optional bool) (string, error) {
 	queryParameter := request.FormValue(name)
 	if queryParameter == "" && !optional {
-		return "", httperror.ErrMissingQueryParameter
+		return "", errMissingQueryParameter
 	}
 	return queryParameter, nil
 }
 
 // RetrieveNumericQueryParameter returns the value of a query parameter as an integer.
 // If optional is set to true, will not return an error when the query parameter is not found.
-// TODO: check if used.
 func RetrieveNumericQueryParameter(request *http.Request, name string, optional bool) (int, error) {
 	queryParameter, err := RetrieveQueryParameter(request, name, optional)
 	if err != nil {
@@ -127,21 +147,4 @@ func RetrieveJSONQueryParameter(request *http.Request, name string, target inter
 		return nil
 	}
 	return json.Unmarshal([]byte(queryParameter), target)
-}
-
-// TODO: remove
-// GetUploadedFileContent retrieve the content of a file uploaded in the request.
-// Uses requestParameter as the key to retrieve the file in the request payload.
-func GetUploadedFileContent(request *http.Request, requestParameter string) ([]byte, error) {
-	file, _, err := request.FormFile(requestParameter)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	fileContent, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-	return fileContent, nil
 }

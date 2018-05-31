@@ -120,7 +120,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     })
     .then(function success() {
       Notifications.success('Stack successfully deployed');
-      $state.go('docker.stacks');
+      $state.go('portainer.stacks');
     })
     .catch(function error(err) {
       Notifications.warning('Deployment error', err.err.data.err);

@@ -7,8 +7,21 @@ import (
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/auth"
 	"github.com/portainer/portainer/http/handler/dockerhub"
-	"github.com/portainer/portainer/http/handler/extensions"
+	"github.com/portainer/portainer/http/handler/endpointgroups"
+	"github.com/portainer/portainer/http/handler/endpointproxy"
+	"github.com/portainer/portainer/http/handler/endpoints"
+	"github.com/portainer/portainer/http/handler/file"
+	"github.com/portainer/portainer/http/handler/registries"
+	"github.com/portainer/portainer/http/handler/resourcecontrols"
+	"github.com/portainer/portainer/http/handler/settings"
 	"github.com/portainer/portainer/http/handler/stacks"
+	"github.com/portainer/portainer/http/handler/status"
+	"github.com/portainer/portainer/http/handler/teammemberships"
+	"github.com/portainer/portainer/http/handler/teams"
+	"github.com/portainer/portainer/http/handler/templates"
+	"github.com/portainer/portainer/http/handler/upload"
+	"github.com/portainer/portainer/http/handler/users"
+	"github.com/portainer/portainer/http/handler/websocket"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
 
@@ -61,61 +74,45 @@ func (server *Server) Start() error {
 	proxyManager := proxy.NewManager(proxyManagerParameters)
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
-	var fileHandler = handler.NewFileHandler(filepath.Join(server.AssetsPath, "public"))
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter, server.AuthDisabled)
 	authHandler.UserService = server.UserService
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
 	authHandler.LDAPService = server.LDAPService
 	authHandler.SettingsService = server.SettingsService
-	var userHandler = handler.NewUserHandler(requestBouncer)
-	userHandler.UserService = server.UserService
-	userHandler.TeamService = server.TeamService
-	userHandler.TeamMembershipService = server.TeamMembershipService
-	userHandler.CryptoService = server.CryptoService
-	userHandler.ResourceControlService = server.ResourceControlService
-	userHandler.SettingsService = server.SettingsService
-	var teamHandler = handler.NewTeamHandler(requestBouncer)
-	teamHandler.TeamService = server.TeamService
-	teamHandler.TeamMembershipService = server.TeamMembershipService
-	var teamMembershipHandler = handler.NewTeamMembershipHandler(requestBouncer)
-	teamMembershipHandler.TeamMembershipService = server.TeamMembershipService
-	var statusHandler = handler.NewStatusHandler(requestBouncer, server.Status)
-	var settingsHandler = handler.NewSettingsHandler(requestBouncer)
-	settingsHandler.SettingsService = server.SettingsService
-	settingsHandler.LDAPService = server.LDAPService
-	settingsHandler.FileService = server.FileService
-	var templatesHandler = handler.NewTemplatesHandler(requestBouncer)
-	templatesHandler.SettingsService = server.SettingsService
-	var dockerHandler = handler.NewDockerHandler(requestBouncer)
-	dockerHandler.EndpointService = server.EndpointService
-	dockerHandler.EndpointGroupService = server.EndpointGroupService
-	dockerHandler.TeamMembershipService = server.TeamMembershipService
-	dockerHandler.ProxyManager = proxyManager
-	var azureHandler = handler.NewAzureHandler(requestBouncer)
-	azureHandler.EndpointService = server.EndpointService
-	azureHandler.EndpointGroupService = server.EndpointGroupService
-	azureHandler.TeamMembershipService = server.TeamMembershipService
-	azureHandler.ProxyManager = proxyManager
-	var websocketHandler = handler.NewWebSocketHandler()
-	websocketHandler.EndpointService = server.EndpointService
-	websocketHandler.SignatureService = server.SignatureService
-	var endpointHandler = handler.NewEndpointHandler(requestBouncer, server.EndpointManagement)
+
+	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
+	dockerHubHandler.DockerHubService = server.DockerHubService
+
+	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.EndpointGroupService = server.EndpointGroupService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = proxyManager
-	var endpointGroupHandler = handler.NewEndpointGroupHandler(requestBouncer)
+
+	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
 	endpointGroupHandler.EndpointService = server.EndpointService
-	var registryHandler = handler.NewRegistryHandler(requestBouncer)
+
+	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
+	endpointProxyHandler.EndpointService = server.EndpointService
+	endpointProxyHandler.EndpointGroupService = server.EndpointGroupService
+	endpointProxyHandler.TeamMembershipService = server.TeamMembershipService
+	endpointProxyHandler.ProxyManager = proxyManager
+
+	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
+
+	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
-	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
-	dockerHubHandler.DockerHubService = server.DockerHubService
-	var resourceHandler = handler.NewResourceHandler(requestBouncer)
-	resourceHandler.ResourceControlService = server.ResourceControlService
-	var uploadHandler = handler.NewUploadHandler(requestBouncer)
-	uploadHandler.FileService = server.FileService
+
+	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
+	resourceControlHandler.ResourceControlService = server.ResourceControlService
+
+	var settingsHandler = settings.NewHandler(requestBouncer)
+	settingsHandler.SettingsService = server.SettingsService
+	settingsHandler.LDAPService = server.LDAPService
+	settingsHandler.FileService = server.FileService
+
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.FileService = server.FileService
 	stackHandler.StackService = server.StackService
@@ -126,36 +123,51 @@ func (server *Server) Start() error {
 	stackHandler.GitService = server.GitService
 	stackHandler.RegistryService = server.RegistryService
 	stackHandler.DockerHubService = server.DockerHubService
-	var extensionHandler = handler.NewExtensionHandler(requestBouncer)
-	extensionHandler.EndpointService = server.EndpointService
-	extensionHandler.ProxyManager = proxyManager
-	var storidgeHandler = extensions.NewStoridgeHandler(requestBouncer)
-	storidgeHandler.EndpointService = server.EndpointService
-	storidgeHandler.EndpointGroupService = server.EndpointGroupService
-	storidgeHandler.TeamMembershipService = server.TeamMembershipService
-	storidgeHandler.ProxyManager = proxyManager
+
+	var teamHandler = teams.NewHandler(requestBouncer)
+	teamHandler.TeamService = server.TeamService
+	teamHandler.TeamMembershipService = server.TeamMembershipService
+
+	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
+	teamMembershipHandler.TeamMembershipService = server.TeamMembershipService
+	var statusHandler = status.NewHandler(requestBouncer, server.Status)
+
+	var templatesHandler = templates.NewHandler(requestBouncer)
+	templatesHandler.SettingsService = server.SettingsService
+
+	var uploadHandler = upload.NewHandler(requestBouncer)
+	uploadHandler.FileService = server.FileService
+
+	var userHandler = users.NewHandler(requestBouncer)
+	userHandler.UserService = server.UserService
+	userHandler.TeamService = server.TeamService
+	userHandler.TeamMembershipService = server.TeamMembershipService
+	userHandler.CryptoService = server.CryptoService
+	userHandler.ResourceControlService = server.ResourceControlService
+	userHandler.SettingsService = server.SettingsService
+
+	var websocketHandler = websocket.NewHandler()
+	websocketHandler.EndpointService = server.EndpointService
+	websocketHandler.SignatureService = server.SignatureService
 
 	server.Handler = &handler.Handler{
-		AuthHandler:           authHandler,
-		UserHandler:           userHandler,
-		TeamHandler:           teamHandler,
-		TeamMembershipHandler: teamMembershipHandler,
-		EndpointHandler:       endpointHandler,
-		EndpointGroupHandler:  endpointGroupHandler,
-		RegistryHandler:       registryHandler,
-		DockerHubHandler:      dockerHubHandler,
-		ResourceHandler:       resourceHandler,
-		SettingsHandler:       settingsHandler,
-		StatusHandler:         statusHandler,
-		StackHandler:          stackHandler,
-		TemplatesHandler:      templatesHandler,
-		DockerHandler:         dockerHandler,
-		AzureHandler:          azureHandler,
-		WebSocketHandler:      websocketHandler,
-		FileHandler:           fileHandler,
-		UploadHandler:         uploadHandler,
-		ExtensionHandler:      extensionHandler,
-		StoridgeHandler:       storidgeHandler,
+		AuthHandler:            authHandler,
+		DockerHubHandler:       dockerHubHandler,
+		EndpointGroupHandler:   endpointGroupHandler,
+		EndpointHandler:        endpointHandler,
+		EndpointProxyHandler:   endpointProxyHandler,
+		FileHandler:            fileHandler,
+		RegistryHandler:        registryHandler,
+		ResourceControlHandler: resourceControlHandler,
+		SettingsHandler:        settingsHandler,
+		StatusHandler:          statusHandler,
+		StackHandler:           stackHandler,
+		TeamHandler:            teamHandler,
+		TeamMembershipHandler:  teamMembershipHandler,
+		TemplatesHandler:       templatesHandler,
+		UploadHandler:          uploadHandler,
+		UserHandler:            userHandler,
+		WebSocketHandler:       websocketHandler,
 	}
 
 	if server.SSL {

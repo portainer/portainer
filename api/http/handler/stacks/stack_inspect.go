@@ -15,24 +15,24 @@ import (
 func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid stack identifier route variable", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}
 
 	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
 	if err == portainer.ErrStackNotFound {
-		return &httperror.HandlerError{err, "Unable to find a stack with the specified identifier inside the database", http.StatusNotFound}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{err, "Unable to find a stack with the specified identifier inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
 	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceID(stack.Name)
 	if err != nil && err != portainer.ErrResourceControlNotFound {
-		return &httperror.HandlerError{err, "Unable to retrieve a resource control associated to the stack", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to retrieve info from request context", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
 	extendedStack := proxy.ExtendedStack{*stack, portainer.ResourceControl{}}
@@ -40,9 +40,9 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 		if securityContext.IsAdmin || proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
 			extendedStack.ResourceControl = *resourceControl
 		} else {
-			return &httperror.HandlerError{portainer.ErrResourceAccessDenied, "Access denied to resource", http.StatusForbidden}
+			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 		}
 	}
 
-	return response.WriteJSONResponse(w, extendedStack)
+	return response.JSON(w, extendedStack)
 }

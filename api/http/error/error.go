@@ -4,28 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
-	"github.com/portainer/portainer"
-)
-
-const (
-	// TODO: check if still used
-	// ErrInvalidJSON defines an error raised the app is unable to parse request data
-	ErrInvalidJSON = portainer.Error("Invalid JSON")
-
-	// TODO: check if still used
-	// ErrInvalidRequestFormat defines an error raised when the format of the data sent in a request is not valid
-	ErrInvalidRequestFormat = portainer.Error("Invalid request data format")
-
-	// TODO: check if still used
-	// ErrInvalidQueryFormat defines an error raised when the data sent in the query or the URL is invalid
-	ErrInvalidQueryFormat = portainer.Error("Invalid query format")
-	// ErrInvalidQueryParameter defines an error raised when a mandatory query parameter has an invalid value.
-	ErrInvalidQueryParameter = portainer.Error("Invalid query parameter")
-	// ErrMissingQueryParameter defines an error raised when a mandatory query parameter is missing.
-	ErrMissingQueryParameter = portainer.Error("Missing query parameter")
-	// ErrMissingFormDataValue defines an error raised when a mandatory form data value is missing.
-	ErrMissingFormDataValue = portainer.Error("Missing form data value")
 )
 
 type (
@@ -33,9 +11,9 @@ type (
 	LoggerHandler func(http.ResponseWriter, *http.Request) *HandlerError
 	// HandlerError represents an error raised inside a HTTP handler
 	HandlerError struct {
-		Err        error
-		Message    string
 		StatusCode int
+		Message    string
+		Err        error
 	}
 	errorResponse struct {
 		Err string `json:"err,omitempty"`
@@ -56,14 +34,8 @@ func writeErrorResponse(rw http.ResponseWriter, err *HandlerError) {
 	json.NewEncoder(rw).Encode(&errorResponse{Err: err.Message})
 }
 
-// WriteErrorResponse writes an error message to the response and logger.
-// TODO: should be removed
-func WriteErrorResponse(w http.ResponseWriter, err error, code int, logger *log.Logger) {
-	if logger != nil {
-		logger.Printf("http error: %s (code=%d)", err, code)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(&errorResponse{Err: err.Error()})
+// WriteError is a convenience function that creates a new HandlerError before calling writeErrorResponse.
+// For use outside of the standard http handlers.
+func WriteError(rw http.ResponseWriter, code int, message string, err error) {
+	writeErrorResponse(rw, &HandlerError{code, message, err})
 }

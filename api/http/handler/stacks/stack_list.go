@@ -21,29 +21,29 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 	var filters stackListOperationFilters
 	err := request.RetrieveJSONQueryParameter(r, "filters", &filters, true)
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid query parameter: filters", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: filters", err}
 	}
 
 	stacks, err := handler.StackService.Stacks()
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to retrieve stacks from the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 	stacks = filterStacks(stacks, &filters)
 
 	resourceControls, err := handler.ResourceControlService.ResourceControls()
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to retrieve resource controls from the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve resource controls from the database", err}
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to retrieve info from request context", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
 	filteredStacks := proxy.FilterStacks(stacks, resourceControls, securityContext.IsAdmin,
 		securityContext.UserID, securityContext.UserMemberships)
 
-	return response.WriteJSONResponse(w, filteredStacks)
+	return response.JSON(w, filteredStacks)
 }
 
 func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters) []portainer.Stack {

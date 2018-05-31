@@ -36,25 +36,25 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	var payload composeStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid request payload", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	stacks, err := handler.StackService.Stacks()
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to retrieve stacks from the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{portainer.ErrStackAlreadyExists, "A stack with this name already exists", http.StatusConflict}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
 		}
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
 	if err == portainer.ErrEndpointNotFound {
-		return &httperror.HandlerError{err, "Unable to find an endpoint with the specified identifier inside the database", http.StatusNotFound}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{err, "Unable to find an endpoint with the specified identifier inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
 	stackIdentifier := buildStackIdentifier(payload.Name, payload.EndpointID)
@@ -68,7 +68,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 
 	projectPath, err := handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to persist Compose file on disk", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
 	}
 	stack.ProjectPath = projectPath
 
@@ -82,16 +82,16 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 
 	err = handler.deployComposeStack(config)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to deploy stack", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy stack", err}
 	}
 
 	err = handler.StackService.CreateStack(stack)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to persist the stack inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
 
 	doCleanUp = false
-	return response.WriteJSONResponse(w, stack)
+	return response.JSON(w, stack)
 }
 
 type composeStackFromGitRepositoryPayload struct {
@@ -127,25 +127,25 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	var payload composeStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid request payload", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	stacks, err := handler.StackService.Stacks()
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to retrieve stacks from the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{portainer.ErrStackAlreadyExists, "A stack with this name already exists", http.StatusConflict}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
 		}
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
 	if err == portainer.ErrEndpointNotFound {
-		return &httperror.HandlerError{err, "Unable to find an endpoint with the specified identifier inside the database", http.StatusNotFound}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{err, "Unable to find an endpoint with the specified identifier inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
 	stackIdentifier := buildStackIdentifier(payload.Name, payload.EndpointID)
@@ -169,7 +169,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	}
 	err = handler.cloneGitRepository(gitCloneParams)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to clone git repository", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
 	}
 
 	doCleanUp := true
@@ -182,16 +182,16 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	err = handler.deployComposeStack(config)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to deploy stack", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy stack", err}
 	}
 
 	err = handler.StackService.CreateStack(stack)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to persist the stack inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
 
 	doCleanUp = false
-	return response.WriteJSONResponse(w, stack)
+	return response.JSON(w, stack)
 }
 
 type composeStackFromFileUploadPayload struct {
@@ -226,25 +226,25 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	payload := &composeStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid request payload", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	stacks, err := handler.StackService.Stacks()
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to retrieve stacks from the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{portainer.ErrStackAlreadyExists, "A stack with this name already exists", http.StatusConflict}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
 		}
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
 	if err == portainer.ErrEndpointNotFound {
-		return &httperror.HandlerError{err, "Unable to find an endpoint with the specified identifier inside the database", http.StatusNotFound}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{err, "Unable to find an endpoint with the specified identifier inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
 	stackIdentifier := buildStackIdentifier(payload.Name, payload.EndpointID)
@@ -258,7 +258,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 
 	projectPath, err := handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to persist Compose file on disk", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
 	}
 	stack.ProjectPath = projectPath
 
@@ -272,16 +272,16 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 
 	err = handler.deployComposeStack(config)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to deploy stack", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy stack", err}
 	}
 
 	err = handler.StackService.CreateStack(stack)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to persist the stack inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
 
 	doCleanUp = false
-	return response.WriteJSONResponse(w, stack)
+	return response.JSON(w, stack)
 }
 
 type composeStackDeploymentConfig struct {
@@ -294,19 +294,19 @@ type composeStackDeploymentConfig struct {
 func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return nil, &httperror.HandlerError{err, "Unable to retrieve info from request context", http.StatusInternalServerError}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
 	dockerhub, err := handler.DockerHubService.DockerHub()
 	if err != nil {
-		return nil, &httperror.HandlerError{err, "Unable to retrieve DockerHub details from the database", http.StatusInternalServerError}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub details from the database", err}
 	}
 
 	registries, err := handler.RegistryService.Registries()
 	if err != nil {
-		return nil, &httperror.HandlerError{err, "Unable to retrieve registries from the database", http.StatusInternalServerError}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}
-	filteredRegistries, _ := security.FilterRegistries(registries, securityContext)
+	filteredRegistries := security.FilterRegistries(registries, securityContext)
 
 	config := &composeStackDeploymentConfig{
 		stack:      stack,

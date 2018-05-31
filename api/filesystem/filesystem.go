@@ -77,7 +77,7 @@ func (service *Service) GetStackProjectPath(stackIdentifier string) string {
 	return path.Join(service.fileStorePath, ComposeStorePath, stackIdentifier)
 }
 
-// StoreStackFileFromBytes creates a subfolder in the ComposeStorePath and stores a new file using from bytes.
+// StoreStackFileFromBytes creates a subfolder in the ComposeStorePath and stores a new file from bytes.
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error) {
 	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
@@ -97,52 +97,13 @@ func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string
 	return path.Join(service.fileStorePath, stackStorePath), nil
 }
 
-// StoreStackFileFromString creates a subfolder in the ComposeStorePath and stores a new file using the content from a string.
-// It returns the path to the folder where the file is stored.
-func (service *Service) StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error) {
-	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
-	err := service.createDirectoryInStore(stackStorePath)
-	if err != nil {
-		return "", err
-	}
-
-	composeFilePath := path.Join(stackStorePath, fileName)
-	data := []byte(stackFileContent)
-	r := bytes.NewReader(data)
-
-	err = service.createFileInStore(composeFilePath, r)
-	if err != nil {
-		return "", err
-	}
-
-	return path.Join(service.fileStorePath, stackStorePath), nil
-}
-
-// StoreStackFileFromReader creates a subfolder in the ComposeStorePath and stores a new file using the content from an io.Reader.
-// It returns the path to the folder where the file is stored.
-func (service *Service) StoreStackFileFromReader(stackIdentifier, fileName string, r io.Reader) (string, error) {
-	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
-	err := service.createDirectoryInStore(stackStorePath)
-	if err != nil {
-		return "", err
-	}
-
-	composeFilePath := path.Join(stackStorePath, fileName)
-
-	err = service.createFileInStore(composeFilePath, r)
-	if err != nil {
-		return "", err
-	}
-
-	return path.Join(service.fileStorePath, stackStorePath), nil
-}
-
-// StoreTLSFile creates a folder in the TLSStorePath and stores a new file with the content from r.
-func (service *Service) StoreTLSFile(folder string, fileType portainer.TLSFileType, r io.Reader) error {
+// StoreTLSFileFromBytes creates a folder in the TLSStorePath and stores a new file from bytes.
+// It returns the path to the newly created file.
+func (service *Service) StoreTLSFileFromBytes(folder string, fileType portainer.TLSFileType, data []byte) (string, error) {
 	storePath := path.Join(TLSStorePath, folder)
 	err := service.createDirectoryInStore(storePath)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var fileName string
@@ -154,15 +115,16 @@ func (service *Service) StoreTLSFile(folder string, fileType portainer.TLSFileTy
 	case portainer.TLSFileKey:
 		fileName = TLSKeyFile
 	default:
-		return portainer.ErrUndefinedTLSFileType
+		return "", portainer.ErrUndefinedTLSFileType
 	}
 
 	tlsFilePath := path.Join(storePath, fileName)
+	r := bytes.NewReader(data)
 	err = service.createFileInStore(tlsFilePath, r)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return path.Join(service.fileStorePath, tlsFilePath), nil
 }
 
 // GetPathForTLSFile returns the absolute path to a specific TLS file for an endpoint.

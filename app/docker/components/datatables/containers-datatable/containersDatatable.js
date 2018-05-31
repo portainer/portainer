@@ -19,6 +19,7 @@ angular.module('portainer.docker').component('containersDatatable', {
     restartAction: '<',
     pauseAction: '<',
     resumeAction: '<',
-    removeAction: '<'
+    removeAction: '<',
+    showAddAction: '<'
   }
 });

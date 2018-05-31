@@ -65,7 +65,6 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
   }
 
   function createComposeStack(name, method) {
-    var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
     var endpointId = EndpointProvider.endpointID();
 
     if (method === 'editor') {
@@ -104,7 +103,6 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       return;
     }
 
-    // TODO: review this flow.
     var type = $scope.state.StackType;
     var action = createSwarmStack;
     if (type === 2) {
@@ -117,10 +115,9 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     })
     .then(function success() {
       Notifications.success('Stack successfully deployed');
-      $state.go('docker.stacks');
+      $state.go('portainer.stacks');
     })
     .catch(function error(err) {
-      // TODO: might want to display warning only when stack deployment fails. If internal server error, display error.
       Notifications.warning('Deployment error', type === 1 ? err.err.data.err : err.data.err);
     })
     .finally(function final() {

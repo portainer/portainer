@@ -1,7 +1,5 @@
 package portainer
 
-import "io"
-
 type (
 	// Pair defines a key/value string pair
 	Pair struct {
@@ -358,10 +356,6 @@ type (
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
 		Stacks() ([]Stack, error)
-		// TODO: I think it's useless now, remove
-		StacksBySwarmID(swarmID string) ([]Stack, error)
-		// TODO: I think it's useless now, remove
-		StacksByEndpointID(endpointID EndpointID) ([]Stack, error)
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
@@ -420,16 +414,12 @@ type (
 	FileService interface {
 		GetFileContent(filePath string) (string, error)
 		RemoveDirectory(directoryPath string) error
-		StoreTLSFile(folder string, fileType TLSFileType, r io.Reader) error
+		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)
 		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
-		// TODO: remove
-		StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error)
-		// TODO: remove
-		StoreStackFileFromReader(stackIdentifier, fileName string, r io.Reader) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
 		LoadKeyPair() ([]byte, []byte, error)

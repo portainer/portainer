@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"log"
 	"net/http"
 	"sync"
 
@@ -16,7 +15,6 @@ type Handler struct {
 	stackCreationMutex *sync.Mutex
 	stackDeletionMutex *sync.Mutex
 	*mux.Router
-	Logger                 *log.Logger
 	FileService            portainer.FileService
 	GitService             portainer.GitService
 	StackService           portainer.StackService

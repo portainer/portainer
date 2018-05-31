@@ -1,11 +1,11 @@
 <rd-header>
   <rd-header-title title="Stack details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.stacks.stack({id: stack.Id})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.stacks.stack({id: stack.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="docker.stacks">Stacks</a> > <a ui-sref="docker.stacks.stack({id: stack.Id})">{{ stack.Name }}</a>
+    <a ui-sref="portainer.stacks">Stacks</a> > <a ui-sref="portainer.stacks.stack({id: stack.Id})">{{ stack.Name }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -35,33 +35,8 @@
       pause-action="pauseAction"
       resume-action="resumeAction"
       remove-action="confirmRemoveAction"
+      show-add-action="false"
     ></containers-datatable>
-  </div>
-</div>
-
-<div class="row" ng-if="stack && stack.Type === 2 && networks">
-  <div class="col-sm-12">
-    <networks-datatable
-    title="Networks" title-icon="fa-sitemap"
-    dataset="networks" table-key="stack-networks"
-    order-by="Name" show-text-filter="true"
-    remove-action="removeAction"
-    show-ownership-column="applicationState.application.authentication"
-    show-host-column="applicationState.endpoint.mode.agentProxy"
-    ></networks-datatable>
-  </div>
-</div>
-
-<div class="row" ng-if="stack && stack.Type === 2 && volumes">
-  <div class="col-sm-12">
-    <volumes-datatable
-    title="Volumes" title-icon="fa-cubes"
-    dataset="volumes" table-key="stack-volumes"
-    order-by="Id" show-text-filter="true"
-    remove-action="removeAction"
-    show-ownership-column="applicationState.application.authentication"
-    show-host-column="applicationState.endpoint.mode.agentProxy"
-    ></volumes-datatable>
   </div>
 </div>
 

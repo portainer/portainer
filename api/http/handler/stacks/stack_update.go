@@ -40,37 +40,37 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid stack identifier route variable", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}
 
 	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
 	if err == portainer.ErrStackNotFound {
-		return &httperror.HandlerError{err, "Unable to find a stack with the specified identifier inside the database", http.StatusNotFound}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{err, "Unable to find a stack with the specified identifier inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
 	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceID(stack.Name)
 	if err != nil && err != portainer.ErrResourceControlNotFound {
-		return &httperror.HandlerError{err, "Unable to retrieve a resource control associated to the stack", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to retrieve info from request context", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
 	if resourceControl != nil {
 		if !securityContext.IsAdmin && !proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
-			return &httperror.HandlerError{portainer.ErrResourceAccessDenied, "Access denied to resource", http.StatusForbidden}
+			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 		}
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(stack.EndpointID)
 	if err == portainer.ErrEndpointNotFound {
-		return &httperror.HandlerError{err, "Unable to find the endpoint associated to the stack inside the database", http.StatusNotFound}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{err, "Unable to find the endpoint associated to the stack inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
 	}
 
 	updateError := handler.updateAndDeployStack(r, stack, endpoint)
@@ -80,10 +80,10 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 
 	err = handler.StackService.UpdateStack(stack.ID, stack)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to persist the stack changes inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
 	}
 
-	return response.WriteJSONResponse(w, stack)
+	return response.JSON(w, stack)
 }
 
 func (handler *Handler) updateAndDeployStack(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) *httperror.HandlerError {
@@ -97,12 +97,12 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 	var payload updateComposeStackPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid request payload", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	_, err = handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to persist updated Compose file on disk", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
 	}
 
 	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
@@ -112,7 +112,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 
 	err = handler.deployComposeStack(config)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to deploy updated stack", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy updated stack", err}
 	}
 
 	return nil
@@ -122,14 +122,14 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 	var payload updateSwarmStackPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid request payload", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	stack.Env = payload.Env
 
 	_, err = handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to persist updated Compose file on disk", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
 	}
 
 	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, payload.Prune)
@@ -139,7 +139,7 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to deploy updated stack", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy updated stack", err}
 	}
 
 	return nil

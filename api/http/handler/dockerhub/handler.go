@@ -1,14 +1,17 @@
 package dockerhub
 
 import (
-	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/security"
-
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/portainer/portainer"
+	httperror "github.com/portainer/portainer/http/error"
+	"github.com/portainer/portainer/http/security"
 )
+
+func hideFields(dockerHub *portainer.DockerHub) {
+	dockerHub.Password = ""
+}
 
 // Handler is the HTTP handler used to handle DockerHub operations.
 type Handler struct {

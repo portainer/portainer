@@ -28,7 +28,7 @@ func (handler *Handler) dockerhubUpdate(w http.ResponseWriter, r *http.Request) 
 	var payload dockerhubUpdatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid request payload", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	dockerhub := &portainer.DockerHub{
@@ -45,8 +45,8 @@ func (handler *Handler) dockerhubUpdate(w http.ResponseWriter, r *http.Request) 
 
 	err = handler.DockerHubService.StoreDockerHub(dockerhub)
 	if err != nil {
-		return &httperror.HandlerError{err, "Unable to persist the Dockerhub changes inside the database", http.StatusInternalServerError}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the Dockerhub changes inside the database", err}
 	}
 
-	return response.EmptyResponse(w)
+	return response.Empty(w)
 }

@@ -82,7 +82,7 @@
             <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
           </button>
         </div>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.containers.new">
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.containers.new" ng-if="$ctrl.showAddAction">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add container
         </button>
       </div>

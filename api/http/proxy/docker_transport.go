@@ -3,6 +3,7 @@ package proxy
 import (
 	"encoding/base64"
 	"encoding/json"
+	"log"
 	"net/http"
 	"path"
 	"regexp"
@@ -303,6 +304,7 @@ func (p *proxyTransport) replaceRegistryAuthenticationHeader(request *http.Reque
 		}
 
 		authenticationHeader := createRegistryAuthenticationHeader(originalHeaderData.Serveraddress, accessContext)
+		log.Printf("Header: %+v", authenticationHeader)
 
 		headerData, err := json.Marshal(authenticationHeader)
 		if err != nil {

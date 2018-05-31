@@ -26,12 +26,12 @@ func buildStackIdentifier(stackName string, endpointID int) string {
 func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackType, err := request.RetrieveNumericQueryParameter(r, "type", false)
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid query parameter: type", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: type", err}
 	}
 
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
-		return &httperror.HandlerError{err, "Invalid query parameter: method", http.StatusBadRequest}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
 	}
 
 	switch portainer.StackType(stackType) {
@@ -41,7 +41,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return handler.createComposeStack(w, r, method)
 	}
 
-	return &httperror.HandlerError{httperror.ErrInvalidRequestFormat, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", http.StatusBadRequest}
+	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", request.ErrInvalidQueryParameter}
 }
 
 func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Request, method string) *httperror.HandlerError {
@@ -55,7 +55,7 @@ func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Reques
 		return handler.createComposeStackFromFileUpload(w, r)
 	}
 
-	return &httperror.HandlerError{httperror.ErrInvalidQueryParameter, "Invalid value for query parameter: method. Value must be one of: string, repository or file", http.StatusBadRequest}
+	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", request.ErrInvalidQueryParameter}
 }
 
 func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request, method string) *httperror.HandlerError {
@@ -68,5 +68,5 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 		return handler.createSwarmStackFromFileUpload(w, r)
 	}
 
-	return &httperror.HandlerError{httperror.ErrInvalidQueryParameter, "Invalid value for query parameter: method. Value must be one of: string, repository or file", http.StatusBadRequest}
+	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", request.ErrInvalidQueryParameter}
 }

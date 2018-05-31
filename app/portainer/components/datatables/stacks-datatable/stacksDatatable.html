@@ -16,7 +16,7 @@
           ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.stacks.new">
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.stacks.new">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add stack
         </button>
       </div>
@@ -55,7 +55,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)" ng-disabled="!item.Id"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ng-if="item.Id" ui-sref="docker.stacks.stack({ id: item.Id })">{{ item.Name }}</a>
+                <a ng-if="item.Id" ui-sref="portainer.stacks.stack({ id: item.Id })">{{ item.Name }}</a>
                 <span ng-if="!item.Id">
                   {{ item.Name }} <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true"></i>
                 </span>

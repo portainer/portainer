@@ -85,13 +85,13 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil {
-			httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
 			return
 		}
 
 		requestContext, err := bouncer.newRestrictedContextRequest(tokenData.ID, tokenData.Role)
 		if err != nil {
-			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, nil)
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to create restricted request context ", err)
 			return
 		}
 
@@ -105,7 +105,7 @@ func mwCheckAdministratorRole(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil || tokenData.Role != portainer.AdministratorRole {
-			httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
 			return
 		}
 
@@ -128,23 +128,23 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 			}
 
 			if token == "" {
-				httperror.WriteErrorResponse(w, portainer.ErrUnauthorized, http.StatusUnauthorized, nil)
+				httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
 				return
 			}
 
 			var err error
 			tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token)
 			if err != nil {
-				httperror.WriteErrorResponse(w, err, http.StatusUnauthorized, nil)
+				httperror.WriteError(w, http.StatusUnauthorized, "Unable to verify JWT token", err)
 				return
 			}
 
 			_, err = bouncer.userService.User(tokenData.ID)
 			if err != nil && err == portainer.ErrUserNotFound {
-				httperror.WriteErrorResponse(w, portainer.ErrUnauthorized, http.StatusUnauthorized, nil)
+				httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
 				return
 			} else if err != nil {
-				httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, nil)
+				httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve users from the database", err)
 				return
 			}
 		} else {

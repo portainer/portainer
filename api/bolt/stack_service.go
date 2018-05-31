@@ -63,60 +63,6 @@ func (service *StackService) Stacks() ([]portainer.Stack, error) {
 	return stacks, nil
 }
 
-// StacksBySwarmID return an array containing all the stacks related to the specified Swarm ID.
-func (service *StackService) StacksBySwarmID(id string) ([]portainer.Stack, error) {
-	var stacks = make([]portainer.Stack, 0)
-	err := service.store.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(stackBucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var stack portainer.Stack
-			err := internal.UnmarshalStack(v, &stack)
-			if err != nil {
-				return err
-			}
-			if stack.SwarmID == id {
-				stacks = append(stacks, stack)
-			}
-		}
-
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return stacks, nil
-}
-
-// StacksByEndpointID return an array containing all the stacks related to the specified Endpoint ID.
-func (service *StackService) StacksByEndpointID(endpointID portainer.EndpointID) ([]portainer.Stack, error) {
-	var stacks = make([]portainer.Stack, 0)
-	err := service.store.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(stackBucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var stack portainer.Stack
-			err := internal.UnmarshalStack(v, &stack)
-			if err != nil {
-				return err
-			}
-			if stack.EndpointID == endpointID {
-				stacks = append(stacks, stack)
-			}
-		}
-
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return stacks, nil
-}
-
 // CreateStack creates a new stack.
 func (service *StackService) CreateStack(stack *portainer.Stack) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
