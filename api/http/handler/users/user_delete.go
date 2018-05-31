@@ -17,10 +17,6 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid user identifier route variable", err}
 	}
 
-	if userID == 1 {
-		return &httperror.HandlerError{http.StatusForbidden, "Cannot remove default administrator user", portainer.ErrCannotRemoveAdmin}
-	}
-
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
