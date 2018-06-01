@@ -5,19 +5,23 @@ import (
 	"strconv"
 
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/http/client"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
 	"github.com/portainer/portainer/http/response"
 )
 
 type endpointUpdatePayload struct {
-	Name                string
-	URL                 string
-	PublicURL           string
-	GroupID             int
-	TLS                 bool
-	TLSSkipVerify       bool
-	TLSSkipClientVerify bool
+	Name                   string
+	URL                    string
+	PublicURL              string
+	GroupID                int
+	TLS                    bool
+	TLSSkipVerify          bool
+	TLSSkipClientVerify    bool
+	AzureApplicationID     string
+	AzureTenantID          string
+	AzureAuthenticationKey string
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
@@ -62,6 +66,26 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.GroupID != 0 {
 		endpoint.GroupID = portainer.EndpointGroupID(payload.GroupID)
+	}
+
+	if endpoint.Type == portainer.AzureEnvironment {
+		credentials := endpoint.AzureCredentials
+		if payload.AzureApplicationID != "" {
+			credentials.ApplicationID = payload.AzureApplicationID
+		}
+		if payload.AzureTenantID != "" {
+			credentials.TenantID = payload.AzureTenantID
+		}
+		if payload.AzureAuthenticationKey != "" {
+			credentials.AuthenticationKey = payload.AzureAuthenticationKey
+		}
+
+		httpClient := client.NewHTTPClient()
+		_, authErr := httpClient.ExecuteAzureAuthenticationRequest(&credentials)
+		if authErr != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate against Azure", err}
+		}
+		endpoint.AzureCredentials = credentials
 	}
 
 	folder := strconv.Itoa(endpointID)
@@ -109,6 +133,5 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}
 
-	hideFields(endpoint)
 	return response.JSON(w, endpoint)
 }

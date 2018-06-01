@@ -23,6 +23,5 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	hideFields(endpoint)
 	return response.JSON(w, endpoint)
 }

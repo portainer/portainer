@@ -135,7 +135,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 			var err error
 			tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token)
 			if err != nil {
-				httperror.WriteError(w, http.StatusUnauthorized, "Unable to verify JWT token", err)
+				httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", err)
 				return
 			}
 

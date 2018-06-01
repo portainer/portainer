@@ -40,6 +40,13 @@
                 </a>
               </th>
               <th>
+                <a ng-click="$ctrl.changeOrderBy('Type')">
+                  Type
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('URL')">
                   URL
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && !$ctrl.state.reverseOrder"></i>
@@ -65,6 +72,12 @@
                 </span>
                 <a ui-sref="portainer.endpoints.endpoint({id: item.Id})" ng-if="$ctrl.endpointManagement">{{ item.Name }}</a>
                 <span ng-if="!$ctrl.endpointManagement">{{ item.Name }}</span>
+              </td>
+              <td>
+                <span>
+                  <i ng-class="item.Type | endpointtypeicon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  {{ item.Type | endpointtypename }}
+                </span>
               </td>
               <td>{{ item.URL | stripprotocol }}</td>
               <td>{{ item.GroupName }}</td>

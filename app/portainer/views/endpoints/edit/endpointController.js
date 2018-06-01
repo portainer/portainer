@@ -23,22 +23,27 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
     var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
     var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
 
-    var endpointParams = {
-      name: endpoint.Name,
-      URL: endpoint.URL,
+    var payload = {
+      Name: endpoint.Name,
       PublicURL: endpoint.PublicURL,
-      GroupId: endpoint.GroupId,
+      GroupID: endpoint.GroupId,
       TLS: TLS,
       TLSSkipVerify: TLSSkipVerify,
       TLSSkipClientVerify: TLSSkipClientVerify,
       TLSCACert: TLSSkipVerify || securityData.TLSCACert === endpoint.TLSConfig.TLSCACert ? null : securityData.TLSCACert,
       TLSCert: TLSSkipClientVerify || securityData.TLSCert === endpoint.TLSConfig.TLSCert ? null : securityData.TLSCert,
       TLSKey: TLSSkipClientVerify || securityData.TLSKey === endpoint.TLSConfig.TLSKey ? null : securityData.TLSKey,
-      type: $scope.endpointType
+      AzureApplicationID: endpoint.AzureCredentials.ApplicationID,
+      AzureTenantID: endpoint.AzureCredentials.TenantID,
+      AzureAuthenticationKey: endpoint.AzureCredentials.AuthenticationKey
     };
 
+    if ($scope.endpointType !== 'local' && endpoint.Type !== 3) {
+      payload.URL = 'tcp://' + endpoint.URL;
+    }
+
     $scope.state.actionInProgress = true;
-    EndpointService.updateEndpoint(endpoint.Id, endpointParams)
+    EndpointService.updateEndpoint(endpoint.Id, payload)
     .then(function success(data) {
       Notifications.success('Endpoint updated', $scope.endpoint.Name);
       EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);

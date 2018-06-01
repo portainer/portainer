@@ -10,7 +10,8 @@ import (
 	"github.com/portainer/portainer/crypto"
 )
 
-const azureAPIBaseURL = "https://management.azure.com"
+// AzureAPIBaseURL is the URL where Azure API requests will be proxied.
+const AzureAPIBaseURL = "https://management.azure.com"
 
 // proxyFactory is a factory to create reverse proxies to Docker endpoints
 type proxyFactory struct {
@@ -28,7 +29,7 @@ func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
 }
 
 func newAzureProxy(credentials *portainer.AzureCredentials) (http.Handler, error) {
-	url, err := url.Parse(azureAPIBaseURL)
+	url, err := url.Parse(AzureAPIBaseURL)
 	if err != nil {
 		return nil, err
 	}

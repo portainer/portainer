@@ -99,7 +99,6 @@ func (manager *Manager) DeleteProxy(key string) {
 
 // CreateAndRegisterExtensionProxy creates a new HTTP reverse proxy for an extension and adds it to the registered proxies.
 func (manager *Manager) CreateAndRegisterExtensionProxy(key, extensionAPIURL string) (http.Handler, error) {
-
 	extensionURL, err := url.Parse(extensionAPIURL)
 	if err != nil {
 		return nil, err
