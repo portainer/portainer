@@ -143,7 +143,7 @@ func (handler *EndpointHandler) createAzureEndpoint(payload *postEndpointPayload
 
 	endpoint := &portainer.Endpoint{
 		Name:             payload.name,
-		URL:              payload.url,
+		URL:              proxy.AzureAPIBaseURL,
 		Type:             portainer.AzureEnvironment,
 		GroupID:          portainer.EndpointGroupID(payload.groupID),
 		PublicURL:        payload.publicURL,
