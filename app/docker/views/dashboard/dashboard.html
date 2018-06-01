@@ -10,6 +10,32 @@
 </div>
 
 <div class="row" ng-if="!applicationState.endpoint.mode.agentProxy">
+  <div class="col-sm-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="col-sm-12 form-section-title">
+          Information
+        </div>
+        <div class="form-group">
+          <span class="small">
+            <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'MANAGER'">
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              Portainer is connected to a node that is part of a Swarm cluster. Some resources located on other nodes in the cluster might not be available for management, have a look
+              at <a href="http://portainer.readthedocs.io/en/stable/agent.html" target="_blank">our agent setup</a> for more details.
+            </p>
+            <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'WORKER'">
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              Portainer is connected to a worker node. Swarm management features will not be available.
+            </p>
+          </span>
+        </div>
+        <div>
+          <span></span>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-tachometer-alt" title="Node info"></rd-widget-header>
@@ -32,29 +58,11 @@
               <td>Memory</td>
               <td>{{ infoData.MemTotal|humansize }}</td>
             </tr>
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-  <div class="col-lg-12 col-md-12 col-xs-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-    <rd-widget>
-      <rd-widget-header icon="fa-tachometer-alt" title="Swarm info"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-            <tr>
-              <td colspan="2"><span class="small text-muted">This node is part of a Swarm cluster</span></td>
-            </tr>
-            <tr >
+            <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
               <td>Node role</td>
               <td>{{ infoData.Swarm.ControlAvailable ? 'Manager' : 'Worker' }}</td>
             </tr>
-            <tr ng-if="infoData.Swarm.ControlAvailable">
-              <td>Nodes in the cluster</td>
-              <td>{{ infoData.Swarm.Nodes }}</td>
-            </tr>
-            <tr>
+            <tr ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
               <td colspan="2">
                 <div class="btn-group" role="group" aria-label="...">
                   <a ui-sref="docker.swarm.visualizer"><i class="fa fa-object-group space-right" aria-hidden="true"></i>Go to cluster visualizer</a>
