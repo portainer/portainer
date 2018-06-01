@@ -33,25 +33,12 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
   };
 
-  service.updateEndpoint = function(id, endpointParams) {
-    var query = {
-      name: endpointParams.name,
-      PublicURL: endpointParams.PublicURL,
-      GroupId: endpointParams.GroupId,
-      TLS: endpointParams.TLS,
-      TLSSkipVerify: endpointParams.TLSSkipVerify,
-      TLSSkipClientVerify: endpointParams.TLSSkipClientVerify,
-      authorizedUsers: endpointParams.authorizedUsers
-    };
-    if (endpointParams.type && endpointParams.URL) {
-      query.URL = endpointParams.type === 'local' ? ('unix://' + endpointParams.URL) : ('tcp://' + endpointParams.URL);
-    }
-
+  service.updateEndpoint = function(id, payload) {
     var deferred = $q.defer();
-    FileUploadService.uploadTLSFilesForEndpoint(id, endpointParams.TLSCACert, endpointParams.TLSCert, endpointParams.TLSKey)
+    FileUploadService.uploadTLSFilesForEndpoint(id, payload.TLSCACert, payload.TLSCert, payload.TLSKey)
     .then(function success() {
       deferred.notify({upload: false});
-      return Endpoints.update({id: id}, query).$promise;
+      return Endpoints.update({id: id}, payload).$promise;
     })
     .then(function success(data) {
       deferred.resolve(data);

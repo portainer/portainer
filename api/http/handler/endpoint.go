@@ -68,13 +68,16 @@ type (
 	}
 
 	putEndpointsRequest struct {
-		Name                string `valid:"-"`
-		URL                 string `valid:"-"`
-		PublicURL           string `valid:"-"`
-		GroupID             int    `valid:"-"`
-		TLS                 bool   `valid:"-"`
-		TLSSkipVerify       bool   `valid:"-"`
-		TLSSkipClientVerify bool   `valid:"-"`
+		Name                   string `valid:"-"`
+		URL                    string `valid:"-"`
+		PublicURL              string `valid:"-"`
+		GroupID                int    `valid:"-"`
+		TLS                    bool   `valid:"-"`
+		TLSSkipVerify          bool   `valid:"-"`
+		TLSSkipClientVerify    bool   `valid:"-"`
+		AzureApplicationID     string `valid:"-"`
+		AzureTenantID          string `valid:"-"`
+		AzureAuthenticationKey string `valid:"-"`
 	}
 
 	postEndpointPayload struct {
@@ -143,7 +146,7 @@ func (handler *EndpointHandler) createAzureEndpoint(payload *postEndpointPayload
 
 	endpoint := &portainer.Endpoint{
 		Name:             payload.name,
-		URL:              payload.url,
+		URL:              proxy.AzureAPIBaseURL,
 		Type:             portainer.AzureEnvironment,
 		GroupID:          portainer.EndpointGroupID(payload.groupID),
 		PublicURL:        payload.publicURL,
@@ -405,8 +408,6 @@ func (handler *EndpointHandler) handleGetEndpoint(w http.ResponseWriter, r *http
 		return
 	}
 
-	endpoint.AzureCredentials = portainer.AzureCredentials{}
-
 	encodeJSON(w, endpoint, handler.Logger)
 }
 
@@ -516,6 +517,18 @@ func (handler *EndpointHandler) handlePutEndpoint(w http.ResponseWriter, r *http
 
 	if req.GroupID != 0 {
 		endpoint.GroupID = portainer.EndpointGroupID(req.GroupID)
+	}
+
+	if endpoint.Type == portainer.AzureEnvironment {
+		if req.AzureApplicationID != "" {
+			endpoint.AzureCredentials.ApplicationID = req.AzureApplicationID
+		}
+		if req.AzureTenantID != "" {
+			endpoint.AzureCredentials.TenantID = req.AzureTenantID
+		}
+		if req.AzureAuthenticationKey != "" {
+			endpoint.AzureCredentials.AuthenticationKey = req.AzureAuthenticationKey
+		}
 	}
 
 	folder := strconv.Itoa(int(endpoint.ID))
