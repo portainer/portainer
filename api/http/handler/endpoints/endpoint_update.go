@@ -83,7 +83,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		httpClient := client.NewHTTPClient()
 		_, authErr := httpClient.ExecuteAzureAuthenticationRequest(&credentials)
 		if authErr != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate against Azure", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate against Azure", authErr}
 		}
 		endpoint.AzureCredentials = credentials
 	}
