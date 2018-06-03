@@ -7,23 +7,23 @@
         </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
-            <i class="fa fa-search" aria-hidden="true"></i> Search
+            <i class="fa fa-search" aria-hidden="true"></i> 搜索
           </span>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> 配置</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader">
-                  Table settings
+                  表格配置
                 </div>
                 <div class="menuContent">
                   <div class="md-checkbox">
                     <input id="setting_container_trunc" type="checkbox" ng-model="$ctrl.settings.truncateContainerName" ng-change="$ctrl.onSettingsContainerNameTruncateChange()"/>
-                    <label for="setting_container_trunc">Truncate container name</label>
+                    <label for="setting_container_trunc">截断容器名称</label>
                   </div>
                 </div>
                 <div class="menuHeader">
-                  Quick actions
+                  快速操作
                 </div>
                 <div class="menuContent">
                   <div class="md-checkbox">
@@ -44,7 +44,7 @@
                   </div>
                 </div>
                 <div>
-                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">关闭</a>
                 </div>
               </div>
             </div>
@@ -55,35 +55,35 @@
         <div class="btn-group" role="group" aria-label="...">
           <button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.startAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noStoppedItemsSelected">
-            <i class="fa fa-play space-right" aria-hidden="true"></i>Start
+            <i class="fa fa-play space-right" aria-hidden="true"></i>开始
           </button>
           <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.stopAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noRunningItemsSelected">
-            <i class="fa fa-stop space-right" aria-hidden="true"></i>Stop
+            <i class="fa fa-stop space-right" aria-hidden="true"></i>停止
           </button>
           <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.killAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0">
-            <i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill
+            <i class="fa fa-bomb space-right" aria-hidden="true"></i>杀死
           </button>
           <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.restartAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0">
-            <i class="fa fa-sync space-right" aria-hidden="true"></i>Restart
+            <i class="fa fa-sync space-right" aria-hidden="true"></i>重启
           </button>
           <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.pauseAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noRunningItemsSelected">
-            <i class="fa fa-pause space-right" aria-hidden="true"></i>Pause
+            <i class="fa fa-pause space-right" aria-hidden="true"></i>暂停
           </button>
           <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.resumeAction($ctrl.state.selectedItems)"
             ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noPausedItemsSelected">
-            <i class="fa fa-play space-right" aria-hidden="true"></i>Resume
+            <i class="fa fa-play space-right" aria-hidden="true"></i>恢复
           </button>
           <button type="button" class="btn btn-sm btn-danger"
             ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-            <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
+            <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>移除
           </button>
         </div>
         <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.containers.new">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add container
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>添加容器
         </button>
       </div>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
@@ -100,14 +100,14 @@
                   <label for="select_all"></label>
                 </span>
                 <a ng-click="$ctrl.changeOrderBy('Names')">
-                  Name
+                  名称
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Names' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Names' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
                 <a ng-click="$ctrl.changeOrderBy('Status')">
-                  State
+                  状态
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
                 </a>
@@ -118,7 +118,7 @@
                 <div class="dropdown-menu" uib-dropdown-menu>
                   <div class="tableMenu">
                     <div class="menuHeader">
-                      Filter by state
+                      通过状态过滤
                     </div>
                     <div class="menuContent">
                       <div class="md-checkbox" ng-repeat="filter in $ctrl.filters.state.values track by $index">
@@ -127,13 +127,13 @@
                       </div>
                     </div>
                     <div>
-                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.state.open = false;">Close</a>
+                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.state.open = false;">关闭</a>
                     </div>
                   </div>
                 </div>
               </th>
               <th ng-if="$ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect">
-                Quick actions
+                快速操作
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('StackName')">
@@ -144,35 +144,35 @@
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Image')">
-                  Image
+                  镜像
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('IP')">
-                  IP Address
+                  IP地址
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th ng-if="$ctrl.showHostColumn">
                 <a ng-click="$ctrl.changeOrderBy('NodeName')">
-                  Host
+                  主机
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Ports')">
-                  Published Ports
+                  发布的端口
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th ng-if="$ctrl.showOwnershipColumn">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
-                  Ownership
+                  归属于
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
                 </a>
@@ -218,10 +218,10 @@
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="9" class="text-center text-muted">Loading...</td>
+              <td colspan="9" class="text-center text-muted">加载中...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="9" class="text-center text-muted">No container available.</td>
+              <td colspan="9" class="text-center text-muted">没有可用的容器.</td>
             </tr>
           </tbody>
         </table>
@@ -234,7 +234,7 @@
           <form class="form-inline">
             <span class="limitSelector">
               <span style="margin-right: 5px;">
-                Items per page
+                每页数量
               </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
                 <option value="0">All</option>

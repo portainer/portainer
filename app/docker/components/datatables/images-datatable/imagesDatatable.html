@@ -7,7 +7,7 @@
         </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
-            <i class="fa fa-search" aria-hidden="true"></i> Search
+            <i class="fa fa-search" aria-hidden="true"></i> 搜索
           </span>
         </div>
       </div>
@@ -15,18 +15,18 @@
         <div class="btn-group">
           <button type="button" class="btn btn-sm btn-danger"
             ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems, false)">
-            <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
+            <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>移除
           </button>
           <button type="button" class="btn btn-sm btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-disabled="$ctrl.state.selectedItemCount === 0">
             <span class="caret"></span>
-            <span class="sr-only">Toggle Dropdown</span>
+            <span class="sr-only">切换下拉菜单</span>
           </button>
           <ul class="dropdown-menu">
             <li><a ng-click="$ctrl.forceRemoveAction($ctrl.state.selectedItems, true)" ng-disabled="$ctrl.state.selectedItemCount === 0">Force Remove</a></li>
           </ul>
         </div>
         <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.images.build">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Build a new image
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>构建一个新镜像
         </button>
       </div>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
@@ -49,53 +49,53 @@
                 </a>
                 <div>
                   <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.usage.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
-                  <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.usage.enabled">Filter <i class="fa fa-check" aria-hidden="true"></i></span>
+                  <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.usage.enabled">过滤器 <i class="fa fa-check" aria-hidden="true"></i></span>
                 </div>
                 <div class="dropdown-menu" uib-dropdown-menu>
                   <div class="tableMenu">
                     <div class="menuHeader">
-                      Filter by usage
+                      根据使用情况过滤
                     </div>
                     <div class="menuContent">
                       <div class="md-checkbox">
                         <input id="filter_usage_usedImages" type="checkbox" ng-model="$ctrl.filters.usage.showUsedImages" ng-change="$ctrl.onUsageFilterChange()"/>
-                        <label for="filter_usage_usedImages">Used images</label>
+                        <label for="filter_usage_usedImages">使用中的镜像</label>
                       </div>
                       <div class="md-checkbox">
                         <input id="filter_usage_unusedImages" type="checkbox" ng-model="$ctrl.filters.usage.showUnusedImages" ng-change="$ctrl.onUsageFilterChange()"/>
-                        <label for="filter_usage_unusedImages">Unused images</label>
+                        <label for="filter_usage_unusedImages">未使用的镜像</label>
                       </div>
                     </div>
                     <div>
-                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.usage.open = false;">Close</a>
+                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.usage.open = false;">关闭</a>
                     </div>
                   </div>
                 </div>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('RepoTags')">
-                  Tags
+                  标签
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RepoTags' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RepoTags' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('VirtualSize')">
-                  Size
+                  大小
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'VirtualSize' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'VirtualSize' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Created')">
-                  Created
+                  创建日期
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Created' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Created' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th ng-if="$ctrl.showHostColumn">
                 <a ng-click="$ctrl.changeOrderBy('NodeName')">
-                  Host
+                  主机
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
                 </a>
@@ -120,10 +120,10 @@
               <td ng-if="$ctrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="5" class="text-center text-muted">Loading...</td>
+              <td colspan="5" class="text-center text-muted">加载中...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="5" class="text-center text-muted">No image available.</td>
+              <td colspan="5" class="text-center text-muted">没有可用镜像.</td>
             </tr>
           </tbody>
         </table>
@@ -136,7 +136,7 @@
           <form class="form-inline">
             <span class="limitSelector">
               <span style="margin-right: 5px;">
-                Items per page
+                每页数量
               </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
                 <option value="0">All</option>
