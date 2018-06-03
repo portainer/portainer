@@ -1,5 +1,5 @@
 <div>
-  <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
+  <label for="image_name" class="col-sm-1 control-label text-left">名称</label>
   <div class="col-sm-11 col-md-6">
     <input type="text" class="form-control" uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
       ng-model="$ctrl.image" id="image_name" placeholder="e.g. myImage:myTag">
