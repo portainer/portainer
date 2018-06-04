@@ -51,7 +51,7 @@ func RetrieveMultiPartFormFile(request *http.Request, requestParameter string) (
 	return fileContent, nil
 }
 
-// RetrieveMultiPartFormJSONValue // decodes the value of some form data as a JSON object into the target parameter.
+// RetrieveMultiPartFormJSONValue decodes the value of some form data as a JSON object into the target parameter.
 // If optional is set to true, will not return an error when the form data value is not found.
 func RetrieveMultiPartFormJSONValue(request *http.Request, name string, target interface{}, optional bool) error {
 	value, err := RetrieveMultiPartFormValue(request, name, optional)

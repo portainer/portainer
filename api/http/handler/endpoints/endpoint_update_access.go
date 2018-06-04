@@ -63,6 +63,5 @@ func (handler *Handler) endpointUpdateAccess(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}
 
-	hideFields(endpoint)
 	return response.JSON(w, endpoint)
 }

@@ -78,6 +78,5 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist registry changes inside the database", err}
 	}
 
-	hideFields(registry)
 	return response.JSON(w, registry)
 }

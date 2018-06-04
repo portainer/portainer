@@ -131,7 +131,6 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		return endpointCreationError
 	}
 
-	hideFields(endpoint)
 	return response.JSON(w, endpoint)
 }
 
