@@ -2,7 +2,7 @@ angular.module('portainer.docker').component('imagesDatatable', {
   templateUrl: 'app/docker/components/datatables/images-datatable/imagesDatatable.html',
   controller: 'ImagesDatatableController',
   bindings: {
-    title: '@',
+    titleText: '@',
     titleIcon: '@',
     dataset: '<',
     tableKey: '@',

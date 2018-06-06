@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Service details">
+  <rd-header-title title-text="Service details">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.services.service({id: service.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -21,7 +21,7 @@
 <div class="row">
   <div class="col-lg-9 col-md-9 col-xs-9">
     <rd-widget>
-      <rd-widget-header icon="fa-list-alt" title="Service details"></rd-widget-header>
+      <rd-widget-header icon="fa-list-alt" title-text="Service details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -109,7 +109,7 @@
 
   <div class="col-lg-3 col-md-3 col-xs-3">
     <rd-widget>
-      <rd-widget-header icon="fa-bars" title="Quick navigation"></rd-widget-header>
+      <rd-widget-header icon="fa-bars" title-text="Quick navigation"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <ul class="nav nav-pills nav-stacked">
           <li><a href ng-click="goToItem('service-env-variables')">Environment variables</a></li>

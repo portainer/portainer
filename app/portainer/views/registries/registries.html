@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Registries">
+  <rd-header-title title-text="Registries">
     <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.registries" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,7 +10,7 @@
 <div class="row" ng-if="dockerhub">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-database" title="DockerHub">
+      <rd-widget-header icon="fa-database" title-text="DockerHub">
       </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
@@ -71,7 +71,7 @@
 <div class="row">
   <div class="col-sm-12">
     <registries-datatable
-    title="Registries" title-icon="fa-database"
+    title-text="Registries" title-icon="fa-database"
     dataset="registries" table-key="registries"
     order-by="Name" show-text-filter="true"
     access-management="applicationState.application.authentication"

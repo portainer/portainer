@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Stacks list">
+  <rd-header-title title-text="Stacks list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.stacks" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,7 +10,7 @@
 <div class="row" ng-if="state.displayInformationPanel">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-info-circle" title="Information"></rd-widget-header>
+      <rd-widget-header icon="fa-info-circle" title-text="Information"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -40,7 +40,7 @@
 <div class="row">
   <div class="col-sm-12">
     <stacks-datatable
-    title="Stacks" title-icon="fa-th-list"
+    title-text="Stacks" title-icon="fa-th-list"
     dataset="stacks" table-key="stacks"
     order-by="Name" show-text-filter="true"
     remove-action="removeAction"
