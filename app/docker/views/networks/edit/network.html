@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Network details"></rd-header-title>
+  <rd-header-title title-text="Network details"></rd-header-title>
   <rd-header-content>
     <a ui-sref="docker.networks">Networks</a> &gt; <a ui-sref="docker.networks.network({id: network.Id})">{{ network.Name }}</a>
   </rd-header-content>
@@ -8,7 +8,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-sitemap" title="Network details"></rd-widget-header>
+      <rd-widget-header icon="fa-sitemap" title-text="Network details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -58,7 +58,7 @@
 <div class="row" ng-if="!(network.Options | emptyobject)">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-cogs" title="Network options"></rd-widget-header>
+      <rd-widget-header icon="fa-cogs" title-text="Network options"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -77,7 +77,7 @@
 <div class="row" ng-if="containersInNetwork.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-server" title="Containers in network"></rd-widget-header>
+      <rd-widget-header icon="fa-server" title-text="Containers in network"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <thead>

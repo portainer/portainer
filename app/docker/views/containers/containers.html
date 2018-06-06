@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Container list">
+  <rd-header-title title-text="Container list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.containers" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,7 +10,7 @@
 <div class="row">
   <div class="col-sm-12" ng-if="containers">
     <containers-datatable
-      title="Containers" title-icon="fa-server"
+      title-text="Containers" title-icon="fa-server"
       dataset="containers" table-key="containers"
       order-by="Status" show-text-filter="true"
       show-ownership-column="applicationState.application.authentication"

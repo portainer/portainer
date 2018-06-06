@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Engine overview">
+  <rd-header-title title-text="Engine overview">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.engine" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,7 +10,7 @@
 <div class="row" ng-if="info && version">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-code" title="Engine version"></rd-widget-header>
+      <rd-widget-header icon="fa-code" title-text="Engine version"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -52,7 +52,7 @@
 <div class="row" ng-if="info && version">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-th" title="Engine status"></rd-widget-header>
+      <rd-widget-header icon="fa-th" title-text="Engine status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -94,7 +94,7 @@
 <div class="row" ng-if="info && info.Plugins">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-plug" title="Engine plugins"></rd-widget-header>
+      <rd-widget-header icon="fa-plug" title-text="Engine plugins"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>

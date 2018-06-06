@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Stack details">
+  <rd-header-title title-text="Stack details">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.stacks.stack({id: stack.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -21,7 +21,7 @@
 <div class="row">
   <div class="col-sm-12">
     <stack-services-datatable
-      title="Services" title-icon="fa-list-alt"
+      title-text="Services" title-icon="fa-list-alt"
       dataset="services" table-key="stack-services"
       order-by="Name"
       nodes="nodes"
@@ -35,7 +35,7 @@
 <div class="row">
   <div class="col-sm-12">
     <tasks-datatable
-      title="Tasks" title-icon="fa-tasks"
+      title-text="Tasks" title-icon="fa-tasks"
       dataset="tasks" table-key="stack-tasks"
       order-by="Updated" reverse-order="true"
       nodes="nodes"
@@ -50,7 +50,7 @@
 <div class="row" ng-if="stackFileContent">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-pencil-alt" title="Stack editor"></rd-widget-header>
+      <rd-widget-header icon="fa-pencil-alt" title-text="Stack editor"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
