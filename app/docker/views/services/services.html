@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Service list">
+  <rd-header-title title-text="Service list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.services" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,7 +10,7 @@
 <div class="row">
   <div class="col-sm-12">
     <services-datatable
-    title="Services" title-icon="fa-list-alt"
+    title-text="Services" title-icon="fa-list-alt"
     dataset="services" table-key="services"
     order-by="Name" show-text-filter="true"
     show-ownership-column="applicationState.application.authentication"
