@@ -126,11 +126,6 @@
                 <span ng-hide="state.actionInProgress">Deploy the container</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
-              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
-              <span ng-if="fromContainerMultipleNetworks" style="margin-left: 10px">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                <span class="small text-muted" style="margin-left: 5px;">This container is connected to multiple networks, only one network will be kept at creation time.</span>
-              </span>
             </div>
           </div>
           <!-- !actions -->
