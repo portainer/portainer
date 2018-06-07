@@ -1,9 +1,10 @@
 angular.module('portainer.app')
-.controller('StacksDatatableController', ['PaginationService', 'DatatableService',
+.controller('ServiceDatatableController', ['PaginationService', 'DatatableService',
 function (PaginationService, DatatableService) {
 
   this.state = {
     selectAll: false,
+    expandAll: false,
     orderBy: this.orderBy,
     paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
     displayTextFilter: false,
@@ -30,9 +31,19 @@ function (PaginationService, DatatableService) {
   this.selectAll = function() {
     for (var i = 0; i < this.state.filteredDataSet.length; i++) {
       var item = this.state.filteredDataSet[i];
-      if (!(item.External && item.Type === 2) && item.Checked !== this.state.selectAll) {
+      if (item.Checked !== this.state.selectAll) {
         item.Checked = this.state.selectAll;
         this.selectItem(item);
+      }
+    }
+  };
+
+  this.expandAll = function() {
+    this.state.expandAll = !this.state.expandAll;
+    for (var i = 0; i < this.state.filteredDataSet.length; i++) {
+      var item = this.state.filteredDataSet[i];
+      if (item.Expanded !== this.state.expandAll) {
+        item.Expanded = this.state.expandAll;
       }
     }
   };

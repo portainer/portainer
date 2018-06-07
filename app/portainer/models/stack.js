@@ -7,5 +7,12 @@ function StackViewModel(data) {
   if (data.ResourceControl && data.ResourceControl.Id !== 0) {
     this.ResourceControl = new ResourceControlViewModel(data.ResourceControl);
   }
-  this.External = data.External;
+  this.External = false;
+}
+
+function ExternalStackViewModel(name, type) {
+  this.Name = name;
+  this.Type = type;
+  this.External = true;
+  this.Checked = false;
 }

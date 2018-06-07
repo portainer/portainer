@@ -33,6 +33,35 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
+  service.stacks = function(compose, swarm, endpointId) {
+    var deferred = $q.defer();
+
+    var queries = [];
+    if (compose) {
+      queries.push(service.composeStacks(true, { EndpointID: endpointId }));
+    }
+    if (swarm) {
+      queries.push(service.swarmStacks(true));
+    }
+
+    $q.all(queries)
+    .then(function success(data) {
+      var stacks = [];
+      if (data[0]) {
+        stacks = stacks.concat(data[0]);
+      }
+      if (data[1]) {
+        stacks = stacks.concat(data[1]);
+      }
+      deferred.resolve(stacks);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve stacks', err: err });
+    });
+
+    return deferred.promise;
+  };
+
   service.externalSwarmStacks = function() {
     var deferred = $q.defer();
 
@@ -40,8 +69,8 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     .then(function success(data) {
       var services = data;
       var stackNames = StackHelper.getExternalStackNamesFromServices(services);
-      var stacks = stackNames.map(function (item) {
-        return new StackViewModel({ Name: item, External: true });
+      var stacks = stackNames.map(function (name) {
+        return new ExternalStackViewModel(name, 1);
       });
       deferred.resolve(stacks);
     })
@@ -59,8 +88,8 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     .then(function success(data) {
       var containers = data;
       var stackNames = StackHelper.getExternalStackNamesFromContainers(containers);
-      var stacks = stackNames.map(function (item) {
-        return new StackViewModel({ Name: item, External: true });
+      var stacks = stackNames.map(function (name) {
+        return new ExternalStackViewModel(name, 2);
       });
       deferred.resolve(stacks);
 
@@ -126,10 +155,10 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.remove = function(stack) {
+  service.remove = function(stack, external, endpointId) {
     var deferred = $q.defer();
 
-    Stack.remove({ id: stack.Id }).$promise
+    Stack.remove({ id: stack.Id ? stack.Id : stack.Name, external: external, endpointId: endpointId }).$promise
     .then(function success(data) {
       if (stack.ResourceControl && stack.ResourceControl.Id) {
         return ResourceControlService.deleteResourceControl(stack.ResourceControl.Id);

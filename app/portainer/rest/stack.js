@@ -7,7 +7,7 @@ angular.module('portainer.app')
     query: { method: 'GET', isArray: true },
     create: { method: 'POST', ignoreLoadingBar: true },
     update: { method: 'PUT', params: { id: '@id' }, ignoreLoadingBar: true },
-    remove: { method: 'DELETE', params: { id: '@id'} },
+    remove: { method: 'DELETE', params: { id: '@id', external: '@external', endpointId: '@endpointId' } },
     getStackFile: { method: 'GET', params: { id : '@id', action: 'file' } }
   });
 }]);

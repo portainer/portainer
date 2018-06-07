@@ -1,10 +1,11 @@
 angular.module('portainer.app')
-.controller('StackController', ['$q', '$scope', '$state', '$transition$', '$filter', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ContainerService', 'ServiceHelper', 'TaskHelper', 'Notifications', 'FormHelper', 'EndpointProvider', 'ModalService', 'NetworkService', 'VolumeService',
-function ($q, $scope, $state, $transition$, $filter, StackService, NodeService, ServiceService, TaskService, ContainerService, ServiceHelper, TaskHelper, Notifications, FormHelper, EndpointProvider, ModalService, NetworkService, VolumeService) {
+.controller('StackController', ['$q', '$scope', '$state', '$transition$', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ContainerService', 'ServiceHelper', 'TaskHelper', 'Notifications', 'FormHelper', 'EndpointProvider', 'ModalService', 'NetworkService', 'VolumeService',
+function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceService, TaskService, ContainerService, ServiceHelper, TaskHelper, Notifications, FormHelper, EndpointProvider, ModalService, NetworkService, VolumeService) {
 
   $scope.state = {
     actionInProgress: false,
-    publicURL: EndpointProvider.endpointPublicURL()
+    publicURL: EndpointProvider.endpointPublicURL(),
+    externalStack: false
   };
 
   $scope.formValues = {
@@ -159,83 +160,111 @@ function ($q, $scope, $state, $transition$, $filter, StackService, NodeService, 
     });
   };
 
-  function loadSwarmStack(stackId) {
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+  function loadStack(id) {
     var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
-    StackService.stack(stackId)
+    StackService.stack(id)
     .then(function success(data) {
       var stack = data;
       $scope.stack = stack;
 
-      var serviceFilters = {
-        label: ['com.docker.stack.namespace=' + stack.Name]
-      };
-
       return $q.all({
-        stackFile: StackService.getStackFile(stackId),
-        services: ServiceService.services(serviceFilters),
-        tasks: TaskService.tasks(serviceFilters),
-        containers: agentProxy ? ContainerService.containers() : [],
-        nodes: NodeService.nodes()
+        stackFile: StackService.getStackFile(id),
+        resources: stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name)
       });
     })
     .then(function success(data) {
       $scope.stackFileContent = data.stackFile;
-      $scope.nodes = data.nodes;
-
-      var services = data.services;
-      var tasks = data.tasks;
-
-      if (agentProxy) {
-        var containers = data.containers;
-        for (var j = 0; j < tasks.length; j++) {
-          var task = tasks[j];
-          TaskHelper.associateContainerToTask(task, containers);
-        }
+      if ($scope.stack.Type === 1) {
+        assignSwarmStackResources(data.resources, agentProxy);
+      } else {
+        assignComposeStackResources(data.resources);
       }
-
-      for (var i = 0; i < services.length; i++) {
-        var service = services[i];
-        ServiceHelper.associateTasksToService(service, tasks);
-      }
-
-      $scope.tasks = tasks;
-      $scope.services = services;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve stack details');
     });
   }
 
-  function loadComposeStack(stackId) {
-    StackService.stack(stackId)
-    .then(function success(data) {
-      var stack = data;
-      $scope.stack = stack;
+  function retrieveSwarmStackResources(stackName, agentProxy) {
+    var stackFilter = {
+      label: ['com.docker.stack.namespace=' + stackName]
+    };
 
-      var stackFilter = {
-        label: ['com.docker.compose.project=' + stack.Name]
-      };
-      var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    return $q.all({
+      services: ServiceService.services(stackFilter),
+      tasks: TaskService.tasks(stackFilter),
+      containers: agentProxy ? ContainerService.containers() : [],
+      nodes: NodeService.nodes()
+    });
+  }
 
-      return $q.all({
-        stackFile: StackService.getStackFile(stackId),
-        containers: ContainerService.containers(1, stackFilter),
-        networks: NetworkService.networks(true, false, false, stackFilter),
-        volumes: apiVersion >= 1.26 ? VolumeService.volumes({ filters: stackFilter }) : []
-      });
-    })
-    .then(function success(data) {
-      $scope.stackFileContent = data.stackFile;
-      var containers = data.containers;
+  function assignSwarmStackResources(resources, agentProxy) {
+    var services = resources.services;
+    var tasks = resources.tasks;
 
-      // TODO: might want to integrate that part into ContainerService.containers
-      for (var i = 0; i < containers.length; i++) {
-        var container = containers[i];
-        container.Status = $filter('containerstatus')(container.Status);
+    if (agentProxy) {
+      var containers = resources.containers;
+      for (var j = 0; j < tasks.length; j++) {
+        var task = tasks[j];
+        TaskHelper.associateContainerToTask(task, containers);
       }
-      $scope.containers = containers;
+    }
+
+    for (var i = 0; i < services.length; i++) {
+      var service = services[i];
+      ServiceHelper.associateTasksToService(service, tasks);
+    }
+
+    $scope.nodes = resources.nodes;
+    $scope.tasks = tasks;
+    $scope.services = services;
+  }
+
+  function retrieveComposeStackResources(stackName) {
+    var stackFilter = {
+      label: ['com.docker.compose.project=' + stackName]
+    };
+
+    return $q.all({
+      containers: ContainerService.containers(1, stackFilter)
+    });
+  }
+
+  function assignComposeStackResources(resources) {
+    $scope.containers = resources.containers;
+  }
+
+  function loadExternalStack(name) {
+    var stackType = $transition$.params().type;
+    if (!stackType || (stackType !== '1' && stackType !== '2')) {
+      Notifications.error('Failure', err, 'Invalid type URL parameter.');
+      return;
+    }
+
+    if (stackType === '1') {
+      loadExternalSwarmStack(name);
+    } else {
+      loadExternalComposeStack(name);
+    }
+  }
+
+  function loadExternalSwarmStack(name) {
+    var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
+
+    retrieveSwarmStackResources(name)
+    .then(function success(data) {
+      assignSwarmStackResources(data);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve stack details');
+    });
+  }
+
+  function loadExternalComposeStack(name) {
+    retrieveComposeStackResources(name)
+    .then(function success(data) {
+      assignComposeStackResources(data);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve stack details');
@@ -243,12 +272,16 @@ function ($q, $scope, $state, $transition$, $filter, StackService, NodeService, 
   }
 
   function initView() {
-    var stackId = $transition$.params().id;
-    var endpointMode = $scope.applicationState.endpoint.mode;
-    if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
-      loadSwarmStack(stackId);
+    var stackName = $transition$.params().name;
+    $scope.stackName = stackName;
+    var external = $transition$.params().external;
+
+    if (external === 'true') {
+      $scope.state.externalStack = true;
+      loadExternalStack(stackName);
     } else {
-      loadComposeStack(stackId);
+      var stackId = $transition$.params().id;
+      loadStack(stackId);
     }
   }
 

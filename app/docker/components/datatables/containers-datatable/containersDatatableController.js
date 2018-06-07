@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainersDatatableController', ['PaginationService', 'DatatableService',
-function (PaginationService, DatatableService) {
+.controller('ContainersDatatableController', ['$filter', 'PaginationService', 'DatatableService',
+function ($filter, PaginationService, DatatableService) {
 
   var ctrl = this;
 
@@ -144,7 +144,7 @@ function (PaginationService, DatatableService) {
       }
       availableStateFilters.push({ label: item.Status, display: true });
     }
-     this.filters.state.values = _.uniqBy(availableStateFilters, 'label');
+    this.filters.state.values = _.uniqBy(availableStateFilters, 'label');
   };
 
   this.updateStoredFilters = function(storedFilters) {

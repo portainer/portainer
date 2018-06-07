@@ -10,7 +10,6 @@ angular.module('portainer.app').component('stacksDatatable', {
     reverseOrder: '<',
     showTextFilter: '<',
     showOwnershipColumn: '<',
-    removeAction: '<',
-    displayExternalStacks: '<'
+    removeAction: '<'
   }
 });

@@ -5,9 +5,29 @@
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="portainer.stacks">Stacks</a> > <a ui-sref="portainer.stacks.stack({id: stack.Id})">{{ stack.Name }}</a>
+    <a ui-sref="portainer.stacks">Stacks</a> &gt; {{ stackName }}</a>
   </rd-header-content>
 </rd-header>
+
+<div class="row" ng-if="state.externalStack">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="col-sm-12 form-section-title">
+          Information
+        </div>
+        <div class="form-group">
+          <span class="small">
+            <p class="text-muted">
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              This stack was created outside of Portainer. Control over this stack is limited.
+            </p>
+          </span>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
 
 <!-- access-control-panel -->
 <por-access-control-panel
@@ -18,7 +38,7 @@
 </por-access-control-panel>
 <!-- !access-control-panel -->
 
-<div class="row" ng-if="stack && stack.Type === 2 && containers">
+<div class="row" ng-if="containers">
   <div class="col-sm-12">
     <containers-datatable
       title-text="Containers" title-icon="fa-server"
@@ -40,32 +60,25 @@
   </div>
 </div>
 
-<div class="row" ng-if="stack && stack.Type === 1">
+<div class="row" ng-if="services">
+  <!-- TODO: change table-key -->
   <div class="col-sm-12">
-    <stack-services-datatable
-      title-text="Services" title-icon="fa-list-alt"
-      dataset="services" table-key="stack-services"
-      order-by="Name"
-      nodes="nodes"
-      public-url="state.publicURL"
-      show-text-filter="true"
-      scale-action="scaleAction"
-    ></stack-services-datatable>
-  </div>
-</div>
-
-<div class="row" ng-if="stack && stack.Type === 1">
-  <div class="col-sm-12">
-    <tasks-datatable
-      title-text="Tasks" title-icon="fa-tasks"
-      dataset="tasks" table-key="stack-tasks"
-      order-by="Updated" reverse-order="true"
-      nodes="nodes"
-      show-text-filter="true"
-      show-slot-column="true"
-      show-logs-button="applicationState.endpoint.apiVersion >= 1.30"
-      agent-proxy="applicationState.endpoint.mode.agentProxy"
-    ></tasks-datatable>
+    <services-datatablee
+    title-text="Services" title-icon="fa-list-alt"
+    dataset="services" table-key="stack-servicess"
+    order-by="Name" show-text-filter="true"
+    show-ownership-column="false"
+    remove-action="removeAction"
+    scale-action="scaleAction"
+    force-update-action="forceUpdateAction"
+    public-url="state.publicURL"
+    show-force-update-button="applicationState.endpoint.apiVersion >= 1.25"
+    show-logs-button="applicationState.endpoint.apiVersion >= 1.30"
+    show-add-action="false"
+    show-stack-column="false"
+    nodes="nodes"
+    agent-proxy="applicationState.endpoint.mode.agentProxy"
+    ></services-datatablee>
   </div>
 </div>
 

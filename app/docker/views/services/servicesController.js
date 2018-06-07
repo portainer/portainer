@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServicesController', ['$q', '$scope', '$state', 'Service', 'ServiceService', 'ServiceHelper', 'Notifications', 'Task', 'Node', 'ModalService', 'EndpointProvider',
-function ($q, $scope, $state, Service, ServiceService, ServiceHelper, Notifications, Task, Node, ModalService, EndpointProvider) {
+.controller('ServicesController', ['$q', '$scope', '$state', 'ServiceService', 'ServiceHelper', 'Notifications', 'TaskService', 'TaskHelper', 'NodeService', 'ModalService', 'EndpointProvider',
+function ($q, $scope, $state, ServiceService, ServiceHelper, Notifications, TaskService, TaskHelper, NodeService, ModalService, EndpointProvider) {
 
   $scope.state = {
     publicURL: EndpointProvider.endpointPublicURL()
@@ -86,24 +86,34 @@ function ($q, $scope, $state, Service, ServiceService, ServiceHelper, Notificati
   }
 
   function initView() {
+    var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
+
     $q.all({
-      services: Service.query({}).$promise,
-      tasks: Task.query({filters: {'desired-state': ['running','accepted']}}).$promise,
-      nodes: Node.query({}).$promise
+      services: ServiceService.services(),
+      tasks: TaskService.tasks(),
+      containers: agentProxy ? ContainerService.containers() : [],
+      nodes: NodeService.nodes()
     })
     .then(function success(data) {
-      $scope.services = data.services.map(function (service) {
-        var runningTasks = data.tasks.filter(function (task) {
-          return task.ServiceID === service.ID && task.Status.State === 'running';
-        });
-        var allTasks = data.tasks.filter(function (task) {
-          return task.ServiceID === service.ID;
-        });
-        var taskNodes = data.nodes.filter(function (node) {
-          return node.Spec.Availability === 'active' && node.Status.State === 'ready';
-        });
-        return new ServiceViewModel(service, runningTasks, allTasks, taskNodes);
-      });
+      var services = data.services;
+      var tasks = data.tasks;
+
+      if (agentProxy) {
+        var containers = data.containers;
+        for (var j = 0; j < tasks.length; j++) {
+          var task = tasks[j];
+          TaskHelper.associateContainerToTask(task, containers);
+        }
+      }
+
+      for (var i = 0; i < services.length; i++) {
+        var service = services[i];
+        ServiceHelper.associateTasksToService(service, tasks);
+      }
+
+      $scope.nodes = data.nodes;
+      $scope.tasks = tasks;
+      $scope.services = services;
     })
     .catch(function error(err) {
       $scope.services = [];

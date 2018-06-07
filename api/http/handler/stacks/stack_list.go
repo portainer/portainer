@@ -47,13 +47,16 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 }
 
 func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters) []portainer.Stack {
-	if filters == nil {
+	if filters.EndpointID == 0 && filters.SwarmID == "" {
 		return stacks
 	}
 
 	filteredStacks := make([]portainer.Stack, 0, len(stacks))
 	for _, stack := range stacks {
-		if stack.EndpointID == portainer.EndpointID(filters.EndpointID) || stack.SwarmID == filters.SwarmID {
+		if stack.Type == portainer.DockerComposeStack && stack.EndpointID == portainer.EndpointID(filters.EndpointID) {
+			filteredStacks = append(filteredStacks, stack)
+		}
+		if stack.Type == portainer.DockerSwarmStack && stack.SwarmID == filters.SwarmID {
 			filteredStacks = append(filteredStacks, stack)
 		}
 	}

@@ -11,11 +11,18 @@ import (
 	"github.com/portainer/portainer/http/security"
 )
 
-// DELETE request on /api/stacks/:id
+// TODO: update Swagger
+
+// DELETE request on /api/stacks/:id?external=<external>&endpointId=<endpointId>
 func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
+	}
+
+	externalStack, _ := request.RetrieveBooleanQueryParameter(r, "external", true)
+	if externalStack {
+		return handler.deleteExternalStack(r, w, stackID)
 	}
 
 	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
@@ -61,6 +68,32 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	err = handler.FileService.RemoveDirectory(stack.ProjectPath)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove stack files from disk", err}
+	}
+
+	return response.Empty(w)
+}
+
+func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWriter, stackName string) *httperror.HandlerError {
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
+	}
+
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrEndpointNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
+	}
+
+	stack := &portainer.Stack{
+		Name: stackName,
+		Type: portainer.DockerSwarmStack,
+	}
+
+	err = handler.deleteStack(stack, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete stack", err}
 	}
 
 	return response.Empty(w)

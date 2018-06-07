@@ -136,6 +136,16 @@ func RetrieveNumericQueryParameter(request *http.Request, name string, optional 
 	return strconv.Atoi(queryParameter)
 }
 
+// RetrieveBooleanQueryParameter  returns the value of a query parameter as a boolean.
+// If optional is set to true, will not return an error when the query parameter is not found.
+func RetrieveBooleanQueryParameter(request *http.Request, name string, optional bool) (bool, error) {
+	queryParameter, err := RetrieveQueryParameter(request, name, optional)
+	if err != nil {
+		return false, err
+	}
+	return queryParameter == "true", nil
+}
+
 // RetrieveJSONQueryParameter decodes the value of a query paramater as a JSON object into the target parameter.
 // If optional is set to true, will not return an error when the query parameter is not found.
 func RetrieveJSONQueryParameter(request *http.Request, name string, target interface{}, optional bool) error {

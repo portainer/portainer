@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-  .controller('ContainersController', ['$q', '$scope', '$state', '$filter', '$transition$', 'ContainerService', 'SystemService', 'Notifications', 'ModalService', 'EndpointProvider', 'HttpRequestHelper',
-  function ($q, $scope, $state, $filter, $transition$, ContainerService, SystemService, Notifications, ModalService, EndpointProvider, HttpRequestHelper) {
+  .controller('ContainersController', ['$q', '$scope', '$state', '$transition$', 'ContainerService', 'SystemService', 'Notifications', 'ModalService', 'EndpointProvider', 'HttpRequestHelper',
+  function ($q, $scope, $state, $transition$, ContainerService, SystemService, Notifications, ModalService, EndpointProvider, HttpRequestHelper) {
   $scope.state = {
     publicURL: EndpointProvider.endpointPublicURL()
   };
@@ -110,8 +110,6 @@ angular.module('portainer.docker')
   function assignContainers(containers) {
     var previouslySelectedContainers = $transition$.params().selectedContainers || [];
     $scope.containers = containers.map(function (container) {
-      container.Status = $filter('containerstatus')(container.Status);
-
       var previousContainer = _.find(previouslySelectedContainers, function(item) {
         return item.Id === container.Id;
       });

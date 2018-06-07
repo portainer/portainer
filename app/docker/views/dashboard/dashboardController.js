@@ -75,6 +75,7 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
       Network.query({}).$promise,
       SystemService.info(),
       endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? ServiceService.services() : [],
+      // TODO: fix swarm count on standalone engine (reports swarm stacks as well, should use endpointID)
       endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? StackService.swarmStacks(true) : StackService.composeStacks(true)
     ]).then(function (d) {
       prepareContainerData(d[0]);
