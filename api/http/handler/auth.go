@@ -17,13 +17,15 @@ import (
 // AuthHandler represents an HTTP API handler for managing authentication.
 type AuthHandler struct {
 	*mux.Router
-	Logger          *log.Logger
-	authDisabled    bool
-	UserService     portainer.UserService
-	CryptoService   portainer.CryptoService
-	JWTService      portainer.JWTService
-	LDAPService     portainer.LDAPService
-	SettingsService portainer.SettingsService
+	Logger                *log.Logger
+	authDisabled          bool
+	UserService           portainer.UserService
+	CryptoService         portainer.CryptoService
+	JWTService            portainer.JWTService
+	LDAPService           portainer.LDAPService
+	SettingsService       portainer.SettingsService
+	TeamService           portainer.TeamService
+	TeamMembershipService portainer.TeamMembershipService
 }
 
 const (
@@ -78,49 +80,147 @@ func (handler *AuthHandler) handlePostAuth(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var username = req.Username
-	var password = req.Password
-
-	u, err := handler.UserService.UserByUsername(username)
-	if err == portainer.ErrUserNotFound {
-		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
-		return
-	} else if err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
-		return
-	}
-
 	settings, err := handler.SettingsService.Settings()
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
-	if settings.AuthenticationMethod == portainer.AuthenticationLDAP && u.ID != 1 {
-		err = handler.LDAPService.AuthenticateUser(username, password, &settings.LDAPSettings)
-		if err != nil {
+	u, err := handler.UserService.UserByUsername(req.Username)
+	if err != nil && err != portainer.ErrUserNotFound {
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
+	}
+
+	if (u != nil && u.ID == 1) || settings.AuthenticationMethod == portainer.AuthenticationInternal {
+		if !handler.authInternal(u, req.Password) {
+			httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
+			return
+		}
+	} else if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
+		u = handler.authLdap(u, req.Username, req.Password, &settings.LDAPSettings)
+		if u == nil {
 			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 			return
 		}
 	} else {
-		err = handler.CryptoService.CompareHashAndData(u.Password, password)
-		if err != nil {
-			httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusUnprocessableEntity, handler.Logger)
-			return
-		}
+		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
+		return
 	}
 
-	tokenData := &portainer.TokenData{
-		ID:       u.ID,
-		Username: u.Username,
-		Role:     u.Role,
+	if u == nil {
+		httperror.WriteErrorResponse(w, ErrInvalidCredentials, http.StatusBadRequest, handler.Logger)
+		return
 	}
 
-	token, err := handler.JWTService.GenerateToken(tokenData)
+	token, err := handler.generateToken(u)
 	if err != nil {
 		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, handler.Logger)
 		return
 	}
 
 	encodeJSON(w, &postAuthResponse{JWT: token}, handler.Logger)
+}
+
+func (handler *AuthHandler) generateToken(user *portainer.User) (string, error) {
+	tokenData := &portainer.TokenData{
+		ID:       user.ID,
+		Username: user.Username,
+		Role:     user.Role,
+	}
+
+	token, err := handler.JWTService.GenerateToken(tokenData)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func (handler *AuthHandler) authInternal(user *portainer.User, password string) bool {
+	if user == nil {
+		return false
+	}
+
+	err := handler.CryptoService.CompareHashAndData(user.Password, password)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (handler *AuthHandler) authLdap(user *portainer.User, username string, password string, settings *portainer.LDAPSettings) *portainer.User {
+	if err := handler.LDAPService.AuthenticateUser(username, password, settings); err != nil {
+		return nil
+	}
+
+	if user == nil {
+		user = &portainer.User{
+			Username: username,
+			Role:     portainer.StandardUserRole,
+		}
+		if err := handler.UserService.CreateUser(user); err != nil {
+			return nil
+		}
+	}
+
+	if err := handler.addLdapUserIntoTeams(user, settings); err != nil {
+		return nil
+	}
+
+	return user
+}
+
+func (handler *AuthHandler) addLdapUserIntoTeams(user *portainer.User, settings *portainer.LDAPSettings) error {
+	teams, err := handler.TeamService.Teams()
+	if err != nil {
+		return err
+	}
+
+	userLdapGroups, err := handler.LDAPService.GetUserGroups(user.Username, settings)
+	if err != nil {
+		return err
+	}
+
+	userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
+	if err != nil {
+		return err
+	}
+
+	for _, team := range teams {
+		if teamExists(team.Name, userLdapGroups) {
+			// Corrensponding team exists in boltDB
+
+			if teamMembershipExists(team.ID, userMemberships) {
+				// User is already in that team
+				continue
+			}
+
+			membership := &portainer.TeamMembership{
+				UserID: user.ID,
+				TeamID: team.ID,
+				Role:   portainer.TeamMember,
+			}
+
+			handler.TeamMembershipService.CreateTeamMembership(membership)
+		}
+	}
+	return nil
+}
+
+func teamExists(teamName string, ldapGroups []string) bool {
+	for _, group := range ldapGroups {
+		if group == teamName {
+			return true
+		}
+	}
+	return false
+}
+
+func teamMembershipExists(teamID portainer.TeamID, memberships []portainer.TeamMembership) bool {
+	for _, membership := range memberships {
+		if membership.TeamID == teamID {
+			return true
+		}
+	}
+	return false
 }
