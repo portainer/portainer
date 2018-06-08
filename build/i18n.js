@@ -1,7 +1,7 @@
 // WIP
 
 const {relative, resolve, join} = require('path');
-const {existsSync, readdirSync, readFileSync, writeFileSync, statSync} = require('fs');
+const {existsSync, readdirSync, readFileSync, writeFileSync, statSync, mkdirSync} = require('fs');
 
 const charset = 'utf-8';
 
@@ -10,11 +10,16 @@ const esprima = require('esprima');
 
 const rootDir = resolve(__dirname, '..');
 const appDir = join(rootDir, 'app');
+const translateDir = join(rootDir, 'i18n');
+
+let result = {};
 
 if (!existsSync(appDir)) {
   console.log('script path error.');
   process.exit(404);
 }
+
+if (!existsSync(translateDir)) mkdirSync(translateDir);
 
 /**
  * Scan file in dir, use ext to filter
@@ -52,9 +57,15 @@ function flatten(arr) {
  */
 
 const allTemplateFiles = flatten(scandir(appDir, '.html'));
+//.slice(0, 3);
 
 console.log(`find ${allTemplateFiles.length} HTML templates.`);
 
+/**
+ * filter the node with text content or attr
+ * @param nodeList
+ * @return {*}
+ */
 function getNodeWithText(nodeList) {
 
   function isTextNode(node) {
@@ -92,27 +103,50 @@ function getNodeWithText(nodeList) {
 allTemplateFiles.forEach(file => {
   const content = readFileSync(file, charset);
   const ast = HTML.parse(content);
+  const textNodes = getNodeWithText(ast);
+  const fileName = relative(appDir, file);
+  result[fileName] = result[fileName] || {};
 
-  // node tree with `text`
-  // console.log(
-  //     JSON.stringify(getNodeWithText(ast), null, 4),
-  // );
+  // todo recursive query html ast tree
+  textNodes.forEach((node) => {
+    if (node.type !== 'tag') {
+      console.error('template maybe has error anonymous text');
+      console.log(file, node);
+    }
+    node.children && node.children.forEach((child) => {
+      if (child.idx) {
+        // todo: just make a placeholder for cache key
+        result[fileName][child.idx] = {};
+      }
+    });
+  });
 });
 // restore via HTML.stringify(...), keep newline etc...
 
+console.log(result);
 
 // todo:: 1. save ast nodes which contains text someplace
 // todo:: 2. check is there any type node lost
 // todo:: 3. modify ng render func
 
-const allScriptFiles = flatten(scandir(appDir, '.js')).slice(0, 1);
+const allScriptFiles = flatten(scandir(appDir, '.js'));
+const esprimaTokenizeConfig = {loc: true, comment: false};
 
-allScriptFiles.forEach(file => {
-
+false && allScriptFiles.forEach(file => {
   const content = readFileSync(file, charset);
-  const ast = esprima.tokenize(content, {range: true}).filter(token => token.type === 'String');
-
-  // echo string write in js logic files.
-  console.log(ast);
+  const ast = esprima.tokenize(content, esprimaTokenizeConfig).filter(token => token.type === 'String');
+  const fileName = relative(appDir, file);
+  result[fileName] = result[fileName] || {};
+  ast.forEach((astItem) => {
+    const {start, end} = astItem.loc;
+    // trim single quote
+    if (astItem.value && astItem.value.length > 2) {
+      result[fileName][`${start.line}_${start.column}_${end.line}_${end.column}`] = astItem.value.slice(1, -1);
+    }
+  });
 });
+
+// keep string result
+writeFileSync(join(translateDir, 'en-US.json'), JSON.stringify(result, null, 2));
+
 // restore via esprima.parse(...)

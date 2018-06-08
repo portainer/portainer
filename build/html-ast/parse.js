@@ -60,6 +60,9 @@ module.exports = function parse(html, options) {
     }
 
     if (!isOpen || current.voidElement) {
+      // use id to define element
+      current.idx = index;
+
       level--;
       if (!inComponent && nextChar !== '<' && nextChar) {
         // trailing text node
