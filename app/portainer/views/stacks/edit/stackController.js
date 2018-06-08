@@ -194,7 +194,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     return $q.all({
       services: ServiceService.services(stackFilter),
       tasks: TaskService.tasks(stackFilter),
-      containers: agentProxy ? ContainerService.containers() : [],
+      containers: agentProxy ? ContainerService.containers(1) : [],
       nodes: NodeService.nodes()
     });
   }

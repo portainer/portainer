@@ -1460,6 +1460,14 @@ paths:
         description: "Stack identifier"
         required: true
         type: "string"
+      - name: "external"
+        in: "query"
+        description: "Set to true to delete an external stack"
+        type: "boolean"
+      - name: "endpointId"
+        in: "query"
+        description: "Endpoint identifier used to remove an external stack (required when external is set to true)"
+        type: "string"
       responses:
         204:
           description: "Success"

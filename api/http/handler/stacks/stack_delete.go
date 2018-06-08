@@ -11,8 +11,6 @@ import (
 	"github.com/portainer/portainer/http/security"
 )
 
-// TODO: update Swagger
-
 // DELETE request on /api/stacks/:id?external=<external>&endpointId=<endpointId>
 func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")

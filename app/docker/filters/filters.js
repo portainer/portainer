@@ -62,6 +62,16 @@ angular.module('portainer.docker')
     return labelStyle;
   };
 })
+.filter('taskhaslogs', function () {
+  'use strict';
+  return function (state) {
+    var validState = ['running', 'complete', 'failed', 'shutdown'];
+    if (validState.indexOf(state) > -1) {
+      return true;
+    }
+    return false;
+  };
+})
 .filter('containerstatusbadge', function () {
   'use strict';
   return function (text) {

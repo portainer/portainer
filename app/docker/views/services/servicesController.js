@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServicesController', ['$q', '$scope', '$state', 'ServiceService', 'ServiceHelper', 'Notifications', 'TaskService', 'TaskHelper', 'NodeService', 'ModalService', 'EndpointProvider',
-function ($q, $scope, $state, ServiceService, ServiceHelper, Notifications, TaskService, TaskHelper, NodeService, ModalService, EndpointProvider) {
+.controller('ServicesController', ['$q', '$scope', '$state', 'ServiceService', 'ServiceHelper', 'Notifications', 'TaskService', 'TaskHelper', 'NodeService', 'ModalService', 'EndpointProvider', 'ContainerService',
+function ($q, $scope, $state, ServiceService, ServiceHelper, Notifications, TaskService, TaskHelper, NodeService, ModalService, EndpointProvider, ContainerService) {
 
   $scope.state = {
     publicURL: EndpointProvider.endpointPublicURL()
@@ -91,7 +91,7 @@ function ($q, $scope, $state, ServiceService, ServiceHelper, Notifications, Task
     $q.all({
       services: ServiceService.services(),
       tasks: TaskService.tasks(),
-      containers: agentProxy ? ContainerService.containers() : [],
+      containers: agentProxy ? ContainerService.containers(1) : [],
       nodes: NodeService.nodes()
     })
     .then(function success(data) {

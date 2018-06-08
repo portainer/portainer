@@ -9,6 +9,7 @@ angular.module('portainer.docker').component('serviceTasksDatatable', {
     reverseOrder: '<',
     nodes: '<',
     agentProxy: '<',
-    textFilter: '='
+    textFilter: '=',
+    showTaskLogsButton: '<'
   }
 });

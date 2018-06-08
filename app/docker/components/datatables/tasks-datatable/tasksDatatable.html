@@ -68,12 +68,9 @@
               <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>
               <td>{{ item.Updated | getisodate }}</td>
               <td>
-                <a ui-sref="docker.tasks.task.logs({id: item.Id})" ng-if="$ctrl.showLogsButton" class="space-right">
-                  <i class="fa fa-file-alt" aria-hidden="true"></i> View logs
-                </a>
-                <a ui-sref="docker.containers.container.console({ id: item.Container.Id, nodeName: item.Container.NodeName })" ng-if="$ctrl.agentProxy">
-                  <i class="fa fa-terminal" aria-hidden="true"></i> Console
-                </a>
+                <a ui-sref="docker.tasks.task.logs({ id: item.Id })" ng-if="!$ctrl.agentProxy && $ctrl.showLogsButton && item.Status.State|taskhaslogs"><i class="fa fa-file-alt" aria-hidden="true"></i> View logs</a>
+                <a ui-sref="docker.containers.container.logs({ id: item.Container.Id, nodeName: item.Container.NodeName })" ng-if="$ctrl.agentProxy && item.Status.State === 'running'"><i class="fa fa-file-alt" aria-hidden="true"></i> View logs</a>
+                <a ui-sref="docker.containers.container.console({ id: item.Container.Id, nodeName: item.Container.NodeName })" title="Console" ng-if="$ctrl.agentProxy"><i class="fa fa-terminal" aria-hidden="true"></i> Console</a>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

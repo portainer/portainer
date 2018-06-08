@@ -2,9 +2,9 @@
   <table class="table table-condensed table-hover">
     <thead style="background-color: #e7f6ff">
       <tr>
-        <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" style="width: 30%;">
+        <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" style="width: 10%;">
           <a ng-click="$ctrl.changeOrderBy('Status.State')">
-            Task
+            Status
             <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status.State' && !$ctrl.state.reverseOrder"></i>
             <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status.State' && $ctrl.state.reverseOrder"></i>
           </a>
@@ -29,6 +29,7 @@
             </div>
           </div>
         </th>
+        <th style="width: 22%;">Task</th>
         <th>Actions</th>
         <th>
           <a ng-click="$ctrl.changeOrderBy('Slot')">
@@ -55,15 +56,18 @@
     </thead>
     <tbody style="background-color: #f1f9fd;">
       <tr ng-repeat="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter: $ctrl.applyFilters | filter:$ctrl.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder))">
-        <td>
+        <td class="text-center">
           <span class="label label-{{ item.Status.State | taskstatusbadge }} space-right">{{ item.Status.State }}</span>
-          <a ng-if="!$ctrl.agentProxy || !item.Container" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}</a>
-          <a ng-if="$ctrl.agentProxy && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.Id }}</a>
+        </td>
+        <td>
+          <a ng-if="!$ctrl.agentProxy || !item.Container" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}Roz</a>
+          <a ng-if="$ctrl.agentProxy && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.Id }}Doz</a>
         </td>
         <td>
           <div class="btn-group btn-group-xs" role="group" aria-label="..." >
-            <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({id: item.Id, nodeName: item.NodeName})" title="Logs"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
-            <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.console({id: item.Id, nodeName: item.NodeName})" title="Console"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
+            <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({ id: item.Container.Id, nodeName: item.Container.NodeName })" title="Logs" ng-if="$ctrl.agentProxy"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
+            <a style="margin: 0 2.5px;" ui-sref="docker.tasks.task.logs({ id: item.Id })" title="Logs" ng-if="!$ctrl.agentProxy && $ctrl.showTaskLogsButton && item.Status.State|taskhaslogs"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
+            <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.console({ id: item.Container.Id, nodeName: item.Container.NodeName })" title="Console" ng-if="$ctrl.agentProxy && item.Status.State === 'running'"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
           </div>
         </td>
         <td>{{ item.Slot ? item.Slot : '-' }}</td>

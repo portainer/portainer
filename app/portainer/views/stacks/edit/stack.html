@@ -61,11 +61,10 @@
 </div>
 
 <div class="row" ng-if="services">
-  <!-- TODO: change table-key -->
   <div class="col-sm-12">
-    <services-datatablee
+    <services-datatable
     title-text="Services" title-icon="fa-list-alt"
-    dataset="services" table-key="stack-servicess"
+    dataset="services" table-key="stack-services"
     order-by="Name" show-text-filter="true"
     show-ownership-column="false"
     remove-action="removeAction"
@@ -73,12 +72,12 @@
     force-update-action="forceUpdateAction"
     public-url="state.publicURL"
     show-force-update-button="applicationState.endpoint.apiVersion >= 1.25"
-    show-logs-button="applicationState.endpoint.apiVersion >= 1.30"
+    show-task-logs-button="applicationState.endpoint.apiVersion >= 1.30"
     show-add-action="false"
     show-stack-column="false"
     nodes="nodes"
     agent-proxy="applicationState.endpoint.mode.agentProxy"
-    ></services-datatablee>
+    ></services-datatable>
   </div>
 </div>
 
