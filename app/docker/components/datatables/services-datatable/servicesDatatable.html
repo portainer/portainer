@@ -11,21 +11,12 @@
           </span>
         </div>
       </div>
-      <div class="actionBar">
-        <div class="btn-group" role="group" aria-label="...">
-          <button ng-if="$ctrl.showForceUpdateButton" type="button" class="btn btn-sm btn-primary"
-            ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.forceUpdateAction($ctrl.state.selectedItems)">
-            <i class="fa fa-sync space-right" aria-hidden="true"></i>Update
-          </button>
-          <button type="button" class="btn btn-sm btn-danger"
-            ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-            <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-          </button>
-        </div>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.services.new" ng-if="$ctrl.showAddAction">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add service
-        </button>
-      </div>
+      <services-datatable-actions
+        selected-items="$ctrl.state.selectedItems"
+        selected-item-count="$ctrl.state.selectedItemCount"
+        show-add-action="$ctrl.showAddAction"
+        show-update-action="$ctrl.showUpdateAction"
+      ></services-datatable-actions>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
@@ -123,7 +114,7 @@
                 </span>
               </td>
               <td>
-                <a ng-if="item.Ports && item.Ports.length > 0 && p.PublishedPort" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.publicUrl }}:{{ p.PublishedPort }}" target="_blank" ng-click="$event.stopPropagation();">
+                <a ng-if="item.Ports && item.Ports.length > 0 && p.PublishedPort" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.state.publicUrl }}:{{ p.PublishedPort }}" target="_blank" ng-click="$event.stopPropagation();">
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
                 </a>
                 <span ng-if="!item.Ports || item.Ports.length === 0">-</span>

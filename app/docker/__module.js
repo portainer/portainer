@@ -49,9 +49,6 @@ angular.module('portainer.docker', ['portainer.app'])
         templateUrl: 'app/docker/views/containers/containers.html',
         controller: 'ContainersController'
       }
-    },
-    params: {
-      selectedContainers: []
     }
   };
 

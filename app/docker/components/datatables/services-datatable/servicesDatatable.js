@@ -8,17 +8,13 @@ angular.module('portainer.docker').component('servicesDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showTextFilter: '<',
-    showOwnershipColumn: '<',
-    removeAction: '<',
-    scaleAction: '<',
-    publicUrl: '<',
-    forceUpdateAction: '<',
-    showForceUpdateButton: '<',
-    showAddAction: '<',
-    showStackColumn: '<',
     nodes: '<',
     agentProxy: '<',
+    showTextFilter: '<',
+    showOwnershipColumn: '<',
+    showUpdateAction: '<',
+    showAddAction: '<',
+    showStackColumn: '<',
     showTaskLogsButton: '<'
   }
 });

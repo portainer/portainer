@@ -46,15 +46,6 @@
       order-by="Status" show-text-filter="true"
       show-ownership-column="applicationState.application.authentication"
       show-host-column="false"
-      public-url="state.publicURL"
-      container-name-truncate-size="truncate_size"
-      start-action="startAction"
-      stop-action="stopAction"
-      restart-action="restartAction"
-      kill-action="killAction"
-      pause-action="pauseAction"
-      resume-action="resumeAction"
-      remove-action="confirmRemoveAction"
       show-add-action="false"
     ></containers-datatable>
   </div>
@@ -66,17 +57,13 @@
     title-text="Services" title-icon="fa-list-alt"
     dataset="services" table-key="stack-services"
     order-by="Name" show-text-filter="true"
+    nodes="nodes"
+    agent-proxy="applicationState.endpoint.mode.agentProxy"
     show-ownership-column="false"
-    remove-action="removeAction"
-    scale-action="scaleAction"
-    force-update-action="forceUpdateAction"
-    public-url="state.publicURL"
-    show-force-update-button="applicationState.endpoint.apiVersion >= 1.25"
+    show-update-action="applicationState.endpoint.apiVersion >= 1.25"
     show-task-logs-button="applicationState.endpoint.apiVersion >= 1.30"
     show-add-action="false"
     show-stack-column="false"
-    nodes="nodes"
-    agent-proxy="applicationState.endpoint.mode.agentProxy"
     ></services-datatable>
   </div>
 </div>

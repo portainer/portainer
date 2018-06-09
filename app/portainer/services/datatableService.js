@@ -33,12 +33,20 @@ function DatatableServiceFactory(LocalStorage) {
     LocalStorage.storeDataTableOrder(key, filter);
   };
 
-  service.setDatatableExpandedItems = function(key, expandedItems) {
+  service.setDataTableExpandedItems = function(key, expandedItems) {
     LocalStorage.storeDataTableExpandedItems(key, expandedItems);
   };
 
-  service.getDatatableExpandedItems = function(key) {
-    return LocalStorage.getDatatableExpandedItems(key);
+  service.getDataTableExpandedItems = function(key) {
+    return LocalStorage.getDataTableExpandedItems(key);
+  };
+
+  service.setDataTableSelectedItems = function(key, selectedItems) {
+    LocalStorage.storeDataTableSelectedItems(key, selectedItems);
+  };
+
+  service.getDataTableSelectedItems = function(key) {
+    return LocalStorage.getDataTableSelectedItems(key);
   };
 
   return service;

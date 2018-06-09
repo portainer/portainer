@@ -1,6 +1,6 @@
-angular.module('portainer.app')
-.controller('ServicesDatatableController', ['PaginationService', 'DatatableService',
-function (PaginationService, DatatableService) {
+angular.module('portainer.docker')
+.controller('ServicesDatatableController', ['PaginationService', 'DatatableService', 'EndpointProvider',
+function (PaginationService, DatatableService, EndpointProvider) {
 
   var ctrl = this;
 
@@ -12,7 +12,8 @@ function (PaginationService, DatatableService) {
     displayTextFilter: false,
     selectedItemCount: 0,
     selectedItems: [],
-    expandedItems: []
+    expandedItems: [],
+    publicURL: EndpointProvider.endpointPublicURL()
   };
 
   this.changeOrderBy = function(orderField) {
@@ -72,7 +73,7 @@ function (PaginationService, DatatableService) {
         this.state.expandedItems.splice(index, 1);
       }
     }
-    DatatableService.setDatatableExpandedItems(this.tableKey, this.state.expandedItems);
+    DatatableService.setDataTableExpandedItems(this.tableKey, this.state.expandedItems);
   };
 
   function expandPreviouslyExpandedItem(item, storedExpandedItems) {
@@ -111,9 +112,9 @@ function (PaginationService, DatatableService) {
       this.state.orderBy = storedOrder.orderBy;
     }
 
-    var storedExpandedItems = DatatableService.getDatatableExpandedItems(this.tableKey);
+    var storedExpandedItems = DatatableService.getDataTableExpandedItems(this.tableKey);
     if (storedExpandedItems !== null) {
-      this.expandItems(storedExpandedItems, this.dataset);
+      this.expandItems(storedExpandedItems);
     }
   };
 

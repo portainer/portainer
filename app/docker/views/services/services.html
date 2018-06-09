@@ -13,17 +13,13 @@
     title-text="Services" title-icon="fa-list-alt"
     dataset="services" table-key="services"
     order-by="Name" show-text-filter="true"
+    nodes="nodes"
+    agent-proxy="applicationState.endpoint.mode.agentProxy"
     show-ownership-column="applicationState.application.authentication"
-    remove-action="removeAction"
-    scale-action="scaleAction"
-    force-update-action="forceUpdateAction"
-    public-url="state.publicURL"
-    show-force-update-button="applicationState.endpoint.apiVersion >= 1.25"
+    show-update-action="applicationState.endpoint.apiVersion >= 1.25"
     show-task-logs-button="applicationState.endpoint.apiVersion >= 1.30"
     show-add-action="true"
     show-stack-column="true"
-    nodes="nodes"
-    agent-proxy="applicationState.endpoint.mode.agentProxy"
     ></services-datatable>
   </div>
 </div>

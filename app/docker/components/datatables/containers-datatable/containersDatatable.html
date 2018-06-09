@@ -51,41 +51,14 @@
           </span>
         </div>
       </div>
-      <div class="actionBar">
-        <div class="btn-group" role="group" aria-label="...">
-          <button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.startAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noStoppedItemsSelected">
-            <i class="fa fa-play space-right" aria-hidden="true"></i>Start
-          </button>
-          <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.stopAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noRunningItemsSelected">
-            <i class="fa fa-stop space-right" aria-hidden="true"></i>Stop
-          </button>
-          <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.killAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0">
-            <i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill
-          </button>
-          <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.restartAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0">
-            <i class="fa fa-sync space-right" aria-hidden="true"></i>Restart
-          </button>
-          <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.pauseAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noRunningItemsSelected">
-            <i class="fa fa-pause space-right" aria-hidden="true"></i>Pause
-          </button>
-          <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.resumeAction($ctrl.state.selectedItems)"
-            ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.state.noPausedItemsSelected">
-            <i class="fa fa-play space-right" aria-hidden="true"></i>Resume
-          </button>
-          <button type="button" class="btn btn-sm btn-danger"
-            ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-            <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-          </button>
-        </div>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.containers.new" ng-if="$ctrl.showAddAction">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add container
-        </button>
-      </div>
+      <containers-datatable-actions
+        selected-items="$ctrl.state.selectedItems"
+        selected-item-count="$ctrl.state.selectedItemCount"
+        no-stopped-items-selected="$ctrl.state.noStoppedItemsSelected"
+        no-running-items-selected="$ctrl.state.noRunningItemsSelected"
+        no-paused-items-selected="$ctrl.state.noPausedItemsSelected"
+        show-add-action="$ctrl.showAddAction"
+      ></containers-datatable-actions>
       <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
@@ -205,7 +178,7 @@
               <td>{{ item.IP ? item.IP : '-' }}</td>
               <td ng-if="$ctrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
               <td>
-                <a ng-if="item.Ports.length > 0" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.publicUrl || p.host }}:{{p.public}}" target="_blank">
+                <a ng-if="item.Ports.length > 0" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.state.publicUrl || p.host }}:{{p.public}}" target="_blank">
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ p.public }}:{{ p.private }}
                 </a>
                 <span ng-if="item.Ports.length == 0" >-</span>
