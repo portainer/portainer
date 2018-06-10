@@ -1,4 +1,4 @@
-angular.module('portainer.app')
+angular.module('portainer.docker')
 .controller('ServiceTasksDatatableController', ['DatatableService',
 function (DatatableService) {
   var ctrl = this;
