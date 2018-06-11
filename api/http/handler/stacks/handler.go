@@ -19,6 +19,8 @@ type Handler struct {
 	GitService             portainer.GitService
 	StackService           portainer.StackService
 	EndpointService        portainer.EndpointService
+	EndpointGroupService   portainer.EndpointGroupService
+	TeamMembershipService  portainer.TeamMembershipService
 	ResourceControlService portainer.ResourceControlService
 	RegistryService        portainer.RegistryService
 	DockerHubService       portainer.DockerHubService
@@ -46,4 +48,22 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/stacks/{id}/file",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.stackFile))).Methods(http.MethodGet)
 	return h
+}
+
+func (handler *Handler) checkEndpointAccess(endpoint *portainer.Endpoint, userID portainer.UserID) error {
+	memberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(userID)
+	if err != nil {
+		return err
+	}
+
+	group, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return err
+	}
+
+	if !security.AuthorizedEndpointAccess(endpoint, group, userID, memberships) {
+		return portainer.ErrEndpointAccessDenied
+	}
+
+	return nil
 }

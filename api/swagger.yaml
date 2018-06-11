@@ -1268,15 +1268,19 @@ paths:
       operationId: "StackList"
       produces:
       - "application/json"
+      parameters:
+      - name: "filters"
+        in: "query"
+        description: |
+          Filters to process on the stack list. Encoded as JSON (a map[string]string).
+          For example, {"SwarmID": "jpofkc0i9uo9wtx1zesuk649w"} will only return stacks that are part
+          of the specified Swarm cluster. Available filters: EndpointID, SwarmID.
+        type: "string"
       responses:
         200:
           description: "Success"
           schema:
             $ref: "#/definitions/StackListResponse"
-        403:
-          description: "Unauthorized"
-          schema:
-            $ref: "#/definitions/GenericError"
           examples:
             application/json:
               err: "Access denied to resource"
@@ -1307,6 +1311,11 @@ paths:
         description: "Stack deployment method. Possible values: file, string or repository."
         required: true
         type: "string"
+      - name: "endpointId"
+        in: "query"
+        description: "Identifier of the endpoint that will be used to deploy the stack."
+        required: true
+        type: "integer"
       - in: "body"
         name: "body"
         description: "Stack details. Required when method equals string or repository."
@@ -1344,6 +1353,10 @@ paths:
           examples:
             application/json:
               err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
         404:
           description: "Endpoint not found"
           schema:
@@ -1435,6 +1448,10 @@ paths:
           examples:
             application/json:
               err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
         404:
           description: "Stack not found"
           schema:
@@ -3429,16 +3446,11 @@ definitions:
     type: "object"
     required:
     - "Name"
-    - "EndpointID"
     properties:
       Name:
         type: "string"
         example: "myStack"
         description: "Name of the stack"
-      EndpointID:
-        type: "integer"
-        example: "1"
-        description: "Endpoint identifier used to deploy the stack."
       SwarmID:
         type: "string"
         example: "jpofkc0i9uo9wtx1zesuk649w"

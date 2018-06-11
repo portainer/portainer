@@ -15,7 +15,6 @@ import (
 
 type composeStackFromFileContentPayload struct {
 	Name             string
-	EndpointID       int
 	StackFileContent string
 }
 
@@ -23,16 +22,13 @@ func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) err
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid stack name")
 	}
-	if payload.EndpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
-	}
 	if govalidator.IsNull(payload.StackFileContent) {
 		return portainer.Error("Invalid stack file content")
 	}
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	var payload composeStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -50,19 +46,12 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
-	if err == portainer.ErrEndpointNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
-	}
-
-	stackIdentifier := buildStackIdentifier(payload.Name, payload.EndpointID)
+	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackIdentifier),
 		Name:       payload.Name,
 		Type:       portainer.DockerComposeStack,
-		EndpointID: portainer.EndpointID(payload.EndpointID),
+		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 	}
 
@@ -96,7 +85,6 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 
 type composeStackFromGitRepositoryPayload struct {
 	Name                        string
-	EndpointID                  int
 	RepositoryURL               string
 	RepositoryAuthentication    bool
 	RepositoryUsername          string
@@ -107,9 +95,6 @@ type composeStackFromGitRepositoryPayload struct {
 func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid stack name")
-	}
-	if payload.EndpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
 	}
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
@@ -123,7 +108,7 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	var payload composeStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -141,19 +126,12 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
-	if err == portainer.ErrEndpointNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
-	}
-
-	stackIdentifier := buildStackIdentifier(payload.Name, payload.EndpointID)
+	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackIdentifier),
 		Name:       payload.Name,
 		Type:       portainer.DockerComposeStack,
-		EndpointID: portainer.EndpointID(payload.EndpointID),
+		EndpointID: endpoint.ID,
 		EntryPoint: payload.ComposeFilePathInRepository,
 	}
 
@@ -196,7 +174,6 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 type composeStackFromFileUploadPayload struct {
 	Name             string
-	EndpointID       int
 	StackFileContent []byte
 }
 
@@ -207,12 +184,6 @@ func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) erro
 	}
 	payload.Name = name
 
-	endpointID, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointID", false)
-	if err != nil || endpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
-	}
-	payload.EndpointID = endpointID
-
 	composeFileContent, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
 		return portainer.Error("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
@@ -222,7 +193,7 @@ func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) erro
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	payload := &composeStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
@@ -240,19 +211,12 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
-	if err == portainer.ErrEndpointNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
-	}
-
-	stackIdentifier := buildStackIdentifier(payload.Name, payload.EndpointID)
+	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackIdentifier),
 		Name:       payload.Name,
 		Type:       portainer.DockerComposeStack,
-		EndpointID: portainer.EndpointID(payload.EndpointID),
+		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 	}
 

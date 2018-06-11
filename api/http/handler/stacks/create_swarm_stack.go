@@ -15,7 +15,6 @@ import (
 
 type swarmStackFromFileContentPayload struct {
 	Name             string
-	EndpointID       int
 	SwarmID          string
 	StackFileContent string
 	Env              []portainer.Pair
@@ -24,9 +23,6 @@ type swarmStackFromFileContentPayload struct {
 func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid stack name")
-	}
-	if payload.EndpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
 	}
 	if govalidator.IsNull(payload.SwarmID) {
 		return portainer.Error("Invalid Swarm ID")
@@ -37,7 +33,7 @@ func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error
 	return nil
 }
 
-func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	var payload swarmStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -55,20 +51,13 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
-	if err == portainer.ErrEndpointNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
-	}
-
-	stackIdentifier := buildStackIdentifier(payload.Name, payload.EndpointID)
+	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackIdentifier),
 		Name:       payload.Name,
 		Type:       portainer.DockerSwarmStack,
 		SwarmID:    payload.SwarmID,
-		EndpointID: portainer.EndpointID(payload.EndpointID),
+		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        payload.Env,
 	}
@@ -103,7 +92,6 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 
 type swarmStackFromGitRepositoryPayload struct {
 	Name                        string
-	EndpointID                  int
 	SwarmID                     string
 	Env                         []portainer.Pair
 	RepositoryURL               string
@@ -116,9 +104,6 @@ type swarmStackFromGitRepositoryPayload struct {
 func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid stack name")
-	}
-	if payload.EndpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
 	}
 	if govalidator.IsNull(payload.SwarmID) {
 		return portainer.Error("Invalid Swarm ID")
@@ -135,7 +120,7 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 	return nil
 }
 
-func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	var payload swarmStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -153,20 +138,13 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
-	if err == portainer.ErrEndpointNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
-	}
-
-	stackIdentifier := buildStackIdentifier(payload.Name, payload.EndpointID)
+	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackIdentifier),
 		Name:       payload.Name,
 		Type:       portainer.DockerSwarmStack,
 		SwarmID:    payload.SwarmID,
-		EndpointID: portainer.EndpointID(payload.EndpointID),
+		EndpointID: endpoint.ID,
 		EntryPoint: payload.ComposeFilePathInRepository,
 		Env:        payload.Env,
 	}
@@ -210,7 +188,6 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 
 type swarmStackFromFileUploadPayload struct {
 	Name             string
-	EndpointID       int
 	SwarmID          string
 	StackFileContent []byte
 	Env              []portainer.Pair
@@ -222,12 +199,6 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 		return portainer.Error("Invalid stack name")
 	}
 	payload.Name = name
-
-	endpointID, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointID", false)
-	if err != nil || endpointID == 0 {
-		return portainer.Error("Invalid endpoint identifier. Must be a positive number")
-	}
-	payload.EndpointID = endpointID
 
 	swarmID, err := request.RetrieveMultiPartFormValue(r, "SwarmID", false)
 	if err != nil {
@@ -250,7 +221,7 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 	return nil
 }
 
-func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
 	payload := &swarmStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
@@ -268,20 +239,13 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
-	if err == portainer.ErrEndpointNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
-	}
-
-	stackIdentifier := buildStackIdentifier(payload.Name, payload.EndpointID)
+	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackIdentifier),
 		Name:       payload.Name,
 		Type:       portainer.DockerSwarmStack,
 		SwarmID:    payload.SwarmID,
-		EndpointID: portainer.EndpointID(payload.EndpointID),
+		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 		Env:        payload.Env,
 	}

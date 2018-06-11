@@ -38,6 +38,35 @@ func (service *StackService) Stack(ID portainer.StackID) (*portainer.Stack, erro
 	return &stack, nil
 }
 
+// StackByName returns a stack object by name.
+func (service *StackService) StackByName(name string) (*portainer.Stack, error) {
+	var stack *portainer.Stack
+
+	err := service.store.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(stackBucketName))
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var t portainer.Stack
+			err := internal.UnmarshalStack(v, &t)
+			if err != nil {
+				return err
+			}
+			if t.Name == name {
+				stack = &t
+			}
+		}
+
+		if stack == nil {
+			return portainer.ErrStackNotFound
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return stack, nil
+}
+
 // Stacks returns an array containing all the stacks.
 func (service *StackService) Stacks() ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)

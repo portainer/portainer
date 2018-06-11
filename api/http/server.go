@@ -117,6 +117,8 @@ func (server *Server) Start() error {
 	stackHandler.FileService = server.FileService
 	stackHandler.StackService = server.StackService
 	stackHandler.EndpointService = server.EndpointService
+	stackHandler.EndpointGroupService = server.EndpointGroupService
+	stackHandler.TeamMembershipService = server.TeamMembershipService
 	stackHandler.ResourceControlService = server.ResourceControlService
 	stackHandler.SwarmStackManager = server.SwarmStackManager
 	stackHandler.ComposeStackManager = server.ComposeStackManager

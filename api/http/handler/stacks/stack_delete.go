@@ -72,6 +72,14 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 }
 
 func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWriter, stackName string) *httperror.HandlerError {
+	stack, err := handler.StackService.StackByName(stackName)
+	if err != nil && err != portainer.ErrStackNotFound {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for stack existence inside the database", err}
+	}
+	if stack != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "A stack with this name exists inside the database. Cannot use external delete method", portainer.ErrStackNotExternal}
+	}
+
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
@@ -84,7 +92,21 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
 	}
 
-	stack := &portainer.Stack{
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
+	}
+
+	if tokenData.Role != portainer.AdministratorRole {
+		err = handler.checkEndpointAccess(endpoint, tokenData.ID)
+		if err != nil && err == portainer.ErrEndpointAccessDenied {
+			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
+		} else if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify permission to access endpoint", err}
+		}
+	}
+
+	stack = &portainer.Stack{
 		Name: stackName,
 		Type: portainer.DockerSwarmStack,
 	}
