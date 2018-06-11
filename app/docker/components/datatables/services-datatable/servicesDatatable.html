@@ -99,7 +99,7 @@
               </td>
               <td ng-if="$ctrl.showStackColumn">{{ item.StackName ? item.StackName : '-' }}</td>
               <td>{{ item.Image | hideshasum }}</td>
-              <td>
+              <td ng-controller="ServicesDatatableActionsController as actionCtrl">
                 {{ item.Mode }}
                 <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount) }}</code>
                 <span ng-if="item.Mode === 'replicated' && !item.Scale">
@@ -108,9 +108,9 @@
                   </a>
                 </span>
                 <span ng-if="item.Mode === 'replicated' && item.Scale">
-                  <input class="input-sm" type="number" ng-model="item.Replicas" on-enter-key="$ctrl.scaleAction(item)" auto-focus/>
+                  <input class="input-sm" type="number" ng-model="item.Replicas" on-enter-key="actionCtrl.scaleAction(item)" auto-focus ng-click="$event.stopPropagation();"/>
                   <a class="interactive" ng-click="item.Scale = false; $event.stopPropagation();"><i class="fa fa-times"></i></a>
-                  <a class="interactive" ng-click="$ctrl.scaleAction(item); $event.stopPropagation();"><i class="fa fa-check-square"></i></a>
+                  <a class="interactive" ng-click="actionCtrl.scaleAction(item); $event.stopPropagation();"><i class="fa fa-check-square"></i></a>
                 </span>
               </td>
               <td>
