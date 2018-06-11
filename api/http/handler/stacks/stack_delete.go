@@ -55,7 +55,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 
 	err = handler.deleteStack(stack, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
 	err = handler.StackService.DeleteStack(portainer.StackID(stackID))

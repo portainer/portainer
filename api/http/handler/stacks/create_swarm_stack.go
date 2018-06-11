@@ -78,7 +78,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
 	err = handler.StackService.CreateStack(stack)
@@ -174,7 +174,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
 	err = handler.StackService.CreateStack(stack)
@@ -266,7 +266,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
 	err = handler.StackService.CreateStack(stack)

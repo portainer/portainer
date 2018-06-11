@@ -112,7 +112,7 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 
 	err = handler.deployComposeStack(config)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy updated stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
 	return nil
@@ -139,7 +139,7 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 
 	err = handler.deploySwarmStack(config)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy updated stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
 	return nil

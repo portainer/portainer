@@ -71,7 +71,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 
 	err = handler.deployComposeStack(config)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
 	err = handler.StackService.CreateStack(stack)
@@ -160,7 +160,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	err = handler.deployComposeStack(config)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
 	err = handler.StackService.CreateStack(stack)
@@ -236,7 +236,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 
 	err = handler.deployComposeStack(config)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy stack", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
 	err = handler.StackService.CreateStack(stack)
