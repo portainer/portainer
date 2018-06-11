@@ -43,6 +43,15 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a resource control with with the specified identifier inside the database", err}
 	}
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+
+	if !security.AuthorizedResourceControlAccess(resourceControl, securityContext) {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", portainer.ErrResourceAccessDenied}
+	}
+
 	resourceControl.AdministratorsOnly = payload.AdministratorsOnly
 
 	var userAccesses = make([]portainer.UserResourceAccess, 0)
@@ -64,11 +73,6 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 		teamAccesses = append(teamAccesses, teamAccess)
 	}
 	resourceControl.TeamAccesses = teamAccesses
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
 
 	if !security.AuthorizedResourceControlUpdate(resourceControl, securityContext) {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", portainer.ErrResourceAccessDenied}
