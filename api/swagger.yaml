@@ -1479,7 +1479,7 @@ paths:
         type: "string"
       - name: "external"
         in: "query"
-        description: "Set to true to delete an external stack"
+        description: "Set to true to delete an external stack. Only external Swarm stacks are supported."
         type: "boolean"
       - name: "endpointId"
         in: "query"
