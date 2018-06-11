@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('DashboardController', ['$scope', '$q', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'ServiceService', 'StackService', 'Notifications',
-function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications) {
+.controller('DashboardController', ['$scope', '$q', 'Container', 'ContainerHelper', 'Image', 'Network', 'Volume', 'SystemService', 'ServiceService', 'StackService', 'Notifications', 'EndpointProvider',
+function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, SystemService, ServiceService, StackService, Notifications, EndpointProvider) {
 
   $scope.containerData = {
     total: 0
@@ -65,8 +65,8 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
   }
 
   function initView() {
-    var endpointProvider = $scope.applicationState.endpoint.mode.provider;
-    var endpointRole = $scope.applicationState.endpoint.mode.role;
+    var endpointMode = $scope.applicationState.endpoint.mode;
+    var endpointId = EndpointProvider.endpointID();
 
     $q.all([
       Container.query({all: 1}).$promise,
@@ -74,8 +74,12 @@ function ($scope, $q, Container, ContainerHelper, Image, Network, Volume, System
       Volume.query({}).$promise,
       Network.query({}).$promise,
       SystemService.info(),
-      endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? ServiceService.services() : [],
-      endpointProvider === 'DOCKER_SWARM_MODE' &&  endpointRole === 'MANAGER' ? StackService.stacks(true) : []
+      endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' ? ServiceService.services() : [],
+      StackService.stacks(
+        true,
+        endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER',
+        endpointId
+      )
     ]).then(function (d) {
       prepareContainerData(d[0]);
       prepareImageData(d[1]);

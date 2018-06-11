@@ -50,9 +50,7 @@ info:
 
     Instead, it acts as a reverse-proxy to the Docker HTTP API. This means that you can execute Docker requests **via** the Portainer HTTP API.
 
-    To do so, you can use the `/endpoints/{id}/docker` Portainer API endpoint (which is not documented below due to Swagger limitations). This
-    endpoint has a restricted access policy so you still need to be authenticated to be able to query this endpoint. Any query on this endpoint will be proxied to the
-    Docker API of the associated endpoint (requests and responses objects are the same as documented in the Docker API).
+    To do so, you can use the `/endpoints/{id}/docker` Portainer API endpoint (which is not documented below due to Swagger limitations). This endpoint has a restricted access policy so you still need to be authenticated to be able to query this endpoint. Any query on this endpoint will be proxied to the Docker API of the associated endpoint (requests and responses objects are the same as documented in the Docker API).
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
@@ -69,6 +67,8 @@ tags:
   description: "Manage how Portainer connects to the DockerHub"
 - name: "endpoints"
   description: "Manage Docker environments"
+- name: "endpoint_groups"
+  description: "Manage endpoint groups"
 - name: "registries"
   description: "Manage Docker registries"
 - name: "resource_controls"
@@ -87,6 +87,8 @@ tags:
   description: "Manage team memberships"
 - name: "templates"
   description: "Manage App Templates"
+- name: "stacks"
+  description: "Manage stacks"
 - name: "upload"
   description: "Upload files"
 - name: "websocket"
@@ -154,7 +156,7 @@ paths:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/DockerHubInspectResponse"
+            $ref: "#/definitions/DockerHubSubset"
         500:
           description: "Server error"
           schema:
@@ -181,6 +183,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/DockerHub"
         400:
           description: "Invalid request"
           schema:
@@ -233,11 +237,15 @@ paths:
         type: "string"
         description: "Name that will be used to identify this endpoint (example: my-endpoint)"
         required: true
+      - name: "EndpointType"
+        in: "formData"
+        type: "integer"
+        description: "Environment type. Value must be one of: 1 (Docker environment), 2 (Agent environment) or 3 (Azure environment)"
+        required: true
       - name: "URL"
         in: "formData"
         type: "string"
-        description: "URL or IP address of a Docker host (example: docker.mydomain.tld:2375)"
-        required: true
+        description: "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Required if endpoint type is set to 1 or 2."
       - name: "PublicURL"
         in: "formData"
         type: "string"
@@ -267,6 +275,18 @@ paths:
         in: "formData"
         type: "file"
         description: "TLS client key file"
+      - name: "AzureApplicationID"
+        in: "formData"
+        type: "string"
+        description: "Azure application ID. Required if endpoint type is set to 3"
+      - name: "AzureTenantID"
+        in: "formData"
+        type: "string"
+        description: "Azure tenant ID. Required if endpoint type is set to 3"
+      - name: "AzureAuthenticationKey"
+        in: "formData"
+        type: "string"
+        description: "Azure authentication key. Required if endpoint type is set to 3"
       responses:
         200:
           description: "Success"
@@ -397,7 +417,7 @@ paths:
         required: true
         type: "integer"
       responses:
-        200:
+        204:
           description: "Success"
         400:
           description: "Invalid request"
@@ -452,6 +472,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/Endpoint"
         400:
           description: "Invalid request"
           schema:
@@ -470,76 +492,53 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
-
-  /endpoints/{endpointId}/stacks:
+  /endpoint_groups:
     get:
       tags:
-      - "stacks"
-      summary: "List stacks"
+      - "endpoint_groups"
+      summary: "List endpoint groups"
       description: |
-        List all stacks based on the current user authorizations.
-        Will return all stacks if using an administrator account otherwise it
-        will only return the list of stacks the user have access to.
+        List all endpoint groups based on the current user authorizations. Will
+        return all endpoint groups if using an administrator account otherwise it will
+        only return authorized endpoint groups.
         **Access policy**: restricted
-      operationId: "StackList"
+      operationId: "EndpointGroupList"
       produces:
       - "application/json"
-      parameters:
-      - name: "endpointId"
-        in: "path"
-        description: "Endpoint identifier"
-        required: true
-        type: "integer"
+      parameters: []
       responses:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/StackListResponse"
-        403:
-          description: "Unauthorized"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Access denied to resource"
+            $ref: "#/definitions/EndpointGroupListResponse"
         500:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
     post:
       tags:
-      - "stacks"
-      summary: "Deploy a new stack"
+      - "endpoint_groups"
+      summary: "Create a new endpoint"
       description: |
-        Deploy a new stack into a Docker environment specified via the endpoint identifier.
-        **Access policy**: restricted
-      operationId: "StackCreate"
+        Create a new endpoint group.
+        **Access policy**: administrator
+      operationId: "EndpointGroupCreate"
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
-      - name: "endpointId"
-        in: "path"
-        description: "Endpoint identifier"
-        required: true
-        type: "integer"
-      - name: "method"
-        in: "query"
-        description: "Stack deployment method. Possible values: string or repository."
-        required: true
-        type: "string"
       - in: "body"
         name: "body"
-        description: "Stack details. Used when"
+        description: "Registry details"
         required: true
         schema:
-          $ref: "#/definitions/StackCreateRequest"
+          $ref: "#/definitions/EndpointGroupCreateRequest"
       responses:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/StackCreateResponse"
+            $ref: "#/definitions/EndpointGroup"
         400:
           description: "Invalid request"
           schema:
@@ -547,44 +546,32 @@ paths:
           examples:
             application/json:
               err: "Invalid request data format"
-        404:
-          description: "Endpoint not found"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Endpoint not found"
         500:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
-  /endpoints/{endpointId}/stacks/{id}:
+  /endpoint_groups/{id}:
     get:
       tags:
-      - "stacks"
-      summary: "Inspect a stack"
+      - "endpoint_groups"
+      summary: "Inspect an endpoint group"
       description: |
-        Retrieve details about a stack.
-        **Access policy**: restricted
-      operationId: "StackInspect"
+        Retrieve details abount an endpoint group.
+        **Access policy**: administrator
+      operationId: "EndpointGroupInspect"
       produces:
       - "application/json"
       parameters:
-      - name: "endpointId"
-        in: "path"
-        description: "Endpoint identifier"
-        required: true
-        type: "integer"
       - name: "id"
         in: "path"
-        description: "Stack identifier"
+        description: "Endpoint group identifier"
         required: true
-        type: "string"
+        type: "integer"
       responses:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/Stack"
+            $ref: "#/definitions/EndpointGroup"
         400:
           description: "Invalid request"
           schema:
@@ -592,53 +579,46 @@ paths:
           examples:
             application/json:
               err: "Invalid request"
-        403:
-          description: "Unauthorized"
-          schema:
-            $ref: "#/definitions/GenericError"
         404:
-          description: "Stack not found"
+          description: "EndpointGroup not found"
           schema:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "Stack not found"
+              err: "EndpointGroup not found"
         500:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
     put:
       tags:
-      - "stacks"
-      summary: "Update a stack"
+      - "endpoint_groups"
+      summary: "Update an endpoint group"
       description: |
-        Update a stack.
-        **Access policy**: restricted
-      operationId: "StackUpdate"
+        Update an endpoint group.
+        **Access policy**: administrator
+      operationId: "EndpointGroupUpdate"
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
-      - name: "endpointId"
-        in: "path"
-        description: "Endpoint identifier"
-        required: true
-        type: "integer"
       - name: "id"
         in: "path"
-        description: "Stack identifier"
+        description: "EndpointGroup identifier"
         required: true
-        type: "string"
+        type: "integer"
       - in: "body"
         name: "body"
-        description: "Stack details"
+        description: "EndpointGroup details"
         required: true
         schema:
-          $ref: "#/definitions/StackUpdateRequest"
+          $ref: "#/definitions/EndpointGroupUpdateRequest"
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/EndpointGroup"
         400:
           description: "Invalid request"
           schema:
@@ -647,37 +627,39 @@ paths:
             application/json:
               err: "Invalid request data format"
         404:
-          description: "Stack not found"
+          description: "EndpointGroup not found"
           schema:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "Stack not found"
+              err: "EndpointGroup not found"
         500:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+        503:
+          description: "EndpointGroup management disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "EndpointGroup management is disabled"
     delete:
       tags:
-      - "stacks"
-      summary: "Remove a stack"
+      - "endpoint_groups"
+      summary: "Remove an endpoint group"
       description: |
-        Remove a stack.
-        **Access policy**: restricted
-      operationId: "StackDelete"
+        Remove an endpoint group.
+        **Access policy**: administrator
+      operationId: "EndpointGroupDelete"
       parameters:
-      - name: "endpointId"
-        in: "path"
-        description: "Endpoint identifier"
-        required: true
-        type: "integer"
       - name: "id"
         in: "path"
-        description: "Stack identifier"
+        description: "EndpointGroup identifier"
         required: true
-        type: "string"
+        type: "integer"
       responses:
-        200:
+        204:
           description: "Success"
         400:
           description: "Invalid request"
@@ -686,66 +668,68 @@ paths:
           examples:
             application/json:
               err: "Invalid request"
-        403:
-          description: "Unauthorized"
-          schema:
-            $ref: "#/definitions/GenericError"
         404:
-          description: "Stack not found"
+          description: "EndpointGroup not found"
           schema:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "Stack not found"
+              err: "EndpointGroup not found"
         500:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
-  /endpoints/{endpointId}/stacks/{id}/stackfile:
-    get:
+        503:
+          description: "EndpointGroup management disabled"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "EndpointGroup management is disabled"
+  /endpoint_groups/{id}/access:
+    put:
       tags:
-      - "stacks"
-      summary: "Retrieve the content of the Stack file for the specified stack"
+      - "endpoint_groups"
+      summary: "Manage accesses to an endpoint group"
       description: |
-        Get Stack file content.
-        **Access policy**: restricted
-      operationId: "StackFileInspect"
+        Manage user and team accesses to an endpoint group.
+        **Access policy**: administrator
+      operationId: "EndpointGroupAccessUpdate"
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       parameters:
-      - name: "endpointId"
-        in: "path"
-        description: "Endpoint identifier"
-        required: true
-        type: "integer"
       - name: "id"
         in: "path"
-        description: "Stack identifier"
+        description: "EndpointGroup identifier"
         required: true
-        type: "string"
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Authorizations details"
+        required: true
+        schema:
+          $ref: "#/definitions/EndpointGroupAccessUpdateRequest"
       responses:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/StackFileInspectResponse"
+            $ref: "#/definitions/EndpointGroup"
         400:
           description: "Invalid request"
           schema:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "Invalid request"
-        403:
-          description: "Unauthorized"
-          schema:
-            $ref: "#/definitions/GenericError"
+              err: "Invalid request data format"
         404:
-          description: "Stack not found"
+          description: "EndpointGroup not found"
           schema:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "Stack not found"
+              err: "EndpointGroup not found"
         500:
           description: "Server error"
           schema:
@@ -796,7 +780,7 @@ paths:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/RegistryCreateResponse"
+            $ref: "#/definitions/Registry"
         400:
           description: "Invalid request"
           schema:
@@ -882,6 +866,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/Registry"
         400:
           description: "Invalid request"
           schema:
@@ -922,7 +908,7 @@ paths:
         required: true
         type: "integer"
       responses:
-        200:
+        204:
           description: "Success"
         400:
           description: "Invalid request"
@@ -970,6 +956,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/Registry"
         400:
           description: "Invalid request"
           schema:
@@ -1011,6 +999,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/ResourceControl"
         400:
           description: "Invalid request"
           schema:
@@ -1064,6 +1054,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/ResourceControl"
         400:
           description: "Invalid request"
           schema:
@@ -1104,7 +1096,7 @@ paths:
         required: true
         type: "integer"
       responses:
-        200:
+        204:
           description: "Success"
         400:
           description: "Invalid request"
@@ -1174,6 +1166,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/Settings"
         400:
           description: "Invalid request"
           schema:
@@ -1227,7 +1221,7 @@ paths:
         schema:
           $ref: "#/definitions/SettingsLDAPCheckRequest"
       responses:
-        200:
+        204:
           description: "Success"
         400:
           description: "Invalid request"
@@ -1257,6 +1251,305 @@ paths:
           description: "Success"
           schema:
             $ref: "#/definitions/Status"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /stacks:
+    get:
+      tags:
+      - "stacks"
+      summary: "List stacks"
+      description: |
+        List all stacks based on the current user authorizations.
+        Will return all stacks if using an administrator account otherwise it
+        will only return the list of stacks the user have access to.
+        **Access policy**: restricted
+      operationId: "StackList"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "filters"
+        in: "query"
+        description: |
+          Filters to process on the stack list. Encoded as JSON (a map[string]string).
+          For example, {"SwarmID": "jpofkc0i9uo9wtx1zesuk649w"} will only return stacks that are part
+          of the specified Swarm cluster. Available filters: EndpointID, SwarmID.
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/StackListResponse"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "stacks"
+      summary: "Deploy a new stack"
+      description: |
+        Deploy a new stack into a Docker environment specified via the endpoint identifier.
+        **Access policy**: restricted
+      operationId: "StackCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type"
+        in: "query"
+        description: "Stack deployment type. Possible values: 1 (Swarm stack) or 2 (Compose stack)."
+        required: true
+        type: "integer"
+      - name: "method"
+        in: "query"
+        description: "Stack deployment method. Possible values: file, string or repository."
+        required: true
+        type: "string"
+      - name: "endpointId"
+        in: "query"
+        description: "Identifier of the endpoint that will be used to deploy the stack."
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Stack details. Required when method equals string or repository."
+        schema:
+          $ref: "#/definitions/StackCreateRequest"
+      - name: "Name"
+        in: "formData"
+        type: "string"
+        description: "Name of the stack. Required when method equals file."
+      - name: "EndpointID"
+        in: "formData"
+        type: "string"
+        description: "Endpoint identifier used to deploy the stack. Required when method equals file."
+      - name: "SwarmID"
+        in: "formData"
+        type: "string"
+        description: "Swarm cluster identifier. Required when method equals file and type equals 1."
+      - name: "StackFileContent"
+        in: "formData"
+        type: "file"
+        description: "Stack file. Required when method equals file."
+      - name: "Env"
+        in: "formData"
+        type: "string"
+        description: "Environment variables passed during deployment, represented as a JSON array [{'name': 'name', 'value': 'value'}]. Optional, used when method equals file and type equals 1."
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Stack"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Endpoint not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /stacks/{id}:
+    get:
+      tags:
+      - "stacks"
+      summary: "Inspect a stack"
+      description: |
+        Retrieve details about a stack.
+        **Access policy**: restricted
+      operationId: "StackInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Stack identifier"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Stack"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Stack not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Stack not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "stacks"
+      summary: "Update a stack"
+      description: |
+        Update a stack.
+        **Access policy**: restricted
+      operationId: "StackUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Stack identifier"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Stack details"
+        required: true
+        schema:
+          $ref: "#/definitions/StackUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Stack"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Stack not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Stack not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "stacks"
+      summary: "Remove a stack"
+      description: |
+        Remove a stack.
+        **Access policy**: restricted
+      operationId: "StackDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Stack identifier"
+        required: true
+        type: "string"
+      - name: "external"
+        in: "query"
+        description: "Set to true to delete an external stack. Only external Swarm stacks are supported."
+        type: "boolean"
+      - name: "endpointId"
+        in: "query"
+        description: "Endpoint identifier used to remove an external stack (required when external is set to true)"
+        type: "string"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Stack not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Stack not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /stacks/{id}/file:
+    get:
+      tags:
+      - "stacks"
+      summary: "Retrieve the content of the Stack file for the specified stack"
+      description: |
+        Get Stack file content.
+        **Access policy**: restricted
+      operationId: "StackFileInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Stack identifier"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/StackFileInspectResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Stack not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Stack not found"
         500:
           description: "Server error"
           schema:
@@ -1306,7 +1599,7 @@ paths:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/UserCreateResponse"
+            $ref: "#/definitions/UserSubset"
         400:
           description: "Invalid request"
           schema:
@@ -1399,6 +1692,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/User"
         400:
           description: "Invalid request"
           schema:
@@ -1439,7 +1734,7 @@ paths:
         required: true
         type: "integer"
       responses:
-        200:
+        204:
           description: "Success"
         400:
           description: "Invalid request"
@@ -1562,10 +1857,8 @@ paths:
       - "application/json"
       parameters: []
       responses:
-        200:
+        204:
           description: "Success"
-          schema:
-            $ref: "#/definitions/UserListResponse"
         404:
           description: "User not found"
           schema:
@@ -1601,6 +1894,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/User"
         400:
           description: "Invalid request"
           schema:
@@ -1707,7 +2002,7 @@ paths:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/TeamCreateResponse"
+            $ref: "#/definitions/Team"
         400:
           description: "Invalid request"
           schema:
@@ -1840,7 +2135,7 @@ paths:
         required: true
         type: "integer"
       responses:
-        200:
+        204:
           description: "Success"
         400:
           description: "Invalid request"
@@ -1953,7 +2248,7 @@ paths:
         200:
           description: "Success"
           schema:
-            $ref: "#/definitions/TeamMembershipCreateResponse"
+            $ref: "#/definitions/TeamMembership"
         400:
           description: "Invalid request"
           schema:
@@ -2007,6 +2302,8 @@ paths:
       responses:
         200:
           description: "Success"
+          schema:
+            $ref: "#/definitions/TeamMembership"
         400:
           description: "Invalid request"
           schema:
@@ -2047,7 +2344,7 @@ paths:
         required: true
         type: "integer"
       responses:
-        200:
+        204:
           description: "Success"
         400:
           description: "Invalid request"
@@ -2144,6 +2441,21 @@ definitions:
         type: "integer"
         example: 1
         description: "Team role (1 for team leader and 2 for team member)"
+  UserSubset:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "User identifier"
+      Username:
+        type: "string"
+        example: "bob"
+        description: "Username"
+      Role:
+        type: "integer"
+        example: 1
+        description: "User role (1 for administrator account and 2 for regular account)"
   User:
     type: "object"
     properties:
@@ -2155,6 +2467,10 @@ definitions:
         type: "string"
         example: "bob"
         description: "Username"
+      Password:
+        type: "string"
+        example: "passwd"
+        description: "Password"
       Role:
         type: "integer"
         example: 1
@@ -2227,7 +2543,21 @@ definitions:
         type: "string"
         example: "/data/tls/key.pem"
         description: "Path to the TLS client key file"
-
+  AzureCredentials:
+    type: "object"
+    properties:
+      ApplicationID:
+        type: "string"
+        example: "eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"
+        description: "Azure application ID"
+      TenantID:
+        type: "string"
+        example: "34ddc78d-4fel-2358-8cc1-df84c8o839f5"
+        description: "Azure tenant ID"
+      AuthenticationKey:
+        type: "string"
+        example: "cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
+        description: "Azure authentication key"
   LDAPSearchSettings:
     type: "object"
     properties:
@@ -2317,6 +2647,14 @@ definitions:
       value:
         type: "string"
         example: "bar"
+  Pair:
+    properties:
+      name:
+        type: "string"
+        example: "name"
+      value:
+        type: "string"
+        example: "value"
   Registry:
     type: "object"
     properties:
@@ -2358,6 +2696,76 @@ definitions:
           type: "integer"
           example: 1
           description: "Team identifier"
+  RegistrySubset:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Registry identifier"
+      Name:
+        type: "string"
+        example: "my-registry"
+        description: "Registry name"
+      URL:
+        type: "string"
+        example: "registry.mydomain.tld:2375"
+        description: "URL or IP address of the Docker registry"
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication against this registry enabled"
+      Username:
+        type: "string"
+        example: "registry_user"
+        description: "Username used to authenticate against this registry"
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to use this registry"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to use this registry"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+  EndpointGroup:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Endpoint group identifier"
+      Name:
+        type: "string"
+        example: "my-endpoint-group"
+        description: "Endpoint group name"
+      Description:
+        type: "string"
+        example: "Description associated to the endpoint group"
+        description: "Endpoint group description"
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to connect to this endpoint group. Will be inherited by endpoints that are part of the group"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to connect to this endpoint. Will be inherited by endpoints that are part of the group"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+      Labels:
+        type: "array"
+        items:
+          $ref: "#/definitions/Pair"
   Endpoint:
     type: "object"
     properties:
@@ -2372,7 +2780,7 @@ definitions:
       Type:
         type: "integer"
         example: 1
-        description: "Endpoint environment type. 1 for a Docker environment, 2 for an agent on Docker environment."
+        description: "Endpoint environment type. 1 for a Docker environment, 2 for an agent on Docker environment or 3 for an Azure environment."
       URL:
         type: "string"
         example: "docker.mydomain.tld:2375"
@@ -2399,6 +2807,53 @@ definitions:
           type: "integer"
           example: 1
           description: "Team identifier"
+      TLSConfig:
+        $ref: "#/definitions/TLSConfiguration"
+      AzureCredentials:
+        $ref: "#/definitions/AzureCredentials"
+  EndpointSubset:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Endpoint identifier"
+      Name:
+        type: "string"
+        example: "my-endpoint"
+        description: "Endpoint name"
+      Type:
+        type: "integer"
+        example: 1
+        description: "Endpoint environment type. 1 for a Docker environment, 2 for an agent on Docker environment, 3 for an Azure environment."
+      URL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address of the Docker host associated to this endpoint"
+      PublicURL:
+        type: "string"
+        example: "docker.mydomain.tld:2375"
+        description: "URL or IP address where exposed containers will be reachable"
+      GroupID:
+        type: "integer"
+        example: 1
+        description: "Endpoint group identifier"
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+      TLSConfig:
+        $ref: "#/definitions/TLSConfiguration"
   GenericError:
     type: "object"
     properties:
@@ -2427,7 +2882,18 @@ definitions:
         type: "string"
         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOjEsImV4cCI6MTQ5OTM3NjE1NH0.NJ6vE8FY1WG6jsRQzfMqeatJ4vh2TWAeeYfDhP71YEE"
         description: "JWT token used to authenticate against the API"
-  DockerHubInspectResponse:
+  DockerHubSubset:
+    type: "object"
+    properties:
+      Authentication:
+        type: "boolean"
+        example: true
+        description: "Is authentication against DockerHub enabled"
+      Username:
+        type: "string"
+        example: "hub_user"
+        description: "Username used to authenticate against the DockerHub"
+  DockerHub:
     type: "object"
     properties:
       Authentication:
@@ -2442,6 +2908,45 @@ definitions:
         type: "string"
         example: "hub_password"
         description: "Password used to authenticate against the DockerHub"
+  ResourceControl:
+    type: "object"
+    properties:
+      ResourceID:
+        type: "string"
+        example: "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
+        description: "Docker resource identifier on which access control will be applied.\
+          \ In the case of a resource control applied to a stack, use the stack name as identifier"
+      Type:
+        type: "string"
+        example: "container"
+        description: "Type of Docker resource. Valid values are: container, volume\
+          \ service, secret, config or stack"
+      AdministratorsOnly:
+        type: "boolean"
+        example: true
+        description: "Restrict access to the associated resource to administrators\
+          \ only"
+      Users:
+        type: "array"
+        description: "List of user identifiers with access to the associated resource"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      Teams:
+        type: "array"
+        description: "List of team identifiers with access to the associated resource"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+      SubResourceIDs:
+        type: "array"
+        description: "List of Docker resources that will inherit this access control"
+        items:
+          type: "string"
+          example: "617c5f22bb9b023d6daab7cba43a57576f83492867bc767d1c59416b065e5f08"
+          description: "Docker resource identifier"
   DockerHubUpdateRequest:
     type: "object"
     required:
@@ -2464,7 +2969,11 @@ definitions:
   EndpointListResponse:
     type: "array"
     items:
-      $ref: "#/definitions/Endpoint"
+      $ref: "#/definitions/EndpointSubset"
+  EndpointGroupListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/EndpointGroup"
   EndpointUpdateRequest:
     type: "object"
     properties:
@@ -2481,6 +2990,10 @@ definitions:
         example: "docker.mydomain.tld:2375"
         description: "URL or IP address where exposed containers will be reachable.\
           \ Defaults to URL if not specified"
+      GroupID:
+        type: "integer"
+        example: "1"
+        description: "Group identifier"
       TLS:
         type: "boolean"
         example: true
@@ -2493,7 +3006,36 @@ definitions:
         type: "boolean"
         example: false
         description: "Skip client verification when using TLS"
+      ApplicationID:
+        type: "string"
+        example: "eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"
+        description: "Azure application ID"
+      TenantID:
+        type: "string"
+        example: "34ddc78d-4fel-2358-8cc1-df84c8o839f5"
+        description: "Azure tenant ID"
+      AuthenticationKey:
+        type: "string"
+        example: "cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
+        description: "Azure authentication key"
   EndpointAccessUpdateRequest:
+    type: "object"
+    properties:
+      AuthorizedUsers:
+        type: "array"
+        description: "List of user identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "User identifier"
+      AuthorizedTeams:
+        type: "array"
+        description: "List of team identifiers authorized to connect to this endpoint"
+        items:
+          type: "integer"
+          example: 1
+          description: "Team identifier"
+  EndpointGroupAccessUpdateRequest:
     type: "object"
     properties:
       AuthorizedUsers:
@@ -2539,17 +3081,10 @@ definitions:
         type: "string"
         example: "registry_password"
         description: "Password used to authenticate against this registry"
-  RegistryCreateResponse:
-    type: "object"
-    properties:
-      Id:
-        type: "integer"
-        example: 1
-        description: "Id of the registry"
   RegistryListResponse:
     type: "array"
     items:
-      $ref: "#/definitions/Registry"
+      $ref: "#/definitions/RegistrySubset"
   RegistryUpdateRequest:
     type: "object"
     required:
@@ -2699,6 +3234,52 @@ definitions:
         type: "boolean"
         example: true
         description: "Whether non-administrator users should be able to use privileged mode when creating containers"
+  EndpointGroupCreateRequest:
+    type: "object"
+    required:
+    - "Name"
+    properties:
+      Name:
+        type: "string"
+        example: "my-endpoint-group"
+        description: "Endpoint group name"
+      Description:
+        type: "string"
+        example: "Endpoint group description"
+        description: "Endpoint group description"
+      Labels:
+        type: "array"
+        items:
+          $ref: "#/definitions/Pair"
+      AssociatedEndpoints:
+        type: "array"
+        description: "List of endpoint identifiers that will be part of this group"
+        items:
+          type: "integer"
+          example: 1
+          description: "Endpoint identifier"
+  EndpointGroupUpdateRequest:
+    type: "object"
+    properties:
+      Name:
+        type: "string"
+        example: "my-endpoint-group"
+        description: "Endpoint group name"
+      Description:
+        type: "string"
+        example: "Endpoint group description"
+        description: "Endpoint group description"
+      Labels:
+        type: "array"
+        items:
+          $ref: "#/definitions/Pair"
+      AssociatedEndpoints:
+        type: "array"
+        description: "List of endpoint identifiers that will be part of this group"
+        items:
+          type: "integer"
+          example: 1
+          description: "Endpoint identifier"
   UserCreateRequest:
     type: "object"
     required:
@@ -2718,17 +3299,10 @@ definitions:
         type: "integer"
         example: 1
         description: "User role (1 for administrator account and 2 for regular account)"
-  UserCreateResponse:
-    type: "object"
-    properties:
-      Id:
-        type: "integer"
-        example: 1
-        description: "Id of the user"
   UserListResponse:
     type: "array"
     items:
-      $ref: "#/definitions/User"
+      $ref: "#/definitions/UserSubset"
   UserUpdateRequest:
     type: "object"
     properties:
@@ -2769,13 +3343,6 @@ definitions:
         type: "string"
         example: "developers"
         description: "Name"
-  TeamCreateResponse:
-    type: "object"
-    properties:
-      Id:
-        type: "integer"
-        example: 1
-        description: "Id of the team"
   TeamListResponse:
     type: "array"
     items:
@@ -2813,13 +3380,6 @@ definitions:
         type: "integer"
         example: 1
         description: "Role for the user inside the team (1 for leader and 2 for regular member)"
-  TeamMembershipCreateResponse:
-    type: "object"
-    properties:
-      Id:
-        type: "integer"
-        example: 1
-        description: "Id of the team membership"
   TeamMembershipListResponse:
     type: "array"
     items:
@@ -2886,7 +3446,6 @@ definitions:
     type: "object"
     required:
     - "Name"
-    - "SwarmID"
     properties:
       Name:
         type: "string"
@@ -2895,7 +3454,7 @@ definitions:
       SwarmID:
         type: "string"
         example: "jpofkc0i9uo9wtx1zesuk649w"
-        description: "Cluster identifier of the Swarm cluster"
+        description: "Swarm cluster identifier. Required when creating a Swarm stack (type 1)."
       StackFileContent:
         type: "string"
         example: "version: 3\n services:\n web:\n image:nginx"
@@ -2907,7 +3466,7 @@ definitions:
       ComposeFilePathInRepository:
         type: "string"
         example: "docker-compose.yml"
-        description: "Path to the Stack file inside the Git repository. Required when using the 'repository' deployment method."
+        description: "Path to the Stack file inside the Git repository. Will default to 'docker-compose.yml' if not specified."
       RepositoryAuthentication:
         type: "boolean"
         example: true
@@ -2933,13 +3492,6 @@ definitions:
       value:
         type: "string"
         example: "password"
-  StackCreateResponse:
-    type: "object"
-    properties:
-      Id:
-        type: "string"
-        example: "myStack_jpofkc0i9uo9wtx1zesuk649w"
-        description: "Id of the stack"
   StackListResponse:
     type: "array"
     items:
@@ -2955,6 +3507,14 @@ definitions:
         type: "string"
         example: "myStack"
         description: "Stack name"
+      Type:
+        type: "integer"
+        example: "1"
+        description: "Stack type. 1 for a Swarm stack, 2 for a Compose stack"
+      EndpointID:
+        type: "integer"
+        example: "1"
+        description: "Endpoint identifier. Reference the endpoint that will be used for deployment "
       EntryPoint:
         type: "string"
         example: "docker-compose.yml"

@@ -1,6 +1,6 @@
 angular.module('portainer.docker').component('servicesDatatable', {
   templateUrl: 'app/docker/components/datatables/services-datatable/servicesDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'ServicesDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
@@ -8,12 +8,13 @@ angular.module('portainer.docker').component('servicesDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
+    nodes: '<',
+    agentProxy: '<',
     showTextFilter: '<',
     showOwnershipColumn: '<',
-    removeAction: '<',
-    scaleAction: '<',
-    publicUrl: '<',
-    forceUpdateAction: '<',
-    showForceUpdateButton: '<'
+    showUpdateAction: '<',
+    showAddAction: '<',
+    showStackColumn: '<',
+    showTaskLogsButton: '<'
   }
 });

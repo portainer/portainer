@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainersDatatableController', ['PaginationService', 'DatatableService',
-function (PaginationService, DatatableService) {
+.controller('ContainersDatatableController', ['PaginationService', 'DatatableService', 'EndpointProvider',
+function (PaginationService, DatatableService, EndpointProvider) {
 
   var ctrl = this;
 
@@ -10,7 +10,11 @@ function (PaginationService, DatatableService) {
     paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
     displayTextFilter: false,
     selectedItemCount: 0,
-    selectedItems: []
+    selectedItems: [],
+    noStoppedItemsSelected: true,
+    noRunningItemsSelected: true,
+    noPausedItemsSelected: true,
+    publicURL: EndpointProvider.endpointPublicURL()
   };
 
   this.settings = {
@@ -45,6 +49,7 @@ function (PaginationService, DatatableService) {
       this.state.selectedItems.splice(this.state.selectedItems.indexOf(item), 1);
       this.state.selectedItemCount--;
     }
+    DatatableService.setDataTableSelectedItems(this.tableKey + '_' + EndpointProvider.endpointID(), this.state.selectedItems);
   };
 
   this.selectItem = function(item) {
@@ -139,12 +144,9 @@ function (PaginationService, DatatableService) {
     var availableStateFilters = [];
     for (var i = 0; i < this.dataset.length; i++) {
       var item = this.dataset[i];
-      if (item.Checked) {
-        this.selectItem(item);
-      }
       availableStateFilters.push({ label: item.Status, display: true });
     }
-     this.filters.state.values = _.uniqBy(availableStateFilters, 'label');
+    this.filters.state.values = _.uniqBy(availableStateFilters, 'label');
   };
 
   this.updateStoredFilters = function(storedFilters) {
@@ -160,6 +162,30 @@ function (PaginationService, DatatableService) {
     }
   };
 
+  function selectPreviouslySelectedItem(item, storedSelectedItems) {
+    var selectedItem = _.find(storedSelectedItems, function(container) {
+      return item.Id === container.Id;
+    });
+
+    if (selectedItem) {
+      item.Checked = true;
+      ctrl.state.selectedItemCount++;
+      ctrl.state.selectedItems.push(item);
+    }
+  }
+
+  this.selectItems = function(storedSelectedItems) {
+    for (var i = 0; i < this.dataset.length; i++) {
+      var item = this.dataset[i];
+      selectPreviouslySelectedItem(item, storedSelectedItems);
+    }
+
+    if (this.state.selectedItemCount > 0 && this.state.selectedItemCount === this.dataset.length) {
+      this.state.selectAll = true;
+    }
+    this.updateSelectionState();
+  };
+
   this.$onInit = function() {
     setDefaults(this);
     this.prepareTableFromDataset();
@@ -168,6 +194,11 @@ function (PaginationService, DatatableService) {
     if (storedOrder !== null) {
       this.state.reverseOrder = storedOrder.reverse;
       this.state.orderBy = storedOrder.orderBy;
+    }
+
+    var storedSelectedItems = DatatableService.getDataTableSelectedItems(this.tableKey + '_' + EndpointProvider.endpointID());
+    if (storedSelectedItems !== null) {
+      this.selectItems(storedSelectedItems);
     }
 
     var storedFilters = DatatableService.getDataTableFilters(this.tableKey);

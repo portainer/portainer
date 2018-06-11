@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'PaginationService', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService',
-function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, PaginationService, ResourceControlService, Authentication, FormValidator, SettingsService, StackService) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'PaginationService', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService', 'EndpointProvider',
+function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, PaginationService, ResourceControlService, Authentication, FormValidator, SettingsService, StackService, EndpointProvider) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
@@ -113,13 +113,14 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       ComposeFilePathInRepository: template.Repository.stackfile
     };
 
-    StackService.createStackFromGitRepository(stackName, repositoryOptions, template.Env)
+    var endpointId = EndpointProvider.endpointID();
+    StackService.createSwarmStackFromGitRepository(stackName, repositoryOptions, template.Env, endpointId)
     .then(function success(data) {
       return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, []);
     })
     .then(function success() {
       Notifications.success('Stack successfully deployed');
-      $state.go('docker.stacks');
+      $state.go('portainer.stacks');
     })
     .catch(function error(err) {
       Notifications.warning('Deployment error', err.err.data.err);

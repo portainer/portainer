@@ -1,7 +1,5 @@
 package portainer
 
-import "io"
-
 type (
 	// Pair defines a key/value string pair
 	Pair struct {
@@ -133,14 +131,19 @@ type (
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier).
 	StackID string
 
+	// StackType represents the type of the stack (compose v2, stack deploy v3).
+	StackType int
+
 	// Stack represents a Docker stack created via docker stack deploy.
 	Stack struct {
-		ID          StackID `json:"Id"`
-		Name        string  `json:"Name"`
-		EntryPoint  string  `json:"EntryPoint"`
-		SwarmID     string  `json:"SwarmId"`
+		ID          StackID    `json:"Id"`
+		Name        string     `json:"Name"`
+		Type        StackType  `json:"Type"`
+		EndpointID  EndpointID `json:"EndpointId"`
+		SwarmID     string     `json:"SwarmId"`
+		EntryPoint  string     `json:"EntryPoint"`
+		Env         []Pair     `json:"Env"`
 		ProjectPath string
-		Env         []Pair `json:"Env"`
 	}
 
 	// RegistryID represents a registry identifier.
@@ -352,8 +355,8 @@ type (
 	// StackService represents a service for managing stack data.
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
+		StackByName(name string) (*Stack, error)
 		Stacks() ([]Stack, error)
-		StacksBySwarmID(ID string) ([]Stack, error)
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
@@ -412,13 +415,12 @@ type (
 	FileService interface {
 		GetFileContent(filePath string) (string, error)
 		RemoveDirectory(directoryPath string) error
-		StoreTLSFile(folder string, fileType TLSFileType, r io.Reader) error
+		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)
 		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
-		StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error)
-		StoreStackFileFromReader(stackIdentifier, fileName string, r io.Reader) (string, error)
+		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
 		LoadKeyPair() ([]byte, []byte, error)
@@ -442,12 +444,18 @@ type (
 		TestConnectivity(settings *LDAPSettings) error
 	}
 
-	// StackManager represents a service to manage stacks.
-	StackManager interface {
+	// SwarmStackManager represents a service to manage Swarm stacks.
+	SwarmStackManager interface {
 		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
+	}
+
+	// ComposeStackManager represents a service to manage Compose stacks.
+	ComposeStackManager interface {
+		Up(stack *Stack, endpoint *Endpoint) error
+		Down(stack *Stack, endpoint *Endpoint) error
 	}
 )
 
@@ -542,4 +550,12 @@ const (
 	AgentOnDockerEnvironment
 	// AzureEnvironment represents an endpoint connected to an Azure environment
 	AzureEnvironment
+)
+
+const (
+	_ StackType = iota
+	// DockerSwarmStack represents a stack managed via docker stack
+	DockerSwarmStack
+	// DockerComposeStack represents a stack managed via docker-compose
+	DockerComposeStack
 )

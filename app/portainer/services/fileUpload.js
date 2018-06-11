@@ -28,15 +28,25 @@ angular.module('portainer.app')
     });
   };
 
-  service.createStack = function(stackName, swarmId, file, env) {
-    var endpointID = EndpointProvider.endpointID();
+  service.createSwarmStack = function(stackName, swarmId, file, env, endpointId) {
     return Upload.upload({
-      url: 'api/endpoints/' + endpointID + '/stacks?method=file',
+      url: 'api/stacks?method=file&type=1&endpointId=' + endpointId,
       data: {
         file: file,
         Name: stackName,
         SwarmID: swarmId,
         Env: Upload.json(env)
+      },
+      ignoreLoadingBar: true
+    });
+  };
+
+  service.createComposeStack = function(stackName, file, endpointId) {
+    return Upload.upload({
+      url: 'api/stacks?method=file&type=2&endpointId=' + endpointId,
+      data: {
+        file: file,
+        Name: stackName
       },
       ignoreLoadingBar: true
     });

@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/http/client"
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
+	"github.com/portainer/portainer/libcompose"
 
 	"log"
 )
@@ -64,8 +65,12 @@ func initStore(dataStorePath string) *bolt.Store {
 	return store
 }
 
-func initStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.StackManager, error) {
-	return exec.NewStackManager(assetsPath, dataStorePath, signatureService, fileService)
+func initComposeStackManager(dataStorePath string) portainer.ComposeStackManager {
+	return libcompose.NewComposeStackManager(dataStorePath)
+}
+
+func initSwarmStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.SwarmStackManager, error) {
+	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService)
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -320,10 +325,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	stackManager, err := initStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
+	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	composeStackManager := initComposeStackManager(*flags.Data)
 
 	err = initSettings(store.SettingsService, flags)
 	if err != nil {
@@ -394,7 +401,8 @@ func main() {
 		RegistryService:        store.RegistryService,
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
-		StackManager:           stackManager,
+		SwarmStackManager:      swarmStackManager,
+		ComposeStackManager:    composeStackManager,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,
