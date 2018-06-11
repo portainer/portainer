@@ -120,10 +120,14 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-sm btn-primary" ng-disabled="state.actionInProgress" ng-click="deployStack()" button-spinner="state.actionInProgress">
-                <span ng-hide="state.actionInProgress">Update the stack</span>
-                <span ng-show="state.actionInProgress">Deployment in progress...</span>
-              </button>
+              <button type="button" class="btn btn-sm btn-primary" ng-disabled="state.updateActionInProgress || state.pullActionInProgress" ng-click="deployStack()" button-spinner="state.updateActionInProgress">
+                <span ng-hide="state.updateActionInProgress">Update</span>
+                <span ng-show="state.updateActionInProgress">Deployment in progress...</span>
+              </button> 
+              <button type="button" class="btn btn-sm btn-primary" ng-disabled="state.pullActionInProgress || state.updateActionInProgress" ng-click="pullAndDeployStack()" button-spinner="state.pullActionInProgress">
+                <span ng-hide="state.pullActionInProgress">Pull and deploy</span>
+                <span ng-show="state.pullActionInProgress">Deployment in progress...</span>
+              </button>              
             </div>
           </div>
         </form>

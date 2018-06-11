@@ -105,6 +105,11 @@ const (
 	ErrUndefinedTLSFileType = Error("Undefined TLS file type")
 )
 
+// Git errors.
+const (
+	ErrAlreadyUptodate = Error("already up-to-date")
+)
+
 // Error represents an application error.
 type Error string
 

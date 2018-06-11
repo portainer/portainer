@@ -174,5 +174,9 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return Stack.update({ id: id, StackFileContent: stackFile, Env: env, Prune: prune}).$promise;
   };
 
+  service.pullAndDeployStack = function(id, stackFile, env, prune) {
+    return Stack.pullAndDeploy({ id: id, StackFileContent: stackFile, Env: env, Prune: prune}).$promise;
+  };
+
   return service;
 }]);
