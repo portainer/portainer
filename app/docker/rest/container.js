@@ -15,10 +15,10 @@ function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
       method: 'GET', params: { action: 'json' }
     },
     stop: {
-      method: 'POST', params: { id: '@id', t: 5, action: 'stop' }
+      method: 'POST', params: { id: '@id', action: 'stop' }
     },
     restart: {
-      method: 'POST', params: { id: '@id', t: 5, action: 'restart' }
+      method: 'POST', params: { id: '@id', action: 'restart' }
     },
     kill: {
       method: 'POST', params: { id: '@id', action: 'kill' }
