@@ -27,6 +27,7 @@ type Store struct {
 	RegistryService        *RegistryService
 	DockerHubService       *DockerHubService
 	StackService           *StackService
+	TagService             *TagService
 
 	db                    *bolt.DB
 	checkForDataMigration bool
@@ -45,6 +46,7 @@ const (
 	registryBucketName        = "registries"
 	dockerhubBucketName       = "dockerhub"
 	stackBucketName           = "stacks"
+	tagBucketName             = "tags"
 )
 
 // NewStore initializes a new Store and the associated services
@@ -62,6 +64,7 @@ func NewStore(storePath string) (*Store, error) {
 		RegistryService:        &RegistryService{},
 		DockerHubService:       &DockerHubService{},
 		StackService:           &StackService{},
+		TagService:             &TagService{},
 	}
 	store.UserService.store = store
 	store.TeamService.store = store
@@ -74,6 +77,7 @@ func NewStore(storePath string) (*Store, error) {
 	store.RegistryService.store = store
 	store.DockerHubService.store = store
 	store.StackService.store = store
+	store.TagService.store = store
 
 	_, err := os.Stat(storePath + "/" + databaseFileName)
 	if err != nil && os.IsNotExist(err) {
@@ -99,7 +103,7 @@ func (store *Store) Open() error {
 
 	bucketsToCreate := []string{versionBucketName, userBucketName, teamBucketName, endpointBucketName,
 		endpointGroupBucketName, resourceControlBucketName, teamMembershipBucketName, settingsBucketName,
-		registryBucketName, dockerhubBucketName, stackBucketName}
+		registryBucketName, dockerhubBucketName, stackBucketName, tagBucketName}
 
 	return db.Update(func(tx *bolt.Tx) error {
 
@@ -128,6 +132,7 @@ func (store *Store) Init() error {
 			Labels:          []portainer.Pair{},
 			AuthorizedUsers: []portainer.UserID{},
 			AuthorizedTeams: []portainer.TeamID{},
+			Tags:            []string{},
 		}
 
 		return store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)

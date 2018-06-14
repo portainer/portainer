@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/http/handler/settings"
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/handler/status"
+	"github.com/portainer/portainer/http/handler/tags"
 	"github.com/portainer/portainer/http/handler/teammemberships"
 	"github.com/portainer/portainer/http/handler/teams"
 	"github.com/portainer/portainer/http/handler/templates"
@@ -37,16 +38,13 @@ type Handler struct {
 	SettingsHandler        *settings.Handler
 	StackHandler           *stacks.Handler
 	StatusHandler          *status.Handler
+	TagHandler             *tags.Handler
 	TeamMembershipHandler  *teammemberships.Handler
 	TeamHandler            *teams.Handler
 	TemplatesHandler       *templates.Handler
 	UploadHandler          *upload.Handler
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
-
-	// StoridgeHandler *extensions.StoridgeHandler
-	// AzureHandler    *azure.Handler
-	// DockerHandler   *docker.Handler
 }
 
 // ServeHTTP delegates a request to the appropriate subhandler.
@@ -79,6 +77,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.StackHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/status"):
 		http.StripPrefix("/api", h.StatusHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/tags"):
+		http.StripPrefix("/api", h.TagHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/templates"):
 		http.StripPrefix("/api", h.TemplatesHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/upload"):

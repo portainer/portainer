@@ -57,7 +57,7 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
   service.createLocalEndpoint = function() {
     var deferred = $q.defer();
 
-    FileUploadService.createEndpoint('local', 1, 'unix:///var/run/docker.sock', '', 1, false)
+    FileUploadService.createEndpoint('local', 1, 'unix:///var/run/docker.sock', '', 1, [], false)
     .then(function success(response) {
       deferred.resolve(response.data);
     })
@@ -68,10 +68,10 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return deferred.promise;
   };
 
-  service.createRemoteEndpoint = function(name, type, URL, PublicURL, groupID, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  service.createRemoteEndpoint = function(name, type, URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var deferred = $q.defer();
 
-    FileUploadService.createEndpoint(name, type, 'tcp://' + URL, PublicURL, groupID, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    FileUploadService.createEndpoint(name, type, 'tcp://' + URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(response) {
       deferred.resolve(response.data);
     })
@@ -82,10 +82,10 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return deferred.promise;
   };
 
-  service.createAzureEndpoint = function(name, applicationId, tenantId, authenticationKey) {
+  service.createAzureEndpoint = function(name, applicationId, tenantId, authenticationKey, groupId, tags) {
     var deferred = $q.defer();
 
-    FileUploadService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey)
+    FileUploadService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags)
     .then(function success(response) {
       deferred.resolve(response.data);
     })

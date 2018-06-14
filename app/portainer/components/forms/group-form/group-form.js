@@ -21,6 +21,7 @@ angular.module('portainer.app').component('groupForm', {
   bindings: {
     model: '=',
     availableEndpoints: '=',
+    availableTags: '<',
     associatedEndpoints: '=',
     addLabelAction: '<',
     removeLabelAction: '<',

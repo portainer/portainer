@@ -49,7 +49,7 @@
           ></azure-endpoint-config>
           <!-- !endpoint-public-url-input -->
           <div class="col-sm-12 form-section-title">
-            Grouping
+            Metadata
           </div>
           <!-- group -->
           <div class="form-group">
@@ -61,6 +61,14 @@
             </div>
           </div>
           <!-- !group -->
+          <!-- tags -->
+          <div class="form-group">
+            <tag-selector
+              tags="availableTags"
+              model="endpoint.Tags"
+            ></tag-selector>
+          </div>
+          <!-- !tags -->
           <!-- endpoint-security -->
           <div ng-if="endpointType === 'remote' && endpoint.Type !== 3">
             <div class="col-sm-12 form-section-title">

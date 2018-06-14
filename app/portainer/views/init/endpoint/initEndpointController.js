@@ -90,7 +90,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
     var endpoint;
 
     $scope.state.actionInProgress = true;
-    EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey)
+    EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, 1, [])
     .then(function success(data) {
       endpoint = data;
       EndpointProvider.setEndpointID(endpoint.Id);
@@ -110,7 +110,7 @@ function ($scope, $state, EndpointService, StateManager, EndpointProvider, Notif
   function createRemoteEndpoint(name, type, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var endpoint;
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, 1, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, 1, [], TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       endpoint = data;
       EndpointProvider.setEndpointID(endpoint.Id);

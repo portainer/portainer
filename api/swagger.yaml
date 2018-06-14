@@ -81,6 +81,8 @@ tags:
   description: "Manage Docker stacks"
 - name: "users"
   description: "Manage users"
+- name: "tags"
+  description: "Manage tags"
 - name: "teams"
   description: "Manage teams"
 - name: "team_memberships"
@@ -1958,6 +1960,99 @@ paths:
           schema:
             $ref: "#/definitions/GenericError"
 
+  /tags:
+    get:
+      tags:
+      - "tags"
+      summary: "List tags"
+      description: |
+        List tags.
+        **Access policy**: administrator
+      operationId: "TagList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/TagListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "tags"
+      summary: "Create a new tag"
+      description: |
+        Create a new tag.
+        **Access policy**: administrator
+      operationId: "TagCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Tag details"
+        required: true
+        schema:
+          $ref: "#/definitions/TagCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Tag"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        409:
+          description: "Conflict"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A tag with the specified name already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /tags/{id}:
+    delete:
+      tags:
+      - "tags"
+      summary: "Remove a tag"
+      description: |
+        Remove a tag.
+        **Access policy**: administrator
+      operationId: "TagDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Tag identifier"
+        required: true
+        type: "integer"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+
   /teams:
     get:
       tags:
@@ -2411,6 +2506,17 @@ securityDefinitions:
     name: "Authorization"
     in: "header"
 definitions:
+  Tag:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Tag identifier"
+      Name:
+        type: "string"
+        example: "org/acme"
+        description: "Tag name"
   Team:
     type: "object"
     properties:
@@ -3334,6 +3440,19 @@ definitions:
         type: "boolean"
         example: true
         description: "Is the password valid"
+  TagListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Tag"
+  TagCreateRequest:
+    type: "object"
+    required:
+    - "Name"
+    properties:
+      Name:
+        type: "string"
+        example: "org/acme"
+        description: "Name"
   TeamCreateRequest:
     type: "object"
     required:

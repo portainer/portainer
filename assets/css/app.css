@@ -729,6 +729,10 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   background-color: #C5CAE9;
 }
 
+.row.header .meta .page {
+  padding-top: 7px;
+}
+
 /*bootbox override*/
 .modal-open {
   padding-right: 0 !important;
@@ -787,12 +791,12 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   font-weight: 600;
 }
 
-/* json-tree */
-
+/* json-tree override */
 json-tree {
   font-size: 13px;
   color: #30426a;
 }
+
 json-tree .key {
   color: #738bc0;
   padding-right: 5px;
@@ -803,7 +807,4 @@ json-tree .branch-preview {
   font-size: 11px;
   opacity: .5;
 }
-
-.row.header .meta .page {
-  padding-top: 7px;
-}
+/* !json-tree override */

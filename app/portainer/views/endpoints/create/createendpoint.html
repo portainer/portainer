@@ -192,6 +192,12 @@
             <!-- !authenticationkey-input -->
           </div>
           <!-- !azure-details -->
+          <!-- endpoint-security -->
+          <por-endpoint-security ng-if="state.EnvironmentType === 'docker'" form-data="formValues.SecurityFormData"></por-endpoint-security>
+          <!-- !endpoint-security -->
+          <div class="col-sm-12 form-section-title">
+            Metadata
+          </div>
           <!-- group -->
           <div class="form-group">
             <label for="endpoint_group" class="col-sm-3 col-lg-2 control-label text-left">
@@ -202,9 +208,17 @@
             </div>
           </div>
           <!-- !group -->
-          <!-- endpoint-security -->
-          <por-endpoint-security ng-if="state.EnvironmentType === 'docker'" form-data="formValues.SecurityFormData"></por-endpoint-security>
-          <!-- !endpoint-security -->
+          <!-- tags -->
+          <div class="form-group">
+            <tag-selector
+              tags="availableTags"
+              model="formValues.Tags"
+            ></tag-selector>
+          </div>
+          <!-- !tags -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">

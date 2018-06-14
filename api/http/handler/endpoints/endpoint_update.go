@@ -22,6 +22,7 @@ type endpointUpdatePayload struct {
 	AzureApplicationID     string
 	AzureTenantID          string
 	AzureAuthenticationKey string
+	Tags                   []string
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
@@ -66,6 +67,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.GroupID != 0 {
 		endpoint.GroupID = portainer.EndpointGroupID(payload.GroupID)
+	}
+
+	if payload.Tags != nil {
+		endpoint.Tags = payload.Tags
 	}
 
 	if endpoint.Type == portainer.AzureEnvironment {

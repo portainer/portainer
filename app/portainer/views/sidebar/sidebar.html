@@ -49,8 +49,11 @@
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="portainer.endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug fa-fw"></span></a>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.endpoints' || $state.current.name === 'portainer.endpoints.endpoint' || $state.current.name === 'portainer.endpoints.endpoint.access' || $state.current.name === 'portainer.groups' || $state.current.name === 'portainer.groups.group' || $state.current.name === 'portainer.groups.group.access' || $state.current.name === 'portainer.groups.new')">
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.endpoints' || $state.current.name === 'portainer.endpoints.endpoint' || $state.current.name === 'portainer.endpoints.new' || $state.current.name === 'portainer.endpoints.endpoint.access' || $state.current.name === 'portainer.groups' || $state.current.name === 'portainer.groups.group' || $state.current.name === 'portainer.groups.group.access' || $state.current.name === 'portainer.groups.new' || $state.current.name === 'portainer.tags')">
         <a ui-sref="portainer.groups" ui-sref-active="active">Groups</a>
+      </div>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.endpoints' || $state.current.name === 'portainer.endpoints.endpoint' || $state.current.name === 'portainer.endpoints.new' || $state.current.name === 'portainer.endpoints.endpoint.access' || $state.current.name === 'portainer.groups' || $state.current.name === 'portainer.groups.group' || $state.current.name === 'portainer.groups.group.access' || $state.current.name === 'portainer.groups.new' || $state.current.name === 'portainer.tags')">
+        <a ui-sref="portainer.tags" ui-sref-active="active">Tags</a>
       </div>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">

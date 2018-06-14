@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('CreateEndpointController', ['$scope', '$state', '$filter', 'EndpointService', 'GroupService', 'Notifications',
-function ($scope, $state, $filter, EndpointService, GroupService, Notifications) {
+.controller('CreateEndpointController', ['$q', '$scope', '$state', '$filter', 'EndpointService', 'GroupService', 'TagService', 'Notifications',
+function ($q, $scope, $state, $filter, EndpointService, GroupService, TagService, Notifications) {
 
   $scope.state = {
     EnvironmentType: 'docker',
@@ -15,7 +15,8 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     SecurityFormData: new EndpointSecurityFormData(),
     AzureApplicationId: '',
     AzureTenantId: '',
-    AzureAuthenticationKey: ''
+    AzureAuthenticationKey: '',
+    Tags: []
   };
 
   $scope.addDockerEndpoint = function() {
@@ -23,6 +24,7 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     var URL = $filter('stripprotocol')($scope.formValues.URL);
     var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
     var groupId = $scope.formValues.GroupId;
+    var tags = $scope.formValues.Tags;
 
     var securityData = $scope.formValues.SecurityFormData;
     var TLS = securityData.TLS;
@@ -33,7 +35,7 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-    addEndpoint(name, 1, URL, publicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+    addEndpoint(name, 1, URL, publicURL, groupId, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
   };
 
   $scope.addAgentEndpoint = function() {
@@ -41,8 +43,9 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     var URL = $filter('stripprotocol')($scope.formValues.URL);
     var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
     var groupId = $scope.formValues.GroupId;
+    var tags = $scope.formValues.Tags;
 
-    addEndpoint(name, 2, URL, publicURL, groupId, true, true, true, null, null, null);
+    addEndpoint(name, 2, URL, publicURL, groupId, tags, true, true, true, null, null, null);
   };
 
   $scope.addAzureEndpoint = function() {
@@ -50,15 +53,17 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     var applicationId = $scope.formValues.AzureApplicationId;
     var tenantId = $scope.formValues.AzureTenantId;
     var authenticationKey = $scope.formValues.AzureAuthenticationKey;
+    var groupId = $scope.formValues.GroupId;
+    var tags = $scope.formValues.Tags;
 
-    createAzureEndpoint(name, applicationId, tenantId, authenticationKey);
+    createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags);
   };
 
-  function createAzureEndpoint(name, applicationId, tenantId, authenticationKey) {
+  function createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags) {
     var endpoint;
 
     $scope.state.actionInProgress = true;
-    EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey)
+    EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags)
     .then(function success() {
       Notifications.success('Endpoint created', name);
       $state.go('portainer.endpoints', {}, {reload: true});
@@ -71,9 +76,9 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
     });
   }
 
-  function addEndpoint(name, type, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  function addEndpoint(name, type, URL, PublicURL, groupId, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, groupId, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, groupId, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success() {
       Notifications.success('Endpoint created', name);
       $state.go('portainer.endpoints', {}, {reload: true});
@@ -87,9 +92,13 @@ function ($scope, $state, $filter, EndpointService, GroupService, Notifications)
   }
 
   function initView() {
-    GroupService.groups()
+    $q.all({
+      groups: GroupService.groups(),
+      tags: TagService.tagNames()
+    })
     .then(function success(data) {
-      $scope.groups = data;
+      $scope.groups = data.groups;
+      $scope.availableTags = data.tags;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to load groups');

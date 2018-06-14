@@ -190,6 +190,7 @@ type (
 		AuthorizedTeams  []TeamID            `json:"AuthorizedTeams"`
 		Extensions       []EndpointExtension `json:"Extensions"`
 		AzureCredentials AzureCredentials    `json:"AzureCredentials,omitempty"`
+		Tags             []string            `json:"Tags"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -217,7 +218,10 @@ type (
 		Description     string          `json:"Description"`
 		AuthorizedUsers []UserID        `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID        `json:"AuthorizedTeams"`
-		Labels          []Pair          `json:"Labels"`
+		Tags            []string        `json:"Tags"`
+
+		// Deprecated fields
+		Labels []Pair `json:"Labels"`
 	}
 
 	// EndpointExtension represents a extension associated to an endpoint.
@@ -262,6 +266,15 @@ type (
 	TeamResourceAccess struct {
 		TeamID      TeamID              `json:"TeamId"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+	}
+
+	// TagID represents a tag identifier.
+	TagID int
+
+	// Tag represents a tag that can be associated to a resource.
+	Tag struct {
+		ID   TagID
+		Name string `json:"Name"`
 	}
 
 	// ResourceAccessLevel represents the level of control associated to a resource.
@@ -390,6 +403,13 @@ type (
 		DeleteResourceControl(ID ResourceControlID) error
 	}
 
+	// TagService represents a service for managing tag data.
+	TagService interface {
+		Tags() ([]Tag, error)
+		CreateTag(tag *Tag) error
+		DeleteTag(ID TagID) error
+	}
+
 	// CryptoService represents a service for encrypting/hashing data.
 	CryptoService interface {
 		Hash(data string) (string, error)
@@ -463,7 +483,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.17.1-dev"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 11
+	DBVersion = 12
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
