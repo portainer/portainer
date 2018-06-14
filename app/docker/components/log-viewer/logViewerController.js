@@ -7,6 +7,7 @@ function (clipboard) {
     copySupported: clipboard.supported,
     logCollection: true,
     autoScroll: true,
+    wrapLines: true,
     search: '',
     filteredLogs: [],
     selectedLines: []
@@ -35,5 +36,9 @@ function (clipboard) {
     } else {
       this.state.selectedLines.splice(idx, 1);
     }
+  };
+
+  this.getLogViewerCSSClass = function() {
+    return 'log_viewer' + (this.state.wrapLines ? ' wrap_lines' : '');
   };
 }]);
