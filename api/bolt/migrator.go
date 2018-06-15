@@ -4,27 +4,30 @@ import "github.com/portainer/portainer"
 
 // Migrator defines a service to migrate data after a Portainer version update.
 type Migrator struct {
-	UserService            *UserService
-	EndpointService        *EndpointService
+	CurrentDBVersion int
+	store            *Store
+
 	EndpointGroupService   *EndpointGroupService
+	EndpointService        *EndpointService
 	ResourceControlService *ResourceControlService
 	SettingsService        *SettingsService
+	StackService           *StackService
+	UserService            *UserService
 	VersionService         *VersionService
-	CurrentDBVersion       int
-	store                  *Store
 }
 
 // NewMigrator creates a new Migrator.
 func NewMigrator(store *Store, version int) *Migrator {
 	return &Migrator{
-		UserService:            store.UserService,
-		EndpointService:        store.EndpointService,
-		EndpointGroupService:   store.EndpointGroupService,
-		ResourceControlService: store.ResourceControlService,
-		SettingsService:        store.SettingsService,
-		VersionService:         store.VersionService,
 		CurrentDBVersion:       version,
 		store:                  store,
+		EndpointGroupService:   store.EndpointGroupService,
+		EndpointService:        store.EndpointService,
+		ResourceControlService: store.ResourceControlService,
+		SettingsService:        store.SettingsService,
+		StackService:           store.StackService,
+		UserService:            store.UserService,
+		VersionService:         store.VersionService,
 	}
 }
 
@@ -122,6 +125,7 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	// Portainer 1.17.1-dev
 	if m.CurrentDBVersion < 12 {
 		err := m.updateEndpointsToVersion12()
 		if err != nil {
@@ -129,6 +133,11 @@ func (m *Migrator) Migrate() error {
 		}
 
 		err = m.updateEndpointGroupsToVersion12()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateStacksToVersion12()
 		if err != nil {
 			return err
 		}

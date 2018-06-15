@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('StackController', ['$q', '$scope', '$state', '$transition$', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ContainerService', 'ServiceHelper', 'TaskHelper', 'Notifications', 'FormHelper',
-function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceService, TaskService, ContainerService, ServiceHelper, TaskHelper, Notifications, FormHelper) {
+.controller('StackController', ['$q', '$scope', '$state', '$transition$', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ContainerService', 'ServiceHelper', 'TaskHelper', 'Notifications', 'FormHelper', 'EndpointProvider',
+function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceService, TaskService, ContainerService, ServiceHelper, TaskHelper, Notifications, FormHelper, EndpointProvider) {
 
   $scope.state = {
     actionInProgress: false,
@@ -15,9 +15,19 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     var stackFile = $scope.stackFileContent;
     var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
     var prune = $scope.formValues.Prune;
+    var stack = $scope.stack;
+
+    // TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
+  	// The EndpointID property is not available for these stacks, we can pass
+    // the current endpoint identifier as a part of the update request. It will be used if
+    // the EndpointID property is not defined on the stack.
+    var endpointId = EndpointProvider.endpointID();
+    if (stack.EndpointId === 0) {
+      stack.EndpointId = endpointId;
+    }
 
     $scope.state.actionInProgress = true;
-    StackService.updateStack($scope.stack.Id, stackFile, env, prune)
+    StackService.updateStack(stack, stackFile, env, prune)
     .then(function success(data) {
       Notifications.success('Stack successfully deployed');
       $state.reload();

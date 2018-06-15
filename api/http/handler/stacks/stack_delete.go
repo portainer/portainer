@@ -46,7 +46,20 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(stack.EndpointID)
+	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
+	// The EndpointID property is not available for these stacks, this API endpoint
+	// can use the optional EndpointID query parameter to set a valid endpoint identifier to be
+	// used in the context of this request.
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
+	}
+	endpointIdentifier := stack.EndpointID
+	if endpointID != 0 {
+		endpointIdentifier = portainer.EndpointID(endpointID)
+	}
+
+	endpoint, err := handler.EndpointService.Endpoint(endpointIdentifier)
 	if err == portainer.ErrEndpointNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {

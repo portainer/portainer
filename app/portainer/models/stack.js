@@ -3,6 +3,7 @@ function StackViewModel(data) {
   this.Type = data.Type;
   this.Name = data.Name;
   this.Checked = false;
+  this.EndpointId = data.EndpointId;
   this.Env = data.Env ? data.Env : [];
   if (data.ResourceControl && data.ResourceControl.Id !== 0) {
     this.ResourceControl = new ResourceControlViewModel(data.ResourceControl);

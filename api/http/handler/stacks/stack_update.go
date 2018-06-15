@@ -36,7 +36,7 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/stacks/:id
+// PUT request on /api/stacks/:id?endpointId=<endpointId>
 func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {
@@ -64,6 +64,17 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		if !securityContext.IsAdmin && !proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
 			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 		}
+	}
+
+	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
+	// The EndpointID property is not available for these stacks, this API endpoint
+	// can use the optional EndpointID query parameter to associate a valid endpoint identifier to the stack.
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
+	}
+	if endpointID != int(stack.EndpointID) {
+		stack.EndpointID = portainer.EndpointID(endpointID)
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(stack.EndpointID)
