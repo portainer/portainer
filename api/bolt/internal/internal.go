@@ -107,6 +107,16 @@ func UnmarshalDockerHub(data []byte, settings *portainer.DockerHub) error {
 	return json.Unmarshal(data, settings)
 }
 
+// MarshalTag encodes a Tag object to binary format.
+func MarshalTag(tag *portainer.Tag) ([]byte, error) {
+	return json.Marshal(tag)
+}
+
+// UnmarshalTag decodes a Tag object from a binary data.
+func UnmarshalTag(data []byte, tag *portainer.Tag) error {
+	return json.Unmarshal(data, tag)
+}
+
 // Itob returns an 8-byte big endian representation of v.
 // This function is typically used for encoding integer IDs to byte slices
 // so that they can be used as BoltDB keys.

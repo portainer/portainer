@@ -22,33 +22,17 @@
     </div>
   </div>
   <!-- !description-input -->
-  <!-- labels -->
-  <div class="form-group">
-    <div class="col-sm-12" style="margin-top: 5px;">
-      <label class="control-label text-left">Labels</label>
-      <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addLabelAction()">
-        <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
-      </span>
-    </div>
-    <!-- labels-input-list -->
-    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-      <div ng-repeat="label in $ctrl.model.Labels" style="margin-top: 2px;">
-        <div class="input-group col-sm-5 input-group-sm">
-          <span class="input-group-addon">name</span>
-          <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. organization">
-        </div>
-        <div class="input-group col-sm-5 input-group-sm">
-          <span class="input-group-addon">value</span>
-          <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. acme">
-        </div>
-        <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLabelAction($index)">
-          <i class="fa fa-trash" aria-hidden="true"></i>
-        </button>
-      </div>
-    </div>
-    <!-- !labels-input-list -->
+  <div class="col-sm-12 form-section-title">
+    Metadata
   </div>
-  <!-- !labels -->
+  <!-- tags -->
+  <div class="form-group">
+    <tag-selector
+      tags="$ctrl.availableTags"
+      model="$ctrl.model.Tags"
+    ></tag-selector>
+  </div>
+  <!-- !tags -->
   <!-- endpoints -->
   <div ng-if="$ctrl.model.Id !== 1">
     <div class="col-sm-12 form-section-title">

@@ -6,6 +6,7 @@ import "github.com/portainer/portainer"
 type Migrator struct {
 	UserService            *UserService
 	EndpointService        *EndpointService
+	EndpointGroupService   *EndpointGroupService
 	ResourceControlService *ResourceControlService
 	SettingsService        *SettingsService
 	VersionService         *VersionService
@@ -18,6 +19,7 @@ func NewMigrator(store *Store, version int) *Migrator {
 	return &Migrator{
 		UserService:            store.UserService,
 		EndpointService:        store.EndpointService,
+		EndpointGroupService:   store.EndpointGroupService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		VersionService:         store.VersionService,
@@ -115,6 +117,18 @@ func (m *Migrator) Migrate() error {
 	// https://github.com/portainer/portainer/issues/1906
 	if m.CurrentDBVersion < 11 {
 		err := m.updateEndpointsToVersion11()
+		if err != nil {
+			return err
+		}
+	}
+
+	if m.CurrentDBVersion < 12 {
+		err := m.updateEndpointsToVersion12()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateEndpointGroupsToVersion12()
 		if err != nil {
 			return err
 		}

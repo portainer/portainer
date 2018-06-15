@@ -236,6 +236,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
+		Tags:            []string{},
 	}
 
 	if strings.HasPrefix(endpoint.URL, "tcp://") {
@@ -274,6 +275,7 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
+		Tags:            []string{},
 	}
 
 	return endpointService.CreateEndpoint(endpoint)
@@ -401,6 +403,7 @@ func main() {
 		RegistryService:        store.RegistryService,
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
+		TagService:             store.TagService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
 		CryptoService:          cryptoService,

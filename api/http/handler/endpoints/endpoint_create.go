@@ -28,6 +28,7 @@ type endpointCreatePayload struct {
 	AzureApplicationID     string
 	AzureTenantID          string
 	AzureAuthenticationKey string
+	Tags                   []string
 }
 
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
@@ -48,6 +49,13 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		groupID = 1
 	}
 	payload.GroupID = groupID
+
+	var tags []string
+	err = request.RetrieveMultiPartFormJSONValue(r, "Tags", &tags, true)
+	if err != nil {
+		return portainer.Error("Invalid Tags parameter")
+	}
+	payload.Tags = tags
 
 	useTLS, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLS", true)
 	payload.TLS = useTLS
@@ -168,6 +176,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		AuthorizedTeams:  []portainer.TeamID{},
 		Extensions:       []portainer.EndpointExtension{},
 		AzureCredentials: credentials,
+		Tags:             payload.Tags,
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
@@ -203,6 +212,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
+		Tags:            payload.Tags,
 	}
 
 	err := handler.EndpointService.CreateEndpoint(endpoint)
@@ -242,6 +252,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
+		Tags:            payload.Tags,
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)

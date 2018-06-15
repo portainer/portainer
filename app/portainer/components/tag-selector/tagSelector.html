@@ -1,0 +1,38 @@
+<div ng-show="$ctrl.model.length > 0" class="col-sm-12" style="padding: 0; margin-bottom: 15px;">
+  <label class="col-sm-3 col-lg-2 control-label text-left">
+    Selected tags
+  </label>
+  <div class="col-sm-9 col-lg-10" style="padding-top: 4px;">
+    <span class="tag space-right interactive" ng-repeat="tag in $ctrl.model" ng-click="$ctrl.removeTag(tag)">
+      {{ tag }}
+      <a title="Remove tag" ng-click="$ctrl.removeTag(tag)" style="margin-left: 2px;">
+        <span class="fa fa-trash-alt white-icon" aria-hidden="true"></span>
+      </a>
+    </span>
+  </div>
+</div>
+<div class="col-sm-12" style="padding: 0">
+  <label for="tags" class="col-sm-3 col-lg-2 control-label text-left">
+    Tags
+  </label>
+  <div class="col-sm-9 col-lg-10" ng-if="$ctrl.tags.length > 0">
+    <input
+      type="text" ng-model="$ctrl.state.selectedValue"
+      id="tags" class="form-control"
+      placeholder="Select tags..."
+      uib-typeahead="tag for tag in $ctrl.tags | filter:$viewValue | limitTo:7"
+      typeahead-on-select="$ctrl.selectTag($item, $model, $label)"
+      typeahead-no-results="$ctrl.state.noResult"
+      typeahead-show-hint="true" typeahead-min-length="0" />
+  </div>
+  <div class="col-sm-9 col-lg-10" ng-if="$ctrl.tags.length === 0">
+    <span class="small text-muted">
+      No tags available.
+    </span>
+  </div>
+</div>
+<div class="col-sm-offset-3 col-lg-offset-2 col-sm-12" ng-if="$ctrl.state.noResult" style="margin-top: 2px;">
+  <span class="small text-muted">
+    No tags matching your filter.
+  </span>
+</div>

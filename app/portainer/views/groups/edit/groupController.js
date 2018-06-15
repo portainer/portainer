@@ -1,17 +1,9 @@
 angular.module('portainer.app')
-.controller('GroupController', ['$q', '$scope', '$state', '$transition$', 'GroupService', 'EndpointService', 'Notifications',
-function ($q, $scope, $state, $transition$, GroupService, EndpointService, Notifications) {
+.controller('GroupController', ['$q', '$scope', '$state', '$transition$', 'GroupService', 'EndpointService', 'TagService', 'Notifications',
+function ($q, $scope, $state, $transition$, GroupService, EndpointService, TagService, Notifications) {
 
   $scope.state = {
     actionInProgress: false
-  };
-
-  $scope.addLabel = function() {
-    $scope.group.Labels.push({ name: '', value: '' });
-  };
-
-  $scope.removeLabel = function(index) {
-    $scope.group.Labels.splice(index, 1);
   };
 
   $scope.update = function() {
@@ -42,7 +34,8 @@ function ($q, $scope, $state, $transition$, GroupService, EndpointService, Notif
 
     $q.all({
       group: GroupService.group(groupId),
-      endpoints: EndpointService.endpoints()
+      endpoints: EndpointService.endpoints(),
+      tags: TagService.tagNames()
     })
     .then(function success(data) {
       $scope.group = data.group;
@@ -60,6 +53,7 @@ function ($q, $scope, $state, $transition$, GroupService, EndpointService, Notif
 
       $scope.availableEndpoints = availableEndpoints;
       $scope.associatedEndpoints = associatedEndpoints;
+      $scope.availableTags = data.tags;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to load view');

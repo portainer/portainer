@@ -12,8 +12,8 @@ import (
 type endpointGroupUpdatePayload struct {
 	Name                string
 	Description         string
-	Labels              []portainer.Pair
 	AssociatedEndpoints []portainer.EndpointID
+	Tags                []string
 }
 
 func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
@@ -48,7 +48,9 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		endpointGroup.Description = payload.Description
 	}
 
-	endpointGroup.Labels = payload.Labels
+	if payload.Tags != nil {
+		endpointGroup.Tags = payload.Tags
+	}
 
 	err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 	if err != nil {

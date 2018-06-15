@@ -296,6 +296,17 @@ angular.module('portainer.app', [])
     }
   };
 
+  var tags = {
+    name: 'portainer.tags',
+    url: '/tags',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/tags/tags.html',
+        controller: 'TagsController'
+      }
+    }
+  };
+
   var users = {
     name: 'portainer.users',
     url: '/users',
@@ -366,6 +377,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(stack);
   $stateRegistryProvider.register(stackCreation);
   $stateRegistryProvider.register(support);
+  $stateRegistryProvider.register(tags);
   $stateRegistryProvider.register(users);
   $stateRegistryProvider.register(user);
   $stateRegistryProvider.register(teams);

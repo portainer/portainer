@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('EndpointController', ['$q', '$scope', '$state', '$transition$', '$filter', 'EndpointService', 'GroupService', 'EndpointProvider', 'Notifications',
-function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupService, EndpointProvider, Notifications) {
+.controller('EndpointController', ['$q', '$scope', '$state', '$transition$', '$filter', 'EndpointService', 'GroupService', 'TagService', 'EndpointProvider', 'Notifications',
+function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupService, TagService, EndpointProvider, Notifications) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('portainer.endpoints');
@@ -27,6 +27,7 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
       Name: endpoint.Name,
       PublicURL: endpoint.PublicURL,
       GroupID: endpoint.GroupId,
+      Tags: endpoint.Tags,
       TLS: TLS,
       TLSSkipVerify: TLSSkipVerify,
       TLSSkipClientVerify: TLSSkipClientVerify,
@@ -61,7 +62,8 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
   function initView() {
     $q.all({
       endpoint: EndpointService.endpoint($transition$.params().id),
-      groups: GroupService.groups()
+      groups: GroupService.groups(),
+      tags: TagService.tagNames()
     })
     .then(function success(data) {
       var endpoint = data.endpoint;
@@ -73,6 +75,7 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
       endpoint.URL = $filter('stripprotocol')(endpoint.URL);
       $scope.endpoint = endpoint;
       $scope.groups = data.groups;
+      $scope.availableTags = data.tags;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint details');

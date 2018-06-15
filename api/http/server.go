@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/http/handler/settings"
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/handler/status"
+	"github.com/portainer/portainer/http/handler/tags"
 	"github.com/portainer/portainer/http/handler/teammemberships"
 	"github.com/portainer/portainer/http/handler/teams"
 	"github.com/portainer/portainer/http/handler/templates"
@@ -36,24 +37,25 @@ type Server struct {
 	AuthDisabled           bool
 	EndpointManagement     bool
 	Status                 *portainer.Status
-	UserService            portainer.UserService
-	TeamService            portainer.TeamService
-	TeamMembershipService  portainer.TeamMembershipService
+	ComposeStackManager    portainer.ComposeStackManager
+	CryptoService          portainer.CryptoService
+	SignatureService       portainer.DigitalSignatureService
+	DockerHubService       portainer.DockerHubService
 	EndpointService        portainer.EndpointService
 	EndpointGroupService   portainer.EndpointGroupService
+	FileService            portainer.FileService
+	GitService             portainer.GitService
+	JWTService             portainer.JWTService
+	LDAPService            portainer.LDAPService
+	RegistryService        portainer.RegistryService
 	ResourceControlService portainer.ResourceControlService
 	SettingsService        portainer.SettingsService
-	CryptoService          portainer.CryptoService
-	JWTService             portainer.JWTService
-	FileService            portainer.FileService
-	RegistryService        portainer.RegistryService
-	DockerHubService       portainer.DockerHubService
 	StackService           portainer.StackService
 	SwarmStackManager      portainer.SwarmStackManager
-	ComposeStackManager    portainer.ComposeStackManager
-	LDAPService            portainer.LDAPService
-	GitService             portainer.GitService
-	SignatureService       portainer.DigitalSignatureService
+	TagService             portainer.TagService
+	TeamService            portainer.TeamService
+	TeamMembershipService  portainer.TeamMembershipService
+	UserService            portainer.UserService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
@@ -126,6 +128,9 @@ func (server *Server) Start() error {
 	stackHandler.RegistryService = server.RegistryService
 	stackHandler.DockerHubService = server.DockerHubService
 
+	var tagHandler = tags.NewHandler(requestBouncer)
+	tagHandler.TagService = server.TagService
+
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
 	teamHandler.TeamMembershipService = server.TeamMembershipService
@@ -164,6 +169,7 @@ func (server *Server) Start() error {
 		SettingsHandler:        settingsHandler,
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
+		TagHandler:             tagHandler,
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,
 		TemplatesHandler:       templatesHandler,

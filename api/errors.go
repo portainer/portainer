@@ -68,6 +68,11 @@ const (
 	ErrStackNotExternal                = Error("Not an external stack")
 )
 
+// Tag errors
+const (
+	ErrTagAlreadyExists = Error("A tag already exists with this name")
+)
+
 // Endpoint extensions error
 const (
 	ErrEndpointExtensionNotSupported      = Error("This extension is not supported")
