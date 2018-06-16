@@ -6,6 +6,53 @@
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
         <div class="settings">
+            <span class="setting" uib-dropdown-toggle uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.columnVisibility.state.open">
+                <i class="fa fa-eye space-right" aria-hidden="true"></i>Column Visibility
+                <div class="dropdown-menu" uib-dropdown-menu>
+                  <div class="tableMenu">
+                    <div class="menuHeader">
+                      Show / Hide Columns
+                    </div>
+                    <div class="menuContent">
+                      <div class="md-checkbox">
+                        <input id="col_vis_name" type="checkbox" ng-model="$ctrl.columnVisibility.columns.name.display"/>
+                        <label for="col_vis_name" ng-bind="$ctrl.columnVisibility.columns.name.label"></label>
+                      </div>
+                      <div class="md-checkbox">
+                          <input id="col_vis_state" type="checkbox" ng-model="$ctrl.columnVisibility.columns.state.display"/>
+                          <label for="col_vis_state" ng-bind="$ctrl.columnVisibility.columns.state.label"></label>
+                      </div>
+                      <div class="md-checkbox">
+                          <input id="col_vis_actions" type="checkbox" ng-model="$ctrl.columnVisibility.columns.actions.display"/>
+                          <label for="col_vis_actions" ng-bind="$ctrl.columnVisibility.columns.actions.label"></label>
+                      </div>
+                      <div class="md-checkbox">
+                          <input id="col_vis_stack" type="checkbox" ng-model="$ctrl.columnVisibility.columns.stack.display"/>
+                          <label for="col_vis_stack" ng-bind="$ctrl.columnVisibility.columns.stack.label"></label>
+                      </div>
+                      <div class="md-checkbox">
+                          <input id="col_vis_image" type="checkbox" ng-model="$ctrl.columnVisibility.columns.image.display"/>
+                          <label for="col_vis_image" ng-bind="$ctrl.columnVisibility.columns.image.label"></label>
+                      </div>
+                      <div class="md-checkbox">
+                          <input id="col_vis_ip" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ip.display"/>
+                          <label for="col_vis_ip" ng-bind="$ctrl.columnVisibility.columns.ip.label"></label>
+                      </div>
+                      <div class="md-checkbox">
+                          <input id="col_vis_ports" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ports.display"/>
+                          <label for="col_vis_ports" ng-bind="$ctrl.columnVisibility.columns.ports.label"></label>
+                      </div>
+                      <div class="md-checkbox">
+                          <input id="col_vis_ownership" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ownership.display"/>
+                          <label for="col_vis_ownership" ng-bind="$ctrl.columnVisibility.columns.ownership.label"></label>
+                      </div>
+                    </div>
+                    <div>
+                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.columnVisibility.state.open = false;">Close</a>
+                    </div>
+                  </div>
+                </div>
+            </span>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
             <i class="fa fa-search" aria-hidden="true"></i> Search
           </span>
@@ -67,7 +114,7 @@
         <table class="table table-hover table-filters">
           <thead>
             <tr>
-              <th>
+              <th ng-show="$ctrl.columnVisibility.columns.name.display">
                 <span class="md-checkbox">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
@@ -78,7 +125,7 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Names' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
+              <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" ng-show="$ctrl.columnVisibility.columns.state.display">
                 <a ng-click="$ctrl.changeOrderBy('Status')">
                   State
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
@@ -105,24 +152,24 @@
                   </div>
                 </div>
               </th>
-              <th ng-if="$ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect">
+              <th ng-if="$ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect" ng-show="$ctrl.columnVisibility.columns.actions.display">
                 Quick actions
               </th>
-              <th>
+              <th ng-show="$ctrl.columnVisibility.columns.stack.display">
                 <a ng-click="$ctrl.changeOrderBy('StackName')">
                   Stack
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th ng-show="$ctrl.columnVisibility.columns.image.display">
                 <a ng-click="$ctrl.changeOrderBy('Image')">
                   Image
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th ng-show="$ctrl.columnVisibility.columns.ip.display">
                 <a ng-click="$ctrl.changeOrderBy('IP')">
                   IP Address
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && !$ctrl.state.reverseOrder"></i>
@@ -136,14 +183,14 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a ng-click="$ctrl.changeOrderBy('Ports')">
                   Published Ports
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th ng-if="$ctrl.showOwnershipColumn">
+              <th ng-if="$ctrl.showOwnershipColumn" ng-show="$ctrl.columnVisibility.columns.ownership.display">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
@@ -154,18 +201,18 @@
           </thead>
           <tbody>
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter: $ctrl.applyFilters | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
-              <td>
+              <td ng-show="$ctrl.columnVisibility.columns.name.display">
                 <span class="md-checkbox">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="docker.containers.container({ id: item.Id, nodeName: item.NodeName })">{{ item | containername | truncate: $ctrl.settings.containerNameTruncateSize }}</a>
               </td>
-              <td>
+              <td ng-show="$ctrl.columnVisibility.columns.state.display">
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) !== -1" class="label label-{{ item.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ item.Status }}</span>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) === -1" class="label label-{{ item.Status|containerstatusbadge }}">{{ item.Status }}</span>
               </td>
-              <td ng-if="$ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect">
+              <td ng-if="$ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect" ng-show="$ctrl.columnVisibility.columns.actions.display">
                 <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:inline-flex;">
                   <a ng-if="$ctrl.settings.showQuickActionStats" style="margin: 0 2.5px;" ui-sref="docker.containers.container.stats({id: item.Id, nodeName: item.NodeName})" title="Stats"><i class="fa fa-chart-area space-right" aria-hidden="true"></i></a>
                   <a ng-if="$ctrl.settings.showQuickActionLogs" style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({id: item.Id, nodeName: item.NodeName})" title="Logs"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
@@ -173,17 +220,17 @@
                   <a ng-if="$ctrl.settings.showQuickActionInspect" style="margin: 0 2.5px;" ui-sref="docker.containers.container.inspect({id: item.Id, nodeName: item.NodeName})" title="Inspect"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
                 </div>
               </td>
-              <td>{{ item.StackName ? item.StackName : '-' }}</td>
-              <td><a ui-sref="docker.images.image({ id: item.Image })">{{ item.Image | trimshasum }}</a></td>
-              <td>{{ item.IP ? item.IP : '-' }}</td>
+              <td ng-show="$ctrl.columnVisibility.columns.stack.display">{{ item.StackName ? item.StackName : '-' }}</td>
+              <td ng-show="$ctrl.columnVisibility.columns.image.display"><a ui-sref="docker.images.image({ id: item.Image })">{{ item.Image | trimshasum }}</a></td>
+              <td ng-show="$ctrl.columnVisibility.columns.ip.display">{{ item.IP ? item.IP : '-' }}</td>
               <td ng-if="$ctrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
-              <td>
+              <td ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a ng-if="item.Ports.length > 0" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.state.publicUrl || p.host }}:{{p.public}}" target="_blank">
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ p.public }}:{{ p.private }}
                 </a>
                 <span ng-if="item.Ports.length == 0" >-</span>
               </td>
-              <td ng-if="$ctrl.showOwnershipColumn">
+              <td ng-if="$ctrl.showOwnershipColumn" ng-show="$ctrl.columnVisibility.columns.ownership.display">
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
                   {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = 'public' }}

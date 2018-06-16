@@ -35,6 +35,46 @@ function (PaginationService, DatatableService, EndpointProvider) {
     }
   };
 
+  this.columnVisibility = {
+    state: {
+      open: false
+    },
+    columns: {
+      name: {
+        label: 'Name',
+        display: true
+      },
+      state: {
+        label: 'State',
+        display: true
+      },
+      actions: {
+        label: 'Quick Actions',
+        display: true
+      },
+      stack: {
+        label: 'Stack',
+        display: true
+      },
+      image: {
+        label: 'Image',
+        display: true
+      },
+      ip: {
+        label: 'IP Address',
+        display: true
+      },
+      ports: {
+        label: 'Published Ports',
+        display: true
+      },
+      ownership: {
+        label: 'Ownership',
+        display: true
+      }
+    }
+  };
+
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
