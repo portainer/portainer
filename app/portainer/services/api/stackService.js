@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.factory('StackService', ['$q', 'Stack', 'ResourceControlService', 'FileUploadService', 'StackHelper', 'ServiceService', 'ContainerService', 'SwarmService',
-function StackServiceFactory($q, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService) {
+.factory('StackService', ['$q', 'Stack', 'ResourceControlService', 'FileUploadService', 'StackHelper', 'ServiceService', 'ContainerService', 'SwarmService', 'EndpointProvider',
+function StackServiceFactory($q, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService, EndpointProvider) {
   'use strict';
   var service = {};
 
@@ -28,6 +28,50 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve stack content', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.migrateSwarmStack = function(stack, targetEndpointId) {
+    var deferred = $q.defer();
+
+    EndpointProvider.setEndpointID(targetEndpointId);
+
+    SwarmService.swarm()
+    .then(function success(data) {
+      var swarm = data;
+      if (swarm.Id === stack.SwarmId) {
+        EndpointProvider.setEndpointID(stack.EndpointId);
+        deferred.reject({ msg: 'Target endpoint is located in the same Swarm cluster as the current endpoint', err: null });
+        return;
+      }
+
+      return Stack.migrate({ id: stack.Id }, { EndpointID: targetEndpointId, SwarmID:  swarm.Id }).$promise;
+    })
+    .then(function success(data) {
+      deferred.resolve();
+    })
+    .catch(function error(err) {
+      EndpointProvider.setEndpointID(stack.EndpointId);
+      deferred.reject({ msg: 'Unable to migrate stack', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.migrateComposeStack = function(stack, targetEndpointId) {
+    var deferred = $q.defer();
+
+    EndpointProvider.setEndpointID(targetEndpointId);
+
+    Stack.migrate({ id: stack.Id }, { EndpointID: targetEndpointId }).$promise
+    .then(function success(data) {
+      deferred.resolve();
+    })
+    .catch(function error(err) {
+      EndpointProvider.setEndpointID(stack.EndpointId);
+      deferred.reject({ msg: 'Unable to migrate stack', err: err });
     });
 
     return deferred.promise;

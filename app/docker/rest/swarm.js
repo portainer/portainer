@@ -5,6 +5,6 @@ angular.module('portainer.docker')
     endpointId: EndpointProvider.endpointID
   },
   {
-    get: {method: 'GET'}
+    get: { method: 'GET' }
   });
 }]);

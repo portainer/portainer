@@ -9,11 +9,11 @@
   </div>
   <div class="sidebar-content">
   <ul class="sidebar">
-    <endpoint-selector ng-if="endpoints && groups"
+    <sidebar-endpoint-selector ng-if="endpoints && groups"
       endpoints="endpoints"
       groups="groups"
       select-endpoint="switchEndpoint"
-    ></endpoint-selector>
+    ></sidebar-endpoint-selector>
     <li class="sidebar-title"><span class="endpoint-name">{{ activeEndpoint.Name }}</span></li>
     <azure-sidebar-content ng-if="applicationState.endpoint.mode.provider === 'AZURE'">
     </azure-sidebar-content>
