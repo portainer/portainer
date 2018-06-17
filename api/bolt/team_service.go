@@ -31,7 +31,7 @@ func (service *TeamService) Team(ID portainer.TeamID) (*portainer.Team, error) {
 	}
 
 	var team portainer.Team
-	err = internal.UnmarshalTeam(data, &team)
+	err = internal.UnmarshalObject(data, &team)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (service *TeamService) TeamByName(name string) (*portainer.Team, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var t portainer.Team
-			err := internal.UnmarshalTeam(v, &t)
+			err := internal.UnmarshalObject(v, &t)
 			if err != nil {
 				return err
 			}
@@ -76,7 +76,7 @@ func (service *TeamService) Teams() ([]portainer.Team, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var team portainer.Team
-			err := internal.UnmarshalTeam(v, &team)
+			err := internal.UnmarshalObject(v, &team)
 			if err != nil {
 				return err
 			}
@@ -94,7 +94,7 @@ func (service *TeamService) Teams() ([]portainer.Team, error) {
 
 // UpdateTeam saves a Team.
 func (service *TeamService) UpdateTeam(ID portainer.TeamID, team *portainer.Team) error {
-	data, err := internal.MarshalTeam(team)
+	data, err := internal.MarshalObject(team)
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func (service *TeamService) CreateTeam(team *portainer.Team) error {
 		id, _ := bucket.NextSequence()
 		team.ID = portainer.TeamID(id)
 
-		data, err := internal.MarshalTeam(team)
+		data, err := internal.MarshalObject(team)
 		if err != nil {
 			return err
 		}

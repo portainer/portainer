@@ -31,7 +31,7 @@ func (service *ResourceControlService) ResourceControl(ID portainer.ResourceCont
 	}
 
 	var resourceControl portainer.ResourceControl
-	err = internal.UnmarshalResourceControl(data, &resourceControl)
+	err = internal.UnmarshalObject(data, &resourceControl)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (service *ResourceControlService) ResourceControlByResourceID(resourceID st
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var rc portainer.ResourceControl
-			err := internal.UnmarshalResourceControl(v, &rc)
+			err := internal.UnmarshalObject(v, &rc)
 			if err != nil {
 				return err
 			}
@@ -82,7 +82,7 @@ func (service *ResourceControlService) ResourceControls() ([]portainer.ResourceC
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var resourceControl portainer.ResourceControl
-			err := internal.UnmarshalResourceControl(v, &resourceControl)
+			err := internal.UnmarshalObject(v, &resourceControl)
 			if err != nil {
 				return err
 			}
@@ -104,7 +104,7 @@ func (service *ResourceControlService) CreateResourceControl(resourceControl *po
 		bucket := tx.Bucket([]byte(resourceControlBucketName))
 		id, _ := bucket.NextSequence()
 		resourceControl.ID = portainer.ResourceControlID(id)
-		data, err := internal.MarshalResourceControl(resourceControl)
+		data, err := internal.MarshalObject(resourceControl)
 		if err != nil {
 			return err
 		}
@@ -119,7 +119,7 @@ func (service *ResourceControlService) CreateResourceControl(resourceControl *po
 
 // UpdateResourceControl saves a ResourceControl object.
 func (service *ResourceControlService) UpdateResourceControl(ID portainer.ResourceControlID, resourceControl *portainer.ResourceControl) error {
-	data, err := internal.MarshalResourceControl(resourceControl)
+	data, err := internal.MarshalObject(resourceControl)
 	if err != nil {
 		return err
 	}

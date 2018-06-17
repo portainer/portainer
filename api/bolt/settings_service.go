@@ -35,7 +35,7 @@ func (service *SettingsService) Settings() (*portainer.Settings, error) {
 	}
 
 	var settings portainer.Settings
-	err = internal.UnmarshalSettings(data, &settings)
+	err = internal.UnmarshalObject(data, &settings)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (service *SettingsService) StoreSettings(settings *portainer.Settings) erro
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(settingsBucketName))
 
-		data, err := internal.MarshalSettings(settings)
+		data, err := internal.MarshalObject(settings)
 		if err != nil {
 			return err
 		}

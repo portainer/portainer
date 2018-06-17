@@ -66,7 +66,7 @@ func (m *Migrator) retrieveLegacyResourceControls() ([]portainer.ResourceControl
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var resourceControl portainer.ResourceControl
-			err := internal.UnmarshalResourceControl(v, &resourceControl)
+			err := internal.UnmarshalObject(v, &resourceControl)
 			if err != nil {
 				return err
 			}
@@ -78,7 +78,7 @@ func (m *Migrator) retrieveLegacyResourceControls() ([]portainer.ResourceControl
 		cursor = bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var resourceControl portainer.ResourceControl
-			err := internal.UnmarshalResourceControl(v, &resourceControl)
+			err := internal.UnmarshalObject(v, &resourceControl)
 			if err != nil {
 				return err
 			}
@@ -90,7 +90,7 @@ func (m *Migrator) retrieveLegacyResourceControls() ([]portainer.ResourceControl
 		cursor = bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var resourceControl portainer.ResourceControl
-			err := internal.UnmarshalResourceControl(v, &resourceControl)
+			err := internal.UnmarshalObject(v, &resourceControl)
 			if err != nil {
 				return err
 			}

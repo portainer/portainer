@@ -35,7 +35,7 @@ func (service *DockerHubService) DockerHub() (*portainer.DockerHub, error) {
 	}
 
 	var dockerhub portainer.DockerHub
-	err = internal.UnmarshalDockerHub(data, &dockerhub)
+	err = internal.UnmarshalObject(data, &dockerhub)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (service *DockerHubService) StoreDockerHub(dockerhub *portainer.DockerHub) 
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(dockerhubBucketName))
 
-		data, err := internal.MarshalDockerHub(dockerhub)
+		data, err := internal.MarshalObject(dockerhub)
 		if err != nil {
 			return err
 		}

@@ -31,7 +31,7 @@ func (service *EndpointGroupService) EndpointGroup(ID portainer.EndpointGroupID)
 	}
 
 	var endpointGroup portainer.EndpointGroup
-	err = internal.UnmarshalEndpointGroup(data, &endpointGroup)
+	err = internal.UnmarshalObject(data, &endpointGroup)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (service *EndpointGroupService) EndpointGroups() ([]portainer.EndpointGroup
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var endpointGroup portainer.EndpointGroup
-			err := internal.UnmarshalEndpointGroup(v, &endpointGroup)
+			err := internal.UnmarshalObject(v, &endpointGroup)
 			if err != nil {
 				return err
 			}
@@ -71,7 +71,7 @@ func (service *EndpointGroupService) CreateEndpointGroup(endpointGroup *portaine
 		id, _ := bucket.NextSequence()
 		endpointGroup.ID = portainer.EndpointGroupID(id)
 
-		data, err := internal.MarshalEndpointGroup(endpointGroup)
+		data, err := internal.MarshalObject(endpointGroup)
 		if err != nil {
 			return err
 		}
@@ -86,7 +86,7 @@ func (service *EndpointGroupService) CreateEndpointGroup(endpointGroup *portaine
 
 // UpdateEndpointGroup updates an endpoint group.
 func (service *EndpointGroupService) UpdateEndpointGroup(ID portainer.EndpointGroupID, endpointGroup *portainer.EndpointGroup) error {
-	data, err := internal.MarshalEndpointGroup(endpointGroup)
+	data, err := internal.MarshalObject(endpointGroup)
 	if err != nil {
 		return err
 	}

@@ -31,7 +31,7 @@ func (service *RegistryService) Registry(ID portainer.RegistryID) (*portainer.Re
 	}
 
 	var registry portainer.Registry
-	err = internal.UnmarshalRegistry(data, &registry)
+	err = internal.UnmarshalObject(data, &registry)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (service *RegistryService) Registries() ([]portainer.Registry, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var registry portainer.Registry
-			err := internal.UnmarshalRegistry(v, &registry)
+			err := internal.UnmarshalObject(v, &registry)
 			if err != nil {
 				return err
 			}
@@ -71,7 +71,7 @@ func (service *RegistryService) CreateRegistry(registry *portainer.Registry) err
 		id, _ := bucket.NextSequence()
 		registry.ID = portainer.RegistryID(id)
 
-		data, err := internal.MarshalRegistry(registry)
+		data, err := internal.MarshalObject(registry)
 		if err != nil {
 			return err
 		}
@@ -86,7 +86,7 @@ func (service *RegistryService) CreateRegistry(registry *portainer.Registry) err
 
 // UpdateRegistry updates an registry.
 func (service *RegistryService) UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error {
-	data, err := internal.MarshalRegistry(registry)
+	data, err := internal.MarshalObject(registry)
 	if err != nil {
 		return err
 	}

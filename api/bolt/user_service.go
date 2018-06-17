@@ -31,7 +31,7 @@ func (service *UserService) User(ID portainer.UserID) (*portainer.User, error) {
 	}
 
 	var user portainer.User
-	err = internal.UnmarshalUser(data, &user)
+	err = internal.UnmarshalObject(data, &user)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (service *UserService) UserByUsername(username string) (*portainer.User, er
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var u portainer.User
-			err := internal.UnmarshalUser(v, &u)
+			err := internal.UnmarshalObject(v, &u)
 			if err != nil {
 				return err
 			}
@@ -76,7 +76,7 @@ func (service *UserService) Users() ([]portainer.User, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var user portainer.User
-			err := internal.UnmarshalUser(v, &user)
+			err := internal.UnmarshalObject(v, &user)
 			if err != nil {
 				return err
 			}
@@ -101,7 +101,7 @@ func (service *UserService) UsersByRole(role portainer.UserRole) ([]portainer.Us
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var user portainer.User
-			err := internal.UnmarshalUser(v, &user)
+			err := internal.UnmarshalObject(v, &user)
 			if err != nil {
 				return err
 			}
@@ -120,7 +120,7 @@ func (service *UserService) UsersByRole(role portainer.UserRole) ([]portainer.Us
 
 // UpdateUser saves a user.
 func (service *UserService) UpdateUser(ID portainer.UserID, user *portainer.User) error {
-	data, err := internal.MarshalUser(user)
+	data, err := internal.MarshalObject(user)
 	if err != nil {
 		return err
 	}
@@ -144,7 +144,7 @@ func (service *UserService) CreateUser(user *portainer.User) error {
 		id, _ := bucket.NextSequence()
 		user.ID = portainer.UserID(id)
 
-		data, err := internal.MarshalUser(user)
+		data, err := internal.MarshalObject(user)
 		if err != nil {
 			return err
 		}

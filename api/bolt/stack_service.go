@@ -31,7 +31,7 @@ func (service *StackService) Stack(ID portainer.StackID) (*portainer.Stack, erro
 	}
 
 	var stack portainer.Stack
-	err = internal.UnmarshalStack(data, &stack)
+	err = internal.UnmarshalObject(data, &stack)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (service *StackService) StackByName(name string) (*portainer.Stack, error) 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var t portainer.Stack
-			err := internal.UnmarshalStack(v, &t)
+			err := internal.UnmarshalObject(v, &t)
 			if err != nil {
 				return err
 			}
@@ -76,7 +76,7 @@ func (service *StackService) Stacks() ([]portainer.Stack, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var stack portainer.Stack
-			err := internal.UnmarshalStack(v, &stack)
+			err := internal.UnmarshalObject(v, &stack)
 			if err != nil {
 				return err
 			}
@@ -97,7 +97,7 @@ func (service *StackService) CreateStack(stack *portainer.Stack) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stackBucketName))
 
-		data, err := internal.MarshalStack(stack)
+		data, err := internal.MarshalObject(stack)
 		if err != nil {
 			return err
 		}
@@ -112,7 +112,7 @@ func (service *StackService) CreateStack(stack *portainer.Stack) error {
 
 // UpdateStack updates an stack.
 func (service *StackService) UpdateStack(ID portainer.StackID, stack *portainer.Stack) error {
-	data, err := internal.MarshalStack(stack)
+	data, err := internal.MarshalObject(stack)
 	if err != nil {
 		return err
 	}

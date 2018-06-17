@@ -31,7 +31,7 @@ func (service *EndpointService) Endpoint(ID portainer.EndpointID) (*portainer.En
 	}
 
 	var endpoint portainer.Endpoint
-	err = internal.UnmarshalEndpoint(data, &endpoint)
+	err = internal.UnmarshalObject(data, &endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (service *EndpointService) Endpoints() ([]portainer.Endpoint, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var endpoint portainer.Endpoint
-			err := internal.UnmarshalEndpoint(v, &endpoint)
+			err := internal.UnmarshalObject(v, &endpoint)
 			if err != nil {
 				return err
 			}
@@ -107,7 +107,7 @@ func (service *EndpointService) CreateEndpoint(endpoint *portainer.Endpoint) err
 
 // UpdateEndpoint updates an endpoint.
 func (service *EndpointService) UpdateEndpoint(ID portainer.EndpointID, endpoint *portainer.Endpoint) error {
-	data, err := internal.MarshalEndpoint(endpoint)
+	data, err := internal.MarshalObject(endpoint)
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ func (service *EndpointService) DeleteEndpoint(ID portainer.EndpointID) error {
 }
 
 func marshalAndStoreEndpoint(endpoint *portainer.Endpoint, bucket *bolt.Bucket) error {
-	data, err := internal.MarshalEndpoint(endpoint)
+	data, err := internal.MarshalObject(endpoint)
 	if err != nil {
 		return err
 	}

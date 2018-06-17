@@ -21,7 +21,7 @@ func (service *TagService) Tags() ([]portainer.Tag, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var tag portainer.Tag
-			err := internal.UnmarshalTag(v, &tag)
+			err := internal.UnmarshalObject(v, &tag)
 			if err != nil {
 				return err
 			}
@@ -45,7 +45,7 @@ func (service *TagService) CreateTag(tag *portainer.Tag) error {
 		id, _ := bucket.NextSequence()
 		tag.ID = portainer.TagID(id)
 
-		data, err := internal.MarshalTag(tag)
+		data, err := internal.MarshalObject(tag)
 		if err != nil {
 			return err
 		}
