@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
 	"github.com/portainer/portainer"
@@ -40,6 +41,9 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 	execID, err := request.RetrieveQueryParameter(r, "id", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: id", err}
+	}
+	if !govalidator.IsHexadecimal(execID) {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: id (must be hexadecimal identifier)", err}
 	}
 
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
