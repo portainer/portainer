@@ -42,7 +42,6 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     .then(function success(data) {
       var swarm = data;
       if (swarm.Id === stack.SwarmId) {
-        EndpointProvider.setEndpointID(stack.EndpointId);
         deferred.reject({ msg: 'Target endpoint is located in the same Swarm cluster as the current endpoint', err: null });
         return;
       }
@@ -53,8 +52,10 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
       deferred.resolve();
     })
     .catch(function error(err) {
-      EndpointProvider.setEndpointID(stack.EndpointId);
       deferred.reject({ msg: 'Unable to migrate stack', err: err });
+    })
+    .finally(function final() {
+      EndpointProvider.setEndpointID(stack.EndpointId);
     });
 
     return deferred.promise;
