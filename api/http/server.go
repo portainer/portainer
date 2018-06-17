@@ -153,8 +153,10 @@ func (server *Server) Start() error {
 	userHandler.ResourceControlService = server.ResourceControlService
 	userHandler.SettingsService = server.SettingsService
 
-	var websocketHandler = websocket.NewHandler()
+	var websocketHandler = websocket.NewHandler(requestBouncer)
 	websocketHandler.EndpointService = server.EndpointService
+	websocketHandler.EndpointGroupService = server.EndpointGroupService
+	websocketHandler.TeamMembershipService = server.TeamMembershipService
 	websocketHandler.SignatureService = server.SignatureService
 
 	server.Handler = &handler.Handler{

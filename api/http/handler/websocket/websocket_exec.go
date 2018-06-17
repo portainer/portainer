@@ -18,6 +18,7 @@ import (
 	"github.com/portainer/portainer/crypto"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
+	"github.com/portainer/portainer/http/security"
 )
 
 type webSocketExecRequestParams struct {
@@ -31,11 +32,17 @@ type execStartOperationPayload struct {
 	Detach bool
 }
 
-// websocketExec handles GET requests on /websocket/exec?id=<execID>&endpointId=<endpointID>&nodeName=<nodeName>
+// websocketExec handles GET requests on /websocket/exec?id=<execID>&endpointId=<endpointID>&nodeName=<nodeName>&token=<token>
 // If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
 // If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
 // an ExecStart operation HTTP request will be created and hijacked.
+// Authentication and access is controled via the mandatory token query parameter.
 func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	// token, err := request.RetrieveNumericQueryParameter(r, "token", false)
+	// if err != nil {
+	// 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: token", err}
+	// }
+
 	execID, err := request.RetrieveQueryParameter(r, "id", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: id", err}
@@ -51,6 +58,20 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
+	}
+
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
+	}
+
+	if tokenData.Role != portainer.AdministratorRole {
+		err = handler.checkEndpointAccess(endpoint, tokenData.ID)
+		if err != nil && err == portainer.ErrEndpointAccessDenied {
+			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
+		} else if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify permission to access endpoint", err}
+		}
 	}
 
 	params := &webSocketExecRequestParams{

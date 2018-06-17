@@ -120,6 +120,10 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 		if !bouncer.authDisabled {
 			var token string
 
+			// Optionally, token might be set via the "token" query parameter.
+			// For example, in websocket requests
+			token = r.URL.Query().Get("token")
+
 			// Get token from the Authorization header
 			tokens, ok := r.Header["Authorization"]
 			if ok && len(tokens) >= 1 {
