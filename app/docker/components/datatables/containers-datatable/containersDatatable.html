@@ -6,55 +6,55 @@
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
         <div class="settings">
-            <span class="setting" uib-dropdown-toggle uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.columnVisibility.state.open">
-                <i class="fa fa-eye space-right" aria-hidden="true"></i>Column Visibility
-                <div class="dropdown-menu" uib-dropdown-menu>
-                  <div class="tableMenu">
-                    <div class="menuHeader">
-                      Show / Hide Columns
-                    </div>
-                    <div class="menuContent">
-                      <div class="md-checkbox">
-                        <input id="col_vis_name" type="checkbox" ng-model="$ctrl.columnVisibility.columns.name.display"/>
-                        <label for="col_vis_name" ng-bind="$ctrl.columnVisibility.columns.name.label"></label>
-                      </div>
-                      <div class="md-checkbox">
-                          <input id="col_vis_state" type="checkbox" ng-model="$ctrl.columnVisibility.columns.state.display"/>
-                          <label for="col_vis_state" ng-bind="$ctrl.columnVisibility.columns.state.label"></label>
-                      </div>
-                      <div class="md-checkbox">
-                          <input id="col_vis_actions" type="checkbox" ng-model="$ctrl.columnVisibility.columns.actions.display"/>
-                          <label for="col_vis_actions" ng-bind="$ctrl.columnVisibility.columns.actions.label"></label>
-                      </div>
-                      <div class="md-checkbox">
-                          <input id="col_vis_stack" type="checkbox" ng-model="$ctrl.columnVisibility.columns.stack.display"/>
-                          <label for="col_vis_stack" ng-bind="$ctrl.columnVisibility.columns.stack.label"></label>
-                      </div>
-                      <div class="md-checkbox">
-                          <input id="col_vis_image" type="checkbox" ng-model="$ctrl.columnVisibility.columns.image.display"/>
-                          <label for="col_vis_image" ng-bind="$ctrl.columnVisibility.columns.image.label"></label>
-                      </div>
-                      <div class="md-checkbox">
-                          <input id="col_vis_ip" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ip.display"/>
-                          <label for="col_vis_ip" ng-bind="$ctrl.columnVisibility.columns.ip.label"></label>
-                      </div>
-                      <div class="md-checkbox">
-                          <input id="col_vis_ports" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ports.display"/>
-                          <label for="col_vis_ports" ng-bind="$ctrl.columnVisibility.columns.ports.label"></label>
-                      </div>
-                      <div class="md-checkbox">
-                          <input id="col_vis_ownership" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ownership.display"/>
-                          <label for="col_vis_ownership" ng-bind="$ctrl.columnVisibility.columns.ownership.label"></label>
-                      </div>
-                    </div>
-                    <div>
-                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.columnVisibility.state.open = false;">Close</a>
-                    </div>
-                  </div>
-                </div>
-            </span>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
             <i class="fa fa-search" aria-hidden="true"></i> Search
+          </span>
+          <span class="setting" ng-class="{ 'setting-active': $ctrl.columnVisibility.state.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.columnVisibility.state.open">
+              <span uib-dropdown-toggle ><i class="fa fa-columns space-right" aria-hidden="true"></i>Columns</span>
+              <div class="dropdown-menu" uib-dropdown-menu>
+                <div class="tableMenu">
+                  <div class="menuHeader">
+                    Show / Hide Columns
+                  </div>
+                  <div class="menuContent">
+                    <div class="md-checkbox">
+                      <input id="col_vis_name" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.name.display"/>
+                      <label for="col_vis_name" ng-bind="$ctrl.columnVisibility.columns.name.label"></label>
+                    </div>
+                    <div class="md-checkbox">
+                      <input id="col_vis_state" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.state.display"/>
+                      <label for="col_vis_state" ng-bind="$ctrl.columnVisibility.columns.state.label"></label>
+                    </div>
+                    <div class="md-checkbox">
+                      <input id="col_vis_actions" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.actions.display"/>
+                      <label for="col_vis_actions" ng-bind="$ctrl.columnVisibility.columns.actions.label"></label>
+                    </div>
+                    <div class="md-checkbox">
+                      <input id="col_vis_stack" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.stack.display"/>
+                      <label for="col_vis_stack" ng-bind="$ctrl.columnVisibility.columns.stack.label"></label>
+                    </div>
+                    <div class="md-checkbox">
+                      <input id="col_vis_image" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.image.display"/>
+                      <label for="col_vis_image" ng-bind="$ctrl.columnVisibility.columns.image.label"></label>
+                    </div>
+                    <div class="md-checkbox">
+                      <input id="col_vis_ip" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ip.display"/>
+                      <label for="col_vis_ip" ng-bind="$ctrl.columnVisibility.columns.ip.label"></label>
+                    </div>
+                    <div class="md-checkbox">
+                      <input id="col_vis_ports" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ports.display"/>
+                      <label for="col_vis_ports" ng-bind="$ctrl.columnVisibility.columns.ports.label"></label>
+                    </div>
+                    <div class="md-checkbox">
+                      <input id="col_vis_ownership" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ownership.display"/>
+                      <label for="col_vis_ownership" ng-bind="$ctrl.columnVisibility.columns.ownership.label"></label>
+                    </div>
+                  </div>
+                  <div>
+                    <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.columnVisibility.state.open = false;">Close</a>
+                  </div>
+                </div>
+              </div>
           </span>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>

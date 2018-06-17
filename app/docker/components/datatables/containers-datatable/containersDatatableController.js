@@ -75,6 +75,10 @@ function (PaginationService, DatatableService, EndpointProvider) {
     }
   };
 
+  this.onColumnVisibilityChange = function()  {
+    DatatableService.setColumnVisibilitySettings(this.tableKey, this.columnVisibility);
+  };
+
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
@@ -252,6 +256,12 @@ function (PaginationService, DatatableService, EndpointProvider) {
       this.settings = storedSettings;
     }
     this.settings.open = false;
+
+    var storedColumnVisibility = DatatableService.getColumnVisibilitySettings(this.tableKey);
+    if (storedColumnVisibility !== null) {
+      this.columnVisibility = storedColumnVisibility;
+    }
+    this.columnVisibility.state.open = false;
   };
 
   function setDefaults(ctrl) {
