@@ -14,7 +14,17 @@ type (
 		jwtService            portainer.JWTService
 		userService           portainer.UserService
 		teamMembershipService portainer.TeamMembershipService
+		endpointGroupService  portainer.EndpointGroupService
 		authDisabled          bool
+	}
+
+	// RequestBouncerParams represents the required parameters to create a new RequestBouncer instance.
+	RequestBouncerParams struct {
+		JWTService            portainer.JWTService
+		UserService           portainer.UserService
+		TeamMembershipService portainer.TeamMembershipService
+		EndpointGroupService  portainer.EndpointGroupService
+		AuthDisabled          bool
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -28,12 +38,13 @@ type (
 )
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(jwtService portainer.JWTService, userService portainer.UserService, teamMembershipService portainer.TeamMembershipService, authDisabled bool) *RequestBouncer {
+func NewRequestBouncer(parameters *RequestBouncerParams) *RequestBouncer {
 	return &RequestBouncer{
-		jwtService:            jwtService,
-		userService:           userService,
-		teamMembershipService: teamMembershipService,
-		authDisabled:          authDisabled,
+		jwtService:            parameters.JWTService,
+		userService:           parameters.UserService,
+		teamMembershipService: parameters.TeamMembershipService,
+		endpointGroupService:  parameters.EndpointGroupService,
+		authDisabled:          parameters.AuthDisabled,
 	}
 }
 
@@ -68,6 +79,36 @@ func (bouncer *RequestBouncer) AdministratorAccess(h http.Handler) http.Handler 
 	h = mwCheckAdministratorRole(h)
 	h = bouncer.AuthenticatedAccess(h)
 	return h
+}
+
+// EndpointAccess retrieves the JWT token from the request context and verifies
+// that the user can access the specified endpoint.
+// An error is returned when access is denied.
+func (bouncer *RequestBouncer) EndpointAccess(r *http.Request, endpoint *portainer.Endpoint) error {
+	tokenData, err := RetrieveTokenData(r)
+	if err != nil {
+		return err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return nil
+	}
+
+	memberships, err := bouncer.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+	if err != nil {
+		return err
+	}
+
+	group, err := bouncer.endpointGroupService.EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return err
+	}
+
+	if !authorizedEndpointAccess(endpoint, group, tokenData.ID, memberships) {
+		return portainer.ErrEndpointAccessDenied
+	}
+
+	return nil
 }
 
 // mwSecureHeaders provides secure headers middleware for handlers.

@@ -64,7 +64,14 @@ type Server struct {
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
-	requestBouncer := security.NewRequestBouncer(server.JWTService, server.UserService, server.TeamMembershipService, server.AuthDisabled)
+	requestBouncerParameters := &security.RequestBouncerParams{
+		JWTService:            server.JWTService,
+		UserService:           server.UserService,
+		TeamMembershipService: server.TeamMembershipService,
+		EndpointGroupService:  server.EndpointGroupService,
+		AuthDisabled:          server.AuthDisabled,
+	}
+	requestBouncer := security.NewRequestBouncer(requestBouncerParameters)
 	proxyManagerParameters := &proxy.ManagerParams{
 		ResourceControlService: server.ResourceControlService,
 		TeamMembershipService:  server.TeamMembershipService,
@@ -98,8 +105,6 @@ func (server *Server) Start() error {
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.EndpointService = server.EndpointService
-	endpointProxyHandler.EndpointGroupService = server.EndpointGroupService
-	endpointProxyHandler.TeamMembershipService = server.TeamMembershipService
 	endpointProxyHandler.ProxyManager = proxyManager
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
@@ -119,8 +124,6 @@ func (server *Server) Start() error {
 	stackHandler.FileService = server.FileService
 	stackHandler.StackService = server.StackService
 	stackHandler.EndpointService = server.EndpointService
-	stackHandler.EndpointGroupService = server.EndpointGroupService
-	stackHandler.TeamMembershipService = server.TeamMembershipService
 	stackHandler.ResourceControlService = server.ResourceControlService
 	stackHandler.SwarmStackManager = server.SwarmStackManager
 	stackHandler.ComposeStackManager = server.ComposeStackManager
@@ -155,8 +158,6 @@ func (server *Server) Start() error {
 
 	var websocketHandler = websocket.NewHandler(requestBouncer)
 	websocketHandler.EndpointService = server.EndpointService
-	websocketHandler.EndpointGroupService = server.EndpointGroupService
-	websocketHandler.TeamMembershipService = server.TeamMembershipService
 	websocketHandler.SignatureService = server.SignatureService
 
 	server.Handler = &handler.Handler{
