@@ -201,10 +201,21 @@ func (service *Service) WriteJSONToFile(path string, content interface{}) error 
 	return ioutil.WriteFile(path, jsonContent, 0644)
 }
 
+// FileExists checks for the existence of the specified file.
+func (service *Service) FileExists(filePath string) (bool, error) {
+	if _, err := os.Stat(filePath); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 // KeyPairFilesExist checks for the existence of the key files.
 func (service *Service) KeyPairFilesExist() (bool, error) {
 	privateKeyPath := path.Join(service.dataStorePath, PrivateKeyFile)
-	exists, err := fileExists(privateKeyPath)
+	exists, err := service.FileExists(privateKeyPath)
 	if err != nil {
 		return false, err
 	}
@@ -213,7 +224,7 @@ func (service *Service) KeyPairFilesExist() (bool, error) {
 	}
 
 	publicKeyPath := path.Join(service.dataStorePath, PublicKeyFile)
-	exists, err = fileExists(publicKeyPath)
+	exists, err = service.FileExists(publicKeyPath)
 	if err != nil {
 		return false, err
 	}
@@ -306,14 +317,4 @@ func (service *Service) getContentFromPEMFile(filePath string) ([]byte, error) {
 
 	block, _ := pem.Decode(fileContent)
 	return block.Bytes, nil
-}
-
-func fileExists(filePath string) (bool, error) {
-	if _, err := os.Stat(filePath); err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		}
-		return false, err
-	}
-	return true, nil
 }

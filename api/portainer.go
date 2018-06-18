@@ -447,6 +447,7 @@ type (
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
+		FileExists(path string) (bool, error)
 	}
 
 	// GitService represents a service for managing Git.
