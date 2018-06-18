@@ -38,7 +38,7 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 
 // PUT request on /api/stacks/:id?endpointId=<endpointId>
 func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	stackID, err := request.RetrieveRouteVariableValue(r, "id")
+	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}

@@ -18,7 +18,7 @@ type stackFileResponse struct {
 
 // GET request on /api/stacks/:id/file
 func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	stackID, err := request.RetrieveRouteVariableValue(r, "id")
+	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}

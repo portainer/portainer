@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
@@ -12,6 +13,8 @@ import (
 )
 
 // DELETE request on /api/stacks/:id?external=<external>&endpointId=<endpointId>
+// If the external query parameter is set to true, the id route variable is expected to be
+// the name of an external stack as a string.
 func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {
@@ -23,7 +26,12 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return handler.deleteExternalStack(r, w, stackID)
 	}
 
-	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
+	id, err := strconv.Atoi(stackID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
+	}
+
+	stack, err := handler.StackService.Stack(portainer.StackID(id))
 	if err == portainer.ErrStackNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -71,7 +79,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.DeleteStack(portainer.StackID(stackID))
+	err = handler.StackService.DeleteStack(portainer.StackID(id))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the stack from the database", err}
 	}

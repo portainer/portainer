@@ -42,8 +42,8 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initStore(dataStorePath string) *bolt.Store {
-	store, err := bolt.NewStore(dataStorePath)
+func initStore(dataStorePath string, fileService portainer.FileService) *bolt.Store {
+	store, err := bolt.NewStore(dataStorePath, fileService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -307,7 +307,7 @@ func main() {
 
 	fileService := initFileService(*flags.Data)
 
-	store := initStore(*flags.Data)
+	store := initStore(*flags.Data, fileService)
 	defer store.Close()
 
 	jwtService := initJWTService(!*flags.NoAuth)

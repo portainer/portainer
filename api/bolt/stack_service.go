@@ -17,7 +17,7 @@ func (service *StackService) Stack(ID portainer.StackID) (*portainer.Stack, erro
 	var data []byte
 	err := service.store.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stackBucketName))
-		value := bucket.Get([]byte(ID))
+		value := bucket.Get(internal.Itob(int(ID)))
 		if value == nil {
 			return portainer.ErrStackNotFound
 		}
@@ -92,17 +92,36 @@ func (service *StackService) Stacks() ([]portainer.Stack, error) {
 	return stacks, nil
 }
 
+// GetNextIdentifier returns the current bucket identifier incremented by 1.
+func (service *StackService) GetNextIdentifier() int {
+	var identifier int
+
+	service.store.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(stackBucketName))
+		id := bucket.Sequence()
+		identifier = int(id)
+		return nil
+	})
+
+	identifier++
+	return identifier
+}
+
 // CreateStack creates a new stack.
 func (service *StackService) CreateStack(stack *portainer.Stack) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stackBucketName))
+		err := bucket.SetSequence(uint64(stack.ID))
+		if err != nil {
+			return err
+		}
 
 		data, err := internal.MarshalObject(stack)
 		if err != nil {
 			return err
 		}
 
-		err = bucket.Put([]byte(stack.ID), data)
+		err = bucket.Put(internal.Itob(int(stack.ID)), data)
 		if err != nil {
 			return err
 		}
@@ -119,7 +138,7 @@ func (service *StackService) UpdateStack(ID portainer.StackID, stack *portainer.
 
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stackBucketName))
-		err = bucket.Put([]byte(ID), data)
+		err = bucket.Put(internal.Itob(int(ID)), data)
 		if err != nil {
 			return err
 		}
@@ -131,7 +150,7 @@ func (service *StackService) UpdateStack(ID portainer.StackID, stack *portainer.
 func (service *StackService) DeleteStack(ID portainer.StackID) error {
 	return service.store.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stackBucketName))
-		err := bucket.Delete([]byte(ID))
+		err := bucket.Delete(internal.Itob(int(ID)))
 		if err != nil {
 			return err
 		}

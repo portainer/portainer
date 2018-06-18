@@ -129,7 +129,7 @@ type (
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier).
-	StackID string
+	StackID int
 
 	// StackType represents the type of the stack (compose v2, stack deploy v3).
 	StackType int
@@ -373,6 +373,7 @@ type (
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
+		GetNextIdentifier() int
 	}
 
 	// DockerHubService represents a service for managing the DockerHub object.
@@ -434,6 +435,7 @@ type (
 	// FileService represents a service for managing files.
 	FileService interface {
 		GetFileContent(filePath string) (string, error)
+		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
 		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)
 		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)

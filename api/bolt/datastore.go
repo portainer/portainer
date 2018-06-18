@@ -31,6 +31,7 @@ type Store struct {
 
 	db                    *bolt.DB
 	checkForDataMigration bool
+	FileService           portainer.FileService
 }
 
 const (
@@ -50,7 +51,7 @@ const (
 )
 
 // NewStore initializes a new Store and the associated services
-func NewStore(storePath string) (*Store, error) {
+func NewStore(storePath string, fileService portainer.FileService) (*Store, error) {
 	store := &Store{
 		Path:                   storePath,
 		UserService:            &UserService{},
@@ -65,6 +66,7 @@ func NewStore(storePath string) (*Store, error) {
 		DockerHubService:       &DockerHubService{},
 		StackService:           &StackService{},
 		TagService:             &TagService{},
+		FileService:            fileService,
 	}
 	store.UserService.store = store
 	store.TeamService.store = store
