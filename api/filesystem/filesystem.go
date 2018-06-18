@@ -186,6 +186,11 @@ func (service *Service) GetFileContent(filePath string) (string, error) {
 	return string(content), nil
 }
 
+// Rename renames a file or directory
+func (service *Service) Rename(oldPath, newPath string) error {
+	return os.Rename(oldPath, newPath)
+}
+
 // WriteJSONToFile writes JSON to the specified file.
 func (service *Service) WriteJSONToFile(path string, content interface{}) error {
 	jsonContent, err := json.Marshal(content)

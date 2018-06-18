@@ -1,8 +1,8 @@
 package stacks
 
 import (
+	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
@@ -15,12 +15,11 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 		return nil
 	}
 
-	handler.FileService.RemoveDirectory(stack.ProjectPath)
+	err := handler.FileService.RemoveDirectory(stack.ProjectPath)
+	if err != nil {
+		log.Printf("http error: Unable to cleanup stack creation (err=%s)\n", err)
+	}
 	return nil
-}
-
-func buildStackIdentifier(stackName string, endpointID portainer.EndpointID) string {
-	return stackName + "_" + strconv.Itoa(int(endpointID))
 }
 
 // POST request on /api/stacks?type=<type>&method=<method>&endpointId=<endpointId>

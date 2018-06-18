@@ -46,9 +46,9 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		}
 	}
 
-	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
+	stackID := handler.StackService.GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackIdentifier),
+		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
 		Type:       portainer.DockerComposeStack,
 		EndpointID: endpoint.ID,
@@ -126,9 +126,9 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		}
 	}
 
-	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
+	stackID := handler.StackService.GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackIdentifier),
+		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
 		Type:       portainer.DockerComposeStack,
 		EndpointID: endpoint.ID,
@@ -211,9 +211,9 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		}
 	}
 
-	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
+	stackID := handler.StackService.GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackIdentifier),
+		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
 		Type:       portainer.DockerComposeStack,
 		EndpointID: endpoint.ID,

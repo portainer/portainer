@@ -51,9 +51,9 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		}
 	}
 
-	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
+	stackID := handler.StackService.GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackIdentifier),
+		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
 		Type:       portainer.DockerSwarmStack,
 		SwarmID:    payload.SwarmID,
@@ -138,9 +138,9 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		}
 	}
 
-	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
+	stackID := handler.StackService.GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackIdentifier),
+		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
 		Type:       portainer.DockerSwarmStack,
 		SwarmID:    payload.SwarmID,
@@ -239,9 +239,9 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		}
 	}
 
-	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
+	stackID := handler.StackService.GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackIdentifier),
+		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
 		Type:       portainer.DockerSwarmStack,
 		SwarmID:    payload.SwarmID,

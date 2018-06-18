@@ -14,6 +14,7 @@ type Migrator struct {
 	StackService           *StackService
 	UserService            *UserService
 	VersionService         *VersionService
+	FileService            portainer.FileService
 }
 
 // NewMigrator creates a new Migrator.
