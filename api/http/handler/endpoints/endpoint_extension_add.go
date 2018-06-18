@@ -19,8 +19,8 @@ func (payload *endpointExtensionAddPayload) Validate(r *http.Request) error {
 	if payload.Type != 1 {
 		return portainer.Error("Invalid type value. Value must be one of: 1 (Storidge)")
 	}
-	if govalidator.IsNull(payload.URL) {
-		return portainer.Error("Invalid URL")
+	if payload.Type == 1 && govalidator.IsNull(payload.URL) {
+		return portainer.Error("Invalid extension URL")
 	}
 	return nil
 }
