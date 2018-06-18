@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
 	"github.com/portainer/portainer"
@@ -31,14 +32,18 @@ type execStartOperationPayload struct {
 	Detach bool
 }
 
-// websocketExec handles GET requests on /websocket/exec?id=<execID>&endpointId=<endpointID>&nodeName=<nodeName>
+// websocketExec handles GET requests on /websocket/exec?id=<execID>&endpointId=<endpointID>&nodeName=<nodeName>&token=<token>
 // If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
 // If the nodeName query parameter is not specified, the request will be upgraded to the websocket protocol and
 // an ExecStart operation HTTP request will be created and hijacked.
+// Authentication and access is controled via the mandatory token query parameter.
 func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	execID, err := request.RetrieveQueryParameter(r, "id", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: id", err}
+	}
+	if !govalidator.IsHexadecimal(execID) {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: id (must be hexadecimal identifier)", err}
 	}
 
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
@@ -51,6 +56,11 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
+	}
+
+	err = handler.requestBouncer.EndpointAccess(r, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
 	}
 
 	params := &webSocketExecRequestParams{
