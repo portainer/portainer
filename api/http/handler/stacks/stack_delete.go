@@ -113,18 +113,9 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
 	}
 
-	tokenData, err := security.RetrieveTokenData(r)
+	err = handler.requestBouncer.EndpointAccess(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
-	}
-
-	if tokenData.Role != portainer.AdministratorRole {
-		err = handler.checkEndpointAccess(endpoint, tokenData.ID)
-		if err != nil && err == portainer.ErrEndpointAccessDenied {
-			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
-		} else if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify permission to access endpoint", err}
-		}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
 	}
 
 	stack = &portainer.Stack{

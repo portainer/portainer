@@ -11,16 +11,16 @@ import (
 // Handler is the HTTP handler used to proxy requests to external APIs.
 type Handler struct {
 	*mux.Router
-	EndpointService       portainer.EndpointService
-	EndpointGroupService  portainer.EndpointGroupService
-	TeamMembershipService portainer.TeamMembershipService
-	ProxyManager          *proxy.Manager
+	requestBouncer  *security.RequestBouncer
+	EndpointService portainer.EndpointService
+	ProxyManager    *proxy.Manager
 }
 
 // NewHandler creates a handler to proxy requests to external APIs.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
+		Router:         mux.NewRouter(),
+		requestBouncer: bouncer,
 	}
 	h.PathPrefix("/{id}/azure").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToAzureAPI)))
@@ -29,22 +29,4 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.PathPrefix("/{id}/extensions/storidge").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToStoridgeAPI)))
 	return h
-}
-
-func (handler *Handler) checkEndpointAccess(endpoint *portainer.Endpoint, userID portainer.UserID) error {
-	memberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(userID)
-	if err != nil {
-		return err
-	}
-
-	group, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
-	if err != nil {
-		return err
-	}
-
-	if !security.AuthorizedEndpointAccess(endpoint, group, userID, memberships) {
-		return portainer.ErrEndpointAccessDenied
-	}
-
-	return nil
 }
