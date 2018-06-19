@@ -25,7 +25,7 @@ func (payload *stackMigratePayload) Validate(r *http.Request) error {
 
 // POST request on /api/stacks/:id/migrate
 func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	stackID, err := request.RetrieveRouteVariableValue(r, "id")
+	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}
@@ -37,14 +37,14 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
-	if err == portainer.ErrStackNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
 	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceID(stack.Name)
-	if err != nil && err != portainer.ErrResourceControlNotFound {
+	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
 
@@ -60,14 +60,14 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(stack.EndpointID)
-	if err == portainer.ErrEndpointNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
 	}
 
 	targetEndpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(payload.EndpointID))
-	if err == portainer.ErrEndpointNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
