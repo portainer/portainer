@@ -17,7 +17,7 @@ func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) 
 	}
 
 	registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
-	if err == portainer.ErrEndpointGroupNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}

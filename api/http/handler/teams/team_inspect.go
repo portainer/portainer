@@ -27,7 +27,7 @@ func (handler *Handler) teamInspect(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	team, err := handler.TeamService.Team(portainer.TeamID(teamID))
-	if err == portainer.ErrTeamNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a team with the specified identifier inside the database", err}

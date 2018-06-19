@@ -2,90 +2,66 @@ package bolt
 
 import (
 	"log"
-	"os"
+	"path"
 	"time"
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/bolt/dockerhub"
+	"github.com/portainer/portainer/bolt/endpoint"
+	"github.com/portainer/portainer/bolt/endpointgroup"
+	"github.com/portainer/portainer/bolt/migrator"
+	"github.com/portainer/portainer/bolt/registry"
+	"github.com/portainer/portainer/bolt/resourcecontrol"
+	"github.com/portainer/portainer/bolt/settings"
+	"github.com/portainer/portainer/bolt/stack"
+	"github.com/portainer/portainer/bolt/tag"
+	"github.com/portainer/portainer/bolt/team"
+	"github.com/portainer/portainer/bolt/teammembership"
+	"github.com/portainer/portainer/bolt/user"
+	"github.com/portainer/portainer/bolt/version"
+)
+
+const (
+	databaseFileName = "portainer.db"
 )
 
 // Store defines the implementation of portainer.DataStore using
 // BoltDB as the storage system.
 type Store struct {
-	// Path where is stored the BoltDB database.
-	Path string
-
-	// Services
-	UserService            *UserService
-	TeamService            *TeamService
-	TeamMembershipService  *TeamMembershipService
-	EndpointService        *EndpointService
-	EndpointGroupService   *EndpointGroupService
-	ResourceControlService *ResourceControlService
-	VersionService         *VersionService
-	SettingsService        *SettingsService
-	RegistryService        *RegistryService
-	DockerHubService       *DockerHubService
-	StackService           *StackService
-	TagService             *TagService
-
-	db                    *bolt.DB
-	checkForDataMigration bool
-	FileService           portainer.FileService
+	path                   string
+	db                     *bolt.DB
+	checkForDataMigration  bool
+	fileService            portainer.FileService
+	DockerHubService       *dockerhub.Service
+	EndpointGroupService   *endpointgroup.Service
+	EndpointService        *endpoint.Service
+	RegistryService        *registry.Service
+	ResourceControlService *resourcecontrol.Service
+	SettingsService        *settings.Service
+	StackService           *stack.Service
+	TagService             *tag.Service
+	TeamMembershipService  *teammembership.Service
+	TeamService            *team.Service
+	UserService            *user.Service
+	VersionService         *version.Service
 }
-
-const (
-	databaseFileName          = "portainer.db"
-	versionBucketName         = "version"
-	userBucketName            = "users"
-	teamBucketName            = "teams"
-	teamMembershipBucketName  = "team_membership"
-	endpointBucketName        = "endpoints"
-	endpointGroupBucketName   = "endpoint_groups"
-	resourceControlBucketName = "resource_control"
-	settingsBucketName        = "settings"
-	registryBucketName        = "registries"
-	dockerhubBucketName       = "dockerhub"
-	stackBucketName           = "stacks"
-	tagBucketName             = "tags"
-)
 
 // NewStore initializes a new Store and the associated services
 func NewStore(storePath string, fileService portainer.FileService) (*Store, error) {
 	store := &Store{
-		Path:                   storePath,
-		UserService:            &UserService{},
-		TeamService:            &TeamService{},
-		TeamMembershipService:  &TeamMembershipService{},
-		EndpointService:        &EndpointService{},
-		EndpointGroupService:   &EndpointGroupService{},
-		ResourceControlService: &ResourceControlService{},
-		VersionService:         &VersionService{},
-		SettingsService:        &SettingsService{},
-		RegistryService:        &RegistryService{},
-		DockerHubService:       &DockerHubService{},
-		StackService:           &StackService{},
-		TagService:             &TagService{},
-		FileService:            fileService,
+		path:        storePath,
+		fileService: fileService,
 	}
-	store.UserService.store = store
-	store.TeamService.store = store
-	store.TeamMembershipService.store = store
-	store.EndpointService.store = store
-	store.EndpointGroupService.store = store
-	store.ResourceControlService.store = store
-	store.VersionService.store = store
-	store.SettingsService.store = store
-	store.RegistryService.store = store
-	store.DockerHubService.store = store
-	store.StackService.store = store
-	store.TagService.store = store
 
-	_, err := os.Stat(storePath + "/" + databaseFileName)
-	if err != nil && os.IsNotExist(err) {
-		store.checkForDataMigration = false
-	} else if err != nil {
+	databasePath := path.Join(storePath, databaseFileName)
+	databaseFileExists, err := fileService.FileExists(databasePath)
+	if err != nil {
 		return nil, err
+	}
+
+	if !databaseFileExists {
+		store.checkForDataMigration = false
 	} else {
 		store.checkForDataMigration = true
 	}
@@ -95,29 +71,14 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 
 // Open opens and initializes the BoltDB database.
 func (store *Store) Open() error {
-	path := store.Path + "/" + databaseFileName
-
-	db, err := bolt.Open(path, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	databasePath := path.Join(store.path, databaseFileName)
+	db, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return err
 	}
 	store.db = db
 
-	bucketsToCreate := []string{versionBucketName, userBucketName, teamBucketName, endpointBucketName,
-		endpointGroupBucketName, resourceControlBucketName, teamMembershipBucketName, settingsBucketName,
-		registryBucketName, dockerhubBucketName, stackBucketName, tagBucketName}
-
-	return db.Update(func(tx *bolt.Tx) error {
-
-		for _, bucket := range bucketsToCreate {
-			_, err := tx.CreateBucketIfNotExists([]byte(bucket))
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
+	return store.initServices()
 }
 
 // Init creates the default data set.
@@ -154,28 +115,114 @@ func (store *Store) Close() error {
 // MigrateData automatically migrate the data based on the DBVersion.
 func (store *Store) MigrateData() error {
 	if !store.checkForDataMigration {
-		err := store.VersionService.StoreDBVersion(portainer.DBVersion)
-		if err != nil {
-			return err
-		}
-		return nil
+		return store.VersionService.StoreDBVersion(portainer.DBVersion)
 	}
 
 	version, err := store.VersionService.DBVersion()
-	if err == portainer.ErrDBVersionNotFound {
+	if err == portainer.ErrObjectNotFound {
 		version = 0
 	} else if err != nil {
 		return err
 	}
 
 	if version < portainer.DBVersion {
+		migratorParams := &migrator.Parameters{
+			DB:                     store.db,
+			DatabaseVersion:        version,
+			EndpointGroupService:   store.EndpointGroupService,
+			EndpointService:        store.EndpointService,
+			ResourceControlService: store.ResourceControlService,
+			SettingsService:        store.SettingsService,
+			StackService:           store.StackService,
+			UserService:            store.UserService,
+			VersionService:         store.VersionService,
+			FileService:            store.fileService,
+		}
+		migrator := migrator.NewMigrator(migratorParams)
+
 		log.Printf("Migrating database from version %v to %v.\n", version, portainer.DBVersion)
-		migrator := NewMigrator(store, version)
 		err = migrator.Migrate()
 		if err != nil {
+			log.Printf("An error occurred during database migration: %s\n", err)
 			return err
 		}
 	}
+
+	return nil
+}
+
+func (store *Store) initServices() error {
+	dockerhubService, err := dockerhub.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.DockerHubService = dockerhubService
+
+	endpointgroupService, err := endpointgroup.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.EndpointGroupService = endpointgroupService
+
+	endpointService, err := endpoint.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.EndpointService = endpointService
+
+	registryService, err := registry.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.RegistryService = registryService
+
+	resourcecontrolService, err := resourcecontrol.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.ResourceControlService = resourcecontrolService
+
+	settingsService, err := settings.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.SettingsService = settingsService
+
+	stackService, err := stack.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.StackService = stackService
+
+	tagService, err := tag.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.TagService = tagService
+
+	teammembershipService, err := teammembership.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.TeamMembershipService = teammembershipService
+
+	teamService, err := team.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.TeamService = teamService
+
+	userService, err := user.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.UserService = userService
+
+	versionService, err := version.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.VersionService = versionService
 
 	return nil
 }

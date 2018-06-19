@@ -62,7 +62,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		return tlsError
 	}
 
-	err = handler.SettingsService.StoreSettings(settings)
+	err = handler.SettingsService.UpdateSettings(settings)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist settings changes inside the database", err}
 	}
