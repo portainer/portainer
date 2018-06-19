@@ -16,7 +16,7 @@ func (handler *Handler) adminCheck(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if len(users) == 0 {
-		return &httperror.HandlerError{http.StatusNotFound, "No administrator account found inside the database", portainer.ErrUserNotFound}
+		return &httperror.HandlerError{http.StatusNotFound, "No administrator account found inside the database", portainer.ErrObjectNotFound}
 	}
 
 	return response.Empty(w)

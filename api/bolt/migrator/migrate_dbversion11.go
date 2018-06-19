@@ -101,11 +101,7 @@ func (m *Migrator) convertLegacyStack(s *legacyStack) error {
 func (m *Migrator) deleteLegacyStack(legacyID string) error {
 	return m.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(stack.BucketName))
-		err := bucket.Delete([]byte(legacyID))
-		if err != nil {
-			return err
-		}
-		return nil
+		return bucket.Delete([]byte(legacyID))
 	})
 }
 
@@ -126,9 +122,6 @@ func (m *Migrator) retrieveLegacyStacks() ([]legacyStack, error) {
 
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	return legacyStacks, nil
+	return legacyStacks, err
 }

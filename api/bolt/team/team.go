@@ -19,13 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(db *bolt.DB) (*Service, error) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(BucketName))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	err := internal.CreateBucket(db, BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -37,27 +31,14 @@ func NewService(db *bolt.DB) (*Service, error) {
 
 // Team returns a Team by ID
 func (service *Service) Team(ID portainer.TeamID) (*portainer.Team, error) {
-	var data []byte
-	err := service.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		value := bucket.Get(internal.Itob(int(ID)))
-		if value == nil {
-			return portainer.ErrTeamNotFound
-		}
-
-		data = make([]byte, len(value))
-		copy(data, value)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	var team portainer.Team
-	err = internal.UnmarshalObject(data, &team)
+	identifier := internal.Itob(int(ID))
+
+	err := internal.GetObject(service.db, BucketName, identifier, &team)
 	if err != nil {
 		return nil, err
 	}
+
 	return &team, nil
 }
 
@@ -67,6 +48,7 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
+
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var t portainer.Team
@@ -74,25 +56,27 @@ func (service *Service) TeamByName(name string) (*portainer.Team, error) {
 			if err != nil {
 				return err
 			}
+
 			if t.Name == name {
 				team = &t
+				break
 			}
 		}
 
 		if team == nil {
-			return portainer.ErrTeamNotFound
+			return portainer.ErrObjectNotFound
 		}
+
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return team, nil
+
+	return team, err
 }
 
 // Teams return an array containing all the teams.
 func (service *Service) Teams() ([]portainer.Team, error) {
 	var teams = make([]portainer.Team, 0)
+
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
@@ -108,29 +92,14 @@ func (service *Service) Teams() ([]portainer.Team, error) {
 
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	return teams, nil
+	return teams, err
 }
 
 // UpdateTeam saves a Team.
 func (service *Service) UpdateTeam(ID portainer.TeamID, team *portainer.Team) error {
-	data, err := internal.MarshalObject(team)
-	if err != nil {
-		return err
-	}
-
-	return service.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		err = bucket.Put(internal.Itob(int(ID)), data)
-
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	identifier := internal.Itob(int(ID))
+	return internal.UpdateObject(service.db, BucketName, identifier, team)
 }
 
 // CreateTeam creates a new Team.
@@ -146,22 +115,12 @@ func (service *Service) CreateTeam(team *portainer.Team) error {
 			return err
 		}
 
-		err = bucket.Put(internal.Itob(int(team.ID)), data)
-		if err != nil {
-			return err
-		}
-		return nil
+		return bucket.Put(internal.Itob(int(team.ID)), data)
 	})
 }
 
 // DeleteTeam deletes a Team.
 func (service *Service) DeleteTeam(ID portainer.TeamID) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		err := bucket.Delete(internal.Itob(int(ID)))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	identifier := internal.Itob(int(ID))
+	return internal.DeleteObject(service.db, BucketName, identifier)
 }

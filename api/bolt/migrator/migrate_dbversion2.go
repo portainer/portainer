@@ -16,10 +16,5 @@ func (m *Migrator) updateSettingsToDBVersion3() error {
 		},
 	}
 
-	err = m.settingsService.StoreSettings(legacySettings)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.settingsService.UpdateSettings(legacySettings)
 }

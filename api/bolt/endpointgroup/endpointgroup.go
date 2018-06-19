@@ -19,13 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(db *bolt.DB) (*Service, error) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(BucketName))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	err := internal.CreateBucket(db, BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -37,33 +31,33 @@ func NewService(db *bolt.DB) (*Service, error) {
 
 // EndpointGroup returns an endpoint group by ID.
 func (service *Service) EndpointGroup(ID portainer.EndpointGroupID) (*portainer.EndpointGroup, error) {
-	var data []byte
-	err := service.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		value := bucket.Get(internal.Itob(int(ID)))
-		if value == nil {
-			return portainer.ErrEndpointGroupNotFound
-		}
-
-		data = make([]byte, len(value))
-		copy(data, value)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	var endpointGroup portainer.EndpointGroup
-	err = internal.UnmarshalObject(data, &endpointGroup)
+	identifier := internal.Itob(int(ID))
+
+	err := internal.GetObject(service.db, BucketName, identifier, &endpointGroup)
 	if err != nil {
 		return nil, err
 	}
+
 	return &endpointGroup, nil
+}
+
+// UpdateEndpointGroup updates an endpoint group.
+func (service *Service) UpdateEndpointGroup(ID portainer.EndpointGroupID, endpointGroup *portainer.EndpointGroup) error {
+	identifier := internal.Itob(int(ID))
+	return internal.UpdateObject(service.db, BucketName, identifier, endpointGroup)
+}
+
+// DeleteEndpointGroup deletes an endpoint group.
+func (service *Service) DeleteEndpointGroup(ID portainer.EndpointGroupID) error {
+	identifier := internal.Itob(int(ID))
+	return internal.DeleteObject(service.db, BucketName, identifier)
 }
 
 // EndpointGroups return an array containing all the endpoint groups.
 func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 	var endpointGroups = make([]portainer.EndpointGroup, 0)
+
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
@@ -79,11 +73,8 @@ func (service *Service) EndpointGroups() ([]portainer.EndpointGroup, error) {
 
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	return endpointGroups, nil
+	return endpointGroups, err
 }
 
 // CreateEndpointGroup assign an ID to a new endpoint group and saves it.
@@ -99,39 +90,6 @@ func (service *Service) CreateEndpointGroup(endpointGroup *portainer.EndpointGro
 			return err
 		}
 
-		err = bucket.Put(internal.Itob(int(endpointGroup.ID)), data)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-}
-
-// UpdateEndpointGroup updates an endpoint group.
-func (service *Service) UpdateEndpointGroup(ID portainer.EndpointGroupID, endpointGroup *portainer.EndpointGroup) error {
-	data, err := internal.MarshalObject(endpointGroup)
-	if err != nil {
-		return err
-	}
-
-	return service.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		err = bucket.Put(internal.Itob(int(ID)), data)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-}
-
-// DeleteEndpointGroup deletes an endpoint group.
-func (service *Service) DeleteEndpointGroup(ID portainer.EndpointGroupID) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		err := bucket.Delete(internal.Itob(int(ID)))
-		if err != nil {
-			return err
-		}
-		return nil
+		return bucket.Put(internal.Itob(int(endpointGroup.ID)), data)
 	})
 }

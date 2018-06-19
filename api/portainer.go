@@ -379,13 +379,13 @@ type (
 	// DockerHubService represents a service for managing the DockerHub object.
 	DockerHubService interface {
 		DockerHub() (*DockerHub, error)
-		StoreDockerHub(registry *DockerHub) error
+		UpdateDockerHub(registry *DockerHub) error
 	}
 
 	// SettingsService represents a service for managing application settings.
 	SettingsService interface {
 		Settings() (*Settings, error)
-		StoreSettings(settings *Settings) error
+		UpdateSettings(settings *Settings) error
 	}
 
 	// VersionService represents a service for managing version data.

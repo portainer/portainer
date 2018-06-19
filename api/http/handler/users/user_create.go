@@ -50,7 +50,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	user, err := handler.UserService.UserByUsername(payload.Username)
-	if err != nil && err != portainer.ErrUserNotFound {
+	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 	}
 	if user != nil {

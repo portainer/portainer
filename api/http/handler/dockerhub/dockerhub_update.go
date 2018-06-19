@@ -43,7 +43,7 @@ func (handler *Handler) dockerhubUpdate(w http.ResponseWriter, r *http.Request) 
 		dockerhub.Password = payload.Password
 	}
 
-	err = handler.DockerHubService.StoreDockerHub(dockerhub)
+	err = handler.DockerHubService.UpdateDockerHub(dockerhub)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the Dockerhub changes inside the database", err}
 	}

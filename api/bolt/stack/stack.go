@@ -19,13 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(db *bolt.DB) (*Service, error) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(BucketName))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	err := internal.CreateBucket(db, BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -37,27 +31,14 @@ func NewService(db *bolt.DB) (*Service, error) {
 
 // Stack returns a stack object by ID.
 func (service *Service) Stack(ID portainer.StackID) (*portainer.Stack, error) {
-	var data []byte
-	err := service.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		value := bucket.Get(internal.Itob(int(ID)))
-		if value == nil {
-			return portainer.ErrStackNotFound
-		}
-
-		data = make([]byte, len(value))
-		copy(data, value)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	var stack portainer.Stack
-	err = internal.UnmarshalObject(data, &stack)
+	identifier := internal.Itob(int(ID))
+
+	err := internal.GetObject(service.db, BucketName, identifier, &stack)
 	if err != nil {
 		return nil, err
 	}
+
 	return &stack, nil
 }
 
@@ -68,31 +49,34 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 		cursor := bucket.Cursor()
+
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var t portainer.Stack
 			err := internal.UnmarshalObject(v, &t)
 			if err != nil {
 				return err
 			}
+
 			if t.Name == name {
 				stack = &t
+				break
 			}
 		}
 
 		if stack == nil {
-			return portainer.ErrStackNotFound
+			return portainer.ErrObjectNotFound
 		}
+
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return stack, nil
+
+	return stack, err
 }
 
 // Stacks returns an array containing all the stacks.
 func (service *Service) Stacks() ([]portainer.Stack, error) {
 	var stacks = make([]portainer.Stack, 0)
+
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
@@ -108,32 +92,21 @@ func (service *Service) Stacks() ([]portainer.Stack, error) {
 
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	return stacks, nil
+	return stacks, err
 }
 
-// GetNextIdentifier returns the current bucket identifier incremented by 1.
+// GetNextIdentifier returns the next identifier for a stack.
 func (service *Service) GetNextIdentifier() int {
-	var identifier int
-
-	service.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		id := bucket.Sequence()
-		identifier = int(id)
-		return nil
-	})
-
-	identifier++
-	return identifier
+	return internal.GetNextIdentifier(service.db, BucketName)
 }
 
 // CreateStack creates a new stack.
 func (service *Service) CreateStack(stack *portainer.Stack) error {
 	return service.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
+
+		// We manually manage sequences for stacks
 		err := bucket.SetSequence(uint64(stack.ID))
 		if err != nil {
 			return err
@@ -144,39 +117,18 @@ func (service *Service) CreateStack(stack *portainer.Stack) error {
 			return err
 		}
 
-		err = bucket.Put(internal.Itob(int(stack.ID)), data)
-		if err != nil {
-			return err
-		}
-		return nil
+		return bucket.Put(internal.Itob(int(stack.ID)), data)
 	})
 }
 
-// UpdateStack updates an stack.
+// UpdateStack updates a stack.
 func (service *Service) UpdateStack(ID portainer.StackID, stack *portainer.Stack) error {
-	data, err := internal.MarshalObject(stack)
-	if err != nil {
-		return err
-	}
-
-	return service.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		err = bucket.Put(internal.Itob(int(ID)), data)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	identifier := internal.Itob(int(ID))
+	return internal.UpdateObject(service.db, BucketName, identifier, stack)
 }
 
-// DeleteStack deletes an stack.
+// DeleteStack deletes a stack.
 func (service *Service) DeleteStack(ID portainer.StackID) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		err := bucket.Delete(internal.Itob(int(ID)))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	identifier := internal.Itob(int(ID))
+	return internal.DeleteObject(service.db, BucketName, identifier)
 }

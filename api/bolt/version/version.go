@@ -5,6 +5,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/bolt/internal"
 )
 
 const (
@@ -20,13 +21,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(db *bolt.DB) (*Service, error) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(BucketName))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	err := internal.CreateBucket(db, BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -39,27 +34,25 @@ func NewService(db *bolt.DB) (*Service, error) {
 // DBVersion retrieves the stored database version.
 func (service *Service) DBVersion() (int, error) {
 	var data []byte
+
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
+
 		value := bucket.Get([]byte(versionKey))
 		if value == nil {
-			return portainer.ErrDBVersionNotFound
+			return portainer.ErrObjectNotFound
 		}
 
 		data = make([]byte, len(value))
 		copy(data, value)
+
 		return nil
 	})
 	if err != nil {
 		return 0, err
 	}
 
-	dbVersion, err := strconv.Atoi(string(data))
-	if err != nil {
-		return 0, err
-	}
-
-	return dbVersion, nil
+	return strconv.Atoi(string(data))
 }
 
 // StoreDBVersion store the database version.
@@ -68,10 +61,6 @@ func (service *Service) StoreDBVersion(version int) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		data := []byte(strconv.Itoa(version))
-		err := bucket.Put([]byte(versionKey), data)
-		if err != nil {
-			return err
-		}
-		return nil
+		return bucket.Put([]byte(versionKey), data)
 	})
 }

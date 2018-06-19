@@ -19,13 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(db *bolt.DB) (*Service, error) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(BucketName))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	err := internal.CreateBucket(db, BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -38,6 +32,7 @@ func NewService(db *bolt.DB) (*Service, error) {
 // Tags return an array containing all the tags.
 func (service *Service) Tags() ([]portainer.Tag, error) {
 	var tags = make([]portainer.Tag, 0)
+
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
@@ -53,11 +48,8 @@ func (service *Service) Tags() ([]portainer.Tag, error) {
 
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	return tags, nil
+	return tags, err
 }
 
 // CreateTag creates a new tag.
@@ -73,22 +65,12 @@ func (service *Service) CreateTag(tag *portainer.Tag) error {
 			return err
 		}
 
-		err = bucket.Put(internal.Itob(int(tag.ID)), data)
-		if err != nil {
-			return err
-		}
-		return nil
+		return bucket.Put(internal.Itob(int(tag.ID)), data)
 	})
 }
 
 // DeleteTag deletes a tag.
 func (service *Service) DeleteTag(ID portainer.TagID) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		err := bucket.Delete(internal.Itob(int(ID)))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	identifier := internal.Itob(int(ID))
+	return internal.DeleteObject(service.db, BucketName, identifier)
 }

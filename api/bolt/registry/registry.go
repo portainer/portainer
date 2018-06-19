@@ -19,13 +19,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(db *bolt.DB) (*Service, error) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(BucketName))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	err := internal.CreateBucket(db, BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -37,33 +31,21 @@ func NewService(db *bolt.DB) (*Service, error) {
 
 // Registry returns an registry by ID.
 func (service *Service) Registry(ID portainer.RegistryID) (*portainer.Registry, error) {
-	var data []byte
-	err := service.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		value := bucket.Get(internal.Itob(int(ID)))
-		if value == nil {
-			return portainer.ErrRegistryNotFound
-		}
-
-		data = make([]byte, len(value))
-		copy(data, value)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	var registry portainer.Registry
-	err = internal.UnmarshalObject(data, &registry)
+	identifier := internal.Itob(int(ID))
+
+	err := internal.GetObject(service.db, BucketName, identifier, &registry)
 	if err != nil {
 		return nil, err
 	}
+
 	return &registry, nil
 }
 
 // Registries returns an array containing all the registries.
 func (service *Service) Registries() ([]portainer.Registry, error) {
 	var registries = make([]portainer.Registry, 0)
+
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
@@ -79,11 +61,8 @@ func (service *Service) Registries() ([]portainer.Registry, error) {
 
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	return registries, nil
+	return registries, err
 }
 
 // CreateRegistry creates a new registry.
@@ -99,39 +78,18 @@ func (service *Service) CreateRegistry(registry *portainer.Registry) error {
 			return err
 		}
 
-		err = bucket.Put(internal.Itob(int(registry.ID)), data)
-		if err != nil {
-			return err
-		}
-		return nil
+		return bucket.Put(internal.Itob(int(registry.ID)), data)
 	})
 }
 
 // UpdateRegistry updates an registry.
 func (service *Service) UpdateRegistry(ID portainer.RegistryID, registry *portainer.Registry) error {
-	data, err := internal.MarshalObject(registry)
-	if err != nil {
-		return err
-	}
-
-	return service.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		err = bucket.Put(internal.Itob(int(ID)), data)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	identifier := internal.Itob(int(ID))
+	return internal.UpdateObject(service.db, BucketName, identifier, registry)
 }
 
 // DeleteRegistry deletes an registry.
 func (service *Service) DeleteRegistry(ID portainer.RegistryID) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		err := bucket.Delete(internal.Itob(int(ID)))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	identifier := internal.Itob(int(ID))
+	return internal.DeleteObject(service.db, BucketName, identifier)
 }

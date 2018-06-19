@@ -7,10 +7,5 @@ func (m *Migrator) updateSettingsToVersion7() error {
 	}
 	legacySettings.DisplayDonationHeader = true
 
-	err = m.settingsService.StoreSettings(legacySettings)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.settingsService.UpdateSettings(legacySettings)
 }

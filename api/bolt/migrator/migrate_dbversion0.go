@@ -22,7 +22,7 @@ func (m *Migrator) updateAdminUserToDBVersion1() error {
 		if err != nil {
 			return err
 		}
-	} else if err != nil && err != portainer.ErrUserNotFound {
+	} else if err != nil && err != portainer.ErrObjectNotFound {
 		return err
 	}
 	return nil
@@ -31,10 +31,6 @@ func (m *Migrator) updateAdminUserToDBVersion1() error {
 func (m *Migrator) removeLegacyAdminUser() error {
 	return m.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(user.BucketName))
-		err := bucket.Delete([]byte("admin"))
-		if err != nil {
-			return err
-		}
-		return nil
+		return bucket.Delete([]byte("admin"))
 	})
 }

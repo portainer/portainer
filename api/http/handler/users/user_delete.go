@@ -27,7 +27,7 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	_, err = handler.UserService.User(portainer.UserID(userID))
-	if err == portainer.ErrUserNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}

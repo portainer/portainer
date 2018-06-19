@@ -125,13 +125,13 @@ func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portaine
 
 func initDockerHub(dockerHubService portainer.DockerHubService) error {
 	_, err := dockerHubService.DockerHub()
-	if err == portainer.ErrDockerHubNotFound {
+	if err == portainer.ErrObjectNotFound {
 		dockerhub := &portainer.DockerHub{
 			Authentication: false,
 			Username:       "",
 			Password:       "",
 		}
-		return dockerHubService.StoreDockerHub(dockerhub)
+		return dockerHubService.UpdateDockerHub(dockerhub)
 	} else if err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func initDockerHub(dockerHubService portainer.DockerHubService) error {
 
 func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
 	_, err := settingsService.Settings()
-	if err == portainer.ErrSettingsNotFound {
+	if err == portainer.ErrObjectNotFound {
 		settings := &portainer.Settings{
 			LogoURL:                     *flags.Logo,
 			DisplayExternalContributors: false,
@@ -168,7 +168,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			settings.BlackListedLabels = make([]portainer.Pair, 0)
 		}
 
-		return settingsService.StoreSettings(settings)
+		return settingsService.UpdateSettings(settings)
 	} else if err != nil {
 		return err
 	}

@@ -20,13 +20,7 @@ type Service struct {
 
 // NewService creates a new instance of a service.
 func NewService(db *bolt.DB) (*Service, error) {
-	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(BucketName))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	err := internal.CreateBucket(db, BucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -38,44 +32,17 @@ func NewService(db *bolt.DB) (*Service, error) {
 
 // Settings retrieve the settings object.
 func (service *Service) Settings() (*portainer.Settings, error) {
-	var data []byte
-	err := service.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		value := bucket.Get([]byte(settingsKey))
-		if value == nil {
-			return portainer.ErrSettingsNotFound
-		}
-
-		data = make([]byte, len(value))
-		copy(data, value)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	var settings portainer.Settings
-	err = internal.UnmarshalObject(data, &settings)
+
+	err := internal.GetObject(service.db, BucketName, []byte(settingsKey), &settings)
 	if err != nil {
 		return nil, err
 	}
+
 	return &settings, nil
 }
 
-// StoreSettings persists a Settings object.
-func (service *Service) StoreSettings(settings *portainer.Settings) error {
-	return service.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		data, err := internal.MarshalObject(settings)
-		if err != nil {
-			return err
-		}
-
-		err = bucket.Put([]byte(settingsKey), data)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+// UpdateSettings persists a Settings object.
+func (service *Service) UpdateSettings(settings *portainer.Settings) error {
+	return internal.UpdateObject(service.db, BucketName, []byte(settingsKey), settings)
 }

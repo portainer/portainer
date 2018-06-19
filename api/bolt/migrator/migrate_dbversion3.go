@@ -17,6 +17,7 @@ func (m *Migrator) updateEndpointsToDBVersion4() error {
 			endpoint.TLSConfig.TLSCertPath = endpoint.TLSCertPath
 			endpoint.TLSConfig.TLSKeyPath = endpoint.TLSKeyPath
 		}
+
 		err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {
 			return err

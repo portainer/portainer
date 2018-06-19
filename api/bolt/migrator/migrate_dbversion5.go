@@ -5,12 +5,7 @@ func (m *Migrator) updateSettingsToVersion6() error {
 	if err != nil {
 		return err
 	}
+
 	legacySettings.AllowPrivilegedModeForRegularUsers = true
-
-	err = m.settingsService.StoreSettings(legacySettings)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.settingsService.UpdateSettings(legacySettings)
 }

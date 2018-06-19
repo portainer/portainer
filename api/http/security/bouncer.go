@@ -185,7 +185,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 			}
 
 			_, err = bouncer.userService.User(tokenData.ID)
-			if err != nil && err == portainer.ErrUserNotFound {
+			if err != nil && err == portainer.ErrObjectNotFound {
 				httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
 				return
 			} else if err != nil {

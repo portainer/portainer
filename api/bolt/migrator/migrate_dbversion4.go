@@ -5,12 +5,7 @@ func (m *Migrator) updateSettingsToVersion5() error {
 	if err != nil {
 		return err
 	}
+
 	legacySettings.AllowBindMountsForRegularUsers = true
-
-	err = m.settingsService.StoreSettings(legacySettings)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.settingsService.UpdateSettings(legacySettings)
 }

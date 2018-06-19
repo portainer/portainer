@@ -59,6 +59,7 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 	if err != nil {
 		return nil, err
 	}
+
 	if !databaseFileExists {
 		store.checkForDataMigration = false
 	} else {
@@ -118,7 +119,7 @@ func (store *Store) MigrateData() error {
 	}
 
 	version, err := store.VersionService.DBVersion()
-	if err == portainer.ErrDBVersionNotFound {
+	if err == portainer.ErrObjectNotFound {
 		version = 0
 	} else if err != nil {
 		return err
@@ -142,6 +143,7 @@ func (store *Store) MigrateData() error {
 		log.Printf("Migrating database from version %v to %v.\n", version, portainer.DBVersion)
 		err = migrator.Migrate()
 		if err != nil {
+			log.Printf("An error occurred during database migration: %s\n", err)
 			return err
 		}
 	}
