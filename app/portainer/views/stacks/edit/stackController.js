@@ -18,6 +18,23 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     $scope.state.showEditorTab = true;
   };
 
+  $scope.migrateStack = function() {
+    ModalService.confirm({
+      title: 'Are you sure?',
+      message: 'This action will deploy a new instance of this stack on the target endpoint, please note that this does NOT relocate the content of any persistent volumes that may be attached to this stack.',
+      buttons: {
+        confirm: {
+          label: 'Migrate',
+          className: 'btn-danger'
+        }
+      },
+      callback: function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        migrateStack();
+      }
+    });
+  };
+
   $scope.removeStack = function() {
     ModalService.confirmDeletion(
       'Do you want to remove the stack? Associated services will be removed as well.',
@@ -27,6 +44,29 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
       }
     );
   };
+
+  function migrateStack() {
+    var stack = $scope.stack;
+    var targetEndpointId = $scope.formValues.Endpoint.Id;
+
+    var migrateRequest = StackService.migrateSwarmStack;
+    if (stack.Type === 2) {
+      migrateRequest = StackService.migrateComposeStack;
+    }
+
+    $scope.state.migrationInProgress = true;
+    migrateRequest(stack, targetEndpointId)
+    .then(function success(data) {
+      Notifications.success('Stack successfully migrated', stack.Name);
+      $state.go('portainer.stacks', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to migrate stack');
+    })
+    .finally(function final() {
+      $scope.state.migrationInProgress = false;
+    });
+  }
 
   function deleteStack() {
     var endpointId = EndpointProvider.endpointID();
@@ -41,29 +81,6 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
       Notifications.error('Failure', err, 'Unable to remove stack ' + stack.Name);
     });
   }
-
-  $scope.migrateStack = function() {
-    var stack = $scope.stack;
-    var targetEndpointId = $scope.formValues.Endpoint.Id;
-
-    var migrateRequest = StackService.migrateSwarmStack;
-    if (stack.Type === 2) {
-      migrateRequest = StackService.migrateComposeStack;
-    }
-
-    $scope.state.migrationInProgress = true;
-    migrateRequest(stack, targetEndpointId)
-    .then(function success(data) {
-      Notifications.success('Stack successfully migrated');
-      $state.go('portainer.stacks', {}, {reload: true});
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to migrate stack');
-    })
-    .finally(function final() {
-      $scope.state.migrationInProgress = false;
-    });
-  };
 
   $scope.deployStack = function () {
     var stackFile = $scope.stackFileContent;
