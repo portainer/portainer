@@ -14,13 +14,12 @@ import (
 type Handler struct {
 	stackCreationMutex *sync.Mutex
 	stackDeletionMutex *sync.Mutex
+	requestBouncer     *security.RequestBouncer
 	*mux.Router
 	FileService            portainer.FileService
 	GitService             portainer.GitService
 	StackService           portainer.StackService
 	EndpointService        portainer.EndpointService
-	EndpointGroupService   portainer.EndpointGroupService
-	TeamMembershipService  portainer.TeamMembershipService
 	ResourceControlService portainer.ResourceControlService
 	RegistryService        portainer.RegistryService
 	DockerHubService       portainer.DockerHubService
@@ -34,6 +33,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router:             mux.NewRouter(),
 		stackCreationMutex: &sync.Mutex{},
 		stackDeletionMutex: &sync.Mutex{},
+		requestBouncer:     bouncer,
 	}
 	h.Handle("/stacks",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.stackCreate))).Methods(http.MethodPost)
@@ -50,22 +50,4 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/stacks/{id}/migrate",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.stackMigrate))).Methods(http.MethodPost)
 	return h
-}
-
-func (handler *Handler) checkEndpointAccess(endpoint *portainer.Endpoint, userID portainer.UserID) error {
-	memberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(userID)
-	if err != nil {
-		return err
-	}
-
-	group, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
-	if err != nil {
-		return err
-	}
-
-	if !security.AuthorizedEndpointAccess(endpoint, group, userID, memberships) {
-		return portainer.ErrEndpointAccessDenied
-	}
-
-	return nil
 }

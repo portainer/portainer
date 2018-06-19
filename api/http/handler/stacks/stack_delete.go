@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
@@ -12,6 +13,8 @@ import (
 )
 
 // DELETE request on /api/stacks/:id?external=<external>&endpointId=<endpointId>
+// If the external query parameter is set to true, the id route variable is expected to be
+// the name of an external stack as a string.
 func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {
@@ -23,15 +26,20 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return handler.deleteExternalStack(r, w, stackID)
 	}
 
-	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
-	if err == portainer.ErrStackNotFound {
+	id, err := strconv.Atoi(stackID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
+	}
+
+	stack, err := handler.StackService.Stack(portainer.StackID(id))
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
 	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceID(stack.Name)
-	if err != nil && err != portainer.ErrResourceControlNotFound {
+	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
 
@@ -60,7 +68,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(endpointIdentifier)
-	if err == portainer.ErrEndpointNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
@@ -71,7 +79,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.DeleteStack(portainer.StackID(stackID))
+	err = handler.StackService.DeleteStack(portainer.StackID(id))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the stack from the database", err}
 	}
@@ -86,7 +94,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 
 func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWriter, stackName string) *httperror.HandlerError {
 	stack, err := handler.StackService.StackByName(stackName)
-	if err != nil && err != portainer.ErrStackNotFound {
+	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for stack existence inside the database", err}
 	}
 	if stack != nil {
@@ -99,24 +107,15 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrEndpointNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
 	}
 
-	tokenData, err := security.RetrieveTokenData(r)
+	err = handler.requestBouncer.EndpointAccess(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
-	}
-
-	if tokenData.Role != portainer.AdministratorRole {
-		err = handler.checkEndpointAccess(endpoint, tokenData.ID)
-		if err != nil && err == portainer.ErrEndpointAccessDenied {
-			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
-		} else if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify permission to access endpoint", err}
-		}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
 	}
 
 	stack = &portainer.Stack{
