@@ -47,5 +47,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.stackUpdate))).Methods(http.MethodPut)
 	h.Handle("/stacks/{id}/file",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.stackFile))).Methods(http.MethodGet)
+	h.Handle("/stacks/{id}/migrate",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.stackMigrate))).Methods(http.MethodPost)
 	return h
 }

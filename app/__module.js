@@ -1,6 +1,7 @@
 angular.module('portainer', [
   'ui.bootstrap',
   'ui.router',
+  'ui.select',
   'isteven-multi-select',
   'ngCookies',
   'ngSanitize',
