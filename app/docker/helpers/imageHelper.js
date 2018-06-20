@@ -55,5 +55,9 @@ angular.module('portainer.docker')
     };
   };
 
+  helper.removeDigestFromRepository = function(repository) {
+    return repository.split('@sha')[0];
+  };
+
   return helper;
 }]);

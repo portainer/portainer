@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper) {
 
   $scope.state = {
     updateInProgress: false,
@@ -354,16 +354,24 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
   $scope.forceUpdateService = function(service) {
     ModalService.confirmServiceForceUpdate(
-      'Do you want to force update this service? All the tasks associated to the selected service(s) will be recreated.',
-      function onConfirm(confirmed) {
-        if(!confirmed) { return; }
-        forceUpdateService(service);
+      'Do you want to force an update of the service? All the tasks associated to the service will be recreated.',
+      function (result) {
+        if(!result) { return; }
+        var pullImage = false;
+        if (result[0]) {
+          pullImage = true;
+        }
+        forceUpdateService(service, pullImage);
       }
     );
   };
 
-  function forceUpdateService(service) {
+  function forceUpdateService(service, pullImage) {
     var config = ServiceHelper.serviceToConfig(service.Model);
+    if (pullImage) {
+      config.TaskTemplate.ContainerSpec.Image = config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
+    }
+
     // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
     // value or an increment of the counter value to force an update.
     config.TaskTemplate.ForceUpdate++;

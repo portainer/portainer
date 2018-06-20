@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServicesDatatableActionsController', ['$state', 'ServiceService', 'ServiceHelper', 'Notifications', 'ModalService',
-function ($state, ServiceService, ServiceHelper, Notifications, ModalService) {
+.controller('ServicesDatatableActionsController', ['$state', 'ServiceService', 'ServiceHelper', 'Notifications', 'ModalService', 'ImageHelper',
+function ($state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper) {
 
   this.scaleAction = function scaleService(service) {
     var config = ServiceHelper.serviceToConfig(service.Model);
@@ -17,16 +17,6 @@ function ($state, ServiceService, ServiceHelper, Notifications, ModalService) {
     });
   };
 
-  this.updateAction = function(selectedItems) {
-    ModalService.confirmServiceForceUpdate(
-      'Do you want to force update of selected service(s)? All the tasks associated to the selected service(s) will be recreated.',
-      function onConfirm(confirmed) {
-        if(!confirmed) { return; }
-        forceUpdateServices(selectedItems);
-      }
-    );
-  };
-
   this.removeAction = function(selectedItems) {
     ModalService.confirmDeletion(
       'Do you want to remove the selected service(s)? All the containers associated to the selected service(s) will be removed too.',
@@ -37,10 +27,28 @@ function ($state, ServiceService, ServiceHelper, Notifications, ModalService) {
     );
   };
 
-  function forceUpdateServices(services) {
+  this.updateAction = function(selectedItems) {
+    ModalService.confirmServiceForceUpdate(
+      'Do you want to force an update of the selected service(s)? All the tasks associated to the selected service(s) will be recreated.',
+      function (result) {
+        if(!result) { return; }
+        var pullImage = false;
+        if (result[0]) {
+          pullImage = true;
+        }
+        forceUpdateServices(selectedItems, pullImage);
+      }
+    );
+  };
+
+  function forceUpdateServices(services, pullImage) {
     var actionCount = services.length;
     angular.forEach(services, function (service) {
       var config = ServiceHelper.serviceToConfig(service.Model);
+      if (pullImage) {
+        config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
+      }
+
       // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random
       // value or an increment of the counter value to force an update.
       config.TaskTemplate.ForceUpdate++;
