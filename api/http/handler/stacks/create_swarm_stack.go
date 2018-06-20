@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/asaskevich/govalidator"
@@ -62,7 +63,8 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		Env:        payload.Env,
 	}
 
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
+	stackFolder := strconv.Itoa(int(stack.ID))
+	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
 	}
@@ -250,7 +252,8 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		Env:        payload.Env,
 	}
 
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
+	stackFolder := strconv.Itoa(int(stack.ID))
+	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
 	}

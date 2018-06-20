@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
@@ -111,7 +112,8 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	_, err = handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
+	stackFolder := strconv.Itoa(int(stack.ID))
+	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
 	}
@@ -138,7 +140,8 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 
 	stack.Env = payload.Env
 
-	_, err = handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
+	stackFolder := strconv.Itoa(int(stack.ID))
+	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
 	}
