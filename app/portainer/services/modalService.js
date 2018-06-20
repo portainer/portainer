@@ -156,7 +156,6 @@ angular.module('portainer.app')
     });
   };
 
-  // TODO: message parameter for different message in serviceController and ServicesDatatableActionsController
   service.confirmServiceForceUpdate = function(message, callback) {
     service.customPrompt({
       title: 'Are you sure ?',
