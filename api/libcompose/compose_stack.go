@@ -87,5 +87,5 @@ func (manager *ComposeStackManager) Down(stack *portainer.Stack, endpoint *porta
 		return err
 	}
 
-	return proj.Down(context.Background(), options.Down{RemoveVolume: true, RemoveOrphans: true})
+	return proj.Down(context.Background(), options.Down{RemoveVolume: false, RemoveOrphans: true})
 }
