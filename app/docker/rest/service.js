@@ -15,7 +15,7 @@ function ServiceFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, Htt
       // We should do digest pinning in Portainer as well.
       headers: {
         'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader,
-        'version': '1.29'
+        'version': '1.30'
       },
       ignoreLoadingBar: true
     },
@@ -24,7 +24,7 @@ function ServiceFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, Htt
       // TODO: This is a temporary work-around that allows us to leverage digest pinning on
       // the Docker daemon side. It has been moved client-side since Docker API version > 1.30.
       // We should do digest pinning in Portainer as well.
-      headers: { 'version': '1.29' }
+      headers: { 'version': '1.30' }
     },
     remove: { method: 'DELETE', params: {id: '@id'} },
     logs: {
