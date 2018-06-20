@@ -114,7 +114,7 @@
                 </span>
               </td>
               <td>
-                <a ng-if="item.Ports && item.Ports.length > 0 && p.PublishedPort" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.state.publicUrl }}:{{ p.PublishedPort }}" target="_blank" ng-click="$event.stopPropagation();">
+                <a ng-if="item.Ports && item.Ports.length > 0 && p.PublishedPort" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.state.publicURL }}:{{ p.PublishedPort }}" target="_blank" ng-click="$event.stopPropagation();">
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
                 </a>
                 <span ng-if="!item.Ports || item.Ports.length === 0">-</span>
