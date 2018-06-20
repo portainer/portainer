@@ -156,10 +156,18 @@ angular.module('portainer.app')
     });
   };
 
+  // TODO: message parameter for different message in serviceController and ServicesDatatableActionsController
   service.confirmServiceForceUpdate = function(message, callback) {
-    service.confirm({
+    service.customPrompt({
       title: 'Are you sure ?',
       message: message,
+      inputType: 'checkbox',
+      inputOptions: [
+        {
+          text: 'Pull latest image version<i></i>',
+          value: '1'
+        }
+      ],
       buttons: {
         confirm: {
           label: 'Update',
