@@ -46,7 +46,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
         return;
       }
 
-      return Stack.migrate({ id: stack.Id }, { EndpointID: targetEndpointId, SwarmID:  swarm.Id }).$promise;
+      return Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, SwarmID:  swarm.Id }).$promise;
     })
     .then(function success(data) {
       deferred.resolve();
@@ -66,7 +66,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
 
     EndpointProvider.setEndpointID(targetEndpointId);
 
-    Stack.migrate({ id: stack.Id }, { EndpointID: targetEndpointId }).$promise
+    Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId }).$promise
     .then(function success(data) {
       deferred.resolve();
     })

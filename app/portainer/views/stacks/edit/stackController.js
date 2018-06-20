@@ -54,6 +54,15 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
       migrateRequest = StackService.migrateComposeStack;
     }
 
+    // TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
+    // The EndpointID property is not available for these stacks, we can pass
+    // the current endpoint identifier as a part of the migrate request. It will be used if
+    // the EndpointID property is not defined on the stack.
+    var endpointId = EndpointProvider.endpointID();
+    if (stack.EndpointId === 0) {
+      stack.EndpointId = endpointId;
+    }
+
     $scope.state.migrationInProgress = true;
     migrateRequest(stack, targetEndpointId)
     .then(function success(data) {

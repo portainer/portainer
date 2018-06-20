@@ -9,6 +9,6 @@ angular.module('portainer.app')
     update: { method: 'PUT', params: { id: '@id' }, ignoreLoadingBar: true },
     remove: { method: 'DELETE', params: { id: '@id', external: '@external', endpointId: '@endpointId' } },
     getStackFile: { method: 'GET', params: { id : '@id', action: 'file' } },
-    migrate: { method: 'POST', params: { id : '@id', action: 'migrate' }, ignoreLoadingBar: true }
+    migrate: { method: 'POST', params: { id : '@id', action: 'migrate', endpointId: '@endpointId' }, ignoreLoadingBar: true }
   });
 }]);
