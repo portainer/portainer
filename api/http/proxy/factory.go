@@ -10,22 +10,41 @@ import (
 	"github.com/portainer/portainer/crypto"
 )
 
+// AzureAPIBaseURL is the URL where Azure API requests will be proxied.
+const AzureAPIBaseURL = "https://management.azure.com"
+
 // proxyFactory is a factory to create reverse proxies to Docker endpoints
 type proxyFactory struct {
 	ResourceControlService portainer.ResourceControlService
 	TeamMembershipService  portainer.TeamMembershipService
 	SettingsService        portainer.SettingsService
+	RegistryService        portainer.RegistryService
+	DockerHubService       portainer.DockerHubService
+	SignatureService       portainer.DigitalSignatureService
 }
 
 func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
 	u.Scheme = "http"
-	return factory.createReverseProxy(u)
+	return newSingleHostReverseProxyWithHostHeader(u)
 }
 
-func (factory *proxyFactory) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
+func newAzureProxy(credentials *portainer.AzureCredentials) (http.Handler, error) {
+	url, err := url.Parse(AzureAPIBaseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy := newSingleHostReverseProxyWithHostHeader(url)
+	proxy.Transport = NewAzureTransport(credentials)
+
+	return proxy, nil
+}
+
+func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portainer.TLSConfiguration, enableSignature bool) (http.Handler, error) {
 	u.Scheme = "https"
-	proxy := factory.createReverseProxy(u)
-	config, err := crypto.CreateTLSConfiguration(&endpoint.TLSConfig)
+
+	proxy := factory.createDockerReverseProxy(u, enableSignature)
+	config, err := crypto.CreateTLSConfigurationFromDisk(tlsConfig.TLSCACertPath, tlsConfig.TLSCertPath, tlsConfig.TLSKeyPath, tlsConfig.TLSSkipVerify)
 	if err != nil {
 		return nil, err
 	}
@@ -34,26 +53,42 @@ func (factory *proxyFactory) newHTTPSProxy(u *url.URL, endpoint *portainer.Endpo
 	return proxy, nil
 }
 
-func (factory *proxyFactory) newSocketProxy(path string) http.Handler {
+func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL, enableSignature bool) http.Handler {
+	u.Scheme = "http"
+	return factory.createDockerReverseProxy(u, enableSignature)
+}
+
+func (factory *proxyFactory) newDockerSocketProxy(path string) http.Handler {
 	proxy := &socketProxy{}
 	transport := &proxyTransport{
+		enableSignature:        false,
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
 		SettingsService:        factory.SettingsService,
+		RegistryService:        factory.RegistryService,
+		DockerHubService:       factory.DockerHubService,
 		dockerTransport:        newSocketTransport(path),
 	}
 	proxy.Transport = transport
 	return proxy
 }
 
-func (factory *proxyFactory) createReverseProxy(u *url.URL) *httputil.ReverseProxy {
+func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, enableSignature bool) *httputil.ReverseProxy {
 	proxy := newSingleHostReverseProxyWithHostHeader(u)
 	transport := &proxyTransport{
+		enableSignature:        enableSignature,
 		ResourceControlService: factory.ResourceControlService,
 		TeamMembershipService:  factory.TeamMembershipService,
 		SettingsService:        factory.SettingsService,
-		dockerTransport:        newHTTPTransport(),
+		RegistryService:        factory.RegistryService,
+		DockerHubService:       factory.DockerHubService,
+		dockerTransport:        &http.Transport{},
 	}
+
+	if enableSignature {
+		transport.SignatureService = factory.SignatureService
+	}
+
 	proxy.Transport = transport
 	return proxy
 }
@@ -64,8 +99,4 @@ func newSocketTransport(socketPath string) *http.Transport {
 			return net.Dial("unix", socketPath)
 		},
 	}
-}
-
-func newHTTPTransport() *http.Transport {
-	return &http.Transport{}
 }

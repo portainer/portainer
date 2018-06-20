@@ -1,0 +1,21 @@
+<rd-header>
+  <rd-header-title title-text="Volume list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.volumes" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Volumes</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <volumes-datatable
+    title-text="Volumes" title-icon="fa-cubes"
+    dataset="volumes" table-key="volumes"
+    order-by="Id" show-text-filter="true"
+    remove-action="removeAction"
+    show-ownership-column="applicationState.application.authentication"
+    show-host-column="applicationState.endpoint.mode.agentProxy"
+    ></volumes-datatable>
+  </div>
+</div>

@@ -12,8 +12,19 @@ type (
 	// RequestBouncer represents an entity that manages API request accesses
 	RequestBouncer struct {
 		jwtService            portainer.JWTService
+		userService           portainer.UserService
 		teamMembershipService portainer.TeamMembershipService
+		endpointGroupService  portainer.EndpointGroupService
 		authDisabled          bool
+	}
+
+	// RequestBouncerParams represents the required parameters to create a new RequestBouncer instance.
+	RequestBouncerParams struct {
+		JWTService            portainer.JWTService
+		UserService           portainer.UserService
+		TeamMembershipService portainer.TeamMembershipService
+		EndpointGroupService  portainer.EndpointGroupService
+		AuthDisabled          bool
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -27,11 +38,13 @@ type (
 )
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(jwtService portainer.JWTService, teamMembershipService portainer.TeamMembershipService, authDisabled bool) *RequestBouncer {
+func NewRequestBouncer(parameters *RequestBouncerParams) *RequestBouncer {
 	return &RequestBouncer{
-		jwtService:            jwtService,
-		teamMembershipService: teamMembershipService,
-		authDisabled:          authDisabled,
+		jwtService:            parameters.JWTService,
+		userService:           parameters.UserService,
+		teamMembershipService: parameters.TeamMembershipService,
+		endpointGroupService:  parameters.EndpointGroupService,
+		authDisabled:          parameters.AuthDisabled,
 	}
 }
 
@@ -68,6 +81,36 @@ func (bouncer *RequestBouncer) AdministratorAccess(h http.Handler) http.Handler 
 	return h
 }
 
+// EndpointAccess retrieves the JWT token from the request context and verifies
+// that the user can access the specified endpoint.
+// An error is returned when access is denied.
+func (bouncer *RequestBouncer) EndpointAccess(r *http.Request, endpoint *portainer.Endpoint) error {
+	tokenData, err := RetrieveTokenData(r)
+	if err != nil {
+		return err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return nil
+	}
+
+	memberships, err := bouncer.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+	if err != nil {
+		return err
+	}
+
+	group, err := bouncer.endpointGroupService.EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return err
+	}
+
+	if !authorizedEndpointAccess(endpoint, group, tokenData.ID, memberships) {
+		return portainer.ErrEndpointAccessDenied
+	}
+
+	return nil
+}
+
 // mwSecureHeaders provides secure headers middleware for handlers.
 func mwSecureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -83,13 +126,13 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil {
-			httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
 			return
 		}
 
 		requestContext, err := bouncer.newRestrictedContextRequest(tokenData.ID, tokenData.Role)
 		if err != nil {
-			httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, nil)
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to create restricted request context ", err)
 			return
 		}
 
@@ -103,7 +146,7 @@ func mwCheckAdministratorRole(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil || tokenData.Role != portainer.AdministratorRole {
-			httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
 			return
 		}
 
@@ -118,6 +161,10 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 		if !bouncer.authDisabled {
 			var token string
 
+			// Optionally, token might be set via the "token" query parameter.
+			// For example, in websocket requests
+			token = r.URL.Query().Get("token")
+
 			// Get token from the Authorization header
 			tokens, ok := r.Header["Authorization"]
 			if ok && len(tokens) >= 1 {
@@ -126,14 +173,23 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 			}
 
 			if token == "" {
-				httperror.WriteErrorResponse(w, portainer.ErrUnauthorized, http.StatusUnauthorized, nil)
+				httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
 				return
 			}
 
 			var err error
 			tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token)
 			if err != nil {
-				httperror.WriteErrorResponse(w, err, http.StatusUnauthorized, nil)
+				httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", err)
+				return
+			}
+
+			_, err = bouncer.userService.User(tokenData.ID)
+			if err != nil && err == portainer.ErrObjectNotFound {
+				httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+				return
+			} else if err != nil {
+				httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve users from the database", err)
 				return
 			}
 		} else {

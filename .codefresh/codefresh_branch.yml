@@ -1,0 +1,46 @@
+version: '1.0'
+steps:
+
+  build_backend:
+    image: portainer/golang-builder:ci
+    working_directory: ${{main_clone}}
+    commands:
+      - mkdir -p /go/src/github.com/${{CF_REPO_OWNER}}
+      - ln -s /codefresh/volume/${{CF_REPO_NAME}}/api /go/src/github.com/${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
+      - /build.sh api/cmd/portainer
+
+  build_frontend:
+    image: portainer/angular-builder:latest
+    working_directory: ${{build_backend}}
+    commands:
+      - yarn
+      - yarn grunt build-webapp
+      - mv api/cmd/portainer/portainer dist/
+
+  get_docker_version:
+    image: alpine
+    working_directory: ${{build_frontend}}
+    commands:
+      - cf_export DOCKER_VERSION=`cat gruntfile.js | grep -m 1 'shippedDockerVersion' | cut -d\' -f2`
+
+  download_docker_binary:
+    image: busybox
+    working_directory: ${{build_frontend}}
+    commands:
+      - echo ${{DOCKER_VERSION}}
+      - wget -O /tmp/docker-binaries.tgz https://download.docker.com/linux/static/stable/x86_64/docker-${{DOCKER_VERSION}}.tgz
+      - tar -xf /tmp/docker-binaries.tgz -C /tmp
+      - mv /tmp/docker/docker dist/
+
+  build_image:
+    type: build
+    working_directory: ${{download_docker_binary}}
+    dockerfile: ./build/linux/Dockerfile
+    image_name: portainer/portainer
+    tag: ${{CF_BRANCH}}
+
+  push_image:
+    type: push
+    candidate: '${{build_image}}'
+    tag: '${{CF_BRANCH}}'
+    registry: dockerhub

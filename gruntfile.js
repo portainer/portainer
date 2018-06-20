@@ -12,13 +12,13 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', ['eslint', 'build']);
   grunt.registerTask('before-copy', [
-    'vendor:',
+    'vendor',
     'html2js',
     'useminPrepare:release',
     'concat',
-    'postcss:build',
     'clean:tmpl',
     'replace',
+    'postcss:build',
     'uglify'
   ]);
   grunt.registerTask('after-copy', [
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
     'clean:app',
     'shell:buildBinary:linux:' + arch,
     'shell:downloadDockerBinary:linux:' + arch,
-    'vendor:regular',
+    'vendor',
     'html2js',
     'useminPrepare:dev',
     'concat',
@@ -55,20 +55,19 @@ module.exports = function (grunt) {
   grunt.registerTask('clear', ['clean:app']);
 
   // Load content of `vendor.yml` to src.jsVendor, src.cssVendor and src.angularVendor
-  grunt.registerTask('vendor', 'vendor:<minified|regular>', function(min) {
-      // Argument `min` defaults to 'minified'
-      var minification = (min === '') ? 'minified' : min;
+  grunt.registerTask('vendor', function() {
       var vendorFile = grunt.file.readYAML('vendor.yml');
       for (var filelist in vendorFile) {
           if (vendorFile.hasOwnProperty(filelist)) {
-              var list = vendorFile[filelist][minification];
+              var list = vendorFile[filelist];
               // Check if any of the files is missing
               for (var itemIndex in list) {
                   if (list.hasOwnProperty(itemIndex)) {
-                      var item = list[itemIndex];
+                      var item = 'node_modules/'+list[itemIndex];
                       if (!grunt.file.exists(item)) {
                           grunt.fail.warn('Dependency file ' + item + ' not found.');
                       }
+                      list[itemIndex] = item;
                   }
               }
               // If none is missing, save the list
@@ -80,7 +79,7 @@ module.exports = function (grunt) {
   // Project configuration.
   grunt.initConfig({
     distdir: 'dist/public',
-    shippedDockerVersion: '17.09.0-ce',
+    shippedDockerVersion: '18.03.1-ce',
     pkg: grunt.file.readJSON('package.json'),
     config: gruntfile_cfg.config,
     src: gruntfile_cfg.src,
@@ -116,7 +115,7 @@ gruntfile_cfg.src = {
   js: ['app/**/__module.js', 'app/**/*.js', '!app/**/*.spec.js'],
   jsTpl: ['<%= distdir %>/templates/**/*.js'],
   html: ['index.html'],
-  tpl: ['app/components/**/*.html', 'app/directives/**/*.html'],
+  tpl: ['app/**/*.html'],
   css: ['assets/css/app.css', 'app/**/*.css']
 };
 
@@ -159,7 +158,7 @@ gruntfile_cfg.copy = {
   assets: {
     files: [
       {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/bootstrap/fonts/'},
-      {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/font-awesome/fonts/'},
+      {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,eot,svg}', expand: true, cwd: 'node_modules/@fortawesome/fontawesome-free-webfonts/webfonts/'},
       {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/rdash-ui/dist/fonts/'},
       {dest: '<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
       {dest: '<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
@@ -218,7 +217,7 @@ gruntfile_cfg.postcss = {
         cssnano() // minify the result
       ]
     },
-    src: '<%= distdir %>/css/<%= pkg.name %>.css',
+    src: '.tmp/concat/css/app.css',
     dest: '<%= distdir %>/css/app.css'
   }
 };
@@ -235,7 +234,8 @@ gruntfile_cfg.replace = {
     options: {
       patterns: [
         { match: 'ENVIRONMENT',  replacement: '<%= grunt.config.get("environment") %>' },
-        { match: 'CONFIG_GA_ID', replacement: '<%= pkg.config.GA_ID %>' }
+        { match: 'CONFIG_GA_ID', replacement: '<%= pkg.config.GA_ID %>' },
+        { match: /..\/webfonts\//g, replacement: '../fonts/'}
       ]
     },
     files: [
@@ -244,6 +244,12 @@ gruntfile_cfg.replace = {
         flatten: true,
         src: ['.tmp/concat/js/app.js'],
         dest: '.tmp/concat/js'
+      },
+      {
+        expand: true,
+        flatten: true,
+        src: ['.tmp/concat/css/app.css'],
+        dest: '.tmp/concat/css'
       }
     ]
   }

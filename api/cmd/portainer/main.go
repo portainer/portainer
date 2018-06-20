@@ -1,17 +1,21 @@
 package main // import "github.com/portainer/portainer"
 
 import (
+	"strings"
+
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/bolt"
 	"github.com/portainer/portainer/cli"
 	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/crypto"
 	"github.com/portainer/portainer/exec"
-	"github.com/portainer/portainer/file"
+	"github.com/portainer/portainer/filesystem"
 	"github.com/portainer/portainer/git"
 	"github.com/portainer/portainer/http"
+	"github.com/portainer/portainer/http/client"
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
+	"github.com/portainer/portainer/libcompose"
 
 	"log"
 )
@@ -31,20 +35,25 @@ func initCLI() *portainer.CLIFlags {
 }
 
 func initFileService(dataStorePath string) portainer.FileService {
-	fileService, err := file.NewService(dataStorePath, "")
+	fileService, err := filesystem.NewService(dataStorePath, "")
 	if err != nil {
 		log.Fatal(err)
 	}
 	return fileService
 }
 
-func initStore(dataStorePath string) *bolt.Store {
-	store, err := bolt.NewStore(dataStorePath)
+func initStore(dataStorePath string, fileService portainer.FileService) *bolt.Store {
+	store, err := bolt.NewStore(dataStorePath, fileService)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	err = store.Open()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = store.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,8 +65,12 @@ func initStore(dataStorePath string) *bolt.Store {
 	return store
 }
 
-func initStackManager(assetsPath string) portainer.StackManager {
-	return exec.NewStackManager(assetsPath)
+func initComposeStackManager(dataStorePath string) portainer.ComposeStackManager {
+	return libcompose.NewComposeStackManager(dataStorePath)
+}
+
+func initSwarmStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.SwarmStackManager, error) {
+	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService)
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -69,6 +82,10 @@ func initJWTService(authenticationEnabled bool) portainer.JWTService {
 		return jwtService
 	}
 	return nil
+}
+
+func initDigitalSignatureService() portainer.DigitalSignatureService {
+	return &crypto.ECDSAService{}
 }
 
 func initCryptoService() portainer.CryptoService {
@@ -108,13 +125,13 @@ func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portaine
 
 func initDockerHub(dockerHubService portainer.DockerHubService) error {
 	_, err := dockerHubService.DockerHub()
-	if err == portainer.ErrDockerHubNotFound {
+	if err == portainer.ErrObjectNotFound {
 		dockerhub := &portainer.DockerHub{
 			Authentication: false,
 			Username:       "",
 			Password:       "",
 		}
-		return dockerHubService.StoreDockerHub(dockerhub)
+		return dockerHubService.UpdateDockerHub(dockerhub)
 	} else if err != nil {
 		return err
 	}
@@ -124,10 +141,9 @@ func initDockerHub(dockerHubService portainer.DockerHubService) error {
 
 func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
 	_, err := settingsService.Settings()
-	if err == portainer.ErrSettingsNotFound {
+	if err == portainer.ErrObjectNotFound {
 		settings := &portainer.Settings{
 			LogoURL:                     *flags.Logo,
-			DisplayDonationHeader:       true,
 			DisplayExternalContributors: false,
 			AuthenticationMethod:        portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
@@ -152,7 +168,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			settings.BlackListedLabels = make([]portainer.Pair, 0)
 		}
 
-		return settingsService.StoreSettings(settings)
+		return settingsService.UpdateSettings(settings)
 	} else if err != nil {
 		return err
 	}
@@ -168,19 +184,137 @@ func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService
 	return &endpoints[0]
 }
 
+func loadAndParseKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
+	private, public, err := fileService.LoadKeyPair()
+	if err != nil {
+		return err
+	}
+	return signatureService.ParseKeyPair(private, public)
+}
+
+func generateAndStoreKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
+	private, public, err := signatureService.GenerateKeyPair()
+	if err != nil {
+		return err
+	}
+	privateHeader, publicHeader := signatureService.PEMHeaders()
+	return fileService.StoreKeyPair(private, public, privateHeader, publicHeader)
+}
+
+func initKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
+	existingKeyPair, err := fileService.KeyPairFilesExist()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if existingKeyPair {
+		return loadAndParseKeyPair(fileService, signatureService)
+	}
+	return generateAndStoreKeyPair(fileService, signatureService)
+}
+
+func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService) error {
+	tlsConfiguration := portainer.TLSConfiguration{
+		TLS:           *flags.TLS,
+		TLSSkipVerify: *flags.TLSSkipVerify,
+	}
+
+	if *flags.TLS {
+		tlsConfiguration.TLSCACertPath = *flags.TLSCacert
+		tlsConfiguration.TLSCertPath = *flags.TLSCert
+		tlsConfiguration.TLSKeyPath = *flags.TLSKey
+	} else if !*flags.TLS && *flags.TLSSkipVerify {
+		tlsConfiguration.TLS = true
+	}
+
+	endpoint := &portainer.Endpoint{
+		Name:            "primary",
+		URL:             *flags.EndpointURL,
+		GroupID:         portainer.EndpointGroupID(1),
+		Type:            portainer.DockerEnvironment,
+		TLSConfig:       tlsConfiguration,
+		AuthorizedUsers: []portainer.UserID{},
+		AuthorizedTeams: []portainer.TeamID{},
+		Extensions:      []portainer.EndpointExtension{},
+		Tags:            []string{},
+	}
+
+	if strings.HasPrefix(endpoint.URL, "tcp://") {
+		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(tlsConfiguration.TLSCACertPath, tlsConfiguration.TLSCertPath, tlsConfiguration.TLSKeyPath, tlsConfiguration.TLSSkipVerify)
+		if err != nil {
+			return err
+		}
+
+		agentOnDockerEnvironment, err := client.ExecutePingOperation(endpoint.URL, tlsConfig)
+		if err != nil {
+			return err
+		}
+
+		if agentOnDockerEnvironment {
+			endpoint.Type = portainer.AgentOnDockerEnvironment
+		}
+	}
+
+	return endpointService.CreateEndpoint(endpoint)
+}
+
+func createUnsecuredEndpoint(endpointURL string, endpointService portainer.EndpointService) error {
+	if strings.HasPrefix(endpointURL, "tcp://") {
+		_, err := client.ExecutePingOperation(endpointURL, nil)
+		if err != nil {
+			return err
+		}
+	}
+
+	endpoint := &portainer.Endpoint{
+		Name:            "primary",
+		URL:             endpointURL,
+		GroupID:         portainer.EndpointGroupID(1),
+		Type:            portainer.DockerEnvironment,
+		TLSConfig:       portainer.TLSConfiguration{},
+		AuthorizedUsers: []portainer.UserID{},
+		AuthorizedTeams: []portainer.TeamID{},
+		Extensions:      []portainer.EndpointExtension{},
+		Tags:            []string{},
+	}
+
+	return endpointService.CreateEndpoint(endpoint)
+}
+
+func initEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService) error {
+	if *flags.EndpointURL == "" {
+		return nil
+	}
+
+	endpoints, err := endpointService.Endpoints()
+	if err != nil {
+		return err
+	}
+
+	if len(endpoints) > 0 {
+		log.Println("Instance already has defined endpoints. Skipping the endpoint defined via CLI.")
+		return nil
+	}
+
+	if *flags.TLS || *flags.TLSSkipVerify {
+		return createTLSSecuredEndpoint(flags, endpointService)
+	}
+	return createUnsecuredEndpoint(*flags.EndpointURL, endpointService)
+}
+
 func main() {
 	flags := initCLI()
 
 	fileService := initFileService(*flags.Data)
 
-	store := initStore(*flags.Data)
+	store := initStore(*flags.Data, fileService)
 	defer store.Close()
-
-	stackManager := initStackManager(*flags.Assets)
 
 	jwtService := initJWTService(!*flags.NoAuth)
 
 	cryptoService := initCryptoService()
+
+	digitalSignatureService := initDigitalSignatureService()
 
 	ldapService := initLDAPService()
 
@@ -188,7 +322,19 @@ func main() {
 
 	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
 
-	err := initSettings(store.SettingsService, flags)
+	err := initKeyPair(fileService, digitalSignatureService)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	composeStackManager := initComposeStackManager(*flags.Data)
+
+	err = initSettings(store.SettingsService, flags)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -200,32 +346,9 @@ func main() {
 
 	applicationStatus := initStatus(authorizeEndpointMgmt, flags)
 
-	if *flags.Endpoint != "" {
-		endpoints, err := store.EndpointService.Endpoints()
-		if err != nil {
-			log.Fatal(err)
-		}
-		if len(endpoints) == 0 {
-			endpoint := &portainer.Endpoint{
-				Name: "primary",
-				URL:  *flags.Endpoint,
-				TLSConfig: portainer.TLSConfiguration{
-					TLS:           *flags.TLSVerify,
-					TLSSkipVerify: false,
-					TLSCACertPath: *flags.TLSCacert,
-					TLSCertPath:   *flags.TLSCert,
-					TLSKeyPath:    *flags.TLSKey,
-				},
-				AuthorizedUsers: []portainer.UserID{},
-				AuthorizedTeams: []portainer.TeamID{},
-			}
-			err = store.EndpointService.CreateEndpoint(endpoint)
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else {
-			log.Println("Instance already has defined endpoints. Skipping the endpoint defined via CLI.")
-		}
+	err = initEndpoint(flags, store.EndpointService)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	adminPasswordHash := ""
@@ -274,17 +397,21 @@ func main() {
 		TeamService:            store.TeamService,
 		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
+		EndpointGroupService:   store.EndpointGroupService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
-		StackManager:           stackManager,
+		TagService:             store.TagService,
+		SwarmStackManager:      swarmStackManager,
+		ComposeStackManager:    composeStackManager,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,
 		LDAPService:            ldapService,
 		GitService:             gitService,
+		SignatureService:       digitalSignatureService,
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,

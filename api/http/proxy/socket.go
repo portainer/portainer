@@ -3,6 +3,7 @@ package proxy
 // unixSocketHandler represents a handler to proxy HTTP requests via a unix:// socket
 import (
 	"io"
+	"log"
 	"net/http"
 
 	httperror "github.com/portainer/portainer/http/error"
@@ -24,7 +25,7 @@ func (proxy *socketProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if res != nil && res.StatusCode != 0 {
 			code = res.StatusCode
 		}
-		httperror.WriteErrorResponse(w, err, code, nil)
+		httperror.WriteError(w, code, "Unable to proxy the request via the Docker socket", err)
 		return
 	}
 	defer res.Body.Close()
@@ -38,6 +39,6 @@ func (proxy *socketProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(res.StatusCode)
 
 	if _, err := io.Copy(w, res.Body); err != nil {
-		httperror.WriteErrorResponse(w, err, http.StatusInternalServerError, nil)
+		log.Printf("proxy error: %s\n", err)
 	}
 }

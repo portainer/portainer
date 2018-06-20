@@ -1,0 +1,57 @@
+<rd-header>
+  <rd-header-title title-text="Cluster overview">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.swarm" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Swarm</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title-text="Cluster status"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Nodes</td>
+              <td>{{ info.Swarm.Nodes }}</td>
+            </tr>
+            <tr>
+              <td>Docker API version</td>
+              <td>{{ docker.ApiVersion }}</td>
+            </tr>
+            <tr>
+              <td>Total CPU</td>
+              <td>{{ totalCPU }}</td>
+            </tr>
+            <tr>
+              <td>Total memory</td>
+              <td>{{ totalMemory|humansize: 2 }}</td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <div class="btn-group" role="group" aria-label="...">
+                  <a ui-sref="docker.swarm.visualizer"><i class="fa fa-object-group space-right" aria-hidden="true"></i>Go to cluster visualizer</a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <nodes-datatable
+    title-text="Nodes" title-icon="fa-hdd"
+    dataset="nodes" table-key="nodes"
+    order-by="Hostname" show-text-filter="true"
+    show-ip-address-column="applicationState.endpoint.apiVersion >= 1.25"
+    access-to-node-details="!applicationState.application.authentication || isAdmin"
+    ></nodes-datatable>
+  </div>
+</div>

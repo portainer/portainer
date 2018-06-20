@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@fortawesome/fontawesome-free-webfonts@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free-webfonts/-/fontawesome-free-webfonts-1.0.4.tgz#bac5d89755bf3bc2d2b4deee47d92febf641bb1f"
+
 "@uirouter/angularjs@~1.0.6":
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/@uirouter/angularjs/-/angularjs-1.0.11.tgz#ced1ec8bea68a5db7dcfd77a43b7b8b9a2953540"
@@ -87,6 +91,10 @@ amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
 
+angular-clipboard@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/angular-clipboard/-/angular-clipboard-1.6.2.tgz#4708e5a1dc94f3940ab89861ea1e19b26754154f"
+
 angular-cookies@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.5.11.tgz#88558de7c5044dcc3abeb79614d7ef8107ba49c0"
@@ -113,6 +121,10 @@ angular-local-storage@~0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/angular-local-storage/-/angular-local-storage-0.5.2.tgz#7079beb0aa5ca91386d223125efefd13ca0ecd0c"
 
+angular-messages@~1.5.0:
+  version "1.5.11"
+  resolved "https://registry.yarnpkg.com/angular-messages/-/angular-messages-1.5.11.tgz#ea99f0163594fcb0a2db701b3038339250decc90"
+
 angular-mocks@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.5.11.tgz#a0e1dd0ea55fd77ee7a757d75536c5e964c86f81"
@@ -136,6 +148,10 @@ angular-utils-pagination@~0.11.1:
 angular@1.x, angular@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.5.11.tgz#8c5ba7386f15965c9acf3429f6881553aada30d6"
+
+angularjs-scroll-glue@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/angularjs-scroll-glue/-/angularjs-scroll-glue-2.2.0.tgz#07d3399ac16ca874c63b6b5ee2ee30558b37e5d1"
 
 angularjs-slider@^6.4.0:
   version "6.4.3"
@@ -1470,10 +1486,6 @@ flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
 
-font-awesome@~4.7.0:
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/font-awesome/-/font-awesome-4.7.0.tgz#8fa8cf0411a1a31afd07b06d2902bb9fc815a133"
-
 for-in@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
@@ -2363,16 +2375,16 @@ istanbul@~0.1.40:
     wordwrap "0.0.x"
 
 isteven-angular-multiselect@~4.0.0:
-  version v4.0.0
+  version "4.0.0"
   resolved "https://registry.yarnpkg.com/isteven-angular-multiselect/-/isteven-angular-multiselect-4.0.0.tgz#70276da5ff3bc4d9a0887dc585ee26a1a26a8ed6"
-
-jquery@1.11.1:
-  version "1.11.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-1.11.1.tgz#b6ec928590112ebed69e1e49cbfd0025ccd60ddb"
 
 jquery@>=1.12.0:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.2.1.tgz#5c4d9de652af6cd0a770154a631bba12b015c787"
+
+jquery@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
 js-base64@^2.1.9:
   version "2.4.0"
@@ -2870,9 +2882,13 @@ mkdirp@0.x.x, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
   dependencies:
     minimist "0.0.8"
 
-moment@^2.10.6, moment@~2.14.1:
+moment@^2.10.6:
   version "2.14.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.14.1.tgz#b35b27c47e57ed2ddc70053d6b07becdb291741c"
+
+moment@^2.21.0:
+  version "2.21.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.21.0.tgz#2a114b51d2a6ec9e6d83cf803f838a878d8a023a"
 
 morgan@~1.6.1:
   version "1.6.1"
@@ -4222,7 +4238,7 @@ uglify-to-browserify@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz#6e0924d6bda6b5afe349e39a6d632850a0f882b7"
 
-ui-select@~0.19.6:
+ui-select@^0.19.8:
   version "0.19.8"
   resolved "https://registry.yarnpkg.com/ui-select/-/ui-select-0.19.8.tgz#74860848a7fd8bc494d9856d2f62776ea98637c1"
 
@@ -4471,9 +4487,9 @@ xtend@~3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-3.0.0.tgz#5cce7407baf642cba7becda568111c493f59665a"
 
-xterm@~2.8.1:
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/xterm/-/xterm-2.8.1.tgz#3f6b939bcb8d015a1f247d66257102cb16a0b2e1"
+xterm@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/xterm/-/xterm-3.1.0.tgz#7f7e1c8cf4b80bd881a4e8891213b851423e90c9"
 
 yargs@~3.10.0:
   version "3.10.0"

@@ -8,15 +8,16 @@ import (
 
 const (
 	// ErrDockerContainerIdentifierNotFound defines an error raised when Portainer is unable to find a container identifier
-	ErrDockerContainerIdentifierNotFound = portainer.Error("Docker container identifier not found")
-	containerIdentifier                  = "Id"
-	containerLabelForServiceIdentifier   = "com.docker.swarm.service.id"
-	containerLabelForStackIdentifier     = "com.docker.stack.namespace"
+	ErrDockerContainerIdentifierNotFound    = portainer.Error("Docker container identifier not found")
+	containerIdentifier                     = "Id"
+	containerLabelForServiceIdentifier      = "com.docker.swarm.service.id"
+	containerLabelForSwarmStackIdentifier   = "com.docker.stack.namespace"
+	containerLabelForComposeStackIdentifier = "com.docker.compose.project"
 )
 
 // containerListOperation extracts the response as a JSON object, loop through the containers array
 // decorate and/or filter the containers based on resource controls before rewriting the response
-func containerListOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
+func containerListOperation(response *http.Response, executor *operationExecutor) error {
 	var err error
 	// ContainerList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
@@ -47,7 +48,7 @@ func containerListOperation(request *http.Request, response *http.Response, exec
 // containerInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the container based on resource control (check are done based on the containerID and optional Swarm service ID)
 // and either rewrite an access denied response or a decorated container.
-func containerInspectOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
+func containerInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ContainerInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
 	responseObject, err := getResponseAsJSONOBject(response)
@@ -71,7 +72,12 @@ func containerInspectOperation(request *http.Request, response *http.Response, e
 		return rewriteAccessDeniedResponse(response)
 	}
 
-	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForStackIdentifier, executor.operationContext)
+	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForSwarmStackIdentifier, executor.operationContext)
+	if !access {
+		return rewriteAccessDeniedResponse(response)
+	}
+
+	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForComposeStackIdentifier, executor.operationContext)
 	if !access {
 		return rewriteAccessDeniedResponse(response)
 	}
@@ -117,7 +123,8 @@ func decorateContainerList(containerData []interface{}, resourceControls []porta
 
 		containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
 		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, resourceControls)
-		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForStackIdentifier, resourceControls)
+		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, resourceControls)
+		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, resourceControls)
 
 		decoratedContainerData = append(decoratedContainerData, containerObject)
 	}
@@ -143,11 +150,14 @@ func filterContainerList(containerData []interface{}, context *restrictedOperati
 		containerObject, access := applyResourceAccessControl(containerObject, containerID, context)
 		if access {
 			containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
-			containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, context)
+			containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, context)
 			if access {
-				containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForStackIdentifier, context)
+				containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, context)
 				if access {
-					filteredContainerData = append(filteredContainerData, containerObject)
+					containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, context)
+					if access {
+						filteredContainerData = append(filteredContainerData, containerObject)
+					}
 				}
 			}
 		}

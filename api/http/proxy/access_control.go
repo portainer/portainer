@@ -10,7 +10,7 @@ type (
 	}
 )
 
-// applyResourceAccessControl returns an optionally decorated object as the first return value and the
+// applyResourceAccessControlFromLabel returns an optionally decorated object as the first return value and the
 // access level for the user (granted or denied) as the second return value.
 // It will retrieve an identifier from the labels object. If an identifier exists, it will check for
 // an existing resource control associated to it.
@@ -98,9 +98,12 @@ func canUserAccessResource(userID portainer.UserID, userTeamIDs []portainer.Team
 }
 
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {
-	metadata := make(map[string]interface{})
-	metadata["ResourceControl"] = resourceControl
-	object["Portainer"] = metadata
+	if object["Portainer"] == nil {
+		object["Portainer"] = make(map[string]interface{})
+	}
+
+	portainerMetadata := object["Portainer"].(map[string]interface{})
+	portainerMetadata["ResourceControl"] = resourceControl
 	return object
 }
 

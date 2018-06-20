@@ -14,7 +14,7 @@ const (
 
 // secretListOperation extracts the response as a JSON object, loop through the secrets array
 // decorate and/or filter the secrets based on resource controls before rewriting the response
-func secretListOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
+func secretListOperation(response *http.Response, executor *operationExecutor) error {
 	var err error
 
 	// SecretList response is a JSON array
@@ -39,7 +39,7 @@ func secretListOperation(request *http.Request, response *http.Response, executo
 // secretInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the secret based on resource control (check are done based on the secretID and optional Swarm service ID)
 // and either rewrite an access denied response or a decorated secret.
-func secretInspectOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
+func secretInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// SecretInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/SecretInspect
 	responseObject, err := getResponseAsJSONOBject(response)

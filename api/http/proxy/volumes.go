@@ -15,7 +15,7 @@ const (
 
 // volumeListOperation extracts the response as a JSON object, loop through the volume array
 // decorate and/or filter the volumes based on resource controls before rewriting the response
-func volumeListOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
+func volumeListOperation(response *http.Response, executor *operationExecutor) error {
 	var err error
 	// VolumeList response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
@@ -48,7 +48,7 @@ func volumeListOperation(request *http.Request, response *http.Response, executo
 // volumeInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the volume based on any existing resource control and either rewrite an access denied response
 // or a decorated volume.
-func volumeInspectOperation(request *http.Request, response *http.Response, executor *operationExecutor) error {
+func volumeInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// VolumeInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
 	responseObject, err := getResponseAsJSONOBject(response)
