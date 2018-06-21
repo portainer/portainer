@@ -1,7 +1,7 @@
 <div class="page-wrapper">
   <!-- simple box -->
   <div class="container simple-box">
-    <div class="col-sm-10 col-sm-offset-1">
+    <div class="col-sm-12">
       <!-- simple box logo -->
       <div class="row">
         <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
@@ -53,6 +53,16 @@
                       Agent
                     </div>
                     <p>Connect to a Portainer agent</p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="azure_endpoint" ng-model="formValues.EndpointType" value="azure">
+                  <label for="azure_endpoint">
+                    <div class="boxselector_header">
+                      <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Azure
+                    </div>
+                    <p>Connect to Microsoft Azure ACI</p>
                   </label>
                 </div>
               </div>
@@ -141,6 +151,78 @@
               <!-- !actions -->
             </div>
             <!-- !agent-endpoint -->
+            <!-- azure-endpoint -->
+            <div ng-if="formValues.EndpointType === 'azure'">
+              <div class="col-sm-12 form-section-title">
+                Information
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <span class="small">
+                    <p class="text-muted">
+                      <i class="fa fa-flask orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> This feature is experimental.
+                    </p>
+                    <p class="text-primary">
+                      Connect to Microsoft Azure to manage Azure Container Instances (ACI).
+                    </p>
+                    <p class="text-muted">
+                      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Have a look at <a href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal" target="_blank">the Azure documentation</a> to retrieve
+                      the credentials required below.
+                    </p>
+                  </span>
+                </div>
+              </div>
+              <div class="col-sm-12 form-section-title">
+                Environment
+              </div>
+              <!-- name-input -->
+              <div class="form-group">
+                <label for="endpoint_name" class="col-sm-4 col-lg-3 control-label text-left">Name</label>
+                <div class="col-sm-8 col-lg-9">
+                  <input type="text" class="form-control" id="endpoint_name" ng-model="formValues.Name" placeholder="e.g. azure-01">
+                </div>
+              </div>
+              <!-- !name-input -->
+              <div class="col-sm-12 form-section-title">
+                Azure credentials
+              </div>
+              <!-- applicationId-input -->
+              <div class="form-group">
+                <label for="azure_credential_appid" class="col-sm-4 col-lg-3 control-label text-left">Application ID</label>
+                <div class="col-sm-8 col-lg-9">
+                  <input type="text" class="form-control" id="azure_credential_appid" ng-model="formValues.AzureApplicationId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                </div>
+              </div>
+              <!-- !applicationId-input -->
+              <!-- tenantId-input -->
+              <div class="form-group">
+                <label for="azure_credential_tenantid" class="col-sm-4 col-lg-3 control-label text-left">Tenant ID</label>
+                <div class="col-sm-8 col-lg-9">
+                  <input type="text" class="form-control" id="azure_credential_tenantid" ng-model="formValues.AzureTenantId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                </div>
+              </div>
+              <!-- !tenantId-input -->
+              <!-- authenticationkey-input -->
+              <div class="form-group">
+                <label for="azure_credential_authkey" class="col-sm-4 col-lg-3 control-label text-left">Authentication key</label>
+                <div class="col-sm-8 col-lg-9">
+                  <input type="text" class="form-control" id="azure_credential_authkey" ng-model="formValues.AzureAuthenticationKey" placeholder="cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk=">
+                </div>
+              </div>
+              <!-- !authenticationkey-input -->
+              <!-- actions -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.AzureApplicationId || !formValues.AzureTenantId || !formValues.AzureAuthenticationKey" ng-click="createAzureEndpoint()" button-spinner="state.actionInProgress">
+                    <span ng-hide="state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
+                    <span ng-show="state.actionInProgress">Connecting...</span>
+                  </button>
+                </div>
+              </div>
+              <!-- !actions -->
+            </div>
+            <!-- !azure-endpoint -->
             <!-- remote-endpoint -->
             <div ng-if="formValues.EndpointType === 'remote'">
               <div class="col-sm-12 form-section-title">

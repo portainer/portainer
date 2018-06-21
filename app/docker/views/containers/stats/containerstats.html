@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Container statistics"></rd-header-title>
+  <rd-header-title title-text="Container statistics"></rd-header-title>
   <rd-header-content>
     <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name|trimcontainername }}</a> &gt; Stats
   </rd-header-content>
@@ -8,7 +8,7 @@
 <div class="row">
   <div class="col-md-12">
     <rd-widget>
-      <rd-widget-header icon="fa-info-circle" title="About statistics">
+      <rd-widget-header icon="fa-info-circle" title-text="About statistics">
       </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
@@ -52,7 +52,7 @@
 <div class="row">
   <div ng-class="{true: 'col-md-6 col-sm-12', false: 'col-lg-4 col-md-6 col-sm-12'}[state.networkStatsUnavailable]">
     <rd-widget>
-      <rd-widget-header icon="fa-chart-area" title="Memory usage"></rd-widget-header>
+      <rd-widget-header icon="fa-chart-area" title-text="Memory usage"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative;">
           <canvas id="memoryChart" width="770" height="300"></canvas>
@@ -62,7 +62,7 @@
   </div>
   <div ng-class="{true: 'col-md-6 col-sm-12', false: 'col-lg-4 col-md-6 col-sm-12'}[state.networkStatsUnavailable]">
     <rd-widget>
-      <rd-widget-header icon="fa-chart-area" title="CPU usage"></rd-widget-header>
+      <rd-widget-header icon="fa-chart-area" title-text="CPU usage"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative;">
           <canvas id="cpuChart" width="770" height="300"></canvas>
@@ -72,7 +72,7 @@
   </div>
   <div class="col-lg-4 col-md-12 col-sm-12" ng-if="!state.networkStatsUnavailable">
     <rd-widget>
-      <rd-widget-header icon="fa-chart-area" title="Network usage"></rd-widget-header>
+      <rd-widget-header icon="fa-chart-area" title-text="Network usage"></rd-widget-header>
       <rd-widget-body>
         <div class="chart-container" style="position: relative;">
           <canvas id="networkChart" width="770" height="300"></canvas>
@@ -83,7 +83,7 @@
 
   <div class="col-sm-12" ng-if="applicationState.endpoint.mode.provider !== 'VMWARE_VIC'">
     <container-processes-datatable
-    title="Processes" title-icon="fa-tasks"
+    title-text="Processes" title-icon="fa-tasks"
     dataset="processInfo.Processes" headerset="processInfo.Titles"
     table-key="container-processes"
     show-text-filter="true"

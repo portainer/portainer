@@ -2,15 +2,68 @@ package client
 
 import (
 	"crypto/tls"
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
 	"github.com/portainer/portainer"
 )
 
+// HTTPClient represents a client to send HTTP requests.
+type HTTPClient struct {
+	*http.Client
+}
+
+// NewHTTPClient is used to build a new HTTPClient.
+func NewHTTPClient() *HTTPClient {
+	return &HTTPClient{
+		&http.Client{
+			Timeout: time.Second * 5,
+		},
+	}
+}
+
+// AzureAuthenticationResponse represents an Azure API authentication response.
+type AzureAuthenticationResponse struct {
+	AccessToken string `json:"access_token"`
+	ExpiresOn   string `json:"expires_on"`
+}
+
+// ExecuteAzureAuthenticationRequest is used to execute an authentication request
+// against the Azure API. It re-uses the same http.Client.
+func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portainer.AzureCredentials) (*AzureAuthenticationResponse, error) {
+	loginURL := fmt.Sprintf("https://login.microsoftonline.com/%s/oauth2/token", credentials.TenantID)
+	params := url.Values{
+		"grant_type":    {"client_credentials"},
+		"client_id":     {credentials.ApplicationID},
+		"client_secret": {credentials.AuthenticationKey},
+		"resource":      {"https://management.azure.com/"},
+	}
+
+	response, err := client.PostForm(loginURL, params)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return nil, portainer.ErrAzureInvalidCredentials
+	}
+
+	var token AzureAuthenticationResponse
+	err = json.NewDecoder(response.Body).Decode(&token)
+	if err != nil {
+		return nil, err
+	}
+
+	return &token, nil
+}
+
 // ExecutePingOperation will send a SystemPing operation HTTP request to a Docker environment
 // using the specified host and optional TLS configuration.
+// It uses a new Http.Client for each operation.
 func ExecutePingOperation(host string, tlsConfig *tls.Config) (bool, error) {
 	transport := &http.Transport{}
 

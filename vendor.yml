@@ -20,8 +20,8 @@ js:
 css:
   - 'bootstrap/dist/css/bootstrap.css'
   - 'rdash-ui/dist/css/rdash.css'
-  - 'isteven-angular-multiselect/isteven-multi-select.css'
   - 'ui-select/dist/select.css'
+  - 'isteven-angular-multiselect/isteven-multi-select.css'
   - '@fortawesome/fontawesome-free-webfonts/css/fa-brands.css'
   - '@fortawesome/fontawesome-free-webfonts/css/fa-solid.css'
   - '@fortawesome/fontawesome-free-webfonts/css/fontawesome.css'
@@ -35,6 +35,7 @@ css:
 angular:
   - 'angular/angular.js'
   - 'angular-ui-bootstrap/dist/ui-bootstrap-tpls.js'
+  - 'ui-select/dist/select.js'
   - 'angular-cookies/angular-cookies.js'
   - 'angular-google-analytics/dist/angular-google-analytics.js'
   - 'angular-jwt/dist/angular-jwt.js'
@@ -42,7 +43,6 @@ angular:
   - 'angular-messages/angular-messages.js'
   - 'angular-resource/angular-resource.js'
   - 'angular-sanitize/angular-sanitize.js'
-  - 'ui-select/dist/select.js'
   - '@uirouter/angularjs/release/angular-ui-router.js'
   - 'angular-utils-pagination/dirPagination.js'
   - 'ng-file-upload/dist/ng-file-upload.js'

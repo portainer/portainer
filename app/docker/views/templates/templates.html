@@ -1,5 +1,5 @@
 <rd-header id="view-top">
-  <rd-header-title title="Application templates list">
+  <rd-header-title title-text="Application templates list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.templates" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -11,7 +11,7 @@
   <!-- stack-form -->
   <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'stack'">
     <rd-widget>
-      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Title">
+      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title">
         <div class="pull-right">
           <button type="button" class="btn btn-sm btn-primary" ng-click="unselectTemplate()">Hide</button>
         </div>
@@ -81,7 +81,7 @@
   <!-- container-form -->
   <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'container'">
     <rd-widget>
-      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title="state.selectedTemplate.Image">
+      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Image">
         <div class="pull-right">
           <button type="button" class="btn btn-sm btn-primary" ng-click="unselectTemplate()">Hide</button>
         </div>
@@ -350,7 +350,7 @@
 <div class="row">
   <div class="col-sm-12" style="height: 100%">
     <rd-template-widget>
-      <rd-widget-header icon="fa-rocket" title="Templates">
+      <rd-widget-header icon="fa-rocket" title-text="Templates">
         <div ng-if="availableCategories.length > 0" class="pull-right">
           Category
           <select ng-model="state.filters.Categories">
