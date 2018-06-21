@@ -1,7 +1,6 @@
 angular.module('portainer.docker')
 .controller('ContainersDatatableController', ['PaginationService', 'DatatableService', 'EndpointProvider',
 function (PaginationService, DatatableService, EndpointProvider) {
-
   var ctrl = this;
 
   this.state = {
@@ -49,7 +48,6 @@ function (PaginationService, DatatableService, EndpointProvider) {
       this.state.selectedItems.splice(this.state.selectedItems.indexOf(item), 1);
       this.state.selectedItemCount--;
     }
-    DatatableService.setDataTableSelectedItems(this.tableKey + '_' + EndpointProvider.endpointID(), this.state.selectedItems);
   };
 
   this.selectItem = function(item) {
@@ -162,30 +160,6 @@ function (PaginationService, DatatableService, EndpointProvider) {
     }
   };
 
-  function selectPreviouslySelectedItem(item, storedSelectedItems) {
-    var selectedItem = _.find(storedSelectedItems, function(container) {
-      return item.Id === container.Id;
-    });
-
-    if (selectedItem) {
-      item.Checked = true;
-      ctrl.state.selectedItemCount++;
-      ctrl.state.selectedItems.push(item);
-    }
-  }
-
-  this.selectItems = function(storedSelectedItems) {
-    for (var i = 0; i < this.dataset.length; i++) {
-      var item = this.dataset[i];
-      selectPreviouslySelectedItem(item, storedSelectedItems);
-    }
-
-    if (this.state.selectedItemCount > 0 && this.state.selectedItemCount === this.dataset.length) {
-      this.state.selectAll = true;
-    }
-    this.updateSelectionState();
-  };
-
   this.$onInit = function() {
     setDefaults(this);
     this.prepareTableFromDataset();
@@ -194,11 +168,6 @@ function (PaginationService, DatatableService, EndpointProvider) {
     if (storedOrder !== null) {
       this.state.reverseOrder = storedOrder.reverse;
       this.state.orderBy = storedOrder.orderBy;
-    }
-
-    var storedSelectedItems = DatatableService.getDataTableSelectedItems(this.tableKey + '_' + EndpointProvider.endpointID());
-    if (storedSelectedItems !== null) {
-      this.selectItems(storedSelectedItems);
     }
 
     var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
