@@ -157,9 +157,16 @@ angular.module('portainer.app')
   };
 
   service.confirmServiceForceUpdate = function(message, callback) {
-    service.confirm({
+    service.customPrompt({
       title: 'Are you sure ?',
       message: message,
+      inputType: 'checkbox',
+      inputOptions: [
+        {
+          text: 'Pull latest image version<i></i>',
+          value: '1'
+        }
+      ],
       buttons: {
         confirm: {
           label: 'Update',

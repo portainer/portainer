@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/http/client"
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
+	"github.com/portainer/portainer/libcompose"
 
 	"log"
 )
@@ -41,8 +42,8 @@ func initFileService(dataStorePath string) portainer.FileService {
 	return fileService
 }
 
-func initStore(dataStorePath string) *bolt.Store {
-	store, err := bolt.NewStore(dataStorePath)
+func initStore(dataStorePath string, fileService portainer.FileService) *bolt.Store {
+	store, err := bolt.NewStore(dataStorePath, fileService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -101,8 +102,12 @@ func initDemoData(store *bolt.Store, cryptoService portainer.CryptoService) erro
 	return nil
 }
 
-func initStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.StackManager, error) {
-	return exec.NewStackManager(assetsPath, dataStorePath, signatureService, fileService)
+func initComposeStackManager(dataStorePath string) portainer.ComposeStackManager {
+	return libcompose.NewComposeStackManager(dataStorePath)
+}
+
+func initSwarmStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.SwarmStackManager, error) {
+	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService)
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -157,13 +162,13 @@ func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portaine
 
 func initDockerHub(dockerHubService portainer.DockerHubService) error {
 	_, err := dockerHubService.DockerHub()
-	if err == portainer.ErrDockerHubNotFound {
+	if err == portainer.ErrObjectNotFound {
 		dockerhub := &portainer.DockerHub{
 			Authentication: false,
 			Username:       "",
 			Password:       "",
 		}
-		return dockerHubService.StoreDockerHub(dockerhub)
+		return dockerHubService.UpdateDockerHub(dockerhub)
 	} else if err != nil {
 		return err
 	}
@@ -173,10 +178,9 @@ func initDockerHub(dockerHubService portainer.DockerHubService) error {
 
 func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
 	_, err := settingsService.Settings()
-	if err == portainer.ErrSettingsNotFound {
+	if err == portainer.ErrObjectNotFound {
 		settings := &portainer.Settings{
 			LogoURL:                     *flags.Logo,
-			DisplayDonationHeader:       true,
 			DisplayExternalContributors: false,
 			AuthenticationMethod:        portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
@@ -201,7 +205,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			settings.BlackListedLabels = make([]portainer.Pair, 0)
 		}
 
-		return settingsService.StoreSettings(settings)
+		return settingsService.UpdateSettings(settings)
 	} else if err != nil {
 		return err
 	}
@@ -269,6 +273,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
+		Tags:            []string{},
 	}
 
 	if strings.HasPrefix(endpoint.URL, "tcp://") {
@@ -307,6 +312,7 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
+		Tags:            []string{},
 	}
 
 	return endpointService.CreateEndpoint(endpoint)
@@ -338,7 +344,7 @@ func main() {
 
 	fileService := initFileService(*flags.Data)
 
-	store := initStore(*flags.Data)
+	store := initStore(*flags.Data, fileService)
 	defer store.Close()
 
 	jwtService := initJWTService(!*flags.NoAuth)
@@ -360,10 +366,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	stackManager, err := initStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
+	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	composeStackManager := initComposeStackManager(*flags.Data)
 
 	err = initSettings(store.SettingsService, flags)
 	if err != nil {
@@ -434,7 +442,9 @@ func main() {
 		RegistryService:        store.RegistryService,
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
-		StackManager:           stackManager,
+		TagService:             store.TagService,
+		SwarmStackManager:      swarmStackManager,
+		ComposeStackManager:    composeStackManager,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,

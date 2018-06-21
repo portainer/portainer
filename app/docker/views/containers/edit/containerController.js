@@ -144,7 +144,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       $scope.state.joinNetworkInProgress = false;
     });
   };
-  
+
   $scope.commit = function () {
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;

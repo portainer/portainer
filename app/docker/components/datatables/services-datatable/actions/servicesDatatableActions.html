@@ -1,0 +1,15 @@
+<div class="actionBar">
+  <div class="btn-group" role="group" aria-label="...">
+    <button ng-if="$ctrl.showUpdateAction" type="button" class="btn btn-sm btn-primary"
+      ng-disabled="$ctrl.selectedItemCount === 0" ng-click="$ctrl.updateAction($ctrl.selectedItems)">
+      <i class="fa fa-sync space-right" aria-hidden="true"></i>Update
+    </button>
+    <button type="button" class="btn btn-sm btn-danger"
+      ng-disabled="$ctrl.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.selectedItems)">
+      <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
+    </button>
+  </div>
+  <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.services.new" ng-if="$ctrl.showAddAction">
+    <i class="fa fa-plus space-right" aria-hidden="true"></i>Add service
+  </button>
+</div>

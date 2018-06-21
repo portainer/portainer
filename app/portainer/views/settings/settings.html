@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Settings"></rd-header-title>
+  <rd-header-title title-text="Settings"></rd-header-title>
   <rd-header-content>Settings</rd-header-content>
 </rd-header>
 
@@ -18,19 +18,9 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-cogs" title="Application settings"></rd-widget-header>
+      <rd-widget-header icon="fa-cogs" title-text="Application settings"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_donation" class="control-label text-left">
-                Disable donation header
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_donation" ng-model="formValues.donationHeader"><i></i>
-              </label>
-            </div>
-          </div>
           <!-- logo -->
           <div class="form-group">
             <div class="col-sm-12">
@@ -154,7 +144,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tags" title="Hidden containers"></rd-widget-header>
+      <rd-widget-header icon="fa-tags" title-text="Hidden containers"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="addFilteredContainerLabel()" name="addTagForm">
           <div class="form-group">

@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerConsoleController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper',
-function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper) {
+.controller('ContainerConsoleController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper', 'LocalStorage',
+function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper, LocalStorage) {
   var socket, term;
 
   $scope.state = {
@@ -36,7 +36,8 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
     ContainerService.createExec(execConfig)
     .then(function success(data) {
       execId = data.Id;
-      var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID();
+      var jwtToken = LocalStorage.getJWT();
+      var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID() + '&token=' + jwtToken;
       if ($transition$.params().nodeName) {
         url += '&nodeName=' + $transition$.params().nodeName;
       }

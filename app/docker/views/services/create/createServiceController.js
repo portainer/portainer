@@ -496,7 +496,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
     $q.all({
       volumes: VolumeService.volumes(),
-      networks: NetworkService.networks(true, true, false, false),
+      networks: NetworkService.networks(true, true, false),
       secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
       configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
       nodes: NodeService.nodes(),

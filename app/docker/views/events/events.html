@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Event list">
+  <rd-header-title title-text="Event list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.events" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,7 +10,7 @@
 <div class="row">
   <div class="col-sm-12">
     <events-datatable
-    title="Events" title-icon="fa-history"
+    title-text="Events" title-icon="fa-history"
     dataset="events" table-key="events"
     order-by="Time" reverse-order="true"
     show-text-filter="true"

@@ -56,8 +56,18 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 **_Portainer_** has full support for the following Docker versions:
 
 * Docker 1.10 to the latest version
-* Docker Swarm >= 1.2.3
+* Standalone Docker Swarm >= 1.2.3 _(**NOTE:** Use of Standalone Docker Swarm is being discouraged since the introduction of built-in Swarm Mode in Docker. While older versions of Portainer had support for Standalone Docker Swarm, Portainer 1.17.0 and newer **do not** support it. However, the built-in Swarm Mode of Docker is fully supported.)_
 
 Partial support for the following Docker versions (some features may not be available):
 
 * Docker 1.9
+
+## Licensing
+
+Portainer is licensed under the zlib license. See [LICENSE](./LICENSE) for reference.
+
+Portainer also contains the following code, which is licensed under the [MIT license](https://opensource.org/licenses/MIT):
+
+UI For Docker: Copyright (c) 2013-2016 Michael Crosby (crosbymichael.com), Kevan Ahlquist (kevanahlquist.com), Anthony Lapenna (portainer.io)
+
+rdash-angular: Copyright (c) [2014] [Elliot Hesp]

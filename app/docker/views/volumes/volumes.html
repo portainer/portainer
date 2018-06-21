@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Volume list">
+  <rd-header-title title-text="Volume list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.volumes" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,7 +10,7 @@
 <div class="row">
   <div class="col-sm-12">
     <volumes-datatable
-    title="Volumes" title-icon="fa-cubes"
+    title-text="Volumes" title-icon="fa-cubes"
     dataset="volumes" table-key="volumes"
     order-by="Id" show-text-filter="true"
     remove-action="removeAction"
