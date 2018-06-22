@@ -54,7 +54,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.17.1-dev"
+  version: "1.18.1-dev"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -1386,7 +1386,7 @@ paths:
         in: "path"
         description: "Stack identifier"
         required: true
-        type: "string"
+        type: "integer"
       responses:
         200:
           description: "Success"
@@ -1431,7 +1431,12 @@ paths:
         in: "path"
         description: "Stack identifier"
         required: true
-        type: "string"
+        type: "integer"
+      - name: "endpointId"
+        in: "query"
+        description: "Stacks created before version 1.18.0 might not have an associated endpoint identifier. Use this \
+        optional parameter to set the endpoint identifier used by the stack."
+        type: "integer"
       - in: "body"
         name: "body"
         description: "Stack details"
@@ -1478,7 +1483,7 @@ paths:
         in: "path"
         description: "Stack identifier"
         required: true
-        type: "string"
+        type: "integer"
       - name: "external"
         in: "query"
         description: "Set to true to delete an external stack. Only external Swarm stacks are supported."
@@ -1528,12 +1533,67 @@ paths:
         in: "path"
         description: "Stack identifier"
         required: true
-        type: "string"
+        type: "integer"
       responses:
         200:
           description: "Success"
           schema:
             $ref: "#/definitions/StackFileInspectResponse"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Stack not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Stack not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /stacks/{id}/migrate:
+    post:
+      tags:
+      - "stacks"
+      summary: "Migrate a stack to another endpoint"
+      description: |
+        Migrate a stack from an endpoint to another endpoint. It will re-create
+        the stack inside the target endpoint before removing the original stack.
+        **Access policy**: restricted
+      operationId: "StackMigrate"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Stack identifier"
+        required: true
+        type: "integer"
+      - name: "endpointId"
+        in: "query"
+        description: "Stacks created before version 1.18.0 might not have an associated endpoint identifier. Use this \
+        optional parameter to set the endpoint identifier used by the stack."
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Stack migration details."
+        schema:
+          $ref: "#/definitions/StackMigrateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Stack"
         400:
           description: "Invalid request"
           schema:
@@ -2598,7 +2658,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.17.1-dev"
+        example: "1.18.1-dev"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -3561,6 +3621,19 @@ definitions:
         type: "string"
         example: "nginx:latest"
         description: "The Docker image associated to the template"
+  StackMigrateRequest:
+    type: "object"
+    required:
+    - "EndpointID"
+    properties:
+      EndpointID:
+        type: "integer"
+        example: 2
+        description: "Endpoint identifier of the target endpoint where the stack will be relocated"
+      SwarmID:
+        type: "string"
+        example: "jpofkc0i9uo9wtx1zesuk649w"
+        description: "Swarm cluster identifier, must match the identifier of the cluster where the stack will be relocated"
   StackCreateRequest:
     type: "object"
     required:

@@ -1,15 +1,95 @@
 angular.module('portainer.app')
-.controller('StackController', ['$q', '$scope', '$state', '$transition$', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ContainerService', 'ServiceHelper', 'TaskHelper', 'Notifications', 'FormHelper', 'EndpointProvider',
-function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceService, TaskService, ContainerService, ServiceHelper, TaskHelper, Notifications, FormHelper, EndpointProvider) {
+.controller('StackController', ['$q', '$scope', '$state', '$transition$', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ContainerService', 'ServiceHelper', 'TaskHelper', 'Notifications', 'FormHelper', 'EndpointProvider', 'EndpointService', 'GroupService', 'ModalService',
+function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceService, TaskService, ContainerService, ServiceHelper, TaskHelper, Notifications, FormHelper, EndpointProvider, EndpointService, GroupService, ModalService) {
 
   $scope.state = {
     actionInProgress: false,
-    externalStack: false
+    migrationInProgress: false,
+    externalStack: false,
+    showEditorTab: false
   };
 
   $scope.formValues = {
-    Prune: false
+    Prune: false,
+    Endpoint: null
   };
+
+  $scope.showEditor = function() {
+    $scope.state.showEditorTab = true;
+  };
+
+  $scope.migrateStack = function() {
+    ModalService.confirm({
+      title: 'Are you sure?',
+      message: 'This action will deploy a new instance of this stack on the target endpoint, please note that this does NOT relocate the content of any persistent volumes that may be attached to this stack.',
+      buttons: {
+        confirm: {
+          label: 'Migrate',
+          className: 'btn-danger'
+        }
+      },
+      callback: function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        migrateStack();
+      }
+    });
+  };
+
+  $scope.removeStack = function() {
+    ModalService.confirmDeletion(
+      'Do you want to remove the stack? Associated services will be removed as well.',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        deleteStack();
+      }
+    );
+  };
+
+  function migrateStack() {
+    var stack = $scope.stack;
+    var targetEndpointId = $scope.formValues.Endpoint.Id;
+
+    var migrateRequest = StackService.migrateSwarmStack;
+    if (stack.Type === 2) {
+      migrateRequest = StackService.migrateComposeStack;
+    }
+
+    // TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
+    // The EndpointID property is not available for these stacks, we can pass
+    // the current endpoint identifier as a part of the migrate request. It will be used if
+    // the EndpointID property is not defined on the stack.
+    var endpointId = EndpointProvider.endpointID();
+    if (stack.EndpointId === 0) {
+      stack.EndpointId = endpointId;
+    }
+
+    $scope.state.migrationInProgress = true;
+    migrateRequest(stack, targetEndpointId)
+    .then(function success(data) {
+      Notifications.success('Stack successfully migrated', stack.Name);
+      $state.go('portainer.stacks', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to migrate stack');
+    })
+    .finally(function final() {
+      $scope.state.migrationInProgress = false;
+    });
+  }
+
+  function deleteStack() {
+    var endpointId = EndpointProvider.endpointID();
+    var stack = $scope.stack;
+
+    StackService.remove(stack, $transition$.params().external, endpointId)
+    .then(function success() {
+      Notifications.success('Stack successfully removed', stack.Name);
+      $state.go('portainer.stacks');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to remove stack ' + stack.Name);
+    });
+  }
 
   $scope.deployStack = function () {
     var stackFile = $scope.stackFileContent;
@@ -54,10 +134,19 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
 
   function loadStack(id) {
     var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
+    var endpointId = EndpointProvider.endpointID();
 
-    StackService.stack(id)
+    $q.all({
+      stack: StackService.stack(id),
+      endpoints: EndpointService.endpoints(),
+      groups: GroupService.groups()
+    })
     .then(function success(data) {
-      var stack = data;
+      var stack = data.stack;
+      $scope.endpoints = data.endpoints.filter(function(endpoint) {
+        return endpoint.Id !== endpointId;
+      });
+      $scope.groups = data.groups;
       $scope.stack = stack;
 
       return $q.all({

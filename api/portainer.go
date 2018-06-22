@@ -129,7 +129,7 @@ type (
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier).
-	StackID string
+	StackID int
 
 	// StackType represents the type of the stack (compose v2, stack deploy v3).
 	StackType int
@@ -373,18 +373,19 @@ type (
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
+		GetNextIdentifier() int
 	}
 
 	// DockerHubService represents a service for managing the DockerHub object.
 	DockerHubService interface {
 		DockerHub() (*DockerHub, error)
-		StoreDockerHub(registry *DockerHub) error
+		UpdateDockerHub(registry *DockerHub) error
 	}
 
 	// SettingsService represents a service for managing application settings.
 	SettingsService interface {
 		Settings() (*Settings, error)
-		StoreSettings(settings *Settings) error
+		UpdateSettings(settings *Settings) error
 	}
 
 	// VersionService represents a service for managing version data.
@@ -434,6 +435,7 @@ type (
 	// FileService represents a service for managing files.
 	FileService interface {
 		GetFileContent(filePath string) (string, error)
+		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
 		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)
 		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)
@@ -445,6 +447,7 @@ type (
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
+		FileExists(path string) (bool, error)
 	}
 
 	// GitService represents a service for managing Git.
@@ -481,7 +484,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.17.1-dev"
+	APIVersion = "1.18.1-dev"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 12
 	// DefaultTemplatesURL represents the default URL for the templates definitions.

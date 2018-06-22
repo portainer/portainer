@@ -1,13 +1,12 @@
 package stacks
 
 import (
+	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/security"
 )
 
 func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
@@ -15,12 +14,11 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 		return nil
 	}
 
-	handler.FileService.RemoveDirectory(stack.ProjectPath)
+	err := handler.FileService.RemoveDirectory(stack.ProjectPath)
+	if err != nil {
+		log.Printf("http error: Unable to cleanup stack creation (err=%s)\n", err)
+	}
 	return nil
-}
-
-func buildStackIdentifier(stackName string, endpointID portainer.EndpointID) string {
-	return stackName + "_" + strconv.Itoa(int(endpointID))
 }
 
 // POST request on /api/stacks?type=<type>&method=<method>&endpointId=<endpointId>
@@ -41,24 +39,15 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrEndpointNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	tokenData, err := security.RetrieveTokenData(r)
+	err = handler.requestBouncer.EndpointAccess(r, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
-	}
-
-	if tokenData.Role != portainer.AdministratorRole {
-		err = handler.checkEndpointAccess(endpoint, tokenData.ID)
-		if err != nil && err == portainer.ErrEndpointAccessDenied {
-			return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
-		} else if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify permission to access endpoint", err}
-		}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
 	}
 
 	switch portainer.StackType(stackType) {

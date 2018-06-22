@@ -64,7 +64,7 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 	}
 
 	rc, err := handler.ResourceControlService.ResourceControlByResourceID(payload.ResourceID)
-	if err != nil && err != portainer.ErrResourceControlNotFound {
+	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve resource controls from the database", err}
 	}
 	if rc != nil {

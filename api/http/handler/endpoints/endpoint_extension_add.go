@@ -19,8 +19,8 @@ func (payload *endpointExtensionAddPayload) Validate(r *http.Request) error {
 	if payload.Type != 1 {
 		return portainer.Error("Invalid type value. Value must be one of: 1 (Storidge)")
 	}
-	if govalidator.IsNull(payload.URL) {
-		return portainer.Error("Invalid URL")
+	if payload.Type == 1 && govalidator.IsNull(payload.URL) {
+		return portainer.Error("Invalid extension URL")
 	}
 	return nil
 }
@@ -33,7 +33,7 @@ func (handler *Handler) endpointExtensionAdd(w http.ResponseWriter, r *http.Requ
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrEndpointNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}

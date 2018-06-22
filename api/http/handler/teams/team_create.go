@@ -29,7 +29,7 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	team, err := handler.TeamService.TeamByName(payload.Name)
-	if err != nil && err != portainer.ErrTeamNotFound {
+	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve teams from the database", err}
 	}
 	if team != nil {

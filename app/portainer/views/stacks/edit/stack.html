@@ -9,34 +9,162 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="state.externalStack">
+<div class="row">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <div class="col-sm-12 form-section-title">
-          Information
-        </div>
-        <div class="form-group">
-          <span class="small">
-            <p class="text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              This stack was created outside of Portainer. Control over this stack is limited.
-            </p>
-          </span>
-        </div>
+        <uib-tabset active="state.activeTab">
+          <!-- tab-info -->
+          <uib-tab index="0">
+            <uib-tab-heading>
+              <i class="fa fa-th-list" aria-hidden="true"></i> Stack
+            </uib-tab-heading>
+            <div style="margin-top: 10px;">
+              <!-- stack-information -->
+              <div ng-if="state.externalStack">
+                <div class="col-sm-12 form-section-title">
+                  Information
+                </div>
+                <div class="form-group">
+                  <span class="small">
+                    <p class="text-muted">
+                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                      This stack was created outside of Portainer. Control over this stack is limited.
+                    </p>
+                  </span>
+                </div>
+              </div>
+              <!-- !stack-information -->
+              <!-- stack-details -->
+              <div>
+                <div class="col-sm-12 form-section-title">
+                  Stack details
+                </div>
+                <div class="form-group">
+                  {{ stackName }}
+                  <button class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this stack</button>
+                </div>
+              </div>
+              <!-- !stack-details -->
+              <!-- stack-migration -->
+              <div ng-if="!state.externalStack && endpoints.length > 0">
+                <div class="col-sm-12 form-section-title">
+                  Stack migration
+                </div>
+                <div class="form-group">
+                  <span class="small" style="margin-top: 10px;">
+                    <p class="text-muted">
+                      This feature allows you to migrate this stack to an alternate compatible endpoint.
+                    </p>
+                  </span>
+                  <div>
+                    <endpoint-selector ng-if="endpoints && groups"
+                      model="formValues.Endpoint"
+                      endpoints="endpoints"
+                      groups="groups"
+                    ></endpoint-selector>
+                    <button class="btn btn-sm btn-primary" ng-click="migrateStack()" ng-disabled="!formValues.Endpoint || state.migrationInProgress" style="margin-top: 7px; margin-left: 0;" button-spinner="state.migrationInProgress">
+                      <span ng-hide="state.migrationInProgress"><i class="fa fa-long-arrow-alt-right space-right" aria-hidden="true"></i> Migrate</span>
+                      <span ng-show="state.migrationInProgress">Migration in progress...</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- !stack-migration -->
+            </div>
+          </uib-tab>
+          <!-- !tab-info -->
+          <!-- tab-file -->
+          <uib-tab index="1" ng-if="stackFileContent" select="showEditor()">
+            <uib-tab-heading>
+              <i class="fa fa-pencil-alt space-right" aria-hidden="true"></i> Editor
+            </uib-tab-heading>
+            <form class="form-horizontal" ng-if="state.showEditorTab" style="margin-top: 10px;">
+              <div class="form-group">
+                <span class="col-sm-12 text-muted small">
+                  You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
+                </span>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <code-editor
+                    identifier="stack-editor"
+                    placeholder="# Define or paste the content of your docker-compose file here"
+                    yml="true"
+                    on-change="editorUpdate"
+                    value="stackFileContent"
+                  ></code-editor>
+                </div>
+              </div>
+              <!-- environment-variables -->
+              <div ng-if="stack && stack.Type === 1">
+                <div class="col-sm-12 form-section-title">
+                  Environment
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12" style="margin-top: 5px;">
+                    <label class="control-label text-left">Environment variables</label>
+                    <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
+                    </span>
+                  </div>
+                  <!-- environment-variable-input-list -->
+                  <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                    <div ng-repeat="variable in stack.Env" style="margin-top: 2px;">
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">name</span>
+                        <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO">
+                      </div>
+                      <div class="input-group col-sm-5 input-group-sm">
+                        <span class="input-group-addon">value</span>
+                        <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
+                      </div>
+                      <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- !environment-variable-input-list -->
+                </div>
+              </div>
+              <!-- !environment-variables -->
+              <!-- options -->
+              <div ng-if="stack.Type === 1 && applicationState.endpoint.apiVersion >= 1.27">
+                <div class="col-sm-12 form-section-title">
+                Options
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <label for="prune" class="control-label text-left">
+                      Prune services
+                      <portainer-tooltip position="bottom" message="Prune services that are no longer referenced."></portainer-tooltip>
+                    </label>
+                    <label class="switch" style="margin-left: 20px;">
+                      <input name="prune" type="checkbox" ng-model="formValues.Prune"><i></i>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <!-- !options -->
+              <div class="col-sm-12 form-section-title">
+                Actions
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <button type="button" class="btn btn-sm btn-primary" ng-disabled="state.actionInProgress" ng-click="deployStack()" button-spinner="state.actionInProgress">
+                    <span ng-hide="state.actionInProgress">Update the stack</span>
+                    <span ng-show="state.actionInProgress">Deployment in progress...</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </uib-tab>
+          <!-- !tab-file -->
+        </uib-tabset>
       </rd-widget-body>
     </rd-widget>
   </div>
 </div>
-
-<!-- access-control-panel -->
-<por-access-control-panel
-  ng-if="stack && applicationState.application.authentication"
-  resource-id="stack.Name"
-  resource-control="stack.ResourceControl"
-  resource-type="'stack'">
-</por-access-control-panel>
-<!-- !access-control-panel -->
 
 <div class="row" ng-if="containers">
   <div class="col-sm-12">
@@ -68,91 +196,11 @@
   </div>
 </div>
 
-<div class="row" ng-if="stackFileContent">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-pencil-alt" title-text="Stack editor"></rd-widget-header>
-      <rd-widget-body>
-        <form class="form-horizontal">
-          <div class="form-group">
-            <span class="col-sm-12 text-muted small">
-              You can get more information about Compose file format in the <a href="https://docs.docker.com/compose/compose-file/" target="_blank">official documentation</a>.
-            </span>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <code-editor
-                identifier="stack-editor"
-                placeholder="# Define or paste the content of your docker-compose file here"
-                yml="true"
-                on-change="editorUpdate"
-                value="stackFileContent"
-              ></code-editor>
-            </div>
-          </div>
-          <!-- environment-variables -->
-          <div ng-if="stack && stack.Type === 1">
-            <div class="col-sm-12 form-section-title">
-              Environment
-            </div>
-            <div class="form-group">
-              <div class="col-sm-12" style="margin-top: 5px;">
-                <label class="control-label text-left">Environment variables</label>
-                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
-                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
-                </span>
-              </div>
-              <!-- environment-variable-input-list -->
-              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                <div ng-repeat="variable in stack.Env" style="margin-top: 2px;">
-                  <div class="input-group col-sm-5 input-group-sm">
-                    <span class="input-group-addon">name</span>
-                    <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO">
-                  </div>
-                  <div class="input-group col-sm-5 input-group-sm">
-                    <span class="input-group-addon">value</span>
-                    <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
-                  </div>
-                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
-                    <i class="fa fa-trash" aria-hidden="true"></i>
-                  </button>
-                </div>
-              </div>
-              <!-- !environment-variable-input-list -->
-            </div>
-          </div>
-          <!-- !environment-variables -->
-          <!-- options -->
-          <div ng-if="stack.Type === 1 && applicationState.endpoint.apiVersion >= 1.27">
-            <div class="col-sm-12 form-section-title">
-            Options
-            </div>
-            <div class="form-group">
-              <div class="col-sm-12">
-                <label for="prune" class="control-label text-left">
-                  Prune services
-                  <portainer-tooltip position="bottom" message="Prune services that are no longer referenced."></portainer-tooltip>
-                </label>
-                <label class="switch" style="margin-left: 20px;">
-                  <input name="prune" type="checkbox" ng-model="formValues.Prune"><i></i>
-                </label>
-              </div>
-            </div>
-          </div>
-          <!-- !options -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button type="button" class="btn btn-sm btn-primary" ng-disabled="state.actionInProgress" ng-click="deployStack()" button-spinner="state.actionInProgress">
-                <span ng-hide="state.actionInProgress">Update the stack</span>
-                <span ng-show="state.actionInProgress">Deployment in progress...</span>
-              </button>
-            </div>
-          </div>
-        </form>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
+<!-- access-control-panel -->
+<por-access-control-panel
+  ng-if="stack && applicationState.application.authentication"
+  resource-id="stack.Name"
+  resource-control="stack.ResourceControl"
+  resource-type="'stack'">
+</por-access-control-panel>
+<!-- !access-control-panel -->

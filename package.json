@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.17.1-dev",
+  "version": "1.18.1-dev",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -55,6 +55,7 @@
     "rdash-ui": "1.0.*",
     "splitargs": "github:deviantony/splitargs#~0.2.0",
     "toastr": "github:CodeSeven/toastr#~2.1.3",
+    "ui-select": "^0.19.8",
     "xterm": "^3.1.0"
   },
   "devDependencies": {

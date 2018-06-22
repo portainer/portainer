@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/asaskevich/govalidator"
@@ -46,16 +47,17 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		}
 	}
 
-	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
+	stackID := handler.StackService.GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackIdentifier),
+		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
 		Type:       portainer.DockerComposeStack,
 		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 	}
 
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
+	stackFolder := strconv.Itoa(int(stack.ID))
+	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
 	}
@@ -126,9 +128,9 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		}
 	}
 
-	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
+	stackID := handler.StackService.GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackIdentifier),
+		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
 		Type:       portainer.DockerComposeStack,
 		EndpointID: endpoint.ID,
@@ -211,16 +213,17 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		}
 	}
 
-	stackIdentifier := buildStackIdentifier(payload.Name, endpoint.ID)
+	stackID := handler.StackService.GetNextIdentifier()
 	stack := &portainer.Stack{
-		ID:         portainer.StackID(stackIdentifier),
+		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
 		Type:       portainer.DockerComposeStack,
 		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 	}
 
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
+	stackFolder := strconv.Itoa(int(stack.ID))
+	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
 	}

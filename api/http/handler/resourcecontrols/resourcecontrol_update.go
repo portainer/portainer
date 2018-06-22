@@ -37,7 +37,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	resourceControl, err := handler.ResourceControlService.ResourceControl(portainer.ResourceControlID(resourceControlID))
-	if err == portainer.ErrResourceControlNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a resource control with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a resource control with with the specified identifier inside the database", err}

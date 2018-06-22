@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
@@ -38,20 +39,20 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 
 // PUT request on /api/stacks/:id?endpointId=<endpointId>
 func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	stackID, err := request.RetrieveRouteVariableValue(r, "id")
+	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}
 
 	stack, err := handler.StackService.Stack(portainer.StackID(stackID))
-	if err == portainer.ErrStackNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
 	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceID(stack.Name)
-	if err != nil && err != portainer.ErrResourceControlNotFound {
+	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
 
@@ -78,7 +79,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(stack.EndpointID)
-	if err == portainer.ErrEndpointNotFound {
+	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
@@ -111,7 +112,8 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	_, err = handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
+	stackFolder := strconv.Itoa(int(stack.ID))
+	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
 	}
@@ -138,7 +140,8 @@ func (handler *Handler) updateSwarmStack(r *http.Request, stack *portainer.Stack
 
 	stack.Env = payload.Env
 
-	_, err = handler.FileService.StoreStackFileFromBytes(string(stack.ID), stack.EntryPoint, []byte(payload.StackFileContent))
+	stackFolder := strconv.Itoa(int(stack.ID))
+	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
 	}
