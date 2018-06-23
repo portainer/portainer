@@ -39,10 +39,6 @@ function (PaginationService, DatatableService, EndpointProvider) {
       open: false
     },
     columns: {
-      name: {
-        label: 'Name',
-        display: true
-      },
       state: {
         label: 'State',
         display: true
