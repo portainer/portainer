@@ -37,6 +37,10 @@
                       <input id="col_vis_ip" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ip.display"/>
                       <label for="col_vis_ip" ng-bind="$ctrl.columnVisibility.columns.ip.label"></label>
                     </div>
+                    <div class="md-checkbox" ng-if="$ctrl.showHostColumn">
+                      <input id="col_vis_host" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.host.display"/>
+                      <label for="col_vis_host" ng-bind="$ctrl.columnVisibility.columns.host.label"></label>
+                    </div>
                     <div class="md-checkbox">
                       <input id="col_vis_ports" ng-click="$ctrl.onColumnVisibilityChange()" type="checkbox" ng-model="$ctrl.columnVisibility.columns.ports.display"/>
                       <label for="col_vis_ports" ng-bind="$ctrl.columnVisibility.columns.ports.label"></label>
@@ -172,7 +176,7 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th ng-if="$ctrl.showHostColumn">
+              <th ng-if="$ctrl.showHostColumn" ng-show="$ctrl.columnVisibility.columns.host.display">
                 <a ng-click="$ctrl.changeOrderBy('NodeName')">
                   Host
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && !$ctrl.state.reverseOrder"></i>
@@ -219,7 +223,7 @@
               <td ng-show="$ctrl.columnVisibility.columns.stack.display">{{ item.StackName ? item.StackName : '-' }}</td>
               <td ng-show="$ctrl.columnVisibility.columns.image.display"><a ui-sref="docker.images.image({ id: item.Image })">{{ item.Image | trimshasum }}</a></td>
               <td ng-show="$ctrl.columnVisibility.columns.ip.display">{{ item.IP ? item.IP : '-' }}</td>
-              <td ng-if="$ctrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
+              <td ng-if="$ctrl.showHostColumn" ng-show="$ctrl.columnVisibility.columns.host.display">{{ item.NodeName ? item.NodeName : '-' }}</td>
               <td ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a ng-if="item.Ports.length > 0" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.state.publicURL || p.host }}:{{p.public}}" target="_blank">
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ p.public }}:{{ p.private }}

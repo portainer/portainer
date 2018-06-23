@@ -59,6 +59,10 @@ function (PaginationService, DatatableService, EndpointProvider) {
         label: 'IP Address',
         display: true
       },
+      host: {
+        label: 'Host',
+        display: true
+      },
       ports: {
         label: 'Published Ports',
         display: true
