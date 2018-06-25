@@ -151,7 +151,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		Env:        payload.Env,
 	}
 
-	projectPath := handler.FileService.GetStackProjectPath(string(stack.ID))
+	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
 	stack.ProjectPath = projectPath
 
 	gitCloneParams := &cloneRepositoryParameters{
