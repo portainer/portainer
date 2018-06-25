@@ -43,6 +43,10 @@ function (PaginationService, DatatableService, EndpointProvider) {
         label: 'State',
         display: true
       },
+      created: {
+        label: 'Created',
+        display: true
+      },
       actions: {
         label: 'Quick Actions',
         display: true
