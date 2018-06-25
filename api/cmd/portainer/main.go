@@ -1,6 +1,7 @@
 package main // import "github.com/portainer/portainer"
 
 import (
+	"encoding/json"
 	"strings"
 
 	"github.com/portainer/portainer"
@@ -156,11 +157,11 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			AllowPrivilegedModeForRegularUsers: true,
 		}
 
-		if *flags.Templates != "" {
-			settings.TemplatesURL = *flags.Templates
-		} else {
-			settings.TemplatesURL = portainer.DefaultTemplatesURL
-		}
+		// if *flags.Templates != "" {
+		// 	settings.TemplatesURL = *flags.Templates
+		// } else {
+		// 	settings.TemplatesURL = portainer.DefaultTemplatesURL
+		// }
 
 		if *flags.Labels != nil {
 			settings.BlackListedLabels = *flags.Labels
@@ -171,6 +172,69 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		return settingsService.UpdateSettings(settings)
 	} else if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func initTemplates(templateService portainer.TemplateService, fileService portainer.FileService, templatesURL string) error {
+
+	existingTemplates, err := templateService.Templates()
+	if err != nil {
+		return err
+	}
+
+	if len(existingTemplates) != 0 {
+		log.Printf("Templates already registered inside the database. Skipping template import.")
+		return nil
+	}
+
+	//cases: 1. no internet access, should load via fs
+	// 2. nothing specified, default behavior: ?
+	// 3. --templates http specified
+	// 4. I want use fs templates: how to? --templates fs://? fd://? /templates.json ?
+
+	// TODO:
+	// Load templates like this:
+	// If --templates found, load from HTTP and fallback to file on error
+	// If --templates not specified, load from file
+
+	// url := portainer.DefaultTemplatesURL
+	// if templatesURL != "" {
+	// 	url = templatesURL
+	// }
+
+	// var templatesJSON []byte
+	// templatesJSON, err = client.Get(url)
+	// if err != nil {
+	// 	log.Printf("Unable to retrieve templates via HTTP (err=%s). Fall-back to filesystem.\n", err)
+	// 	// TODO: use a flag here with default win/linux values
+	// 	templatesJSON, err = fileService.GetFileContent("/templates.json")
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+
+	// templatesJSON, err := fileService.GetFileContent("/home/tony/workspaces/portainer/portainer/dist/templates.json")
+	templatesJSON, err := fileService.GetFileContent("/app/templates.json")
+	if err != nil {
+		// What if cannot fetch from filesystem? Or if JSON is invalid? Fail fast or ignore and continue?
+		// IMO should failfast as it means that you've altered something and probably want to use custom templates
+		// if so you should be aware that something is wrong with your setup
+		return err
+	}
+
+	var templates []portainer.Template
+	err = json.Unmarshal(templatesJSON, &templates)
+	if err != nil {
+		return err
+	}
+
+	for _, template := range templates {
+		err := templateService.CreateTemplate(&template)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -334,6 +398,11 @@ func main() {
 
 	composeStackManager := initComposeStackManager(*flags.Data)
 
+	err = initTemplates(store.TemplateService, fileService, *flags.Templates)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = initSettings(store.SettingsService, flags)
 	if err != nil {
 		log.Fatal(err)
@@ -357,7 +426,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		adminPasswordHash, err = cryptoService.Hash(content)
+		adminPasswordHash, err = cryptoService.Hash(string(content))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -404,6 +473,7 @@ func main() {
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
 		TagService:             store.TagService,
+		TemplateService:        store.TemplateService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
 		CryptoService:          cryptoService,

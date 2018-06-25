@@ -78,6 +78,7 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
+    root: 'dist',
     distdir: 'dist/public',
     shippedDockerVersion: '18.03.1-ce',
     pkg: grunt.file.readJSON('package.json'),
@@ -162,6 +163,11 @@ gruntfile_cfg.copy = {
       {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/rdash-ui/dist/fonts/'},
       {dest: '<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
       {dest: '<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
+    ]
+  },
+  templates: {
+    files: [
+      { dest: '<%= root %>/', src: 'templates.json', cwd: '' }
     ]
   }
 };

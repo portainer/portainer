@@ -55,6 +55,7 @@ type Server struct {
 	TagService             portainer.TagService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
+	TemplateService        portainer.TemplateService
 	UserService            portainer.UserService
 	Handler                *handler.Handler
 	SSL                    bool
@@ -143,7 +144,7 @@ func (server *Server) Start() error {
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
-	templatesHandler.SettingsService = server.SettingsService
+	templatesHandler.TemplateService = server.TemplateService
 
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService

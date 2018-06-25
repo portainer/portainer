@@ -351,6 +351,59 @@ angular.module('portainer.app', [])
     }
   };
 
+  var templates = {
+    name: 'portainer.templates',
+    url: '/templates',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/templates/templates.html',
+        controller: 'TemplatesController'
+      }
+    },
+    params: {
+      key: 'containers',
+      hide_descriptions: false
+    }
+  };
+
+  var template = {
+    name: 'portainer.templates.template',
+    url: '/:id',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/templates/edit/template.html',
+        controller: 'TemplateController'
+      }
+    }
+  };
+
+  var templateCreation = {
+    name: 'portainer.templates.new',
+    url: '/new',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/templates/create/createtemplate.html',
+        controller: 'CreateTemplateController'
+      }
+    }
+  };
+
+  // TODO: drop LinuxServer templates support?
+  var templatesLinuxServer = {
+    name: 'portainer.templates.linuxserver',
+    url: '/linuxserver',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/templates/templates.html',
+        controller: 'TemplatesController'
+      }
+    },
+    params: {
+      key: 'linuxserver.io',
+      hide_descriptions: true
+    }
+  };
+
   $stateRegistryProvider.register(root);
   $stateRegistryProvider.register(portainer);
   $stateRegistryProvider.register(about);
@@ -382,4 +435,9 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(user);
   $stateRegistryProvider.register(teams);
   $stateRegistryProvider.register(team);
+  $stateRegistryProvider.register(templates);
+  $stateRegistryProvider.register(template);
+  $stateRegistryProvider.register(templateCreation);
+  // TODO: remove this
+  $stateRegistryProvider.register(templatesLinuxServer);
 }]);

@@ -54,5 +54,5 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Compose file from disk", err}
 	}
 
-	return response.JSON(w, &stackFileResponse{StackFileContent: stackFileContent})
+	return response.JSON(w, &stackFileResponse{StackFileContent: string(stackFileContent)})
 }

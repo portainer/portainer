@@ -1,4 +1,4 @@
-angular.module('portainer.docker')
+angular.module('portainer.app')
 .controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'PaginationService', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService', 'EndpointProvider',
 function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, PaginationService, ResourceControlService, Authentication, FormValidator, SettingsService, StackService, EndpointProvider) {
   $scope.state = {
@@ -152,13 +152,13 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
   };
 
   $scope.unselectTemplate = function() {
-    var currentTemplateIndex = $scope.state.selectedTemplate.index;
+    var currentTemplateIndex = $scope.state.selectedTemplate.Id;
     $('#template_' + currentTemplateIndex).toggleClass('template-container--selected');
     $scope.state.selectedTemplate = null;
   };
 
   $scope.selectTemplate = function(index, pos) {
-    if ($scope.state.selectedTemplate && $scope.state.selectedTemplate.index !== index) {
+    if ($scope.state.selectedTemplate && $scope.state.selectedTemplate.Id !== index) {
       $scope.unselectTemplate();
     }
 
@@ -211,6 +211,19 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     updateCategories(templates, type);
   };
 
+  $scope.deleteTemplate = function(template) {
+    // TODO: add modal confirmation
+    TemplateService.delete(template.Id)
+    .then(function success() {
+      Notifications.success('Template successfully deleted');
+      var idx = $scope.templates.indexOf(template);
+      $scope.templates.splice(idx, 1);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to remove template');
+    });
+  };
+
   function updateCategories(templates, type) {
     var availableCategories = [];
     angular.forEach(templates, function(template) {
@@ -223,7 +236,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
 
   function initTemplates(templatesKey, type, provider, apiVersion) {
     $q.all({
-      templates: TemplateService.getTemplates(templatesKey),
+      templates: TemplateService.templates(),
       containers: ContainerService.containers(0),
       volumes: VolumeService.getVolumes(),
       networks: NetworkService.networks(
@@ -252,6 +265,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
   }
 
   function initView() {
+    // TODO: should remove this
     var templatesKey = $transition$.params().key;
     $scope.templatesKey = templatesKey;
 

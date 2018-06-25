@@ -1,6 +1,6 @@
 <rd-header id="view-top">
   <rd-header-title title-text="Application templates list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.templates" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.templates" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
@@ -11,11 +11,7 @@
   <!-- stack-form -->
   <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'stack'">
     <rd-widget>
-      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title">
-        <div class="pull-right">
-          <button type="button" class="btn btn-sm btn-primary" ng-click="unselectTemplate()">Hide</button>
-        </div>
-      </rd-widget-custom-header>
+      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
 
         <form class="form-horizontal">
@@ -68,6 +64,7 @@
                 <span ng-hide="state.actionInProgress">Deploy the stack</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
+              <button type="button" class="btn btn-sm btn-default" ng-click="unselectTemplate()">Hide</button>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
@@ -81,11 +78,7 @@
   <!-- container-form -->
   <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'container'">
     <rd-widget>
-      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Image">
-        <div class="pull-right">
-          <button type="button" class="btn btn-sm btn-primary" ng-click="unselectTemplate()">Hide</button>
-        </div>
-      </rd-widget-custom-header>
+      <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Image"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
 
         <form class="form-horizontal">
@@ -285,7 +278,7 @@
               </div>
             </div>
             <!-- !extra-host -->
-            <!-- Label -->
+            <!-- labels -->
             <div class="form-group" >
               <div class="col-sm-12" style="margin-top: 5px;">
                 <label class="control-label text-left">Labels</label>
@@ -313,7 +306,7 @@
               </div>
                 <!-- !labels-input-list -->
             </div>
-            <!-- !Label -->
+            <!-- !labels -->
             <!-- hostname -->
             <div class="form-group">
               <label for="container_hostname" class="col-sm-2 control-label text-left">Hostname</label>
@@ -334,6 +327,7 @@
                 <span ng-hide="state.actionInProgress">Deploy the container</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
+              <button type="button" class="btn btn-sm btn-default" ng-click="unselectTemplate()">Hide</button>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
@@ -419,7 +413,7 @@
 
           <div class="template-list">
             <!-- template -->
-            <div ng-repeat="tpl in templates | filter:state.filters:true" class="template-container" id="template_{{ tpl.index }}" ng-click="selectTemplate(tpl.index, $index)">
+            <div ng-repeat="tpl in templates | filter:state.filters:true" class="template-container" id="template_{{ tpl.Id }}" ng-click="selectTemplate(tpl.Id, $index)">
               <div class="template-main">
                 <!-- template-image -->
                 <span class="">
@@ -432,6 +426,8 @@
                   <div class="template-line">
                     <span class="template-title">
                       {{ tpl.Title }}
+                      <button class="btn btn-sm btn-danger space-left" ng-click="$event.stopPropagation(); deleteTemplate(tpl);">Delete</button>
+                      <a ui-sref="portainer.templates.template({ id: tpl.Id })" class="space-left" ng-click="$event.stopPropagation();">Update</a>
                     </span>
                     <span>
                       <i class="fab fa-windows" aria-hidden="true" ng-if="tpl.Platform === 'windows'"></i>

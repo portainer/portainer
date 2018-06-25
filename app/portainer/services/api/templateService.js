@@ -1,11 +1,68 @@
 angular.module('portainer.app')
-.factory('TemplateService', ['$q', 'Template', 'TemplateHelper', 'ImageHelper', 'ContainerHelper', function TemplateServiceFactory($q, Template, TemplateHelper, ImageHelper, ContainerHelper) {
+.factory('TemplateService', ['$q', 'Templates', 'TemplateHelper', 'ImageHelper', 'ContainerHelper',
+function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, ContainerHelper) {
   'use strict';
   var service = {};
 
+  service.templates = function() {
+    var deferred = $q.defer();
+
+    Templates.query().$promise
+    .then(function success(data) {
+      var templates = data.map(function (item) {
+        if (item.type === 'container') {
+          return new ContainerTemplateViewModel(item);
+        }
+        return new StackTemplateViewModel(item);
+      });
+      deferred.resolve(templates);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve templates', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.template = function(id) {
+    var deferred = $q.defer();
+
+    Templates.get({ id: id }).$promise
+    .then(function success(data) {
+      var template;
+      if (data.type === 'container') {
+        template = new ContainerTemplateViewModel(data);
+      } else {
+        template = new StackTemplateViewModel(data);
+      }
+      deferred.resolve(template);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve template details', err: err });
+    });
+
+
+    return deferred.promise;
+  };
+
+  service.delete = function(id) {
+    return Templates.remove({ id: id }).$promise;
+  };
+
+  service.createTemplate = function(model) {
+    var payload = new TemplateCreateRequest(model);
+    return Templates.create(payload).$promise;
+  };
+
+  service.updateTemplate = function(model) {
+    var payload = new TemplateUpdateRequest(model);
+    return Templates.update(payload).$promise;
+  };
+
+  // TODO: remove
   service.getTemplates = function(key) {
     var deferred = $q.defer();
-    Template.get({key: key}).$promise
+    Templates.get({key: key}).$promise
     .then(function success(data) {
       var templates = data.map(function (tpl, idx) {
         var template;

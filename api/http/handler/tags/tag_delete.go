@@ -9,7 +9,7 @@ import (
 	"github.com/portainer/portainer/http/response"
 )
 
-// DELETE request on /api/tags/:name
+// DELETE request on /api/tags/:id
 func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

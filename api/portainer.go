@@ -68,7 +68,6 @@ type (
 
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL                       string               `json:"TemplatesURL"`
 		LogoURL                            string               `json:"LogoURL"`
 		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
 		DisplayExternalContributors        bool                 `json:"DisplayExternalContributors"`
@@ -78,6 +77,8 @@ type (
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		// Deprecated fields
 		DisplayDonationHeader bool
+		// TODO: remove all the code related to this
+		TemplatesURL string `json:"TemplatesURL"`
 	}
 
 	// User represents a user account.
@@ -277,6 +278,87 @@ type (
 		Name string `json:"Name"`
 	}
 
+	// TemplateID represents a template identifier.
+	TemplateID int
+
+	// Template represents an application template.
+	Template struct {
+		// Mandatory container/stack fields
+		ID          TemplateID `json:"Id"`
+		Type        string     `json:"type"`
+		Title       string     `json:"title"`
+		Description string     `json:"description"`
+
+		// Mandatory container fields
+		Image string `json:"image"`
+
+		// Mandatory stack fields
+		Repository TemplateRepository `json:"repository"`
+
+		// Optional stack/container fields
+		Name       string        `json:"name,omitempty"`
+		LogoURL    string        `json:"logo,omitempty"`
+		Env        []TemplateEnv `json:"env,omitempty"`
+		Note       string        `json:"note,omitempty"`
+		Platform   string        `json:"platform,omitempty"`
+		Categories []string      `json:"categories,omitempty"`
+
+		// Optional stack fields
+		// None
+
+		// Optional container fields
+		// TODO: ? remove this registry field?
+		Registry        string           `json:"registry,omitempty"`
+		Command         string           `json:"command,omitempty"`
+		Network         string           `json:"network,omitempty"`
+		Volumes         []TemplateVolume `json:"volumes,omitempty"`
+		Ports           []string         `json:"ports,omitempty"`
+		Labels          []Pair           `json:"labels,omitempty"`
+		PrivilegedMode  bool             `json:"privileged,omitempty"`
+		InteractiveMode bool             `json:"interactive,omitempty"`
+		RestartPolicy   string           `json:"restart_policy,omitempty"`
+		Hostname        string           `json:"hostname,omitempty"`
+	}
+
+	// TODO: TemplateEnv is different for container/stack templates
+	// Refactor to use the same struct
+	// Drop support for container list as a select, just use simple input
+
+	// Container:
+	// {
+	// "name": "the name of the environment variable, as supported in the container image (mandatory)",
+	// "label": "label for the input in the UI (mandatory)",
+	// "type": "only container is available at the moment (optional)",
+	// "set": "pre-defined value for the variable, will not generate an input in the UI (optional)"
+	// }
+
+	// Stack:
+	// {
+	//   "name": "the name of the environment variable, as supported in the container image (mandatory)",
+	//   "label": "label for the input in the UI (mandatory unless set is present)",
+	//   "description": "a short description for this input, will be available as a tooltip in the UI (optional)",
+	//   "set": "pre-defined value for the variable, will not generate an input in the UI (optional)",
+	//   "select": "an array of possible values, will generate a select input (optional)"
+	// }
+
+	TemplateEnv struct {
+		Name  string `json:"name"`
+		Label string `json:"label,omitempty"`
+		Type  string `json:"type,omitempty"`
+		Set   string `json:"set,omitempty"`
+	}
+
+	TemplateVolume struct {
+		Container string `json:"container"`
+		Bind      string `json:"bind,omitempty"`
+		ReadOnly  bool   `json:"readonly,omitempty"`
+	}
+
+	TemplateRepository struct {
+		URL       string `json:"url"`
+		StackFile string `json:"stackfile"`
+	}
+
 	// ResourceAccessLevel represents the level of control associated to a resource.
 	ResourceAccessLevel int
 
@@ -411,6 +493,15 @@ type (
 		DeleteTag(ID TagID) error
 	}
 
+	// TemplateService represents a service for managing template data.
+	TemplateService interface {
+		Templates() ([]Template, error)
+		Template(ID TemplateID) (*Template, error)
+		CreateTemplate(template *Template) error
+		UpdateTemplate(ID TemplateID, template *Template) error
+		DeleteTemplate(ID TemplateID) error
+	}
+
 	// CryptoService represents a service for encrypting/hashing data.
 	CryptoService interface {
 		Hash(data string) (string, error)
@@ -434,7 +525,7 @@ type (
 
 	// FileService represents a service for managing files.
 	FileService interface {
-		GetFileContent(filePath string) (string, error)
+		GetFileContent(filePath string) ([]byte, error)
 		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
 		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)
@@ -487,6 +578,9 @@ const (
 	APIVersion = "1.18.1-dev"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 12
+
+	// TODO: remove DefaultTemplatesURL
+
 	// DefaultTemplatesURL represents the default URL for the templates definitions.
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
