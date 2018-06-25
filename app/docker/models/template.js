@@ -40,6 +40,15 @@ function TemplateViewModel(data) {
   this.Ports = [];
   if (data.ports) {
     this.Ports = data.ports.map(function (p) {
+
+      if(_.isObject(p)){
+        return {
+          containerPort: p.container,
+          protocol: p.protocol || 'tcp',
+          hostPort: p.host
+        };
+      }
+
       var portAndProtocol = _.split(p, '/');
       return {
         containerPort: portAndProtocol[0],
