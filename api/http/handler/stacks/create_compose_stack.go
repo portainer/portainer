@@ -137,7 +137,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		EntryPoint: payload.ComposeFilePathInRepository,
 	}
 
-	projectPath := handler.FileService.GetStackProjectPath(string(stack.ID))
+	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
 	stack.ProjectPath = projectPath
 
 	gitCloneParams := &cloneRepositoryParameters{
