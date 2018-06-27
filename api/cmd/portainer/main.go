@@ -216,7 +216,7 @@ func initTemplates(templateService portainer.TemplateService, fileService portai
 	// }
 
 	// templatesJSON, err := fileService.GetFileContent("/home/tony/workspaces/portainer/portainer/dist/templates.json")
-	templatesJSON, err := fileService.GetFileContent("/app/templates.json")
+	templatesJSON, err := fileService.GetFileContent("/templates.json")
 	if err != nil {
 		// What if cannot fetch from filesystem? Or if JSON is invalid? Fail fast or ignore and continue?
 		// IMO should failfast as it means that you've altered something and probably want to use custom templates
