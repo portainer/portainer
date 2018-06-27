@@ -6,6 +6,23 @@ function ($q, $scope, $state, $transition$, TemplateService, NetworkService, Not
     actionInProgress: false
   };
 
+  $scope.update = function() {
+    var model = $scope.template;
+
+    $scope.state.actionInProgress = true;
+    TemplateService.update(model)
+    .then(function success() {
+      Notifications.success('Template successfully updated', model.Title);
+      $state.go('portainer.templates');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to update template');
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
+    });
+  };
+
   function initView() {
     var provider = $scope.applicationState.endpoint.mode.provider;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;

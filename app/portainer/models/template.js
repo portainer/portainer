@@ -1,35 +1,92 @@
-// function ContainerTemplateUpdateRequest(model) {
-//   this.id = model.Id;
-//   this.Type = model.Type;
-//   this.Name = model.Name;
-//   this.Hostname = model.Hostname;
-//   this.Title = model.Title;
-//   this.Description = model.Description;
-//   this.Note = model.Note;
-//   this.Categories = model.Categories;
-//   this.Platform = model.Platform;
-//   this.Logo = model.Logo;
-//   this.Image = model.Image;
-//   this.Registry = model.Registry;
-//   this.Command = model.Command;
-//   this.Network = model.Network;
-//   this.Privileged = model.Privileged;
-//   this.Interactive = model.Interactive;
-//   this.RestartPolicy = model.RestartPolicy;
-//   this.Labels = model.Labels;
-// }
+function TemplateDefaultModel() {
+  this.Type = 'container';
+  this.Title = '';
+  this.Image = '';
+  this.Description = '';
+  this.Volumes = [];
+  this.Ports = [];
+  this.Env = [];
+  this.Labels = [];
+  this.RestartPolicy = 'always';
+}
 
-function ContainerTemplateViewModel(data) {
+function TemplateCreateRequest(model) {
+  this.Type = model.Type;
+  this.Name = model.Name;
+  this.Hostname = model.Hostname;
+  this.Title = model.Title;
+  this.Description = model.Description;
+  this.Note = model.Note;
+  this.Categories = model.Categories;
+  this.Platform = model.Platform;
+  this.Logo = model.Logo;
+  this.Image = model.Image;
+  this.Registry = model.Registry;
+  this.Command = model.Command;
+  this.Network = model.Network;
+  this.Privileged = model.Privileged;
+  this.Interactive = model.Interactive;
+  this.RestartPolicy = model.RestartPolicy;
+  this.Labels = model.Labels;
+  this.Repository = model.Repository;
+  this.Env = model.Env;
+
+  this.Ports = [];
+  for (var i = 0; i < model.Ports.length; i++) {
+    var binding = model.Ports[i];
+    if (binding.containerPort && binding.protocol) {
+      this.Ports.push(binding.containerPort + '/' + binding.protocol);
+    }
+  }
+
+  this.Volumes = model.Volumes;
+}
+
+// TODO: similar to TemplateCreateRequest
+function TemplateUpdateRequest(model) {
+  this.id = model.Id;
+  this.Type = model.Type;
+  this.Name = model.Name;
+  this.Hostname = model.Hostname;
+  this.Title = model.Title;
+  this.Description = model.Description;
+  this.Note = model.Note;
+  this.Categories = model.Categories;
+  this.Platform = model.Platform;
+  this.Logo = model.Logo;
+  this.Image = model.Image;
+  this.Registry = model.Registry;
+  this.Command = model.Command;
+  this.Network = model.Network;
+  this.Privileged = model.Privileged;
+  this.Interactive = model.Interactive;
+  this.RestartPolicy = model.RestartPolicy;
+  this.Labels = model.Labels;
+  this.Repository = model.Repository;
+  this.Env = model.Env;
+
+  this.Ports = [];
+  for (var i = 0; i < model.Ports.length; i++) {
+    var binding = model.Ports[i];
+    if (binding.containerPort && binding.protocol) {
+      this.Ports.push(binding.containerPort + '/' + binding.protocol);
+    }
+  }
+
+  this.Volumes = model.Volumes;
+}
+
+function TemplateViewModel(data) {
   this.Id = data.Id;
-  this.Type = data.type;
-  this.Name = data.name;
-  this.Hostname = data.hostname;
   this.Title = data.title;
+  this.Type = data.type;
   this.Description = data.description;
-  this.Note = data.note;
-  this.Categories = data.categories ? data.categories : [];
-  this.Platform = data.platform ? data.platform : '';
-  this.Logo = data.logo;
+
+  // Stack
+  this.Repository = data.repository;
+
+  // Container
+  this.Hostname = data.hostname;
   this.Image = data.image;
   this.Registry = data.registry ? data.registry : '';
   this.Command = data.command ? data.command : '';
@@ -38,14 +95,11 @@ function ContainerTemplateViewModel(data) {
   this.Interactive = data.interactive ? data.interactive : false;
   this.RestartPolicy = data.restart_policy ? data.restart_policy : 'always';
   this.Labels = data.labels ? data.labels : [];
-
-  this.Env = data.env ? data.env : [];
-
   this.Volumes = [];
   if (data.volumes) {
     this.Volumes = data.volumes.map(function (v) {
       return {
-        containerPath: v.container,
+        container: v.container,
         readOnly: v.readonly || false,
         type: v.bind ? 'bind' : 'auto',
         bind : v.bind ? v.bind : null
@@ -64,20 +118,28 @@ function ContainerTemplateViewModel(data) {
     });
   }
   this.Hosts = data.hosts ? data.hosts : [];
-}
 
-function StackTemplateViewModel(data) {
-  this.Type = data.type;
+  // Both
   this.Name = data.name;
-  this.Title = data.title;
-  this.Description = data.description;
+  this.Env = data.env ? data.env : [];
   this.Note = data.note;
   this.Categories = data.categories ? data.categories : [];
-  this.Platform = data.platform ? data.platform : 'undefined';
+  this.Platform = data.platform ? data.platform : '';
   this.Logo = data.logo;
-  this.Repository = data.repository;
-  this.Env = data.env ? data.env : [];
 }
+
+// function StackTemplateViewModel(data) {
+//   this.Type = data.type;
+//   this.Name = data.name;
+//   this.Title = data.title;
+//   this.Description = data.description;
+//   this.Note = data.note;
+//   this.Categories = data.categories ? data.categories : [];
+//   this.Platform = data.platform ? data.platform : 'undefined';
+//   this.Logo = data.logo;
+//   this.Repository = data.repository;
+//   this.Env = data.env ? data.env : [];
+// }
 
 // TODO: remove
 // function TemplateViewModel(data) {
@@ -134,6 +196,7 @@ function StackTemplateViewModel(data) {
 //   this.Hosts = data.hosts ? data.hosts : [];
 // }
 
+// TODO: remove
 function TemplateLSIOViewModel(data) {
   this.Type = data.type;
   this.Title = data.title;

@@ -1,0 +1,55 @@
+<!-- template -->
+<div ng-class="{ 'template-container--selected': $ctrl.model.Selected }" class="template-container" ng-click="$ctrl.onSelect($ctrl.model)">
+  <div class="template-main">
+    <!-- template-image -->
+    <span ng-if="$ctrl.model.Logo">
+      <img class="template-logo" ng-src="{{ $ctrl.model.Logo }}" />
+    </span>
+    <span class="template-logo" ng-if="!$ctrl.model.Logo">
+      <i class="fa fa-rocket fa-4x blue-icon" aria-hidden="true"></i>
+    </span>
+    <!-- !template-image -->
+    <!-- template-details -->
+    <span class="col-sm-12">
+      <!-- template-line1 -->
+      <div class="template-line">
+        <span>
+          <span class="template-title">
+            {{ $ctrl.model.Title }}
+          </span>
+          <span class="space-left template-type">
+            <span>
+              <i class="fab fa-windows" aria-hidden="true" ng-if="$ctrl.model.Platform === 'windows'"></i>
+              <i class="fab fa-linux" aria-hidden="true" ng-if="$ctrl.model.Platform === 'linux'"></i>
+            </span>
+            <span>
+              {{ $ctrl.model.Type }}
+            </span>
+          </span>
+        </span>
+        <span class="text-small">
+          <a ui-sref="portainer.templates.template({ id: $ctrl.model.Id })" class="btn btn-xs btn-primary" ng-click="$event.stopPropagation();" ng-if="$ctrl.showUpdateAction">
+            <i class="fa fa-edit" aria-hidden="true"></i>
+            Update
+          </a>
+          <btn class="btn btn-xs btn-danger" ng-click="$event.stopPropagation(); $ctrl.onDelete($ctrl.model)" ng-if="$ctrl.showDeleteAction">
+            <i class="fa fa-trash" aria-hidden="true"></i> Delete
+          </btn>
+        </span>
+      </div>
+      <!-- !template-line1 -->
+      <!-- template-line2 -->
+      <div class="template-line">
+        <span class="template-description">
+          {{ $ctrl.model.Description }}
+        </span>
+        <span class="small text-muted" ng-if="$ctrl.model.Categories.length > 0">
+          {{ $ctrl.model.Categories.join(', ') }}
+        </span>
+      </div>
+      <!-- !template-line2 -->
+    </span>
+    <!-- !template-details -->
+  </div>
+  <!-- !template -->
+</div>

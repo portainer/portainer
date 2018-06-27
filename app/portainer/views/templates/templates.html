@@ -9,7 +9,7 @@
 
 <div class="row">
   <!-- stack-form -->
-  <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'stack'">
+  <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 'stack'">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
@@ -46,7 +46,7 @@
               <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}">
               <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
                 <option selected disabled hidden value="">Select value</option>
-                <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.text }}</option>
+                <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.name }}</option>
               </select>
             </div>
           </div>
@@ -64,7 +64,7 @@
                 <span ng-hide="state.actionInProgress">Deploy the stack</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
-              <button type="button" class="btn btn-sm btn-default" ng-click="unselectTemplate()">Hide</button>
+              <button type="button" class="btn btn-sm btn-default" ng-click="unselectTemplate(state.selectedTemplate)">Hide</button>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
@@ -76,7 +76,7 @@
   </div>
   <!-- !stack-form -->
   <!-- container-form -->
-  <div class="col-sm-12" ng-if="state.selectedTemplate && state.filters.Type === 'container'">
+  <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 'container'">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Image"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
@@ -119,10 +119,16 @@
           <div ng-repeat="var in state.selectedTemplate.Env" ng-if="!var.set" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
             <div class="col-sm-10">
-              <select ng-if="var.type === 'container'" ng-options="container|containername for container in runningContainers" class="form-control" ng-model="var.value">
+              <!-- TODO: remove the container type? -->
+              <!-- <select ng-if="var.type === 'container'" ng-options="container|containername for container in runningContainers" class="form-control" ng-model="var.value">
                 <option selected disabled hidden value="">Select a container</option>
+              </select> -->
+              <!-- TODO: common with stacks, relocate -->
+              <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}">
+              <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
+                <option selected disabled hidden value="">Select value</option>
+                <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.name }}</option>
               </select>
-              <input ng-if="!var.type || !var.type === 'container'" type="text" class="form-control" ng-model="var.value" id="field_{{ $index }}">
             </div>
           </div>
           <!-- !env -->
@@ -205,15 +211,15 @@
                     <!-- container-path -->
                     <div class="input-group input-group-sm col-sm-6">
                       <span class="input-group-addon">container</span>
-                      <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container">
+                      <input type="text" class="form-control" ng-model="volume.container" placeholder="e.g. /path/in/container">
                     </div>
                     <!-- !container-path -->
                     <!-- volume-type -->
                     <div class="input-group col-sm-5" style="margin-left: 5px;">
                       <div class="btn-group btn-group-sm">
-                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'auto'" ng-click="volume.name = ''">Auto</label>
-                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.name = ''">Volume</label>
-                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''" ng-if="isAdmin || allowBindMounts">Bind</label>
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'auto'" ng-click="volume.bind = ''">Auto</label>
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'volume'" ng-click="volume.bind = ''">Volume</label>
+                        <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.bind = ''" ng-if="isAdmin || allowBindMounts">Bind</label>
                       </div>
                       <button class="btn btn-sm btn-danger" type="button" ng-click="removeVolume($index)">
                         <i class="fa fa-trash" aria-hidden="true"></i>
@@ -228,7 +234,7 @@
                     <!-- volume -->
                     <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
                       <span class="input-group-addon">volume</span>
-                      <select class="form-control" ng-model="volume.name">
+                      <select class="form-control" ng-model="volume.bind">
                         <option selected disabled hidden value="">Select a volume</option>
                         <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
                       </select>
@@ -237,14 +243,14 @@
                     <!-- bind -->
                     <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
                       <span class="input-group-addon">host</span>
-                      <input type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host">
+                      <input type="text" class="form-control" ng-model="volume.bind" placeholder="e.g. /path/on/host">
                     </div>
                     <!-- !bind -->
                     <!-- read-only -->
                     <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
                       <div class="btn-group btn-group-sm">
-                        <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
-                        <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
+                        <label class="btn btn-primary" ng-model="volume.readonly" uib-btn-radio="false">Writable</label>
+                        <label class="btn btn-primary" ng-model="volume.readonly" uib-btn-radio="true">Read-only</label>
                       </div>
                     </div>
                     <!-- !read-only -->
@@ -327,7 +333,7 @@
                 <span ng-hide="state.actionInProgress">Deploy the container</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
-              <button type="button" class="btn btn-sm btn-default" ng-click="unselectTemplate()">Hide</button>
+              <button type="button" class="btn btn-sm btn-default" ng-click="unselectTemplate(state.selectedTemplate)">Hide</button>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
@@ -340,8 +346,23 @@
   <!-- container-form -->
 </div>
 
-
 <div class="row">
+  <div class="col-sm-12">
+    <template-list ng-if="templates"
+      title-text="Templates" title-icon="fa-rocket"
+      templates="templates"
+      select-action="selectTemplate"
+      delete-action="deleteTemplate"
+      show-add-action="isAdmin"
+      show-update-action="isAdmin"
+      show-delete-action="isAdmin"
+      show-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
+    ></template-list>
+  </div>
+</div>
+
+<!-- TODO: remove -->
+<!-- <div class="row">
   <div class="col-sm-12" style="height: 100%">
     <rd-template-widget>
       <rd-widget-header icon="fa-rocket" title-text="Templates">
@@ -354,8 +375,10 @@
         </div>
       </rd-widget-header>
       <rd-widget-taskbar>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.templates.new">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add template
+        </button>
         <div>
-          <!-- Platform -->
           <span class="btn-group btn-group-sm" style="margin-right: 15px;">
             <label class="btn btn-primary" ng-model="state.filters.Platform" uib-btn-radio="'!'">
               All
@@ -412,45 +435,12 @@
           </div>
 
           <div class="template-list">
-            <!-- template -->
-            <div ng-repeat="tpl in templates | filter:state.filters:true" class="template-container" id="template_{{ tpl.Id }}" ng-click="selectTemplate(tpl.Id, $index)">
-              <div class="template-main">
-                <!-- template-image -->
-                <span class="">
-                  <img class="template-logo" ng-src="{{ tpl.Logo }}" />
-                </span>
-                <!-- !template-image -->
-                <!-- template-details -->
-                <span class="col-sm-12">
-                  <!-- template-line1 -->
-                  <div class="template-line">
-                    <span class="template-title">
-                      {{ tpl.Title }}
-                      <button class="btn btn-sm btn-danger space-left" ng-click="$event.stopPropagation(); deleteTemplate(tpl);">Delete</button>
-                      <a ui-sref="portainer.templates.template({ id: tpl.Id })" class="space-left" ng-click="$event.stopPropagation();">Update</a>
-                    </span>
-                    <span>
-                      <i class="fab fa-windows" aria-hidden="true" ng-if="tpl.Platform === 'windows'"></i>
-                      <i class="fab fa-linux" aria-hidden="true" ng-if="tpl.Platform === 'linux'"></i>
-                      <!-- Arch / Platform -->
-                    </span>
-                  </div>
-                  <!-- !template-line1 -->
-                  <!-- template-line2 -->
-                  <div class="template-line">
-                    <span class="template-description">
-                      {{ tpl.Description }}
-                    </span>
-                    <span class="small text-muted" ng-if="tpl.Categories.length > 0">
-                      {{ tpl.Categories.join(', ') }}
-                    </span>
-                  </div>
-                  <!-- !template-line2 -->
-                </span>
-                <!-- !template-details -->
-              </div>
-              <!-- !template -->
-            </div>
+            <template-item
+              ng-repeat="template in templates | filter:state.filters:true"
+              model="template"
+              on-select="selectTemplate"
+            ></template-item>
+
             <div ng-if="!templates" class="text-center text-muted">
               Loading...
             </div>
@@ -463,3 +453,4 @@
     </rd-template-widget>
   </div>
 </div>
+ -->

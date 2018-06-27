@@ -10,10 +10,11 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     Templates.query().$promise
     .then(function success(data) {
       var templates = data.map(function (item) {
-        if (item.type === 'container') {
-          return new ContainerTemplateViewModel(item);
-        }
-        return new StackTemplateViewModel(item);
+        // if (item.type === 'container') {
+        //   return new ContainerTemplateViewModel(item);
+        // }
+        // return new StackTemplateViewModel(item);
+        return new TemplateViewModel(item);
       });
       deferred.resolve(templates);
     })
@@ -29,12 +30,12 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
 
     Templates.get({ id: id }).$promise
     .then(function success(data) {
-      var template;
-      if (data.type === 'container') {
-        template = new ContainerTemplateViewModel(data);
-      } else {
-        template = new StackTemplateViewModel(data);
-      }
+      var template = new TemplateViewModel(data);
+      // if (data.type === 'container') {
+      //   template = new ContainerTemplateViewModel(data);
+      // } else {
+      //   template = new StackTemplateViewModel(data);
+      // }
       deferred.resolve(template);
     })
     .catch(function error(err) {
@@ -49,12 +50,12 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     return Templates.remove({ id: id }).$promise;
   };
 
-  service.createTemplate = function(model) {
+  service.create = function(model) {
     var payload = new TemplateCreateRequest(model);
     return Templates.create(payload).$promise;
   };
 
-  service.updateTemplate = function(model) {
+  service.update = function(model) {
     var payload = new TemplateUpdateRequest(model);
     return Templates.update(payload).$promise;
   };
@@ -87,14 +88,14 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     return deferred.promise;
   };
 
-  service.createTemplateConfiguration = function(template, containerName, network, containerMapping) {
+  service.createTemplateConfiguration = function(template, containerName, network) {
     var imageConfiguration = ImageHelper.createImageConfigForContainer(template.Image, template.Registry);
-    var containerConfiguration = service.createContainerConfiguration(template, containerName, network, containerMapping);
+    var containerConfiguration = service.createContainerConfiguration(template, containerName, network);
     containerConfiguration.Image = imageConfiguration.fromImage + ':' + imageConfiguration.tag;
     return containerConfiguration;
   };
 
-  service.createContainerConfiguration = function(template, containerName, network, containerMapping) {
+  service.createContainerConfiguration = function(template, containerName, network) {
     var configuration = TemplateHelper.getDefaultContainerConfiguration();
     configuration.HostConfig.NetworkMode = network.Name;
     configuration.HostConfig.Privileged = template.Privileged;
@@ -103,7 +104,7 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     configuration.name = containerName;
     configuration.Hostname = template.Hostname;
     configuration.Image = template.Image;
-    configuration.Env = TemplateHelper.EnvToStringArray(template.Env, containerMapping);
+    configuration.Env = TemplateHelper.EnvToStringArray(template.Env);
     configuration.Cmd = ContainerHelper.commandStringToArray(template.Command);
     var portConfiguration = TemplateHelper.portArrayToPortConfiguration(template.Ports);
     configuration.HostConfig.PortBindings = portConfiguration.bindings;
@@ -120,7 +121,7 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     TemplateHelper.createVolumeBindings(volumes, generatedVolumesPile);
     volumes.forEach(function (volume) {
       if (volume.binding) {
-        configuration.Volumes[volume.containerPath] = {};
+        configuration.Volumes[volume.container] = {};
         configuration.HostConfig.Binds.push(volume.binding);
       }
     });

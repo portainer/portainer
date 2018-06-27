@@ -62,14 +62,15 @@ angular.module('portainer.app')
     templateEnvironment.forEach(function(envvar) {
       if (envvar.value || envvar.set) {
         var value = envvar.set ? envvar.set : envvar.value;
-        if (envvar.type && envvar.type === 'container') {
-          if (containerMapping === 'BY_CONTAINER_IP') {
-            var container = envvar.value;
-            value = container.NetworkSettings.Networks[Object.keys(container.NetworkSettings.Networks)[0]].IPAddress;
-          } else if (containerMapping === 'BY_CONTAINER_NAME') {
-            value = $filter('containername')(envvar.value);
-          }
-        }
+        // TODO: cleanup
+        // if (envvar.type && envvar.type === 'container') {
+        //   if (containerMapping === 'BY_CONTAINER_IP') {
+        //     var container = envvar.value;
+        //     value = container.NetworkSettings.Networks[Object.keys(container.NetworkSettings.Networks)[0]].IPAddress;
+        //   } else if (containerMapping === 'BY_CONTAINER_NAME') {
+        //     value = $filter('containername')(envvar.value);
+        //   }
+        // }
         env.push(envvar.name + '=' + value);
       }
     });
@@ -90,14 +91,14 @@ angular.module('portainer.app')
 
   helper.createVolumeBindings = function(volumes, generatedVolumesPile) {
     volumes.forEach(function (volume) {
-      if (volume.containerPath) {
+      if (volume.container) {
         var binding;
         if (volume.type === 'auto') {
-          binding = generatedVolumesPile.pop().Id + ':' + volume.containerPath;
-        } else if (volume.type !== 'auto' && volume.name) {
-          binding = volume.name + ':' + volume.containerPath;
+          binding = generatedVolumesPile.pop().Id + ':' + volume.container;
+        } else if (volume.type !== 'auto' && volume.bind) {
+          binding = volume.bind + ':' + volume.container;
         }
-        if (volume.readOnly) {
+        if (volume.readonly) {
           binding += ':ro';
         }
         volume.binding = binding;

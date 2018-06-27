@@ -4,11 +4,12 @@ angular.module('portainer.app').component('templateForm', {
     this.state = {
       collapseTemplate: false,
       collapseContainer: false,
+      collapseStack: false,
       collapseEnv: false
     };
 
     this.addPortBinding = function() {
-      this.model.Ports.push({ hostPort: '', containerPort: '', protocol: 'tcp' });
+      this.model.Ports.push({ containerPort: '', protocol: 'tcp' });
     };
 
     this.removePortBinding = function(index) {
@@ -16,7 +17,7 @@ angular.module('portainer.app').component('templateForm', {
     };
 
     this.addVolume = function () {
-      this.model.Volumes.push({ containerPath: '', name: '', readOnly: false, type: 'auto' });
+      this.model.Volumes.push({ container: '', bind: '', readonly: false, type: 'auto' });
     };
 
     this.removeVolume = function(index) {
@@ -38,6 +39,14 @@ angular.module('portainer.app').component('templateForm', {
     this.removeEnvVar = function(index) {
       this.model.Env.splice(index, 1);
     };
+
+    this.addEnvVarValue = function(env) {
+      env.select.push({ name: '', value: '' });
+    };
+
+    this.removeEnvVarValue = function(env, index) {
+      env.select.splice(index, 1);
+    };
   },
   bindings: {
     model: '=',
@@ -45,6 +54,7 @@ angular.module('portainer.app').component('templateForm', {
     networks: '<',
     formAction: '<',
     formActionLabel: '@',
-    actionInProgress: '<'
+    actionInProgress: '<',
+    showTypeSelector: '<'
   }
 });

@@ -297,7 +297,7 @@ type (
 
 		// Optional stack/container fields
 		Name       string        `json:"name,omitempty"`
-		LogoURL    string        `json:"logo,omitempty"`
+		Logo       string        `json:"logo,omitempty"`
 		Env        []TemplateEnv `json:"env,omitempty"`
 		Note       string        `json:"note,omitempty"`
 		Platform   string        `json:"platform,omitempty"`
@@ -308,21 +308,23 @@ type (
 
 		// Optional container fields
 		// TODO: ? remove this registry field?
-		Registry        string           `json:"registry,omitempty"`
-		Command         string           `json:"command,omitempty"`
-		Network         string           `json:"network,omitempty"`
-		Volumes         []TemplateVolume `json:"volumes,omitempty"`
-		Ports           []string         `json:"ports,omitempty"`
-		Labels          []Pair           `json:"labels,omitempty"`
-		PrivilegedMode  bool             `json:"privileged,omitempty"`
-		InteractiveMode bool             `json:"interactive,omitempty"`
-		RestartPolicy   string           `json:"restart_policy,omitempty"`
-		Hostname        string           `json:"hostname,omitempty"`
+		Registry      string           `json:"registry,omitempty"`
+		Command       string           `json:"command,omitempty"`
+		Network       string           `json:"network,omitempty"`
+		Volumes       []TemplateVolume `json:"volumes,omitempty"`
+		Ports         []string         `json:"ports,omitempty"`
+		Labels        []Pair           `json:"labels,omitempty"`
+		Privileged    bool             `json:"privileged,omitempty"`
+		Interactive   bool             `json:"interactive,omitempty"`
+		RestartPolicy string           `json:"restart_policy,omitempty"`
+		Hostname      string           `json:"hostname,omitempty"`
 	}
 
 	// TODO: TemplateEnv is different for container/stack templates
 	// Refactor to use the same struct
 	// Drop support for container list as a select, just use simple input
+	// When using templates that must use other containers, the recommended way is to
+	// go for a stack template.
 
 	// Container:
 	// {
@@ -342,10 +344,13 @@ type (
 	// }
 
 	TemplateEnv struct {
-		Name  string `json:"name"`
-		Label string `json:"label,omitempty"`
-		Type  string `json:"type,omitempty"`
-		Set   string `json:"set,omitempty"`
+		Name        string `json:"name"`
+		Label       string `json:"label,omitempty"`
+		Description string `json:"description,omitempty"`
+		Set         string `json:"set,omitempty"`
+		// TODO: update docs and official templates,
+		// now using pair means that {text: '', value: ''} is replaced by {name:'', value: ''}
+		Select []Pair `json:"select,omitempty"`
 	}
 
 	TemplateVolume struct {

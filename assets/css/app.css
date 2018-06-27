@@ -152,6 +152,8 @@ a[ng-click]{
 .template-list {
   display: flex;
   flex-direction: column;
+  padding: 10px;
+  border-top: 2px solid #e2e2e2;
 }
 
 .template-logo {
@@ -193,6 +195,11 @@ a[ng-click]{
 .template-title {
   font-size: 1.8em;
   font-weight: bold;
+}
+
+.template-type {
+  font-size: 0.9em;
+  padding-right: 1em;
 }
 
 .template-description {

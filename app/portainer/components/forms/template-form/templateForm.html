@@ -38,6 +38,35 @@
   </div>
   <!-- template-details -->
   <div uib-collapse="$ctrl.state.collapseTemplate">
+
+    <div ng-if="$ctrl.showTypeSelector">
+      <div class="form-group"></div>
+      <div class="form-group" style="margin-bottom: 0">
+        <div class="boxselector_wrapper">
+          <div>
+            <input type="radio" id="template_stack" ng-model="$ctrl.model.Type" value="stack">
+            <label for="template_stack">
+              <div class="boxselector_header">
+                <i class="fa fa-th-list" aria-hidden="true" style="margin-right: 2px;"></i>
+                Stack
+              </div>
+              <p>Stack template</p>
+            </label>
+          </div>
+          <div>
+            <input type="radio" id="template_container" ng-model="$ctrl.model.Type" value="container">
+            <label for="template_container">
+              <div class="boxselector_header">
+                <i class="fa fa-server" aria-hidden="true" style="margin-right: 2px;"></i>
+                Container
+              </div>
+              <p>Container template</p>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- name -->
     <div class="form-group">
       <label for="template_name" class="col-sm-3 col-lg-2 control-label text-left">
@@ -102,240 +131,280 @@
     <!-- !categories -->
   </div>
   <!-- !template-details -->
-  <div class="col-sm-12 form-section-title interactive" ng-click="$ctrl.state.collapseContainer = !$ctrl.state.collapseContainer">
-    Container
-    <span class="small space-left">
-      <a ng-if="$ctrl.state.collapseContainer"><i class="fa fa-plus" aria-hidden="true"></i> expand</a>
-      <a ng-if="!$ctrl.state.collapseContainer"><i class="fa fa-minus" aria-hidden="true"></i> collapse</a>
-    </span>
-  </div>
-  <!-- container-details -->
-  <div uib-collapse="$ctrl.state.collapseContainer">
-    <!-- image-input -->
-    <div class="form-group" ng-class="{ 'has-error': templateForm.template_image.$invalid }">
-      <label for="template_image" class="col-sm-3 col-lg-2 control-label text-left">Image</label>
-      <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" name="template_image" ng-model="$ctrl.model.Image" placeholder="e.g. nginx" required>
-      </div>
+  <div ng-if="$ctrl.model.Type === 'stack'">
+    <div class="col-sm-12 form-section-title interactive" ng-click="$ctrl.state.collapseStack = !$ctrl.state.collapseStack">
+      Stack
+      <span class="small space-left">
+        <a ng-if="$ctrl.state.collapseStack"><i class="fa fa-plus" aria-hidden="true"></i> expand</a>
+        <a ng-if="!$ctrl.state.collapseStack"><i class="fa fa-minus" aria-hidden="true"></i> collapse</a>
+      </span>
     </div>
-    <div class="form-group" ng-show="templateForm.template_image.$invalid">
-      <div class="col-sm-12 small text-danger">
-        <div ng-messages="templateForm.template_image.$error">
-          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+    <!-- stack-details -->
+    <div uib-collapse="$ctrl.state.collapseStack">
+      <!-- repository-url -->
+      <div class="form-group" ng-class="{ 'has-error': templateForm.template_repository_url.$invalid }">
+        <label for="template_repository_url" class="col-sm-3 col-lg-2 control-label text-left">Repository URL</label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="text" class="form-control" name="template_repository_url" ng-model="$ctrl.model.Repository.url" placeholder="https://github.com/portainer/portainer-compose" required>
         </div>
       </div>
+      <div class="form-group" ng-show="templateForm.template_repository_url.$invalid">
+        <div class="col-sm-12 small text-danger">
+          <div ng-messages="templateForm.template_repository_url.$error">
+            <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+          </div>
+        </div>
+      </div>
+      <!-- !repository-url -->
+      <!-- composefile-path -->
+      <div class="form-group">
+        <label for="template_repository_path" class="col-sm-3 col-lg-2 control-label text-left">
+          Compose file path
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="text" class="form-control" name="template_repository_path" ng-model="$ctrl.model.Repository.stackfile" placeholder='docker-compose.yml'>
+        </div>
+      </div>
+      <!-- !composefile-path -->
     </div>
-    <!-- !image-input -->
-    <!-- command -->
-    <div class="form-group">
-      <label for="template_command" class="col-sm-3 col-lg-2 control-label text-left">
-        Command
-        <portainer-tooltip position="bottom" message="The command to run in the container. If not specified, the container will use the default command specified in its Dockerfile."></portainer-tooltip>
-      </label>
-      <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" name="template_command" ng-model="$ctrl.model.Command" placeholder='/bin/bash -c \"echo hello\" && exit 777'>
-      </div>
+    <!-- !stack-details -->
+  </div>
+  <div ng-if="$ctrl.model.Type === 'container'">
+    <div class="col-sm-12 form-section-title interactive" ng-click="$ctrl.state.collapseContainer = !$ctrl.state.collapseContainer">
+      Container
+      <span class="small space-left">
+        <a ng-if="$ctrl.state.collapseContainer"><i class="fa fa-plus" aria-hidden="true"></i> expand</a>
+        <a ng-if="!$ctrl.state.collapseContainer"><i class="fa fa-minus" aria-hidden="true"></i> collapse</a>
+      </span>
     </div>
-    <!-- !command -->
-    <!-- hostname -->
-    <div class="form-group">
-      <label for="template_hostname" class="col-sm-3 col-lg-2 control-label text-left">
-        Hostname
-        <portainer-tooltip position="bottom" message="Set the hostname of the container. Will use Docker default if not specified."></portainer-tooltip>
-      </label>
-      <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" name="template_hostname" ng-model="$ctrl.model.Hostname" placeholder='mycontainername'>
+    <!-- container-details -->
+    <div uib-collapse="$ctrl.state.collapseContainer">
+      <!-- image-input -->
+      <div class="form-group" ng-class="{ 'has-error': templateForm.template_image.$invalid }">
+        <label for="template_image" class="col-sm-3 col-lg-2 control-label text-left">Image</label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="text" class="form-control" name="template_image" ng-model="$ctrl.model.Image" placeholder="e.g. nginx" required>
+        </div>
       </div>
-    </div>
-    <!-- !hostname -->
-    <!-- network -->
-    <div class="form-group">
-      <label for="template_network" class="col-sm-3 col-lg-2 control-label text-left">
-        Network
-      </label>
-      <div class="col-sm-10">
-        <select class="form-control" ng-options="net.Name for net in $ctrl.networks" ng-model="$ctrl.model.Network">
-          <option disabled hidden value="">Select a network</option>
-        </select>
+      <div class="form-group" ng-show="templateForm.template_image.$invalid">
+        <div class="col-sm-12 small text-danger">
+          <div ng-messages="templateForm.template_image.$error">
+            <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+          </div>
+        </div>
       </div>
-    </div>
-    <!-- !network -->
-    <!-- port-mapping -->
-    <div class="form-group" >
-      <div class="col-sm-12" style="margin-top: 5px;">
-        <label class="control-label text-left">Port mapping</label>
-        <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addPortBinding()">
-          <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional port
-        </span>
+      <!-- !image-input -->
+      <!-- command -->
+      <div class="form-group">
+        <label for="template_command" class="col-sm-3 col-lg-2 control-label text-left">
+          Command
+          <portainer-tooltip position="bottom" message="The command to run in the container. If not specified, the container will use the default command specified in its Dockerfile."></portainer-tooltip>
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="text" class="form-control" name="template_command" ng-model="$ctrl.model.Command" placeholder='/bin/bash -c \"echo hello\" && exit 777'>
+        </div>
       </div>
-      <div class="col-sm-12" style="margin-top: 10px" ng-if="$ctrl.model.Ports.length > 0">
-        <span class="small text-muted">Portainer will automatically assign a port if you leave the host port empty.</span>
+      <!-- !command -->
+      <!-- hostname -->
+      <div class="form-group">
+        <label for="template_hostname" class="col-sm-3 col-lg-2 control-label text-left">
+          Hostname
+          <portainer-tooltip position="bottom" message="Set the hostname of the container. Will use Docker default if not specified."></portainer-tooltip>
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="text" class="form-control" name="template_hostname" ng-model="$ctrl.model.Hostname" placeholder='mycontainername'>
+        </div>
       </div>
-      <!-- port-mapping-input-list -->
-      <div class="col-sm-12">
-        <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-          <div ng-repeat="portBinding in $ctrl.model.Ports" style="margin-top: 2px;">
-            <!-- host-port -->
-            <div class="input-group col-sm-4 input-group-sm">
-              <span class="input-group-addon">host</span>
-              <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
+      <!-- !hostname -->
+      <!-- network -->
+      <div class="form-group">
+        <label for="template_network" class="col-sm-3 col-lg-2 control-label text-left">
+          Network
+        </label>
+        <div class="col-sm-10">
+          <select class="form-control" ng-options="net.Name for net in $ctrl.networks" ng-model="$ctrl.model.Network">
+            <option disabled hidden value="">Select a network</option>
+          </select>
+        </div>
+      </div>
+      <!-- !network -->
+      <!-- port-mapping -->
+      <div class="form-group" >
+        <div class="col-sm-12" style="margin-top: 5px;">
+          <label class="control-label text-left">Port mapping</label>
+          <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addPortBinding()">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional port
+          </span>
+        </div>
+        <div class="col-sm-12" style="margin-top: 10px" ng-if="$ctrl.model.Ports.length > 0">
+          <span class="small text-muted">Portainer will automatically assign a port if you leave the host port empty.</span>
+        </div>
+        <!-- port-mapping-input-list -->
+        <div class="col-sm-12">
+          <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+            <div ng-repeat="portBinding in $ctrl.model.Ports" style="margin-top: 2px;">
+              <!-- host-port -->
+              <div class="input-group col-sm-4 input-group-sm">
+                <span class="input-group-addon">host</span>
+                <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
+              </div>
+              <!-- !host-port -->
+              <span style="margin: 0 10px 0 10px;">
+                <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
+              </span>
+              <!-- container-port -->
+              <div class="input-group col-sm-4 input-group-sm">
+                <span class="input-group-addon">container</span>
+                <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
+              </div>
+              <!-- !container-port -->
+              <!-- protocol-actions -->
+              <div class="input-group col-sm-3 input-group-sm">
+                <div class="btn-group btn-group-sm">
+                  <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'tcp'">TCP</label>
+                  <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
+                </div>
+                <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removePortBinding($index)">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+              <!-- !protocol-actions -->
             </div>
-            <!-- !host-port -->
-            <span style="margin: 0 10px 0 10px;">
+          </div>
+        </div>
+        <!-- !port-mapping-input-list -->
+      </div>
+      <!-- !port-mapping -->
+      <!-- volumes -->
+      <div class="form-group" >
+        <div class="col-sm-12" style="margin-top: 5px;">
+          <label class="control-label text-left">Volume mapping</label>
+          <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addVolume()">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional volume
+          </span>
+        </div>
+        <div class="col-sm-12" style="margin-top: 10px" ng-if="$ctrl.model.Volumes.length > 0">
+          <span class="small text-muted">Portainer will automatically create and map a local volume when using the <b>auto</b> option.</span>
+        </div>
+        <div ng-repeat="volume in $ctrl.model.Volumes">
+          <div class="col-sm-12" style="margin-top: 10px;">
+            <!-- volume-line1 -->
+            <div class="col-sm-12 form-inline">
+              <!-- container-path -->
+              <div class="input-group input-group-sm col-sm-6">
+                <span class="input-group-addon">container</span>
+                <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container">
+              </div>
+              <!-- !container-path -->
+              <!-- volume-type -->
+              <div class="input-group col-sm-5" style="margin-left: 5px;">
+                <div class="btn-group btn-group-sm">
+                  <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'auto'" ng-click="volume.name = ''">Auto</label>
+                  <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
+                </div>
+                <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeVolume($index)">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+              <!-- !volume-type -->
+            </div>
+            <!-- !volume-line1 -->
+            <!-- volume-line2 -->
+            <div class="col-sm-12 form-inline" style="margin-top: 5px;" ng-if="volume.type !== 'auto'">
               <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
-            </span>
-            <!-- container-port -->
-            <div class="input-group col-sm-4 input-group-sm">
-              <span class="input-group-addon">container</span>
-              <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
-            </div>
-            <!-- !container-port -->
-            <!-- protocol-actions -->
-            <div class="input-group col-sm-3 input-group-sm">
-              <div class="btn-group btn-group-sm">
-                <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'tcp'">TCP</label>
-                <label class="btn btn-primary" ng-model="portBinding.protocol" uib-btn-radio="'udp'">UDP</label>
+              <!-- bind -->
+              <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
+                <span class="input-group-addon">host</span>
+                <input type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host">
               </div>
-              <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removePortBinding($index)">
+              <!-- !bind -->
+              <!-- read-only -->
+              <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
+                <div class="btn-group btn-group-sm">
+                  <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
+                  <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
+                </div>
+              </div>
+              <!-- !read-only -->
+            </div>
+            <!-- !volume-line2 -->
+          </div>
+        </div>
+      </div>
+      <!-- !volumes -->
+      <!-- labels -->
+      <div class="form-group" >
+        <div class="col-sm-12" style="margin-top: 5px;">
+          <label class="control-label text-left">Labels</label>
+          <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addLabel()">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
+          </span>
+        </div>
+          <!-- labels-input-list -->
+        <div class="col-sm-12">
+          <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+            <div ng-repeat="label in $ctrl.model.Labels" style="margin-top: 2px;">
+              <div class="input-group col-sm-5 input-group-sm">
+                <span class="input-group-addon">name</span>
+                <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+              </div>
+              <div class="input-group col-sm-5 input-group-sm">
+                <span class="input-group-addon">value</span>
+                <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+              </div>
+              <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLabel($index)">
                 <i class="fa fa-trash" aria-hidden="true"></i>
               </button>
             </div>
-            <!-- !protocol-actions -->
           </div>
         </div>
+          <!-- !labels-input-list -->
       </div>
-      <!-- !port-mapping-input-list -->
-    </div>
-    <!-- !port-mapping -->
-    <!-- volumes -->
-    <div class="form-group" >
-      <div class="col-sm-12" style="margin-top: 5px;">
-        <label class="control-label text-left">Volume mapping</label>
-        <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addVolume()">
-          <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional volume
-        </span>
-      </div>
-      <div class="col-sm-12" style="margin-top: 10px" ng-if="$ctrl.model.Volumes.length > 0">
-        <span class="small text-muted">Portainer will automatically create and map a local volume when using the <b>auto</b> option.</span>
-      </div>
-      <div ng-repeat="volume in $ctrl.model.Volumes">
-        <div class="col-sm-12" style="margin-top: 10px;">
-          <!-- volume-line1 -->
-          <div class="col-sm-12 form-inline">
-            <!-- container-path -->
-            <div class="input-group input-group-sm col-sm-6">
-              <span class="input-group-addon">container</span>
-              <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container">
-            </div>
-            <!-- !container-path -->
-            <!-- volume-type -->
-            <div class="input-group col-sm-5" style="margin-left: 5px;">
-              <div class="btn-group btn-group-sm">
-                <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'auto'" ng-click="volume.name = ''">Auto</label>
-                <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
-              </div>
-              <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeVolume($index)">
-                <i class="fa fa-trash" aria-hidden="true"></i>
-              </button>
-            </div>
-            <!-- !volume-type -->
-          </div>
-          <!-- !volume-line1 -->
-          <!-- volume-line2 -->
-          <div class="col-sm-12 form-inline" style="margin-top: 5px;" ng-if="volume.type !== 'auto'">
-            <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
-            <!-- bind -->
-            <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
-              <span class="input-group-addon">host</span>
-              <input type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host">
-            </div>
-            <!-- !bind -->
-            <!-- read-only -->
-            <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
-              <div class="btn-group btn-group-sm">
-                <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
-                <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
-              </div>
-            </div>
-            <!-- !read-only -->
-          </div>
-          <!-- !volume-line2 -->
+      <!-- !labels -->
+      <!-- restart_policy -->
+      <div class="form-group">
+        <label for="template_restart_policy" class="col-sm-3 col-lg-2 control-label text-left">
+          Restart policy
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <select class="form-control" name="template_platform" ng-model="$ctrl.model.RestartPolicy">
+            <option value="always">Always</option>
+            <option value="unless-stopped">Unless stopped</option>
+            <option value="on-failure">On failure</option>
+            <option value="no">None</option>
+          </select>
         </div>
       </div>
-    </div>
-    <!-- !volumes -->
-    <!-- labels -->
-    <div class="form-group" >
-      <div class="col-sm-12" style="margin-top: 5px;">
-        <label class="control-label text-left">Labels</label>
-        <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addLabel()">
-          <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
-        </span>
-      </div>
-        <!-- labels-input-list -->
-      <div class="col-sm-12">
-        <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-          <div ng-repeat="label in $ctrl.model.Labels" style="margin-top: 2px;">
-            <div class="input-group col-sm-5 input-group-sm">
-              <span class="input-group-addon">name</span>
-              <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
-            </div>
-            <div class="input-group col-sm-5 input-group-sm">
-              <span class="input-group-addon">value</span>
-              <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
-            </div>
-            <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLabel($index)">
-              <i class="fa fa-trash" aria-hidden="true"></i>
-            </button>
-          </div>
+      <!-- !restart_policy -->
+      <!-- privileged-mode -->
+      <div class="form-group">
+        <div class="col-sm-12">
+          <label for="tls" class="control-label text-left">
+            Privileged mode
+            <portainer-tooltip position="bottom" message="Start the container in privileged mode."></portainer-tooltip>
+          </label>
+          <label class="switch" style="margin-left: 20px;">
+            <input type="checkbox" ng-model="$ctrl.model.Privileged"><i></i>
+          </label>
         </div>
       </div>
-        <!-- !labels-input-list -->
-    </div>
-    <!-- !labels -->
-    <!-- restart_policy -->
-    <div class="form-group">
-      <label for="template_restart_policy" class="col-sm-3 col-lg-2 control-label text-left">
-        Restart policy
-      </label>
-      <div class="col-sm-9 col-lg-10">
-        <select class="form-control" name="template_platform" ng-model="$ctrl.model.RestartPolicy">
-          <option value="always">Always</option>
-          <option value="unless-stopped">Unless stopped</option>
-          <option value="on-failure">On failure</option>
-          <option value="no">None</option>
-        </select>
+      <!-- !privileged-mode -->
+      <!-- interactive-mode -->
+      <div class="form-group">
+        <div class="col-sm-12">
+          <label for="tls" class="control-label text-left">
+            Interactive mode
+            <portainer-tooltip position="bottom" message="Start the container in foreground (equivalent of -i -t flags)."></portainer-tooltip>
+          </label>
+          <label class="switch" style="margin-left: 20px;">
+            <input type="checkbox" ng-model="$ctrl.model.Interactive"><i></i>
+          </label>
+        </div>
       </div>
+      <!-- !interactive-mode -->
     </div>
-    <!-- !restart_policy -->
-    <!-- privileged-mode -->
-    <div class="form-group">
-      <div class="col-sm-12">
-        <label for="tls" class="control-label text-left">
-          Privileged mode
-          <portainer-tooltip position="bottom" message="Start the container in privileged mode."></portainer-tooltip>
-        </label>
-        <label class="switch" style="margin-left: 20px;">
-          <input type="checkbox" ng-model="$ctrl.model.Privileged"><i></i>
-        </label>
-      </div>
-    </div>
-    <!-- !privileged-mode -->
-    <!-- interactive-mode -->
-    <div class="form-group">
-      <div class="col-sm-12">
-        <label for="tls" class="control-label text-left">
-          Interactive mode
-          <portainer-tooltip position="bottom" message="Start the container in foreground (equivalent of -i -t flags)."></portainer-tooltip>
-        </label>
-        <label class="switch" style="margin-left: 20px;">
-          <input type="checkbox" ng-model="$ctrl.model.Interactive"><i></i>
-        </label>
-      </div>
-    </div>
-    <!-- !interactive-mode -->
+    <!-- !container-details -->
   </div>
-  <!-- !container-details -->
   <div class="col-sm-12 form-section-title interactive" ng-click="$ctrl.state.collapseEnv = !$ctrl.state.collapseEnv">
     Environment
     <span class="small space-left">

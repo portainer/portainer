@@ -1,18 +1,11 @@
 angular.module('portainer.app')
-.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'PaginationService', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService', 'EndpointProvider',
-function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, PaginationService, ResourceControlService, Authentication, FormValidator, SettingsService, StackService, EndpointProvider) {
+.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', 'ContainerService', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService', 'EndpointProvider', 'ModalService',
+function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, ResourceControlService, Authentication, FormValidator, SettingsService, StackService, EndpointProvider, ModalService) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
-    hideDescriptions: $transition$.params().hide_descriptions,
     formValidationError: '',
-    showDeploymentSelector: false,
-    actionInProgress: false,
-    filters: {
-      Categories: '!',
-      Platform: '!',
-      Type: 'container'
-    }
+    actionInProgress: false
   };
 
   $scope.formValues = {
@@ -22,7 +15,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
   };
 
   $scope.addVolume = function () {
-    $scope.state.selectedTemplate.Volumes.push({ containerPath: '', name: '', readOnly: false, type: 'auto' });
+    $scope.state.selectedTemplate.Volumes.push({ containerPath: '', bind: '', readonly: false, type: 'auto' });
   };
 
   $scope.removeVolume = function(index) {
@@ -151,68 +144,63 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     }
   };
 
-  $scope.unselectTemplate = function() {
-    var currentTemplateIndex = $scope.state.selectedTemplate.Id;
-    $('#template_' + currentTemplateIndex).toggleClass('template-container--selected');
+  $scope.unselectTemplate = function(template) {
+    template.Selected = false;
     $scope.state.selectedTemplate = null;
   };
 
-  $scope.selectTemplate = function(index, pos) {
-    if ($scope.state.selectedTemplate && $scope.state.selectedTemplate.Id !== index) {
-      $scope.unselectTemplate();
+  $scope.selectTemplate = function(template) {
+    if ($scope.state.selectedTemplate) {
+      $scope.unselectTemplate($scope.state.selectedTemplate);
     }
 
-    var templates = $filter('filter')($scope.templates, $scope.state.filters, true);
-    var template = templates[pos];
-    if (template === $scope.state.selectedTemplate) {
-      $scope.unselectTemplate();
-    } else {
-      selectTemplate(index, pos, templates);
-    }
-  };
+    template.Selected = true;
+    // TODO: remove this, debugging purposes
+    console.log(JSON.stringify(template, null, 4));
 
-  function selectTemplate(index, pos, filteredTemplates) {
-    $('#template_' + index).toggleClass('template-container--selected');
-    var selectedTemplate = filteredTemplates[pos];
-    $scope.state.selectedTemplate = selectedTemplate;
-
-    if (selectedTemplate.Network) {
-      $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === selectedTemplate.Network; });
+    if (template.Network) {
+      $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === template.Network; });
     } else {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === 'bridge'; });
     }
 
-    if (selectedTemplate.Name) {
-      $scope.formValues.name = selectedTemplate.Name;
-    } else {
-      $scope.formValues.name = '';
-    }
-
+    $scope.formValues.name = template.Name ? template.Name : '';
+    $scope.state.selectedTemplate = template;
     $anchorScroll('view-top');
-  }
+  };
 
   function createTemplateConfiguration(template) {
     var network = $scope.formValues.network;
     var name = $scope.formValues.name;
-    var containerMapping = determineContainerMapping(network);
-    return TemplateService.createTemplateConfiguration(template, name, network, containerMapping);
+    // var containerMapping = determineContainerMapping(network);
+    // return TemplateService.createTemplateConfiguration(template, name, network, containerMapping);
+    return TemplateService.createTemplateConfiguration(template, name, network);
   }
 
-  function determineContainerMapping(network) {
-    var containerMapping = 'BY_CONTAINER_IP';
-    if (network.Name !== 'bridge') {
-      containerMapping = 'BY_CONTAINER_NAME';
-    }
-    return containerMapping;
-  }
+  // function determineContainerMapping(network) {
+  //   var containerMapping = 'BY_CONTAINER_IP';
+  //   if (network.Name !== 'bridge') {
+  //     containerMapping = 'BY_CONTAINER_NAME';
+  //   }
+  //   return containerMapping;
+  // }
 
-  $scope.updateCategories = function(templates, type) {
-    $scope.state.filters.Categories = '!';
-    updateCategories(templates, type);
-  };
+  // $scope.updateCategories = function(templates, type) {
+  //   $scope.state.filters.Categories = '!';
+  //   updateCategories(templates, type);
+  // };
 
   $scope.deleteTemplate = function(template) {
-    // TODO: add modal confirmation
+    ModalService.confirmDeletion(
+      'Do you want to delete this template?',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        deleteTemplate(template);
+      }
+    );
+  };
+
+  function deleteTemplate(template) {
     TemplateService.delete(template.Id)
     .then(function success() {
       Notifications.success('Template successfully deleted');
@@ -222,22 +210,22 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to remove template');
     });
-  };
-
-  function updateCategories(templates, type) {
-    var availableCategories = [];
-    angular.forEach(templates, function(template) {
-      if (template.Type === type) {
-        availableCategories = availableCategories.concat(template.Categories);
-      }
-    });
-    $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
   }
 
-  function initTemplates(templatesKey, type, provider, apiVersion) {
+  // function updateCategories(templates, type) {
+  //   var availableCategories = [];
+  //   angular.forEach(templates, function(template) {
+  //     if (template.Type === type) {
+  //       availableCategories = availableCategories.concat(template.Categories);
+  //     }
+  //   });
+  //   $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
+  // }
+
+  function initTemplates(provider, apiVersion) {
     $q.all({
       templates: TemplateService.templates(),
-      containers: ContainerService.containers(0),
+      // containers: ContainerService.containers(0),
       volumes: VolumeService.getVolumes(),
       networks: NetworkService.networks(
         provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
@@ -248,13 +236,13 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     })
     .then(function success(data) {
       var templates =  data.templates;
-      updateCategories(templates, type);
+      // updateCategories(templates, type);
       $scope.templates = templates;
-      $scope.runningContainers = data.containers;
+      // $scope.runningContainers = data.containers;
       $scope.availableVolumes = data.volumes.Volumes;
       var networks = data.networks;
       $scope.availableNetworks = networks;
-      $scope.globalNetworkCount = networks.length;
+      // $scope.globalNetworkCount = networks.length;
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
     })
@@ -266,22 +254,24 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
 
   function initView() {
     // TODO: should remove this
-    var templatesKey = $transition$.params().key;
-    $scope.templatesKey = templatesKey;
+    // var templatesKey = $transition$.params().key;
+    // $scope.templatesKey = templatesKey;
 
     var userDetails = Authentication.getUserDetails();
     $scope.isAdmin = userDetails.role === 1;
 
     var endpointMode = $scope.applicationState.endpoint.mode;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
+    // if (templatesKey !== 'linuxserver.io'
+    //   && endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
+    //   $scope.state.filters.Type = 'stack';
+    //   $scope.state.showDeploymentSelector = true;
+    // }
+    // if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
+    //   $scope.state.showContainerSwitch = true;
+    // }
 
-    if (templatesKey !== 'linuxserver.io'
-      && endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
-      $scope.state.filters.Type = 'stack';
-      $scope.state.showDeploymentSelector = true;
-    }
-
-    initTemplates(templatesKey, $scope.state.filters.Type, endpointMode.provider, apiVersion);
+    initTemplates(endpointMode.provider, apiVersion);
   }
 
   initView();
