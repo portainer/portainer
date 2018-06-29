@@ -43,10 +43,6 @@ function (PaginationService, DatatableService, EndpointProvider) {
         label: 'State',
         display: true
       },
-      created: {
-        label: 'Created',
-        display: true
-      },
       actions: {
         label: 'Quick Actions',
         display: true
@@ -57,6 +53,10 @@ function (PaginationService, DatatableService, EndpointProvider) {
       },
       image: {
         label: 'Image',
+        display: true
+      },
+      created: {
+        label: 'Created',
         display: true
       },
       ip: {

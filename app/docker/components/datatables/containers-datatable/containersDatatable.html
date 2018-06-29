@@ -156,9 +156,6 @@
                   </div>
                 </div>
               </th>
-              <th ng-show="$ctrl.columnVisibility.columns.created.display">
-                Created
-              </th>
               <th ng-if="$ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect" ng-show="$ctrl.columnVisibility.columns.actions.display">
                 Quick actions
               </th>
@@ -174,6 +171,13 @@
                   Image
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th ng-show="$ctrl.columnVisibility.columns.created.display">
+                <a ng-click="$ctrl.changeOrderBy('Created')">
+                    <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Created' && !$ctrl.state.reverseOrder"></i>
+                    <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Created' && $ctrl.state.reverseOrder"></i>
+                  Created
                 </a>
               </th>
               <th ng-show="$ctrl.columnVisibility.columns.ip.display">
@@ -219,9 +223,6 @@
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) !== -1" class="label label-{{ item.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ item.Status }}</span>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) === -1" class="label label-{{ item.Status|containerstatusbadge }}">{{ item.Status }}</span>
               </td>
-              <th ng-show="$ctrl.columnVisibility.columns.created.display">
-                  {{item.Created | getisodate}}
-              </th>
               <td ng-if="$ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect" ng-show="$ctrl.columnVisibility.columns.actions.display">
                 <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:inline-flex;">
                   <a ng-if="$ctrl.settings.showQuickActionStats" style="margin: 0 2.5px;" ui-sref="docker.containers.container.stats({id: item.Id, nodeName: item.NodeName})" title="Stats"><i class="fa fa-chart-area space-right" aria-hidden="true"></i></a>
@@ -232,6 +233,9 @@
               </td>
               <td ng-show="$ctrl.columnVisibility.columns.stack.display">{{ item.StackName ? item.StackName : '-' }}</td>
               <td ng-show="$ctrl.columnVisibility.columns.image.display"><a ui-sref="docker.images.image({ id: item.Image })">{{ item.Image | trimshasum }}</a></td>
+              <td ng-show="$ctrl.columnVisibility.columns.created.display">
+                  {{item.Created | getisodatefromtimestamp}}
+              </td>
               <td ng-show="$ctrl.columnVisibility.columns.ip.display">{{ item.IP ? item.IP : '-' }}</td>
               <td ng-if="$ctrl.showHostColumn" ng-show="$ctrl.columnVisibility.columns.host.display">{{ item.NodeName ? item.NodeName : '-' }}</td>
               <td ng-show="$ctrl.columnVisibility.columns.ports.display">
