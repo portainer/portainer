@@ -103,7 +103,7 @@ function TemplateViewModel(data) {
     this.Volumes = data.volumes.map(function (v) {
       return {
         container: v.container,
-        readOnly: v.readonly || false,
+        readonly: v.readonly || false,
         type: v.bind ? 'bind' : 'auto',
         bind : v.bind ? v.bind : null
       };

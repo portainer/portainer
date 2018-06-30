@@ -316,14 +316,14 @@
               <!-- container-path -->
               <div class="input-group input-group-sm col-sm-6">
                 <span class="input-group-addon">container</span>
-                <input type="text" class="form-control" ng-model="volume.containerPath" placeholder="e.g. /path/in/container">
+                <input type="text" class="form-control" ng-model="volume.container" placeholder="e.g. /path/in/container">
               </div>
               <!-- !container-path -->
               <!-- volume-type -->
               <div class="input-group col-sm-5" style="margin-left: 5px;">
                 <div class="btn-group btn-group-sm">
-                  <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'auto'" ng-click="volume.name = ''">Auto</label>
-                  <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.name = ''">Bind</label>
+                  <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'auto'" ng-click="volume.bind = ''">Auto</label>
+                  <label class="btn btn-primary" ng-model="volume.type" uib-btn-radio="'bind'" ng-click="volume.bind = ''">Bind</label>
                 </div>
                 <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeVolume($index)">
                   <i class="fa fa-trash" aria-hidden="true"></i>
@@ -338,14 +338,14 @@
               <!-- bind -->
               <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
                 <span class="input-group-addon">host</span>
-                <input type="text" class="form-control" ng-model="volume.name" placeholder="e.g. /path/on/host">
+                <input type="text" class="form-control" ng-model="volume.bind" placeholder="e.g. /path/on/host">
               </div>
               <!-- !bind -->
               <!-- read-only -->
               <div class="input-group input-group-sm col-sm-5" style="margin-left: 5px;">
                 <div class="btn-group btn-group-sm">
-                  <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
-                  <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
+                  <label class="btn btn-primary" ng-model="volume.readonly" uib-btn-radio="false">Writable</label>
+                  <label class="btn btn-primary" ng-model="volume.readonly" uib-btn-radio="true">Read-only</label>
                 </div>
               </div>
               <!-- !read-only -->
