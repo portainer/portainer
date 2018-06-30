@@ -25,7 +25,7 @@
           </span>
         </div>
 
-        <div class="small text-muted" style="margin: 15px 0 0 5px;" ng-if="$ctrl.showStacks">
+        <div class="small text-muted" style="margin: 15px 0 0 5px;">
           <label for="show_stacks" class="control-label text-left">
             Show container templates
           </label>
@@ -42,8 +42,7 @@
 
       <div class="template-list">
         <template-item
-          ng-repeat="template in $ctrl.templates | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter"
-          ng-show="(template.Type === 'stack' && $ctrl.showStacks) || (template.Type === 'container' && $ctrl.state.showContainerTemplates)"
+          ng-repeat="template in $ctrl.templates | filter: $ctrl.filterByType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter"
           model="template"
           show-update-action="$ctrl.showUpdateAction"
           show-delete-action="$ctrl.showDeleteAction"
@@ -53,7 +52,7 @@
         <div ng-if="!$ctrl.templates" class="text-center text-muted">
           Loading...
         </div>
-        <div ng-if="($ctrl.templates | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter).length == 0" class="text-center text-muted">
+        <div ng-if="($ctrl.templates | filter: $ctrl.filterByType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter).length == 0" class="text-center text-muted">
           No templates available.
         </div>
       </div>

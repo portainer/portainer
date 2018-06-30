@@ -23,7 +23,7 @@
               <i class="fab fa-linux" aria-hidden="true" ng-if="$ctrl.model.Platform === 'linux'"></i>
             </span>
             <span>
-              {{ $ctrl.model.Type }}
+              {{ $ctrl.model.Type === 1 ? 'container' : 'stack' }}
             </span>
           </span>
         </span>

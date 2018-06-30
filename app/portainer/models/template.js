@@ -1,5 +1,6 @@
 function TemplateDefaultModel() {
-  this.Type = 'container';
+  this.Type = 1;
+  this.AdministratorOnly = false;
   this.Title = '';
   this.Image = '';
   this.Description = '';
@@ -30,6 +31,7 @@ function TemplateCreateRequest(model) {
   this.Labels = model.Labels;
   this.Repository = model.Repository;
   this.Env = model.Env;
+  this.AdministratorOnly = model.AdministratorOnly;
 
   this.Ports = [];
   for (var i = 0; i < model.Ports.length; i++) {
@@ -81,6 +83,7 @@ function TemplateViewModel(data) {
   this.Title = data.title;
   this.Type = data.type;
   this.Description = data.description;
+  this.AdministratorOnly = data.AdministratorOnly;
 
   // Stack
   this.Repository = data.repository;

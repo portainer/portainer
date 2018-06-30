@@ -15,7 +15,7 @@ angular.module('portainer.app').component('templateList', {
 
       for (var i = 0; i < ctrl.templates.length; i++) {
         var template = ctrl.templates[i];
-        if ((template.Type === 'stack' && ctrl.showStacks) || (template.Type === 'container' && ctrl.state.showContainerTemplates)) {
+        if ((template.Type === 1 && ctrl.state.showContainerTemplates) || (template.Type === 2 && ctrl.showSwarmStacks) || (template.Type === 3 && !ctrl.showSwarmStacks)) {
           availableCategories = availableCategories.concat(template.Categories);
         }
       }
@@ -31,8 +31,15 @@ angular.module('portainer.app').component('templateList', {
       return _.includes(item.Categories, ctrl.state.selectedCategory);
     };
 
+    this.filterByType = function(item) {
+      if ((item.Type === 1 && ctrl.state.showContainerTemplates) || (item.Type === 2 && ctrl.showSwarmStacks) || (item.Type === 3 && !ctrl.showSwarmStacks)) {
+        return true;
+      }
+      return false;
+    };
+
     this.$onInit = function() {
-      if (this.showStacks) {
+      if (this.showSwarmStacks) {
         this.state.showContainerTemplates = false;
       }
       this.updateCategories();
@@ -44,7 +51,7 @@ angular.module('portainer.app').component('templateList', {
     templates: '<',
     selectAction: '<',
     deleteAction: '<',
-    showStacks: '<',
+    showSwarmStacks: '<',
     showAddAction: '<',
     showUpdateAction: '<',
     showDeleteAction: '<'

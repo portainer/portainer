@@ -27,7 +27,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/templates",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.templateList))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.templateList))).Methods(http.MethodGet)
 	h.Handle("/templates",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.templateCreate))).Methods(http.MethodPost)
 	h.Handle("/templates/{id}",

@@ -5,6 +5,7 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/filesystem"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
 	"github.com/portainer/portainer/http/response"
@@ -12,9 +13,10 @@ import (
 
 type templateCreatePayload struct {
 	// Mandatory
-	Type        string
-	Title       string
-	Description string
+	Type              int
+	Title             string
+	Description       string
+	AdministratorOnly bool
 
 	// Opt stack/container
 	Name       string
@@ -43,8 +45,8 @@ type templateCreatePayload struct {
 }
 
 func (payload *templateCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Type) || (payload.Type != "container" && payload.Type != "stack") {
-		return portainer.Error("Invalid template type. Valid values are: container or stack.")
+	if payload.Type == 0 || (payload.Type != 1 && payload.Type != 2 && payload.Type != 3) {
+		return portainer.Error("Invalid template type. Valid values are: 1 (container), 2 (Swarm stack template) or 3 (Compose stack template).")
 	}
 	if govalidator.IsNull(payload.Title) {
 		return portainer.Error("Invalid template title")
@@ -53,18 +55,18 @@ func (payload *templateCreatePayload) Validate(r *http.Request) error {
 		return portainer.Error("Invalid template description")
 	}
 
-	if payload.Type == "container" {
+	if payload.Type == 1 {
 		if govalidator.IsNull(payload.Image) {
 			return portainer.Error("Invalid template image")
 		}
 	}
 
-	if payload.Type == "stack" {
+	if payload.Type == 2 || payload.Type == 3 {
 		if govalidator.IsNull(payload.Repository.URL) {
 			return portainer.Error("Invalid template repository URL")
 		}
 		if govalidator.IsNull(payload.Repository.StackFile) {
-			return portainer.Error("Invalid template repository Compose file path")
+			payload.Repository.StackFile = filesystem.ComposeFileDefaultName
 		}
 	}
 
@@ -80,18 +82,19 @@ func (handler *Handler) templateCreate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	template := &portainer.Template{
-		Type:        payload.Type,
-		Title:       payload.Title,
-		Description: payload.Description,
-		Name:        payload.Name,
-		Logo:        payload.Logo,
-		Note:        payload.Note,
-		Platform:    payload.Platform,
-		Categories:  payload.Categories,
-		Env:         payload.Env,
+		Type:              portainer.TemplateType(payload.Type),
+		Title:             payload.Title,
+		Description:       payload.Description,
+		AdministratorOnly: payload.AdministratorOnly,
+		Name:              payload.Name,
+		Logo:              payload.Logo,
+		Note:              payload.Note,
+		Platform:          payload.Platform,
+		Categories:        payload.Categories,
+		Env:               payload.Env,
 	}
 
-	if template.Type == "container" {
+	if template.Type == portainer.ContainerTemplate {
 		template.Image = payload.Image
 		template.Command = payload.Command
 		template.Network = payload.Network
@@ -104,7 +107,7 @@ func (handler *Handler) templateCreate(w http.ResponseWriter, r *http.Request) *
 		template.Hostname = payload.Hostname
 	}
 
-	if template.Type == "stack" {
+	if template.Type == portainer.SwarmStackTemplate || template.Type == portainer.ComposeStackTemplate {
 		template.Repository = payload.Repository
 	}
 

@@ -18,7 +18,7 @@
   <div class="form-group" ng-class="{ 'has-error': templateForm.template_description.$invalid }">
     <label for="template_description" class="col-sm-3 col-lg-2 control-label text-left">Description</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" name="template_description" ng-model="$ctrl.model.Description" placeholder="e.g. my-template" required auto-focus>
+      <input type="text" class="form-control" name="template_description" ng-model="$ctrl.model.Description" placeholder="e.g. my-template" required>
     </div>
   </div>
   <div class="form-group" ng-show="templateForm.template_description.$invalid">
@@ -44,23 +44,33 @@
       <div class="form-group" style="margin-bottom: 0">
         <div class="boxselector_wrapper">
           <div>
-            <input type="radio" id="template_stack" ng-model="$ctrl.model.Type" value="stack">
-            <label for="template_stack">
-              <div class="boxselector_header">
-                <i class="fa fa-th-list" aria-hidden="true" style="margin-right: 2px;"></i>
-                Stack
-              </div>
-              <p>Stack template</p>
-            </label>
-          </div>
-          <div>
-            <input type="radio" id="template_container" ng-model="$ctrl.model.Type" value="container">
+            <input type="radio" id="template_container" ng-model="$ctrl.model.Type" ng-value="1">
             <label for="template_container">
               <div class="boxselector_header">
                 <i class="fa fa-server" aria-hidden="true" style="margin-right: 2px;"></i>
                 Container
               </div>
               <p>Container template</p>
+            </label>
+          </div>
+          <div>
+            <input type="radio" id="template_swarm_stack" ng-model="$ctrl.model.Type" ng-value="2">
+            <label for="template_swarm_stack">
+              <div class="boxselector_header">
+                <i class="fa fa-th-list" aria-hidden="true" style="margin-right: 2px;"></i>
+                Swarm stack
+              </div>
+              <p>Stack template (Swarm)</p>
+            </label>
+          </div>
+          <div>
+            <input type="radio" id="template_compose_stack" ng-model="$ctrl.model.Type" ng-value="3">
+            <label for="template_compose_stack">
+              <div class="boxselector_header">
+                <i class="fa fa-th-list" aria-hidden="true" style="margin-right: 2px;"></i>
+                Compose stack
+              </div>
+              <p>Stack template (Compose)</p>
             </label>
           </div>
         </div>
@@ -129,9 +139,22 @@
       </div>
     </div>
     <!-- !categories -->
+    <!-- administrator-only -->
+    <div class="form-group">
+      <div class="col-sm-12">
+        <label for="tls" class="control-label text-left">
+          Administrator template
+          <portainer-tooltip position="bottom" message="Should this template be only available to administrator users."></portainer-tooltip>
+        </label>
+        <label class="switch" style="margin-left: 20px;">
+          <input type="checkbox" ng-model="$ctrl.model.AdministratorOnly"><i></i>
+        </label>
+      </div>
+    </div>
+    <!-- administrator-only -->
   </div>
   <!-- !template-details -->
-  <div ng-if="$ctrl.model.Type === 'stack'">
+  <div ng-if="$ctrl.model.Type === 2 || $ctrl.model.Type === 3">
     <div class="col-sm-12 form-section-title interactive" ng-click="$ctrl.state.collapseStack = !$ctrl.state.collapseStack">
       Stack
       <span class="small space-left">
@@ -169,7 +192,7 @@
     </div>
     <!-- !stack-details -->
   </div>
-  <div ng-if="$ctrl.model.Type === 'container'">
+  <div ng-if="$ctrl.model.Type === 1">
     <div class="col-sm-12 form-section-title interactive" ng-click="$ctrl.state.collapseContainer = !$ctrl.state.collapseContainer">
       Container
       <span class="small space-left">

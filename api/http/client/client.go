@@ -65,7 +65,11 @@ func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portain
 // Get executes a simple HTTP GET to the specified URL and returns
 // the content of the response body.
 func Get(url string) ([]byte, error) {
-	response, err := http.Get(url)
+	client := &http.Client{
+		Timeout: time.Second * 3,
+	}
+
+	response, err := client.Get(url)
 	if err != nil {
 		return nil, err
 	}

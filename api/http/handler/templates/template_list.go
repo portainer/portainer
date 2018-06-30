@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/response"
+	"github.com/portainer/portainer/http/security"
 )
 
 // GET request on /api/templates?key=<key>
@@ -14,7 +15,16 @@ func (handler *Handler) templateList(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve templates from the database", err}
 	}
 
-	return response.JSON(w, templates)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+
+	filteredTemplates := security.FilterTemplates(templates, securityContext)
+
+	return response.JSON(w, filteredTemplates)
+
+	// TODO: remove this
 	// key, err := request.RetrieveQueryParameter(r, "key", false)
 	// if err != nil {
 	// 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: key", err}

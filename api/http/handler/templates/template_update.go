@@ -10,32 +10,29 @@ import (
 )
 
 type templateUpdatePayload struct {
-	Type          *string
-	Title         *string
-	Description   *string
-	Name          *string
-	Logo          *string
-	Note          *string
-	Platform      *string
-	Categories    []string
-	Env           []portainer.TemplateEnv
-	Image         *string
-	Repository    portainer.TemplateRepository
-	Command       *string
-	Network       *string
-	Volumes       []portainer.TemplateVolume
-	Ports         []string
-	Labels        []portainer.Pair
-	Privileged    *bool
-	Interactive   *bool
-	RestartPolicy *string
-	Hostname      *string
+	Title             *string
+	Description       *string
+	AdministratorOnly *bool
+	Name              *string
+	Logo              *string
+	Note              *string
+	Platform          *string
+	Categories        []string
+	Env               []portainer.TemplateEnv
+	Image             *string
+	Repository        portainer.TemplateRepository
+	Command           *string
+	Network           *string
+	Volumes           []portainer.TemplateVolume
+	Ports             []string
+	Labels            []portainer.Pair
+	Privileged        *bool
+	Interactive       *bool
+	RestartPolicy     *string
+	Hostname          *string
 }
 
 func (payload *templateUpdatePayload) Validate(r *http.Request) error {
-	if payload.Type != nil && *payload.Type != "container" && *payload.Type != "stack" {
-		return portainer.Error("Invalid template type. Valid values are: container or stack.")
-	}
 	return nil
 }
 
@@ -118,10 +115,6 @@ func updateStackProperties(template *portainer.Template, payload *templateUpdate
 }
 
 func updateTemplate(template *portainer.Template, payload *templateUpdatePayload) {
-	if payload.Type != nil {
-		template.Type = *payload.Type
-	}
-
 	if payload.Title != nil {
 		template.Title = *payload.Title
 	}
@@ -154,9 +147,13 @@ func updateTemplate(template *portainer.Template, payload *templateUpdatePayload
 		template.Env = payload.Env
 	}
 
-	if template.Type == "container" {
+	if payload.AdministratorOnly != nil {
+		template.AdministratorOnly = *payload.AdministratorOnly
+	}
+
+	if template.Type == portainer.ContainerTemplate {
 		updateContainerProperties(template, payload)
-	} else if template.Type == "stack" {
+	} else if template.Type == portainer.SwarmStackTemplate || template.Type == portainer.ComposeStackTemplate {
 		updateStackProperties(template, payload)
 	}
 }

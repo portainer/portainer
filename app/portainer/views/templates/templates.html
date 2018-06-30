@@ -9,7 +9,7 @@
 
 <div class="row">
   <!-- stack-form -->
-  <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 'stack'">
+  <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 2">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
@@ -76,7 +76,7 @@
   </div>
   <!-- !stack-form -->
   <!-- container-form -->
-  <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 'container'">
+  <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 1">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Image"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
@@ -119,7 +119,7 @@
           <div ng-repeat="var in state.selectedTemplate.Env" ng-if="!var.set" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">{{ var.label }}</label>
             <div class="col-sm-10">
-              <!-- TODO: remove the container type? -->
+              <!-- TODO: remove the container type? Replace the wordpress container by a wordpress compose stack template -->
               <!-- <select ng-if="var.type === 'container'" ng-options="container|containername for container in runningContainers" class="form-control" ng-model="var.value">
                 <option selected disabled hidden value="">Select a container</option>
               </select> -->
@@ -356,7 +356,7 @@
       show-add-action="isAdmin"
       show-update-action="isAdmin"
       show-delete-action="isAdmin"
-      show-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
+      show-swarm-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
     ></template-list>
   </div>
 </div>

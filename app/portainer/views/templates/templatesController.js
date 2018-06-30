@@ -137,7 +137,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     var templatesKey = $scope.templatesKey;
 
     $scope.state.actionInProgress = true;
-    if (template.Type === 'stack') {
+    if (template.Type === 2) {
       createStackFromTemplate(template, userId, accessControlData);
     } else {
       createContainerFromTemplate(template, userId, accessControlData);

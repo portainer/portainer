@@ -157,6 +157,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			AllowPrivilegedModeForRegularUsers: true,
 		}
 
+		// TODO: remove
 		// if *flags.Templates != "" {
 		// 	settings.TemplatesURL = *flags.Templates
 		// } else {
@@ -177,7 +178,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 	return nil
 }
 
-func initTemplates(templateService portainer.TemplateService, fileService portainer.FileService, templatesURL string) error {
+func initTemplates(templateService portainer.TemplateService, fileService portainer.FileService, templateURL, templateFile string) error {
 
 	existingTemplates, err := templateService.Templates()
 	if err != nil {
@@ -189,44 +190,37 @@ func initTemplates(templateService portainer.TemplateService, fileService portai
 		return nil
 	}
 
-	//cases: 1. no internet access, should load via fs
-	// 2. nothing specified, default behavior: ?
-	// 3. --templates http specified
-	// 4. I want use fs templates: how to? --templates fs://? fd://? /templates.json ?
+	var templatesJSON []byte
+	if templateURL == "" {
+		return loadTemplatesFromFile(fileService, templateService, templateFile)
+	}
 
-	// TODO:
-	// Load templates like this:
-	// If --templates found, load from HTTP and fallback to file on error
-	// If --templates not specified, load from file
-
-	// url := portainer.DefaultTemplatesURL
-	// if templatesURL != "" {
-	// 	url = templatesURL
-	// }
-
-	// var templatesJSON []byte
-	// templatesJSON, err = client.Get(url)
-	// if err != nil {
-	// 	log.Printf("Unable to retrieve templates via HTTP (err=%s). Fall-back to filesystem.\n", err)
-	// 	// TODO: use a flag here with default win/linux values
-	// 	templatesJSON, err = fileService.GetFileContent("/templates.json")
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-
-	// templatesJSON, err := fileService.GetFileContent("/home/tony/workspaces/portainer/portainer/dist/templates.json")
-	templatesJSON, err := fileService.GetFileContent("/templates.json")
+	templatesJSON, err = client.Get(templateURL)
 	if err != nil {
+		log.Printf("Unable to retrieve templates via HTTP (err=%s). Fallback to filesystem templates.\n", err)
+		return loadTemplatesFromFile(fileService, templateService, templateFile)
+	}
+
+	return unmarshalAndPersistTemplates(templateService, templatesJSON)
+}
+
+func loadTemplatesFromFile(fileService portainer.FileService, templateService portainer.TemplateService, templateFile string) error {
+	templatesJSON, err := fileService.GetFileContent(templateFile)
+	if err != nil {
+		// TODO: figure this out
 		// What if cannot fetch from filesystem? Or if JSON is invalid? Fail fast or ignore and continue?
 		// IMO should failfast as it means that you've altered something and probably want to use custom templates
 		// if so you should be aware that something is wrong with your setup
 		return err
 	}
+	return unmarshalAndPersistTemplates(templateService, templatesJSON)
+}
 
+func unmarshalAndPersistTemplates(templateService portainer.TemplateService, templateData []byte) error {
 	var templates []portainer.Template
-	err = json.Unmarshal(templatesJSON, &templates)
+	err := json.Unmarshal(templateData, &templates)
 	if err != nil {
+		// TODO: see above
 		return err
 	}
 
@@ -236,7 +230,6 @@ func initTemplates(templateService portainer.TemplateService, fileService portai
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -398,7 +391,7 @@ func main() {
 
 	composeStackManager := initComposeStackManager(*flags.Data)
 
-	err = initTemplates(store.TemplateService, fileService, *flags.Templates)
+	err = initTemplates(store.TemplateService, fileService, *flags.Templates, *flags.TemplateFile)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -21,6 +21,7 @@ type (
 		NoAuth            *bool
 		NoAnalytics       *bool
 		Templates         *string
+		TemplateFile      *string
 		TLS               *bool
 		TLSSkipVerify     *bool
 		TLSCacert         *string
@@ -281,13 +282,18 @@ type (
 	// TemplateID represents a template identifier.
 	TemplateID int
 
+	// TemplateType represents the type of a template.
+	TemplateType int
+
 	// Template represents an application template.
 	Template struct {
 		// Mandatory container/stack fields
-		ID          TemplateID `json:"Id"`
-		Type        string     `json:"type"`
-		Title       string     `json:"title"`
-		Description string     `json:"description"`
+		ID TemplateID `json:"Id"`
+		// TODO: breaking change, must migrate type from string to integer
+		Type              TemplateType `json:"type"`
+		Title             string       `json:"title"`
+		Description       string       `json:"description"`
+		AdministratorOnly bool         `json:"administrator_only"`
 
 		// Mandatory container fields
 		Image string `json:"image"`
@@ -308,6 +314,8 @@ type (
 
 		// Optional container fields
 		// TODO: ? remove this registry field?
+		// Do some testing to ensure that templates are still working
+		// with private registries
 		Registry      string           `json:"registry,omitempty"`
 		Command       string           `json:"command,omitempty"`
 		Network       string           `json:"network,omitempty"`
@@ -680,4 +688,14 @@ const (
 	DockerSwarmStack
 	// DockerComposeStack represents a stack managed via docker-compose
 	DockerComposeStack
+)
+
+const (
+	_ TemplateType = iota
+	// ContainerTemplate represents a container template
+	ContainerTemplate
+	// SwarmStackTemplate represents a template used to deploy a Swarm stack
+	SwarmStackTemplate
+	// ComposeStackTemplate represents a template used to deploy a Compose stack
+	ComposeStackTemplate
 )
