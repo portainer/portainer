@@ -41,8 +41,10 @@ function TemplateViewModel(data) {
   if (data.ports) {
     this.Ports = data.ports.map(function (p) {
       var portAndProtocol = _.split(p, '/');
+      var hostAndContainerPort = _.split(portAndProtocol[0], ':');
       return {
-        containerPort: portAndProtocol[0],
+        hostPort: hostAndContainerPort.length > 1 ? hostAndContainerPort[0] : undefined,
+        containerPort: hostAndContainerPort.length > 1 ? hostAndContainerPort[1] : hostAndContainerPort[0],
         protocol: portAndProtocol[1]
       };
     });
