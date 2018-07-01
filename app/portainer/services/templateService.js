@@ -55,6 +55,22 @@ angular.module('portainer.app')
     configuration.OpenStdin = consoleConfiguration.openStdin;
     configuration.Tty = consoleConfiguration.tty;
     configuration.Labels = TemplateHelper.updateContainerConfigurationWithLabels(template.Labels);
+    if (template.MemoryLimit > 0) {
+      // Memory Limit - Round to 0.125
+      var memoryLimit = (Math.round(template.MemoryLimit * 8) / 8).toFixed(3);
+      memoryLimit *= 1024 * 1024;
+      configuration.HostConfig.Memory = memoryLimit;
+    }
+    if (template.MemoryReservation > 0) {
+      // Memory Reservation - Round to 0.125
+      var memoryReservation = (Math.round(template.MemoryReservation * 8) / 8).toFixed(3);
+      memoryReservation *= 1024 * 1024;
+      configuration.HostConfig.MemoryReservation = memoryReservation;
+    }
+    if (template.CpuLimit > 0) {
+      // CPU Limit
+      configuration.HostConfig.NanoCpus = template.CpuLimit * 1000000000;
+    }
     return configuration;
   };
 
