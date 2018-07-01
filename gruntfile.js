@@ -31,6 +31,7 @@ module.exports = function (grunt) {
     'clean:all',
     'before-copy',
     'copy:assets',
+    'copy:templates',
     'after-copy'
   ]);
   grunt.registerTask('build', [
