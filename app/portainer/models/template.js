@@ -9,6 +9,7 @@ function TemplateDefaultModel() {
   this.Env = [];
   this.Labels = [];
   this.RestartPolicy = 'always';
+  this.Registry = {};
 }
 
 function TemplateCreateRequest(model) {
@@ -22,7 +23,7 @@ function TemplateCreateRequest(model) {
   this.Platform = model.Platform;
   this.Logo = model.Logo;
   this.Image = model.Image;
-  this.Registry = model.Registry;
+  this.Registry = model.Registry.URL;
   this.Command = model.Command;
   this.Network = model.Network;
   this.Privileged = model.Privileged;
@@ -57,7 +58,7 @@ function TemplateUpdateRequest(model) {
   this.Platform = model.Platform;
   this.Logo = model.Logo;
   this.Image = model.Image;
-  this.Registry = model.Registry;
+  this.Registry = model.Registry.URL;
   this.Command = model.Command;
   this.Network = model.Network;
   this.Privileged = model.Privileged;
@@ -90,6 +91,7 @@ function TemplateViewModel(data) {
 
   // Container
   this.Hostname = data.hostname;
+  this.Registry = data.registry ? { URL: data.registry } : {};
   this.Image = data.image;
   this.Registry = data.registry ? data.registry : '';
   this.Command = data.command ? data.command : '';

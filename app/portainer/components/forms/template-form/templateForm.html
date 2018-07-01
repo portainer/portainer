@@ -18,7 +18,7 @@
   <div class="form-group" ng-class="{ 'has-error': templateForm.template_description.$invalid }">
     <label for="template_description" class="col-sm-3 col-lg-2 control-label text-left">Description</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" name="template_description" ng-model="$ctrl.model.Description" placeholder="e.g. my-template" required>
+      <input type="text" class="form-control" name="template_description" ng-model="$ctrl.model.Description" placeholder="e.g. template description..." required>
     </div>
   </div>
   <div class="form-group" ng-show="templateForm.template_description.$invalid">
@@ -202,21 +202,12 @@
     </div>
     <!-- container-details -->
     <div uib-collapse="$ctrl.state.collapseContainer">
-      <!-- image-input -->
-      <div class="form-group" ng-class="{ 'has-error': templateForm.template_image.$invalid }">
-        <label for="template_image" class="col-sm-3 col-lg-2 control-label text-left">Image</label>
-        <div class="col-sm-9 col-lg-10">
-          <input type="text" class="form-control" name="template_image" ng-model="$ctrl.model.Image" placeholder="e.g. nginx" required>
-        </div>
-      </div>
-      <div class="form-group" ng-show="templateForm.template_image.$invalid">
-        <div class="col-sm-12 small text-danger">
-          <div ng-messages="templateForm.template_image.$error">
-            <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-          </div>
-        </div>
-      </div>
-      <!-- !image-input -->
+      <por-image-registry
+        image="$ctrl.model.Image"
+        registry="$ctrl.model.Registry"
+        auto-complete="true"
+        label-class="col-sm-2" input-class="col-sm-10 col-md-4"
+      ></por-image-registry>
       <!-- command -->
       <div class="form-group">
         <label for="template_command" class="col-sm-3 col-lg-2 control-label text-left">
@@ -363,7 +354,7 @@
             <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
           </span>
         </div>
-          <!-- labels-input-list -->
+        <!-- labels-input-list -->
         <div class="col-sm-12">
           <div class="col-sm-12 form-inline" style="margin-top: 10px;">
             <div ng-repeat="label in $ctrl.model.Labels" style="margin-top: 2px;">
@@ -381,7 +372,7 @@
             </div>
           </div>
         </div>
-          <!-- !labels-input-list -->
+        <!-- !labels-input-list -->
       </div>
       <!-- !labels -->
       <!-- restart_policy -->
@@ -445,9 +436,9 @@
           <i class="fa fa-plus-circle" aria-hidden="true"></i> add variable
         </span>
       </div>
-        <!-- env-var-list -->
+      <!-- env-var-list -->
       <div style="margin-top: 10px;">
-        <div class="col-sm-12" ng-repeat="var in $ctrl.model.Env" style="margin-top: 10px;">
+        <div class="col-sm-12 template-envvar" ng-repeat="var in $ctrl.model.Env" style="margin-top: 10px;">
           <label class="col-sm-2 control-label text-left">
             Name
           </label>
@@ -490,18 +481,32 @@
                 <input type="checkbox" ng-model="var.freeVal"><i></i>
               </label>
             </div>
-            <div ng-if="!var.freeVal">
-              <label for="template_categories" class="col-sm-3 col-lg-2 control-label text-left">
-                Values
-              </label>
-              <div class="col-sm-9 col-lg-10">
-                <ui-select multiple tagging tagging-label="(new value)" ng-model="var.select" sortable="true" style="width: 300px;" title="Enter values">
-                  <ui-select-match placeholder="Select values...">{{ $item }}</ui-select-match>
-                  <ui-select-choices repeat="val in [] | filter:$select.search">
-                    {{ val }}
-                  </ui-select-choices>
-                </ui-select>
+            <div ng-if="!var.freeVal" style="margin-bottom: 5px;">
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Values</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addEnvVarValue(var)">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add allowed value
+                </span>
               </div>
+              <!-- envvar-values-list -->
+              <div class="col-sm-12">
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="val in var.select" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">name</span>
+                      <input type="text" class="form-control" ng-model="val.name" placeholder="Yes, I agree">
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="val.value" placeholder="Y">
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeEnvVarValue(var, $index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- envvar-values-list -->
             </div>
           </div>
           <div ng-if="var.setVal">
@@ -512,9 +517,12 @@
               <input type="text" class="form-control" ng-model="var.set" placeholder="default_value">
             </div>
           </div>
+          <div class="col-sm-12" ng-show="$ctrl.model.Env.length > 1">
+            <div class="line-separator"></div>
+          </div>
         </div>
       </div>
-        <!-- !env-var-list -->
+      <!-- !env-var-list -->
     </div>
     <!-- !env -->
   </div>

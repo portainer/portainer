@@ -748,6 +748,16 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   border-radius: 4px;
 }
 
+.template-envvar {
+  padding-bottom: 5px;
+}
+
+.line-separator{
+  border-bottom: 1px solid #777;
+  width: 50%;
+  margin: 10px auto;
+}
+
 /*bootbox override*/
 .modal-open {
   padding-right: 0 !important;

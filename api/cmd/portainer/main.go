@@ -197,8 +197,8 @@ func initTemplates(templateService portainer.TemplateService, fileService portai
 
 	templatesJSON, err = client.Get(templateURL)
 	if err != nil {
-		log.Printf("Unable to retrieve templates via HTTP (err=%s). Fallback to filesystem templates.\n", err)
-		return loadTemplatesFromFile(fileService, templateService, templateFile)
+		log.Println("Unable to retrieve templates via HTTP")
+		return err
 	}
 
 	return unmarshalAndPersistTemplates(templateService, templatesJSON)
@@ -207,10 +207,7 @@ func initTemplates(templateService portainer.TemplateService, fileService portai
 func loadTemplatesFromFile(fileService portainer.FileService, templateService portainer.TemplateService, templateFile string) error {
 	templatesJSON, err := fileService.GetFileContent(templateFile)
 	if err != nil {
-		// TODO: figure this out
-		// What if cannot fetch from filesystem? Or if JSON is invalid? Fail fast or ignore and continue?
-		// IMO should failfast as it means that you've altered something and probably want to use custom templates
-		// if so you should be aware that something is wrong with your setup
+		log.Println("Unable to retrieve template via filesystem")
 		return err
 	}
 	return unmarshalAndPersistTemplates(templateService, templatesJSON)
@@ -220,7 +217,7 @@ func unmarshalAndPersistTemplates(templateService portainer.TemplateService, tem
 	var templates []portainer.Template
 	err := json.Unmarshal(templateData, &templates)
 	if err != nil {
-		// TODO: see above
+		log.Println("Unable to parse templates file. Please review your template definition file.")
 		return err
 	}
 

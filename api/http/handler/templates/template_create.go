@@ -33,6 +33,7 @@ type templateCreatePayload struct {
 	Repository portainer.TemplateRepository
 
 	// Opt container
+	Registry      string
 	Command       string
 	Network       string
 	Volumes       []portainer.TemplateVolume
@@ -96,6 +97,7 @@ func (handler *Handler) templateCreate(w http.ResponseWriter, r *http.Request) *
 
 	if template.Type == portainer.ContainerTemplate {
 		template.Image = payload.Image
+		template.Registry = payload.Registry
 		template.Command = payload.Command
 		template.Network = payload.Network
 		template.Volumes = payload.Volumes

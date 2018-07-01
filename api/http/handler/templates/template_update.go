@@ -20,6 +20,7 @@ type templateUpdatePayload struct {
 	Categories        []string
 	Env               []portainer.TemplateEnv
 	Image             *string
+	Registry          *string
 	Repository        portainer.TemplateRepository
 	Command           *string
 	Network           *string
@@ -69,6 +70,10 @@ func (handler *Handler) templateUpdate(w http.ResponseWriter, r *http.Request) *
 func updateContainerProperties(template *portainer.Template, payload *templateUpdatePayload) {
 	if payload.Image != nil {
 		template.Image = *payload.Image
+	}
+
+	if payload.Registry != nil {
+		template.Registry = *payload.Registry
 	}
 
 	if payload.Command != nil {

@@ -91,6 +91,31 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     });
   }
 
+  function createComposeStackFromTemplate(template, userId, accessControlData) {
+    var stackName = $scope.formValues.name;
+
+    var repositoryOptions = {
+      RepositoryURL: template.Repository.url,
+      ComposeFilePathInRepository: template.Repository.stackfile
+    };
+
+    var endpointId = EndpointProvider.endpointID();
+    StackService.createComposeStackFromGitRepository(stackName, repositoryOptions, endpointId)
+    .then(function success(data) {
+      return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, []);
+    })
+    .then(function success() {
+      Notifications.success('Stack successfully deployed');
+      $state.go('portainer.stacks');
+    })
+    .catch(function error(err) {
+      Notifications.warning('Deployment error', err.data.err);
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
+    });
+  }
+
   function createStackFromTemplate(template, userId, accessControlData) {
     var stackName = $scope.formValues.name;
 
@@ -139,6 +164,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     $scope.state.actionInProgress = true;
     if (template.Type === 2) {
       createStackFromTemplate(template, userId, accessControlData);
+    } if (template.Type === 3) {
+      createComposeStackFromTemplate(template, userId, accessControlData);
     } else {
       createContainerFromTemplate(template, userId, accessControlData);
     }

@@ -9,7 +9,7 @@
 
 <div class="row">
   <!-- stack-form -->
-  <div class="col-sm-12" ng-if="state.selectedTemplate && state.selectedTemplate.Type === 2">
+  <div class="col-sm-12" ng-if="state.selectedTemplate && (state.selectedTemplate.Type === 2 || state.selectedTemplate.Type === 3)">
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Title"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
@@ -360,97 +360,3 @@
     ></template-list>
   </div>
 </div>
-
-<!-- TODO: remove -->
-<!-- <div class="row">
-  <div class="col-sm-12" style="height: 100%">
-    <rd-template-widget>
-      <rd-widget-header icon="fa-rocket" title-text="Templates">
-        <div ng-if="availableCategories.length > 0" class="pull-right">
-          Category
-          <select ng-model="state.filters.Categories">
-            <option value="!">All</option>
-            <option ng-repeat="category in availableCategories" value="{{ category }}">{{ category }}</option>
-          </select>
-        </div>
-      </rd-widget-header>
-      <rd-widget-taskbar>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.templates.new">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add template
-        </button>
-        <div>
-          <span class="btn-group btn-group-sm" style="margin-right: 15px;">
-            <label class="btn btn-primary" ng-model="state.filters.Platform" uib-btn-radio="'!'">
-              All
-            </label>
-            <label class="btn btn-primary" ng-model="state.filters.Platform" uib-btn-radio="'windows'">
-              <i class="fab fa-windows" aria-hidden="true"></i>
-              Windows
-            </label>
-            <label class="btn btn-primary" ng-model="state.filters.Platform" uib-btn-radio="'linux'">
-              <i class="fab fa-linux" aria-hidden="true"></i>
-              Linux
-            </label>
-          </span>
-        </div>
-      </rd-widget-taskbar>
-      <rd-widget-body classes="padding template-widget-body">
-        <form class="form-horizontal">
-          <div ng-if="templatesKey !== 'linuxserver.io' && state.showDeploymentSelector">
-            <div class="col-sm-12 form-section-title">
-              Deployment method
-            </div>
-            <div class="form-group"></div>
-            <div class="form-group" style="margin-bottom: 0">
-              <div class="boxselector_wrapper">
-                <div ng-click="updateCategories(templates, state.filters.Type)">
-                  <input type="radio" id="template_stack" ng-model="state.filters.Type" value="stack">
-                  <label for="template_stack">
-                    <div class="boxselector_header">
-                      <i class="fa fa-th-list" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Stack
-                    </div>
-                    <p>Multi-containers deployment</p>
-                  </label>
-                </div>
-                <div ng-click="updateCategories(templates, state.filters.Type)">
-                  <input type="radio" id="template_container" ng-model="state.filters.Type" value="container">
-                  <label for="template_container">
-                    <div class="boxselector_header">
-                      <i class="fa fa-server" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Container
-                    </div>
-                    <p>Single container deployment</p>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div ng-if="templatesKey !== 'linuxserver.io' && state.showDeploymentSelector">
-            <div class="col-sm-12 form-section-title">
-              Templates
-            </div>
-            <div class="form-group"></div>
-          </div>
-
-          <div class="template-list">
-            <template-item
-              ng-repeat="template in templates | filter:state.filters:true"
-              model="template"
-              on-select="selectTemplate"
-            ></template-item>
-
-            <div ng-if="!templates" class="text-center text-muted">
-              Loading...
-            </div>
-            <div ng-if="(templates | filter:state.filters:true).length == 0" class="text-center text-muted">
-              No templates available.
-            </div>
-          </div>
-        </form>
-      </rd-widget-body>
-    </rd-template-widget>
-  </div>
-</div>
- -->
