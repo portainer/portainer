@@ -2691,7 +2691,7 @@ paths:
             $ref: "#/definitions/GenericError"
     delete:
       tags:
-      - "teams"
+      - "templates"
       summary: "Remove a template"
       description: |
         Remove a template.
