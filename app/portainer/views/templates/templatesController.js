@@ -182,9 +182,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     }
 
     template.Selected = true;
-    // TODO: remove this, debugging purposes
-    console.log(JSON.stringify(template, null, 4));
-
     if (template.Network) {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === template.Network; });
     } else {

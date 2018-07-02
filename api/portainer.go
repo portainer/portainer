@@ -284,7 +284,6 @@ type (
 	// TemplateType represents the type of a template.
 	TemplateType int
 
-	// TODO: GODOC
 	// Template represents an application template.
 	Template struct {
 		// Mandatory container/stack fields
@@ -309,9 +308,6 @@ type (
 		Platform   string        `json:"platform,omitempty"`
 		Categories []string      `json:"categories,omitempty"`
 
-		// Optional stack fields
-		// None
-
 		// Optional container fields
 		// TODO: Do some testing to ensure that templates are still working
 		// with private registries
@@ -327,6 +323,7 @@ type (
 		Hostname      string           `json:"hostname,omitempty"`
 	}
 
+	// TemplateEnv represents a template environment variable configuration.
 	// TODO: breaking changes, the env structure of containers must be updated.
 	TemplateEnv struct {
 		Name        string `json:"name"`
@@ -338,12 +335,14 @@ type (
 		Select []Pair `json:"select,omitempty"`
 	}
 
+	// TemplateVolume represents a template volume configuration.
 	TemplateVolume struct {
 		Container string `json:"container"`
 		Bind      string `json:"bind,omitempty"`
 		ReadOnly  bool   `json:"readonly,omitempty"`
 	}
 
+	// TemplateRepository represents the git repository configuration for a template.
 	TemplateRepository struct {
 		URL       string `json:"url"`
 		StackFile string `json:"stackfile"`

@@ -115,7 +115,7 @@ func (handler *Handler) templateCreate(w http.ResponseWriter, r *http.Request) *
 
 	err = handler.TemplateService.CreateTemplate(template)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to persist the template inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the template inside the database", err}
 	}
 
 	return response.JSON(w, template)

@@ -15,7 +15,6 @@ type Handler struct {
 	TemplateService portainer.TemplateService
 }
 
-// TODO: update Swagger
 // NewHandler returns a new instance of Handler.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
