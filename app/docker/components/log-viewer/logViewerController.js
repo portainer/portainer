@@ -37,8 +37,4 @@ function (clipboard) {
       this.state.selectedLines.splice(idx, 1);
     }
   };
-
-  this.getLogViewerCSSClass = function() {
-    return 'log_viewer' + (this.state.wrapLines ? ' wrap_lines' : '');
-  };
 }]);
