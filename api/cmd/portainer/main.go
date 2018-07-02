@@ -144,9 +144,8 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 	_, err := settingsService.Settings()
 	if err == portainer.ErrObjectNotFound {
 		settings := &portainer.Settings{
-			LogoURL:                     *flags.Logo,
-			DisplayExternalContributors: false,
-			AuthenticationMethod:        portainer.AuthenticationInternal,
+			LogoURL:              *flags.Logo,
+			AuthenticationMethod: portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
 				TLSConfig: portainer.TLSConfiguration{},
 				SearchSettings: []portainer.LDAPSearchSettings{
@@ -156,13 +155,6 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,
 		}
-
-		// TODO: remove
-		// if *flags.Templates != "" {
-		// 	settings.TemplatesURL = *flags.Templates
-		// } else {
-		// 	settings.TemplatesURL = portainer.DefaultTemplatesURL
-		// }
 
 		if *flags.Labels != nil {
 			settings.BlackListedLabels = *flags.Labels

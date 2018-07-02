@@ -71,15 +71,14 @@ type (
 	Settings struct {
 		LogoURL                            string               `json:"LogoURL"`
 		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
-		DisplayExternalContributors        bool                 `json:"DisplayExternalContributors"`
 		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
 		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		// Deprecated fields
-		DisplayDonationHeader bool
-		// TODO: remove all the code related to this
-		TemplatesURL string `json:"TemplatesURL"`
+		DisplayDonationHeader       bool
+		DisplayExternalContributors bool
+		TemplatesURL                string
 	}
 
 	// User represents a user account.
@@ -285,6 +284,7 @@ type (
 	// TemplateType represents the type of a template.
 	TemplateType int
 
+	// TODO: GODOC
 	// Template represents an application template.
 	Template struct {
 		// Mandatory container/stack fields
@@ -313,8 +313,7 @@ type (
 		// None
 
 		// Optional container fields
-		// TODO: ? remove this registry field?
-		// Do some testing to ensure that templates are still working
+		// TODO: Do some testing to ensure that templates are still working
 		// with private registries
 		Registry      string           `json:"registry,omitempty"`
 		Command       string           `json:"command,omitempty"`
@@ -328,35 +327,13 @@ type (
 		Hostname      string           `json:"hostname,omitempty"`
 	}
 
-	// TODO: TemplateEnv is different for container/stack templates
-	// Refactor to use the same struct
-	// Drop support for container list as a select, just use simple input
-	// When using templates that must use other containers, the recommended way is to
-	// go for a stack template.
-
-	// Container:
-	// {
-	// "name": "the name of the environment variable, as supported in the container image (mandatory)",
-	// "label": "label for the input in the UI (mandatory)",
-	// "type": "only container is available at the moment (optional)",
-	// "set": "pre-defined value for the variable, will not generate an input in the UI (optional)"
-	// }
-
-	// Stack:
-	// {
-	//   "name": "the name of the environment variable, as supported in the container image (mandatory)",
-	//   "label": "label for the input in the UI (mandatory unless set is present)",
-	//   "description": "a short description for this input, will be available as a tooltip in the UI (optional)",
-	//   "set": "pre-defined value for the variable, will not generate an input in the UI (optional)",
-	//   "select": "an array of possible values, will generate a select input (optional)"
-	// }
-
+	// TODO: breaking changes, the env structure of containers must be updated.
 	TemplateEnv struct {
 		Name        string `json:"name"`
 		Label       string `json:"label,omitempty"`
 		Description string `json:"description,omitempty"`
 		Set         string `json:"set,omitempty"`
-		// TODO: update docs and official templates,
+		// TODO: breaking changes, update docs and official templates,
 		// now using pair means that {text: '', value: ''} is replaced by {name:'', value: ''}
 		Select []Pair `json:"select,omitempty"`
 	}
@@ -591,11 +568,6 @@ const (
 	APIVersion = "1.18.2-dev"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 12
-
-	// TODO: remove DefaultTemplatesURL
-
-	// DefaultTemplatesURL represents the default URL for the templates definitions.
-	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name.

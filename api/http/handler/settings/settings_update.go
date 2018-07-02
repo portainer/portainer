@@ -12,10 +12,8 @@ import (
 )
 
 type settingsUpdatePayload struct {
-	TemplatesURL                       string
 	LogoURL                            string
 	BlackListedLabels                  []portainer.Pair
-	DisplayExternalContributors        bool
 	AuthenticationMethod               int
 	LDAPSettings                       portainer.LDAPSettings
 	AllowBindMountsForRegularUsers     bool
@@ -23,9 +21,6 @@ type settingsUpdatePayload struct {
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.TemplatesURL) || !govalidator.IsURL(payload.TemplatesURL) {
-		return portainer.Error("Invalid templates URL. Must correspond to a valid URL format")
-	}
 	if payload.AuthenticationMethod == 0 {
 		return portainer.Error("Invalid authentication method")
 	}
@@ -47,10 +42,8 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	settings := &portainer.Settings{
-		TemplatesURL:                       payload.TemplatesURL,
 		LogoURL:                            payload.LogoURL,
 		BlackListedLabels:                  payload.BlackListedLabels,
-		DisplayExternalContributors:        payload.DisplayExternalContributors,
 		LDAPSettings:                       payload.LDAPSettings,
 		AllowBindMountsForRegularUsers:     payload.AllowBindMountsForRegularUsers,
 		AllowPrivilegedModeForRegularUsers: payload.AllowPrivilegedModeForRegularUsers,

@@ -199,23 +199,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
   function createTemplateConfiguration(template) {
     var network = $scope.formValues.network;
     var name = $scope.formValues.name;
-    // var containerMapping = determineContainerMapping(network);
-    // return TemplateService.createTemplateConfiguration(template, name, network, containerMapping);
     return TemplateService.createTemplateConfiguration(template, name, network);
   }
-
-  // function determineContainerMapping(network) {
-  //   var containerMapping = 'BY_CONTAINER_IP';
-  //   if (network.Name !== 'bridge') {
-  //     containerMapping = 'BY_CONTAINER_NAME';
-  //   }
-  //   return containerMapping;
-  // }
-
-  // $scope.updateCategories = function(templates, type) {
-  //   $scope.state.filters.Categories = '!';
-  //   updateCategories(templates, type);
-  // };
 
   $scope.deleteTemplate = function(template) {
     ModalService.confirmDeletion(
@@ -239,37 +224,29 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     });
   }
 
-  // function updateCategories(templates, type) {
-  //   var availableCategories = [];
-  //   angular.forEach(templates, function(template) {
-  //     if (template.Type === type) {
-  //       availableCategories = availableCategories.concat(template.Categories);
-  //     }
-  //   });
-  //   $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
-  // }
+  function initView() {
+    var userDetails = Authentication.getUserDetails();
+    $scope.isAdmin = userDetails.role === 1;
 
-  function initTemplates(provider, apiVersion) {
+    var endpointMode = $scope.applicationState.endpoint.mode;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+
     $q.all({
       templates: TemplateService.templates(),
-      // containers: ContainerService.containers(0),
       volumes: VolumeService.getVolumes(),
       networks: NetworkService.networks(
-        provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
+        endpointMode.provider === 'DOCKER_STANDALONE' || endpointMode.provider === 'DOCKER_SWARM_MODE',
         false,
-        provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
+        endpointMode.provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
       ),
       settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
       var templates =  data.templates;
-      // updateCategories(templates, type);
       $scope.templates = templates;
-      // $scope.runningContainers = data.containers;
       $scope.availableVolumes = data.volumes.Volumes;
       var networks = data.networks;
       $scope.availableNetworks = networks;
-      // $scope.globalNetworkCount = networks.length;
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
     })
@@ -277,28 +254,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
       $scope.templates = [];
       Notifications.error('Failure', err, 'An error occured during apps initialization.');
     });
-  }
-
-  function initView() {
-    // TODO: should remove this
-    // var templatesKey = $transition$.params().key;
-    // $scope.templatesKey = templatesKey;
-
-    var userDetails = Authentication.getUserDetails();
-    $scope.isAdmin = userDetails.role === 1;
-
-    var endpointMode = $scope.applicationState.endpoint.mode;
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    // if (templatesKey !== 'linuxserver.io'
-    //   && endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
-    //   $scope.state.filters.Type = 'stack';
-    //   $scope.state.showDeploymentSelector = true;
-    // }
-    // if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
-    //   $scope.state.showContainerSwitch = true;
-    // }
-
-    initTemplates(endpointMode.provider, apiVersion);
   }
 
   initView();

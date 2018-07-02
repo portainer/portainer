@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"log"
 	"time"
 
 	"github.com/portainer/portainer"
@@ -51,9 +52,8 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		AdminPasswordFile: kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
 		Labels:            pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
 		Logo:              kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
-		// TODO: depreciate templates in favor of templatefile
-		Templates:    kingpin.Flag("templates", "URL to the templates (apps) definitions").Short('t').String(),
-		TemplateFile: kingpin.Flag("template-file", "Path to the templates (app) definitions on the filesystem").Default(defaultTemplateFile).String(),
+		Templates:         kingpin.Flag("templates", "URL to the templates definitions. Deprecated, please use the --template-file flag").Short('t').String(),
+		TemplateFile:      kingpin.Flag("template-file", "Path to the templates (app) definitions on the filesystem").Default(defaultTemplateFile).String(),
 	}
 
 	kingpin.Parse()
@@ -74,6 +74,10 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 
 	if *flags.EndpointURL != "" && *flags.ExternalEndpoints != "" {
 		return errEndpointExcludeExternal
+	}
+
+	if *flags.Templates != "" {
+		log.Println("The --template flag is deprecated and will be removed in future versions. Consider using the --template-file flag instead.")
 	}
 
 	err := validateTemplateFile(*flags.TemplateFile)

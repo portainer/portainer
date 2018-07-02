@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('TemplateController', ['$q', '$scope', '$state', '$transition$', 'TemplateService', 'NetworkService', 'Notifications',
-function ($q, $scope, $state, $transition$, TemplateService, NetworkService, Notifications) {
+.controller('TemplateController', ['$q', '$scope', '$state', '$transition$', 'TemplateService', 'TemplateHelper', 'NetworkService', 'Notifications',
+function ($q, $scope, $state, $transition$, TemplateService, TemplateHelper, NetworkService, Notifications) {
 
   $scope.state = {
     actionInProgress: false
@@ -38,12 +38,7 @@ function ($q, $scope, $state, $transition$, TemplateService, NetworkService, Not
       )
     })
     .then(function success(data) {
-      var categories = [];
-      for (var i = 0; i < data.templates.length; i++) {
-        var template = data.templates[i];
-        categories = categories.concat(template.Categories);
-      }
-      $scope.categories = _.uniq(categories);
+      $scope.categories = TemplateHelper.getUniqueCategories(data.templates);
       $scope.template = data.template;
       $scope.networks = data.networks;
     })

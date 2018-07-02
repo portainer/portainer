@@ -9,18 +9,13 @@ import (
 	"github.com/portainer/portainer/http/security"
 )
 
-// TODO: remove this
-// const (
-// containerTemplatesURLLinuxServerIo = "https://tools.linuxserver.io/portainer.json"
-// )
-
 // Handler represents an HTTP API handler for managing templates.
 type Handler struct {
 	*mux.Router
-	// SettingsService portainer.SettingsService
 	TemplateService portainer.TemplateService
 }
 
+// TODO: update Swagger
 // NewHandler returns a new instance of Handler.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{

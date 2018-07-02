@@ -10,10 +10,6 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     Templates.query().$promise
     .then(function success(data) {
       var templates = data.map(function (item) {
-        // if (item.type === 'container') {
-        //   return new ContainerTemplateViewModel(item);
-        // }
-        // return new StackTemplateViewModel(item);
         return new TemplateViewModel(item);
       });
       deferred.resolve(templates);
@@ -31,11 +27,6 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     Templates.get({ id: id }).$promise
     .then(function success(data) {
       var template = new TemplateViewModel(data);
-      // if (data.type === 'container') {
-      //   template = new ContainerTemplateViewModel(data);
-      // } else {
-      //   template = new StackTemplateViewModel(data);
-      // }
       deferred.resolve(template);
     })
     .catch(function error(err) {
@@ -58,34 +49,6 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
   service.update = function(model) {
     var payload = new TemplateUpdateRequest(model);
     return Templates.update(payload).$promise;
-  };
-
-  // TODO: remove
-  service.getTemplates = function(key) {
-    var deferred = $q.defer();
-    Templates.get({key: key}).$promise
-    .then(function success(data) {
-      var templates = data.map(function (tpl, idx) {
-        var template;
-        if (tpl.type === 'stack') {
-          template = new StackTemplateViewModel(tpl);
-        } else if (tpl.type === 'container' && key === 'linuxserver.io') {
-          template = new TemplateLSIOViewModel(tpl);
-        } else {
-          template = new TemplateViewModel(tpl);
-        }
-        template.index = idx;
-        return template;
-      });
-      if (key === 'linuxserver.io') {
-        templates = TemplateHelper.filterLinuxServerIOTemplates(templates);
-      }
-      deferred.resolve(templates);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve templates', err: err });
-    });
-    return deferred.promise;
   };
 
   service.createTemplateConfiguration = function(template, containerName, network) {

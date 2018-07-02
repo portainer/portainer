@@ -23,12 +23,3 @@ func Empty(rw http.ResponseWriter) *httperror.HandlerError {
 	rw.WriteHeader(http.StatusNoContent)
 	return nil
 }
-
-// TODO: remove, useless now
-
-// Bytes write data into rw. It also allows to set the Content-Type header.
-func Bytes(rw http.ResponseWriter, data []byte, contentType string) *httperror.HandlerError {
-	rw.Header().Set("Content-Type", contentType)
-	rw.Write(data)
-	return nil
-}

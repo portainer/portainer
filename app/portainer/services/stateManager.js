@@ -25,18 +25,12 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     LocalStorage.storeApplicationState(state.application);
   };
 
-  manager.updateExternalContributions = function(displayExternalContributors) {
-    state.application.displayExternalContributors = displayExternalContributors;
-    LocalStorage.storeApplicationState(state.application);
-  };
-
  function assignStateFromStatusAndSettings(status, settings) {
    state.application.authentication = status.Authentication;
    state.application.analytics = status.Analytics;
    state.application.endpointManagement = status.EndpointManagement;
    state.application.version = status.Version;
    state.application.logo = settings.LogoURL;
-   state.application.displayExternalContributors = settings.DisplayExternalContributors;
    state.application.validity = moment().unix();
  }
 

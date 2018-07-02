@@ -388,22 +388,6 @@ angular.module('portainer.app', [])
     }
   };
 
-  // TODO: drop LinuxServer templates support?
-  var templatesLinuxServer = {
-    name: 'portainer.templates.linuxserver',
-    url: '/linuxserver',
-    views: {
-      'content@': {
-        templateUrl: 'app/portainer/views/templates/templates.html',
-        controller: 'TemplatesController'
-      }
-    },
-    params: {
-      key: 'linuxserver.io',
-      hide_descriptions: true
-    }
-  };
-
   $stateRegistryProvider.register(root);
   $stateRegistryProvider.register(portainer);
   $stateRegistryProvider.register(about);
@@ -438,6 +422,4 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(templates);
   $stateRegistryProvider.register(template);
   $stateRegistryProvider.register(templateCreation);
-  // TODO: remove this
-  $stateRegistryProvider.register(templatesLinuxServer);
 }]);
