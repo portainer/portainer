@@ -27,9 +27,13 @@
           </div>
           <div ng-if="formValues.Registry || !fromContainer">
             <!-- image-and-registry -->
-            <div class="form-group">
-              <por-image-registry image="config.Image" registry="formValues.Registry" ng-if="formValues.Registry" auto-complete="true"></por-image-registry>
-            </div>
+            <por-image-registry
+              image="config.Image"
+              registry="formValues.Registry"
+              ng-if="formValues.Registry"
+              auto-complete="true"
+              label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+            ></por-image-registry>
             <!-- !image-and-registry -->
             <!-- always-pull -->
             <div class="form-group">

@@ -169,7 +169,7 @@ func (manager *SwarmStackManager) retrieveConfigurationFromDisk(path string) (ma
 		return make(map[string]interface{}), nil
 	}
 
-	err = json.Unmarshal([]byte(raw), &config)
+	err = json.Unmarshal(raw, &config)
 	if err != nil {
 		return nil, err
 	}

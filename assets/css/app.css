@@ -152,6 +152,8 @@ a[ng-click]{
 .template-list {
   display: flex;
   flex-direction: column;
+  padding: 10px;
+  border-top: 2px solid #e2e2e2;
 }
 
 .template-logo {
@@ -193,6 +195,11 @@ a[ng-click]{
 .template-title {
   font-size: 1.8em;
   font-weight: bold;
+}
+
+.template-type {
+  font-size: 0.9em;
+  padding-right: 1em;
 }
 
 .template-description {
@@ -739,6 +746,16 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   background-color: #337ab7;
   border: 1px solid #2e6da4;
   border-radius: 4px;
+}
+
+.template-envvar {
+  padding-bottom: 5px;
+}
+
+.line-separator{
+  border-bottom: 1px solid #777;
+  width: 50%;
+  margin: 20px auto 10px auto;
 }
 
 /*bootbox override*/

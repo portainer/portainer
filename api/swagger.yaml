@@ -2530,32 +2530,189 @@ paths:
     get:
       tags:
       - "templates"
-      summary: "Retrieve App templates"
+      summary: "List available templates"
       description: |
-        Retrieve App templates.
-        You can find more information about the format at http://portainer.readthedocs.io/en/stable/templates.html
-        **Access policy**: authenticated
+        List available templates.
+        Administrator templates will not be listed for non-administrator users.
+        **Access policy**: restricted
       operationId: "TemplateList"
       produces:
       - "application/json"
       parameters:
-      - name: "key"
-        in: "query"
-        required: true
-        description: "Templates key. Valid values are 'container' or 'linuxserver.io'."
-        type: "string"
       responses:
         200:
           description: "Success"
           schema:
             $ref: "#/definitions/TemplateListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "templates"
+      summary: "Create a new template"
+      description: |
+        Create a new template.
+        **Access policy**: administrator
+      operationId: "TemplateCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Template details"
+        required: true
+        schema:
+          $ref: "#/definitions/TemplateCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Template"
         400:
           description: "Invalid request"
           schema:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "Invalid query format"
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /templates/{id}:
+    get:
+      tags:
+      - "templates"
+      summary: "Inspect a template"
+      description: |
+        Retrieve details about a template.
+        **Access policy**: administrator
+      operationId: "TemplateInspect"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Template identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Template"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "Template not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Template not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    put:
+      tags:
+      - "templates"
+      summary: "Update a template"
+      description: |
+        Update a template.
+        **Access policy**: administrator
+      operationId: "TemplateUpdate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Template identifier"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Template details"
+        required: true
+        schema:
+          $ref: "#/definitions/TemplateUpdateRequest"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Access denied to resource"
+        404:
+          description: "Template not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Template not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "templates"
+      summary: "Remove a template"
+      description: |
+        Remove a template.
+        **Access policy**: administrator
+      operationId: "TemplateDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Template identifier"
+        required: true
+        type: "integer"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
         500:
           description: "Server error"
           schema:
@@ -3602,9 +3759,17 @@ definitions:
     type: "array"
     items:
       $ref: "#/definitions/Template"
-  Template:
+  TemplateCreateRequest:
     type: "object"
+    required:
+      - "type"
+      - "title"
+      - "description"
     properties:
+      type:
+        type: "integer"
+        example: 1
+        description: "Template type. Valid values are: 1 (container), 2 (Swarm stack) or 3 (Compose stack)"
       title:
         type: "string"
         example: "Nginx"
@@ -3613,14 +3778,354 @@ definitions:
         type: "string"
         example: "High performance web server"
         description: "Description of the template"
+      administrator_only:
+        type: "boolean"
+        example: true
+        description: "Whether the template should be available to administrators only"
+      image:
+        type: "string"
+        example: "nginx:latest"
+        description: "Image associated to a container template. Mandatory for a container template"
+      repository:
+        $ref: "#/definitions/TemplateRepository"
+      name:
+        type: "string"
+        example: "mystackname"
+        description: "Default name for the stack/container to be used on deployment"
       logo:
         type: "string"
         example: "https://cloudinovasi.id/assets/img/logos/nginx.png"
         description: "URL of the template's logo"
+      env:
+        type: "array"
+        description: "A list of environment variables used during the template deployment"
+        items:
+          $ref: "#/definitions/TemplateEnv"
+      note:
+        type: "string"
+        example: "This is my <b>custom</b> template"
+        description: "A note that will be displayed in the UI. Supports HTML content"
+      platform:
+        type: "string"
+        example: "linux"
+        description: "Platform associated to the template. Valid values are: 'linux', 'windows' or leave empty for multi-platform"
+      categories:
+        type: "array"
+        description: "A list of categories associated to the template"
+        items:
+          type: "string"
+          exampe: "database"
+      registry:
+        type: "string"
+        example: "quay.io"
+        description: "The URL of a registry associated to the image for a container template"
+      command:
+        type: "string"
+        example: "ls -lah"
+        description: "The command that will be executed in a container template"
+      network:
+        type: "string"
+        example: "mynet"
+        description: "Name of a network that will be used on container deployment if it exists inside the environment"
+      volumes:
+        type: "array"
+        description: "A list of volumes used during the container template deployment"
+        items:
+          $ref: "#/definitions/TemplateVolume"
+      ports:
+        type: "array"
+        description: "A list of ports exposed by the container"
+        items:
+          type: "string"
+          example: "8080:80/tcp"
+      labels:
+        type: "array"
+        description: "Container labels"
+        items:
+          $ref: '#/definitions/Pair'
+      privileged:
+        type: "boolean"
+        example: true
+        description: "Whether the container should be started in privileged mode"
+      interactive:
+        type: "boolean"
+        example: true
+        description: "Whether the container should be started in interactive mode (-i -t equivalent on the CLI)"
+      restart_policy:
+        type: "string"
+        example: "on-failure"
+        description: "Container restart policy"
+      hostname:
+        type: "string"
+        example: "mycontainer"
+        description: "Container hostname"
+  TemplateUpdateRequest:
+    type: "object"
+    properties:
+      type:
+        type: "integer"
+        example: 1
+        description: "Template type. Valid values are: 1 (container), 2 (Swarm stack) or 3 (Compose stack)"
+      title:
+        type: "string"
+        example: "Nginx"
+        description: "Title of the template"
+      description:
+        type: "string"
+        example: "High performance web server"
+        description: "Description of the template"
+      administrator_only:
+        type: "boolean"
+        example: true
+        description: "Whether the template should be available to administrators only"
       image:
         type: "string"
         example: "nginx:latest"
-        description: "The Docker image associated to the template"
+        description: "Image associated to a container template. Mandatory for a container template"
+      repository:
+        $ref: "#/definitions/TemplateRepository"
+      name:
+        type: "string"
+        example: "mystackname"
+        description: "Default name for the stack/container to be used on deployment"
+      logo:
+        type: "string"
+        example: "https://cloudinovasi.id/assets/img/logos/nginx.png"
+        description: "URL of the template's logo"
+      env:
+        type: "array"
+        description: "A list of environment variables used during the template deployment"
+        items:
+          $ref: "#/definitions/TemplateEnv"
+      note:
+        type: "string"
+        example: "This is my <b>custom</b> template"
+        description: "A note that will be displayed in the UI. Supports HTML content"
+      platform:
+        type: "string"
+        example: "linux"
+        description: "Platform associated to the template. Valid values are: 'linux', 'windows' or leave empty for multi-platform"
+      categories:
+        type: "array"
+        description: "A list of categories associated to the template"
+        items:
+          type: "string"
+          exampe: "database"
+      registry:
+        type: "string"
+        example: "quay.io"
+        description: "The URL of a registry associated to the image for a container template"
+      command:
+        type: "string"
+        example: "ls -lah"
+        description: "The command that will be executed in a container template"
+      network:
+        type: "string"
+        example: "mynet"
+        description: "Name of a network that will be used on container deployment if it exists inside the environment"
+      volumes:
+        type: "array"
+        description: "A list of volumes used during the container template deployment"
+        items:
+          $ref: "#/definitions/TemplateVolume"
+      ports:
+        type: "array"
+        description: "A list of ports exposed by the container"
+        items:
+          type: "string"
+          example: "8080:80/tcp"
+      labels:
+        type: "array"
+        description: "Container labels"
+        items:
+          $ref: '#/definitions/Pair'
+      privileged:
+        type: "boolean"
+        example: true
+        description: "Whether the container should be started in privileged mode"
+      interactive:
+        type: "boolean"
+        example: true
+        description: "Whether the container should be started in interactive mode (-i -t equivalent on the CLI)"
+      restart_policy:
+        type: "string"
+        example: "on-failure"
+        description: "Container restart policy"
+      hostname:
+        type: "string"
+        example: "mycontainer"
+        description: "Container hostname"
+  Template:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        example: 1
+        description: "Template identifier"
+      type:
+        type: "integer"
+        example: 1
+        description: "Template type. Valid values are: 1 (container), 2 (Swarm stack) or 3 (Compose stack)"
+      title:
+        type: "string"
+        example: "Nginx"
+        description: "Title of the template"
+      description:
+        type: "string"
+        example: "High performance web server"
+        description: "Description of the template"
+      administrator_only:
+        type: "boolean"
+        example: true
+        description: "Whether the template should be available to administrators only"
+      image:
+        type: "string"
+        example: "nginx:latest"
+        description: "Image associated to a container template. Mandatory for a container template"
+      repository:
+        $ref: "#/definitions/TemplateRepository"
+      name:
+        type: "string"
+        example: "mystackname"
+        description: "Default name for the stack/container to be used on deployment"
+      logo:
+        type: "string"
+        example: "https://cloudinovasi.id/assets/img/logos/nginx.png"
+        description: "URL of the template's logo"
+      env:
+        type: "array"
+        description: "A list of environment variables used during the template deployment"
+        items:
+          $ref: "#/definitions/TemplateEnv"
+      note:
+        type: "string"
+        example: "This is my <b>custom</b> template"
+        description: "A note that will be displayed in the UI. Supports HTML content"
+      platform:
+        type: "string"
+        example: "linux"
+        description: "Platform associated to the template. Valid values are: 'linux', 'windows' or leave empty for multi-platform"
+      categories:
+        type: "array"
+        description: "A list of categories associated to the template"
+        items:
+          type: "string"
+          exampe: "database"
+      registry:
+        type: "string"
+        example: "quay.io"
+        description: "The URL of a registry associated to the image for a container template"
+      command:
+        type: "string"
+        example: "ls -lah"
+        description: "The command that will be executed in a container template"
+      network:
+        type: "string"
+        example: "mynet"
+        description: "Name of a network that will be used on container deployment if it exists inside the environment"
+      volumes:
+        type: "array"
+        description: "A list of volumes used during the container template deployment"
+        items:
+          $ref: "#/definitions/TemplateVolume"
+      ports:
+        type: "array"
+        description: "A list of ports exposed by the container"
+        items:
+          type: "string"
+          example: "8080:80/tcp"
+      labels:
+        type: "array"
+        description: "Container labels"
+        items:
+          $ref: '#/definitions/Pair'
+      privileged:
+        type: "boolean"
+        example: true
+        description: "Whether the container should be started in privileged mode"
+      interactive:
+        type: "boolean"
+        example: true
+        description: "Whether the container should be started in interactive mode (-i -t equivalent on the CLI)"
+      restart_policy:
+        type: "string"
+        example: "on-failure"
+        description: "Container restart policy"
+      hostname:
+        type: "string"
+        example: "mycontainer"
+        description: "Container hostname"
+  TemplateVolume:
+    type: "object"
+    properties:
+      container:
+        type: "string"
+        example: "/data"
+        description: "Path inside the container"
+      bind:
+        type: "string"
+        example: "/tmp"
+        description: "Path on the host"
+      readonly:
+        type: "boolean"
+        example: true
+        description: "Whether the volume used should be readonly"
+  TemplateEnv:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "MYSQL_ROOT_PASSWORD"
+        description: "name of the environment variable"
+      label:
+        type: "string"
+        example: "Root password"
+        description: "Text for the label that will be generated in the UI"
+      description:
+        type: "string"
+        example: "MySQL root account password"
+        description: "Content of the tooltip that will be generated in the UI"
+      default:
+        type: "string"
+        example: "default_value"
+        description: "Default value that will be set for the variable"
+      preset:
+        type: "boolean"
+        example: true
+        description: "If set to true, will not generate any input for this variable in the UI"
+      select:
+        type: "array"
+        description: "A list of name/value that will be used to generate a dropdown in the UI"
+        items:
+          $ref: '#/definitions/TemplateEnvSelect'
+  TemplateEnvSelect:
+    type: "object"
+    properties:
+      text:
+        type: "string"
+        example: "text value"
+        description: "Some text that will displayed as a choice"
+      value:
+        type: "string"
+        example: "value"
+        description: "A value that will be associated to the choice"
+      default:
+        type: "boolean"
+        example: true
+        description: "Will set this choice as the default choice"
+  TemplateRepository:
+    type: "object"
+    required:
+      - "URL"
+    properties:
+      URL:
+        type: "string"
+        example: "https://github.com/portainer/portainer-compose"
+        description: "URL of a git repository used to deploy a stack template. Mandatory for a Swarm/Compose stack template"
+      stackfile:
+        type: "string"
+        example: "./subfolder/docker-compose.yml"
+        description: "Path to the stack file inside the git repository"
   StackMigrateRequest:
     type: "object"
     required:

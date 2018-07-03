@@ -1,18 +1,11 @@
-angular.module('portainer.docker')
-.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', '$filter', 'ContainerService', 'ContainerHelper', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'PaginationService', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService', 'EndpointProvider',
-function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerService, ContainerHelper, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, PaginationService, ResourceControlService, Authentication, FormValidator, SettingsService, StackService, EndpointProvider) {
+angular.module('portainer.app')
+.controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', 'ContainerService', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService', 'EndpointProvider', 'ModalService',
+function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, ResourceControlService, Authentication, FormValidator, SettingsService, StackService, EndpointProvider, ModalService) {
   $scope.state = {
     selectedTemplate: null,
     showAdvancedOptions: false,
-    hideDescriptions: $transition$.params().hide_descriptions,
     formValidationError: '',
-    showDeploymentSelector: false,
-    actionInProgress: false,
-    filters: {
-      Categories: '!',
-      Platform: '!',
-      Type: 'container'
-    }
+    actionInProgress: false
   };
 
   $scope.formValues = {
@@ -22,7 +15,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
   };
 
   $scope.addVolume = function () {
-    $scope.state.selectedTemplate.Volumes.push({ containerPath: '', name: '', readOnly: false, type: 'auto' });
+    $scope.state.selectedTemplate.Volumes.push({ containerPath: '', bind: '', readonly: false, type: 'auto' });
   };
 
   $scope.removeVolume = function(index) {
@@ -98,6 +91,31 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     });
   }
 
+  function createComposeStackFromTemplate(template, userId, accessControlData) {
+    var stackName = $scope.formValues.name;
+
+    var repositoryOptions = {
+      RepositoryURL: template.Repository.url,
+      ComposeFilePathInRepository: template.Repository.stackfile
+    };
+
+    var endpointId = EndpointProvider.endpointID();
+    StackService.createComposeStackFromGitRepository(stackName, repositoryOptions, endpointId)
+    .then(function success(data) {
+      return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, []);
+    })
+    .then(function success() {
+      Notifications.success('Stack successfully deployed');
+      $state.go('portainer.stacks');
+    })
+    .catch(function error(err) {
+      Notifications.warning('Deployment error', err.data.err);
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
+    });
+  }
+
   function createStackFromTemplate(template, userId, accessControlData) {
     var stackName = $scope.formValues.name;
 
@@ -144,104 +162,88 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
     var templatesKey = $scope.templatesKey;
 
     $scope.state.actionInProgress = true;
-    if (template.Type === 'stack') {
+    if (template.Type === 2) {
       createStackFromTemplate(template, userId, accessControlData);
+    } if (template.Type === 3) {
+      createComposeStackFromTemplate(template, userId, accessControlData);
     } else {
       createContainerFromTemplate(template, userId, accessControlData);
     }
   };
 
-  $scope.unselectTemplate = function() {
-    var currentTemplateIndex = $scope.state.selectedTemplate.index;
-    $('#template_' + currentTemplateIndex).toggleClass('template-container--selected');
+  $scope.unselectTemplate = function(template) {
+    template.Selected = false;
     $scope.state.selectedTemplate = null;
   };
 
-  $scope.selectTemplate = function(index, pos) {
-    if ($scope.state.selectedTemplate && $scope.state.selectedTemplate.index !== index) {
-      $scope.unselectTemplate();
+  $scope.selectTemplate = function(template) {
+    if ($scope.state.selectedTemplate) {
+      $scope.unselectTemplate($scope.state.selectedTemplate);
     }
 
-    var templates = $filter('filter')($scope.templates, $scope.state.filters, true);
-    var template = templates[pos];
-    if (template === $scope.state.selectedTemplate) {
-      $scope.unselectTemplate();
-    } else {
-      selectTemplate(index, pos, templates);
-    }
-  };
-
-  function selectTemplate(index, pos, filteredTemplates) {
-    $('#template_' + index).toggleClass('template-container--selected');
-    var selectedTemplate = filteredTemplates[pos];
-    $scope.state.selectedTemplate = selectedTemplate;
-
-    if (selectedTemplate.Network) {
-      $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === selectedTemplate.Network; });
+    template.Selected = true;
+    if (template.Network) {
+      $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === template.Network; });
     } else {
       $scope.formValues.network = _.find($scope.availableNetworks, function(o) { return o.Name === 'bridge'; });
     }
 
-    if (selectedTemplate.Name) {
-      $scope.formValues.name = selectedTemplate.Name;
-    } else {
-      $scope.formValues.name = '';
-    }
-
+    $scope.formValues.name = template.Name ? template.Name : '';
+    $scope.state.selectedTemplate = template;
     $anchorScroll('view-top');
-  }
+  };
 
   function createTemplateConfiguration(template) {
     var network = $scope.formValues.network;
     var name = $scope.formValues.name;
-    var containerMapping = determineContainerMapping(network);
-    return TemplateService.createTemplateConfiguration(template, name, network, containerMapping);
+    return TemplateService.createTemplateConfiguration(template, name, network);
   }
 
-  function determineContainerMapping(network) {
-    var containerMapping = 'BY_CONTAINER_IP';
-    if (network.Name !== 'bridge') {
-      containerMapping = 'BY_CONTAINER_NAME';
-    }
-    return containerMapping;
-  }
-
-  $scope.updateCategories = function(templates, type) {
-    $scope.state.filters.Categories = '!';
-    updateCategories(templates, type);
+  $scope.deleteTemplate = function(template) {
+    ModalService.confirmDeletion(
+      'Do you want to delete this template?',
+      function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        deleteTemplate(template);
+      }
+    );
   };
 
-  function updateCategories(templates, type) {
-    var availableCategories = [];
-    angular.forEach(templates, function(template) {
-      if (template.Type === type) {
-        availableCategories = availableCategories.concat(template.Categories);
-      }
+  function deleteTemplate(template) {
+    TemplateService.delete(template.Id)
+    .then(function success() {
+      Notifications.success('Template successfully deleted');
+      var idx = $scope.templates.indexOf(template);
+      $scope.templates.splice(idx, 1);
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to remove template');
     });
-    $scope.availableCategories = _.sortBy(_.uniq(availableCategories));
   }
 
-  function initTemplates(templatesKey, type, provider, apiVersion) {
+  function initView() {
+    var userDetails = Authentication.getUserDetails();
+    $scope.isAdmin = userDetails.role === 1;
+
+    var endpointMode = $scope.applicationState.endpoint.mode;
+    var apiVersion = $scope.applicationState.endpoint.apiVersion;
+
     $q.all({
-      templates: TemplateService.getTemplates(templatesKey),
-      containers: ContainerService.containers(0),
+      templates: TemplateService.templates(),
       volumes: VolumeService.getVolumes(),
       networks: NetworkService.networks(
-        provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
+        endpointMode.provider === 'DOCKER_STANDALONE' || endpointMode.provider === 'DOCKER_SWARM_MODE',
         false,
-        provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
+        endpointMode.provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
       ),
       settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
       var templates =  data.templates;
-      updateCategories(templates, type);
       $scope.templates = templates;
-      $scope.runningContainers = data.containers;
       $scope.availableVolumes = data.volumes.Volumes;
       var networks = data.networks;
       $scope.availableNetworks = networks;
-      $scope.globalNetworkCount = networks.length;
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
     })
@@ -249,25 +251,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, $filter, ContainerSer
       $scope.templates = [];
       Notifications.error('Failure', err, 'An error occured during apps initialization.');
     });
-  }
-
-  function initView() {
-    var templatesKey = $transition$.params().key;
-    $scope.templatesKey = templatesKey;
-
-    var userDetails = Authentication.getUserDetails();
-    $scope.isAdmin = userDetails.role === 1;
-
-    var endpointMode = $scope.applicationState.endpoint.mode;
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
-
-    if (templatesKey !== 'linuxserver.io'
-      && endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER' && apiVersion >= 1.25) {
-      $scope.state.filters.Type = 'stack';
-      $scope.state.showDeploymentSelector = true;
-    }
-
-    initTemplates(templatesKey, $scope.state.filters.Type, endpointMode.provider, apiVersion);
   }
 
   initView();

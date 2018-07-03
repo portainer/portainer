@@ -18,6 +18,7 @@ import (
 	"github.com/portainer/portainer/bolt/tag"
 	"github.com/portainer/portainer/bolt/team"
 	"github.com/portainer/portainer/bolt/teammembership"
+	"github.com/portainer/portainer/bolt/template"
 	"github.com/portainer/portainer/bolt/user"
 	"github.com/portainer/portainer/bolt/version"
 )
@@ -43,6 +44,7 @@ type Store struct {
 	TagService             *tag.Service
 	TeamMembershipService  *teammembership.Service
 	TeamService            *team.Service
+	TemplateService        *template.Service
 	UserService            *user.Service
 	VersionService         *version.Service
 }
@@ -211,6 +213,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.TeamService = teamService
+
+	templateService, err := template.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.TemplateService = templateService
 
 	userService, err := user.NewService(store.db)
 	if err != nil {

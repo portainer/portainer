@@ -176,14 +176,14 @@ func (service *Service) DeleteTLSFile(folder string, fileType portainer.TLSFileT
 	return nil
 }
 
-// GetFileContent returns a string content from file.
-func (service *Service) GetFileContent(filePath string) (string, error) {
+// GetFileContent returns the content of a file as bytes.
+func (service *Service) GetFileContent(filePath string) ([]byte, error) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(content), nil
+	return content, nil
 }
 
 // Rename renames a file or directory

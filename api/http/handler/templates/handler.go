@@ -9,14 +9,10 @@ import (
 	"github.com/portainer/portainer/http/security"
 )
 
-const (
-	containerTemplatesURLLinuxServerIo = "https://tools.linuxserver.io/portainer.json"
-)
-
 // Handler represents an HTTP API handler for managing templates.
 type Handler struct {
 	*mux.Router
-	SettingsService portainer.SettingsService
+	TemplateService portainer.TemplateService
 }
 
 // NewHandler returns a new instance of Handler.
@@ -25,6 +21,14 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/templates",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.templateList))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.templateList))).Methods(http.MethodGet)
+	h.Handle("/templates",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.templateCreate))).Methods(http.MethodPost)
+	h.Handle("/templates/{id}",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.templateInspect))).Methods(http.MethodGet)
+	h.Handle("/templates/{id}",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.templateUpdate))).Methods(http.MethodPut)
+	h.Handle("/templates/{id}",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.templateDelete))).Methods(http.MethodDelete)
 	return h
 }

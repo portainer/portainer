@@ -62,14 +62,6 @@ angular.module('portainer.app')
     templateEnvironment.forEach(function(envvar) {
       if (envvar.value || envvar.set) {
         var value = envvar.set ? envvar.set : envvar.value;
-        if (envvar.type && envvar.type === 'container') {
-          if (containerMapping === 'BY_CONTAINER_IP') {
-            var container = envvar.value;
-            value = container.NetworkSettings.Networks[Object.keys(container.NetworkSettings.Networks)[0]].IPAddress;
-          } else if (containerMapping === 'BY_CONTAINER_NAME') {
-            value = $filter('containername')(envvar.value);
-          }
-        }
         env.push(envvar.name + '=' + value);
       }
     });
@@ -90,14 +82,14 @@ angular.module('portainer.app')
 
   helper.createVolumeBindings = function(volumes, generatedVolumesPile) {
     volumes.forEach(function (volume) {
-      if (volume.containerPath) {
+      if (volume.container) {
         var binding;
         if (volume.type === 'auto') {
-          binding = generatedVolumesPile.pop().Id + ':' + volume.containerPath;
-        } else if (volume.type !== 'auto' && volume.name) {
-          binding = volume.name + ':' + volume.containerPath;
+          binding = generatedVolumesPile.pop().Id + ':' + volume.container;
+        } else if (volume.type !== 'auto' && volume.bind) {
+          binding = volume.bind + ':' + volume.container;
         }
-        if (volume.readOnly) {
+        if (volume.readonly) {
           binding += ':ro';
         }
         volume.binding = binding;
@@ -115,21 +107,13 @@ angular.module('portainer.app')
     return count;
   };
 
-  helper.filterLinuxServerIOTemplates = function(templates) {
-    return templates.filter(function f(template) {
-      var valid = false;
-      if (template.Categories) {
-        angular.forEach(template.Categories, function(category) {
-          if (_.startsWith(category, 'Network')) {
-            valid = true;
-          }
-        });
-      }
-      return valid;
-    }).map(function(template, idx) {
-      template.index = idx;
-      return template;
-    });
+  helper.getUniqueCategories = function(templates) {
+    var categories = [];
+    for (var i = 0; i < templates.length; i++) {
+      var template = templates[i];
+      categories = categories.concat(template.Categories);
+    }
+    return _.uniq(categories);
   };
 
   return helper;

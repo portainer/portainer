@@ -21,6 +21,7 @@ type (
 		NoAuth            *bool
 		NoAnalytics       *bool
 		Templates         *string
+		TemplateFile      *string
 		TLS               *bool
 		TLSSkipVerify     *bool
 		TLSCacert         *string
@@ -68,16 +69,16 @@ type (
 
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL                       string               `json:"TemplatesURL"`
 		LogoURL                            string               `json:"LogoURL"`
 		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
-		DisplayExternalContributors        bool                 `json:"DisplayExternalContributors"`
 		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
 		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		// Deprecated fields
-		DisplayDonationHeader bool
+		DisplayDonationHeader       bool
+		DisplayExternalContributors bool
+		TemplatesURL                string
 	}
 
 	// User represents a user account.
@@ -277,6 +278,79 @@ type (
 		Name string `json:"Name"`
 	}
 
+	// TemplateID represents a template identifier.
+	TemplateID int
+
+	// TemplateType represents the type of a template.
+	TemplateType int
+
+	// Template represents an application template.
+	Template struct {
+		// Mandatory container/stack fields
+		ID                TemplateID   `json:"Id"`
+		Type              TemplateType `json:"type"`
+		Title             string       `json:"title"`
+		Description       string       `json:"description"`
+		AdministratorOnly bool         `json:"administrator_only"`
+
+		// Mandatory container fields
+		Image string `json:"image"`
+
+		// Mandatory stack fields
+		Repository TemplateRepository `json:"repository"`
+
+		// Optional stack/container fields
+		Name       string        `json:"name,omitempty"`
+		Logo       string        `json:"logo,omitempty"`
+		Env        []TemplateEnv `json:"env,omitempty"`
+		Note       string        `json:"note,omitempty"`
+		Platform   string        `json:"platform,omitempty"`
+		Categories []string      `json:"categories,omitempty"`
+
+		// Optional container fields
+		Registry      string           `json:"registry,omitempty"`
+		Command       string           `json:"command,omitempty"`
+		Network       string           `json:"network,omitempty"`
+		Volumes       []TemplateVolume `json:"volumes,omitempty"`
+		Ports         []string         `json:"ports,omitempty"`
+		Labels        []Pair           `json:"labels,omitempty"`
+		Privileged    bool             `json:"privileged,omitempty"`
+		Interactive   bool             `json:"interactive,omitempty"`
+		RestartPolicy string           `json:"restart_policy,omitempty"`
+		Hostname      string           `json:"hostname,omitempty"`
+	}
+
+	// TemplateEnv represents a template environment variable configuration.
+	TemplateEnv struct {
+		Name        string              `json:"name"`
+		Label       string              `json:"label,omitempty"`
+		Description string              `json:"description,omitempty"`
+		Default     string              `json:"default,omitempty"`
+		Preset      bool                `json:"preset,omitempty"`
+		Select      []TemplateEnvSelect `json:"select,omitempty"`
+	}
+
+	// TemplateVolume represents a template volume configuration.
+	TemplateVolume struct {
+		Container string `json:"container"`
+		Bind      string `json:"bind,omitempty"`
+		ReadOnly  bool   `json:"readonly,omitempty"`
+	}
+
+	// TemplateRepository represents the git repository configuration for a template.
+	TemplateRepository struct {
+		URL       string `json:"url"`
+		StackFile string `json:"stackfile"`
+	}
+
+	// TemplateEnvSelect represents text/value pair that will be displayed as a choice for the
+	// template user.
+	TemplateEnvSelect struct {
+		Text    string `json:"text"`
+		Value   string `json:"value"`
+		Default bool   `json:"default"`
+	}
+
 	// ResourceAccessLevel represents the level of control associated to a resource.
 	ResourceAccessLevel int
 
@@ -411,6 +485,15 @@ type (
 		DeleteTag(ID TagID) error
 	}
 
+	// TemplateService represents a service for managing template data.
+	TemplateService interface {
+		Templates() ([]Template, error)
+		Template(ID TemplateID) (*Template, error)
+		CreateTemplate(template *Template) error
+		UpdateTemplate(ID TemplateID, template *Template) error
+		DeleteTemplate(ID TemplateID) error
+	}
+
 	// CryptoService represents a service for encrypting/hashing data.
 	CryptoService interface {
 		Hash(data string) (string, error)
@@ -434,7 +517,7 @@ type (
 
 	// FileService represents a service for managing files.
 	FileService interface {
-		GetFileContent(filePath string) (string, error)
+		GetFileContent(filePath string) ([]byte, error)
 		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
 		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)
@@ -487,8 +570,6 @@ const (
 	APIVersion = "1.18.2-dev"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 12
-	// DefaultTemplatesURL represents the default URL for the templates definitions.
-	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name.
@@ -581,4 +662,14 @@ const (
 	DockerSwarmStack
 	// DockerComposeStack represents a stack managed via docker-compose
 	DockerComposeStack
+)
+
+const (
+	_ TemplateType = iota
+	// ContainerTemplate represents a container template
+	ContainerTemplate
+	// SwarmStackTemplate represents a template used to deploy a Swarm stack
+	SwarmStackTemplate
+	// ComposeStackTemplate represents a template used to deploy a Compose stack
+	ComposeStackTemplate
 )

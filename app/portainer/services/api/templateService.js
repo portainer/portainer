@@ -1,43 +1,64 @@
 angular.module('portainer.app')
-.factory('TemplateService', ['$q', 'Template', 'TemplateHelper', 'ImageHelper', 'ContainerHelper', function TemplateServiceFactory($q, Template, TemplateHelper, ImageHelper, ContainerHelper) {
+.factory('TemplateService', ['$q', 'Templates', 'TemplateHelper', 'ImageHelper', 'ContainerHelper',
+function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, ContainerHelper) {
   'use strict';
   var service = {};
 
-  service.getTemplates = function(key) {
+  service.templates = function() {
     var deferred = $q.defer();
-    Template.get({key: key}).$promise
+
+    Templates.query().$promise
     .then(function success(data) {
-      var templates = data.map(function (tpl, idx) {
-        var template;
-        if (tpl.type === 'stack') {
-          template = new StackTemplateViewModel(tpl);
-        } else if (tpl.type === 'container' && key === 'linuxserver.io') {
-          template = new TemplateLSIOViewModel(tpl);
-        } else {
-          template = new TemplateViewModel(tpl);
-        }
-        template.index = idx;
-        return template;
+      var templates = data.map(function (item) {
+        return new TemplateViewModel(item);
       });
-      if (key === 'linuxserver.io') {
-        templates = TemplateHelper.filterLinuxServerIOTemplates(templates);
-      }
       deferred.resolve(templates);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to retrieve templates', err: err });
     });
+
     return deferred.promise;
   };
 
-  service.createTemplateConfiguration = function(template, containerName, network, containerMapping) {
+  service.template = function(id) {
+    var deferred = $q.defer();
+
+    Templates.get({ id: id }).$promise
+    .then(function success(data) {
+      var template = new TemplateViewModel(data);
+      deferred.resolve(template);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve template details', err: err });
+    });
+
+
+    return deferred.promise;
+  };
+
+  service.delete = function(id) {
+    return Templates.remove({ id: id }).$promise;
+  };
+
+  service.create = function(model) {
+    var payload = new TemplateCreateRequest(model);
+    return Templates.create(payload).$promise;
+  };
+
+  service.update = function(model) {
+    var payload = new TemplateUpdateRequest(model);
+    return Templates.update(payload).$promise;
+  };
+
+  service.createTemplateConfiguration = function(template, containerName, network) {
     var imageConfiguration = ImageHelper.createImageConfigForContainer(template.Image, template.Registry);
-    var containerConfiguration = service.createContainerConfiguration(template, containerName, network, containerMapping);
+    var containerConfiguration = service.createContainerConfiguration(template, containerName, network);
     containerConfiguration.Image = imageConfiguration.fromImage + ':' + imageConfiguration.tag;
     return containerConfiguration;
   };
 
-  service.createContainerConfiguration = function(template, containerName, network, containerMapping) {
+  service.createContainerConfiguration = function(template, containerName, network) {
     var configuration = TemplateHelper.getDefaultContainerConfiguration();
     configuration.HostConfig.NetworkMode = network.Name;
     configuration.HostConfig.Privileged = template.Privileged;
@@ -46,7 +67,7 @@ angular.module('portainer.app')
     configuration.name = containerName;
     configuration.Hostname = template.Hostname;
     configuration.Image = template.Image;
-    configuration.Env = TemplateHelper.EnvToStringArray(template.Env, containerMapping);
+    configuration.Env = TemplateHelper.EnvToStringArray(template.Env);
     configuration.Cmd = ContainerHelper.commandStringToArray(template.Command);
     var portConfiguration = TemplateHelper.portArrayToPortConfiguration(template.Ports);
     configuration.HostConfig.PortBindings = portConfiguration.bindings;
@@ -63,7 +84,7 @@ angular.module('portainer.app')
     TemplateHelper.createVolumeBindings(volumes, generatedVolumesPile);
     volumes.forEach(function (volume) {
       if (volume.binding) {
-        configuration.Volumes[volume.containerPath] = {};
+        configuration.Volumes[volume.container] = {};
         configuration.HostConfig.Binds.push(volume.binding);
       }
     });

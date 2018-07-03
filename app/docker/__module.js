@@ -361,36 +361,6 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
-  var templates = {
-    name: 'docker.templates',
-    url: '/templates',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/templates/templates.html',
-        controller: 'TemplatesController'
-      }
-    },
-    params: {
-      key: 'containers',
-      hide_descriptions: false
-    }
-  };
-
-  var templatesLinuxServer = {
-    name: 'docker.templates.linuxserver',
-    url: '/linuxserver',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/templates/templates.html',
-        controller: 'TemplatesController'
-      }
-    },
-    params: {
-      key: 'linuxserver.io',
-      hide_descriptions: true
-    }
-  };
-
   var volumes = {
     name: 'docker.volumes',
     url: '/volumes',
@@ -458,8 +428,6 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(tasks);
   $stateRegistryProvider.register(task);
   $stateRegistryProvider.register(taskLogs);
-  $stateRegistryProvider.register(templates);
-  $stateRegistryProvider.register(templatesLinuxServer);
   $stateRegistryProvider.register(volumes);
   $stateRegistryProvider.register(volume);
   $stateRegistryProvider.register(volumeCreation);

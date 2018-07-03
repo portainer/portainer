@@ -1,6 +1,7 @@
 package main // import "github.com/portainer/portainer"
 
 import (
+	"encoding/json"
 	"strings"
 
 	"github.com/portainer/portainer"
@@ -143,9 +144,8 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 	_, err := settingsService.Settings()
 	if err == portainer.ErrObjectNotFound {
 		settings := &portainer.Settings{
-			LogoURL:                     *flags.Logo,
-			DisplayExternalContributors: false,
-			AuthenticationMethod:        portainer.AuthenticationInternal,
+			LogoURL:              *flags.Logo,
+			AuthenticationMethod: portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
 				TLSConfig: portainer.TLSConfiguration{},
 				SearchSettings: []portainer.LDAPSearchSettings{
@@ -154,12 +154,6 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			},
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,
-		}
-
-		if *flags.Templates != "" {
-			settings.TemplatesURL = *flags.Templates
-		} else {
-			settings.TemplatesURL = portainer.DefaultTemplatesURL
 		}
 
 		if *flags.Labels != nil {
@@ -173,6 +167,58 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		return err
 	}
 
+	return nil
+}
+
+func initTemplates(templateService portainer.TemplateService, fileService portainer.FileService, templateURL, templateFile string) error {
+
+	existingTemplates, err := templateService.Templates()
+	if err != nil {
+		return err
+	}
+
+	if len(existingTemplates) != 0 {
+		log.Printf("Templates already registered inside the database. Skipping template import.")
+		return nil
+	}
+
+	var templatesJSON []byte
+	if templateURL == "" {
+		return loadTemplatesFromFile(fileService, templateService, templateFile)
+	}
+
+	templatesJSON, err = client.Get(templateURL)
+	if err != nil {
+		log.Println("Unable to retrieve templates via HTTP")
+		return err
+	}
+
+	return unmarshalAndPersistTemplates(templateService, templatesJSON)
+}
+
+func loadTemplatesFromFile(fileService portainer.FileService, templateService portainer.TemplateService, templateFile string) error {
+	templatesJSON, err := fileService.GetFileContent(templateFile)
+	if err != nil {
+		log.Println("Unable to retrieve template via filesystem")
+		return err
+	}
+	return unmarshalAndPersistTemplates(templateService, templatesJSON)
+}
+
+func unmarshalAndPersistTemplates(templateService portainer.TemplateService, templateData []byte) error {
+	var templates []portainer.Template
+	err := json.Unmarshal(templateData, &templates)
+	if err != nil {
+		log.Println("Unable to parse templates file. Please review your template definition file.")
+		return err
+	}
+
+	for _, template := range templates {
+		err := templateService.CreateTemplate(&template)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -334,6 +380,11 @@ func main() {
 
 	composeStackManager := initComposeStackManager(*flags.Data)
 
+	err = initTemplates(store.TemplateService, fileService, *flags.Templates, *flags.TemplateFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = initSettings(store.SettingsService, flags)
 	if err != nil {
 		log.Fatal(err)
@@ -357,7 +408,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		adminPasswordHash, err = cryptoService.Hash(content)
+		adminPasswordHash, err = cryptoService.Hash(string(content))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -404,6 +455,7 @@ func main() {
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
 		TagService:             store.TagService,
+		TemplateService:        store.TemplateService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
 		CryptoService:          cryptoService,
