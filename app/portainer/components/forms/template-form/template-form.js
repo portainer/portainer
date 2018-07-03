@@ -33,7 +33,7 @@ angular.module('portainer.app').component('templateForm', {
     };
 
     this.addEnvVar = function() {
-      this.model.Env.push({ name: '', label: '', description: '', set: '', setVal: false, freeVal: true, select: [] });
+      this.model.Env.push({ type: 1, name: '', label: '', description: '', default: '', preset: true, select: [] });
     };
 
     this.removeEnvVar = function(index) {
@@ -46,6 +46,14 @@ angular.module('portainer.app').component('templateForm', {
 
     this.removeEnvVarValue = function(env, index) {
       env.select.splice(index, 1);
+    };
+
+    this.changeEnvVarType = function(env) {
+      if (env.type === 1) {
+        env.preset = true;
+      } else if (env.type === 2) {
+        env.preset = false;
+      }
     };
   },
   bindings: {

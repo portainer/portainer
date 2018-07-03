@@ -439,83 +439,109 @@
       <!-- env-var-list -->
       <div style="margin-top: 10px;">
         <div class="col-sm-12 template-envvar" ng-repeat="var in $ctrl.model.Env" style="margin-top: 10px;">
-          <label class="col-sm-2 control-label text-left">
-            Name
-          </label>
-          <div class="col-sm-8">
-            <input type="text" class="form-control" ng-model="var.name" placeholder="env_var">
+          <div class="form-group"></div>
+          <div class="form-group" style="margin-bottom: 0">
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="preset_var_{{$index}}" ng-model="var.type" ng-value="1" ng-change="$ctrl.changeEnvVarType(var)">
+                <label for="preset_var_{{$index}}">
+                  <div class="boxselector_header">
+                    <i class="fa fa-user-slash" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Preset
+                  </div>
+                  <p>Preset variable</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="text_var_{{$index}}" ng-model="var.type" ng-value="2" ng-change="$ctrl.changeEnvVarType(var)">
+                <label for="text_var_{{$index}}">
+                  <div class="boxselector_header">
+                    <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Text
+                  </div>
+                  <p>Free text value</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="select_var_{{$index}}" ng-model="var.type" ng-value="3">
+                <label for="select_var_{{$index}}">
+                  <div class="boxselector_header">
+                    <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Select
+                  </div>
+                  <p>Choose value from list</p>
+                </label>
+              </div>
+            </div>
           </div>
-          <div class="col-sm-2">
-            <button class="btn btn-sm btn-danger space-left" type="button" ng-click="$ctrl.removeEnvVar($index)">
-              <i class="fa fa-trash" aria-hidden="true"></i>
-            </button>
-          </div>
-          <div class="col-sm-12">
-            <label for="tls" class="control-label text-left">
-              Use default
-              <portainer-tooltip position="bottom" message="Set a default value for this variable or allows the user to enter a custom value when disabled."></portainer-tooltip>
-            </label>
-            <label class="switch" style="margin-left: 20px;">
-              <input type="checkbox" ng-model="var.setVal"><i></i>
-            </label>
-          </div>
-          <div ng-if="!var.setVal">
+          <div class="form-group">
             <label class="col-sm-2 control-label text-left">
-              Label
+              Name
+            </label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" ng-model="var.name" placeholder="env_var">
+            </div>
+            <div class="col-sm-2">
+              <button class="btn btn-sm btn-danger space-left" type="button" ng-click="$ctrl.removeEnvVar($index)">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div ng-if="var.type == 2 || var.type == 3">
+            <div  class="form-group">
+              <label class="col-sm-2 control-label text-left">
+                Label
+              </label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="var.label" placeholder="Choose a label">
+              </div>
+            </div>
+            <div  class="form-group">
+              <label class="col-sm-2 control-label text-left" style="margin-top: 2px;">
+                Description
+              </label>
+              <div class="col-sm-10" style="margin-top: 2px;">
+                <input type="text" class="form-control" ng-model="var.description" placeholder="Tooltip">
+              </div>
+            </div>
+          </div>
+          <div class="form-group" ng-if="var.type === 1 || var.type === 2">
+            <label class="col-sm-2 control-label text-left">
+              Default value
             </label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" ng-model="var.label" placeholder="Choose a label">
+              <input type="text" class="form-control" ng-model="var.default" placeholder="default_value">
             </div>
-            <label class="col-sm-2 control-label text-left" style="margin-top: 2px;">
-              Description
-            </label>
-            <div class="col-sm-10" style="margin-top: 2px;">
-              <input type="text" class="form-control" ng-model="var.description" placeholder="Tooltip">
+          </div>
+          <div ng-if="var.type === 3" style="margin-bottom: 5px;" class="form-group">
+            <div class="col-sm-12" style="margin-top: 5px;">
+              <label class="control-label text-left">Values</label>
+              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addEnvVarValue(var)">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> add allowed value
+              </span>
             </div>
+            <!-- envvar-values-list -->
             <div class="col-sm-12">
-              <label for="tls" class="control-label text-left">
-                Allow free value
-                <portainer-tooltip position="bottom" message="Allow the user to enter any value or select a value from a pre-defined list if disabled."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="var.freeVal"><i></i>
-              </label>
-            </div>
-            <div ng-if="!var.freeVal" style="margin-bottom: 5px;">
-              <div class="col-sm-12" style="margin-top: 5px;">
-                <label class="control-label text-left">Values</label>
-                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addEnvVarValue(var)">
-                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add allowed value
-                </span>
-              </div>
-              <!-- envvar-values-list -->
-              <div class="col-sm-12">
-                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                  <div ng-repeat="val in var.select" style="margin-top: 2px;">
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">name</span>
-                      <input type="text" class="form-control" ng-model="val.name" placeholder="Yes, I agree">
-                    </div>
-                    <div class="input-group col-sm-5 input-group-sm">
-                      <span class="input-group-addon">value</span>
-                      <input type="text" class="form-control" ng-model="val.value" placeholder="Y">
-                    </div>
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                <div ng-repeat="val in var.select" style="margin-top: 2px;">
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">name</span>
+                    <input type="text" class="form-control" ng-model="val.text" placeholder="Yes, I agree">
+                  </div>
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">value</span>
+                    <input type="text" class="form-control" ng-model="val.value" placeholder="Y">
+                  </div>
+                  <div class="input-group col-sm-1 input-group-sm">
                     <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeEnvVarValue(var, $index)">
                       <i class="fa fa-trash" aria-hidden="true"></i>
                     </button>
+                    <input style="margin-left: 5px;" type="checkbox" ng-model="val.default" id="val_default_{{$index}}"><label for="val_default_{{$index}}" class="space-left">Default</label>
                   </div>
                 </div>
               </div>
-              <!-- envvar-values-list -->
             </div>
-          </div>
-          <div ng-if="var.setVal">
-            <label class="col-sm-2 control-label text-left">
-              Value
-            </label>
-            <div class="col-sm-8">
-              <input type="text" class="form-control" ng-model="var.set" placeholder="default_value">
-            </div>
+            <!-- envvar-values-list -->
           </div>
           <div class="col-sm-12" ng-show="$ctrl.model.Env.length > 1">
             <div class="line-separator"></div>

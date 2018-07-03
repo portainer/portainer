@@ -287,8 +287,7 @@ type (
 	// Template represents an application template.
 	Template struct {
 		// Mandatory container/stack fields
-		ID TemplateID `json:"Id"`
-		// TODO: breaking change, must migrate type from string to integer
+		ID                TemplateID   `json:"Id"`
 		Type              TemplateType `json:"type"`
 		Title             string       `json:"title"`
 		Description       string       `json:"description"`
@@ -309,8 +308,6 @@ type (
 		Categories []string      `json:"categories,omitempty"`
 
 		// Optional container fields
-		// TODO: Do some testing to ensure that templates are still working
-		// with private registries
 		Registry      string           `json:"registry,omitempty"`
 		Command       string           `json:"command,omitempty"`
 		Network       string           `json:"network,omitempty"`
@@ -324,15 +321,13 @@ type (
 	}
 
 	// TemplateEnv represents a template environment variable configuration.
-	// TODO: breaking changes, the env structure of containers must be updated.
 	TemplateEnv struct {
-		Name        string `json:"name"`
-		Label       string `json:"label,omitempty"`
-		Description string `json:"description,omitempty"`
-		Set         string `json:"set,omitempty"`
-		// TODO: breaking changes, update docs and official templates,
-		// now using pair means that {text: '', value: ''} is replaced by {name:'', value: ''}
-		Select []Pair `json:"select,omitempty"`
+		Name        string              `json:"name"`
+		Label       string              `json:"label,omitempty"`
+		Description string              `json:"description,omitempty"`
+		Default     string              `json:"default,omitempty"`
+		Preset      bool                `json:"preset,omitempty"`
+		Select      []TemplateEnvSelect `json:"select,omitempty"`
 	}
 
 	// TemplateVolume represents a template volume configuration.
@@ -346,6 +341,14 @@ type (
 	TemplateRepository struct {
 		URL       string `json:"url"`
 		StackFile string `json:"stackfile"`
+	}
+
+	// TemplateEnvSelect represents text/value pair that will be displayed as a choice for the
+	// template user.
+	TemplateEnvSelect struct {
+		Text    string `json:"text"`
+		Value   string `json:"value"`
+		Default bool   `json:"default"`
 	}
 
 	// ResourceAccessLevel represents the level of control associated to a resource.

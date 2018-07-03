@@ -38,7 +38,8 @@ function TemplateCreateRequest(model) {
   for (var i = 0; i < model.Ports.length; i++) {
     var binding = model.Ports[i];
     if (binding.containerPort && binding.protocol) {
-      this.Ports.push(binding.containerPort + '/' + binding.protocol);
+      var port = binding.hostPort ? binding.hostPort + ':' + binding.containerPort + '/' + binding.protocol: binding.containerPort + '/' + binding.protocol;
+      this.Ports.push(port);
     }
   }
 
@@ -57,12 +58,10 @@ function TemplateViewModel(data) {
   this.Description = data.description;
   this.AdministratorOnly = data.AdministratorOnly;
   this.Name = data.name;
-  this.Env = data.env ? data.env : [];
   this.Note = data.note;
   this.Categories = data.categories ? data.categories : [];
   this.Platform = data.platform ? data.platform : '';
   this.Logo = data.logo;
-
   this.Repository = data.repository;
   this.Hostname = data.hostname;
   this.Registry = data.registry ? { URL: data.registry } : {};
@@ -74,9 +73,36 @@ function TemplateViewModel(data) {
   this.Interactive = data.interactive ? data.interactive : false;
   this.RestartPolicy = data.restart_policy ? data.restart_policy : 'always';
   this.Labels = data.labels ? data.labels : [];
-  this.Volumes = [];
+  this.Hosts = data.hosts ? data.hosts : [];
+  this.Env = templateEnv(data);
+  this.Volumes = templateVolumes(data);
+  this.Ports = templatePorts(data);
+}
+
+function templatePorts(data) {
+  var ports = [];
+
+  if (data.ports) {
+    ports = data.ports.map(function (p) {
+      var portAndProtocol = _.split(p, '/');
+      var hostAndContainerPort = _.split(portAndProtocol[0], ':');
+
+      return {
+        hostPort: hostAndContainerPort.length > 1 ? hostAndContainerPort[0] : undefined,
+        containerPort: hostAndContainerPort.length > 1 ? hostAndContainerPort[1] : hostAndContainerPort[0],
+        protocol: portAndProtocol[1]
+      };
+    });
+  }
+
+  return ports;
+}
+
+function templateVolumes(data) {
+  var volumes = [];
+
   if (data.volumes) {
-    this.Volumes = data.volumes.map(function (v) {
+    volumes = data.volumes.map(function (v) {
       return {
         container: v.container,
         readonly: v.readonly || false,
@@ -86,15 +112,34 @@ function TemplateViewModel(data) {
     });
   }
 
-  this.Ports = [];
-  if (data.ports) {
-    this.Ports = data.ports.map(function (p) {
-      var portAndProtocol = _.split(p, '/');
-      return {
-        containerPort: portAndProtocol[0],
-        protocol: portAndProtocol[1]
-      };
+  return volumes;
+}
+
+function templateEnv(data) {
+  var env = [];
+
+  if (data.env) {
+    env = data.env.map(function(envvar) {
+      envvar.type = 2;
+      envvar.value = envvar.default ? envvar.default : '';
+
+      if (envvar.preset) {
+        envvar.type = 1;
+      }
+
+      if (envvar.select) {
+        envvar.type = 3;
+        for (var i = 0; i < envvar.select.length; i++) {
+          var allowedValue = envvar.select[i];
+          if (allowedValue.default) {
+            envvar.value = allowedValue.value;
+            break;
+          }
+        }
+      }
+      return envvar;
     });
   }
-  this.Hosts = data.hosts ? data.hosts : [];
+
+  return env;
 }

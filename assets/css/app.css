@@ -755,7 +755,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .line-separator{
   border-bottom: 1px solid #777;
   width: 50%;
-  margin: 10px auto;
+  margin: 20px auto 10px auto;
 }
 
 /*bootbox override*/

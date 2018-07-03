@@ -39,7 +39,7 @@
           </div>
           <!-- !name-input -->
           <!-- env -->
-          <div ng-repeat="var in state.selectedTemplate.Env" ng-if="var.label && !var.set" class="form-group">
+          <div ng-repeat="var in state.selectedTemplate.Env" ng-if="!var.preset || var.select" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">
               {{ var.label }}
               <portainer-tooltip ng-if="var.description" position="bottom" message="{{ var.description }}"></portainer-tooltip>
@@ -48,7 +48,7 @@
               <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}">
               <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
                 <option selected disabled hidden value="">Select value</option>
-                <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.name }}</option>
+                <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.text }}</option>
               </select>
             </div>
           </div>
@@ -118,7 +118,7 @@
           </div>
           <!-- !network-input -->
           <!-- env -->
-          <div ng-repeat="var in state.selectedTemplate.Env" ng-if="var.label && !var.set" class="form-group">
+          <div ng-repeat="var in state.selectedTemplate.Env" ng-if="!var.preset || var.select" class="form-group">
             <label for="field_{{ $index }}" class="col-sm-2 control-label text-left">
               {{ var.label }}
               <portainer-tooltip ng-if="var.description" position="bottom" message="{{ var.description }}"></portainer-tooltip>
@@ -127,7 +127,7 @@
               <input type="text" class="form-control" ng-if="!var.select" ng-model="var.value" id="field_{{ $index }}">
               <select class="form-control" ng-if="var.select" ng-model="var.value" id="field_{{ $index }}">
                 <option selected disabled hidden value="">Select value</option>
-                <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.name }}</option>
+                <option ng-repeat="choice in var.select" value="{{ choice.value }}">{{ choice.text }}</option>
               </select>
             </div>
           </div>

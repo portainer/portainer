@@ -3837,7 +3837,7 @@ definitions:
         description: "A list of ports exposed by the container"
         items:
           type: "string"
-          example: "80/tcp"
+          example: "8080:80/tcp"
       labels:
         type: "array"
         description: "Container labels"
@@ -3933,7 +3933,7 @@ definitions:
         description: "A list of ports exposed by the container"
         items:
           type: "string"
-          example: "80/tcp"
+          example: "8080:80/tcp"
       labels:
         type: "array"
         description: "Container labels"
@@ -4033,7 +4033,7 @@ definitions:
         description: "A list of ports exposed by the container"
         items:
           type: "string"
-          example: "80/tcp"
+          example: "8080:80/tcp"
       labels:
         type: "array"
         description: "Container labels"
@@ -4085,15 +4085,34 @@ definitions:
         type: "string"
         example: "MySQL root account password"
         description: "Content of the tooltip that will be generated in the UI"
-      set:
+      default:
         type: "string"
-        example: "mypassword"
-        description: "Default value for this environment variable. If specified, will not generate any input for this variable in the UI"
+        example: "default_value"
+        description: "Default value that will be set for the variable"
+      preset:
+        type: "boolean"
+        example: true
+        description: "If set to true, will not generate any input for this variable in the UI"
       select:
         type: "array"
-        description: "A list of name/values that will be used to generate a dropdown in the UI"
+        description: "A list of name/value that will be used to generate a dropdown in the UI"
         items:
-          $ref: '#/definitions/Pair'
+          $ref: '#/definitions/TemplateEnvSelect'
+  TemplateEnvSelect:
+    type: "object"
+    properties:
+      text:
+        type: "string"
+        example: "text value"
+        description: "Some text that will displayed as a choice"
+      value:
+        type: "string"
+        example: "value"
+        description: "A value that will be associated to the choice"
+      default:
+        type: "boolean"
+        example: true
+        description: "Will set this choice as the default choice"
   TemplateRepository:
     type: "object"
     required:
