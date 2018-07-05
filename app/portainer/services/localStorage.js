@@ -77,6 +77,12 @@ angular.module('portainer.app')
     getSwarmVisualizerSettings: function(key) {
       return localStorageService.get('swarmvisualizer_' + key);
     },
+    storeColumnVisibilitySettings: function(key, data) {
+      localStorageService.set('col_visibility_' + key, data);
+    },
+    getColumnVisibilitySettings: function(key) {
+      return localStorageService.get('col_visibility_' + key);
+    },
     clean: function() {
       localStorageService.clearAll();
     }

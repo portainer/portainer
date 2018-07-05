@@ -34,6 +34,54 @@ function (PaginationService, DatatableService, EndpointProvider) {
     }
   };
 
+  this.columnVisibility = {
+    state: {
+      open: false
+    },
+    columns: {
+      state: {
+        label: 'State',
+        display: true
+      },
+      actions: {
+        label: 'Quick Actions',
+        display: true
+      },
+      stack: {
+        label: 'Stack',
+        display: true
+      },
+      image: {
+        label: 'Image',
+        display: true
+      },
+      created: {
+        label: 'Created',
+        display: true
+      },
+      ip: {
+        label: 'IP Address',
+        display: true
+      },
+      host: {
+        label: 'Host',
+        display: true
+      },
+      ports: {
+        label: 'Published Ports',
+        display: true
+      },
+      ownership: {
+        label: 'Ownership',
+        display: true
+      }
+    }
+  };
+
+  this.onColumnVisibilityChange = function()  {
+    DatatableService.setColumnVisibilitySettings(this.tableKey, this.columnVisibility);
+  };
+
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
@@ -181,6 +229,12 @@ function (PaginationService, DatatableService, EndpointProvider) {
       this.settings = storedSettings;
     }
     this.settings.open = false;
+
+    var storedColumnVisibility = DatatableService.getColumnVisibilitySettings(this.tableKey);
+    if (storedColumnVisibility !== null) {
+      this.columnVisibility = storedColumnVisibility;
+    }
+    this.columnVisibility.state.open = false;
   };
 
   function setDefaults(ctrl) {
