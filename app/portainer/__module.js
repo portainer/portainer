@@ -187,6 +187,17 @@ angular.module('portainer.app', [])
     }
   };
 
+  var home = {
+    name: 'portainer.home',
+    url: '/home',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/home/home.html',
+        controller: 'HomeController'
+      }
+    }
+  };
+
   var registries = {
     name: 'portainer.registries',
     url: '/registries',
@@ -404,6 +415,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(group);
   $stateRegistryProvider.register(groupAccess);
   $stateRegistryProvider.register(groupCreation);
+  $stateRegistryProvider.register(home);
   $stateRegistryProvider.register(registries);
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);

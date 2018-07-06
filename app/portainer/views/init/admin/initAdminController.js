@@ -30,20 +30,21 @@ function ($scope, $state, $sanitize, Notifications, Authentication, StateManager
       if (data.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
-        var endpoint = data[0];
-        endpointID = endpoint.Id;
-        EndpointProvider.setEndpointID(endpointID);
-        ExtensionManager.initEndpointExtensions(endpointID)
-        .then(function success(data) {
-          var extensions = data;
-          return StateManager.updateEndpointState(false, endpoint.Type, extensions);
-        })
-        .then(function success() {
-          $state.go('docker.dashboard');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to connect to Docker environment');
-        });
+        $state.go('portainer.home');
+        // var endpoint = data[0];
+        // endpointID = endpoint.Id;
+        // EndpointProvider.setEndpointID(endpointID);
+        // ExtensionManager.initEndpointExtensions(endpointID)
+        // .then(function success(data) {
+        //   var extensions = data;
+        //   return StateManager.updateEndpointState(false, endpoint.Type, extensions);
+        // })
+        // .then(function success() {
+        //   $state.go('portainer.home');
+        // })
+        // .catch(function error(err) {
+        //   Notifications.error('Failure', err, 'Unable to connect to Docker environment');
+        // });
       }
     })
     .catch(function error(err) {

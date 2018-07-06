@@ -25,12 +25,19 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     LocalStorage.storeApplicationState(state.application);
   };
 
+  manager.updateSnapshotInterval = function(interval) {
+    state.application.snapshotInterval = interval;
+    LocalStorage.storeApplicationState(state.application);
+  };
+
  function assignStateFromStatusAndSettings(status, settings) {
    state.application.authentication = status.Authentication;
    state.application.analytics = status.Analytics;
    state.application.endpointManagement = status.EndpointManagement;
+   state.application.snapshot = status.Snapshot;
    state.application.version = status.Version;
    state.application.logo = settings.LogoURL;
+   state.application.snapshotInterval = settings.SnapshotInterval;
    state.application.validity = moment().unix();
  }
 
@@ -110,6 +117,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     return extensions;
   }
 
+  // TODO: loading is not used anymore
   manager.updateEndpointState = function(loading, type, extensions) {
     var deferred = $q.defer();
 

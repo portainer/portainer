@@ -12,22 +12,20 @@ import (
 )
 
 type settingsUpdatePayload struct {
-	LogoURL                            string
+	LogoURL                            *string
 	BlackListedLabels                  []portainer.Pair
-	AuthenticationMethod               int
-	LDAPSettings                       portainer.LDAPSettings
-	AllowBindMountsForRegularUsers     bool
-	AllowPrivilegedModeForRegularUsers bool
+	AuthenticationMethod               *int
+	LDAPSettings                       *portainer.LDAPSettings
+	AllowBindMountsForRegularUsers     *bool
+	AllowPrivilegedModeForRegularUsers *bool
+	SnapshotInterval                   *string
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
-	if payload.AuthenticationMethod == 0 {
-		return portainer.Error("Invalid authentication method")
-	}
-	if payload.AuthenticationMethod != 1 && payload.AuthenticationMethod != 2 {
+	if *payload.AuthenticationMethod != 1 && *payload.AuthenticationMethod != 2 {
 		return portainer.Error("Invalid authentication method value. Value must be one of: 1 (internal) or 2 (LDAP/AD)")
 	}
-	if !govalidator.IsNull(payload.LogoURL) && !govalidator.IsURL(payload.LogoURL) {
+	if payload.LogoURL != nil && *payload.LogoURL != "" && !govalidator.IsURL(*payload.LogoURL) {
 		return portainer.Error("Invalid logo URL. Must correspond to a valid URL format")
 	}
 	return nil
@@ -41,15 +39,40 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	settings := &portainer.Settings{
-		LogoURL:                            payload.LogoURL,
-		BlackListedLabels:                  payload.BlackListedLabels,
-		LDAPSettings:                       payload.LDAPSettings,
-		AllowBindMountsForRegularUsers:     payload.AllowBindMountsForRegularUsers,
-		AllowPrivilegedModeForRegularUsers: payload.AllowPrivilegedModeForRegularUsers,
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
 	}
 
-	settings.AuthenticationMethod = portainer.AuthenticationMethod(payload.AuthenticationMethod)
+	if payload.AuthenticationMethod != nil {
+		settings.AuthenticationMethod = portainer.AuthenticationMethod(*payload.AuthenticationMethod)
+	}
+
+	if payload.LogoURL != nil {
+		settings.LogoURL = *payload.LogoURL
+	}
+
+	if payload.BlackListedLabels != nil {
+		settings.BlackListedLabels = payload.BlackListedLabels
+	}
+
+	if payload.LDAPSettings != nil {
+		settings.LDAPSettings = *payload.LDAPSettings
+	}
+
+	if payload.AllowBindMountsForRegularUsers != nil {
+		settings.AllowBindMountsForRegularUsers = *payload.AllowBindMountsForRegularUsers
+	}
+
+	if payload.AllowPrivilegedModeForRegularUsers != nil {
+		settings.AllowPrivilegedModeForRegularUsers = *payload.AllowPrivilegedModeForRegularUsers
+	}
+
+	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
+		settings.SnapshotInterval = *payload.SnapshotInterval
+		handler.JobScheduler.Update(settings.SnapshotInterval)
+	}
+
 	tlsError := handler.updateTLS(settings)
 	if tlsError != nil {
 		return tlsError

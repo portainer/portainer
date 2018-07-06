@@ -9,6 +9,14 @@
       <rd-widget-header icon="fa-cogs" title-text="Application settings"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
+          <!-- snapshot-interval -->
+          <div class="form-group">
+            <label for="snapshot_interval" class="col-sm-2 control-label text-left">Snapshot interval</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" ng-model="settings.SnapshotInterval" id="snapshot_interval" placeholder="e.g. 15m">
+            </div>
+          </div>
+          <!-- !snapshot-interval -->
           <!-- logo -->
           <div class="form-group">
             <div class="col-sm-12">

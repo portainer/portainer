@@ -48,6 +48,9 @@ function ($q, $scope, $state, EndpointService, GroupService, StateManager, Endpo
 
   function setActiveEndpoint(endpoints) {
     var activeEndpointID = EndpointProvider.endpointID();
+    if (!activeEndpointID) {
+      return;
+    }
 
     for (var i = 0; i < endpoints.length; i++) {
       var endpoint = endpoints[i];

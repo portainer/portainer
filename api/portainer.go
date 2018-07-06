@@ -31,12 +31,15 @@ type (
 		SSLCert           *string
 		SSLKey            *string
 		SyncInterval      *string
+		Snapshot          *bool
+		SnapshotInterval  *string
 	}
 
 	// Status represents the application status.
 	Status struct {
 		Authentication     bool   `json:"Authentication"`
 		EndpointManagement bool   `json:"EndpointManagement"`
+		Snapshot           bool   `json:"Snapshot"`
 		Analytics          bool   `json:"Analytics"`
 		Version            string `json:"Version"`
 	}
@@ -75,6 +78,8 @@ type (
 		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		SnapshotInterval                   string               `json:"SnapshotInterval"`
+
 		// Deprecated fields
 		DisplayDonationHeader       bool
 		DisplayExternalContributors bool
@@ -177,6 +182,9 @@ type (
 	// EndpointType represents the type of an endpoint.
 	EndpointType int
 
+	// EndpointStatus represents the status of an endpoint
+	EndpointStatus int
+
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
@@ -192,6 +200,10 @@ type (
 		Extensions       []EndpointExtension `json:"Extensions"`
 		AzureCredentials AzureCredentials    `json:"AzureCredentials,omitempty"`
 		Tags             []string            `json:"Tags"`
+		Status           EndpointStatus      `json:"Status"`
+		// TODO: determine if it's good to store Snapshots inside a slice here
+		// instead of persisting them in their own bucket (long-term vision)
+		Snapshots []Snapshot `json:"Snapshots"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -207,6 +219,17 @@ type (
 		ApplicationID     string `json:"ApplicationID"`
 		TenantID          string `json:"TenantID"`
 		AuthenticationKey string `json:"AuthenticationKey"`
+	}
+
+	// Snapshot represents a snapshot of a specific endpoint at a specific time
+	Snapshot struct {
+		Time              int64  `json:"Time"`
+		DockerVersion     string `json:"DockerVersion"`
+		Swarm             bool   `json:"Swarm"`
+		ContainersRunning int    `json:"ContainersRunning"`
+		ContainersStopped int    `json:"ContainersStopped"`
+		TotalCPU          int    `json:"TotalCPU"`
+		TotalMemory       int64  `json:"TotalMemory"`
 	}
 
 	// EndpointGroupID represents an endpoint group identifier.
@@ -539,9 +562,17 @@ type (
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, destination, username, password string) error
 	}
 
-	// EndpointWatcher represents a service to synchronize the endpoints via an external source.
-	EndpointWatcher interface {
-		WatchEndpointFile(endpointFilePath string) error
+	// JobScheduler represents a service to run jobs on a periodic basis.
+	JobScheduler interface {
+		ScheduleEndpointSyncJob(endpointFilePath, interval string) error
+		ScheduleSnapshotJob(interval string) error
+		Start()
+		Update(interval string)
+	}
+
+	// Snapshotter represents a service used to create endpoint snapshots.
+	Snapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD.
@@ -581,6 +612,8 @@ const (
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
+	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer.
+	SupportedDockerAPIVersion = "1.24"
 )
 
 const (
@@ -672,4 +705,12 @@ const (
 	SwarmStackTemplate
 	// ComposeStackTemplate represents a template used to deploy a Compose stack
 	ComposeStackTemplate
+)
+
+const (
+	_ EndpointStatus = iota
+	// EndpointStatusUp is used to represent an available endpoint
+	EndpointStatusUp
+	// EndpointStatusDown is used to represent an unavailable endpoint
+	EndpointStatusDown
 )

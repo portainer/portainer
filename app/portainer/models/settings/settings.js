@@ -5,4 +5,5 @@ function SettingsViewModel(data) {
   this.LDAPSettings = data.LDAPSettings;
   this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
   this.AllowPrivilegedModeForRegularUsers = data.AllowPrivilegedModeForRegularUsers;
+  this.SnapshotInterval = data.SnapshotInterval;
 }

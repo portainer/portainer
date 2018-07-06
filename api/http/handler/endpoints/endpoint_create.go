@@ -177,6 +177,8 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		Extensions:       []portainer.EndpointExtension{},
 		AzureCredentials: credentials,
 		Tags:             payload.Tags,
+		Status:           portainer.EndpointStatusUp,
+		Snapshots:        []portainer.Snapshot{},
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
@@ -213,6 +215,8 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
 		Tags:            payload.Tags,
+		Status:          portainer.EndpointStatusUp,
+		Snapshots:       []portainer.Snapshot{},
 	}
 
 	err := handler.EndpointService.CreateEndpoint(endpoint)
@@ -253,6 +257,8 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
 		Tags:            payload.Tags,
+		Status:          portainer.EndpointStatusUp,
+		Snapshots:       []portainer.Snapshot{},
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
