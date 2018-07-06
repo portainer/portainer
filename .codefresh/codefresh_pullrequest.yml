@@ -18,7 +18,7 @@ steps:
       - mv api/cmd/portainer/portainer dist/
 
   get_docker_version:
-    image: alpine
+    image: alpine:3.7
     working_directory: ${{build_frontend}}
     commands:
       - cf_export DOCKER_VERSION=`cat gruntfile.js | grep -m 1 'shippedDockerVersion' | cut -d\' -f2`
