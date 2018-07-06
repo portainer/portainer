@@ -17,5 +17,5 @@ const (
 	defaultSyncInterval     = "60s"
 	defaultSnapshot         = "true"
 	defaultSnapshotInterval = "15m"
-	defaultTemplateFile     = "C:\\templates.json"
+	defaultTemplateFile     = "/templates.json"
 )
