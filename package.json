@@ -23,7 +23,7 @@
     "node": ">= 0.8.4"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free-webfonts": "^1.0.4",
+    "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
     "@uirouter/angularjs": "~1.0.6",
     "angular": "~1.5.0",
     "angular-clipboard": "^1.6.2",

@@ -70,7 +70,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
 		settings.SnapshotInterval = *payload.SnapshotInterval
-		handler.JobScheduler.Update(settings.SnapshotInterval)
+		handler.JobScheduler.UpdateSnapshotJob(settings.SnapshotInterval)
 	}
 
 	tlsError := handler.updateTLS(settings)

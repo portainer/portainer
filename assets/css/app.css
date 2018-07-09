@@ -311,6 +311,13 @@ ul.sidebar .sidebar-title {
   height: auto;
 }
 
+ul.sidebar .sidebar-title.home {
+  color: #fff;
+  text-align: center;
+  text-indent: 0;
+  font-size: 14px;
+}
+
 ul.sidebar .sidebar-title .endpoint-name {
   color: #fff;
 }

@@ -4,7 +4,7 @@
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content>Landing</rd-header-content>
+  <rd-header-content>Endpoints</rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -25,7 +25,8 @@
         <div class="form-group" ng-if="isAdmin && applicationState.application.snapshot">
           <span class="small">
             <p class="text-muted">
-              Endpoint snapshot is enabled. A snapshot of each endpoint will be triggered every <code>{{ applicationState.application.snapshotInterval }}</code>.
+              Endpoint snapshot is enabled, a snapshot of each endpoint will be triggered every <code>{{ applicationState.application.snapshotInterval }}</code>.
+              The snapshot frequency can be updated in the <a ui-sref="portainer.settings"><i class="fa fa-cogs" aria-hidden="true"></i> settings</a>.
             </p>
           </span>
         </div>
@@ -44,11 +45,11 @@
 
 <div class="row" ng-if="endpoints">
   <div class="col-sm-12">
-    <home-endpoints-datatable
+    <endpoints-snapshot-datatable
     title-text="Endpoints" title-icon="fa-plug"
     dataset="endpoints" table-key="endpoints"
     order-by="Name" show-text-filter="true"
     dashboard-action="goToDashboard"
-    ></home-endpoints-datatable>
+    ></endpoints-snapshot-datatable>
   </div>
 </div>

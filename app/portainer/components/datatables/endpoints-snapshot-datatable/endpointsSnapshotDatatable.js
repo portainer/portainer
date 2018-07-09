@@ -1,5 +1,5 @@
-angular.module('portainer.app').component('homeEndpointsDatatable', {
-  templateUrl: 'app/portainer/components/datatables/home-endpoints-datatable/homeEndpointsDatatable.html',
+angular.module('portainer.app').component('endpointsSnapshotDatatable', {
+  templateUrl: 'app/portainer/components/datatables/endpoints-snapshot-datatable/endpointsSnapshotDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',

@@ -223,13 +223,17 @@ type (
 
 	// Snapshot represents a snapshot of a specific endpoint at a specific time
 	Snapshot struct {
-		Time              int64  `json:"Time"`
-		DockerVersion     string `json:"DockerVersion"`
-		Swarm             bool   `json:"Swarm"`
-		ContainersRunning int    `json:"ContainersRunning"`
-		ContainersStopped int    `json:"ContainersStopped"`
-		TotalCPU          int    `json:"TotalCPU"`
-		TotalMemory       int64  `json:"TotalMemory"`
+		Time                  int64  `json:"Time"`
+		DockerVersion         string `json:"DockerVersion"`
+		Swarm                 bool   `json:"Swarm"`
+		TotalCPU              int    `json:"TotalCPU"`
+		TotalMemory           int64  `json:"TotalMemory"`
+		RunningContainerCount int    `json:"RunningContainerCount"`
+		StoppedContainerCount int    `json:"StoppedContainerCount"`
+		VolumeCount           int    `json:"VolumeCount"`
+		ImageCount            int    `json:"ImageCount"`
+		ServiceCount          int    `json:"ServiceCount"`
+		StackCount            int    `json:"StackCount"`
 	}
 
 	// EndpointGroupID represents an endpoint group identifier.
@@ -566,8 +570,8 @@ type (
 	JobScheduler interface {
 		ScheduleEndpointSyncJob(endpointFilePath, interval string) error
 		ScheduleSnapshotJob(interval string) error
+		UpdateSnapshotJob(interval string)
 		Start()
-		Update(interval string)
 	}
 
 	// Snapshotter represents a service used to create endpoint snapshots.

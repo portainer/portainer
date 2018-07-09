@@ -10,20 +10,21 @@ import (
 
 // JobScheduler represents a service for managing crons.
 type JobScheduler struct {
-	cron            *cron.Cron
-	endpointService portainer.EndpointService
-	snapshotter     *docker.Snapshotter
+	cron             *cron.Cron
+	endpointService  portainer.EndpointService
+	signatureService portainer.DigitalSignatureService
+	snapshotter      *docker.Snapshotter
 
 	endpointFilePath     string
 	endpointSyncInterval string
 }
 
 // NewJobScheduler initializes a new service.
-func NewJobScheduler(endpointService portainer.EndpointService) *JobScheduler {
+func NewJobScheduler(endpointService portainer.EndpointService, signatureService portainer.DigitalSignatureService) *JobScheduler {
 	return &JobScheduler{
 		cron:            cron.New(),
 		endpointService: endpointService,
-		snapshotter:     &docker.Snapshotter{},
+		snapshotter:     docker.NewSnapshotter(signatureService),
 	}
 }
 
@@ -49,9 +50,8 @@ func (scheduler *JobScheduler) ScheduleSnapshotJob(interval string) error {
 	return scheduler.cron.AddJob("@every "+interval, job)
 }
 
-// TODO: rename the function
-// Update will update the schedules to match the new snapshot interval
-func (scheduler *JobScheduler) Update(snapshotInterval string) {
+// UpdateSnapshotJob will update the schedules to match the new snapshot interval
+func (scheduler *JobScheduler) UpdateSnapshotJob(interval string) {
 	// TODO: the cron library do not support removing/updating schedules.
 	// As a work-around we need to re-create the cron and reschedule the jobs.
 	// We should update the library.
@@ -63,7 +63,7 @@ func (scheduler *JobScheduler) Update(snapshotInterval string) {
 	for _, job := range jobs {
 		switch job.Job.(type) {
 		case endpointSnapshotJob:
-			scheduler.ScheduleSnapshotJob(snapshotInterval)
+			scheduler.ScheduleSnapshotJob(interval)
 		case endpointSyncJob:
 			scheduler.ScheduleEndpointSyncJob(scheduler.endpointFilePath, scheduler.endpointSyncInterval)
 		default:

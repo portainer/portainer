@@ -1,0 +1,22 @@
+<span style="border-top: 2px solid #e2e2e2; padding: 8px;">
+  <span>
+    <i class="fa fa-th-list space-right" aria-hidden="true"></i>{{ $ctrl.snapshot.StackCount }} stacks
+  </span>
+  <span style="margin-left: 25px;" ng-if="$ctrl.snapshot.Swarm">
+    <i class="fa fa-list-alt space-right" aria-hidden="true"></i>{{ $ctrl.snapshot.ServiceCount }} services
+  </span>
+  <span style="margin-left: 25px;">
+    <i class="fa fa-server space-right" aria-hidden="true"></i>{{ $ctrl.snapshot.RunningContainerCount + $ctrl.snapshot.StoppedContainerCount }} containers
+    <span ng-if="$ctrl.snapshot.RunningContainerCount > 0 || $ctrl.snapshot.StoppedContainerCount > 0">
+      -
+      <i class="fa fa-heartbeat green-icon" aria-hidden="true"></i> {{ $ctrl.snapshot.RunningContainerCount }}
+      <i class="fa fa-heartbeat red-icon" aria-hidden="true"></i> {{ $ctrl.snapshot.StoppedContainerCount }}
+    </span>
+  </span>
+  <span style="margin-left: 25px;">
+    <i class="fa fa-cubes space-right" aria-hidden="true"></i>{{ $ctrl.snapshot.VolumeCount }} volumes
+  </span>
+  <span style="margin-left: 25px;">
+    <i class="fa fa-clone space-right" aria-hidden="true"></i>{{ $ctrl.snapshot.ImageCount }} images
+  </span>
+</span>

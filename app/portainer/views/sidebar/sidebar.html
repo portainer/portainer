@@ -9,12 +9,12 @@
   </div>
   <div class="sidebar-content">
   <ul class="sidebar">
-    <sidebar-endpoint-selector ng-if="endpoints && groups"
-      endpoints="endpoints"
-      groups="groups"
-      select-endpoint="switchEndpoint"
-    ></sidebar-endpoint-selector>
-    <li class="sidebar-title" ng-if="activeEndpoint"><span class="endpoint-name">{{ activeEndpoint.Name }}</span></li>
+    <li class="sidebar-title home">
+      <a ui-sref="portainer.home" ui-sref-active="active">
+        <i class="fa fa-home" aria-hidden="true"></i> Home
+      </a>
+    </li>
+    <li class="sidebar-title" ng-if="applicationState.endpoint.name"><span class="endpoint-name">{{ applicationState.endpoint.name }}</span></li>
     <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'">
     </azure-sidebar-content>
     <docker-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider !== 'AZURE'"
@@ -22,9 +22,6 @@
       swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
       standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'"
       admin-access="!applicationState.application.authentication || isAdmin"
-      external-contributions="displayExternalContributors"
-      sidebar-toggled-on="toggle"
-      current-state="$state.current.name"
     ></docker-sidebar-content>
     <li class="sidebar-title" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0">
       <span>Extensions</span>
@@ -39,10 +36,10 @@
       </div>
     </li>
     <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin || isTeamLeader">
-      <span>Portainer settings</span>
+      <span>Settings</span>
     </li>
     <li class="sidebar-list" ng-if="applicationState.application.authentication && (isAdmin || isTeamLeader)">
-      <a ui-sref="portainer.users" ui-sref-active="active">User management <span class="menu-icon fa fa-users fa-fw"></span></a>
+      <a ui-sref="portainer.users" ui-sref-active="active">Users <span class="menu-icon fa fa-users fa-fw"></span></a>
       <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.users' || $state.current.name === 'portainer.users.user' || $state.current.name === 'portainer.teams' || $state.current.name === 'portainer.teams.team')">
         <a ui-sref="portainer.teams" ui-sref-active="active">Teams</a>
       </div>

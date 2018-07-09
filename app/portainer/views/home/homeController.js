@@ -2,7 +2,6 @@ angular.module('portainer.app')
 .controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager',
 function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager) {
 
-  // TODO: these 3 functions looks like a dup of sidebarcontroller functions
   $scope.goToDashboard = function(endpoint) {
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
@@ -14,7 +13,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
   };
 
   function switchToAzureEndpoint(endpoint) {
-    StateManager.updateEndpointState(false, endpoint.Type, [])
+    StateManager.updateEndpointState(endpoint.Name, endpoint.Type, [])
     .then(function success() {
       $state.go('azure.dashboard');
     })
@@ -27,7 +26,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
     ExtensionManager.initEndpointExtensions(endpoint.Id)
     .then(function success(data) {
       var extensions = data;
-      return StateManager.updateEndpointState(false, endpoint.Type, extensions);
+      return StateManager.updateEndpointState(endpoint.Name, endpoint.Type, extensions);
     })
     .then(function success() {
       $state.go('docker.dashboard');

@@ -16,7 +16,7 @@
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table">
           <thead>
             <tr>
               <th>
@@ -27,31 +27,10 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Type')">
-                  Type
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('URL')">
-                  URL
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
                 <a ng-click="$ctrl.changeOrderBy('GroupName')">
                   Group
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'GroupName' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'GroupName' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Snapshots[0].Time')">
-                  Last snapshot
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Snapshots[0].Time' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Snapshots[0].Time' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -61,60 +40,61 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Type')">
+                  Type
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Snapshots[0].Time')">
+                  Last snapshot
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Snapshots[0].Time' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Snapshots[0].Time' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
               <td>
-                <span><a ng-click="$ctrl.dashboardAction(item)">{{ item.Name }}</a></span>
+                <a ng-click="$ctrl.dashboardAction(item)"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> {{ item.Name }}</a>
+              </td>
+              <td>{{ item.GroupName }}</td>
+              <td>
+                <span class="label label-{{ item.Status|endpointstatusbadge }}">{{ item.Status === 1 ? 'up' : 'down' }}</span>
+                <span class="text-muted space-left" ng-if="item.Snapshots.length > 0">
+                  <i class="fa fa-memory" aria-hidden="true"></i> {{ item.Snapshots[0].TotalMemory | humansize }}
+                  <i class="fa fa-microchip" aria-hidden="true"></i> {{ item.Snapshots[0].TotalCPU }}
+              </span>
               </td>
               <td>
                 <span>
                   <i ng-class="item.Type | endpointtypeicon" aria-hidden="true" style="margin-right: 2px;"></i>
                   {{ item.Type | endpointtypename }}
+                  <span class="text-muted" ng-if="item.Snapshots.length > 0">- {{ item.Snapshots[0].Swarm ? 'Swarm' : 'Standalone' }} {{ item.Snapshots[0].DockerVersion }}</span>
                 </span>
               </td>
-              <td>{{ item.URL | stripprotocol }}</td>
-              <td>{{ item.GroupName }}</td>
               <td>
                 <span ng-if="item.Snapshots.length > 0">
                   {{ item.Snapshots[0].Time | getisodatefromtimestamp }}
-                  <a class="space-left" ng-click="item.showSnapshotDetails = !item.showSnapshotDetails"><i class="fa fa-info-circle" aria-hidden="true"></i> details</a>
                 </span>
                 <span ng-if="item.Snapshots.length === 0">-</span>
               </td>
-              <td>
-                <span class="label label-{{ item.Status|endpointstatusbadge }}">{{ item.Status === 1 ? 'up' : 'down' }}</span>
-              </td>
             </tr>
-            <tr dir-paginate-end ng-if="item.showSnapshotDetails">
-              <!-- TODO: create a component -->
-              <td colspan="6" style="border: 0">
-                <div class="small text-muted">
-                  <div>
-                    Engine version: {{ item.Snapshots[0].DockerVersion }}
-                  </div>
-                  <div>
-                    Swarm: <i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[item.Snapshots[0].Swarm]" aria-hidden="true"></i>
-                  </div>
-                  <div>
-                    Containers: {{ item.Snapshots[0].ContainersRunning + item.Snapshots[0].ContainersStopped }}
-                    <span ng-if="item.Snapshots[0].ContainersRunning > 0 || item.Snapshots[0].ContainersStopped > 0">({{ item.Snapshots[0].ContainersRunning }} running / {{ item.Snapshots[0].ContainersStopped }} stopped)</span>
-                  </div>
-                  <div>
-                    CPU: {{ item.Snapshots[0].TotalCPU }}
-                  </div>
-                  <div>
-                    Memory: {{ item.Snapshots[0].TotalMemory }}
-                  </div>
-                </div>
+            <tr dir-paginate-end class="text-muted" ng-if="item.Snapshots.length > 0">
+              <td colspan="5" style="border: 0; text-align:center;">
+                <snapshot-details
+                  snapshot="item.Snapshots[0]"
+                ></snapshot-details
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="6" class="text-center text-muted">Loading...</td>
+              <td colspan="5" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="6" class="text-center text-muted">No endpoint available.</td>
+              <td colspan="5" class="text-center text-muted">No endpoint available.</td>
             </tr>
           </tbody>
         </table>

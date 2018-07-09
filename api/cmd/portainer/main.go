@@ -101,8 +101,8 @@ func initGitService() portainer.GitService {
 	return &git.Service{}
 }
 
-func initJobScheduler(endpointService portainer.EndpointService) portainer.JobScheduler {
-	return cron.NewJobScheduler(endpointService)
+func initJobScheduler(endpointService portainer.EndpointService, signatureService portainer.DigitalSignatureService) portainer.JobScheduler {
+	return cron.NewJobScheduler(endpointService, signatureService)
 }
 
 func initStatus(endpointManagement, snapshot bool, flags *portainer.CLIFlags) *portainer.Status {
@@ -362,7 +362,7 @@ func main() {
 
 	gitService := initGitService()
 
-	jobScheduler := initJobScheduler(store.EndpointService)
+	jobScheduler := initJobScheduler(store.EndpointService, digitalSignatureService)
 
 	// TODO: refactor into a function
 	endpointManagement := true

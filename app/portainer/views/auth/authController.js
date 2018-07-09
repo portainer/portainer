@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$scope', '$state', '$transition$', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'UserService', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'SettingsService', 'ExtensionManager',
-function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentication, Users, UserService, EndpointService, StateManager, EndpointProvider, Notifications, SettingsService, ExtensionManager) {
+.controller('AuthenticationController', ['$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
+function ($scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -13,49 +13,9 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     AuthenticationError: ''
   };
 
-  // function redirectToDockerDashboard(endpoint) {
-  //   ExtensionManager.initEndpointExtensions(endpoint.Id)
-  //   .then(function success(data) {
-  //     var extensions = data;
-  //     return StateManager.updateEndpointState(true, endpoint.Type, extensions);
-  //   })
-  //   .then(function success(data) {
-  //     $state.go('portainer.home');
-  //   })
-  //   .catch(function error(err) {
-  //     Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
-  //   });
-  // }
-  //
-  // function redirectToAzureDashboard(endpoint) {
-  //   StateManager.updateEndpointState(false, endpoint.Type, [])
-  //   .then(function success(data) {
-  //     $state.go('portainer.home');
-  //   })
-  //   .catch(function error(err) {
-  //     Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
-  //   });
-  // }
-
-  // function redirectToDashboard(endpoint) {
-  //   EndpointProvider.setEndpointID(endpoint.Id);
-  //
-  //   if (endpoint.Type === 3) {
-  //     return redirectToAzureDashboard(endpoint);
-  //   }
-  //   redirectToDockerDashboard(endpoint);
-  // }
-
   function unauthenticatedFlow() {
     EndpointService.endpoints()
     .then(function success(data) {
-      // var endpoints = data;
-      // if (endpoints.length > 0)  {
-      //   redirectToDashboard(endpoints[0]);
-      // } else {
-      //   $state.go('portainer.init.endpoint');
-      // }
-
       if (endpoints.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
@@ -103,15 +63,6 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
       } else {
         $state.go('portainer.home');
       }
-
-      // if (endpoints.length > 0)  {
-      //   redirectToDashboard(endpoints[0]);
-      // } else if (endpoints.length === 0 && userDetails.role === 1) {
-      //   $state.go('portainer.init.endpoint');
-      // } else if (endpoints.length === 0 && userDetails.role === 2) {
-      //   Authentication.logout();
-      //   $scope.state.AuthenticationError = 'User not allowed. Please contact your administrator.';
-      // }
     })
     .catch(function error() {
       $scope.state.AuthenticationError = 'Invalid credentials';

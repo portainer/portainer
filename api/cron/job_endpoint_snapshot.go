@@ -29,13 +29,17 @@ func (job endpointSnapshotJob) Snapshot() error {
 	}
 
 	for _, endpoint := range endpoints {
+		if endpoint.Type == portainer.AzureEnvironment {
+			continue
+		}
+
 		snapshot, err := job.snapshotter.CreateSnapshot(&endpoint)
+		endpoint.Status = portainer.EndpointStatusUp
 		if err != nil {
 			log.Printf("cron error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 			endpoint.Status = portainer.EndpointStatusDown
 		}
 
-		// TODO: at the moment, only persist one snapshot
 		if snapshot != nil {
 			endpoint.Snapshots = []portainer.Snapshot{*snapshot}
 		}
@@ -50,8 +54,6 @@ func (job endpointSnapshotJob) Snapshot() error {
 }
 
 func (job endpointSnapshotJob) Run() {
-	// TODO: should be a debug statement
-	log.Println("cron: snapshot job started")
 	err := job.Snapshot()
 	if err != nil {
 		log.Printf("cron error: snapshot job error (err=%s)\n", err)
