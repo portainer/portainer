@@ -715,10 +715,13 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .log_viewer {
   height:100%;
   overflow-y: scroll;
-  white-space: pre-wrap;
   color: black;
   font-size: .85em;
   background-color: white;
+}
+
+.log_viewer.wrap_lines {
+  white-space: pre-wrap;
 }
 
 .log_viewer .inner_line {
