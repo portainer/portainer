@@ -201,9 +201,7 @@ type (
 		AzureCredentials AzureCredentials    `json:"AzureCredentials,omitempty"`
 		Tags             []string            `json:"Tags"`
 		Status           EndpointStatus      `json:"Status"`
-		// TODO: determine if it's good to store Snapshots inside a slice here
-		// instead of persisting them in their own bucket (long-term vision)
-		Snapshots []Snapshot `json:"Snapshots"`
+		Snapshots        []Snapshot          `json:"Snapshots"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
