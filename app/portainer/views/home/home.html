@@ -7,49 +7,31 @@
   <rd-header-content>Endpoints</rd-header-content>
 </rd-header>
 
-<div class="row">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="col-sm-12 form-section-title">
-          Information
-        </div>
-        <div class="form-group" ng-if="!isAdmin && endpoints.length === 0">
-          <span class="small">
-            <p class="text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              You do not have access to any environment. Please contact your administrator.
-            </p>
-          </span>
-        </div>
-        <div class="form-group" ng-if="isAdmin && applicationState.application.snapshot">
-          <span class="small">
-            <p class="text-muted">
-              Endpoint snapshot is enabled, a snapshot of each endpoint will be triggered every <code>{{ applicationState.application.snapshotInterval }}</code>.
-              The snapshot frequency can be updated in the <a ui-sref="portainer.settings"><i class="fa fa-cogs" aria-hidden="true"></i> settings</a>.
-            </p>
-          </span>
-        </div>
-        <div class="form-group" ng-if="isAdmin && !applicationState.application.snapshot">
-          <span class="small">
-            <p class="text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              Endpoint snapshot is disabled.
-            </p>
-          </span>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
+<information-panel title-text="Information" ng-if="!isAdmin && endpoints.length === 0">
+  <span class="small">
+    <p class="text-muted">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      You do not have access to any environment. Please contact your administrator.
+    </p>
+  </span>
+</information-panel>
 
-<div class="row" ng-if="endpoints">
+<information-panel title-text="Information" ng-if="isAdmin && !applicationState.application.snapshot">
+  <span class="small">
+    <p class="text-muted">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      Endpoint snapshot is disabled.
+    </p>
+  </span>
+</information-panel>
+
+<div class="row" ng-if="endpoints.length > 0">
   <div class="col-sm-12">
     <endpoints-snapshot-datatable
-    title-text="Endpoints" title-icon="fa-plug"
-    dataset="endpoints" table-key="endpoints"
-    order-by="Name" show-text-filter="true"
-    dashboard-action="goToDashboard"
+      title-text="Endpoints" title-icon="fa-plug"
+      dataset="endpoints" table-key="endpoints"
+      order-by="Name"
+      dashboard-action="goToDashboard"
     ></endpoints-snapshot-datatable>
   </div>
 </div>

@@ -9,10 +9,8 @@
   </div>
   <div class="sidebar-content">
   <ul class="sidebar">
-    <li class="sidebar-title home">
-      <a ui-sref="portainer.home" ui-sref-active="active">
-        <i class="fa fa-home" aria-hidden="true"></i> Home
-      </a>
+    <li class="sidebar-list">
+      <a ui-sref="portainer.home" ui-sref-active="active">Home <span class="menu-icon fa fa-home fa-fw"></span></a>
     </li>
     <li class="sidebar-title" ng-if="applicationState.endpoint.name"><span class="endpoint-name">{{ applicationState.endpoint.name }}</span></li>
     <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'">

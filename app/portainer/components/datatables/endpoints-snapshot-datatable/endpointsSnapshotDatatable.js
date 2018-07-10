@@ -8,7 +8,6 @@ angular.module('portainer.app').component('endpointsSnapshotDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showTextFilter: '<',
     dashboardAction: '<'
   }
 });

@@ -22,6 +22,7 @@ func NewSnapshotter(signatureService portainer.DigitalSignatureService) *Snapsho
 	}
 }
 
+// TODO: refactor
 func (snapshotter *Snapshotter) createClient(endpoint *portainer.Endpoint) (*client.Client, error) {
 
 	if strings.HasPrefix(endpoint.URL, "unix://") {
@@ -65,12 +66,6 @@ func (snapshotter *Snapshotter) createClient(endpoint *portainer.Endpoint) (*cli
 			client.WithHTTPHeaders(headers),
 		)
 	}
-
-	// TODO: define a client for each type of endpoints
-	// Local (unix), broken
-	// Remote (http), current setup works
-	// Remote (https), current works
-	// Agent (https, self signed), not tested
 
 	return client.NewClientWithOpts(
 		client.WithHost(endpoint.URL),

@@ -30,8 +30,9 @@
 }
 
 .datatable .searchBar {
-  border-top: 1px solid #f6f6f6;
-  padding: 10px;
+  border-top: 1px solid #d2d1d1;
+  border-bottom: 1px solid #d2d1d1;
+  padding: 8px;
 }
 
 .datatable .searchInput {

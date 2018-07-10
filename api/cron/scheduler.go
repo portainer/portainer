@@ -47,6 +47,12 @@ func (scheduler *JobScheduler) ScheduleEndpointSyncJob(endpointFilePath string, 
 // ScheduleSnapshotJob schedules a cron job to create endpoint snapshots
 func (scheduler *JobScheduler) ScheduleSnapshotJob(interval string) error {
 	job := newEndpointSnapshotJob(scheduler.endpointService, scheduler.snapshotter)
+
+	err := job.Snapshot()
+	if err != nil {
+		return err
+	}
+
 	return scheduler.cron.AddJob("@every "+interval, job)
 }
 

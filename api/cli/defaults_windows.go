@@ -16,6 +16,6 @@ const (
 	defaultSSLKeyPath       = "C:\\certs\\portainer.key"
 	defaultSyncInterval     = "60s"
 	defaultSnapshot         = "true"
-	defaultSnapshotInterval = "15m"
+	defaultSnapshotInterval = "5m"
 	defaultTemplateFile     = "/templates.json"
 )
