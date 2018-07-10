@@ -59,16 +59,11 @@
               <td>{{ item.GroupName }}</td>
               <td>
                 <span class="label label-{{ item.Status|endpointstatusbadge }}">{{ item.Status === 1 ? 'up' : 'down' }}</span>
-                <span class="text-muted space-left" ng-if="item.Snapshots.length > 0">
-                  <i class="fa fa-memory" aria-hidden="true"></i> {{ item.Snapshots[0].TotalMemory | humansize }}
-                  <i class="fa fa-microchip" aria-hidden="true"></i> {{ item.Snapshots[0].TotalCPU }}
-              </span>
               </td>
               <td>
                 <span>
                   <i ng-class="item.Type | endpointtypeicon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  {{ item.Type | endpointtypename }}
-                  <span class="text-muted" ng-if="item.Snapshots.length > 0">- {{ item.Snapshots[0].Swarm ? 'Swarm' : 'Standalone' }} {{ item.Snapshots[0].DockerVersion }}</span>
+                  {{ item.Type | endpointtypename }}                  
                 </span>
               </td>
               <td>
