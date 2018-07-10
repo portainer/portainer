@@ -4,17 +4,16 @@ import (
 	"log"
 
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/docker"
 )
 
 type (
 	endpointSnapshotJob struct {
 		endpointService portainer.EndpointService
-		snapshotter     *docker.Snapshotter
+		snapshotter     portainer.Snapshotter
 	}
 )
 
-func newEndpointSnapshotJob(endpointService portainer.EndpointService, snapshotter *docker.Snapshotter) endpointSnapshotJob {
+func newEndpointSnapshotJob(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) endpointSnapshotJob {
 	return endpointSnapshotJob{
 		endpointService: endpointService,
 		snapshotter:     snapshotter,

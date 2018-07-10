@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/cli"
 	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/docker"
 	"github.com/portainer/portainer/exec"
 	"github.com/portainer/portainer/filesystem"
 	"github.com/portainer/portainer/git"
@@ -101,8 +102,29 @@ func initGitService() portainer.GitService {
 	return &git.Service{}
 }
 
-func initJobScheduler(endpointService portainer.EndpointService, signatureService portainer.DigitalSignatureService) portainer.JobScheduler {
-	return cron.NewJobScheduler(endpointService, signatureService)
+func initClientFactory(signatureService portainer.DigitalSignatureService) *docker.ClientFactory {
+	return docker.NewClientFactory(signatureService)
+}
+
+func initJobScheduler(endpointService portainer.EndpointService, clientFactory *docker.ClientFactory, flags *portainer.CLIFlags) (portainer.JobScheduler, error) {
+	jobScheduler := cron.NewJobScheduler(endpointService, clientFactory)
+
+	if *flags.ExternalEndpoints != "" {
+		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
+		err := jobScheduler.ScheduleEndpointSyncJob(*flags.ExternalEndpoints, *flags.SyncInterval)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if *flags.Snapshot {
+		err := jobScheduler.ScheduleSnapshotJob(*flags.SnapshotInterval)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return jobScheduler, nil
 }
 
 func initStatus(endpointManagement, snapshot bool, flags *portainer.CLIFlags) *portainer.Status {
@@ -362,44 +384,21 @@ func main() {
 
 	gitService := initGitService()
 
-	jobScheduler := initJobScheduler(store.EndpointService, digitalSignatureService)
+	clientFactory := initClientFactory(digitalSignatureService)
 
-	// TODO: refactor into a function
-	endpointManagement := true
-	if *flags.ExternalEndpoints != "" {
-		endpointManagement = false
-		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
-		err := jobScheduler.ScheduleEndpointSyncJob(*flags.ExternalEndpoints, *flags.SyncInterval)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	// authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
-	// func initEndpointWatcher(endpointService portainer.EndpointService, externalEnpointFile string, syncInterval string) bool {
-	// 	authorizeEndpointMgmt := true
-	// 	if externalEnpointFile != "" {
-	// 		authorizeEndpointMgmt = false
-	// 		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
-	// 		endpointWatcher := cron.NewWatcher(endpointService, syncInterval)
-	// 		err := endpointWatcher.WatchEndpointFile(externalEnpointFile)
-	// 		if err != nil {
-	// 			log.Fatal(err)
-	// 		}
-	// 	}
-	// 	return authorizeEndpointMgmt
-	// }
-
-	if *flags.Snapshot {
-		err := jobScheduler.ScheduleSnapshotJob(*flags.SnapshotInterval)
-		if err != nil {
-			log.Fatal(err)
-		}
+	jobScheduler, err := initJobScheduler(store.EndpointService, clientFactory, flags)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	jobScheduler.Start()
 
-	err := initKeyPair(fileService, digitalSignatureService)
+	endpointManagement := true
+	if *flags.ExternalEndpoints != "" {
+		endpointManagement = false
+	}
+
+	err = initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
 		log.Fatal(err)
 	}

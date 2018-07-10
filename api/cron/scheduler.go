@@ -10,21 +10,20 @@ import (
 
 // JobScheduler represents a service for managing crons.
 type JobScheduler struct {
-	cron             *cron.Cron
-	endpointService  portainer.EndpointService
-	signatureService portainer.DigitalSignatureService
-	snapshotter      *docker.Snapshotter
+	cron            *cron.Cron
+	endpointService portainer.EndpointService
+	snapshotter     portainer.Snapshotter
 
 	endpointFilePath     string
 	endpointSyncInterval string
 }
 
 // NewJobScheduler initializes a new service.
-func NewJobScheduler(endpointService portainer.EndpointService, signatureService portainer.DigitalSignatureService) *JobScheduler {
+func NewJobScheduler(endpointService portainer.EndpointService, clientFactory *docker.ClientFactory) *JobScheduler {
 	return &JobScheduler{
 		cron:            cron.New(),
 		endpointService: endpointService,
-		snapshotter:     docker.NewSnapshotter(signatureService),
+		snapshotter:     docker.NewSnapshotter(clientFactory),
 	}
 }
 
