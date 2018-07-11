@@ -12,7 +12,9 @@
     <li class="sidebar-list">
       <a ui-sref="portainer.home" ui-sref-active="active">Home <span class="menu-icon fa fa-home fa-fw"></span></a>
     </li>
-    <li class="sidebar-title" ng-if="applicationState.endpoint.name"><span class="endpoint-name">{{ applicationState.endpoint.name }}</span></li>
+    <li class="sidebar-title endpoint-name" ng-if="applicationState.endpoint.name">
+      <span class="fa fa-plug space-right"></span>{{ applicationState.endpoint.name }}
+    </li>
     <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'">
     </azure-sidebar-content>
     <docker-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider !== 'AZURE'"
