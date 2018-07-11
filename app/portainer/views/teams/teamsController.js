@@ -2,8 +2,6 @@ angular.module('portainer.app')
 .controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Authentication',
 function ($q, $scope, $state, TeamService, UserService, ModalService, Notifications, Authentication) {
   $scope.state = {
-    userGroupGroupCreationError: '',
-    validName: false,
     actionInProgress: false
   };
 
@@ -12,7 +10,7 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
     Leaders: []
   };
 
-  $scope.checkNameValidity = function() {
+  $scope.checkNameValidity = function(form) {
     var valid = true;
     for (var i = 0; i < $scope.teams.length; i++) {
       if ($scope.formValues.Name === $scope.teams[i].Name) {
@@ -20,19 +18,17 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
         break;
       }
     }
-    $scope.state.validName = valid;
-    $scope.state.teamCreationError = valid ? '' : 'Team name already existing';
+    form.team_name.$setValidity('validName', valid);
   };
 
   $scope.addTeam = function() {
-    $scope.state.actionInProgress = true;
-    $scope.state.teamCreationError = '';
     var teamName = $scope.formValues.Name;
     var leaderIds = [];
     angular.forEach($scope.formValues.Leaders, function(user) {
       leaderIds.push(user.Id);
     });
 
+    $scope.state.actionInProgress = true;
     TeamService.createTeam(teamName, leaderIds)
     .then(function success(data) {
       Notifications.success('Team successfully created', teamName);

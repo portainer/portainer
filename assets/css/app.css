@@ -123,6 +123,10 @@ a[ng-click]{
   color: #337ab7;
 }
 
+.text-warning {
+  color: #f0ad4e;
+}
+
 .widget .widget-body table tbody .image-tag {
   font-size: 90% !important;
   margin-right: 5px;
