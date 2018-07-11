@@ -13,14 +13,19 @@
       <rd-widget-header icon="fa-plus" title-text="Add a new team">
       </rd-widget-header>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="teamCreationForm" ng-submit="addTeam()">
           <!-- name-input -->
           <div class="form-group">
-            <label for="teamname" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-9">
-              <div class="input-group">
-                <input type="text" class="form-control" id="teamname" ng-model="formValues.Name" ng-change="checkNameValidity()" placeholder="e.g. development" auto-focus>
-                <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[state.validName]" aria-hidden="true"></i></span>
+            <label for="team_name" class="col-sm-2 control-label text-left">Name</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="team_name" name="team_name" ng-model="formValues.Name" ng-change="checkNameValidity(teamCreationForm)" placeholder="e.g. development" auto-focus required>
+            </div>
+          </div>
+          <div class="form-group" ng-show="teamCreationForm.team_name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="teamCreationForm.team_name.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="validName"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This team already exists.</p>
               </div>
             </div>
           </div>
@@ -49,13 +54,10 @@
           <!-- !team-leaders -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !state.validName || formValues.Name === ''" ng-click="addTeam()" button-spinner="state.actionInProgress">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !teamCreationForm.$valid" ng-click="addTeam()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create team</span>
                 <span ng-show="state.actionInProgress">Creating team...</span>
               </button>
-              <span class="text-danger" ng-if="state.teamCreationError" style="margin: 5px;">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ state.teamCreationError }}
-              </span>
             </div>
           </div>
         </form>
