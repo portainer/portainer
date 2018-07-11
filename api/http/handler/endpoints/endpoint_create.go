@@ -2,8 +2,8 @@ package endpoints
 
 import (
 	"net/http"
+	"runtime"
 	"strconv"
-	"strings"
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
@@ -109,7 +109,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		}
 		payload.AzureAuthenticationKey = azureAuthenticationKey
 	default:
-		url, err := request.RetrieveMultiPartFormValue(r, "URL", false)
+		url, err := request.RetrieveMultiPartFormValue(r, "URL", true)
 		if err != nil {
 			return portainer.Error("Invalid endpoint URL")
 		}
@@ -192,7 +192,13 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointType := portainer.DockerEnvironment
 
-	if !strings.HasPrefix(payload.URL, "unix://") {
+	if payload.Name == "local" && payload.URL == "" {
+		if runtime.GOOS == "windows" {
+			payload.URL = "npipe:////./pipe/docker_engine"
+		} else {
+			payload.URL = "unix:///var/run/docker.sock"
+		}
+	} else {
 		agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.URL, nil)
 		if err != nil {
 			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to ping Docker environment", err}

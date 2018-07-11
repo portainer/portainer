@@ -16,8 +16,8 @@ import (
 type Service struct{}
 
 const (
-	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix:// or tcp://")
-	errSocketNotFound                = portainer.Error("Unable to locate Unix socket")
+	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
+	errSocketNotFound                = portainer.Error("Unable to locate filesystem socket")
 	errEndpointsFileNotFound         = portainer.Error("Unable to locate external endpoints file")
 	errTemplateFileNotFound          = portainer.Error("Unable to locate template file on disk")
 	errInvalidSyncInterval           = portainer.Error("Invalid synchronization interval")
@@ -116,12 +116,13 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 
 func validateEndpointURL(endpointURL string) error {
 	if endpointURL != "" {
-		if !strings.HasPrefix(endpointURL, "unix://") && !strings.HasPrefix(endpointURL, "tcp://") {
+		if !strings.HasPrefix(endpointURL, "unix://") && !strings.HasPrefix(endpointURL, "tcp://") && !strings.HasPrefix(endpointURL, "npipe://") {
 			return errInvalidEndpointProtocol
 		}
 
-		if strings.HasPrefix(endpointURL, "unix://") {
+		if strings.HasPrefix(endpointURL, "unix://") || strings.HasPrefix(endpointURL, "npipe://") {
 			socketPath := strings.TrimPrefix(endpointURL, "unix://")
+			socketPath = strings.TrimPrefix(socketPath, "npipe://")
 			if _, err := os.Stat(socketPath); err != nil {
 				if os.IsNotExist(err) {
 					return errSocketNotFound

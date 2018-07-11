@@ -164,22 +164,32 @@ func createDial(endpoint *portainer.Endpoint) (net.Conn, error) {
 		return nil, err
 	}
 
-	var host string
-	if url.Scheme == "tcp" {
-		host = url.Host
-	} else if url.Scheme == "unix" {
+	host := url.Host
+
+	if url.Scheme == "unix" || url.Scheme == "npipe" {
 		host = url.Path
 	}
+
+	var (
+		dial    net.Conn
+		dialErr error
+	)
 
 	if endpoint.TLSConfig.TLS {
 		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
 		if err != nil {
 			return nil, err
 		}
-		return tls.Dial(url.Scheme, host, tlsConfig)
+		dial, dialErr = tls.Dial(url.Scheme, host, tlsConfig)
+	} else {
+		if url.Scheme == "npipe" {
+			dial, dialErr = createWinDial(host)
+		} else {
+			dial, dialErr = net.Dial(url.Scheme, host)
+		}
 	}
 
-	return net.Dial(url.Scheme, host)
+	return dial, dialErr
 }
 
 func createExecStartRequest(execID string) (*http.Request, error) {

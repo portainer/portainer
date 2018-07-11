@@ -51,8 +51,7 @@ func (manager *Manager) createDockerProxy(endpointURL *url.URL, tlsConfig *porta
 		}
 		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false), nil
 	}
-	// Assume unix:// scheme
-	return manager.proxyFactory.newDockerSocketProxy(endpointURL.Path), nil
+	return manager.proxyFactory.newLocalProxy(endpointURL.Path), nil
 }
 
 func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
