@@ -8,7 +8,6 @@ angular.module('portainer.docker').component('imagesDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showTextFilter: '<',
     showHostColumn: '<',
     removeAction: '<',
     forceRemoveAction: '<'
