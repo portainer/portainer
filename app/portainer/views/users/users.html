@@ -22,7 +22,7 @@
             </label>
             <div class="col-sm-8">
               <div class="input-group">
-                <input type="text" class="form-control" id="username" ng-model="formValues.Username" ng-change="checkUsernameValidity()" placeholder="e.g. jdoe">
+                <input type="text" class="form-control" id="username" ng-model="formValues.Username" ng-change="checkUsernameValidity()" placeholder="e.g. jdoe" auto-focus>
                 <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[state.validUsername]" aria-hidden="true"></i></span>
               </div>
             </div>
@@ -117,7 +117,7 @@
     <users-datatable
     title-text="Users" title-icon="fa-user"
     dataset="users" table-key="users"
-    order-by="Username" show-text-filter="true"
+    order-by="Username"
     authentication-method="AuthenticationMethod"
     remove-action="removeAction"
     ></users-datatable>
