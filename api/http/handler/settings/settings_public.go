@@ -13,6 +13,7 @@ type publicSettingsResponse struct {
 	AuthenticationMethod               portainer.AuthenticationMethod `json:"AuthenticationMethod"`
 	AllowBindMountsForRegularUsers     bool                           `json:"AllowBindMountsForRegularUsers"`
 	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
+	SnapshotInterval                   string                         `json:"SnapshotInterval"`
 }
 
 // GET request on /api/settings/public
@@ -27,6 +28,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AuthenticationMethod:               settings.AuthenticationMethod,
 		AllowBindMountsForRegularUsers:     settings.AllowBindMountsForRegularUsers,
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
+		SnapshotInterval:                   settings.SnapshotInterval,
 	}
 
 	return response.JSON(w, publicSettings)

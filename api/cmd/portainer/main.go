@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/cli"
 	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/docker"
 	"github.com/portainer/portainer/exec"
 	"github.com/portainer/portainer/filesystem"
 	"github.com/portainer/portainer/git"
@@ -101,25 +102,37 @@ func initGitService() portainer.GitService {
 	return &git.Service{}
 }
 
-func initEndpointWatcher(endpointService portainer.EndpointService, externalEnpointFile string, syncInterval string) bool {
-	authorizeEndpointMgmt := true
-	if externalEnpointFile != "" {
-		authorizeEndpointMgmt = false
-		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
-		endpointWatcher := cron.NewWatcher(endpointService, syncInterval)
-		err := endpointWatcher.WatchEndpointFile(externalEnpointFile)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	return authorizeEndpointMgmt
+func initClientFactory(signatureService portainer.DigitalSignatureService) *docker.ClientFactory {
+	return docker.NewClientFactory(signatureService)
 }
 
-func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portainer.Status {
+func initJobScheduler(endpointService portainer.EndpointService, clientFactory *docker.ClientFactory, flags *portainer.CLIFlags) (portainer.JobScheduler, error) {
+	jobScheduler := cron.NewJobScheduler(endpointService, clientFactory)
+
+	if *flags.ExternalEndpoints != "" {
+		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
+		err := jobScheduler.ScheduleEndpointSyncJob(*flags.ExternalEndpoints, *flags.SyncInterval)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if *flags.Snapshot {
+		err := jobScheduler.ScheduleSnapshotJob(*flags.SnapshotInterval)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return jobScheduler, nil
+}
+
+func initStatus(endpointManagement, snapshot bool, flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
 		Analytics:          !*flags.NoAnalytics,
 		Authentication:     !*flags.NoAuth,
-		EndpointManagement: authorizeEndpointMgmt,
+		EndpointManagement: endpointManagement,
+		Snapshot:           snapshot,
 		Version:            portainer.APIVersion,
 	}
 }
@@ -154,6 +167,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			},
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,
+			SnapshotInterval:                   *flags.SnapshotInterval,
 		}
 
 		if *flags.Labels != nil {
@@ -283,6 +297,8 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
 		Tags:            []string{},
+		Status:          portainer.EndpointStatusUp,
+		Snapshots:       []portainer.Snapshot{},
 	}
 
 	if strings.HasPrefix(endpoint.URL, "tcp://") {
@@ -322,6 +338,8 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
 		Tags:            []string{},
+		Status:          portainer.EndpointStatusUp,
+		Snapshots:       []portainer.Snapshot{},
 	}
 
 	return endpointService.CreateEndpoint(endpoint)
@@ -366,9 +384,21 @@ func main() {
 
 	gitService := initGitService()
 
-	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
+	clientFactory := initClientFactory(digitalSignatureService)
 
-	err := initKeyPair(fileService, digitalSignatureService)
+	jobScheduler, err := initJobScheduler(store.EndpointService, clientFactory, flags)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	jobScheduler.Start()
+
+	endpointManagement := true
+	if *flags.ExternalEndpoints != "" {
+		endpointManagement = false
+	}
+
+	err = initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -395,7 +425,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	applicationStatus := initStatus(authorizeEndpointMgmt, flags)
+	applicationStatus := initStatus(endpointManagement, *flags.Snapshot, flags)
 
 	err = initEndpoint(flags, store.EndpointService)
 	if err != nil {
@@ -443,7 +473,7 @@ func main() {
 		BindAddress:            *flags.Addr,
 		AssetsPath:             *flags.Assets,
 		AuthDisabled:           *flags.NoAuth,
-		EndpointManagement:     authorizeEndpointMgmt,
+		EndpointManagement:     endpointManagement,
 		UserService:            store.UserService,
 		TeamService:            store.TeamService,
 		TeamMembershipService:  store.TeamMembershipService,
@@ -464,6 +494,7 @@ func main() {
 		LDAPService:            ldapService,
 		GitService:             gitService,
 		SignatureService:       digitalSignatureService,
+		JobScheduler:           jobScheduler,
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,

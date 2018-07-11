@@ -311,8 +311,10 @@ ul.sidebar .sidebar-title {
   height: auto;
 }
 
-ul.sidebar .sidebar-title .endpoint-name {
+ul.sidebar .sidebar-title.endpoint-name {
   color: #fff;
+  text-align: center;
+  text-indent: 0;
 }
 
 ul.sidebar .sidebar-list a {
