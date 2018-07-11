@@ -141,13 +141,6 @@ function (PaginationService, DatatableService, EndpointProvider) {
     PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
-  this.updateDisplayTextFilter = function() {
-    this.state.displayTextFilter = !this.state.displayTextFilter;
-    if (!this.state.displayTextFilter) {
-      delete this.state.textFilter;
-    }
-  };
-
   this.applyFilters = function(value, index, array) {
     var container = value;
     var filters = ctrl.filters;

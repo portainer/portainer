@@ -6,9 +6,6 @@
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
         <div class="settings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
-            <i class="fa fa-search" aria-hidden="true"></i> Search
-          </span>
           <span class="setting" ng-class="{ 'setting-active': $ctrl.columnVisibility.state.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.columnVisibility.state.open">
               <span uib-dropdown-toggle ><i class="fa fa-columns space-right" aria-hidden="true"></i>Columns</span>
               <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
@@ -110,7 +107,7 @@
         no-paused-items-selected="$ctrl.state.noPausedItemsSelected"
         show-add-action="$ctrl.showAddAction"
       ></containers-datatable-actions>
-      <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
+      <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
       </div>

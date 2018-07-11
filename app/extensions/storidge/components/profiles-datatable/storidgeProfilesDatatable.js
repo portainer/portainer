@@ -8,7 +8,6 @@ angular.module('extension.storidge').component('storidgeProfilesDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showTextFilter: '<',
     removeAction: '<'
   }
 });

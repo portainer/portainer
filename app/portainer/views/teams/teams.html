@@ -19,7 +19,7 @@
             <label for="teamname" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-9">
               <div class="input-group">
-                <input type="text" class="form-control" id="teamname" ng-model="formValues.Name" ng-change="checkNameValidity()" placeholder="e.g. development">
+                <input type="text" class="form-control" id="teamname" ng-model="formValues.Name" ng-change="checkNameValidity()" placeholder="e.g. development" auto-focus>
                 <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[state.validName]" aria-hidden="true"></i></span>
               </div>
             </div>
@@ -69,7 +69,7 @@
     <teams-datatable
     title-text="Teams" title-icon="fa-users"
     dataset="teams" table-key="teams"
-    order-by="Name" show-text-filter="true"
+    order-by="Name"
     remove-action="removeAction"
     ></teams-datatable>
   </div>
