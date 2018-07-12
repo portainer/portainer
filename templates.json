@@ -410,30 +410,6 @@
   },
   {
     "type": 1,
-    "title": "WordPress",
-    "description": "A free and open-source CMS",
-    "categories": ["CMS"],
-    "platform": "linux",
-    "logo": "https://portainer.io/images/logos/wordpress.png",
-    "image": "wordpress:latest",
-    "env": [
-      {
-        "name": "WORDPRESS_DB_HOST",
-        "label": "MySQL database host",
-        "type": "container"
-      },
-      {
-        "name": "WORDPRESS_DB_PASSWORD",
-        "label": "Database password"
-      }
-    ],
-    "ports": [
-      "80/tcp"
-    ],
-    "volumes": [{"container": "/var/www/html"}]
-  },
-  {
-    "type": 1,
     "title": "Joomla",
     "description": "Another free and open-source CMS",
     "categories": ["CMS"],
@@ -777,7 +753,27 @@
     },
     "env": [
       {
-        "name": "MYSQL_ROOT_PASSWORD",
+        "name": "MYSQL_DATABASE_PASSWORD",
+        "label": "Database root password",
+        "description": "Password used by the MySQL root user."
+      }
+    ]
+  },
+  {
+    "type": 3,
+    "title": "Wordpress",
+    "description": "Wordpress setup with a MySQL database",
+    "note": "Deploys a Wordpress instance connected to a MySQL database.",
+    "categories": ["CMS"],
+    "platform": "linux",
+    "logo": "https://portainer.io/images/logos/wordpress.png",
+    "repository": {
+      "url": "https://github.com/portainer/templates",
+      "stackfile": "stacks/wordpress/docker-compose.yml"
+    },
+    "env": [
+      {
+        "name": "MYSQL_DATABASE_PASSWORD",
         "label": "Database root password",
         "description": "Password used by the MySQL root user."
       }
@@ -826,12 +822,6 @@
       {
         "name": "SPM_TOKEN",
         "label": "SPM monitoring token"
-      }
-    ],
-    "volumes": [
-      {
-        "container": "/var/run/docker.sock",
-        "bind": "/var/run/docker.sock"
       }
     ]
   }
