@@ -164,7 +164,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     $scope.state.actionInProgress = true;
     if (template.Type === 2) {
       createStackFromTemplate(template, userId, accessControlData);
-    } if (template.Type === 3) {
+    } else if (template.Type === 3) {
       createComposeStackFromTemplate(template, userId, accessControlData);
     } else {
       createContainerFromTemplate(template, userId, accessControlData);
