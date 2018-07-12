@@ -376,13 +376,18 @@ func main() {
 
 	jwtService := initJWTService(!*flags.NoAuth)
 
+	ldapService := initLDAPService()
+
+	gitService := initGitService()
+
 	cryptoService := initCryptoService()
 
 	digitalSignatureService := initDigitalSignatureService()
 
-	ldapService := initLDAPService()
-
-	gitService := initGitService()
+	err := initKeyPair(fileService, digitalSignatureService)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	clientFactory := initClientFactory(digitalSignatureService)
 
@@ -396,11 +401,6 @@ func main() {
 	endpointManagement := true
 	if *flags.ExternalEndpoints != "" {
 		endpointManagement = false
-	}
-
-	err = initKeyPair(fileService, digitalSignatureService)
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
