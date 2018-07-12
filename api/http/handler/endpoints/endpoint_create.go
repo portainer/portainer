@@ -192,11 +192,10 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointType := portainer.DockerEnvironment
 
-	if payload.Name == "local" && payload.URL == "" {
+	if payload.URL == "" {
+		payload.URL = "unix:///var/run/docker.sock"
 		if runtime.GOOS == "windows" {
 			payload.URL = "npipe:////./pipe/docker_engine"
-		} else {
-			payload.URL = "unix:///var/run/docker.sock"
 		}
 	} else {
 		agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.URL, nil)

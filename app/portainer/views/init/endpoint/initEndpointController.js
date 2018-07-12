@@ -30,7 +30,7 @@ function ($scope, $state, EndpointService, StateManager, Notifications) {
 
   $scope.createLocalEndpoint = function() {
     var name = 'local';
-	var URL = '';
+    var URL = '';
     var endpoint;
 
     $scope.state.actionInProgress = true;
