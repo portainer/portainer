@@ -65,14 +65,15 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
   }
 
   function createComposeStack(name, method) {
+    var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
     var endpointId = EndpointProvider.endpointID();
 
     if (method === 'editor') {
       var stackFileContent = $scope.formValues.StackFileContent;
-      return StackService.createComposeStackFromFileContent(name, stackFileContent, endpointId);
+      return StackService.createComposeStackFromFileContent(name, stackFileContent, env, endpointId);
     } else if (method === 'upload') {
       var stackFile = $scope.formValues.StackFile;
-      return StackService.createComposeStackFromFileUpload(name, stackFile, endpointId);
+      return StackService.createComposeStackFromFileUpload(name, stackFile, env, endpointId);
     } else if (method === 'repository') {
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
@@ -81,7 +82,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
         RepositoryUsername: $scope.formValues.RepositoryUsername,
         RepositoryPassword: $scope.formValues.RepositoryPassword
       };
-      return StackService.createComposeStackFromGitRepository(name, repositoryOptions, endpointId);
+      return StackService.createComposeStackFromGitRepository(name, repositoryOptions, env, endpointId);
     }
   }
 

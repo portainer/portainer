@@ -15,6 +15,7 @@ import (
 
 type updateComposeStackPayload struct {
 	StackFileContent string
+	Env              []portainer.Pair
 }
 
 func (payload *updateComposeStackPayload) Validate(r *http.Request) error {
@@ -111,6 +112,8 @@ func (handler *Handler) updateComposeStack(r *http.Request, stack *portainer.Sta
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
+
+	stack.Env = payload.Env
 
 	stackFolder := strconv.Itoa(int(stack.ID))
 	_, err = handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))

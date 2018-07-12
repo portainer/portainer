@@ -41,12 +41,13 @@ angular.module('portainer.app')
     });
   };
 
-  service.createComposeStack = function(stackName, file, endpointId) {
+  service.createComposeStack = function(stackName, file, env, endpointId) {
     return Upload.upload({
       url: 'api/stacks?method=file&type=2&endpointId=' + endpointId,
       data: {
         file: file,
-        Name: stackName
+        Name: stackName,
+        Env: Upload.json(env)
       },
       ignoreLoadingBar: true
     });

@@ -94,13 +94,20 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
   function createComposeStackFromTemplate(template, userId, accessControlData) {
     var stackName = $scope.formValues.name;
 
+    for (var i = 0; i < template.Env.length; i++) {
+      var envvar = template.Env[i];
+      if (envvar.preset) {
+        envvar.value = envvar.default;
+      }
+    }
+
     var repositoryOptions = {
       RepositoryURL: template.Repository.url,
       ComposeFilePathInRepository: template.Repository.stackfile
     };
 
     var endpointId = EndpointProvider.endpointID();
-    StackService.createComposeStackFromGitRepository(stackName, repositoryOptions, endpointId)
+    StackService.createComposeStackFromGitRepository(stackName, repositoryOptions, template.Env, endpointId)
     .then(function success(data) {
       return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, []);
     })
@@ -121,8 +128,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
 
     for (var i = 0; i < template.Env.length; i++) {
       var envvar = template.Env[i];
-      if (envvar.set) {
-        envvar.value = envvar.set;
+      if (envvar.preset) {
+        envvar.value = envvar.default;
       }
     }
 

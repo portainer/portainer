@@ -5,6 +5,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/portainer/libcompose/config"
 	"github.com/portainer/libcompose/docker"
 	"github.com/portainer/libcompose/docker/client"
 	"github.com/portainer/libcompose/docker/ctx"
@@ -35,10 +36,15 @@ func (manager *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portain
 		TLSCAFile:   endpoint.TLSCACertPath,
 		TLSCertFile: endpoint.TLSCertPath,
 		TLSKeyFile:  endpoint.TLSKeyPath,
-		APIVersion:  "1.24",
+		APIVersion:  portainer.SupportedDockerAPIVersion,
 	})
 	if err != nil {
 		return err
+	}
+
+	env := make(map[string]string)
+	for _, envvar := range stack.Env {
+		env[envvar.Name] = envvar.Value
 	}
 
 	composeFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
@@ -46,8 +52,15 @@ func (manager *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portain
 		ConfigDir: manager.dataPath,
 		Context: project.Context{
 			ComposeFiles: []string{composeFilePath},
-			EnvironmentLookup: &lookup.EnvfileLookup{
-				Path: filepath.Join(stack.ProjectPath, ".env"),
+			EnvironmentLookup: &lookup.ComposableEnvLookup{
+				Lookups: []config.EnvironmentLookup{
+					&lookup.EnvfileLookup{
+						Path: filepath.Join(stack.ProjectPath, ".env"),
+					},
+					&lookup.MapLookup{
+						Vars: env,
+					},
+				},
 			},
 			ProjectName: stack.Name,
 		},
@@ -69,7 +82,7 @@ func (manager *ComposeStackManager) Down(stack *portainer.Stack, endpoint *porta
 		TLSCAFile:   endpoint.TLSCACertPath,
 		TLSCertFile: endpoint.TLSCertPath,
 		TLSKeyFile:  endpoint.TLSKeyPath,
-		APIVersion:  "1.24",
+		APIVersion:  portainer.SupportedDockerAPIVersion,
 	})
 	if err != nil {
 		return err
