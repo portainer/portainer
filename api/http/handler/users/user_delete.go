@@ -26,6 +26,26 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusForbidden, "Cannot remove your own user account. Contact another administrator", portainer.ErrAdminCannotRemoveSelf}
 	}
 
+	users, err := handler.UserService.Users()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
+	}
+	var role portainer.UserRole
+	var password string
+	var adminsWithPassword = 0
+	for _, user := range users {
+		if portainer.UserID(userID) == user.ID {
+			role = user.Role
+			password = user.Password
+		}
+		if user.Role == portainer.AdministratorRole && user.Password != "" {
+			adminsWithPassword++
+		}
+	}
+	if role == portainer.AdministratorRole && password != "" && (adminsWithPassword-1) < 1 {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Cannot remove last local admin", portainer.ErrCannotRemoveLastLocalAdmin}
+	}
+
 	_, err = handler.UserService.User(portainer.UserID(userID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}

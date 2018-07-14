@@ -40,27 +40,30 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	u, err := handler.UserService.UserByUsername(payload.Username)
-	if err == portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid credentials", ErrInvalidCredentials}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
-	}
-
 	settings, err := handler.SettingsService.Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
 
-	if settings.AuthenticationMethod == portainer.AuthenticationLDAP && u.ID != 1 {
-		err = handler.LDAPService.AuthenticateUser(payload.Username, payload.Password, &settings.LDAPSettings)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate user via LDAP/AD", err}
+	u, err := handler.UserService.UserByUsername(payload.Username)
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
+	}
+
+	if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
+		u, err = handler.authLdap(u, payload.Username, payload.Password, settings)
+		if err != nil && err != portainer.ErrUnauthorized {
+			err = handler.authInternal(u, payload.Password)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", err}
+			}
+		} else if err != nil {
+			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", err}
 		}
 	} else {
-		err = handler.CryptoService.CompareHashAndData(u.Password, payload.Password)
+		err = handler.authInternal(u, payload.Password)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", ErrInvalidCredentials}
+			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", err}
 		}
 	}
 
@@ -76,4 +79,97 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	return response.JSON(w, &authenticateResponse{JWT: token})
+}
+
+func (handler *Handler) authInternal(user *portainer.User, password string) error {
+	if user == nil {
+		return portainer.Error("User not found")
+	}
+
+	err := handler.CryptoService.CompareHashAndData(user.Password, password)
+	if err != nil {
+		return portainer.Error("Incorrect password")
+	}
+	return nil
+}
+
+func (handler *Handler) authLdap(user *portainer.User, username string, password string, settings *portainer.Settings) (*portainer.User, error) {
+	err := handler.LDAPService.AuthenticateUser(username, password, &settings.LDAPSettings)
+	if err == nil {
+		return user, err
+	}
+
+	if user == nil {
+		user = &portainer.User{
+			Username: username,
+			Role:     portainer.StandardUserRole,
+		}
+		err = handler.UserService.CreateUser(user)
+		if err == nil {
+			user, err = handler.UserService.UserByUsername(username)
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	err = handler.addUserIntoTeams(user, settings)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (handler *Handler) addUserIntoTeams(user *portainer.User, settings *portainer.Settings) error {
+	teams, err := handler.TeamService.Teams()
+	if err != nil {
+		return err
+	}
+
+	userGroups, err := handler.LDAPService.GetUserGroups(user.Username, &settings.LDAPSettings)
+	if err != nil {
+		return err
+	}
+
+	userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
+	if err != nil {
+		return err
+	}
+
+	for _, team := range teams {
+		if teamExists(team.Name, userGroups) {
+
+			if teamMembershipExists(team.ID, userMemberships) {
+				continue
+			}
+
+			membership := &portainer.TeamMembership{
+				UserID: user.ID,
+				TeamID: team.ID,
+				Role:   portainer.TeamMember,
+			}
+
+			handler.TeamMembershipService.CreateTeamMembership(membership)
+		}
+	}
+	return nil
+}
+
+func teamExists(teamName string, ldapGroups []string) bool {
+	for _, group := range ldapGroups {
+		if group == teamName {
+			return true
+		}
+	}
+	return false
+}
+
+func teamMembershipExists(teamID portainer.TeamID, memberships []portainer.TeamMembership) bool {
+	for _, membership := range memberships {
+		if membership.TeamID == teamID {
+			return true
+		}
+	}
+	return false
 }

@@ -102,7 +102,7 @@ func (*Service) AuthenticateUser(username, password string, settings *portainer.
 
 	err = connection.Bind(userDN, password)
 	if err != nil {
-		return err
+		return portainer.ErrUnauthorized
 	}
 
 	return nil
